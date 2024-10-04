@@ -54,7 +54,7 @@ public class DefaultResidentMavenInvoker
             super.close();
         }
 
-        public LocalContext createShadow() {
+        public LocalContext copy(ResidentMavenInvokerRequest invokerRequest) {
             LocalContext shadow = new LocalContext((DefaultResidentMavenInvoker) invoker, invokerRequest);
 
             shadow.logger = logger;
@@ -122,10 +122,12 @@ public class DefaultResidentMavenInvoker
                         throw new InvokerException("Failed to init master context", e);
                     }
                 })
-                .createShadow();
+                .copy(invokerRequest);
     }
 
     protected String getContextId(ResidentMavenInvokerRequest invokerRequest) {
+        // TODO: in a moment Maven stop pushing user properties to system properties (and maybe something more)
+        // and allow multiple instances per JVM, this may become a pool?
         return "resident";
     }
 

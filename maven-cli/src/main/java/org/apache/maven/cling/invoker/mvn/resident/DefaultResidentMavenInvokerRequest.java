@@ -25,11 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.maven.api.cli.Logger;
+import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
-import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.mvn.DefaultMavenInvokerRequest;
 
 /**
@@ -41,14 +40,12 @@ public class DefaultResidentMavenInvokerRequest extends DefaultMavenInvokerReque
 
     @SuppressWarnings("ParameterNumber")
     public DefaultResidentMavenInvokerRequest(
-            String command,
+            ParserRequest parserRequest,
             Path cwd,
             Path installationDirectory,
             Path userHomeDirectory,
             Map<String, String> userProperties,
             Map<String, String> systemProperties,
-            Logger logger,
-            MessageBuilderFactory messageBuilderFactory,
             Path topDirectory,
             Path rootDirectory,
             InputStream in,
@@ -58,14 +55,12 @@ public class DefaultResidentMavenInvokerRequest extends DefaultMavenInvokerReque
             List<String> jvmArguments,
             ResidentMavenOptions options) {
         super(
-                command,
+                parserRequest,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
                 userProperties,
                 systemProperties,
-                logger,
-                messageBuilderFactory,
                 topDirectory,
                 rootDirectory,
                 in,

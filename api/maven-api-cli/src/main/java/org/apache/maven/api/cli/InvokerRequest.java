@@ -26,8 +26,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilderFactory;
 
 /**
@@ -38,15 +40,35 @@ import org.apache.maven.api.services.MessageBuilderFactory;
  *
  * @since 4.0.0
  */
+@Immutable
 @Experimental
 public interface InvokerRequest<O extends Options> {
     /**
-     * Returns the command to be executed.
-     *
-     * @return the command string
+     * The parser request this instance was created from.
      */
     @Nonnull
-    String command();
+    ParserRequest parserRequest();
+
+    /**
+     * Shorthand for {@link Logger} to use.
+     */
+    default Logger logger() {
+        return parserRequest().logger();
+    }
+
+    /**
+     * Shorthand for {@link MessageBuilderFactory}.
+     */
+    default MessageBuilderFactory messageBuilderFactory() {
+        return parserRequest().messageBuilderFactory();
+    }
+
+    /**
+     * Shorthand for {@link Lookup}.
+     */
+    default Lookup lookup() {
+        return parserRequest().lookup();
+    }
 
     /**
      * Returns the current working directory for the Maven execution.
@@ -92,24 +114,6 @@ public interface InvokerRequest<O extends Options> {
      */
     @Nonnull
     Map<String, String> systemProperties();
-
-    /**
-     * Returns the logger to be used during the early phases of Maven execution,
-     * before the main Maven logger is initialized.
-     *
-     * @return the early-phase logger
-     */
-    @Nonnull
-    Logger logger();
-
-    /**
-     * Returns the factory for creating message builders.
-     * Message builders are used for constructing formatted log messages.
-     *
-     * @return the message builder factory
-     */
-    @Nonnull
-    MessageBuilderFactory messageBuilderFactory();
 
     /**
      * Returns the top-level directory of the Maven invocation.

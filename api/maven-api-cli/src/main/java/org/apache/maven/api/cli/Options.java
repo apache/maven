@@ -196,12 +196,12 @@ public interface Options {
      *
      * @param printWriter the PrintWriter to use for output
      */
-    default void warnAboutDeprecatedOptions(@Nonnull PrintWriter printWriter) {}
+    default void warnAboutDeprecatedOptions(@Nonnull ParserRequest request, @Nonnull PrintWriter printWriter) {}
 
     /**
      * Displays help information for these options.
      *
      * @param printWriter the PrintWriter to use for output
      */
-    void displayHelp(@Nonnull String command, @Nonnull PrintWriter printWriter);
+    void displayHelp(@Nonnull ParserRequest request, @Nonnull PrintWriter printWriter);
 }

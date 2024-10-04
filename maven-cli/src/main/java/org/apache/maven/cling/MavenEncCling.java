@@ -21,26 +21,27 @@ package org.apache.maven.cling;
 import java.io.IOException;
 
 import org.apache.maven.api.cli.Invoker;
-import org.apache.maven.api.cli.Parser;
+import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
+import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptParser;
+import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Maven encrypt CLI "new-gen".
  */
 public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRequest> {
-    public static final String NAME = "mvnenc";
-
     /**
      * "Normal" Java entry point. Note: Maven uses ClassWorld Launcher and this entry point is NOT used under normal
      * circumstances.
      */
     public static void main(String[] args) throws IOException {
-        int exitCode = new MavenEncCling(NAME).run(args);
+        int exitCode = new MavenEncCling().run(args);
         System.exit(exitCode);
     }
 
@@ -48,15 +49,15 @@ public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRe
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
     public static int main(String[] args, ClassWorld world) throws IOException {
-        return new MavenEncCling(NAME, world).run(args);
+        return new MavenEncCling(world).run(args);
     }
 
-    public MavenEncCling(String command) {
-        super(command);
+    public MavenEncCling() {
+        super();
     }
 
-    public MavenEncCling(String command, ClassWorld classWorld) {
-        super(command, classWorld);
+    public MavenEncCling(ClassWorld classWorld) {
+        super(classWorld);
     }
 
     @Override
@@ -66,7 +67,9 @@ public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRe
     }
 
     @Override
-    protected Parser<EncryptInvokerRequest> createParser() {
-        return new DefaultEncryptParser();
+    protected EncryptInvokerRequest parseArguments(String[] args) throws ParserException, IOException {
+        return new DefaultEncryptParser()
+                .parse(ParserRequest.mvnenc(args, new ProtoLogger(), new JLineMessageBuilderFactory())
+                        .build());
     }
 }

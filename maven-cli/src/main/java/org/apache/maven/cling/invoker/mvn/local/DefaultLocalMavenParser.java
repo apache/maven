@@ -52,14 +52,12 @@ public class DefaultLocalMavenParser extends DefaultMavenParser<MavenOptions, Ma
             ArrayList<CoreExtension> extensions,
             Options options) {
         return new DefaultMavenInvokerRequest<>(
-                parserRequest.command(),
+                parserRequest,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
                 userProperties,
                 systemProperties,
-                parserRequest.logger(),
-                parserRequest.messageBuilderFactory(),
                 topDirectory,
                 rootDirectory,
                 parserRequest.in(),
@@ -70,9 +68,9 @@ public class DefaultLocalMavenParser extends DefaultMavenParser<MavenOptions, Ma
     }
 
     @Override
-    protected MavenOptions parseArgs(String source, String[] args) throws ParserException {
+    protected MavenOptions parseArgs(String source, List<String> args) throws ParserException {
         try {
-            return CommonsCliMavenOptions.parse(source, args);
+            return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
         } catch (ParseException e) {
             throw new ParserException("Failed to parse source " + source, e.getCause());
         }

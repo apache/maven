@@ -16,54 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.resident;
+package org.apache.maven.cling.invoker.mvn.forked;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-import com.google.common.jimfs.Configuration;
-import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
-import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvokerRequest;
-import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
-import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
-import org.codehaus.plexus.classworlds.ClassWorld;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Resident UT.
+ * Forked UT: it cannot use jimFS as it runs in child process.
  */
-public class DefaultResidentMavenInvokerTest
-        extends MavenInvokerTestSupport<ResidentMavenOptions, ResidentMavenInvokerRequest> {
+public class DefaultForkedMavenInvokerTest extends MavenInvokerTestSupport<MavenOptions, ForkedMavenInvokerRequest> {
 
     @Override
-    protected Invoker<ResidentMavenInvokerRequest> createInvoker() {
-        return new DefaultResidentMavenInvoker(ProtoLookup.builder()
-                .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
-                .build());
+    protected Invoker<ForkedMavenInvokerRequest> createInvoker() {
+        return new DefaultForkedMavenInvoker();
     }
 
     @Override
-    protected Parser<ResidentMavenInvokerRequest> createParser() {
-        return new DefaultResidentMavenParser();
+    protected Parser<ForkedMavenInvokerRequest> createParser() {
+        return new DefaultForkedMavenParser();
     }
 
     @Test
     void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         invoke(tempDir, Arrays.asList("clean", "verify"));
-    }
-
-    @Disabled("Until we move off fully from File")
-    @Test
-    void jimFs() throws Exception {
-        try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
-            invoke(fs.getPath("/"), Arrays.asList("clean", "verify"));
-        }
     }
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.resident;
+package org.apache.maven.cling.invoker.mvn.local;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -26,8 +26,8 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
-import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvokerRequest;
-import org.apache.maven.api.cli.mvn.resident.ResidentMavenOptions;
+import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
+import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -37,21 +37,20 @@ import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Resident UT.
+ * Local UT.
  */
-public class DefaultResidentMavenInvokerTest
-        extends MavenInvokerTestSupport<ResidentMavenOptions, ResidentMavenInvokerRequest> {
-
+public class DefaultLocalMavenInvokerTest
+        extends MavenInvokerTestSupport<MavenOptions, MavenInvokerRequest<MavenOptions>> {
     @Override
-    protected Invoker<ResidentMavenInvokerRequest> createInvoker() {
-        return new DefaultResidentMavenInvoker(ProtoLookup.builder()
+    protected Invoker<MavenInvokerRequest<MavenOptions>> createInvoker() {
+        return new DefaultLocalMavenInvoker(ProtoLookup.builder()
                 .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
                 .build());
     }
 
     @Override
-    protected Parser<ResidentMavenInvokerRequest> createParser() {
-        return new DefaultResidentMavenParser();
+    protected Parser<MavenInvokerRequest<MavenOptions>> createParser() {
+        return new DefaultLocalMavenParser();
     }
 
     @Test

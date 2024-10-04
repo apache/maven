@@ -20,7 +20,6 @@ package org.apache.maven.cling.invoker.mvn.forked;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -53,14 +52,12 @@ public class DefaultForkedMavenParser extends DefaultMavenParser<MavenOptions, F
             ArrayList<CoreExtension> extensions,
             Options options) {
         return new DefaultForkedMavenInvokerRequest(
-                parserRequest.command(),
+                parserRequest,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
                 userProperties,
                 systemProperties,
-                parserRequest.logger(),
-                parserRequest.messageBuilderFactory(),
                 topDirectory,
                 rootDirectory,
                 parserRequest.in(),
@@ -74,15 +71,15 @@ public class DefaultForkedMavenParser extends DefaultMavenParser<MavenOptions, F
     protected List<String> getJvmArguments(Path rootDirectory) {
         if (rootDirectory != null) {
             // TODO: do this
-            return Collections.emptyList();
+            return null;
         }
         return null;
     }
 
     @Override
-    protected MavenOptions parseArgs(String source, String[] args) throws ParserException {
+    protected MavenOptions parseArgs(String source, List<String> args) throws ParserException {
         try {
-            return CommonsCliMavenOptions.parse(source, args);
+            return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
         } catch (ParseException e) {
             throw new ParserException("Failed to parse source " + source, e.getCause());
         }

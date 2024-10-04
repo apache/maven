@@ -51,14 +51,12 @@ public class DefaultResidentMavenParser extends DefaultMavenParser<ResidentMaven
             ArrayList<CoreExtension> extensions,
             Options options) {
         return new DefaultResidentMavenInvokerRequest(
-                parserRequest.command(),
+                parserRequest,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
                 userProperties,
                 systemProperties,
-                parserRequest.logger(),
-                parserRequest.messageBuilderFactory(),
                 topDirectory,
                 rootDirectory,
                 parserRequest.in(),
@@ -78,9 +76,9 @@ public class DefaultResidentMavenParser extends DefaultMavenParser<ResidentMaven
     }
 
     @Override
-    protected ResidentMavenOptions parseArgs(String source, String[] args) throws ParserException {
+    protected ResidentMavenOptions parseArgs(String source, List<String> args) throws ParserException {
         try {
-            return CommonsCliResidentMavenOptions.parse(source, args);
+            return CommonsCliResidentMavenOptions.parse(source, args.toArray(new String[0]));
         } catch (ParseException e) {
             throw new ParserException("Failed to parse source " + source, e.getCause());
         }
