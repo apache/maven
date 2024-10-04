@@ -29,6 +29,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilderFactory;
 
 /**
@@ -60,6 +61,13 @@ public interface InvokerRequest<O extends Options> {
      */
     default MessageBuilderFactory messageBuilderFactory() {
         return parserRequest().messageBuilderFactory();
+    }
+
+    /**
+     * Shorthand for {@link Lookup}.
+     */
+    default Lookup lookup() {
+        return parserRequest().lookup();
     }
 
     /**

@@ -23,11 +23,15 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.services.MessageBuilderFactory;
 
 import static java.util.Objects.requireNonNull;
@@ -87,6 +91,14 @@ public interface ParserRequest {
      */
     @Nonnull
     List<String> args();
+
+    /**
+     * Per-request {@link Lookup} for customization.
+     *
+     * @return a lookup possibly with custom components
+     */
+    @Nonnull
+    Lookup lookup();
 
     /**
      * Returns the current working directory for the Maven execution.
@@ -224,6 +236,7 @@ public interface ParserRequest {
         private final List<String> args;
         private final Logger logger;
         private final MessageBuilderFactory messageBuilderFactory;
+        private Lookup lookup = EMPTY_LOOKUP;
         private Path cwd;
         private Path mavenHome;
         private Path userHome;
@@ -242,6 +255,11 @@ public interface ParserRequest {
             this.args = requireNonNull(args, "args");
             this.logger = requireNonNull(logger, "logger");
             this.messageBuilderFactory = requireNonNull(messageBuilderFactory, "messageBuilderFactory");
+        }
+
+        public Builder lookup(@Nonnull Lookup lookup) {
+            this.lookup = requireNonNull(lookup);
+            return this;
         }
 
         public Builder cwd(Path cwd) {
@@ -276,7 +294,18 @@ public interface ParserRequest {
 
         public ParserRequest build() {
             return new ParserRequestImpl(
-                    command, commandName, args, logger, messageBuilderFactory, cwd, mavenHome, userHome, in, out, err);
+                    command,
+                    commandName,
+                    args,
+                    logger,
+                    messageBuilderFactory,
+                    lookup,
+                    cwd,
+                    mavenHome,
+                    userHome,
+                    in,
+                    out,
+                    err);
         }
 
         @SuppressWarnings("ParameterNumber")
@@ -286,6 +315,7 @@ public interface ParserRequest {
             private final Logger logger;
             private final MessageBuilderFactory messageBuilderFactory;
             private final List<String> args;
+            private final Lookup lookup;
             private final Path cwd;
             private final Path mavenHome;
             private final Path userHome;
@@ -299,6 +329,7 @@ public interface ParserRequest {
                     List<String> args,
                     Logger logger,
                     MessageBuilderFactory messageBuilderFactory,
+                    Lookup lookup,
                     Path cwd,
                     Path mavenHome,
                     Path userHome,
@@ -310,6 +341,7 @@ public interface ParserRequest {
                 this.args = List.copyOf(requireNonNull(args, "args"));
                 this.logger = requireNonNull(logger, "logger");
                 this.messageBuilderFactory = requireNonNull(messageBuilderFactory, "messageBuilderFactory");
+                this.lookup = requireNonNull(lookup, "lookup");
                 this.cwd = cwd;
                 this.mavenHome = mavenHome;
                 this.userHome = userHome;
@@ -344,6 +376,11 @@ public interface ParserRequest {
             }
 
             @Override
+            public Lookup lookup() {
+                return lookup;
+            }
+
+            @Override
             public Path cwd() {
                 return cwd;
             }
@@ -373,5 +410,37 @@ public interface ParserRequest {
                 return err;
             }
         }
+
+        private static final Lookup EMPTY_LOOKUP = new Lookup() {
+            @Override
+            public <T> T lookup(Class<T> type) {
+                throw new LookupException("empty lookup");
+            }
+
+            @Override
+            public <T> T lookup(Class<T> type, String name) {
+                throw new LookupException("empty lookup");
+            }
+
+            @Override
+            public <T> Optional<T> lookupOptional(Class<T> type) {
+                return Optional.empty();
+            }
+
+            @Override
+            public <T> Optional<T> lookupOptional(Class<T> type, String name) {
+                return Optional.empty();
+            }
+
+            @Override
+            public <T> List<T> lookupList(Class<T> type) {
+                return List.of();
+            }
+
+            @Override
+            public <T> Map<String, T> lookupMap(Class<T> type) {
+                return Map.of();
+            }
+        };
     }
 }

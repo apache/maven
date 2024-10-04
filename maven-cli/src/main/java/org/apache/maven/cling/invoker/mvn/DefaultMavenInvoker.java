@@ -105,7 +105,7 @@ public abstract class DefaultMavenInvoker<
     }
 
     @Override
-    protected void prepare(C localContext) throws Exception {
+    protected void prepare(C context) throws Exception {
         // explicitly fill in "defaults"?
         DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         mavenExecutionRequest.setRepositoryCache(new DefaultRepositoryCache());
@@ -120,7 +120,7 @@ public abstract class DefaultMavenInvoker<
         mavenExecutionRequest.setDegreeOfConcurrency(1);
         mavenExecutionRequest.setBuilderId("singlethreaded");
 
-        localContext.mavenExecutionRequest = mavenExecutionRequest;
+        context.mavenExecutionRequest = mavenExecutionRequest;
     }
 
     @Override
@@ -146,11 +146,11 @@ public abstract class DefaultMavenInvoker<
     }
 
     @Override
-    protected void postCommands(C localContext) throws Exception {
-        super.postCommands(localContext);
+    protected void postCommands(C context) throws Exception {
+        super.postCommands(context);
 
-        R invokerRequest = localContext.invokerRequest;
-        Logger logger = localContext.logger;
+        R invokerRequest = context.invokerRequest;
+        Logger logger = context.logger;
         if (invokerRequest.options().relaxedChecksums().orElse(false)) {
             logger.info("Disabling strict checksum verification on all artifact downloads.");
         } else if (invokerRequest.options().strictChecksums().orElse(false)) {
@@ -172,12 +172,12 @@ public abstract class DefaultMavenInvoker<
         }
     }
 
-    protected void toolchains(C localContext) throws Exception {
+    protected void toolchains(C context) throws Exception {
         Path userToolchainsFile = null;
 
-        if (localContext.invokerRequest.options().altUserToolchains().isPresent()) {
-            userToolchainsFile = localContext.cwdResolver.apply(
-                    localContext.invokerRequest.options().altUserToolchains().get());
+        if (context.invokerRequest.options().altUserToolchains().isPresent()) {
+            userToolchainsFile = context.cwdResolver.apply(
+                    context.invokerRequest.options().altUserToolchains().get());
 
             if (!Files.isRegularFile(userToolchainsFile)) {
                 throw new FileNotFoundException(
@@ -185,20 +185,17 @@ public abstract class DefaultMavenInvoker<
             }
         } else {
             String userToolchainsFileStr =
-                    localContext.invokerRequest.userProperties().get(Constants.MAVEN_USER_TOOLCHAINS);
+                    context.invokerRequest.userProperties().get(Constants.MAVEN_USER_TOOLCHAINS);
             if (userToolchainsFileStr != null) {
-                userToolchainsFile = localContext.cwdResolver.apply(userToolchainsFileStr);
+                userToolchainsFile = context.cwdResolver.apply(userToolchainsFileStr);
             }
         }
 
         Path installationToolchainsFile = null;
 
-        if (localContext.invokerRequest.options().altInstallationToolchains().isPresent()) {
-            installationToolchainsFile = localContext.cwdResolver.apply(localContext
-                    .invokerRequest
-                    .options()
-                    .altInstallationToolchains()
-                    .get());
+        if (context.invokerRequest.options().altInstallationToolchains().isPresent()) {
+            installationToolchainsFile = context.cwdResolver.apply(
+                    context.invokerRequest.options().altInstallationToolchains().get());
 
             if (!Files.isRegularFile(installationToolchainsFile)) {
                 throw new FileNotFoundException(
@@ -206,15 +203,15 @@ public abstract class DefaultMavenInvoker<
             }
         } else {
             String installationToolchainsFileStr =
-                    localContext.invokerRequest.userProperties().get(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
+                    context.invokerRequest.userProperties().get(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
             if (installationToolchainsFileStr != null) {
-                installationToolchainsFile = localContext.cwdResolver.apply(installationToolchainsFileStr);
+                installationToolchainsFile = context.cwdResolver.apply(installationToolchainsFileStr);
             }
         }
 
-        localContext.mavenExecutionRequest.setInstallationToolchainsFile(
+        context.mavenExecutionRequest.setInstallationToolchainsFile(
                 installationToolchainsFile != null ? installationToolchainsFile.toFile() : null);
-        localContext.mavenExecutionRequest.setUserToolchainsFile(
+        context.mavenExecutionRequest.setUserToolchainsFile(
                 userToolchainsFile != null ? userToolchainsFile.toFile() : null);
 
         DefaultToolchainsBuildingRequest toolchainsRequest = new DefaultToolchainsBuildingRequest();
@@ -225,35 +222,35 @@ public abstract class DefaultMavenInvoker<
             toolchainsRequest.setUserToolchainsSource(new FileSource(userToolchainsFile));
         }
 
-        localContext.eventSpyDispatcher.onEvent(toolchainsRequest);
+        context.eventSpyDispatcher.onEvent(toolchainsRequest);
 
-        localContext.logger.debug("Reading installation toolchains from '"
+        context.logger.debug("Reading installation toolchains from '"
                 + (toolchainsRequest.getGlobalToolchainsSource() != null
                         ? toolchainsRequest.getGlobalToolchainsSource().getLocation()
                         : installationToolchainsFile)
                 + "'");
-        localContext.logger.debug("Reading user toolchains from '"
+        context.logger.debug("Reading user toolchains from '"
                 + (toolchainsRequest.getUserToolchainsSource() != null
                         ? toolchainsRequest.getUserToolchainsSource().getLocation()
                         : userToolchainsFile)
                 + "'");
 
-        ToolchainsBuildingResult toolchainsResult = localContext.toolchainsBuilder.build(toolchainsRequest);
+        ToolchainsBuildingResult toolchainsResult = context.toolchainsBuilder.build(toolchainsRequest);
 
-        localContext.eventSpyDispatcher.onEvent(toolchainsResult);
+        context.eventSpyDispatcher.onEvent(toolchainsResult);
 
-        localContext.mavenExecutionRequestPopulator.populateFromToolchains(
-                localContext.mavenExecutionRequest, toolchainsResult.getEffectiveToolchains());
+        context.mavenExecutionRequestPopulator.populateFromToolchains(
+                context.mavenExecutionRequest, toolchainsResult.getEffectiveToolchains());
 
         if (!toolchainsResult.getProblems().isEmpty()) {
-            localContext.logger.warn("");
-            localContext.logger.warn("Some problems were encountered while building the effective toolchains");
+            context.logger.warn("");
+            context.logger.warn("Some problems were encountered while building the effective toolchains");
 
             for (Problem problem : toolchainsResult.getProblems()) {
-                localContext.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
+                context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
             }
 
-            localContext.logger.warn("");
+            context.logger.warn("");
         }
     }
 
@@ -325,21 +322,21 @@ public abstract class DefaultMavenInvoker<
         }
     }
 
-    protected Path determinePom(C localContext) {
-        Path current = localContext.invokerRequest.cwd();
-        if (localContext.invokerRequest.options().alternatePomFile().isPresent()) {
-            current = localContext.cwdResolver.apply(
-                    localContext.invokerRequest.options().alternatePomFile().get());
+    protected Path determinePom(C context) {
+        Path current = context.invokerRequest.cwd();
+        if (context.invokerRequest.options().alternatePomFile().isPresent()) {
+            current = context.cwdResolver.apply(
+                    context.invokerRequest.options().alternatePomFile().get());
         }
-        if (localContext.modelProcessor != null) {
-            return localContext.modelProcessor.locateExistingPom(current);
+        if (context.modelProcessor != null) {
+            return context.modelProcessor.locateExistingPom(current);
         } else {
             return Files.isRegularFile(current) ? current : null;
         }
     }
 
-    protected String determineReactorFailureBehaviour(C localContext) {
-        MavenOptions mavenOptions = localContext.invokerRequest.options();
+    protected String determineReactorFailureBehaviour(C context) {
+        MavenOptions mavenOptions = context.invokerRequest.options();
         if (mavenOptions.failFast().isPresent()) {
             return MavenExecutionRequest.REACTOR_FAIL_FAST;
         } else if (mavenOptions.failAtEnd().isPresent()) {
@@ -351,8 +348,8 @@ public abstract class DefaultMavenInvoker<
         }
     }
 
-    protected String determineGlobalChecksumPolicy(C localContext) {
-        MavenOptions mavenOptions = localContext.invokerRequest.options();
+    protected String determineGlobalChecksumPolicy(C context) {
+        MavenOptions mavenOptions = context.invokerRequest.options();
         if (mavenOptions.strictChecksums().orElse(false)) {
             return MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
         } else if (mavenOptions.relaxedChecksums().orElse(false)) {
@@ -362,18 +359,17 @@ public abstract class DefaultMavenInvoker<
         }
     }
 
-    protected ExecutionListener determineExecutionListener(C localContext) {
-        ExecutionListener executionListener =
-                new ExecutionEventLogger(localContext.invokerRequest.messageBuilderFactory());
-        if (localContext.eventSpyDispatcher != null) {
-            return localContext.eventSpyDispatcher.chainListener(executionListener);
+    protected ExecutionListener determineExecutionListener(C context) {
+        ExecutionListener executionListener = new ExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+        if (context.eventSpyDispatcher != null) {
+            return context.eventSpyDispatcher.chainListener(executionListener);
         } else {
             return executionListener;
         }
     }
 
-    protected String determineMakeBehavior(C localContext) {
-        MavenOptions mavenOptions = localContext.invokerRequest.options();
+    protected String determineMakeBehavior(C context) {
+        MavenOptions mavenOptions = context.invokerRequest.options();
         if (mavenOptions.alsoMake().isPresent()
                 && mavenOptions.alsoMakeDependents().isEmpty()) {
             return MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
@@ -388,8 +384,8 @@ public abstract class DefaultMavenInvoker<
         }
     }
 
-    protected void performProjectActivation(C localContext, ProjectActivation projectActivation) {
-        MavenOptions mavenOptions = localContext.invokerRequest.options();
+    protected void performProjectActivation(C context, ProjectActivation projectActivation) {
+        MavenOptions mavenOptions = context.invokerRequest.options();
         if (mavenOptions.projects().isPresent()
                 && !mavenOptions.projects().get().isEmpty()) {
             List<String> optionValues = mavenOptions.projects().get();
@@ -416,8 +412,8 @@ public abstract class DefaultMavenInvoker<
         }
     }
 
-    protected void performProfileActivation(C localContext, ProfileActivation profileActivation) {
-        MavenOptions mavenOptions = localContext.invokerRequest.options();
+    protected void performProfileActivation(C context, ProfileActivation profileActivation) {
+        MavenOptions mavenOptions = context.invokerRequest.options();
         if (mavenOptions.activatedProfiles().isPresent()
                 && !mavenOptions.activatedProfiles().get().isEmpty()) {
             List<String> optionValues = mavenOptions.activatedProfiles().get();
@@ -444,21 +440,21 @@ public abstract class DefaultMavenInvoker<
         }
     }
 
-    protected int doExecute(C localContext) throws Exception {
-        MavenExecutionRequest request = localContext.mavenExecutionRequest;
+    protected int doExecute(C context) throws Exception {
+        MavenExecutionRequest request = context.mavenExecutionRequest;
 
         // why? No way to disable caching?
-        if (localContext.mavenExecutionRequest.getRepositoryCache() == null) {
-            localContext.mavenExecutionRequest.setRepositoryCache(new DefaultRepositoryCache());
+        if (context.mavenExecutionRequest.getRepositoryCache() == null) {
+            context.mavenExecutionRequest.setRepositoryCache(new DefaultRepositoryCache());
         }
 
-        localContext.eventSpyDispatcher.onEvent(request);
+        context.eventSpyDispatcher.onEvent(request);
 
-        MavenExecutionResult result = localContext.maven.execute(request);
+        MavenExecutionResult result = context.maven.execute(request);
 
-        localContext.eventSpyDispatcher.onEvent(result);
+        context.eventSpyDispatcher.onEvent(result);
 
-        localContext.eventSpyDispatcher.close();
+        context.eventSpyDispatcher.close();
 
         if (result.hasExceptions()) {
             ExceptionHandler handler = new DefaultExceptionHandler();
@@ -470,36 +466,36 @@ public abstract class DefaultMavenInvoker<
             for (Throwable exception : result.getExceptions()) {
                 ExceptionSummary summary = handler.handleException(exception);
 
-                logSummary(localContext, summary, references, "");
+                logSummary(context, summary, references, "");
 
                 if (exception instanceof LifecycleExecutionException) {
                     failedProjects.add(((LifecycleExecutionException) exception).getProject());
                 }
             }
 
-            localContext.logger.error("");
+            context.logger.error("");
 
-            if (!localContext.invokerRequest.options().showErrors().orElse(false)) {
-                localContext.logger.error("To see the full stack trace of the errors, re-run Maven with the '"
+            if (!context.invokerRequest.options().showErrors().orElse(false)) {
+                context.logger.error("To see the full stack trace of the errors, re-run Maven with the '"
                         + MessageUtils.builder().strong("-e") + "' switch");
             }
-            if (!localContext.invokerRequest.options().verbose().orElse(false)) {
-                localContext.logger.error("Re-run Maven using the '"
+            if (!context.invokerRequest.options().verbose().orElse(false)) {
+                context.logger.error("Re-run Maven using the '"
                         + MessageUtils.builder().strong("-X") + "' switch to enable verbose output");
             }
 
             if (!references.isEmpty()) {
-                localContext.logger.error("");
-                localContext.logger.error("For more information about the errors and possible solutions"
+                context.logger.error("");
+                context.logger.error("For more information about the errors and possible solutions"
                         + ", please read the following articles:");
 
                 for (Map.Entry<String, String> entry : references.entrySet()) {
-                    localContext.logger.error(MessageUtils.builder().strong(entry.getValue()) + " " + entry.getKey());
+                    context.logger.error(MessageUtils.builder().strong(entry.getValue()) + " " + entry.getKey());
                 }
             }
 
             if (result.canResume()) {
-                logBuildResumeHint(localContext, "mvn [args] -r");
+                logBuildResumeHint(context, "mvn [args] -r");
             } else if (!failedProjects.isEmpty()) {
                 List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
 
@@ -509,12 +505,12 @@ public abstract class DefaultMavenInvoker<
                 MavenProject firstFailedProject = failedProjects.get(0);
                 if (!firstFailedProject.equals(sortedProjects.get(0))) {
                     String resumeFromSelector = getResumeFromSelector(sortedProjects, firstFailedProject);
-                    logBuildResumeHint(localContext, "mvn [args] -rf " + resumeFromSelector);
+                    logBuildResumeHint(context, "mvn [args] -rf " + resumeFromSelector);
                 }
             }
 
-            if (localContext.invokerRequest.options().failNever().orElse(false)) {
-                localContext.logger.info("Build failures were ignored.");
+            if (context.invokerRequest.options().failNever().orElse(false)) {
+                context.logger.info("Build failures were ignored.");
                 return 0;
             } else {
                 return 1;
@@ -524,10 +520,10 @@ public abstract class DefaultMavenInvoker<
         }
     }
 
-    protected void logBuildResumeHint(C localContext, String resumeBuildHint) {
-        localContext.logger.error("");
-        localContext.logger.error("After correcting the problems, you can resume the build with the command");
-        localContext.logger.error(
+    protected void logBuildResumeHint(C context, String resumeBuildHint) {
+        context.logger.error("");
+        context.logger.error("After correcting the problems, you can resume the build with the command");
+        context.logger.error(
                 MessageUtils.builder().a("  ").strong(resumeBuildHint).toString());
     }
 
@@ -567,7 +563,7 @@ public abstract class DefaultMavenInvoker<
 
     protected static final String ANSI_RESET = "\u001B\u005Bm";
 
-    protected void logSummary(C localContext, ExceptionSummary summary, Map<String, String> references, String indent) {
+    protected void logSummary(C context, ExceptionSummary summary, Map<String, String> references, String indent) {
         String referenceKey = "";
 
         if (summary.getReference() != null && !summary.getReference().isEmpty()) {
@@ -607,11 +603,11 @@ public abstract class DefaultMavenInvoker<
             line = indent + line + ("".equals(nextColor) ? "" : ANSI_RESET);
 
             if ((i == lines.length - 1)
-                    && (localContext.invokerRequest.options().showErrors().orElse(false)
+                    && (context.invokerRequest.options().showErrors().orElse(false)
                             || (summary.getException() instanceof InternalErrorException))) {
-                localContext.logger.error(line, summary.getException());
+                context.logger.error(line, summary.getException());
             } else {
-                localContext.logger.error(line);
+                context.logger.error(line);
             }
 
             currentColor = nextColor;
@@ -620,7 +616,7 @@ public abstract class DefaultMavenInvoker<
         indent += "  ";
 
         for (ExceptionSummary child : summary.getChildren()) {
-            logSummary(localContext, child, references, indent);
+            logSummary(context, child, references, indent);
         }
     }
 }
