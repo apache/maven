@@ -60,94 +60,91 @@ import static org.apache.maven.cling.invoker.Utils.stripLeadingAndTrailingQuotes
 import static org.apache.maven.cling.invoker.Utils.toMap;
 
 public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>> implements Parser<R> {
+
+    @SuppressWarnings("VisibilityModifier")
+    public static class LocalContext {
+        public final ParserRequest parserRequest;
+        public final Map<String, String> systemPropertiesOverrides;
+
+        public LocalContext(ParserRequest parserRequest) {
+            this.parserRequest = parserRequest;
+            this.systemPropertiesOverrides = new HashMap<>();
+        }
+
+        public Path cwd;
+        public Path installationDirectory;
+        public Path userHomeDirectory;
+        public Map<String, String> systemProperties;
+        public Map<String, String> userProperties;
+        public Path topDirectory;
+        public Path rootDirectory;
+        public List<CoreExtension> extensions;
+        public Options options;
+
+        public Map<String, String> extraInterpolationSource() {
+            Map<String, String> extra = new HashMap<>();
+            extra.put("session.topDirectory", topDirectory.toString());
+            extra.put("session.rootDirectory", rootDirectory.toString());
+            return extra;
+        }
+    }
+
     @Override
     public R parse(ParserRequest parserRequest) throws ParserException, IOException {
         requireNonNull(parserRequest);
 
+        LocalContext context = new LocalContext(parserRequest);
+
         // the basics
-        HashMap<String, String> overrides = new HashMap<>();
-        Path cwd = requireNonNull(getCwd(parserRequest, overrides));
-        Path installationDirectory = requireNonNull(getInstallationDirectory(parserRequest, overrides));
-        Path userHomeDirectory = requireNonNull(getUserHomeDirectory(parserRequest, overrides));
+        context.cwd = requireNonNull(getCwd(context));
+        context.installationDirectory = requireNonNull(getInstallationDirectory(context));
+        context.userHomeDirectory = requireNonNull(getUserHomeDirectory(context));
 
         // top/root
-        Path topDirectory = requireNonNull(getTopDirectory(parserRequest, cwd));
-        Path rootDirectory = requireNonNull(getRootDirectory(parserRequest, cwd, topDirectory));
+        context.topDirectory = requireNonNull(getTopDirectory(context));
+        context.rootDirectory = requireNonNull(getRootDirectory(context));
 
         // options
-        List<O> parsedOptions = parseCliOptions(rootDirectory, parserRequest.args());
+        List<O> parsedOptions = parseCliOptions(context);
 
         // warn about deprecated options
         parsedOptions.forEach(o -> o.warnAboutDeprecatedOptions(
                 parserRequest, new PrintWriter(parserRequest.out() != null ? parserRequest.out() : System.out, true)));
 
         // assemble options if needed
-        O options = assembleOptions(parsedOptions);
+        context.options = assembleOptions(parsedOptions);
 
         // system and user properties
-        Map<String, String> systemProperties = populateSystemProperties(overrides);
-        Map<String, String> paths = new HashMap<>();
-        paths.put("session.topDirectory", topDirectory.toString());
-        paths.put("session.rootDirectory", rootDirectory.toString());
-        Map<String, String> userProperties =
-                populateUserProperties(systemProperties, installationDirectory, paths, options);
+        context.systemProperties = populateSystemProperties(context);
+        context.userProperties = populateUserProperties(context);
 
         // options: interpolate
-        Options interpolatedOptions = options.interpolate(Arrays.asList(paths, systemProperties, userProperties));
+        context.options = context.options.interpolate(
+                Arrays.asList(context.extraInterpolationSource(), context.userProperties, context.systemProperties));
 
         // core extensions
-        ArrayList<CoreExtension> extensions = new ArrayList<>();
-        String installationExtensionsFile = userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptor(installationExtensionsFile, installationDirectory));
+        context.extensions = readCoreExtensionsDescriptor(context);
 
-        String projectExtensionsFile = userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptor(projectExtensionsFile, cwd));
-
-        String userExtensionsFile = userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptor(userExtensionsFile, userHomeDirectory));
-
-        return getInvokerRequest(
-                parserRequest,
-                cwd,
-                installationDirectory,
-                userHomeDirectory,
-                userProperties,
-                systemProperties,
-                topDirectory,
-                rootDirectory,
-                extensions,
-                interpolatedOptions);
+        return getInvokerRequest(context);
     }
 
-    @SuppressWarnings("ParameterNumber")
-    protected abstract R getInvokerRequest(
-            ParserRequest parserRequest,
-            Path cwd,
-            Path installationDirectory,
-            Path userHomeDirectory,
-            Map<String, String> userProperties,
-            Map<String, String> systemProperties,
-            Path topDirectory,
-            Path rootDirectory,
-            ArrayList<CoreExtension> extensions,
-            Options options);
+    protected abstract R getInvokerRequest(LocalContext context);
 
-    protected Path getCwd(ParserRequest parserRequest, Map<String, String> overrides) throws ParserException {
-        if (parserRequest.cwd() != null) {
-            Path result = getCanonicalPath(parserRequest.cwd());
-            overrides.put("user.dir", result.toString());
+    protected Path getCwd(LocalContext context) throws ParserException {
+        if (context.parserRequest.cwd() != null) {
+            Path result = getCanonicalPath(context.parserRequest.cwd());
+            context.systemPropertiesOverrides.put("user.dir", result.toString());
             return result;
         } else {
             return getCanonicalPath(Paths.get(System.getProperty("user.dir")));
         }
     }
 
-    protected Path getInstallationDirectory(ParserRequest parserRequest, Map<String, String> overrides)
-            throws ParserException {
+    protected Path getInstallationDirectory(LocalContext context) throws ParserException {
         Path result;
-        if (parserRequest.mavenHome() != null) {
-            result = getCanonicalPath(parserRequest.mavenHome());
-            overrides.put(MAVEN_HOME, result.toString());
+        if (context.parserRequest.mavenHome() != null) {
+            result = getCanonicalPath(context.parserRequest.mavenHome());
+            context.systemPropertiesOverrides.put(MAVEN_HOME, result.toString());
         } else {
             String mavenHome = System.getProperty(Constants.MAVEN_HOME);
             if (mavenHome == null) {
@@ -158,23 +155,22 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         return result;
     }
 
-    protected Path getUserHomeDirectory(ParserRequest parserRequest, Map<String, String> overrides)
-            throws ParserException {
-        if (parserRequest.userHome() != null) {
-            Path result = getCanonicalPath(parserRequest.userHome());
-            overrides.put("user.home", result.toString());
+    protected Path getUserHomeDirectory(LocalContext context) throws ParserException {
+        if (context.parserRequest.userHome() != null) {
+            Path result = getCanonicalPath(context.parserRequest.userHome());
+            context.systemPropertiesOverrides.put("user.home", result.toString());
             return result;
         } else {
             return getCanonicalPath(Paths.get(System.getProperty("user.home")));
         }
     }
 
-    protected Path getTopDirectory(ParserRequest parserRequest, Path cwd) throws ParserException {
+    protected Path getTopDirectory(LocalContext context) throws ParserException {
         // We need to locate the top level project which may be pointed at using
         // the -f/--file option.
-        Path topDirectory = cwd;
+        Path topDirectory = requireNonNull(context.cwd);
         boolean isAltFile = false;
-        for (String arg : parserRequest.args()) {
+        for (String arg : context.parserRequest.args()) {
             if (isAltFile) {
                 // this is the argument following -f/--file
                 Path path = topDirectory.resolve(stripLeadingAndTrailingQuotes(arg));
@@ -199,32 +195,34 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         return getCanonicalPath(topDirectory);
     }
 
-    protected Path getRootDirectory(ParserRequest parserRequest, Path cwd, Path topDirectory) throws ParserException {
+    protected Path getRootDirectory(LocalContext context) throws ParserException {
         RootLocator rootLocator =
                 ServiceLoader.load(RootLocator.class).iterator().next();
-        Path rootDirectory = rootLocator.findRoot(topDirectory);
+        Path rootDirectory = rootLocator.findRoot(requireNonNull(context.topDirectory));
 
         // TODO: multiModuleProjectDirectory vs rootDirectory?
         // fallback if no root? otherwise make sure they are same?
         Path mmpd = System.getProperty("maven.multiModuleProjectDirectory") == null
                 ? null
-                : getCanonicalPath(cwd.resolve(requireNonNull(
+                : getCanonicalPath(context.cwd.resolve(requireNonNull(
                         System.getProperty("maven.multiModuleProjectDirectory"),
                         "maven.multiModuleProjectDirectory is not set")));
         if (rootDirectory == null) {
-            parserRequest.logger().warn(rootLocator.getNoRootMessage());
+            context.parserRequest.logger().warn(rootLocator.getNoRootMessage());
             rootDirectory = requireNonNull(
                     mmpd, "maven.multiModuleProjectDirectory is not set and rootDirectory was not discovered");
         } else {
             rootDirectory = getCanonicalPath(rootDirectory);
             if (mmpd != null && !Objects.equals(rootDirectory, mmpd)) {
-                parserRequest.logger().warn("Project root directory and multiModuleProjectDirectory are not aligned");
+                context.parserRequest
+                        .logger()
+                        .warn("Project root directory and multiModuleProjectDirectory are not aligned");
             }
         }
         return getCanonicalPath(rootDirectory);
     }
 
-    protected Map<String, String> populateSystemProperties(Map<String, String> overrides) throws ParserException {
+    protected Map<String, String> populateSystemProperties(LocalContext context) throws ParserException {
         Properties systemProperties = new Properties();
 
         // ----------------------------------------------------------------------
@@ -248,18 +246,11 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         systemProperties.setProperty("maven.build.version", mavenBuildVersion);
 
         Map<String, String> result = toMap(systemProperties);
-        if (overrides != null) {
-            result.putAll(overrides);
-        }
+        result.putAll(context.systemPropertiesOverrides);
         return result;
     }
 
-    protected Map<String, String> populateUserProperties(
-            Map<String, String> systemProperties,
-            Path installationDirectory,
-            Map<String, String> paths,
-            Options options)
-            throws ParserException, IOException {
+    protected Map<String, String> populateUserProperties(LocalContext context) throws ParserException, IOException {
         Properties userProperties = new Properties();
 
         // ----------------------------------------------------------------------
@@ -268,47 +259,63 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         // are most dominant.
         // ----------------------------------------------------------------------
 
-        Map<String, String> userSpecifiedProperties = options.userProperties().orElse(new HashMap<>());
-        userProperties.putAll(userSpecifiedProperties);
+        Map<String, String> userSpecifiedProperties =
+                context.options.userProperties().orElse(new HashMap<>());
 
         // ----------------------------------------------------------------------
         // Load config files
         // ----------------------------------------------------------------------
+        Map<String, String> paths = context.extraInterpolationSource();
         Function<String, String> callback =
-                or(paths::get, prefix("cli.", userSpecifiedProperties::get), systemProperties::get);
+                or(paths::get, prefix("cli.", userSpecifiedProperties::get), context.systemProperties::get);
 
         Path mavenConf;
-        if (systemProperties.get(MAVEN_INSTALLATION_CONF) != null) {
-            mavenConf = installationDirectory.resolve(systemProperties.get(MAVEN_INSTALLATION_CONF));
-        } else if (systemProperties.get("maven.conf") != null) {
-            mavenConf = installationDirectory.resolve(systemProperties.get("maven.conf"));
-        } else if (systemProperties.get(MAVEN_HOME) != null) {
-            mavenConf = installationDirectory
-                    .resolve(systemProperties.get(MAVEN_HOME))
+        if (context.systemProperties.get(MAVEN_INSTALLATION_CONF) != null) {
+            mavenConf = context.installationDirectory.resolve(context.systemProperties.get(MAVEN_INSTALLATION_CONF));
+        } else if (context.systemProperties.get("maven.conf") != null) {
+            mavenConf = context.installationDirectory.resolve(context.systemProperties.get("maven.conf"));
+        } else if (context.systemProperties.get(MAVEN_HOME) != null) {
+            mavenConf = context.installationDirectory
+                    .resolve(context.systemProperties.get(MAVEN_HOME))
                     .resolve("conf");
         } else {
-            mavenConf = installationDirectory.resolve("");
+            mavenConf = context.installationDirectory.resolve("");
         }
         Path propertiesFile = mavenConf.resolve("maven.properties");
         MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
 
+        // CLI specified properties are most dominant
+        userProperties.putAll(userSpecifiedProperties);
+
         return toMap(userProperties);
     }
 
-    protected abstract List<O> parseCliOptions(Path rootDirectory, List<String> args)
-            throws ParserException, IOException;
+    protected abstract List<O> parseCliOptions(LocalContext context) throws ParserException, IOException;
 
     protected abstract O assembleOptions(List<O> parsedOptions);
 
-    protected List<CoreExtension> readCoreExtensionsDescriptor(String extensionsFile, Path cwd)
+    protected List<CoreExtension> readCoreExtensionsDescriptor(LocalContext context)
+            throws ParserException, IOException {
+        ArrayList<CoreExtension> extensions = new ArrayList<>();
+        String installationExtensionsFile = context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptorFromFile(
+                context.installationDirectory.resolve(installationExtensionsFile)));
+
+        String projectExtensionsFile = context.userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptorFromFile(context.cwd.resolve(projectExtensionsFile)));
+
+        String userExtensionsFile = context.userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptorFromFile(context.userHomeDirectory.resolve(userExtensionsFile)));
+
+        return extensions;
+    }
+
+    protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile)
             throws ParserException, IOException {
         try {
-            if (extensionsFile != null) {
-                Path extensionsPath = cwd.resolve(extensionsFile);
-                if (Files.exists(extensionsPath)) {
-                    try (InputStream is = Files.newInputStream(extensionsPath)) {
-                        return new CoreExtensionsStaxReader().read(is, true).getExtensions();
-                    }
+            if (extensionsFile != null && Files.exists(extensionsFile)) {
+                try (InputStream is = Files.newInputStream(extensionsFile)) {
+                    return new CoreExtensionsStaxReader().read(is, true).getExtensions();
                 }
             }
             return List.of();

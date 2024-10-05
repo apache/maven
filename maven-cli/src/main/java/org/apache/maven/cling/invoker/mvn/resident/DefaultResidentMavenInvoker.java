@@ -55,6 +55,9 @@ public class DefaultResidentMavenInvoker
         }
 
         public LocalContext copy(MavenInvokerRequest<MavenOptions> invokerRequest) {
+            if (invokerRequest == this.invokerRequest) {
+                return this;
+            }
             LocalContext shadow = new LocalContext((DefaultResidentMavenInvoker) invoker, invokerRequest);
 
             shadow.logger = logger;
@@ -109,19 +112,7 @@ public class DefaultResidentMavenInvoker
     @Override
     protected LocalContext createContext(MavenInvokerRequest<MavenOptions> invokerRequest) {
         return residentContext
-                .computeIfAbsent(getContextId(invokerRequest), k -> {
-                    LocalContext master = new LocalContext(this, invokerRequest);
-                    try {
-                        validate(master);
-                        prepare(master);
-                        configureLogging(master);
-                        container(master);
-                        lookup(master);
-                        return master;
-                    } catch (Exception e) {
-                        throw new InvokerException("Failed to init master context", e);
-                    }
-                })
+                .computeIfAbsent(getContextId(invokerRequest), k -> new LocalContext(this, invokerRequest))
                 .copy(invokerRequest);
     }
 
@@ -133,7 +124,7 @@ public class DefaultResidentMavenInvoker
 
     @Override
     protected void container(LocalContext context) throws Exception {
-        if (context.maven == null) {
+        if (context.containerCapsule == null) {
             super.container(context);
         }
     }

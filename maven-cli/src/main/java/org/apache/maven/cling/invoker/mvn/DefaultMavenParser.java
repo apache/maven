@@ -18,49 +18,32 @@
  */
 package org.apache.maven.cling.invoker.mvn;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.MavenParser;
 
 public class DefaultMavenParser extends BaseMavenParser<MavenOptions, MavenInvokerRequest<MavenOptions>>
         implements MavenParser<MavenInvokerRequest<MavenOptions>> {
-    @SuppressWarnings("ParameterNumber")
     @Override
-    protected DefaultMavenInvokerRequest<MavenOptions> getInvokerRequest(
-            ParserRequest parserRequest,
-            Path cwd,
-            Path installationDirectory,
-            Path userHomeDirectory,
-            Map<String, String> userProperties,
-            Map<String, String> systemProperties,
-            Path topDirectory,
-            Path rootDirectory,
-            ArrayList<CoreExtension> extensions,
-            Options options) {
+    protected DefaultMavenInvokerRequest<MavenOptions> getInvokerRequest(LocalContext context) {
         return new DefaultMavenInvokerRequest<>(
-                parserRequest,
-                cwd,
-                installationDirectory,
-                userHomeDirectory,
-                userProperties,
-                systemProperties,
-                topDirectory,
-                rootDirectory,
-                parserRequest.in(),
-                parserRequest.out(),
-                parserRequest.err(),
-                extensions,
-                (MavenOptions) options);
+                context.parserRequest,
+                context.cwd,
+                context.installationDirectory,
+                context.userHomeDirectory,
+                context.userProperties,
+                context.systemProperties,
+                context.topDirectory,
+                context.rootDirectory,
+                context.parserRequest.in(),
+                context.parserRequest.out(),
+                context.parserRequest.err(),
+                context.extensions,
+                (MavenOptions) context.options);
     }
 
     @Override

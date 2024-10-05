@@ -18,55 +18,38 @@
  */
 package org.apache.maven.cling.invoker.mvnenc;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.api.cli.mvnenc.EncryptParser;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class DefaultEncryptParser extends BaseParser<EncryptOptions, EncryptInvokerRequest> implements EncryptParser {
-    @SuppressWarnings("ParameterNumber")
     @Override
-    protected EncryptInvokerRequest getInvokerRequest(
-            ParserRequest parserRequest,
-            Path cwd,
-            Path installationDirectory,
-            Path userHomeDirectory,
-            Map<String, String> userProperties,
-            Map<String, String> systemProperties,
-            Path topDirectory,
-            Path rootDirectory,
-            ArrayList<CoreExtension> extensions,
-            Options options) {
+    protected EncryptInvokerRequest getInvokerRequest(LocalContext context) {
         return new DefaultEncryptInvokerRequest(
-                parserRequest,
-                cwd,
-                installationDirectory,
-                userHomeDirectory,
-                userProperties,
-                systemProperties,
-                topDirectory,
-                rootDirectory,
-                parserRequest.in(),
-                parserRequest.out(),
-                parserRequest.err(),
-                extensions,
-                options);
+                context.parserRequest,
+                context.cwd,
+                context.installationDirectory,
+                context.userHomeDirectory,
+                context.userProperties,
+                context.systemProperties,
+                context.topDirectory,
+                context.rootDirectory,
+                context.parserRequest.in(),
+                context.parserRequest.out(),
+                context.parserRequest.err(),
+                context.extensions,
+                context.options);
     }
 
     @Override
-    protected List<EncryptOptions> parseCliOptions(Path rootDirectory, List<String> args) throws ParserException {
-        return Collections.singletonList(parseEncryptCliOptions(args));
+    protected List<EncryptOptions> parseCliOptions(LocalContext context) throws ParserException {
+        return Collections.singletonList(parseEncryptCliOptions(context.parserRequest.args()));
     }
 
     protected CommonsCliEncryptOptions parseEncryptCliOptions(List<String> args) throws ParserException {

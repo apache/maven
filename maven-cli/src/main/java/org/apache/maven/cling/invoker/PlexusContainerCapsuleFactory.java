@@ -57,6 +57,7 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.logging.LoggerManager;
 import org.slf4j.ILoggerFactory;
 
 import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
@@ -110,9 +111,10 @@ public class PlexusContainerCapsuleFactory<
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm(null);
+        context.currentThreadContextClassLoader = container.getContainerRealm();
         Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
-        container.setLoggerManager(new Slf4jLoggerManager());
+        container.setLoggerManager(createLoggerManager());
         R invokerRequest = context.invokerRequest;
         Function<String, String> extensionSource = expression -> {
             String value = invokerRequest.userProperties().get(expression);
@@ -165,6 +167,10 @@ public class PlexusContainerCapsuleFactory<
                 bind(MessageBuilderFactory.class).toInstance(context.invokerRequest.messageBuilderFactory());
             }
         };
+    }
+
+    protected LoggerManager createLoggerManager() {
+        return new Slf4jLoggerManager();
     }
 
     protected void customizeContainerConfiguration(C context, ContainerConfiguration configuration) throws Exception {}
@@ -261,7 +267,7 @@ public class PlexusContainerCapsuleFactory<
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try {
             container.setLookupRealm(null);
-            container.setLoggerManager(new Slf4jLoggerManager());
+            container.setLoggerManager(createLoggerManager());
             container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
             Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 

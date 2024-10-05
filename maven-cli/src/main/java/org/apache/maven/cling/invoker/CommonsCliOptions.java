@@ -403,6 +403,10 @@ public abstract class CommonsCliOptions implements Options {
             return commandLine;
         }
 
+        public org.apache.commons.cli.Options getOptions() {
+            return options;
+        }
+
         public Set<Option> getUsedDeprecatedOptions() {
             return usedDeprecatedOptions;
         }

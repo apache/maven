@@ -88,6 +88,19 @@ public abstract class LookupInvoker<
                 O extends Options, R extends InvokerRequest<O>, C extends LookupInvoker.LookupInvokerContext<O, R, C>>
         implements Invoker<R> {
 
+    /**
+     * Exception for intentional exit: No message or anything will be displayed, just the
+     * carried exit code will be returned from {@link #invoke(InvokerRequest)} method.
+     */
+    public static final class ExitException extends InvokerException {
+        private final int exitCode;
+
+        public ExitException(int exitCode) {
+            super("EXIT");
+            this.exitCode = exitCode;
+        }
+    }
+
     @SuppressWarnings("VisibilityModifier")
     public static class LookupInvokerContext<
                     O extends Options, R extends InvokerRequest<O>, C extends LookupInvokerContext<O, R, C>>
@@ -124,6 +137,7 @@ public abstract class LookupInvoker<
         public ILoggerFactory loggerFactory;
         public Slf4jConfiguration slf4jConfiguration;
         public Slf4jConfiguration.Level loggerLevel;
+        public ClassLoader currentThreadContextClassLoader;
         public ContainerCapsule containerCapsule;
         public Lookup lookup;
         public SettingsBuilder settingsBuilder;
@@ -153,49 +167,39 @@ public abstract class LookupInvoker<
     public int invoke(R invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
 
+        Properties oldProps = (Properties) System.getProperties().clone();
+        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try (C context = createContext(invokerRequest)) {
-            Properties props = (Properties) System.getProperties().clone();
             try {
-                HashSet<String> sys =
-                        new HashSet<>(invokerRequest.systemProperties().keySet());
-                invokerRequest.userProperties().entrySet().stream()
-                        .filter(k -> !sys.contains(k.getKey()))
-                        .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
-                System.setProperty(
-                        Constants.MAVEN_HOME,
-                        invokerRequest.installationDirectory().toString());
-
-                validate(context);
-                prepare(context);
-                configureLogging(context);
-                activateLogging(context);
-
-                if (invokerRequest.options().help().isPresent()) {
-                    invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), context.stdOut);
-                    return 0;
+                if (context.currentThreadContextClassLoader != null) {
+                    Thread.currentThread().setContextClassLoader(context.currentThreadContextClassLoader);
                 }
-                if (invokerRequest.options().showVersionAndExit().isPresent()) {
-                    if (invokerRequest.options().quiet().orElse(false)) {
-                        context.stdOut.println(CLIReportingUtils.showVersionMinimal());
-                    } else {
-                        context.stdOut.println(CLIReportingUtils.showVersion());
-                    }
-                    return 0;
-                }
-
-                preCommands(context);
-                container(context);
-                lookup(context);
-                init(context);
-                postCommands(context);
-                settings(context);
-                return execute(context);
+                return doInvoke(context);
+            } catch (ExitException e) {
+                return e.exitCode;
             } catch (Exception e) {
                 throw handleException(context, e);
-            } finally {
-                System.setProperties(props);
             }
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldCL);
+            System.setProperties(oldProps);
         }
+    }
+
+    protected int doInvoke(C context) throws Exception {
+        pushProperties(context);
+        validate(context);
+        prepare(context);
+        configureLogging(context);
+        activateLogging(context);
+        helpOrVersionAndMayExit(context);
+        preCommands(context);
+        container(context);
+        lookup(context);
+        init(context);
+        postCommands(context);
+        settings(context);
+        return execute(context);
     }
 
     protected InvokerException handleException(LookupInvokerContext<O, R, C> context, Exception e)
@@ -216,6 +220,16 @@ public abstract class LookupInvoker<
     }
 
     protected abstract C createContext(R invokerRequest) throws InvokerException;
+
+    protected void pushProperties(C context) throws Exception {
+        R invokerRequest = context.invokerRequest;
+        HashSet<String> sys = new HashSet<>(invokerRequest.systemProperties().keySet());
+        invokerRequest.userProperties().entrySet().stream()
+                .filter(k -> !sys.contains(k.getKey()))
+                .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+        System.setProperty(
+                Constants.MAVEN_HOME, invokerRequest.installationDirectory().toString());
+    }
 
     protected void validate(C context) throws Exception {}
 
@@ -295,6 +309,22 @@ public abstract class LookupInvoker<
                         + context.loggerFactory.getClass().getName() + "' instead. "
                         + "The --fail-on-severity flag will not take effect.");
             }
+        }
+    }
+
+    protected void helpOrVersionAndMayExit(C context) throws Exception {
+        R invokerRequest = context.invokerRequest;
+        if (invokerRequest.options().help().isPresent()) {
+            invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), context.stdOut);
+            throw new ExitException(0);
+        }
+        if (invokerRequest.options().showVersionAndExit().isPresent()) {
+            if (invokerRequest.options().quiet().orElse(false)) {
+                context.stdOut.println(CLIReportingUtils.showVersionMinimal());
+            } else {
+                context.stdOut.println(CLIReportingUtils.showVersion());
+            }
+            throw new ExitException(0);
         }
     }
 
