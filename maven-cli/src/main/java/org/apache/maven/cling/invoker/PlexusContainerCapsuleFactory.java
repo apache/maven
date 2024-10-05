@@ -111,6 +111,7 @@ public class PlexusContainerCapsuleFactory<
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm(null);
+        context.currentThreadContextClassLoader = container.getContainerRealm();
         Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
         container.setLoggerManager(createLoggerManager());

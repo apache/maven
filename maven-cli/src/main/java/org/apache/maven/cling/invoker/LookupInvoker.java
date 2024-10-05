@@ -137,6 +137,7 @@ public abstract class LookupInvoker<
         public ILoggerFactory loggerFactory;
         public Slf4jConfiguration slf4jConfiguration;
         public Slf4jConfiguration.Level loggerLevel;
+        public ClassLoader currentThreadContextClassLoader;
         public ContainerCapsule containerCapsule;
         public Lookup lookup;
         public SettingsBuilder settingsBuilder;
@@ -166,9 +167,13 @@ public abstract class LookupInvoker<
     public int invoke(R invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
 
-        Properties props = (Properties) System.getProperties().clone();
+        Properties oldProps = (Properties) System.getProperties().clone();
+        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try (C context = createContext(invokerRequest)) {
             try {
+                if (context.currentThreadContextClassLoader != null) {
+                    Thread.currentThread().setContextClassLoader(context.currentThreadContextClassLoader);
+                }
                 return doInvoke(context);
             } catch (ExitException e) {
                 return e.exitCode;
@@ -176,7 +181,8 @@ public abstract class LookupInvoker<
                 throw handleException(context, e);
             }
         } finally {
-            System.setProperties(props);
+            Thread.currentThread().setContextClassLoader(oldCL);
+            System.setProperties(oldProps);
         }
     }
 
