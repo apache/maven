@@ -49,14 +49,15 @@ public abstract class BaseMavenParser<O extends MavenOptions, R extends MavenInv
             Map<String, String> systemProperties,
             Path topDirectory,
             Path rootDirectory,
-            ArrayList<CoreExtension> extensions,
+            List<CoreExtension> extensions,
             Options options);
 
     @Override
-    protected List<O> parseCliOptions(Path rootDirectory, List<String> args) throws ParserException, IOException {
+    protected List<O> parseCliOptions(ParserRequest parserRequest, Path rootDirectory)
+            throws ParserException, IOException {
         ArrayList<O> result = new ArrayList<>();
         // CLI args
-        result.add(parseMavenCliOptions(args));
+        result.add(parseMavenCliOptions(parserRequest.args()));
         // maven.config; if exists
         Path mavenConfig = rootDirectory.resolve(".mvn/maven.config");
         if (Files.isRegularFile(mavenConfig)) {

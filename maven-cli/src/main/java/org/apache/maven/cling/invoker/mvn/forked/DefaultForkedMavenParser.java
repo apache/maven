@@ -19,7 +19,6 @@
 package org.apache.maven.cling.invoker.mvn.forked;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +48,7 @@ public class DefaultForkedMavenParser extends BaseMavenParser<MavenOptions, Fork
             Map<String, String> systemProperties,
             Path topDirectory,
             Path rootDirectory,
-            ArrayList<CoreExtension> extensions,
+            List<CoreExtension> extensions,
             Options options) {
         return new DefaultForkedMavenInvokerRequest(
                 parserRequest,

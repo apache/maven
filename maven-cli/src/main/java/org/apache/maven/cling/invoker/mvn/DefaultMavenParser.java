@@ -19,7 +19,6 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +44,7 @@ public class DefaultMavenParser extends BaseMavenParser<MavenOptions, MavenInvok
             Map<String, String> systemProperties,
             Path topDirectory,
             Path rootDirectory,
-            ArrayList<CoreExtension> extensions,
+            List<CoreExtension> extensions,
             Options options) {
         return new DefaultMavenInvokerRequest<>(
                 parserRequest,

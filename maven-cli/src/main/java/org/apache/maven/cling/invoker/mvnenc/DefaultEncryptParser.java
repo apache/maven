@@ -19,7 +19,6 @@
 package org.apache.maven.cling.invoker.mvnenc;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class DefaultEncryptParser extends BaseParser<EncryptOptions, EncryptInvo
             Map<String, String> systemProperties,
             Path topDirectory,
             Path rootDirectory,
-            ArrayList<CoreExtension> extensions,
+            List<CoreExtension> extensions,
             Options options) {
         return new DefaultEncryptInvokerRequest(
                 parserRequest,
@@ -65,8 +64,9 @@ public class DefaultEncryptParser extends BaseParser<EncryptOptions, EncryptInvo
     }
 
     @Override
-    protected List<EncryptOptions> parseCliOptions(Path rootDirectory, List<String> args) throws ParserException {
-        return Collections.singletonList(parseEncryptCliOptions(args));
+    protected List<EncryptOptions> parseCliOptions(ParserRequest parserRequest, Path rootDirectory)
+            throws ParserException {
+        return Collections.singletonList(parseEncryptCliOptions(parserRequest.args()));
     }
 
     protected CommonsCliEncryptOptions parseEncryptCliOptions(List<String> args) throws ParserException {

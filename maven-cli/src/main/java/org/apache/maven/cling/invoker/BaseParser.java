@@ -75,7 +75,7 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         Path rootDirectory = requireNonNull(getRootDirectory(parserRequest, cwd, topDirectory));
 
         // options
-        List<O> parsedOptions = parseCliOptions(rootDirectory, parserRequest.args());
+        List<O> parsedOptions = parseCliOptions(parserRequest, rootDirectory);
 
         // warn about deprecated options
         parsedOptions.forEach(o -> o.warnAboutDeprecatedOptions(
@@ -85,26 +85,19 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         O options = assembleOptions(parsedOptions);
 
         // system and user properties
-        Map<String, String> systemProperties = populateSystemProperties(overrides);
+        Map<String, String> systemProperties = populateSystemProperties(parserRequest, overrides);
         Map<String, String> paths = new HashMap<>();
         paths.put("session.topDirectory", topDirectory.toString());
         paths.put("session.rootDirectory", rootDirectory.toString());
         Map<String, String> userProperties =
-                populateUserProperties(systemProperties, installationDirectory, paths, options);
+                populateUserProperties(parserRequest, systemProperties, installationDirectory, paths, options);
 
         // options: interpolate
         Options interpolatedOptions = options.interpolate(Arrays.asList(paths, systemProperties, userProperties));
 
         // core extensions
-        ArrayList<CoreExtension> extensions = new ArrayList<>();
-        String installationExtensionsFile = userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptor(installationExtensionsFile, installationDirectory));
-
-        String projectExtensionsFile = userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptor(projectExtensionsFile, cwd));
-
-        String userExtensionsFile = userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptor(userExtensionsFile, userHomeDirectory));
+        List<CoreExtension> extensions = readCoreExtensionsDescriptor(
+                parserRequest, cwd, userHomeDirectory, installationDirectory, systemProperties, userProperties);
 
         return getInvokerRequest(
                 parserRequest,
@@ -129,7 +122,7 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
             Map<String, String> systemProperties,
             Path topDirectory,
             Path rootDirectory,
-            ArrayList<CoreExtension> extensions,
+            List<CoreExtension> extensions,
             Options options);
 
     protected Path getCwd(ParserRequest parserRequest, Map<String, String> overrides) throws ParserException {
@@ -224,7 +217,8 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         return getCanonicalPath(rootDirectory);
     }
 
-    protected Map<String, String> populateSystemProperties(Map<String, String> overrides) throws ParserException {
+    protected Map<String, String> populateSystemProperties(ParserRequest parserRequest, Map<String, String> overrides)
+            throws ParserException {
         Properties systemProperties = new Properties();
 
         // ----------------------------------------------------------------------
@@ -255,6 +249,7 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
     }
 
     protected Map<String, String> populateUserProperties(
+            ParserRequest parserRequest,
             Map<String, String> systemProperties,
             Path installationDirectory,
             Map<String, String> paths,
@@ -269,7 +264,6 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         // ----------------------------------------------------------------------
 
         Map<String, String> userSpecifiedProperties = options.userProperties().orElse(new HashMap<>());
-        userProperties.putAll(userSpecifiedProperties);
 
         // ----------------------------------------------------------------------
         // Load config files
@@ -292,23 +286,45 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         Path propertiesFile = mavenConf.resolve("maven.properties");
         MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
 
+        // CLI specified properties are most dominant
+        userProperties.putAll(userSpecifiedProperties);
+
         return toMap(userProperties);
     }
 
-    protected abstract List<O> parseCliOptions(Path rootDirectory, List<String> args)
+    protected abstract List<O> parseCliOptions(ParserRequest parserRequest, Path rootDirectory)
             throws ParserException, IOException;
 
     protected abstract O assembleOptions(List<O> parsedOptions);
 
-    protected List<CoreExtension> readCoreExtensionsDescriptor(String extensionsFile, Path cwd)
+    protected List<CoreExtension> readCoreExtensionsDescriptor(
+            ParserRequest parserRequest,
+            Path cwd,
+            Path userHomeDirectory,
+            Path installationDirectory,
+            Map<String, String> systemProperties,
+            Map<String, String> userProperties)
+            throws ParserException, IOException {
+        ArrayList<CoreExtension> extensions = new ArrayList<>();
+        String installationExtensionsFile = userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS);
+        extensions.addAll(
+                readCoreExtensionsDescriptorFromFile(installationDirectory.resolve(installationExtensionsFile)));
+
+        String projectExtensionsFile = userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptorFromFile(cwd.resolve(projectExtensionsFile)));
+
+        String userExtensionsFile = userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
+        extensions.addAll(readCoreExtensionsDescriptorFromFile(userHomeDirectory.resolve(userExtensionsFile)));
+
+        return extensions;
+    }
+
+    protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile)
             throws ParserException, IOException {
         try {
-            if (extensionsFile != null) {
-                Path extensionsPath = cwd.resolve(extensionsFile);
-                if (Files.exists(extensionsPath)) {
-                    try (InputStream is = Files.newInputStream(extensionsPath)) {
-                        return new CoreExtensionsStaxReader().read(is, true).getExtensions();
-                    }
+            if (extensionsFile != null && Files.exists(extensionsFile)) {
+                try (InputStream is = Files.newInputStream(extensionsFile)) {
+                    return new CoreExtensionsStaxReader().read(is, true).getExtensions();
                 }
             }
             return List.of();
