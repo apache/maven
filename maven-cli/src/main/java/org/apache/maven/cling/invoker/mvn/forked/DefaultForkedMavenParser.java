@@ -20,13 +20,9 @@ package org.apache.maven.cling.invoker.mvn.forked;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.forked.ForkedMavenParser;
@@ -39,32 +35,22 @@ public class DefaultForkedMavenParser extends BaseMavenParser<MavenOptions, Fork
 
     @SuppressWarnings("ParameterNumber")
     @Override
-    protected ForkedMavenInvokerRequest getInvokerRequest(
-            ParserRequest parserRequest,
-            Path cwd,
-            Path installationDirectory,
-            Path userHomeDirectory,
-            Map<String, String> userProperties,
-            Map<String, String> systemProperties,
-            Path topDirectory,
-            Path rootDirectory,
-            List<CoreExtension> extensions,
-            Options options) {
+    protected ForkedMavenInvokerRequest getInvokerRequest(LocalContext context) {
         return new DefaultForkedMavenInvokerRequest(
-                parserRequest,
-                cwd,
-                installationDirectory,
-                userHomeDirectory,
-                userProperties,
-                systemProperties,
-                topDirectory,
-                rootDirectory,
-                parserRequest.in(),
-                parserRequest.out(),
-                parserRequest.err(),
-                extensions,
-                getJvmArguments(rootDirectory),
-                (MavenOptions) options);
+                context.parserRequest,
+                context.cwd,
+                context.installationDirectory,
+                context.userHomeDirectory,
+                context.userProperties,
+                context.systemProperties,
+                context.topDirectory,
+                context.rootDirectory,
+                context.parserRequest.in(),
+                context.parserRequest.out(),
+                context.parserRequest.err(),
+                context.extensions,
+                getJvmArguments(context.rootDirectory),
+                (MavenOptions) context.options);
     }
 
     protected List<String> getJvmArguments(Path rootDirectory) {

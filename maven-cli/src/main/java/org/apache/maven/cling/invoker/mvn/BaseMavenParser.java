@@ -24,13 +24,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.MavenParser;
@@ -38,28 +35,14 @@ import org.apache.maven.cling.invoker.BaseParser;
 
 public abstract class BaseMavenParser<O extends MavenOptions, R extends MavenInvokerRequest<O>> extends BaseParser<O, R>
         implements MavenParser<R> {
-    @SuppressWarnings("ParameterNumber")
-    @Override
-    protected abstract R getInvokerRequest(
-            ParserRequest parserRequest,
-            Path cwd,
-            Path installationDirectory,
-            Path userHomeDirectory,
-            Map<String, String> userProperties,
-            Map<String, String> systemProperties,
-            Path topDirectory,
-            Path rootDirectory,
-            List<CoreExtension> extensions,
-            Options options);
 
     @Override
-    protected List<O> parseCliOptions(ParserRequest parserRequest, Path rootDirectory)
-            throws ParserException, IOException {
+    protected List<O> parseCliOptions(LocalContext context) throws ParserException, IOException {
         ArrayList<O> result = new ArrayList<>();
         // CLI args
-        result.add(parseMavenCliOptions(parserRequest.args()));
+        result.add(parseMavenCliOptions(context.parserRequest.args()));
         // maven.config; if exists
-        Path mavenConfig = rootDirectory.resolve(".mvn/maven.config");
+        Path mavenConfig = context.rootDirectory.resolve(".mvn/maven.config");
         if (Files.isRegularFile(mavenConfig)) {
             result.add(parseMavenConfigOptions(mavenConfig));
         }
