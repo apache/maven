@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -153,7 +154,17 @@ public abstract class LookupInvoker<
         requireNonNull(invokerRequest);
 
         try (C context = createContext(invokerRequest)) {
+            Properties props = (Properties) System.getProperties().clone();
             try {
+                HashSet<String> sys =
+                        new HashSet<>(invokerRequest.systemProperties().keySet());
+                invokerRequest.userProperties().entrySet().stream()
+                        .filter(k -> !sys.contains(k.getKey()))
+                        .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+                System.setProperty(
+                        Constants.MAVEN_HOME,
+                        invokerRequest.installationDirectory().toString());
+
                 validate(context);
                 prepare(context);
                 configureLogging(context);
@@ -181,6 +192,8 @@ public abstract class LookupInvoker<
                 return execute(context);
             } catch (Exception e) {
                 throw handleException(context, e);
+            } finally {
+                System.setProperties(props);
             }
         }
     }

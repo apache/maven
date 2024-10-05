@@ -110,9 +110,9 @@ public abstract class DefaultMavenInvoker<
         DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         mavenExecutionRequest.setRepositoryCache(new DefaultRepositoryCache());
         mavenExecutionRequest.setInteractiveMode(true);
+        mavenExecutionRequest.setCacheTransferError(false);
         mavenExecutionRequest.setIgnoreInvalidArtifactDescriptor(true);
         mavenExecutionRequest.setIgnoreMissingArtifactDescriptor(true);
-        mavenExecutionRequest.setProjectPresent(true);
         mavenExecutionRequest.setRecursive(true);
         mavenExecutionRequest.setReactorFailureBehavior(MavenExecutionRequest.REACTOR_FAIL_FAST);
         mavenExecutionRequest.setStartTime(new Date());
