@@ -43,6 +43,7 @@ import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
 import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.manager.TransitiveDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
@@ -84,7 +85,10 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     }
 
     public DependencyManager getDependencyManager(boolean transitive) {
-        return new ClassicDependencyManager(transitive, getScopeManager());
+        if (transitive) {
+            return new TransitiveDependencyManager(getScopeManager());
+        }
+        return new ClassicDependencyManager(getScopeManager());
     }
 
     protected DependencySelector getDependencySelector() {
