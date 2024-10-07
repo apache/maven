@@ -1744,20 +1744,16 @@
           <name>relativePath</name>
           <version>4.0.0+</version>
           <description>
-            The relative path of the parent {@code pom.xml} file within the checkout.
-            If not specified, it defaults to {@code ../pom.xml}.
+            The relative path of the parent subproject POM file or directory within the checkout.
+            If not specified, it defaults to {@code ..}, i.e. the parent directory.
             Maven looks for the parent POM first in this location on
-            the filesystem, then the local repository, and lastly in the remote repo.
-            {@code relativePath} allows you to select a different location,
-            for example when your structure is flat, or deeper without an intermediate parent POM.
-            However, the group ID, artifact ID and version are still required,
-            and must match the file in the location given, or it will revert to the repository for the POM.
-            This feature is only for enhancing the development in a local checkout of that project.
-            Set the value to an empty string in case you want to disable the feature and always resolve
-            the parent POM from the repositories.
+            the filesystem if explicitly provided, then in the reactor if groupId and artifactId are provided,
+            then in the default parent directory, then the local repository, and lastly in the remote repo.
+            However, if the both relative path and the group ID / artifact ID are provided,
+            they must match the file in the location given.
+            Specify either the {@code relativePath} or the {@code groupId}/{@code artifactId}, not both.
           </description>
           <type>String</type>
-          <defaultValue>..</defaultValue>
         </field>
       </fields>
       <codeSegments>

@@ -53,6 +53,10 @@ public interface ModelBuilderRequest {
          */
         BUILD_POM,
         /**
+         * The request is for building the consumer POM.
+         */
+        CONSUMER_POM,
+        /**
          * The request is for building a model from a parent POM file from a downloaded artifact.
          */
         PARENT_POM,

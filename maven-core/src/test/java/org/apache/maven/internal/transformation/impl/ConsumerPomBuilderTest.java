@@ -20,9 +20,6 @@ package org.apache.maven.internal.transformation.impl;
 
 import javax.inject.Inject;
 
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -35,17 +32,17 @@ import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.model.ModelResolver;
 import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.api.spi.ModelTransformerException;
 import org.apache.maven.di.Injector;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.impl.InternalSession;
-import org.apache.maven.internal.impl.model.DefaultModelBuilder;
 import org.apache.maven.internal.transformation.AbstractRepositoryTestCase;
-import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,6 +54,9 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
     @Inject
     ConsumerPomBuilder builder;
+
+    @Inject
+    ModelBuilder modelBuilder;
 
     @BeforeEach
     void setupTransformerContext() throws Exception {
@@ -71,33 +71,30 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         //    to maven central
         getContainer().lookup(Injector.class).bindImplicit(MyModelResolver.class);
         InternalSession iSession = InternalSession.from(session);
-        // set up the transformers
-        List<ModelTransformer> transformers = List.of(new CIFriendlyVersionModelTransformer(iSession));
-        Field transformersField = DefaultModelBuilder.class.getDeclaredField("transformers");
-        transformersField.setAccessible(true);
-        DefaultModelBuilder modelBuilder = (DefaultModelBuilder) getContainer().lookup(ModelBuilder.class);
-        transformersField.set(modelBuilder, transformers);
-        transformersField = DefaultConsumerPomBuilder.class.getDeclaredField("transformers");
-        transformersField.setAccessible(true);
-        transformersField.set(builder, transformers);
         // set up the model resolver
         iSession.getData().set(SessionData.key(ModelResolver.class), new MyModelResolver());
     }
 
     @Test
     void testTrivialConsumer() throws Exception {
-        MavenProject project;
-        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
-        try (InputStream inputStream = Files.newInputStream(file)) {
-            org.apache.maven.model.Model model =
-                    new org.apache.maven.model.Model(new MavenStaxReader().read(inputStream));
-            project = new MavenProject(model);
-            project.setOriginalModel(model);
-        }
         InternalMavenSession.from(InternalSession.from(session))
                 .getMavenSession()
                 .getRequest()
                 .setRootDirectory(Paths.get("src/test/resources/consumer/trivial"));
+
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+
+        ModelBuilder.ModelBuilderSession mbs = modelBuilder.newSession();
+        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
+        Model orgModel = mbs.build(ModelBuilderRequest.builder()
+                        .session(InternalSession.from(session))
+                        .source(ModelSource.fromPath(file))
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
+                        .build())
+                .getEffectiveModel();
+
+        MavenProject project = new MavenProject(orgModel);
+        project.setOriginalModel(new org.apache.maven.model.Model(orgModel));
         Model model = builder.build(session, project, file);
 
         assertNotNull(model);
@@ -105,24 +102,26 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
     @Test
     void testSimpleConsumer() throws Exception {
-        MavenProject project;
+        MavenExecutionRequest request = InternalMavenSession.from(InternalSession.from(session))
+                .getMavenSession()
+                .getRequest();
+        request.setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
+        request.getUserProperties().setProperty("changelist", "MNG6957");
+
         Path file = Paths.get("src/test/resources/consumer/simple/simple-parent/simple-weather/pom.xml");
 
-        InternalMavenSession.from(InternalSession.from(session))
-                .getMavenSession()
-                .getRequest()
-                .getUserProperties()
-                .setProperty("changelist", "MNG6957");
-        try (InputStream inputStream = Files.newInputStream(file)) {
-            org.apache.maven.model.Model model =
-                    new org.apache.maven.model.Model(new MavenStaxReader().read(inputStream));
-            project = new MavenProject(model);
-            project.setOriginalModel(model);
-        }
-        InternalMavenSession.from(InternalSession.from(session))
-                .getMavenSession()
-                .getRequest()
-                .setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
+        ModelBuilder.ModelBuilderSession mbs = modelBuilder.newSession();
+        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
+        Model orgModel = mbs.build(ModelBuilderRequest.builder()
+                        .session(InternalSession.from(session))
+                        .source(ModelSource.fromPath(file))
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
+                        .build())
+                .getEffectiveModel();
+
+        MavenProject project = new MavenProject(orgModel);
+        project.setOriginalModel(new org.apache.maven.model.Model(orgModel));
+        request.setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
         Model model = builder.build(session, project, file);
 
         assertNotNull(model);

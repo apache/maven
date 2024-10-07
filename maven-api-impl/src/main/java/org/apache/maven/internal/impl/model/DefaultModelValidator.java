@@ -326,6 +326,24 @@ public class DefaultModelValidator implements ModelValidator {
                         "is either LATEST or RELEASE (both of them are being deprecated)",
                         parent);
             }
+
+            if (parent.getRelativePath() != null
+                    && !parent.getRelativePath().isEmpty()
+                    && (parent.getGroupId() != null && !parent.getGroupId().isEmpty()
+                            || parent.getArtifactId() != null
+                                    && !parent.getArtifactId().isEmpty())
+                    && validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0
+                    && VALID_MODEL_VERSIONS.contains(m.getModelVersion())
+                    && !Objects.equals(m.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {
+                addViolation(
+                        problems,
+                        Severity.WARNING,
+                        Version.BASE,
+                        "parent.relativePath",
+                        null,
+                        "only specify relativePath or groupId/artifactId in modelVersion 4.1.0",
+                        parent);
+            }
         }
 
         if (validationLevel == ModelValidator.VALIDATION_LEVEL_MINIMAL) {

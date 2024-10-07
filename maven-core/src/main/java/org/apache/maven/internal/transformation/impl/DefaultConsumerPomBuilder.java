@@ -21,10 +21,14 @@ package org.apache.maven.internal.transformation.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.SessionData;
@@ -35,42 +39,17 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.SuperPomProvider;
-import org.apache.maven.api.services.model.DependencyManagementImporter;
-import org.apache.maven.api.services.model.DependencyManagementInjector;
-import org.apache.maven.api.services.model.InheritanceAssembler;
+import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
-import org.apache.maven.api.services.model.ModelCacheFactory;
-import org.apache.maven.api.services.model.ModelInterpolator;
-import org.apache.maven.api.services.model.ModelNormalizer;
-import org.apache.maven.api.services.model.ModelPathTranslator;
-import org.apache.maven.api.services.model.ModelProcessor;
-import org.apache.maven.api.services.model.ModelResolver;
-import org.apache.maven.api.services.model.ModelUrlNormalizer;
-import org.apache.maven.api.services.model.ModelValidator;
-import org.apache.maven.api.services.model.ModelVersionParser;
-import org.apache.maven.api.services.model.PluginConfigurationExpander;
-import org.apache.maven.api.services.model.PluginManagementInjector;
-import org.apache.maven.api.services.model.ProfileActivationContext;
-import org.apache.maven.api.services.model.ProfileInjector;
-import org.apache.maven.api.services.model.ProfileSelector;
-import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.internal.impl.InternalSession;
-import org.apache.maven.internal.impl.model.DefaultModelBuilder;
-import org.apache.maven.internal.impl.model.DefaultProfileSelector;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
@@ -78,73 +57,13 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
     public static final String POM_PACKAGING = "pom";
 
-    private final ProfileInjector profileInjector;
-    private final InheritanceAssembler inheritanceAssembler;
-    private final DependencyManagementImporter dependencyManagementImporter;
-    private final DependencyManagementInjector dependencyManagementInjector;
     private final LifecycleBindingsInjector lifecycleBindingsInjector;
-    private final ModelInterpolator modelInterpolator;
-    private final ModelNormalizer modelNormalizer;
-    private final ModelPathTranslator modelPathTranslator;
-    private final ModelProcessor modelProcessor;
-    private final ModelUrlNormalizer modelUrlNormalizer;
-    private final ModelValidator modelValidator;
-    private final PluginConfigurationExpander pluginConfigurationExpander;
-    private final PluginManagementInjector pluginManagementInjector;
-    private final SuperPomProvider superPomProvider;
-    private final ModelVersionParser versionParser;
-    private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
-    private final List<ModelTransformer> transformers;
-    private final ModelCacheFactory modelCacheFactory;
-    private final ModelResolver modelResolver;
-    private final Interpolator interpolator;
 
     @Inject
     @SuppressWarnings("checkstyle:ParameterNumber")
-    DefaultConsumerPomBuilder(
-            ProfileInjector profileInjector,
-            InheritanceAssembler inheritanceAssembler,
-            DependencyManagementImporter dependencyManagementImporter,
-            DependencyManagementInjector dependencyManagementInjector,
-            LifecycleBindingsInjector lifecycleBindingsInjector,
-            ModelInterpolator modelInterpolator,
-            ModelNormalizer modelNormalizer,
-            ModelPathTranslator modelPathTranslator,
-            ModelProcessor modelProcessor,
-            ModelUrlNormalizer modelUrlNormalizer,
-            ModelValidator modelValidator,
-            PluginConfigurationExpander pluginConfigurationExpander,
-            PluginManagementInjector pluginManagementInjector,
-            SuperPomProvider superPomProvider,
-            ModelVersionParser versionParser,
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
-            List<ModelTransformer> transformers,
-            ModelCacheFactory modelCacheFactory,
-            ModelResolver modelResolver,
-            Interpolator interpolator) {
-        this.profileInjector = profileInjector;
-        this.inheritanceAssembler = inheritanceAssembler;
-        this.dependencyManagementImporter = dependencyManagementImporter;
-        this.dependencyManagementInjector = dependencyManagementInjector;
+    DefaultConsumerPomBuilder(LifecycleBindingsInjector lifecycleBindingsInjector) {
         this.lifecycleBindingsInjector = lifecycleBindingsInjector;
-        this.modelInterpolator = modelInterpolator;
-        this.modelNormalizer = modelNormalizer;
-        this.modelPathTranslator = modelPathTranslator;
-        this.modelProcessor = modelProcessor;
-        this.modelUrlNormalizer = modelUrlNormalizer;
-        this.modelValidator = modelValidator;
-        this.pluginConfigurationExpander = pluginConfigurationExpander;
-        this.pluginManagementInjector = pluginManagementInjector;
-        this.superPomProvider = superPomProvider;
-        this.versionParser = versionParser;
-        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
-        this.transformers = transformers;
-        this.modelCacheFactory = modelCacheFactory;
-        this.modelResolver = modelResolver;
-        this.interpolator = interpolator;
     }
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
@@ -174,49 +93,18 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
     private ModelBuilderResult buildModel(RepositorySystemSession session, MavenProject project, Path src)
             throws ModelBuilderException {
-        ProfileSelector customSelector = new DefaultProfileSelector() {
-            @Override
-            public List<Profile> getActiveProfiles(
-                    Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems) {
-                return new ArrayList<>();
-            }
-        };
-        // TODO: the custom selector should be used as a flag on the request
-        DefaultModelBuilder modelBuilder = new DefaultModelBuilder(
-                modelProcessor,
-                modelValidator,
-                modelNormalizer,
-                modelInterpolator,
-                modelPathTranslator,
-                modelUrlNormalizer,
-                superPomProvider,
-                inheritanceAssembler,
-                customSelector,
-                profileInjector,
-                pluginManagementInjector,
-                dependencyManagementInjector,
-                dependencyManagementImporter,
-                pluginConfigurationExpander,
-                profileActivationFilePathInterpolator,
-                versionParser,
-                transformers,
-                modelCacheFactory,
-                modelResolver,
-                interpolator);
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
-        request.requestType(ModelBuilderRequest.RequestType.BUILD_POM);
+        request.requestType(ModelBuilderRequest.RequestType.CONSUMER_POM);
         request.session(iSession);
-        request.source(ModelSource.fromPath(src));
+        // in order to resolve parents, we need to fake being at the correct location
+        request.source(new PomConsumerModelSource(project.getModel().getPomPath(), src));
         request.locationTracking(false);
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
         request.lifecycleBindingsInjector(lifecycleBindingsInjector::injectLifecycleBindings);
         ModelBuilder.ModelBuilderSession mbSession =
                 iSession.getData().get(SessionData.key(ModelBuilder.ModelBuilderSession.class));
-        if (mbSession == null) {
-            mbSession = modelBuilder.newSession();
-        }
         return mbSession.build(request.build());
     }
 
@@ -319,5 +207,64 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         return repositories.stream()
                 .filter(r -> !org.apache.maven.api.Repository.CENTRAL_ID.equals(r.getId()))
                 .collect(Collectors.toList());
+    }
+
+    static class PomConsumerModelSource implements ModelSource {
+        final Path path;
+        final Path src;
+
+        PomConsumerModelSource(Path path, Path src) {
+            this.path = path;
+            this.src = src;
+        }
+
+        @Override
+        public Path getPath() {
+            return path;
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return Files.newInputStream(src);
+        }
+
+        @Override
+        public String getLocation() {
+            return src.toString();
+        }
+
+        @Override
+        public Source resolve(String relative) {
+            return ModelSource.fromPath(path.resolve(relative));
+        }
+
+        @Override
+        public ModelSource resolve(ModelLocator locator, String relative) {
+            String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
+            Path path = getPath().getParent().resolve(norm);
+            Path relatedPom = locator.locateExistingPom(path);
+            if (relatedPom != null) {
+                return ModelSource.fromPath(relatedPom);
+            }
+            return null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return this == o
+                    || o.getClass() == getClass()
+                            && Objects.equals(path, ((PomConsumerModelSource) o).path)
+                            && Objects.equals(src, ((PomConsumerModelSource) o).src);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(path, src);
+        }
+
+        @Override
+        public String toString() {
+            return "PomConsumerModelSource[" + "path=" + path + ']';
+        }
     }
 }
