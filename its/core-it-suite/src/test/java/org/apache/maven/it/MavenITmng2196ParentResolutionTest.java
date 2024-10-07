@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng2196ParentResolutionTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng2196ParentResolutionTest() {
-        super(ALL_MAVEN_VERSIONS);
+        super("[2.0,4.0.0-beta-5)");
     }
 
     /**
