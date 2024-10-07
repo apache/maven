@@ -1328,9 +1328,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                 // defined on the root project.
                 Map<String, String> properties = new HashMap<>();
                 if (!Objects.equals(rootDirectory, model.getProjectDirectory())) {
-                    Model rootModel = derive(ModelSource.fromPath(modelProcessor.locateExistingPom(rootDirectory)))
-                            .readFileModel();
-                    properties.putAll(rootModel.getProperties());
+                    Path rootModelPath = modelProcessor.locateExistingPom(rootDirectory);
+                    if (rootModelPath != null) {
+                        Model rootModel =
+                                derive(ModelSource.fromPath(rootModelPath)).readFileModel();
+                        properties.putAll(rootModel.getProperties());
+                    }
                 } else {
                     properties.putAll(model.getProperties());
                 }
