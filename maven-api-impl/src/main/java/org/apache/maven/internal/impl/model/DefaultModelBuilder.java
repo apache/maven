@@ -1640,7 +1640,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (sources != null) {
                 for (ModelSource source : sources) {
                     Model model = derive(source).readRawModel();
-                    if (Objects.equals(model.getVersion(), version)) {
+                    if (Objects.equals(getVersion(model), version)) {
                         return source;
                     }
                 }
