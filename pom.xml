@@ -165,7 +165,7 @@ under the License.
     <project.build.outputTimestamp>2024-08-30T12:59:00Z</project.build.outputTimestamp>
     <!-- various versions -->
     <assertjVersion>3.26.3</assertjVersion>
-    <asmVersion>9.7</asmVersion>
+    <asmVersion>9.7.1</asmVersion>
     <byteBuddyVersion>1.15.3</byteBuddyVersion>
     <cipherVersion>3.0.0</cipherVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
