@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -283,9 +284,9 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
-    private final Set<String> validCoordinatesIds = new HashSet<>();
+    private final Set<String> validCoordinatesIds = ConcurrentHashMap.newKeySet();
 
-    private final Set<String> validProfileIds = new HashSet<>();
+    private final Set<String> validProfileIds = ConcurrentHashMap.newKeySet();
 
     @Inject
     public DefaultModelValidator() {}
