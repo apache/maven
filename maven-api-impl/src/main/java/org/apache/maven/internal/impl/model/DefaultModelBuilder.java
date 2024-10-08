@@ -828,6 +828,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             result.setEffectiveModel(resultModel);
+            if (result.getFileModel().getParent() != null
+                    && result.getFileModel().getParent().getRelativePath() == null) {
+                result.setFileModel(result.getFileModel()
+                        .withParent(result.getFileModel()
+                                .getParent()
+                                .withRelativePath(resultModel.getParent().getRelativePath())));
+            }
 
             // effective model validation
             modelValidator.validateEffectiveModel(
@@ -1137,6 +1144,21 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             Model parentModel = readParent(inputModel);
+            if (inputModel.getParent() != null && inputModel.getParent().getRelativePath() == null) {
+                String relPath;
+                if (parentModel.getPomFile() != null
+                        && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+                                || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM)) {
+                    relPath = inputModel
+                            .getPomFile()
+                            .getParent()
+                            .relativize(parentModel.getPomFile().getParent())
+                            .toString();
+                } else {
+                    relPath = "..";
+                }
+                inputModel = inputModel.withParent(inputModel.getParent().withRelativePath(relPath));
+            }
 
             List<Profile> parentInterpolatedProfiles =
                     interpolateActivations(parentModel.getProfiles(), profileActivationContext, this);
