@@ -1497,7 +1497,7 @@ public class DefaultModelValidator implements ModelValidator {
             String id,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (validCoordinatesIds.contains(id)) {
+        if (id != null && validCoordinatesIds.contains(id)) {
             return true;
         }
         if (!validateStringNotEmpty(prefix, fieldName, problems, severity, version, id, sourceHint, tracker)) {
