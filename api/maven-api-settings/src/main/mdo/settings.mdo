@@ -975,7 +975,8 @@
           <version>1.0.0+</version>
           <type>String</type>
           <description>
-            The name of the file that should be missing to activate a profile.
+            The name of the file that should be missing to activate a profile. Please note, that missing and exists
+            fields cannot be used together. Only one of them should be used at any one time.
           </description>
         </field>
         <field>
@@ -983,7 +984,8 @@
           <version>1.0.0+</version>
           <type>String</type>
           <description>
-            The name of the file that should exist to activate a profile.
+            The name of the file that should exist to activate a profile. Please note, that missing and exists
+            fields cannot be used together. Only one of them should be used at any one time.
           </description>
         </field>
       </fields>

@@ -2892,14 +2892,15 @@
           <name>missing</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <description>The name of the file that must be missing to activate the
-          profile.</description>
+          <description>The name of the file that must be missing to activate the profile. Please note, that missing and exists
+          fields cannot be used together. Only one of them should be used at any one time.</description>
         </field>
         <field>
           <name>exists</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <description>The name of the file that must exist to activate the profile.</description>
+          <description>The name of the file that must exist to activate the profile. Please note, that missing and exists
+          fields cannot be used together. Only one of them should be used at any one time.</description>
         </field>
       </fields>
     </class>
