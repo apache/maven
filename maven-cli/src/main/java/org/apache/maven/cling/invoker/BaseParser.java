@@ -31,8 +31,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.function.Function;
@@ -197,33 +195,10 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
     }
 
     protected Path getRootDirectory(LocalContext context) throws ParserException {
-        RootLocator rootLocator =
-                ServiceLoader.load(RootLocator.class).iterator().next();
-        Path rootDirectory = rootLocator.findMandatoryRoot(requireNonNull(context.topDirectory));
-
-        Optional<Path> rdf = getRootDirectoryFallback(context);
-        if (rootDirectory == null) {
-            context.parserRequest.logger().warn(rootLocator.getNoRootMessage());
-            rootDirectory = rdf.orElseThrow(() -> new ParserException(
-                    "local mode requires rootDirectory, but rootDirectory could not be discovered and "
-                            + "fallback maven.multiModuleProjectDirectory is not set"));
-        } else {
-            rootDirectory = getCanonicalPath(rootDirectory);
-            if (rdf.isPresent() && !Objects.equals(rootDirectory, rdf.get())) {
-                context.parserRequest
-                        .logger()
-                        .warn("Project root directory and multiModuleProjectDirectory are not aligned");
-            }
-        }
-        return getCanonicalPath(rootDirectory);
-    }
-
-    protected Optional<Path> getRootDirectoryFallback(LocalContext context) throws ParserException {
-        String mmpd = System.getProperty("maven.multiModuleProjectDirectory");
-        if (mmpd != null) {
-            return Optional.of(getCanonicalPath(context.cwd.resolve(mmpd)));
-        }
-        return Optional.empty();
+        return getCanonicalPath(ServiceLoader.load(RootLocator.class)
+                .iterator()
+                .next()
+                .findMandatoryRoot(requireNonNull(context.topDirectory)));
     }
 
     protected Map<String, String> populateSystemProperties(LocalContext context) throws ParserException {
