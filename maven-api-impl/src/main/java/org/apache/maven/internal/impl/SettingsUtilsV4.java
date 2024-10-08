@@ -127,6 +127,8 @@ public final class SettingsUtilsV4 {
 
             activation.packaging(modelActivation.getPackaging());
 
+            activation.condition(modelActivation.getCondition());
+
             profile.activation(activation.build());
         }
 
@@ -212,6 +214,8 @@ public final class SettingsUtilsV4 {
 
             activation.packaging(settingsActivation.getPackaging());
 
+            activation.condition(settingsActivation.getCondition());
+
             profile.activation(activation.build());
         }
 
@@ -233,7 +237,7 @@ public final class SettingsUtilsV4 {
         }
 
         org.apache.maven.api.model.Profile value = profile.build();
-        value.setSource("settings.xml");
+        value.setSource(org.apache.maven.api.model.Profile.SOURCE_SETTINGS);
         return value;
     }
 

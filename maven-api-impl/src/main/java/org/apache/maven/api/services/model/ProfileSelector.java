@@ -38,8 +38,13 @@ public interface ProfileSelector {
      * @param context The environmental context used to determine the activation status of a profile, must not be
      *            {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     * @param cascade Indicates whether profile activation should cascade, i.e. properties from an activated profile may
+     *                trigger the activation of other profiles.
      * @return The profiles that have been activated, never {@code null}.
      */
     List<Profile> getActiveProfiles(
-            Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems);
+            Collection<Profile> profiles,
+            ProfileActivationContext context,
+            ModelProblemCollector problems,
+            boolean cascade);
 }

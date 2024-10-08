@@ -2746,10 +2746,43 @@
     <class>
       <name>Activation</name>
       <version>4.0.0+</version>
-      <description>The conditions within the build runtime environment which will trigger the
+      <description><![CDATA[
+        The conditions within the build runtime environment which will trigger the
         automatic inclusion of the build profile. Multiple conditions can be defined, which must
         be all satisfied to activate the profile.
-      </description>
+
+        <p>In addition to the traditional activation mechanisms (JDK version, OS properties,
+        file existence, etc.), Maven now supports a powerful condition-based activation
+        through the {@code condition} field. This new mechanism allows for more flexible
+        and expressive profile activation rules.</p>
+
+        <h2>Condition Syntax</h2>
+
+        <p>The condition is specified as a string expression that can include various
+        functions, comparisons, and logical operators. Some key features include:</p>
+
+        <ul>
+        <li>Property access: {@code ${property.name}}</li>
+        <li>Comparison operators: {@code ==}, {@code !=}, {@code <}, {@code >}, {@code <=}, {@code >=}</li>
+        <li>Logical operators: {@code &&} (AND), {@code ||} (OR), {@code not(...)}</li>
+        <li>Functions: {@code exists(...)}, {@code missing(...)}, {@code matches(...)}, {@code inrange(...)}</li>
+        </ul>
+
+        <h2>Examples</h2>
+
+        <ol>
+        <li>JDK version range: {@code inrange(${java.version}, '[11,)')} (JDK 11 or higher)</li>
+        <li>OS check: {@code ${os.name} == 'windows'}</li>
+        <li>File existence: {@code exists('${project.basedir}/some-file.txt')}</li>
+        <li>Property check: {@code ${my.property} != 'some-value'}</li>
+        <li>Regex matching: {@code matches(${os.version}, '.*aws')}</li>
+        <li>Complex condition: {@code ${os.name} == 'windows' && ${os.arch} != 'amd64' && inrange(${os.version}, '[10,)')}</li>
+        </ol>
+
+        <p>This flexible condition mechanism allows for more precise control over profile
+        activation, enabling developers to create profiles that respond to a wide range of
+        environmental factors and project states.</p>
+      ]]></description>
       <fields>
         <field>
           <name>activeByDefault</name>
@@ -2801,6 +2834,12 @@
           <version>4.1.0+</version>
           <type>String</type>
           <description>Specifies that this profile will be activated based on the project's packaging.</description>
+        </field>
+        <field>
+          <name>condition</name>
+          <version>4.1.0+</version>
+          <type>String</type>
+          <description>The condition which must be satisfied to activate the profile.</description>
         </field>
         <!--
         This could be included once we teach Maven to deal with multiple versions of the model
