@@ -134,8 +134,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 pluginArtifact = pluginArtifact.setProperties(props);
             }
         } catch (ArtifactDescriptorException e) {
-            throw new PluginResolutionException(
-                    plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
+            throw new PluginResolutionException(plugin, e.getResult().getExceptions(), e);
         }
 
         try {
@@ -143,8 +142,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             request.setTrace(trace);
             pluginArtifact = repoSystem.resolveArtifact(session, request).getArtifact();
         } catch (ArtifactResolutionException e) {
-            throw new PluginResolutionException(
-                    plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
+            throw new PluginResolutionException(plugin, e.getResult().getExceptions(), e);
         }
 
         return pluginArtifact;
@@ -233,8 +231,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             depRequest.setRoot(node);
             return repoSystem.resolveDependencies(session, depRequest);
         } catch (DependencyCollectionException e) {
-            throw new PluginResolutionException(
-                    plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
+            throw new PluginResolutionException(plugin, e.getResult().getExceptions(), e);
         } catch (DependencyResolutionException e) {
             List<Exception> exceptions = Stream.concat(
                             e.getResult().getCollectExceptions().stream(),
@@ -242,7 +239,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                                     .filter(r -> !r.isResolved())
                                     .flatMap(r -> r.getExceptions().stream()))
                     .collect(Collectors.toList());
-            throw new PluginResolutionException(plugin, exceptions, logger.isDebugEnabled() ? e : null);
+            throw new PluginResolutionException(plugin, exceptions, e);
         }
     }
 }
