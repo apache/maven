@@ -128,7 +128,7 @@ under the License.
     <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
     <classWorldsVersion>2.8.0</classWorldsVersion>
     <commonsCliVersion>1.8.0</commonsCliVersion>
-    <commonsIoVersion>2.16.1</commonsIoVersion>
+    <commonsIoVersion>2.17.0</commonsIoVersion>
     <junitVersion>4.13.2</junitVersion>
     <hamcrestVersion>3.0</hamcrestVersion>
     <mockitoVersion>4.11.0</mockitoVersion>
