@@ -744,6 +744,14 @@
             Specifies that this profile will be activated based on the project's packaging.
           </description>
         </field>
+        <field>
+          <name>condition</name>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>
+            The condition which must be satisfied to activate the profile.
+          </description>
+        </field>
       </fields>
     </class>
 
