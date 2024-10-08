@@ -201,15 +201,15 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
                 ServiceLoader.load(RootLocator.class).iterator().next();
         Path rootDirectory = rootLocator.findRoot(requireNonNull(context.topDirectory));
 
-        Optional<Path> mmpd = getRootDirectoryFallback(context);
+        Optional<Path> rdf = getRootDirectoryFallback(context);
         if (rootDirectory == null) {
             context.parserRequest.logger().warn(rootLocator.getNoRootMessage());
-            rootDirectory = mmpd.orElseThrow(() -> new ParserException(
+            rootDirectory = rdf.orElseThrow(() -> new ParserException(
                     "local mode requires rootDirectory, but rootDirectory could not be discovered and "
                             + "fallback maven.multiModuleProjectDirectory is not set"));
         } else {
             rootDirectory = getCanonicalPath(rootDirectory);
-            if (mmpd.isPresent() && !Objects.equals(rootDirectory, mmpd.get())) {
+            if (rdf.isPresent() && !Objects.equals(rootDirectory, rdf.get())) {
                 context.parserRequest
                         .logger()
                         .warn("Project root directory and multiModuleProjectDirectory are not aligned");
