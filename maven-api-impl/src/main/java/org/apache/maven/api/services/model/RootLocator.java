@@ -22,12 +22,11 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Interface used to locate the root directory for a given project.
  *
- * The root locator is usually looked up from the plexus container.
+ * The root locator is usually looked up from the DI container.
  * One notable exception is the computation of the early {@code session.rootDirectory}
  * property which happens very early.  The implementation used in this case
  * will be discovered using the JDK service mechanism.
@@ -42,27 +41,10 @@ public interface RootLocator extends Service {
             + " attribute on the root project's model to identify it.";
 
     @Nonnull
-    default Path findMandatoryRoot(@Nullable Path basedir) {
-        Path rootDirectory = findRoot(basedir);
-        if (rootDirectory == null) {
-            throw new IllegalStateException(getNoRootMessage());
-        }
-        return rootDirectory;
-    }
-
-    @Nullable
-    default Path findRoot(@Nullable Path basedir) {
-        Path rootDirectory = basedir;
-        while (rootDirectory != null && !isRootDirectory(rootDirectory)) {
-            rootDirectory = rootDirectory.getParent();
-        }
-        return rootDirectory;
-    }
+    Path findMandatoryRoot(@Nonnull Path basedir);
 
     @Nonnull
     default String getNoRootMessage() {
         return UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE;
     }
-
-    boolean isRootDirectory(Path dir);
 }

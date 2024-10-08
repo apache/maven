@@ -164,7 +164,7 @@ public abstract class AbstractMavenProjectTestCase {
                 new DefaultSessionFactory(repoSystem, repositorySystem, new DefaultLookup(container), null);
 
         MavenSession session = new MavenSession(
-                getContainer(), repoSession, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
+                getContainer(), repoSession, new DefaultMavenExecutionRequest(true), new DefaultMavenExecutionResult());
         session.setSession(defaultSessionFactory.newSession(session));
 
         DefaultSession s = new DefaultSession(session, null, null, null, null, null);

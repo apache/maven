@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.function.Function;
@@ -43,10 +42,10 @@ import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.props.MavenPropertiesLoader;
-import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 
@@ -196,30 +195,10 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
     }
 
     protected Path getRootDirectory(LocalContext context) throws ParserException {
-        RootLocator rootLocator =
-                ServiceLoader.load(RootLocator.class).iterator().next();
-        Path rootDirectory = rootLocator.findRoot(requireNonNull(context.topDirectory));
-
-        // TODO: multiModuleProjectDirectory vs rootDirectory?
-        // fallback if no root? otherwise make sure they are same?
-        Path mmpd = System.getProperty("maven.multiModuleProjectDirectory") == null
-                ? null
-                : getCanonicalPath(context.cwd.resolve(requireNonNull(
-                        System.getProperty("maven.multiModuleProjectDirectory"),
-                        "maven.multiModuleProjectDirectory is not set")));
-        if (rootDirectory == null) {
-            context.parserRequest.logger().warn(rootLocator.getNoRootMessage());
-            rootDirectory = requireNonNull(
-                    mmpd, "maven.multiModuleProjectDirectory is not set and rootDirectory was not discovered");
-        } else {
-            rootDirectory = getCanonicalPath(rootDirectory);
-            if (mmpd != null && !Objects.equals(rootDirectory, mmpd)) {
-                context.parserRequest
-                        .logger()
-                        .warn("Project root directory and multiModuleProjectDirectory are not aligned");
-            }
-        }
-        return getCanonicalPath(rootDirectory);
+        return getCanonicalPath(ServiceLoader.load(RootLocator.class)
+                .iterator()
+                .next()
+                .findMandatoryRoot(requireNonNull(context.topDirectory)));
     }
 
     protected Map<String, String> populateSystemProperties(LocalContext context) throws ParserException {

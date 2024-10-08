@@ -52,6 +52,7 @@ import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.TypeRegistry;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.spi.TypeProvider;
 import org.apache.maven.di.Injector;
@@ -153,12 +154,12 @@ public class ApiRunner {
 
         @Override
         public Path getTopDirectory() {
-            return null;
+            return Paths.get("");
         }
 
         @Override
         public Path getRootDirectory() {
-            throw new IllegalStateException();
+            return getService(RootLocator.class).findMandatoryRoot(getTopDirectory());
         }
 
         @Override
