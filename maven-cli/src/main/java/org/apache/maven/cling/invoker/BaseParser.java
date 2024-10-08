@@ -44,10 +44,10 @@ import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.props.MavenPropertiesLoader;
-import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 
@@ -199,7 +199,7 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
     protected Path getRootDirectory(LocalContext context) throws ParserException {
         RootLocator rootLocator =
                 ServiceLoader.load(RootLocator.class).iterator().next();
-        Path rootDirectory = rootLocator.findRoot(requireNonNull(context.topDirectory));
+        Path rootDirectory = rootLocator.findMandatoryRoot(requireNonNull(context.topDirectory));
 
         Optional<Path> rdf = getRootDirectoryFallback(context);
         if (rootDirectory == null) {

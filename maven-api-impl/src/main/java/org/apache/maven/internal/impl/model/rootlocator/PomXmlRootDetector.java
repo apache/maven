@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl.model;
+package org.apache.maven.internal.impl.model.rootlocator;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -27,28 +27,13 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
-import org.apache.maven.api.services.model.RootLocator;
+import org.apache.maven.api.services.model.RootDetector;
 
 @Named
-public class DefaultRootLocator implements RootLocator {
-
-    @Override
-    @Nullable
-    public Path findRoot(Path basedir) {
-        Path rootDirectory = basedir;
-        while (rootDirectory != null && !isRootDirectory(rootDirectory)) {
-            rootDirectory = rootDirectory.getParent();
-        }
-        return rootDirectory;
-    }
-
+public class PomXmlRootDetector implements RootDetector {
     @Override
     public boolean isRootDirectory(Path dir) {
-        if (Files.isDirectory(dir.resolve(".mvn"))) {
-            return true;
-        }
         // we're too early to use the modelProcessor ...
         Path pom = dir.resolve("pom.xml");
         try (InputStream is = Files.newInputStream(pom)) {

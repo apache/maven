@@ -637,7 +637,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             try {
                 rootDirectory = session.getRootDirectory();
             } catch (IllegalStateException e) {
-                rootDirectory = session.getService(RootLocator.class).findRoot(top);
+                rootDirectory = session.getService(RootLocator.class).findMandatoryRoot(top);
             }
 
             // Locate and normalize the root POM if it exists, fallback to top otherwise

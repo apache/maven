@@ -29,7 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@link org.apache.maven.api.services.model.RootLocator} instead
  */
 @Named
 @Deprecated(since = "4.0.0")
