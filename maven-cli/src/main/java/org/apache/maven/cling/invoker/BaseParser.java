@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.function.Function;
@@ -200,26 +201,29 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
                 ServiceLoader.load(RootLocator.class).iterator().next();
         Path rootDirectory = rootLocator.findRoot(requireNonNull(context.topDirectory));
 
-        // TODO: multiModuleProjectDirectory vs rootDirectory?
-        // fallback if no root? otherwise make sure they are same?
-        Path mmpd = System.getProperty("maven.multiModuleProjectDirectory") == null
-                ? null
-                : getCanonicalPath(context.cwd.resolve(requireNonNull(
-                        System.getProperty("maven.multiModuleProjectDirectory"),
-                        "maven.multiModuleProjectDirectory is not set")));
+        Optional<Path> mmpd = getRootDirectoryFallback(context);
         if (rootDirectory == null) {
             context.parserRequest.logger().warn(rootLocator.getNoRootMessage());
-            rootDirectory = requireNonNull(
-                    mmpd, "maven.multiModuleProjectDirectory is not set and rootDirectory was not discovered");
+            rootDirectory = mmpd.orElseThrow(() -> new ParserException(
+                    "local mode requires rootDirectory, but rootDirectory could not be discovered and "
+                            + "fallback maven.multiModuleProjectDirectory is not set"));
         } else {
             rootDirectory = getCanonicalPath(rootDirectory);
-            if (mmpd != null && !Objects.equals(rootDirectory, mmpd)) {
+            if (mmpd.isPresent() && !Objects.equals(rootDirectory, mmpd.get())) {
                 context.parserRequest
                         .logger()
                         .warn("Project root directory and multiModuleProjectDirectory are not aligned");
             }
         }
         return getCanonicalPath(rootDirectory);
+    }
+
+    protected Optional<Path> getRootDirectoryFallback(LocalContext context) throws ParserException {
+        String mmpd = System.getProperty("maven.multiModuleProjectDirectory");
+        if (mmpd != null) {
+            return Optional.of(getCanonicalPath(context.cwd.resolve(mmpd)));
+        }
+        return Optional.empty();
     }
 
     protected Map<String, String> populateSystemProperties(LocalContext context) throws ParserException {
