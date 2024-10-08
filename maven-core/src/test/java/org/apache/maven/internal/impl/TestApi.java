@@ -119,7 +119,7 @@ class TestApi {
                 .get()
                 .withLocalRepositoryBaseDirectories(new File("target").toPath())
                 .build();
-        DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
+        DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest(true);
         DefaultMavenExecutionResult meres = new DefaultMavenExecutionResult();
         MavenSession ms = new MavenSession(rss, mer, meres);
         DefaultSession session = new DefaultSession(

@@ -161,7 +161,7 @@ public abstract class AbstractMavenProjectTestCase {
         session.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
         request.setRepositorySession(session);
 
-        DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
+        DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest(true);
         MavenSession msession =
                 new MavenSession(getContainer(), session, mavenExecutionRequest, new DefaultMavenExecutionResult());
         DefaultSession iSession = new DefaultSession(

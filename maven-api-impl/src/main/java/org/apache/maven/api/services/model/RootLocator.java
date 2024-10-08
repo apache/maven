@@ -26,7 +26,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Interface used to locate the root directory for a given project.
  *
- * The root locator is usually looked up from the plexus container.
+ * The root locator is usually looked up from the DI container.
  * One notable exception is the computation of the early {@code session.rootDirectory}
  * property which happens very early.  The implementation used in this case
  * will be discovered using the JDK service mechanism.

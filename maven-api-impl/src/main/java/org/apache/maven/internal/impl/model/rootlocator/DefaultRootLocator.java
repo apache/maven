@@ -53,10 +53,10 @@ public class DefaultRootLocator implements RootLocator {
         while (rootDirectory != null && !isRootDirectory(rootDirectory)) {
             rootDirectory = rootDirectory.getParent();
         }
-        Optional<Path> rdf = getRootDirectoryFallback();
+        Optional<Path> rdf = getMultiModuleProjectDirectory();
         if (rootDirectory == null) {
-            rootDirectory = rdf.orElseThrow(() -> new IllegalStateException(getNoRootMessage()));
             logger.warn(getNoRootMessage());
+            rootDirectory = rdf.orElseGet(() -> Paths.get("").toAbsolutePath());
         } else {
             if (rdf.isPresent() && !Objects.equals(rootDirectory, rdf.get())) {
                 logger.warn("Project root directory and multiModuleProjectDirectory are not aligned");
@@ -75,7 +75,7 @@ public class DefaultRootLocator implements RootLocator {
         return false;
     }
 
-    protected Optional<Path> getRootDirectoryFallback() {
+    protected Optional<Path> getMultiModuleProjectDirectory() {
         String mmpd = System.getProperty("maven.multiModuleProjectDirectory");
         if (mmpd != null) {
             return Optional.of(Paths.get(mmpd));

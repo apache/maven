@@ -20,6 +20,7 @@ package org.apache.maven.execution;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -171,6 +172,12 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     private Map<String, Object> data;
 
     public DefaultMavenExecutionRequest() {}
+
+    public DefaultMavenExecutionRequest(boolean withDefaultRoot) {
+        if (withDefaultRoot) {
+            setRootDirectory(Paths.get("").toAbsolutePath());
+        }
+    }
 
     public static MavenExecutionRequest copy(MavenExecutionRequest original) {
         DefaultMavenExecutionRequest copy = new DefaultMavenExecutionRequest();
