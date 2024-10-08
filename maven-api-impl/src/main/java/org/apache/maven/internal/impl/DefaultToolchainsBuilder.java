@@ -56,13 +56,16 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
     private final Interpolator interpolator;
 
+    private final ToolchainsXmlFactory toolchainsXmlFactory;
+
     public DefaultToolchainsBuilder() {
-        this(new DefaultInterpolator());
+        this(new DefaultInterpolator(), new DefaultToolchainsXmlFactory());
     }
 
     @Inject
-    public DefaultToolchainsBuilder(Interpolator interpolator) {
+    public DefaultToolchainsBuilder(Interpolator interpolator, ToolchainsXmlFactory toolchainsXmlFactory) {
         this.interpolator = interpolator;
+        this.toolchainsXmlFactory = toolchainsXmlFactory;
     }
 
     @Override
@@ -110,25 +113,21 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
                 if (is == null) {
                     return PersistedToolchains.newInstance();
                 }
-                toolchains = request.getSession()
-                        .getService(ToolchainsXmlFactory.class)
-                        .read(XmlReaderRequest.builder()
-                                .inputStream(is)
-                                .location(toolchainsSource.getLocation())
-                                .strict(true)
-                                .build());
+                toolchains = toolchainsXmlFactory.read(XmlReaderRequest.builder()
+                        .inputStream(is)
+                        .location(toolchainsSource.getLocation())
+                        .strict(true)
+                        .build());
             } catch (XmlReaderException e) {
                 InputStream is = toolchainsSource.openStream();
                 if (is == null) {
                     return PersistedToolchains.newInstance();
                 }
-                toolchains = request.getSession()
-                        .getService(ToolchainsXmlFactory.class)
-                        .read(XmlReaderRequest.builder()
-                                .inputStream(is)
-                                .location(toolchainsSource.getLocation())
-                                .strict(false)
-                                .build());
+                toolchains = toolchainsXmlFactory.read(XmlReaderRequest.builder()
+                        .inputStream(is)
+                        .location(toolchainsSource.getLocation())
+                        .strict(false)
+                        .build());
                 Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
                 problems.add(new DefaultBuilderProblem(
                         toolchainsSource.getLocation(),

@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +33,25 @@ import java.util.Properties;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.SettingsBuilder;
+import org.apache.maven.api.services.SettingsBuilderRequest;
+import org.apache.maven.api.services.SettingsBuilderResult;
+import org.apache.maven.api.services.Source;
+import org.apache.maven.api.settings.Mirror;
+import org.apache.maven.api.settings.Profile;
+import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Repository;
+import org.apache.maven.api.settings.Server;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -52,28 +65,17 @@ import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.SimplexTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
+import org.apache.maven.cling.invoker.mvn.ProtoSession;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.internal.impl.SettingsUtilsV4;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Profile;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Repository;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtils;
-import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsBuilder;
-import org.apache.maven.settings.building.SettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsBuildingResult;
-import org.apache.maven.settings.building.SettingsProblem;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.cling.invoker.Utils.toFile;
 import static org.apache.maven.cling.invoker.Utils.toMavenExecutionRequestLoggingLevel;
 import static org.apache.maven.cling.invoker.Utils.toProperties;
 
@@ -114,6 +116,7 @@ public abstract class LookupInvoker<
         public final InputStream stdIn;
         public final PrintWriter stdOut;
         public final PrintWriter stdErr;
+        public final Session session;
 
         protected LookupInvokerContext(LookupInvoker<O, R, C> invoker, R invokerRequest) {
             this.invoker = invoker;
@@ -131,6 +134,12 @@ public abstract class LookupInvoker<
             this.stdOut = new PrintWriter(invokerRequest.out().orElse(System.out), true);
             this.stdErr = new PrintWriter(invokerRequest.err().orElse(System.err), true);
             this.logger = invokerRequest.parserRequest().logger();
+
+            Map<String, String> user = new HashMap<>(invokerRequest.userProperties());
+            user.put("session.rootDirectory", invokerRequest.rootDirectory().toString());
+            user.put("session.topDirectory", invokerRequest.topDirectory().toString());
+            Map<String, String> system = new HashMap<>(invokerRequest.systemProperties());
+            this.session = ProtoSession.create(user, system);
         }
 
         public Logger logger;
@@ -443,36 +452,29 @@ public abstract class LookupInvoker<
         context.projectSettingsPath = projectSettingsFile;
         context.userSettingsPath = userSettingsFile;
 
-        SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
-        settingsRequest.setGlobalSettingsFile(toFile(installationSettingsFile));
-        settingsRequest.setProjectSettingsFile(toFile(projectSettingsFile));
-        settingsRequest.setUserSettingsFile(toFile(userSettingsFile));
-        settingsRequest.setSystemProperties(toProperties(context.invokerRequest.systemProperties()));
-        Properties props = toProperties(context.invokerRequest.userProperties());
-        props.put(
-                "session.rootDirectory", context.invokerRequest.rootDirectory().toString());
-        props.put("session.topDirectory", context.invokerRequest.topDirectory().toString());
+        SettingsBuilderRequest settingsRequest = SettingsBuilderRequest.builder()
+                .session(context.session)
+                .installationSettingsSource(
+                        installationSettingsFile != null && Files.exists(installationSettingsFile)
+                                ? Source.fromPath(installationSettingsFile)
+                                : null)
+                .projectSettingsSource(
+                        projectSettingsFile != null && Files.exists(projectSettingsFile)
+                                ? Source.fromPath(projectSettingsFile)
+                                : null)
+                .userSettingsSource(
+                        userSettingsFile != null && Files.exists(userSettingsFile)
+                                ? Source.fromPath(userSettingsFile)
+                                : null)
+                .build();
 
-        settingsRequest.setUserProperties(props);
         customizeSettingsRequest(context, settingsRequest);
 
-        context.logger.debug("Reading installation settings from '"
-                + (settingsRequest.getGlobalSettingsSource() != null
-                        ? settingsRequest.getGlobalSettingsSource().getLocation()
-                        : settingsRequest.getGlobalSettingsFile())
-                + "'");
-        context.logger.debug("Reading project settings from '"
-                + (settingsRequest.getProjectSettingsSource() != null
-                        ? settingsRequest.getProjectSettingsSource().getLocation()
-                        : settingsRequest.getProjectSettingsFile())
-                + "'");
-        context.logger.debug("Reading user settings from '"
-                + (settingsRequest.getUserSettingsSource() != null
-                        ? settingsRequest.getUserSettingsSource().getLocation()
-                        : settingsRequest.getUserSettingsFile())
-                + "'");
+        context.logger.debug("Reading installation settings from '" + installationSettingsFile + "'");
+        context.logger.debug("Reading project settings from '" + projectSettingsFile + "'");
+        context.logger.debug("Reading user settings from '" + userSettingsFile + "'");
 
-        SettingsBuildingResult settingsResult = settingsBuilder.build(settingsRequest);
+        SettingsBuilderResult settingsResult = settingsBuilder.build(settingsRequest);
         customizeSettingsResult(context, settingsResult);
 
         context.effectiveSettings = settingsResult.getEffectiveSettings();
@@ -483,17 +485,17 @@ public abstract class LookupInvoker<
             context.logger.warn("");
             context.logger.warn("Some problems were encountered while building the effective settings");
 
-            for (SettingsProblem problem : settingsResult.getProblems()) {
+            for (BuilderProblem problem : settingsResult.getProblems()) {
                 context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
             }
             context.logger.warn("");
         }
     }
 
-    protected void customizeSettingsRequest(C context, SettingsBuildingRequest settingsBuildingRequest)
+    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest)
             throws Exception {}
 
-    protected void customizeSettingsResult(C context, SettingsBuildingResult settingsBuildingResult) throws Exception {}
+    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception {}
 
     protected boolean mayDisableInteractiveMode(C context, boolean proposedInteractive) {
         if (!context.invokerRequest.options().forceInteractive().orElse(false)) {
@@ -582,7 +584,7 @@ public abstract class LookupInvoker<
         request.setPluginGroups(settings.getPluginGroups());
         request.setLocalRepositoryPath(settings.getLocalRepository());
         for (Server server : settings.getServers()) {
-            request.addServer(server);
+            request.addServer(new org.apache.maven.settings.Server(server));
         }
 
         //  <proxies>
@@ -601,7 +603,7 @@ public abstract class LookupInvoker<
             if (!proxy.isActive()) {
                 continue;
             }
-            request.addProxy(proxy);
+            request.addProxy(new org.apache.maven.settings.Proxy(proxy));
         }
 
         // <mirrors>
@@ -613,12 +615,13 @@ public abstract class LookupInvoker<
         // </mirrors>
 
         for (Mirror mirror : settings.getMirrors()) {
-            request.addMirror(mirror);
+            request.addMirror(new org.apache.maven.settings.Mirror(mirror));
         }
 
         for (Repository remoteRepository : settings.getRepositories()) {
             try {
-                request.addRemoteRepository(MavenRepositorySystem.buildArtifactRepository(remoteRepository));
+                request.addRemoteRepository(MavenRepositorySystem.buildArtifactRepository(
+                        new org.apache.maven.settings.Repository(remoteRepository)));
             } catch (InvalidRepositoryException e) {
                 // do nothing for now
             }
@@ -626,7 +629,8 @@ public abstract class LookupInvoker<
 
         for (Repository pluginRepository : settings.getPluginRepositories()) {
             try {
-                request.addPluginArtifactRepository(MavenRepositorySystem.buildArtifactRepository(pluginRepository));
+                request.addPluginArtifactRepository(MavenRepositorySystem.buildArtifactRepository(
+                        new org.apache.maven.settings.Repository(pluginRepository)));
             } catch (InvalidRepositoryException e) {
                 // do nothing for now
             }
@@ -634,13 +638,15 @@ public abstract class LookupInvoker<
 
         request.setActiveProfiles(settings.getActiveProfiles());
         for (Profile rawProfile : settings.getProfiles()) {
-            request.addProfile(SettingsUtils.convertFromSettingsProfile(rawProfile));
+            request.addProfile(
+                    new org.apache.maven.model.Profile(SettingsUtilsV4.convertFromSettingsProfile(rawProfile)));
 
             if (settings.getActiveProfiles().contains(rawProfile.getId())) {
                 List<Repository> remoteRepositories = rawProfile.getRepositories();
                 for (Repository remoteRepository : remoteRepositories) {
                     try {
-                        request.addRemoteRepository(MavenRepositorySystem.buildArtifactRepository(remoteRepository));
+                        request.addRemoteRepository(MavenRepositorySystem.buildArtifactRepository(
+                                new org.apache.maven.settings.Repository(remoteRepository)));
                     } catch (InvalidRepositoryException e) {
                         // do nothing for now
                     }
@@ -649,8 +655,8 @@ public abstract class LookupInvoker<
                 List<Repository> pluginRepositories = rawProfile.getPluginRepositories();
                 for (Repository pluginRepository : pluginRepositories) {
                     try {
-                        request.addPluginArtifactRepository(
-                                MavenRepositorySystem.buildArtifactRepository(pluginRepository));
+                        request.addPluginArtifactRepository(MavenRepositorySystem.buildArtifactRepository(
+                                new org.apache.maven.settings.Repository(pluginRepository)));
                     } catch (InvalidRepositoryException e) {
                         // do nothing for now
                     }
