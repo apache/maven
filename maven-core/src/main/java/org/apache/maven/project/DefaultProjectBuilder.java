@@ -74,6 +74,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.resolver.ArtifactDescriptorUtils;
+import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource2;
@@ -499,6 +500,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             List<ProjectBuildingResult> results = new ArrayList<>();
             List<ModelBuilderResult> allModels = results(result).toList();
             for (ModelBuilderResult r : allModels) {
+                List<ModelProblem> problems = new ArrayList<>(r.getProblems());
+                results(r)
+                        .filter(c -> c != r)
+                        .flatMap(c -> c.getProblems().stream())
+                        .forEach(problems::remove);
                 if (r.getEffectiveModel() != null) {
                     File pom = r.getSource().getPath().toFile();
                     MavenProject project =
@@ -510,7 +516,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     project.setExecutionRoot(pom.equals(pomFile));
                     initProject(project, r);
                     project.setCollectedProjects(results(r)
-                            .filter(cr -> cr != r)
+                            .filter(cr -> cr != r && cr.getEffectiveModel() != null)
                             .map(cr -> projectIndex.get(cr.getEffectiveModel().getId()))
                             .collect(Collectors.toList()));
 
@@ -518,10 +524,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     if (request.isResolveDependencies()) {
                         resolutionResult = resolveDependencies(project);
                     }
-                    results.add(
-                            new DefaultProjectBuildingResult(project, convert(result.getProblems()), resolutionResult));
+                    results.add(new DefaultProjectBuildingResult(project, convert(problems), resolutionResult));
                 } else {
-                    results.add(new DefaultProjectBuildingResult(null, convert(result.getProblems()), null));
+                    results.add(new DefaultProjectBuildingResult(null, convert(problems), null));
                 }
             }
             return results;
@@ -535,20 +540,21 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             if (problems == null) {
                 return null;
             }
-            return problems.stream()
-                    .map(p -> (org.apache.maven.model.building.ModelProblem)
-                            new org.apache.maven.model.building.DefaultModelProblem(
-                                    p.getMessage(),
-                                    org.apache.maven.model.building.ModelProblem.Severity.valueOf(
-                                            p.getSeverity().name()),
-                                    org.apache.maven.model.building.ModelProblem.Version.valueOf(
-                                            p.getVersion().name()),
-                                    p.getSource(),
-                                    p.getLineNumber(),
-                                    p.getColumnNumber(),
-                                    p.getModelId(),
-                                    p.getException()))
-                    .toList();
+            return problems.stream().map(p -> convert(p)).toList();
+        }
+
+        private static org.apache.maven.model.building.ModelProblem convert(ModelProblem p) {
+            return new DefaultModelProblem(
+                    p.getMessage(),
+                    org.apache.maven.model.building.ModelProblem.Severity.valueOf(
+                            p.getSeverity().name()),
+                    org.apache.maven.model.building.ModelProblem.Version.valueOf(
+                            p.getVersion().name()),
+                    p.getSource(),
+                    p.getLineNumber(),
+                    p.getColumnNumber(),
+                    p.getModelId(),
+                    p.getException());
         }
 
         @SuppressWarnings({"checkstyle:methodlength", "deprecation"})

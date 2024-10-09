@@ -1616,8 +1616,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         String parentPath = childModel.getParent().getRelativePath();
-
-        if (parentPath == null || parentPath.isEmpty()) {
+        if (parentPath == null) {
+            parentPath = "..";
+            childModel.getParent().setRelativePath(parentPath);
+        } else if (parentPath.isEmpty()) {
             return null;
         }
 
