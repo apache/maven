@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Dialect;
 import org.apache.maven.api.ExtensibleEnum;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.PathScope;
@@ -33,10 +34,12 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.services.DialectRegistry;
 import org.apache.maven.api.services.ExtensibleEnumRegistry;
 import org.apache.maven.api.services.LanguageRegistry;
 import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.services.ProjectScopeRegistry;
+import org.apache.maven.api.spi.DialectProvider;
 import org.apache.maven.api.spi.ExtensibleEnumProvider;
 import org.apache.maven.api.spi.LanguageProvider;
 import org.apache.maven.api.spi.PathScopeProvider;
@@ -70,6 +73,17 @@ public class ExtensibleEnumRegistries {
         @Inject
         public DefaultProjectScopeRegistry(List<ProjectScopeProvider> providers) {
             super(providers, ProjectScope.MAIN, ProjectScope.TEST);
+        }
+    }
+
+    @Named
+    @Singleton
+    public static class DefaultDialectRegistry extends DefaultExtensibleEnumRegistry<Dialect, DialectProvider>
+            implements DialectRegistry {
+
+        @Inject
+        public DefaultDialectRegistry(List<DialectProvider> providers) {
+            super(providers, Dialect.XML);
         }
     }
 
