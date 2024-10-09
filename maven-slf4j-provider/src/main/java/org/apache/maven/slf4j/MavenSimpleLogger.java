@@ -22,7 +22,6 @@ import java.io.PrintStream;
 import java.util.function.Consumer;
 
 import org.apache.maven.api.services.MessageBuilder;
-import org.slf4j.simple.ExtSimpleLogger;
 
 import static org.apache.maven.jline.MessageUtils.builder;
 
@@ -32,7 +31,7 @@ import static org.apache.maven.jline.MessageUtils.builder;
  *
  * @since 3.5.0
  */
-public class MavenSimpleLogger extends ExtSimpleLogger {
+public class MavenSimpleLogger extends MavenBaseLogger {
 
     private String traceRenderedLevel;
     private String debugRenderedLevel;
@@ -74,13 +73,12 @@ public class MavenSimpleLogger extends ExtSimpleLogger {
         }
     }
 
-    @Override
-    protected void doWrite(StringBuilder buf, Throwable t) {
+    protected void write(StringBuilder buf, Throwable t) {
         Consumer<String> sink = logSink;
         if (sink != null) {
             sink.accept(buf.toString());
         } else {
-            super.doWrite(buf, t);
+            super.write(buf, t);
         }
     }
 
@@ -98,7 +96,7 @@ public class MavenSimpleLogger extends ExtSimpleLogger {
         printStackTrace(t, stream, "");
     }
 
-    private void printStackTrace(Throwable t, PrintStream stream, String prefix) {
+    protected void printStackTrace(Throwable t, PrintStream stream, String prefix) {
         MessageBuilder builder = builder();
         for (StackTraceElement e : t.getStackTrace()) {
             builder.a(prefix);
@@ -123,7 +121,7 @@ public class MavenSimpleLogger extends ExtSimpleLogger {
         }
     }
 
-    private void writeThrowable(Throwable t, PrintStream stream, String caption, String prefix) {
+    protected void writeThrowable(Throwable t, PrintStream stream, String caption, String prefix) {
         MessageBuilder builder =
                 builder().a(prefix).strong(caption).a(": ").a(t.getClass().getName());
         if (t.getMessage() != null) {
@@ -146,5 +144,18 @@ public class MavenSimpleLogger extends ExtSimpleLogger {
         } else {
             return e.getFileName();
         }
+    }
+
+    public void configure(int defaultLogLevel) {
+        String levelString = recursivelyComputeLevelString();
+        if (levelString != null) {
+            this.currentLogLevel = SimpleLoggerConfiguration.stringToLevel(levelString);
+        } else {
+            this.currentLogLevel = defaultLogLevel;
+        }
+    }
+
+    public void setLogLevel(int logLevel) {
+        this.currentLogLevel = logLevel;
     }
 }

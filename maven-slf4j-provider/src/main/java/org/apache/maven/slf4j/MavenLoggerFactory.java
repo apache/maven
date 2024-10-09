@@ -19,19 +19,23 @@
 package org.apache.maven.slf4j;
 
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.slf4j.Logger;
-import org.slf4j.simple.SimpleLoggerFactory;
 
 /**
  * LogFactory for Maven which can create a simple logger or one which, if set, fails the build on a severity threshold.
  */
-public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4jWrapperFactory {
+public class MavenLoggerFactory implements MavenSlf4jWrapperFactory {
     private LogLevelRecorder logLevelRecorder = null;
+    private final ConcurrentMap<String, Logger> loggerMap = new ConcurrentHashMap<>();
 
-    public MavenLoggerFactory() {}
+    public MavenLoggerFactory() {
+        MavenSimpleLogger.lazyInit();
+    }
 
     @Override
     public void setLogLevelRecorder(LogLevelRecorder logLevelRecorder) {
@@ -39,7 +43,6 @@ public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4
             throw new IllegalStateException("LogLevelRecorder has already been set.");
         }
         this.logLevelRecorder = logLevelRecorder;
-        reset();
     }
 
     @Override
@@ -47,11 +50,29 @@ public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4
         return Optional.ofNullable(logLevelRecorder);
     }
 
-    protected Logger createLogger(String name) {
+    /**
+     * Return an appropriate {@link Logger} instance by name.
+     */
+    @Override
+    public Logger getLogger(String name) {
+        return loggerMap.computeIfAbsent(name, this::getNewLoggingInstance);
+    }
+
+    protected Logger getNewLoggingInstance(String name) {
         if (logLevelRecorder == null) {
             return new MavenSimpleLogger(name);
         } else {
             return new MavenFailOnSeverityLogger(name, logLevelRecorder);
         }
+    }
+
+    public void reconfigure() {
+        SimpleLoggerConfiguration config = MavenSimpleLogger.CONFIG_PARAMS;
+        config.init();
+        loggerMap.values().forEach(l -> {
+            if (l instanceof MavenSimpleLogger msl) {
+                msl.configure(config.defaultLogLevel);
+            }
+        });
     }
 }

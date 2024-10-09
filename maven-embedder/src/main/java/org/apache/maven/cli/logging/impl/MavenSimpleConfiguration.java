@@ -19,14 +19,16 @@
 package org.apache.maven.cli.logging.impl;
 
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
-import org.slf4j.simple.MavenSlf4jSimpleFriend;
+import org.apache.maven.slf4j.MavenLoggerFactory;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configuration for slf4j-simple.
  *
  * @since 3.1.0
  */
-public class Slf4jSimpleConfiguration extends BaseSlf4jConfiguration {
+public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
     @Override
     public void setRootLoggerLevel(Level level) {
         String value;
@@ -48,7 +50,9 @@ public class Slf4jSimpleConfiguration extends BaseSlf4jConfiguration {
 
     @Override
     public void activate() {
-        // property for root logger level or System.out redirection need to be taken into account
-        MavenSlf4jSimpleFriend.init();
+        ILoggerFactory lf = LoggerFactory.getILoggerFactory();
+        if (lf instanceof MavenLoggerFactory mlf) {
+            mlf.reconfigure();
+        }
     }
 }

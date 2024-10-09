@@ -18,6 +18,8 @@
  */
 package org.apache.maven.slf4j;
 
+import java.util.ServiceLoader;
+
 import org.slf4j.ILoggerFactory;
 import org.slf4j.IMarkerFactory;
 import org.slf4j.helpers.BasicMarkerFactory;
@@ -35,9 +37,13 @@ public class MavenServiceProvider implements SLF4JServiceProvider {
     @SuppressWarnings({"checkstyle:StaticVariableName", "checkstyle:VisibilityModifier"})
     public static String REQUESTED_API_VERSION = "2.0.99"; // !final
 
-    private MavenLoggerFactory loggerFactory = new MavenLoggerFactory();
+    private MavenLoggerFactory loggerFactory = loadMavenLoggerFactory();
     private IMarkerFactory markerFactory = new BasicMarkerFactory();
     private MDCAdapter mdcAdapter = new NOPMDCAdapter();
+
+    protected MavenLoggerFactory loadMavenLoggerFactory() {
+        return ServiceLoader.load(MavenLoggerFactory.class).findFirst().orElseGet(MavenLoggerFactory::new);
+    }
 
     public ILoggerFactory getLoggerFactory() {
         return loggerFactory;
