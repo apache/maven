@@ -51,7 +51,7 @@ public class DefaultMavenParser extends BaseMavenParser<MavenOptions, MavenInvok
         try {
             return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
         } catch (ParseException e) {
-            throw new ParserException("Failed to parse source " + source, e.getCause());
+            throw new ParserException("Failed to parse source " + source + ": " + e.getMessage(), e.getCause());
         }
     }
 
