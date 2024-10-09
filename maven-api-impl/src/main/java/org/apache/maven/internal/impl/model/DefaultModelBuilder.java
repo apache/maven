@@ -828,6 +828,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             result.setEffectiveModel(resultModel);
+            // Set the default relative path for the parent in the file model
             if (result.getFileModel().getParent() != null
                     && result.getFileModel().getParent().getRelativePath() == null) {
                 result.setFileModel(result.getFileModel()
@@ -1144,6 +1145,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             Model parentModel = readParent(inputModel);
+            // Now that we have read the parent, we can set the relative
+            // path correctly if it was not set in the input model
             if (inputModel.getParent() != null && inputModel.getParent().getRelativePath() == null) {
                 String relPath;
                 if (parentModel.getPomFile() != null
