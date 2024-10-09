@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MavenProjectTest extends AbstractMavenProjectTestCase {
@@ -173,10 +172,8 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
 
         assertEquals(1, activeProfilesClone.size(), "Expecting 1 active profile");
 
-        assertNotSame(
-                activeProfilesOrig,
-                activeProfilesClone,
-                "The list of active profiles should have been cloned too but is same");
+        // Note that the lists may be the same instance when unmodifiable.
+        assertEquals(activeProfilesOrig, activeProfilesClone);
     }
 
     @Test
