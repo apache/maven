@@ -36,15 +36,15 @@ import org.apache.maven.api.cli.Options;
 @Experimental
 public interface EncryptOptions extends Options {
     /**
-     * Returns the cipher that the user wants to use for non-dispatched encryption.
+     * Returns the cipher that the user wants to use for master encryption.
      *
      * @return an {@link Optional} containing the cipher string, or empty if not specified
      */
     @Nonnull
-    Optional<String> cipher();
+    Optional<String> masterCipher();
 
     /**
-     * Returns the master source that the user wants to use for non-dispatched encryption.
+     * Returns the password source that the user wants to use for master encryption.
      *
      * @return an {@link Optional} containing the master source string, or empty if not specified
      */

@@ -99,6 +99,9 @@ public class DefaultEncryptInvoker
     protected int doExecute(LocalContext context) throws Exception {
         if (!context.interactive) {
             System.out.println("This tool works only in interactive mode!");
+            System.out.println("Tool purpose is to configure password management on developer workstations.");
+            System.out.println(
+                    "Note: Generated configuration can be moved/copied to headless environments, if configured as such.");
             return BAD_OPERATION;
         }
 
@@ -131,17 +134,14 @@ public class DefaultEncryptInvoker
 
             if (context.invokerRequest.options().goals().isEmpty()
                     || context.invokerRequest.options().goals().get().size() != 1) {
-                System.out.println("No goal or multiple goals specified, specify only one goal. Use -h to see help.");
-                System.out.println("Supported goals are: " + context.goals.keySet());
-                return BAD_OPERATION;
+                return badGoalsErrorMessage("No goal or multiple goals specified, specify only one goal.", context);
             }
 
-            Goal goal = context.goals.get(
-                    context.invokerRequest.options().goals().get().get(0));
+            String goalName = context.invokerRequest.options().goals().get().get(0);
+            Goal goal = context.goals.get(goalName);
 
             if (goal == null) {
-                System.out.println("Unknown goal, supported goals are: " + context.goals.keySet());
-                return BAD_OPERATION;
+                return badGoalsErrorMessage("Unknown goal: " + goalName, context);
             }
 
             return goal.execute(context);
@@ -152,5 +152,12 @@ public class DefaultEncryptInvoker
             context.logger.error(e.getMessage(), e);
             return ERROR;
         }
+    }
+
+    protected int badGoalsErrorMessage(String message, LocalContext context) {
+        System.out.println(message);
+        System.out.println("Supported goals are: " + String.join(", ", context.goals.keySet()));
+        System.out.println("Use -h to display help.");
+        return BAD_OPERATION;
     }
 }

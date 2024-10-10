@@ -27,8 +27,10 @@ import java.util.Objects;
 
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
 import org.apache.maven.cling.invoker.mvnenc.Goal;
-import org.codehaus.plexus.components.secdispatcher.Meta;
+import org.codehaus.plexus.components.secdispatcher.DispatcherMeta;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
+import org.codehaus.plexus.components.secdispatcher.model.Config;
+import org.codehaus.plexus.components.secdispatcher.model.ConfigProperty;
 import org.codehaus.plexus.components.secdispatcher.model.SettingsSecurity;
 import org.jline.consoleui.elements.ConfirmChoice;
 import org.jline.consoleui.prompt.ConfirmResult;
@@ -56,7 +58,7 @@ public class InitGoal implements Goal {
 
     @Override
     public int execute(DefaultEncryptInvoker.LocalContext context) throws Exception {
-        context.addInHeader(context.style.italic().bold().foreground(Colors.rgbColor("yellow")), "init");
+        context.addInHeader(context.style.italic().bold().foreground(Colors.rgbColor("yellow")), "goal: init");
         context.addInHeader("");
 
         ConsolePrompt prompt = context.prompt;
@@ -65,29 +67,62 @@ public class InitGoal implements Goal {
 
         boolean configExists = secDispatcher.readConfiguration(false) != null;
         if (configExists && !force) {
-            System.out.println("Error: cannot init, configuration exist.");
+            System.out.println("Error: configuration exist. Use --force if you want to reset existing configuration.");
             return BAD_OPERATION;
         }
 
         SettingsSecurity config = secDispatcher.readConfiguration(true);
 
-        Map<String, ? extends PromptResultItemIF> result =
-                prompt.prompt(context.header, prompt(prompt).build());
+        // reset config
+        config.setDefaultDispatcher(null);
+        config.getConfigurations().clear();
+
+        Map<String, ? extends PromptResultItemIF> result = prompt.prompt(
+                context.header, dispatcherPrompt(prompt.getPromptBuilder()).build());
         if (result == null) {
             throw new InterruptedException();
         }
         config.setDefaultDispatcher(result.get("defaultDispatcher").getResult());
-        configureDispatcher(
-                context,
-                config,
-                secDispatcher.availableDispatchers().stream()
-                        .filter(d -> Objects.equals(config.getDefaultDispatcher(), d.name()))
-                        .findFirst()
-                        .orElseThrow());
+
+        DispatcherMeta meta = secDispatcher.availableDispatchers().stream()
+                .filter(d -> Objects.equals(config.getDefaultDispatcher(), d.name()))
+                .findFirst()
+                .orElseThrow();
+        if (!meta.fields().isEmpty()) {
+            result = prompt.prompt(
+                    context.header,
+                    configureDispatcher(context, meta, prompt.getPromptBuilder())
+                            .build());
+            if (result == null) {
+                throw new InterruptedException();
+            }
+
+            Config dispatcherConfig = new Config();
+            dispatcherConfig.setName(meta.name());
+            for (DispatcherMeta.Field field : meta.fields()) {
+                ConfigProperty property = new ConfigProperty();
+                property.setName(field.getKey());
+                property.setValue(result.get(field.getKey()).getResult());
+            }
+            if (!dispatcherConfig.getProperties().isEmpty()) {
+                config.addConfiguration(dispatcherConfig);
+            }
+        }
+
+        System.out.println();
+        System.out.println("Values set:");
+        System.out.println("defaultDispatcher=" + config.getDefaultDispatcher());
+        for (Config c : config.getConfigurations()) {
+            System.out.println("  dispatcherName=" + c.getName());
+            for (ConfigProperty cp : c.getProperties()) {
+                System.out.println("    " + cp.getName() + "=" + cp.getValue());
+            }
+        }
 
         if (yes) {
             secDispatcher.writeConfiguration(config);
         } else {
+            result = prompt.prompt(confirmPrompt(prompt.getPromptBuilder()).build());
             ConfirmResult confirm = (ConfirmResult) result.get("confirm");
             if (confirm.getConfirmed() == ConfirmChoice.ConfirmationValue.YES) {
                 System.out.println("Writing out the configuration...");
@@ -101,9 +136,7 @@ public class InitGoal implements Goal {
         return OK;
     }
 
-    protected PromptBuilder prompt(ConsolePrompt prompt) {
-        PromptBuilder promptBuilder = prompt.getPromptBuilder();
-        dispatcherPrompt(promptBuilder);
+    protected PromptBuilder confirmPrompt(PromptBuilder promptBuilder) {
         promptBuilder
                 .createConfirmPromp()
                 .name("confirm")
@@ -113,12 +146,12 @@ public class InitGoal implements Goal {
         return promptBuilder;
     }
 
-    protected void dispatcherPrompt(PromptBuilder promptBuilder) {
+    protected PromptBuilder dispatcherPrompt(PromptBuilder promptBuilder) {
         ListPromptBuilder listPromptBuilder = promptBuilder
                 .createListPrompt()
                 .name("defaultDispatcher")
                 .message("Which dispatcher you want to use as default?");
-        for (Meta meta : secDispatcher.availableDispatchers()) {
+        for (DispatcherMeta meta : secDispatcher.availableDispatchers()) {
             listPromptBuilder
                     .newItem()
                     .name(meta.name())
@@ -126,26 +159,22 @@ public class InitGoal implements Goal {
                     .add();
         }
         listPromptBuilder.addPrompt();
+        return promptBuilder;
     }
 
-    private void configureDispatcher(
-            DefaultEncryptInvoker.LocalContext context, SettingsSecurity config, Meta dispatcherMeta) throws Exception {
+    private PromptBuilder configureDispatcher(
+            DefaultEncryptInvoker.LocalContext context, DispatcherMeta dispatcherMeta, PromptBuilder promptBuilder)
+            throws Exception {
         context.addInHeader(
                 context.style.italic().bold().foreground(Colors.rgbColor("yellow")),
                 "Configure " + dispatcherMeta.name() + " dispatcher");
         context.addInHeader("");
-        PromptBuilder promptBuilder = context.prompt.getPromptBuilder();
-        for (Meta.Field fields : dispatcherMeta.fields()) {
-
-        }
-        cipherPrompt(promptBuilder);
         promptBuilder
                 .createConfirmPromp()
                 .name("confirm")
                 .message("Are values above correct?")
                 .defaultValue(ConfirmChoice.ConfirmationValue.YES)
                 .addPrompt();
-
-        Map<String, ? extends PromptResultItemIF> result = context.prompt.prompt(context.header, promptBuilder.build());
+        return promptBuilder;
     }
 }

@@ -72,9 +72,9 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
     }
 
     @Override
-    public Optional<String> cipher() {
-        if (commandLine.hasOption(CLIManager.CIPHER)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.CIPHER));
+    public Optional<String> masterCipher() {
+        if (commandLine.hasOption(CLIManager.MASTER_CIPHER)) {
+            return Optional.of(commandLine.getOptionValue(CLIManager.MASTER_CIPHER));
         }
         return Optional.empty();
     }
@@ -125,8 +125,8 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
     }
 
     protected static class CLIManager extends CommonsCliOptions.CLIManager {
-        public static final String CIPHER = "c";
-        public static final String MASTER_SOURCE = "m";
+        public static final String MASTER_CIPHER = "mc";
+        public static final String MASTER_SOURCE = "ms";
         public static final String DISPATCHER = "d";
         public static final String FORCE = "f";
         public static final String YES = "y";
@@ -134,25 +134,28 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
             super.prepareOptions(options);
-            options.addOption(Option.builder(CIPHER)
-                    .longOpt("cipher")
-                    .desc("The cipher that user wants to use for non-dispatched encryption")
+            options.addOption(Option.builder(MASTER_CIPHER)
+                    .longOpt("master-cipher")
+                    .hasArg()
+                    .desc("The cipher that user wants to use with master dispatcher")
                     .build());
             options.addOption(Option.builder(MASTER_SOURCE)
                     .longOpt("master-source")
-                    .desc("The master source that user wants to use for non-dispatched encryption")
+                    .hasArg()
+                    .desc("The master source that user wants to use with master dispatcher")
                     .build());
             options.addOption(Option.builder(DISPATCHER)
                     .longOpt("dispatcher")
+                    .hasArg()
                     .desc("The dispatcher to use for dispatched encryption")
                     .build());
             options.addOption(Option.builder(FORCE)
                     .longOpt("force")
-                    .desc("Should overwrite without asking any configuration, if exist.")
+                    .desc("Should overwrite without asking any configuration?")
                     .build());
             options.addOption(Option.builder(YES)
                     .longOpt("yes")
-                    .desc("Should imply \"yes\" answer to all questions")
+                    .desc("Should imply user answered \"yes\" to all incoming questions?")
                     .build());
         }
     }
