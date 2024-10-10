@@ -186,7 +186,7 @@ under the License.
     <plexusTestingVersion>1.4.0</plexusTestingVersion>
     <plexusXmlVersion>4.0.4</plexusXmlVersion>
     <resolverVersion>2.0.1</resolverVersion>
-    <securityDispatcherVersion>3.0.0</securityDispatcherVersion>
+    <securityDispatcherVersion>4.0.0-SNAPSHOT</securityDispatcherVersion>
     <sisuVersion>0.9.0.M3</sisuVersion>
     <slf4jVersion>2.0.16</slf4jVersion>
     <stax2ApiVersion>4.2.2</stax2ApiVersion>
@@ -473,6 +473,21 @@ under the License.
       <dependency>
         <groupId>org.jline</groupId>
         <artifactId>jline-reader</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-style</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-builtins</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-console-ui</artifactId>
         <version>${jlineVersion}</version>
       </dependency>
       <dependency>

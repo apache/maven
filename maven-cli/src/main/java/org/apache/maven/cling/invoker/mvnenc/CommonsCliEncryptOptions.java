@@ -96,6 +96,22 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
     }
 
     @Override
+    public Optional<Boolean> force() {
+        if (commandLine.hasOption(CLIManager.FORCE)) {
+            return Optional.of(Boolean.TRUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Boolean> yes() {
+        if (commandLine.hasOption(CLIManager.YES)) {
+            return Optional.of(Boolean.TRUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<List<String>> goals() {
         if (!commandLine.getArgList().isEmpty()) {
             return Optional.of(commandLine.getArgList());
@@ -112,6 +128,8 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
         public static final String CIPHER = "c";
         public static final String MASTER_SOURCE = "m";
         public static final String DISPATCHER = "d";
+        public static final String FORCE = "f";
+        public static final String YES = "y";
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
@@ -127,6 +145,14 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
             options.addOption(Option.builder(DISPATCHER)
                     .longOpt("dispatcher")
                     .desc("The dispatcher to use for dispatched encryption")
+                    .build());
+            options.addOption(Option.builder(FORCE)
+                    .longOpt("force")
+                    .desc("Should overwrite without asking any configuration, if exist.")
+                    .build());
+            options.addOption(Option.builder(YES)
+                    .longOpt("yes")
+                    .desc("Should imply \"yes\" answer to all questions")
                     .build());
         }
     }

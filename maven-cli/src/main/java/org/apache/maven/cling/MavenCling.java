@@ -29,6 +29,7 @@ import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.DefaultMavenParser;
 import org.apache.maven.cling.invoker.mvn.local.DefaultLocalMavenInvoker;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
+import org.apache.maven.jline.MessageUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
@@ -57,6 +58,17 @@ public class MavenCling extends ClingSupport<MavenOptions, MavenInvokerRequest<M
 
     public MavenCling(ClassWorld classWorld) {
         super(classWorld);
+    }
+
+    @Override
+    public int run(String[] args) throws IOException {
+        MessageUtils.systemInstall();
+        MessageUtils.registerShutdownHook();
+        try {
+            return super.run(args);
+        } finally {
+            MessageUtils.systemUninstall();
+        }
     }
 
     @Override

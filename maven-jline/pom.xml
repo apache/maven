@@ -44,6 +44,18 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.jline</groupId>
+      <artifactId>jline-style</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-builtins</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-console-ui</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
       <artifactId>jline-terminal-jni</artifactId>
     </dependency>
     <dependency>

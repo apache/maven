@@ -60,6 +60,20 @@ public interface EncryptOptions extends Options {
     Optional<String> dispatcher();
 
     /**
+     * Should the operation be forced (ie overwrite existing config, if any).
+     *
+     * @return an {@link Optional} containing the boolean value {@code true} if specified, or empty
+     */
+    Optional<Boolean> force();
+
+    /**
+     * Should imply "yes" to all questions.
+     *
+     * @return an {@link Optional} containing the boolean value {@code true} if specified, or empty
+     */
+    Optional<Boolean> yes();
+
+    /**
      * Returns the list of encryption goals to be executed.
      * These goals can include operations like "init", "add-server", "delete-server", etc.
      *
