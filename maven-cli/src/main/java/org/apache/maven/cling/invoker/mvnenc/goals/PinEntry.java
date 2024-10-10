@@ -18,6 +18,9 @@
  */
 package org.apache.maven.cling.invoker.mvnenc.goals;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -42,6 +45,7 @@ public class PinEntry {
 
     public record Result<T>(Outcome outcome, T payload) {}
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String cmd;
     private final LinkedHashMap<String, String> commands;
 
@@ -129,6 +133,7 @@ public class PinEntry {
             } else {
                 cmd = entry.getKey();
             }
+            logger.debug("> {}", cmd);
             writer.write(cmd);
             writer.newLine();
             writer.flush();
@@ -155,6 +160,7 @@ public class PinEntry {
 
     private void expectOK(BufferedReader in) throws IOException {
         String response = in.readLine();
+        logger.debug("< {}", response);
         if (!response.startsWith("OK")) {
             throw new IOException("Expected OK but got this instead: " + response);
         }
@@ -163,6 +169,7 @@ public class PinEntry {
     private Result<String> lastExpect(BufferedReader in) throws IOException {
         while (true) {
             String response = in.readLine();
+            logger.debug("< {}", response);
             if (response.startsWith("#")) {
                 continue;
             }
