@@ -30,6 +30,9 @@ import org.codehaus.plexus.components.secdispatcher.MasterSource;
 import org.codehaus.plexus.components.secdispatcher.MasterSourceMeta;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcherException;
 
+/**
+ * Trivial master password source using Maven {@link Prompter} service.
+ */
 @Singleton
 @Named(ConsolePasswordPrompt.NAME)
 public class ConsolePasswordPrompt implements MasterSource, MasterSourceMeta {
