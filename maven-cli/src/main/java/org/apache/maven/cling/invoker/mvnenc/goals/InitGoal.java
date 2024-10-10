@@ -97,31 +97,38 @@ public class InitGoal implements Goal {
                 throw new InterruptedException();
             }
 
+            ConfirmResult confirm = (ConfirmResult) result.get("confirm");
+            if (confirm.getConfirmed() != ConfirmChoice.ConfirmationValue.YES) {
+                System.out.println("Values not accepted; not saving configuration.");
+                return BAD_OPERATION;
+            }
+
             Config dispatcherConfig = new Config();
             dispatcherConfig.setName(meta.name());
             for (DispatcherMeta.Field field : meta.fields()) {
                 ConfigProperty property = new ConfigProperty();
                 property.setName(field.getKey());
                 property.setValue(result.get(field.getKey()).getResult());
+                dispatcherConfig.addProperty(property);
             }
             if (!dispatcherConfig.getProperties().isEmpty()) {
                 config.addConfiguration(dispatcherConfig);
             }
         }
 
-        System.out.println();
-        System.out.println("Values set:");
-        System.out.println("defaultDispatcher=" + config.getDefaultDispatcher());
-        for (Config c : config.getConfigurations()) {
-            System.out.println("  dispatcherName=" + c.getName());
-            for (ConfigProperty cp : c.getProperties()) {
-                System.out.println("    " + cp.getName() + "=" + cp.getValue());
-            }
-        }
-
         if (yes) {
             secDispatcher.writeConfiguration(config);
         } else {
+            context.addInHeader("");
+            context.addInHeader("Values set:");
+            context.addInHeader("defaultDispatcher=" + config.getDefaultDispatcher());
+            for (Config c : config.getConfigurations()) {
+                context.addInHeader("  dispatcherName=" + c.getName());
+                for (ConfigProperty cp : c.getProperties()) {
+                    context.addInHeader("    " + cp.getName() + "=" + cp.getValue());
+                }
+            }
+
             result = prompt.prompt(confirmPrompt(prompt.getPromptBuilder()).build());
             ConfirmResult confirm = (ConfirmResult) result.get("confirm");
             if (confirm.getConfirmed() == ConfirmChoice.ConfirmationValue.YES) {
@@ -167,8 +174,45 @@ public class InitGoal implements Goal {
             throws Exception {
         context.addInHeader(
                 context.style.italic().bold().foreground(Colors.rgbColor("yellow")),
-                "Configure " + dispatcherMeta.name() + " dispatcher");
+                "Configure " + dispatcherMeta.displayName());
         context.addInHeader("");
+
+        for (DispatcherMeta.Field field : dispatcherMeta.fields()) {
+            String fieldKey = field.getKey();
+            String fieldDescription = "Configure " + fieldKey + ": " + field.getDescription();
+            if (field.getOptions().isPresent()) {
+                // list options
+                ListPromptBuilder listPromptBuilder =
+                        promptBuilder.createListPrompt().name(fieldKey).message(fieldDescription);
+                for (DispatcherMeta.Field option : field.getOptions().get()) {
+                    listPromptBuilder
+                            .newItem()
+                            .name(
+                                    option.getDefaultValue().isPresent()
+                                            ? option.getDefaultValue().get()
+                                            : option.getKey())
+                            .text(option.getDescription())
+                            .add();
+                }
+                listPromptBuilder.addPrompt();
+            } else if (field.getDefaultValue().isPresent()) {
+                // input w/ def value
+                promptBuilder
+                        .createInputPrompt()
+                        .name(fieldKey)
+                        .message(fieldDescription)
+                        .defaultValue(field.getDefaultValue().get())
+                        .addPrompt();
+            } else {
+                // ? plain input?
+                promptBuilder
+                        .createInputPrompt()
+                        .name(fieldKey)
+                        .message(fieldDescription)
+                        .addPrompt();
+            }
+        }
+
         promptBuilder
                 .createConfirmPromp()
                 .name("confirm")

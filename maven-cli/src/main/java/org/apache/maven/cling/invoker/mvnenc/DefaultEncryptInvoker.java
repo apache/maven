@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cling.invoker.mvnenc;
 
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +32,8 @@ import org.apache.maven.cling.invoker.ProtoLookup;
 import org.jline.consoleui.prompt.ConsolePrompt;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
@@ -72,8 +73,11 @@ public class DefaultEncryptInvoker
         }
     }
 
+    private final Terminal terminal;
+
     public DefaultEncryptInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
+        this.terminal = protoLookup.lookup(Terminal.class);
     }
 
     @Override
@@ -113,7 +117,7 @@ public class DefaultEncryptInvoker
         context.addInHeader("Tool for secure password management on workstations.");
         context.addInHeader("This tool is part of Apache Maven 4 distribution.");
         context.addInHeader("");
-        try (Terminal terminal = TerminalBuilder.builder().build()) {
+        try {
             Thread executeThread = Thread.currentThread();
             terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
             ConsolePrompt.UiConfig config;
@@ -145,11 +149,15 @@ public class DefaultEncryptInvoker
             }
 
             return goal.execute(context);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | InterruptedIOException | UserInterruptException e) {
             System.out.println("Goal canceled by user.");
             return CANCELED;
         } catch (Exception e) {
-            context.logger.error(e.getMessage(), e);
+            if (context.invokerRequest.options().showErrors().orElse(false)) {
+                context.logger.error(e.getMessage(), e);
+            } else {
+                context.logger.error(e.getMessage());
+            }
             return ERROR;
         }
     }

@@ -44,7 +44,7 @@ public class PinEntryPrompt extends PrefixMasterSourceSupport implements MasterS
 
     @Override
     public String description() {
-        return "Uses selected pinentry application to ask for master password";
+        return "Secure PinEntry prompt";
     }
 
     @Override
@@ -56,7 +56,7 @@ public class PinEntryPrompt extends PrefixMasterSourceSupport implements MasterS
     public String doHandle(String s) throws SecDispatcherException {
         try {
             PinEntry.Result<String> result = new PinEntry(s)
-                    .setTimeout(Duration.ofSeconds(5))
+                    .setTimeout(Duration.ofSeconds(30))
                     .setKeyInfo("maven:masterPassword")
                     .setTitle("Maven Master Password")
                     .setDescription("Please enter the Maven master password")
