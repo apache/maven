@@ -60,6 +60,15 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
             server = server.clone();
 
             try {
+                if (isLegacy(server.getPassword())) {
+                    problems.add(new DefaultSettingsProblem(
+                            "Legacy/insecurely encrypted password detected for server " + server.getId(),
+                            Severity.WARNING,
+                            "server: " + server.getId(),
+                            -1,
+                            -1,
+                            null));
+                }
                 server.setPassword(decrypt(server.getPassword()));
             } catch (SecDispatcherException | IOException e) {
                 problems.add(new DefaultSettingsProblem(
@@ -72,6 +81,15 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
             }
 
             try {
+                if (isLegacy(server.getPassphrase())) {
+                    problems.add(new DefaultSettingsProblem(
+                            "Legacy/insecurely encrypted passphrase detected for server " + server.getId(),
+                            Severity.WARNING,
+                            "server: " + server.getId(),
+                            -1,
+                            -1,
+                            null));
+                }
                 server.setPassphrase(decrypt(server.getPassphrase()));
             } catch (SecDispatcherException | IOException e) {
                 problems.add(new DefaultSettingsProblem(
@@ -90,6 +108,15 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
 
         for (Proxy proxy : request.getProxies()) {
             try {
+                if (isLegacy(proxy.getPassword())) {
+                    problems.add(new DefaultSettingsProblem(
+                            "Legacy/insecurely encrypted password detected for proxy " + proxy.getId(),
+                            Severity.WARNING,
+                            "proxy: " + proxy.getId(),
+                            -1,
+                            -1,
+                            null));
+                }
                 proxy.setPassword(decrypt(proxy.getPassword()));
             } catch (SecDispatcherException | IOException e) {
                 problems.add(new DefaultSettingsProblem(
@@ -105,6 +132,10 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
         }
 
         return new DefaultSettingsDecryptionResult(servers, proxies, problems);
+    }
+
+    private boolean isLegacy(String str) {
+        return str != null && securityDispatcher.isLegacyPassword(str);
     }
 
     private String decrypt(String str) throws SecDispatcherException, IOException {

@@ -194,11 +194,13 @@ public class InitGoal implements Goal {
                 .name("defaultDispatcher")
                 .message("Which dispatcher you want to use as default?");
         for (DispatcherMeta meta : secDispatcher.availableDispatchers()) {
-            listPromptBuilder
-                    .newItem()
-                    .name(meta.name())
-                    .text(meta.displayName())
-                    .add();
+            if (!meta.isHidden()) {
+                listPromptBuilder
+                        .newItem()
+                        .name(meta.name())
+                        .text(meta.displayName())
+                        .add();
+            }
         }
         listPromptBuilder.addPrompt();
         return promptBuilder;
