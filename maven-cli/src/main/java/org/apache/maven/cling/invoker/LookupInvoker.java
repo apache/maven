@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -308,15 +309,21 @@ public abstract class LookupInvoker<
             context.closeables.add(() -> System.setOut(sysOut));
             context.closeables.add(() -> System.setErr(sysErr));
         }
+        BuildEventListener bel = determineBuildEventListener(context);
+        ProjectBuildLogAppender projectBuildLogAppender = new ProjectBuildLogAppender(bel);
+        context.closeables.add(projectBuildLogAppender);
+    }
+
+    protected BuildEventListener determineBuildEventListener(C context) throws IOException {
         BuildEventListener bel;
-        if (mavenOptions.logFile().isPresent()) {
-            Path logFile = context.cwdResolver.apply(mavenOptions.logFile().get());
+        O options = context.invokerRequest.options();
+        if (options.logFile().isPresent()) {
+            Path logFile = context.cwdResolver.apply(options.logFile().get());
             bel = new SimpleBuildEventListener(new PrintWriter(Files.newBufferedWriter(logFile)));
         } else {
             bel = new SimpleBuildEventListener(MessageUtils.getTerminal().writer(), true);
         }
-        ProjectBuildLogAppender projectBuildLogAppender = new ProjectBuildLogAppender(bel);
-        context.closeables.add(projectBuildLogAppender);
+        return bel;
     }
 
     protected void activateLogging(C context) throws Exception {
