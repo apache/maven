@@ -41,6 +41,8 @@ import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatche
 @Singleton
 @Deprecated(since = "4.0.0")
 public class MavenSecDispatcher extends DefaultSecDispatcher {
+    private static final String FILE_NAME = "settings-security4.xml";
+
     @Inject
     public MavenSecDispatcher(PlexusCipher cipher, Map<String, Dispatcher> dispatchers) {
         super(cipher, dispatchers, configurationFile());
@@ -49,9 +51,9 @@ public class MavenSecDispatcher extends DefaultSecDispatcher {
     private static Path configurationFile() {
         String mavenUserConf = System.getProperty(Constants.MAVEN_USER_CONF);
         if (mavenUserConf != null) {
-            return Paths.get(mavenUserConf, "settings-security.xml");
+            return Paths.get(mavenUserConf, FILE_NAME);
         }
         // this means we are in UT or alike
-        return Paths.get(System.getProperty("user.home"), ".m2", "settings-security.xml");
+        return Paths.get(System.getProperty("user.home"), ".m2", FILE_NAME);
     }
 }
