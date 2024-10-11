@@ -71,7 +71,6 @@ import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.Task;
 import org.apache.maven.lifecycle.internal.TaskSegment;
-import org.apache.maven.logging.ConcurrentLogOutput;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MavenPluginManager;
@@ -165,7 +164,6 @@ public class BuildPlanExecutor {
         final MavenSession session;
         final ReactorContext reactorContext;
         final PhasingExecutor executor;
-        final ConcurrentLogOutput appender;
         final Map<Object, Clock> clocks = new ConcurrentHashMap<>();
         final ReadWriteLock lock = new ReentrantReadWriteLock();
         final int threads;
@@ -180,7 +178,6 @@ public class BuildPlanExecutor {
             // Propagate the parallel flag to the root session
             session.setParallel(threads > 1);
             this.executor = new PhasingExecutor(Executors.newFixedThreadPool(threads, new BuildThreadFactory()));
-            this.appender = new ConcurrentLogOutput();
 
             // build initial plan
             this.plan = buildInitialPlan(taskSegments);
@@ -191,7 +188,6 @@ public class BuildPlanExecutor {
             this.reactorContext = null;
             this.threads = 1;
             this.executor = null;
-            this.appender = null;
             this.plan = null;
         }
 
@@ -313,7 +309,6 @@ public class BuildPlanExecutor {
 
         @Override
         public void close() {
-            this.appender.close();
             this.executor.close();
         }
 
@@ -332,7 +327,7 @@ public class BuildPlanExecutor {
                         .forEach(step -> {
                             boolean nextIsPlanning = step.successors.stream().anyMatch(st -> PLAN.equals(st.name));
                             executor.execute(() -> {
-                                try (AutoCloseable ctx = appender.build(step.project)) {
+                                try {
                                     executeStep(step);
                                     if (nextIsPlanning) {
                                         lock.writeLock().lock();
