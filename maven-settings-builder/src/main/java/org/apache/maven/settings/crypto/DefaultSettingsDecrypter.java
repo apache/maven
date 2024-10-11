@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
 
             try {
                 server.setPassword(decrypt(server.getPassword()));
-            } catch (SecDispatcherException e) {
+            } catch (SecDispatcherException | IOException e) {
                 problems.add(new DefaultSettingsProblem(
                         "Failed to decrypt password for server " + server.getId() + ": " + e.getMessage(),
                         Severity.ERROR,
@@ -72,7 +73,7 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
 
             try {
                 server.setPassphrase(decrypt(server.getPassphrase()));
-            } catch (SecDispatcherException e) {
+            } catch (SecDispatcherException | IOException e) {
                 problems.add(new DefaultSettingsProblem(
                         "Failed to decrypt passphrase for server " + server.getId() + ": " + e.getMessage(),
                         Severity.ERROR,
@@ -90,7 +91,7 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
         for (Proxy proxy : request.getProxies()) {
             try {
                 proxy.setPassword(decrypt(proxy.getPassword()));
-            } catch (SecDispatcherException e) {
+            } catch (SecDispatcherException | IOException e) {
                 problems.add(new DefaultSettingsProblem(
                         "Failed to decrypt password for proxy " + proxy.getId() + ": " + e.getMessage(),
                         Severity.ERROR,
@@ -106,7 +107,7 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
         return new DefaultSettingsDecryptionResult(servers, proxies, problems);
     }
 
-    private String decrypt(String str) throws SecDispatcherException {
+    private String decrypt(String str) throws SecDispatcherException, IOException {
         return (str == null) ? null : securityDispatcher.decrypt(str);
     }
 }
