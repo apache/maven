@@ -71,6 +71,7 @@ import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.Task;
 import org.apache.maven.lifecycle.internal.TaskSegment;
+import org.apache.maven.logging.ConcurrentLogOutput;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MavenPluginManager;

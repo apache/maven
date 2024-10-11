@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.lifecycle.internal.concurrent;
+package org.apache.maven.logging;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

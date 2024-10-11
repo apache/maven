@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cli.logging;
 
+import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -29,16 +30,20 @@ import org.codehaus.plexus.logging.Logger;
 public class Slf4jLogger implements Logger {
 
     private org.slf4j.Logger logger;
+    private String projectId;
 
     public Slf4jLogger(org.slf4j.Logger logger) {
         this.logger = logger;
+        this.projectId = ProjectBuildLogAppender.getProjectId();
     }
 
     public void debug(String message) {
+        setMdc();
         logger.debug(message);
     }
 
     public void debug(String message, Throwable throwable) {
+        setMdc();
         logger.debug(message, throwable);
     }
 
@@ -47,10 +52,12 @@ public class Slf4jLogger implements Logger {
     }
 
     public void info(String message) {
+        setMdc();
         logger.info(message);
     }
 
     public void info(String message, Throwable throwable) {
+        setMdc();
         logger.info(message, throwable);
     }
 
@@ -59,10 +66,12 @@ public class Slf4jLogger implements Logger {
     }
 
     public void warn(String message) {
+        setMdc();
         logger.warn(message);
     }
 
     public void warn(String message, Throwable throwable) {
+        setMdc();
         logger.warn(message, throwable);
     }
 
@@ -71,10 +80,12 @@ public class Slf4jLogger implements Logger {
     }
 
     public void error(String message) {
+        setMdc();
         logger.error(message);
     }
 
     public void error(String message, Throwable throwable) {
+        setMdc();
         logger.error(message, throwable);
     }
 
@@ -83,10 +94,12 @@ public class Slf4jLogger implements Logger {
     }
 
     public void fatalError(String message) {
+        setMdc();
         logger.error(message);
     }
 
     public void fatalError(String message, Throwable throwable) {
+        setMdc();
         logger.error(message, throwable);
     }
 
@@ -115,5 +128,11 @@ public class Slf4jLogger implements Logger {
 
     public String getName() {
         return logger.getName();
+    }
+
+    private void setMdc() {
+        if (projectId != null && ProjectBuildLogAppender.getProjectId() == null) {
+            ProjectBuildLogAppender.setProjectId(projectId);
+        }
     }
 }
