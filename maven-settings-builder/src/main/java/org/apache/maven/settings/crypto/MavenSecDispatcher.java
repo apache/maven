@@ -16,15 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
+package org.apache.maven.settings.crypto;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Provides;
-import org.apache.maven.api.di.Singleton;
 import org.codehaus.plexus.components.cipher.PlexusCipher;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
@@ -32,15 +34,24 @@ import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatche
 
 /**
  * This class implements "Maven specific" {@link SecDispatcher}.
+ *
+ * @deprecated since 4.0.0
  */
 @Named
-public class MavenSecDispatcherProvider {
-    @Singleton
-    @Provides
-    public static SecDispatcher secDispatcher(PlexusCipher plexusCipher, Map<String, Dispatcher> dispatchers) {
-        return new DefaultSecDispatcher(
-                plexusCipher,
-                dispatchers,
-                Paths.get(System.getProperty(Constants.MAVEN_USER_CONF), "settings-security.xml"));
+@Singleton
+@Deprecated(since = "4.0.0")
+public class MavenSecDispatcher extends DefaultSecDispatcher {
+    @Inject
+    public MavenSecDispatcher(PlexusCipher cipher, Map<String, Dispatcher> dispatchers) {
+        super(cipher, dispatchers, configurationFile());
+    }
+
+    private static Path configurationFile() {
+        String mavenUserConf = System.getProperty(Constants.MAVEN_USER_CONF);
+        if (mavenUserConf != null) {
+            return Paths.get(mavenUserConf, "settings-security.xml");
+        }
+        // this means we are in UT or alike
+        return Paths.get(System.getProperty("user.home"), ".m2", "settings-security.xml");
     }
 }
