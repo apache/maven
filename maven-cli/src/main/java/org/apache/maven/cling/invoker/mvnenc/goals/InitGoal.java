@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -38,6 +39,10 @@ import org.jline.consoleui.prompt.ConsolePrompt;
 import org.jline.consoleui.prompt.PromptResultItemIF;
 import org.jline.consoleui.prompt.builder.ListPromptBuilder;
 import org.jline.consoleui.prompt.builder.PromptBuilder;
+import org.jline.reader.Candidate;
+import org.jline.reader.Completer;
+import org.jline.reader.LineReader;
+import org.jline.reader.ParsedLine;
 import org.jline.utils.Colors;
 
 import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.BAD_OPERATION;
@@ -77,7 +82,7 @@ public class InitGoal implements Goal {
         config.setDefaultDispatcher(null);
         config.getConfigurations().clear();
 
-        Map<String, ? extends PromptResultItemIF> result = prompt.prompt(
+        Map<String, PromptResultItemIF> result = prompt.prompt(
                 context.header, dispatcherPrompt(prompt.getPromptBuilder()).build());
         if (result == null) {
             throw new InterruptedException();
@@ -95,6 +100,41 @@ public class InitGoal implements Goal {
                             .build());
             if (result == null) {
                 throw new InterruptedException();
+            }
+
+            List<Map.Entry<String, PromptResultItemIF>> editables = result.entrySet().stream()
+                    .filter(e -> e.getValue().getResult().contains("$"))
+                    .toList();
+            if (!editables.isEmpty()) {
+                context.addInHeader("");
+                context.addInHeader("Please customize the editable value:");
+                Map<String, PromptResultItemIF> editMap;
+                for (Map.Entry<String, PromptResultItemIF> editable : editables) {
+                    String template = editable.getValue().getResult();
+                    String prefix = template.substring(0, template.indexOf("$"));
+                    editMap = prompt.prompt(
+                            context.header,
+                            prompt.getPromptBuilder()
+                                    .createInputPrompt()
+                                    .name("edit")
+                                    .message(template)
+                                    .addCompleter(new Completer() {
+                                        @Override
+                                        public void complete(
+                                                LineReader reader, ParsedLine line, List<Candidate> candidates) {
+                                            if (!line.line().startsWith(prefix)) {
+                                                candidates.add(
+                                                        new Candidate(prefix, prefix, null, null, null, null, false));
+                                            }
+                                        }
+                                    })
+                                    .addPrompt()
+                                    .build());
+                    if (editMap == null) {
+                        throw new InterruptedException();
+                    }
+                    result.put(editable.getKey(), editMap.get("edit"));
+                }
             }
 
             Config dispatcherConfig = new Config();
