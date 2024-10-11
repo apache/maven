@@ -16,33 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.logging;
+package org.apache.maven.logging.api;
 
-import org.apache.maven.execution.ExecutionEvent;
-import org.eclipse.aether.transfer.TransferEvent;
+public interface LogLevelRecorder {
 
-/**
- * An abstract build event sink.
- */
-public interface BuildEventListener {
+    enum Level {
+        DEBUG,
+        INFO,
+        WARN,
+        ERROR
+    }
 
-    void sessionStarted(ExecutionEvent event);
+    boolean hasReachedMaxLevel();
 
-    void projectStarted(String projectId);
+    Level getMaxLevelReached();
 
-    void projectLogMessage(String projectId, String event);
+    Level getMaxLevelAllowed();
 
-    void projectFinished(String projectId);
-
-    void executionFailure(String projectId, boolean halted, String exception);
-
-    void mojoStarted(ExecutionEvent event);
-
-    void finish(int exitCode) throws Exception;
-
-    void fail(Throwable t) throws Exception;
-
-    void log(String msg);
-
-    void transfer(String projectId, TransferEvent e);
+    void setMaxLevelAllowed(Level level);
 }

@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -99,8 +100,7 @@ import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.logwrapper.LogLevelRecorder;
-import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
+import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.MavenProject;
@@ -541,15 +541,22 @@ public class MavenCli {
         if (commandLine.hasOption(CLIManager.FAIL_ON_SEVERITY)) {
             String logLevelThreshold = commandLine.getOptionValue(CLIManager.FAIL_ON_SEVERITY);
 
-            if (slf4jLoggerFactory instanceof MavenSlf4jWrapperFactory) {
-                LogLevelRecorder logLevelRecorder = new LogLevelRecorder(logLevelThreshold);
-                ((MavenSlf4jWrapperFactory) slf4jLoggerFactory).setLogLevelRecorder(logLevelRecorder);
+            if (slf4jLoggerFactory instanceof LogLevelRecorder recorder) {
+                LogLevelRecorder.Level level =
+                        switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
+                            case "warn", "warning" -> LogLevelRecorder.Level.WARN;
+                            case "error" -> LogLevelRecorder.Level.ERROR;
+                            default -> throw new IllegalArgumentException(
+                                    logLevelThreshold
+                                            + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
+                        };
+                recorder.setMaxLevelAllowed(level);
                 slf4jLogger.info("Enabled to break the build on log level {}.", logLevelThreshold);
             } else {
                 slf4jLogger.warn(
                         "Expected LoggerFactory to be of type '{}', but found '{}' instead. "
                                 + "The --fail-on-severity flag will not take effect.",
-                        MavenSlf4jWrapperFactory.class.getName(),
+                        LogLevelRecorder.class.getName(),
                         slf4jLoggerFactory.getClass().getName());
             }
         }

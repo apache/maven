@@ -98,4 +98,8 @@ public class MessageUtils {
     public static MessageBuilder builder() {
         return messageBuilderFactory.builder();
     }
+
+    public static Terminal getTerminal() {
+        return terminal;
+    }
 }

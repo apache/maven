@@ -19,14 +19,15 @@
 package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
@@ -54,8 +55,11 @@ import org.apache.maven.cli.transfer.SimplexTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.jline.MessageUtils;
-import org.apache.maven.logwrapper.LogLevelRecorder;
-import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
+import org.apache.maven.logging.BuildEventListener;
+import org.apache.maven.logging.LoggingOutputStream;
+import org.apache.maven.logging.ProjectBuildLogAppender;
+import org.apache.maven.logging.SimpleBuildEventListener;
+import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Proxy;
@@ -68,9 +72,11 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
+import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
+import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.Utils.toFile;
@@ -149,10 +155,27 @@ public abstract class LookupInvoker<
         public Path userSettingsPath;
         public Settings effectiveSettings;
 
+        public final List<AutoCloseable> closeables = new ArrayList<>();
+
         @Override
         public void close() throws InvokerException {
-            if (containerCapsule != null) {
-                containerCapsule.close();
+            List<Exception> causes = null;
+            for (AutoCloseable c : closeables) {
+                if (c != null) {
+                    try {
+                        c.close();
+                    } catch (Exception e) {
+                        if (causes == null) {
+                            causes = new ArrayList<>();
+                        }
+                        causes.add(e);
+                    }
+                }
+            }
+            if (causes != null) {
+                InvokerException exception = new InvokerException("Unable to close context");
+                causes.forEach(exception::addSuppressed);
+                throw exception;
             }
         }
     }
@@ -273,17 +296,27 @@ public abstract class LookupInvoker<
         // see https://issues.apache.org/jira/browse/MNG-2570
 
         // LOG STREAMS
+        PrintStream sysOut = System.out;
+        PrintStream sysErr = System.err;
+        if (mavenOptions.rawStreams().isEmpty() || !mavenOptions.rawStreams().get()) {
+            MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
+            MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
+            stdout.setLogLevel(LocationAwareLogger.INFO_INT);
+            stderr.setLogLevel(LocationAwareLogger.INFO_INT);
+            System.setOut(new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream());
+            System.setErr(new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream());
+            context.closeables.add(() -> System.setOut(sysOut));
+            context.closeables.add(() -> System.setErr(sysErr));
+        }
+        BuildEventListener bel;
         if (mavenOptions.logFile().isPresent()) {
             Path logFile = context.cwdResolver.apply(mavenOptions.logFile().get());
-            // redirect stdout and stderr to file
-            try {
-                PrintStream ps = new PrintStream(Files.newOutputStream(logFile));
-                System.setOut(ps);
-                System.setErr(ps);
-            } catch (IOException e) {
-                throw new InvokerException("Cannot set up log " + e.getMessage(), e);
-            }
+            bel = new SimpleBuildEventListener(new PrintWriter(Files.newBufferedWriter(logFile)));
+        } else {
+            bel = new SimpleBuildEventListener(MessageUtils.getTerminal().writer(), true);
         }
+        ProjectBuildLogAppender projectBuildLogAppender = new ProjectBuildLogAppender(bel);
+        context.closeables.add(projectBuildLogAppender);
     }
 
     protected void activateLogging(C context) throws Exception {
@@ -298,13 +331,19 @@ public abstract class LookupInvoker<
 
         if (mavenOptions.failOnSeverity().isPresent()) {
             String logLevelThreshold = mavenOptions.failOnSeverity().get();
-
-            if (context.loggerFactory instanceof MavenSlf4jWrapperFactory) {
-                LogLevelRecorder logLevelRecorder = new LogLevelRecorder(logLevelThreshold);
-                ((MavenSlf4jWrapperFactory) context.loggerFactory).setLogLevelRecorder(logLevelRecorder);
+            if (context.loggerFactory instanceof LogLevelRecorder recorder) {
+                LogLevelRecorder.Level level =
+                        switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
+                            case "warn", "warning" -> LogLevelRecorder.Level.WARN;
+                            case "error" -> LogLevelRecorder.Level.ERROR;
+                            default -> throw new IllegalArgumentException(
+                                    logLevelThreshold
+                                            + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
+                        };
+                recorder.setMaxLevelAllowed(level);
                 context.logger.info("Enabled to break the build on log level " + logLevelThreshold + ".");
             } else {
-                context.logger.warn("Expected LoggerFactory to be of type '" + MavenSlf4jWrapperFactory.class.getName()
+                context.logger.warn("Expected LoggerFactory to be of type '" + LogLevelRecorder.class.getName()
                         + "', but found '"
                         + context.loggerFactory.getClass().getName() + "' instead. "
                         + "The --fail-on-severity flag will not take effect.");
@@ -337,6 +376,7 @@ public abstract class LookupInvoker<
 
     protected void container(C context) throws Exception {
         context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(context);
+        context.closeables.add(context.containerCapsule);
         context.lookup = context.containerCapsule.getLookup();
         context.settingsBuilder = context.lookup.lookup(SettingsBuilder.class);
 

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.slf4j.MavenSimpleLogger;
 
 /**
  * Forwards log messages to the client.
@@ -32,7 +31,7 @@ public class ConcurrentLogOutput implements AutoCloseable {
     private static final ThreadLocal<ProjectExecutionContext> CONTEXT = new InheritableThreadLocal<>();
 
     public ConcurrentLogOutput() {
-        MavenSimpleLogger.setLogSink(this::accept);
+        // MavenSimpleLogger.setLogSink(this::accept);
     }
 
     protected void accept(String message) {
@@ -46,11 +45,12 @@ public class ConcurrentLogOutput implements AutoCloseable {
 
     @Override
     public void close() {
-        MavenSimpleLogger.setLogSink(null);
+        // MavenSimpleLogger.setLogSink(null);
     }
 
     public AutoCloseable build(MavenProject project) {
-        return new ProjectExecutionContext(project);
+        return () -> {};
+        // return new ProjectExecutionContext(project);
     }
 
     private static class ProjectExecutionContext implements AutoCloseable {
