@@ -36,30 +36,6 @@ import org.apache.maven.api.cli.Options;
 @Experimental
 public interface EncryptOptions extends Options {
     /**
-     * Returns the cipher that the user wants to use for master encryption.
-     *
-     * @return an {@link Optional} containing the cipher string, or empty if not specified
-     */
-    @Nonnull
-    Optional<String> masterCipher();
-
-    /**
-     * Returns the password source that the user wants to use for master encryption.
-     *
-     * @return an {@link Optional} containing the master source string, or empty if not specified
-     */
-    @Nonnull
-    Optional<String> masterSource();
-
-    /**
-     * Returns the dispatcher to use for dispatched encryption.
-     *
-     * @return an {@link Optional} containing the dispatcher string, or empty if not specified
-     */
-    @Nonnull
-    Optional<String> dispatcher();
-
-    /**
      * Should the operation be forced (ie overwrite existing config, if any).
      *
      * @return an {@link Optional} containing the boolean value {@code true} if specified, or empty

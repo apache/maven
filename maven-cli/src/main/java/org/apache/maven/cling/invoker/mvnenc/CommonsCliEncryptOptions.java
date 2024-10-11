@@ -72,30 +72,6 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
     }
 
     @Override
-    public Optional<String> masterCipher() {
-        if (commandLine.hasOption(CLIManager.MASTER_CIPHER)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.MASTER_CIPHER));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> masterSource() {
-        if (commandLine.hasOption(CLIManager.MASTER_SOURCE)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.MASTER_SOURCE));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> dispatcher() {
-        if (commandLine.hasOption(CLIManager.DISPATCHER)) {
-            return Optional.of(commandLine.getOptionValue(CLIManager.DISPATCHER));
-        }
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<Boolean> force() {
         if (commandLine.hasOption(CLIManager.FORCE)) {
             return Optional.of(Boolean.TRUE);
@@ -125,30 +101,12 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
     }
 
     protected static class CLIManager extends CommonsCliOptions.CLIManager {
-        public static final String MASTER_CIPHER = "mc";
-        public static final String MASTER_SOURCE = "ms";
-        public static final String DISPATCHER = "d";
         public static final String FORCE = "f";
         public static final String YES = "y";
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
             super.prepareOptions(options);
-            options.addOption(Option.builder(MASTER_CIPHER)
-                    .longOpt("master-cipher")
-                    .hasArg()
-                    .desc("The cipher that user wants to use with master dispatcher")
-                    .build());
-            options.addOption(Option.builder(MASTER_SOURCE)
-                    .longOpt("master-source")
-                    .hasArg()
-                    .desc("The master source that user wants to use with master dispatcher")
-                    .build());
-            options.addOption(Option.builder(DISPATCHER)
-                    .longOpt("dispatcher")
-                    .hasArg()
-                    .desc("The dispatcher to use for dispatched encryption")
-                    .build());
             options.addOption(Option.builder(FORCE)
                     .longOpt("force")
                     .desc("Should overwrite without asking any configuration?")
