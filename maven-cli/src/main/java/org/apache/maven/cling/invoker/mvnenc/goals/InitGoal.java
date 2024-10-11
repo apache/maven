@@ -97,12 +97,6 @@ public class InitGoal implements Goal {
                 throw new InterruptedException();
             }
 
-            ConfirmResult confirm = (ConfirmResult) result.get("confirm");
-            if (confirm.getConfirmed() != ConfirmChoice.ConfirmationValue.YES) {
-                System.out.println("Values not accepted; not saving configuration.");
-                return BAD_OPERATION;
-            }
-
             Config dispatcherConfig = new Config();
             dispatcherConfig.setName(meta.name());
             for (DispatcherMeta.Field field : meta.fields()) {
@@ -129,7 +123,8 @@ public class InitGoal implements Goal {
                 }
             }
 
-            result = prompt.prompt(confirmPrompt(prompt.getPromptBuilder()).build());
+            result = prompt.prompt(
+                    context.header, confirmPrompt(prompt.getPromptBuilder()).build());
             ConfirmResult confirm = (ConfirmResult) result.get("confirm");
             if (confirm.getConfirmed() == ConfirmChoice.ConfirmationValue.YES) {
                 System.out.println("Writing out the configuration...");
@@ -212,13 +207,6 @@ public class InitGoal implements Goal {
                         .addPrompt();
             }
         }
-
-        promptBuilder
-                .createConfirmPromp()
-                .name("confirm")
-                .message("Are values above correct?")
-                .defaultValue(ConfirmChoice.ConfirmationValue.YES)
-                .addPrompt();
         return promptBuilder;
     }
 }
