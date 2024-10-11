@@ -18,30 +18,27 @@
  */
 package org.apache.maven.cling.invoker.mvnenc.goals;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
-import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
+import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.ERROR;
 
 /**
- * The "encrypt" goal.
+ * The support class for goal implementations.
  */
-@Singleton
-@Named("encrypt")
-public class Encrypt extends ConfiguredGoalSupport {
-    @Inject
-    public Encrypt(SecDispatcher secDispatcher) {
+public abstract class ConfiguredGoalSupport extends GoalSupport {
+    protected ConfiguredGoalSupport(SecDispatcher secDispatcher) {
         super(secDispatcher);
     }
 
     @Override
-    protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
-        String cleartext = context.reader.readLine("Enter the password to encrypt: ", '*');
-        System.out.println(secDispatcher.encrypt(cleartext, null));
-        return OK;
+    public int execute(DefaultEncryptInvoker.LocalContext context) throws Exception {
+        if (!configExists()) {
+            context.logger.error("Encryption is not configured, run `mvnenc init` first.");
+            return ERROR;
+        }
+        return doExecute(context);
     }
+
+    protected abstract int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception;
 }

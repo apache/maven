@@ -18,30 +18,22 @@
  */
 package org.apache.maven.cling.invoker.mvnenc.goals;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.io.IOException;
 
-import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
+import org.apache.maven.cling.invoker.mvnenc.Goal;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
-import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
-
 /**
- * The "encrypt" goal.
+ * The support class for goal implementations.
  */
-@Singleton
-@Named("encrypt")
-public class Encrypt extends ConfiguredGoalSupport {
-    @Inject
-    public Encrypt(SecDispatcher secDispatcher) {
-        super(secDispatcher);
+public abstract class GoalSupport implements Goal {
+    protected final SecDispatcher secDispatcher;
+
+    protected GoalSupport(SecDispatcher secDispatcher) {
+        this.secDispatcher = secDispatcher;
     }
 
-    @Override
-    protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
-        String cleartext = context.reader.readLine("Enter the password to encrypt: ", '*');
-        System.out.println(secDispatcher.encrypt(cleartext, null));
-        return OK;
+    protected boolean configExists() throws IOException {
+        return secDispatcher.readConfiguration(false) != null;
     }
 }

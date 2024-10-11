@@ -28,20 +28,20 @@ import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
 
 /**
- * The "encrypt" goal.
+ * The "migrate" goal.
  */
 @Singleton
-@Named("encrypt")
-public class Encrypt extends ConfiguredGoalSupport {
+@Named("migrate")
+public class Migrate extends ConfiguredGoalSupport {
     @Inject
-    public Encrypt(SecDispatcher secDispatcher) {
+    public Migrate(SecDispatcher secDispatcher) {
         super(secDispatcher);
     }
 
     @Override
     protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
-        String cleartext = context.reader.readLine("Enter the password to encrypt: ", '*');
-        System.out.println(secDispatcher.encrypt(cleartext, null));
+        // TODO: implement it
+        context.logger.info("Migration...");
         return OK;
     }
 }

@@ -23,7 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
-import org.apache.maven.cling.invoker.mvnenc.Goal;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
 import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
@@ -33,16 +32,14 @@ import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
  */
 @Singleton
 @Named("decrypt")
-public class Decrypt implements Goal {
-    private final SecDispatcher secDispatcher;
-
+public class Decrypt extends ConfiguredGoalSupport {
     @Inject
     public Decrypt(SecDispatcher secDispatcher) {
-        this.secDispatcher = secDispatcher;
+        super(secDispatcher);
     }
 
     @Override
-    public int execute(DefaultEncryptInvoker.LocalContext context) throws Exception {
+    protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
         String encrypted = context.reader.readLine("Enter the password to decrypt: ");
         System.out.println(secDispatcher.decrypt(encrypted));
         return OK;

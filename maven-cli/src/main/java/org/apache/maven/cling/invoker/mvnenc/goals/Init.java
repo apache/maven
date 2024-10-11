@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
-import org.apache.maven.cling.invoker.mvnenc.Goal;
 import org.codehaus.plexus.components.secdispatcher.DispatcherMeta;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.components.secdispatcher.model.Config;
@@ -53,12 +52,10 @@ import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
  */
 @Singleton
 @Named("init")
-public class InitGoal implements Goal {
-    private final SecDispatcher secDispatcher;
-
+public class Init extends GoalSupport {
     @Inject
-    public InitGoal(SecDispatcher secDispatcher) {
-        this.secDispatcher = secDispatcher;
+    public Init(SecDispatcher secDispatcher) {
+        super(secDispatcher);
     }
 
     @Override
@@ -70,8 +67,7 @@ public class InitGoal implements Goal {
         boolean force = context.invokerRequest.options().force().orElse(false);
         boolean yes = context.invokerRequest.options().yes().orElse(false);
 
-        boolean configExists = secDispatcher.readConfiguration(false) != null;
-        if (configExists && !force) {
+        if (configExists() && !force) {
             System.out.println("Error: configuration exist. Use --force if you want to reset existing configuration.");
             return BAD_OPERATION;
         }

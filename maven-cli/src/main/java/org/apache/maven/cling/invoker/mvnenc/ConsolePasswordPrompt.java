@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvnenc.goals;
+package org.apache.maven.cling.invoker.mvnenc;
 
 import javax.inject.Inject;
 import javax.inject.Named;
