@@ -40,6 +40,8 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Local UT.
  */
+@Disabled(
+        "The tests reuse properties from the JVM being launched, thus may lead to failures depending on which options are used")
 public class DefaultLocalMavenInvokerTest
         extends MavenInvokerTestSupport<MavenOptions, MavenInvokerRequest<MavenOptions>> {
     @Override
