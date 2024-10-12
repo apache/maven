@@ -151,6 +151,11 @@ under the License.
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-provider-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
