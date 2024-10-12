@@ -54,6 +54,8 @@ import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
 @Singleton
 @Named("init")
 public class Init extends GoalSupport {
+    private static final String NONE = "__none__";
+
     @Inject
     public Init(MessageBuilderFactory messageBuilderFactory, SecDispatcher secDispatcher) {
         super(messageBuilderFactory, secDispatcher);
@@ -85,6 +87,15 @@ public class Init extends GoalSupport {
                 context.header, dispatcherPrompt(prompt.getPromptBuilder()).build());
         if (result == null) {
             throw new InterruptedException();
+        }
+        if (NONE.equals(result.get("defaultDispatcher").getResult())) {
+            logger.warn(messageBuilderFactory
+                    .builder()
+                    .warning(
+                            "Maven4 SecDispatcher disabled; Maven3 fallback may still work, use `mvnenc diag` to check")
+                    .build());
+            secDispatcher.writeConfiguration(config);
+            return OK;
         }
         config.setDefaultDispatcher(result.get("defaultDispatcher").getResult());
 
@@ -166,11 +177,16 @@ public class Init extends GoalSupport {
                     context.header, confirmPrompt(prompt.getPromptBuilder()).build());
             ConfirmResult confirm = (ConfirmResult) result.get("confirm");
             if (confirm.getConfirmed() == ConfirmChoice.ConfirmationValue.YES) {
-                System.out.println(messageBuilderFactory.builder().info("Writing out the configuration..."));
+                logger.info(messageBuilderFactory
+                        .builder()
+                        .info("Writing out the configuration...")
+                        .build());
                 secDispatcher.writeConfiguration(config);
             } else {
-                System.out.println(
-                        messageBuilderFactory.builder().warning("Values not accepted; not saving configuration."));
+                logger.warn(messageBuilderFactory
+                        .builder()
+                        .warning("Values not accepted; not saving configuration.")
+                        .build());
                 return BAD_OPERATION;
             }
         }
@@ -193,6 +209,11 @@ public class Init extends GoalSupport {
                 .createListPrompt()
                 .name("defaultDispatcher")
                 .message("Which dispatcher you want to use as default?");
+        listPromptBuilder
+                .newItem()
+                .name(NONE)
+                .text("None (disable MavenSecDispatcher)")
+                .add();
         for (DispatcherMeta meta : secDispatcher.availableDispatchers()) {
             if (!meta.isHidden()) {
                 listPromptBuilder
