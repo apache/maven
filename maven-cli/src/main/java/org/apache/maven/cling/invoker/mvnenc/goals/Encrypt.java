@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
@@ -34,14 +35,14 @@ import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
 @Named("encrypt")
 public class Encrypt extends ConfiguredGoalSupport {
     @Inject
-    public Encrypt(SecDispatcher secDispatcher) {
-        super(secDispatcher);
+    public Encrypt(MessageBuilderFactory messageBuilderFactory, SecDispatcher secDispatcher) {
+        super(messageBuilderFactory, secDispatcher);
     }
 
     @Override
     protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
         String cleartext = context.reader.readLine("Enter the password to encrypt: ", '*');
-        System.out.println(secDispatcher.encrypt(cleartext, null));
+        logger.info(secDispatcher.encrypt(cleartext, null));
         return OK;
     }
 }

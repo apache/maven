@@ -29,20 +29,19 @@ import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
 
 /**
- * The "decrypt" goal.
+ * The "diag" goal.
  */
 @Singleton
-@Named("decrypt")
-public class Decrypt extends ConfiguredGoalSupport {
+@Named("diag")
+public class Diag extends ConfiguredGoalSupport {
     @Inject
-    public Decrypt(MessageBuilderFactory messageBuilderFactory, SecDispatcher secDispatcher) {
+    public Diag(MessageBuilderFactory messageBuilderFactory, SecDispatcher secDispatcher) {
         super(messageBuilderFactory, secDispatcher);
     }
 
     @Override
-    protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
-        String encrypted = context.reader.readLine("Enter the password to decrypt: ");
-        logger.info(secDispatcher.decrypt(encrypted));
+    protected int doExecute(DefaultEncryptInvoker.LocalContext context) {
+        dumpResponse("", secDispatcher.validateConfiguration());
         return OK;
     }
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
 import org.codehaus.plexus.components.secdispatcher.DispatcherMeta;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
@@ -54,8 +55,8 @@ import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
 @Named("init")
 public class Init extends GoalSupport {
     @Inject
-    public Init(SecDispatcher secDispatcher) {
-        super(secDispatcher);
+    public Init(MessageBuilderFactory messageBuilderFactory, SecDispatcher secDispatcher) {
+        super(messageBuilderFactory, secDispatcher);
     }
 
     @Override
@@ -68,7 +69,9 @@ public class Init extends GoalSupport {
         boolean yes = context.invokerRequest.options().yes().orElse(false);
 
         if (configExists() && !force) {
-            System.out.println("Error: configuration exist. Use --force if you want to reset existing configuration.");
+            System.out.println(messageBuilderFactory
+                    .builder()
+                    .error("Error: configuration exist. Use --force if you want to reset existing configuration."));
             return BAD_OPERATION;
         }
 
@@ -163,10 +166,11 @@ public class Init extends GoalSupport {
                     context.header, confirmPrompt(prompt.getPromptBuilder()).build());
             ConfirmResult confirm = (ConfirmResult) result.get("confirm");
             if (confirm.getConfirmed() == ConfirmChoice.ConfirmationValue.YES) {
-                System.out.println("Writing out the configuration...");
+                System.out.println(messageBuilderFactory.builder().info("Writing out the configuration..."));
                 secDispatcher.writeConfiguration(config);
             } else {
-                System.out.println("Values not accepted; not saving configuration.");
+                System.out.println(
+                        messageBuilderFactory.builder().warning("Values not accepted; not saving configuration."));
                 return BAD_OPERATION;
             }
         }

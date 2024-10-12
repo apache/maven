@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
@@ -34,14 +35,14 @@ import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
 @Named("migrate")
 public class Migrate extends ConfiguredGoalSupport {
     @Inject
-    public Migrate(SecDispatcher secDispatcher) {
-        super(secDispatcher);
+    public Migrate(MessageBuilderFactory messageBuilderFactory, SecDispatcher secDispatcher) {
+        super(messageBuilderFactory, secDispatcher);
     }
 
     @Override
     protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
         // TODO: implement it
-        context.logger.info("Migration...");
+        logger.info("Migration...");
         return OK;
     }
 }

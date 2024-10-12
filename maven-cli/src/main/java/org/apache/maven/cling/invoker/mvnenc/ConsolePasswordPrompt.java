@@ -22,12 +22,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.services.Prompter;
 import org.apache.maven.api.services.PrompterException;
 import org.codehaus.plexus.components.secdispatcher.MasterSource;
 import org.codehaus.plexus.components.secdispatcher.MasterSourceMeta;
+import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcherException;
 
 /**
@@ -56,13 +59,21 @@ public class ConsolePasswordPrompt implements MasterSource, MasterSourceMeta {
     }
 
     @Override
-    public String handle(String s) throws SecDispatcherException {
-        if (NAME.equals(s)) {
+    public String handle(String config) throws SecDispatcherException {
+        if (NAME.equals(config)) {
             try {
                 return prompter.promptForPassword("Enter the master password: ");
             } catch (PrompterException e) {
                 throw new SecDispatcherException("Could not collect the password", e);
             }
+        }
+        return null;
+    }
+
+    @Override
+    public SecDispatcher.ValidationResponse validateConfiguration(String config) {
+        if (NAME.equals(config)) {
+            return new SecDispatcher.ValidationResponse(getClass().getSimpleName(), true, Map.of(), List.of());
         }
         return null;
     }
