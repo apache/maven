@@ -1355,7 +1355,7 @@ class PomConstructionTest {
         assertEquals("project-property", pom.getValue("properties[1]/itProperty"));
         assertEquals("UTF-8", pom.getValue("properties[1]/project.build.sourceEncoding"));
         assertEquals("UTF-8", pom.getValue("properties[1]/project.reporting.outputEncoding"));
-        assertEquals("2001-01-01T00:00:00Z", pom.getValue("properties[1]/project.build.outputTimestamp"));
+        assertEquals("1980-02-01T00:00:00Z", pom.getValue("properties[1]/project.build.outputTimestamp"));
 
         assertEquals(1, ((List<?>) pom.getValue("dependencyManagement/dependencies")).size());
         assertEquals("org.apache.maven.its", pom.getValue("dependencyManagement/dependencies[1]/groupId"));
