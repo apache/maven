@@ -77,6 +77,9 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         Consumer<String> sink = logSink;
         if (sink != null) {
             sink.accept(buf.toString());
+            if (t != null) {
+                writeThrowable(t, sink);
+            }
         } else {
             super.write(buf, t);
         }
@@ -84,6 +87,10 @@ public class MavenSimpleLogger extends MavenBaseLogger {
 
     @Override
     protected void writeThrowable(Throwable t, PrintStream stream) {
+        writeThrowable(t, stream::println);
+    }
+
+    protected void writeThrowable(Throwable t, Consumer<String> stream) {
         if (t == null) {
             return;
         }
@@ -91,12 +98,12 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         if (t.getMessage() != null) {
             builder.a(": ").failure(t.getMessage());
         }
-        stream.println(builder);
+        stream.accept(builder.toString());
 
         printStackTrace(t, stream, "");
     }
 
-    protected void printStackTrace(Throwable t, PrintStream stream, String prefix) {
+    protected void printStackTrace(Throwable t, Consumer<String> stream, String prefix) {
         MessageBuilder builder = builder();
         for (StackTraceElement e : t.getStackTrace()) {
             builder.a(prefix);
@@ -109,7 +116,7 @@ public class MavenSimpleLogger extends MavenBaseLogger {
             builder.a("(");
             builder.strong(getLocation(e));
             builder.a(")");
-            stream.println(builder);
+            stream.accept(builder.toString());
             builder.setLength(0);
         }
         for (Throwable se : t.getSuppressed()) {
@@ -121,13 +128,13 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         }
     }
 
-    protected void writeThrowable(Throwable t, PrintStream stream, String caption, String prefix) {
+    protected void writeThrowable(Throwable t, Consumer<String> stream, String caption, String prefix) {
         MessageBuilder builder =
                 builder().a(prefix).strong(caption).a(": ").a(t.getClass().getName());
         if (t.getMessage() != null) {
             builder.a(": ").failure(t.getMessage());
         }
-        stream.println(builder);
+        stream.accept(builder.toString());
 
         printStackTrace(t, stream, prefix);
     }
