@@ -18,12 +18,27 @@
  */
 package org.apache.maven.cling.invoker.mvnenc;
 
+import java.io.InterruptedIOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.api.cli.mvnenc.EncryptInvoker;
 import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
+import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.invoker.ProtoLookup;
-import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
+import org.jline.consoleui.prompt.ConsolePrompt;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
+import org.jline.terminal.Terminal;
+import org.jline.utils.AttributedString;
+import org.jline.utils.AttributedStringBuilder;
+import org.jline.utils.AttributedStyle;
+import org.jline.utils.Colors;
+import org.jline.utils.OSUtils;
 
 /**
  * Encrypt invoker implementation, when Encrypt CLI is being run. System uses ClassWorld launcher, and class world
@@ -33,17 +48,36 @@ public class DefaultEncryptInvoker
         extends LookupInvoker<EncryptOptions, EncryptInvokerRequest, DefaultEncryptInvoker.LocalContext>
         implements EncryptInvoker {
 
+    @SuppressWarnings("VisibilityModifier")
     public static class LocalContext
             extends LookupInvokerContext<EncryptOptions, EncryptInvokerRequest, DefaultEncryptInvoker.LocalContext> {
         protected LocalContext(DefaultEncryptInvoker invoker, EncryptInvokerRequest invokerRequest) {
             super(invoker, invokerRequest);
         }
 
-        protected SecDispatcher secDispatcher;
+        public Map<String, Goal> goals;
+
+        public List<AttributedString> header;
+        public AttributedStyle style;
+        public LineReader reader;
+        public ConsolePrompt prompt;
+
+        public void addInHeader(String text) {
+            addInHeader(AttributedStyle.DEFAULT, text);
+        }
+
+        public void addInHeader(AttributedStyle style, String text) {
+            AttributedStringBuilder asb = new AttributedStringBuilder();
+            asb.style(style).append(text);
+            header.add(asb.toAttributedString());
+        }
     }
+
+    private final Terminal terminal;
 
     public DefaultEncryptInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
+        this.terminal = protoLookup.lookup(Terminal.class);
     }
 
     @Override
@@ -58,14 +92,80 @@ public class DefaultEncryptInvoker
 
     @Override
     protected void lookup(LocalContext context) {
-        context.secDispatcher = context.lookup.lookup(SecDispatcher.class);
+        context.goals = context.lookup.lookupMap(Goal.class);
     }
 
-    protected int doExecute(LocalContext localContext) throws Exception {
-        localContext.logger.info("Hello, this is SecDispatcher.");
-        localContext.logger.info("Available Ciphers: " + localContext.secDispatcher.availableCiphers());
-        localContext.logger.info("Available Dispatchers: " + localContext.secDispatcher.availableDispatchers());
-        // TODO: implement mvnenc
-        return 0;
+    public static final int OK = 0; // OK
+    public static final int ERROR = 1; // "generic" error
+    public static final int BAD_OPERATION = 2; // bad user input or alike
+    public static final int CANCELED = 3; // user canceled
+
+    protected int doExecute(LocalContext context) throws Exception {
+        if (!context.interactive) {
+            System.out.println("This tool works only in interactive mode!");
+            System.out.println("Tool purpose is to configure password management on developer workstations.");
+            System.out.println(
+                    "Note: Generated configuration can be moved/copied to headless environments, if configured as such.");
+            return BAD_OPERATION;
+        }
+
+        context.header = new ArrayList<>();
+        context.style = new AttributedStyle();
+        context.addInHeader(
+                context.style.italic().bold().foreground(Colors.rgbColor("green")),
+                "Maven Encryption " + CLIReportingUtils.showVersionMinimal());
+        context.addInHeader("Tool for secure password management on workstations.");
+        context.addInHeader("This tool is part of Apache Maven 4 distribution.");
+        context.addInHeader("");
+        try {
+            Thread executeThread = Thread.currentThread();
+            terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
+            ConsolePrompt.UiConfig config;
+            if (terminal.getType().equals(Terminal.TYPE_DUMB)
+                    || terminal.getType().equals(Terminal.TYPE_DUMB_COLOR)) {
+                System.out.println(terminal.getName() + ": " + terminal.getType());
+                throw new IllegalStateException("Dumb terminal detected.\nThis tool requires real terminal to work!\n"
+                        + "Note: On Windows Jansi or JNA library must be included in classpath.");
+            } else if (OSUtils.IS_WINDOWS) {
+                config = new ConsolePrompt.UiConfig(">", "( )", "(x)", "( )");
+            } else {
+                config = new ConsolePrompt.UiConfig("❯", "◯ ", "◉ ", "◯ ");
+            }
+            config.setCancellableFirstPrompt(true);
+
+            context.reader = LineReaderBuilder.builder().terminal(terminal).build();
+            context.prompt = new ConsolePrompt(context.reader, terminal, config);
+
+            if (context.invokerRequest.options().goals().isEmpty()
+                    || context.invokerRequest.options().goals().get().size() != 1) {
+                return badGoalsErrorMessage("No goal or multiple goals specified, specify only one goal.", context);
+            }
+
+            String goalName = context.invokerRequest.options().goals().get().get(0);
+            Goal goal = context.goals.get(goalName);
+
+            if (goal == null) {
+                return badGoalsErrorMessage("Unknown goal: " + goalName, context);
+            }
+
+            return goal.execute(context);
+        } catch (InterruptedException | InterruptedIOException | UserInterruptException e) {
+            System.out.println("Goal canceled by user.");
+            return CANCELED;
+        } catch (Exception e) {
+            if (context.invokerRequest.options().showErrors().orElse(false)) {
+                context.logger.error(e.getMessage(), e);
+            } else {
+                context.logger.error(e.getMessage());
+            }
+            return ERROR;
+        }
+    }
+
+    protected int badGoalsErrorMessage(String message, LocalContext context) {
+        System.out.println(message);
+        System.out.println("Supported goals are: " + String.join(", ", context.goals.keySet()));
+        System.out.println("Use -h to display help.");
+        return BAD_OPERATION;
     }
 }

@@ -36,28 +36,18 @@ import org.apache.maven.api.cli.Options;
 @Experimental
 public interface EncryptOptions extends Options {
     /**
-     * Returns the cipher that the user wants to use for non-dispatched encryption.
+     * Should the operation be forced (ie overwrite existing config, if any).
      *
-     * @return an {@link Optional} containing the cipher string, or empty if not specified
+     * @return an {@link Optional} containing the boolean value {@code true} if specified, or empty
      */
-    @Nonnull
-    Optional<String> cipher();
+    Optional<Boolean> force();
 
     /**
-     * Returns the master source that the user wants to use for non-dispatched encryption.
+     * Should imply "yes" to all questions.
      *
-     * @return an {@link Optional} containing the master source string, or empty if not specified
+     * @return an {@link Optional} containing the boolean value {@code true} if specified, or empty
      */
-    @Nonnull
-    Optional<String> masterSource();
-
-    /**
-     * Returns the dispatcher to use for dispatched encryption.
-     *
-     * @return an {@link Optional} containing the dispatcher string, or empty if not specified
-     */
-    @Nonnull
-    Optional<String> dispatcher();
+    Optional<Boolean> yes();
 
     /**
      * Returns the list of encryption goals to be executed.

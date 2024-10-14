@@ -214,10 +214,15 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         decrypt.setProxies(request.getProxies());
         decrypt.setServers(request.getServers());
         SettingsDecryptionResult decrypted = settingsDecrypter.decrypt(decrypt);
-
-        if (logger.isDebugEnabled()) {
-            for (SettingsProblem problem : decrypted.getProblems()) {
-                logger.debug(problem.getMessage(), problem.getException());
+        for (SettingsProblem problem : decrypted.getProblems()) {
+            if (problem.getSeverity() == SettingsProblem.Severity.WARNING) {
+                logger.warn(problem.getMessage());
+            } else if (problem.getSeverity() == SettingsProblem.Severity.ERROR) {
+                logger.error(
+                        problem.getMessage(),
+                        request.isShowErrors()
+                                ? problem.getException()
+                                : problem.getException().getMessage());
             }
         }
 
