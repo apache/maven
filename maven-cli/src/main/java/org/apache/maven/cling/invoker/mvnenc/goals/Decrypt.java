@@ -26,6 +26,7 @@ import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
+import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.BAD_OPERATION;
 import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
 
 /**
@@ -42,7 +43,12 @@ public class Decrypt extends ConfiguredGoalSupport {
     @Override
     protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
         String encrypted = context.reader.readLine("Enter the password to decrypt: ");
-        logger.info(secDispatcher.decrypt(encrypted));
-        return OK;
+        if (secDispatcher.isAnyEncryptedString(encrypted)) {
+            logger.info(secDispatcher.decrypt(encrypted));
+            return OK;
+        } else {
+            logger.error("Malformed encrypted string");
+            return BAD_OPERATION;
+        }
     }
 }
