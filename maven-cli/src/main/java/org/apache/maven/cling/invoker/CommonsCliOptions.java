@@ -97,7 +97,7 @@ public abstract class CommonsCliOptions implements Options {
 
     @Override
     public Optional<Boolean> showErrors() {
-        if (commandLine.hasOption(CLIManager.SHOW_ERRORS)) {
+        if (commandLine.hasOption(CLIManager.SHOW_ERRORS) || verbose().orElse(false)) {
             return Optional.of(Boolean.TRUE);
         }
         return Optional.empty();
