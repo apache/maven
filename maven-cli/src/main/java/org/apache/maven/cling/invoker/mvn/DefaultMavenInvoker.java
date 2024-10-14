@@ -37,7 +37,6 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenInvoker;
 import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.api.services.LookupException;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
 import org.apache.maven.cli.CLIReportingUtils;
@@ -57,7 +56,6 @@ import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingExecutionListener;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
@@ -366,12 +364,7 @@ public abstract class DefaultMavenInvoker<
         if (context.eventSpyDispatcher != null) {
             listener = context.eventSpyDispatcher.chainListener(listener);
         }
-        try {
-            LoggingExecutionListener leListener = context.lookup.lookup(LoggingExecutionListener.class);
-            leListener.init(listener, context.lookup.lookup(BuildEventListener.class));
-            listener = leListener;
-        } catch (LookupException ignore) {
-        }
+        listener = new LoggingExecutionListener(listener, determineBuildEventListener(context));
         return listener;
     }
 

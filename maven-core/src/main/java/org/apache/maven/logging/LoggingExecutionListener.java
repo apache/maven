@@ -18,9 +18,6 @@
  */
 package org.apache.maven.logging;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -30,14 +27,12 @@ import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 
-@Singleton
-@Named
 public class LoggingExecutionListener implements ExecutionListener, ProjectExecutionListener {
 
-    private ExecutionListener delegate;
-    private BuildEventListener buildEventListener;
+    private final ExecutionListener delegate;
+    private final BuildEventListener buildEventListener;
 
-    public void init(ExecutionListener delegate, BuildEventListener buildEventListener) {
+    public LoggingExecutionListener(ExecutionListener delegate, BuildEventListener buildEventListener) {
         this.delegate = delegate;
         this.buildEventListener = buildEventListener;
     }

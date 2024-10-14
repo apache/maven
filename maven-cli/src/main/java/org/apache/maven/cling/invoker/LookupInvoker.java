@@ -40,6 +40,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -144,6 +145,7 @@ public abstract class LookupInvoker<
         public ILoggerFactory loggerFactory;
         public Slf4jConfiguration slf4jConfiguration;
         public Slf4jConfiguration.Level loggerLevel;
+        public BuildEventListener buildEventListener;
         public ClassLoader currentThreadContextClassLoader;
         public ContainerCapsule containerCapsule;
         public Lookup lookup;
@@ -309,17 +311,28 @@ public abstract class LookupInvoker<
             context.closeables.add(() -> System.setOut(sysOut));
             context.closeables.add(() -> System.setErr(sysErr));
         }
-        BuildEventListener bel = determineBuildEventListener(context);
-        ProjectBuildLogAppender projectBuildLogAppender = new ProjectBuildLogAppender(bel);
+        ProjectBuildLogAppender projectBuildLogAppender =
+                new ProjectBuildLogAppender(determineBuildEventListener(context));
         context.closeables.add(projectBuildLogAppender);
     }
 
-    protected BuildEventListener determineBuildEventListener(C context) throws IOException {
+    protected BuildEventListener determineBuildEventListener(C context) {
+        if (context.buildEventListener == null) {
+            context.buildEventListener = doDetermineBuildEventListener(context);
+        }
+        return context.buildEventListener;
+    }
+
+    protected BuildEventListener doDetermineBuildEventListener(C context) {
         BuildEventListener bel;
         O options = context.invokerRequest.options();
         if (options.logFile().isPresent()) {
             Path logFile = context.cwdResolver.apply(options.logFile().get());
-            bel = new SimpleBuildEventListener(new PrintWriter(Files.newBufferedWriter(logFile)));
+            try {
+                bel = new SimpleBuildEventListener(new PrintWriter(Files.newBufferedWriter(logFile)));
+            } catch (IOException e) {
+                throw new MavenException("Unable to redirect logging to " + logFile, e);
+            }
         } else {
             bel = new SimpleBuildEventListener(MessageUtils.getTerminal().writer(), true);
         }
