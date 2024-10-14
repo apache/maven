@@ -60,9 +60,9 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
             server = server.clone();
 
             String password = server.getPassword();
-            if (password != null && !password.isBlank() && !password.startsWith("${")) {
+            if (securityDispatcher.isAnyEncryptedString(password)) {
                 try {
-                    if (isLegacy(password)) {
+                    if (securityDispatcher.isLegacyEncryptedString(password)) {
                         problems.add(new DefaultSettingsProblem(
                                 "Legacy/insecurely encrypted password detected for server " + server.getId(),
                                 Severity.WARNING,
@@ -71,7 +71,7 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
                                 -1,
                                 null));
                     }
-                    server.setPassword(decrypt(password));
+                    server.setPassword(securityDispatcher.decrypt(password));
                 } catch (SecDispatcherException | IOException e) {
                     problems.add(new DefaultSettingsProblem(
                             "Failed to decrypt password for server " + server.getId() + ": " + e.getMessage(),
@@ -84,9 +84,9 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
             }
 
             String passphrase = server.getPassphrase();
-            if (passphrase != null && !passphrase.isBlank() && !passphrase.startsWith("${")) {
+            if (securityDispatcher.isAnyEncryptedString(passphrase)) {
                 try {
-                    if (isLegacy(passphrase)) {
+                    if (securityDispatcher.isLegacyEncryptedString(passphrase)) {
                         problems.add(new DefaultSettingsProblem(
                                 "Legacy/insecurely encrypted passphrase detected for server " + server.getId(),
                                 Severity.WARNING,
@@ -95,7 +95,7 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
                                 -1,
                                 null));
                     }
-                    server.setPassphrase(decrypt(passphrase));
+                    server.setPassphrase(securityDispatcher.decrypt(passphrase));
                 } catch (SecDispatcherException | IOException e) {
                     problems.add(new DefaultSettingsProblem(
                             "Failed to decrypt passphrase for server " + server.getId() + ": " + e.getMessage(),
@@ -114,9 +114,9 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
 
         for (Proxy proxy : request.getProxies()) {
             String password = proxy.getPassword();
-            if (password != null && !password.isBlank() && !password.startsWith("${")) {
+            if (securityDispatcher.isAnyEncryptedString(password)) {
                 try {
-                    if (isLegacy(password)) {
+                    if (securityDispatcher.isLegacyEncryptedString(password)) {
                         problems.add(new DefaultSettingsProblem(
                                 "Legacy/insecurely encrypted password detected for proxy " + proxy.getId(),
                                 Severity.WARNING,
@@ -125,7 +125,7 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
                                 -1,
                                 null));
                     }
-                    proxy.setPassword(decrypt(password));
+                    proxy.setPassword(securityDispatcher.decrypt(password));
                 } catch (SecDispatcherException | IOException e) {
                     problems.add(new DefaultSettingsProblem(
                             "Failed to decrypt password for proxy " + proxy.getId() + ": " + e.getMessage(),
@@ -141,13 +141,5 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
         }
 
         return new DefaultSettingsDecryptionResult(servers, proxies, problems);
-    }
-
-    private boolean isLegacy(String str) {
-        return str != null && securityDispatcher.isLegacyPassword(str);
-    }
-
-    private String decrypt(String str) throws SecDispatcherException, IOException {
-        return (str == null) ? null : securityDispatcher.decrypt(str);
     }
 }
