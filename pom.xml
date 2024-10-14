@@ -168,7 +168,6 @@ under the License.
     <asmVersion>9.7.1</asmVersion>
     <byteBuddyVersion>1.15.3</byteBuddyVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
-    <classWorldsVersion>2.8.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
     <guavaVersion>33.3.1-jre</guavaVersion>
