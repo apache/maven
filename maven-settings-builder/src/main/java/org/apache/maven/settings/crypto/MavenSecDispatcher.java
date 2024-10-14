@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.maven.api.Constants;
-import org.codehaus.plexus.components.cipher.PlexusCipher;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatcher;
@@ -44,8 +43,8 @@ public class MavenSecDispatcher extends DefaultSecDispatcher {
     private static final String FILE_NAME = "settings-security4.xml";
 
     @Inject
-    public MavenSecDispatcher(PlexusCipher cipher, Map<String, Dispatcher> dispatchers) {
-        super(cipher, dispatchers, configurationFile());
+    public MavenSecDispatcher(Map<String, Dispatcher> dispatchers) {
+        super(dispatchers, configurationFile());
     }
 
     private static Path configurationFile() {
