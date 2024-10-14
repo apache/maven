@@ -218,7 +218,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             if (problem.getSeverity() == SettingsProblem.Severity.WARNING) {
                 logger.warn(problem.getMessage());
             } else if (problem.getSeverity() == SettingsProblem.Severity.ERROR) {
-                logger.error(
+                logger.warn(
                         problem.getMessage(),
                         request.isShowErrors()
                                 ? problem.getException()
