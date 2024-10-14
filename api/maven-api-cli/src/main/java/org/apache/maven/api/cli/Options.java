@@ -87,7 +87,7 @@ public interface Options {
     Optional<Boolean> verbose();
 
     /**
-     * Indicates whether to show error messages.
+     * Indicates whether to show error stack traces.
      *
      * @return an {@link Optional} containing the boolean flag, or empty if not set
      */
