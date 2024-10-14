@@ -547,7 +547,7 @@ public abstract class LookupInvoker<
         request.setLocalRepository(createLocalArtifactRepository(context.localRepositoryPath));
 
         request.setInteractiveMode(context.interactive);
-        request.setShowErrors(options.showErrors().orElse(options.verbose().orElse(false)));
+        request.setShowErrors(options.showErrors().orElse(false));
         request.setBaseDirectory(context.invokerRequest.topDirectory().toFile());
         request.setSystemProperties(toProperties(context.invokerRequest.systemProperties()));
         request.setUserProperties(toProperties(context.invokerRequest.userProperties()));
