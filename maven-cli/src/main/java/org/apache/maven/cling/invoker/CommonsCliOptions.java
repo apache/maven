@@ -359,7 +359,6 @@ public abstract class CommonsCliOptions implements Options {
                     .build());
             options.addOption(Option.builder()
                     .longOpt(RAW_STREAMS)
-                    .hasArg()
                     .desc("Do not decorate standard output and error streams")
                     .build());
             options.addOption(Option.builder(SHOW_VERSION)
