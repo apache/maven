@@ -57,6 +57,7 @@ import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logging.LoggingExecutionListener;
+import org.apache.maven.logging.MavenTransferListener;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
@@ -66,6 +67,7 @@ import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.transfer.TransferListener;
 
 import static java.util.Comparator.comparing;
 import static org.apache.maven.cling.invoker.Utils.toProperties;
@@ -366,6 +368,11 @@ public abstract class DefaultMavenInvoker<
         }
         listener = new LoggingExecutionListener(listener, determineBuildEventListener(context));
         return listener;
+    }
+
+    protected TransferListener determineTransferListener(C context, boolean noTransferProgress) {
+        TransferListener delegate = super.determineTransferListener(context, noTransferProgress);
+        return new MavenTransferListener(delegate, determineBuildEventListener(context));
     }
 
     protected String determineMakeBehavior(C context) {
