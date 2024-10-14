@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -160,7 +161,9 @@ public abstract class LookupInvoker<
         @Override
         public void close() throws InvokerException {
             List<Exception> causes = null;
-            for (AutoCloseable c : closeables) {
+            List<AutoCloseable> cs = new ArrayList<>(closeables);
+            Collections.reverse(cs);
+            for (AutoCloseable c : cs) {
                 if (c != null) {
                     try {
                         c.close();
@@ -297,7 +300,17 @@ public abstract class LookupInvoker<
 
         // JLine is quite slow to start due to the native library unpacking and loading
         // so boot it asynchronously
-        context.terminal = new FastTerminal(
+        context.terminal = createTerminal(context);
+        context.closeables.add(MessageUtils::systemUninstall);
+
+        // Create the build log appender
+        ProjectBuildLogAppender projectBuildLogAppender =
+                new ProjectBuildLogAppender(determineBuildEventListener(context));
+        context.closeables.add(projectBuildLogAppender);
+    }
+
+    protected Terminal createTerminal(C context) {
+        return new FastTerminal(
                 () -> TerminalBuilder.builder()
                         .name("Maven")
                         .streams(
@@ -306,16 +319,12 @@ public abstract class LookupInvoker<
                         .dumb(true)
                         .build(),
                 terminal -> doConfigureWithTerminal(context, terminal));
-        ProjectBuildLogAppender projectBuildLogAppender =
-                new ProjectBuildLogAppender(determineBuildEventListener(context));
-        context.closeables.add(projectBuildLogAppender);
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
         MessageUtils.systemInstall(terminal);
         AnsiConsole.setTerminal(terminal);
         AnsiConsole.systemInstall();
-        context.closeables.add(MessageUtils::systemUninstall);
         MessageUtils.registerShutdownHook(); // safety belt
 
         O options = context.invokerRequest.options();
