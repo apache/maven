@@ -20,8 +20,6 @@ package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,6 +54,7 @@ import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.SimplexTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
@@ -76,6 +75,9 @@ import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.eclipse.aether.transfer.TransferListener;
+import org.jline.jansi.AnsiConsole;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
@@ -119,9 +121,6 @@ public abstract class LookupInvoker<
         public final Function<String, Path> cwdResolver;
         public final Function<String, Path> installationResolver;
         public final Function<String, Path> userResolver;
-        public final InputStream stdIn;
-        public final PrintWriter stdOut;
-        public final PrintWriter stdErr;
 
         protected LookupInvokerContext(LookupInvoker<O, R, C> invoker, R invokerRequest) {
             this.invoker = invoker;
@@ -135,9 +134,6 @@ public abstract class LookupInvoker<
                     .toAbsolutePath();
             this.userResolver = s ->
                     invokerRequest.userHomeDirectory().resolve(s).normalize().toAbsolutePath();
-            this.stdIn = invokerRequest.in().orElse(System.in);
-            this.stdOut = new PrintWriter(invokerRequest.out().orElse(System.out), true);
-            this.stdErr = new PrintWriter(invokerRequest.err().orElse(System.err), true);
             this.logger = invokerRequest.parserRequest().logger();
         }
 
@@ -145,6 +141,7 @@ public abstract class LookupInvoker<
         public ILoggerFactory loggerFactory;
         public Slf4jConfiguration slf4jConfiguration;
         public Slf4jConfiguration.Level loggerLevel;
+        public Terminal terminal;
         public BuildEventListener buildEventListener;
         public ClassLoader currentThreadContextClassLoader;
         public ContainerCapsule containerCapsule;
@@ -298,22 +295,39 @@ public abstract class LookupInvoker<
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
 
-        // LOG STREAMS
-        PrintStream sysOut = System.out;
-        PrintStream sysErr = System.err;
-        if (mavenOptions.rawStreams().isEmpty() || !mavenOptions.rawStreams().get()) {
+        // JLine is quite slow to start due to the native library unpacking and loading
+        // so boot it asynchronously
+        context.terminal = new FastTerminal(
+                () -> TerminalBuilder.builder()
+                        .name("Maven")
+                        .streams(
+                                context.invokerRequest.in().orElse(null),
+                                context.invokerRequest.out().orElse(null))
+                        .dumb(true)
+                        .build(),
+                terminal -> doConfigureWithTerminal(context, terminal));
+        ProjectBuildLogAppender projectBuildLogAppender =
+                new ProjectBuildLogAppender(determineBuildEventListener(context));
+        context.closeables.add(projectBuildLogAppender);
+    }
+
+    protected void doConfigureWithTerminal(C context, Terminal terminal) {
+        MessageUtils.systemInstall(terminal);
+        AnsiConsole.setTerminal(terminal);
+        AnsiConsole.systemInstall();
+        context.closeables.add(MessageUtils::systemUninstall);
+        MessageUtils.registerShutdownHook(); // safety belt
+
+        O options = context.invokerRequest.options();
+        if (options.rawStreams().isEmpty() || !options.rawStreams().get()) {
             MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
             MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
             stdout.setLogLevel(LocationAwareLogger.INFO_INT);
             stderr.setLogLevel(LocationAwareLogger.INFO_INT);
             System.setOut(new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream());
             System.setErr(new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream());
-            context.closeables.add(() -> System.setOut(sysOut));
-            context.closeables.add(() -> System.setErr(sysErr));
+            // no need to set them back, this is already handled by MessageUtils.systemUninstall() above
         }
-        ProjectBuildLogAppender projectBuildLogAppender =
-                new ProjectBuildLogAppender(determineBuildEventListener(context));
-        context.closeables.add(projectBuildLogAppender);
     }
 
     protected BuildEventListener determineBuildEventListener(C context) {
@@ -329,12 +343,19 @@ public abstract class LookupInvoker<
         if (options.logFile().isPresent()) {
             Path logFile = context.cwdResolver.apply(options.logFile().get());
             try {
-                bel = new SimpleBuildEventListener(new PrintWriter(Files.newBufferedWriter(logFile)));
+                PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile));
+                bel = new SimpleBuildEventListener(printWriter::println);
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
             }
         } else {
-            bel = new SimpleBuildEventListener(MessageUtils.getTerminal().writer(), true);
+            // Given the terminal creation has been offloaded to a different thread,
+            // do not pass directory the terminal writer
+            bel = new SimpleBuildEventListener(msg -> {
+                PrintWriter pw = context.terminal.writer();
+                pw.println(msg);
+                pw.flush();
+            });
         }
         return bel;
     }
@@ -374,14 +395,14 @@ public abstract class LookupInvoker<
     protected void helpOrVersionAndMayExit(C context) throws Exception {
         R invokerRequest = context.invokerRequest;
         if (invokerRequest.options().help().isPresent()) {
-            invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), context.stdOut);
+            invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), context.terminal.writer());
             throw new ExitException(0);
         }
         if (invokerRequest.options().showVersionAndExit().isPresent()) {
             if (invokerRequest.options().quiet().orElse(false)) {
-                context.stdOut.println(CLIReportingUtils.showVersionMinimal());
+                context.terminal.writer().println(CLIReportingUtils.showVersionMinimal());
             } else {
-                context.stdOut.println(CLIReportingUtils.showVersion());
+                context.terminal.writer().println(CLIReportingUtils.showVersion());
             }
             throw new ExitException(0);
         }
@@ -390,7 +411,7 @@ public abstract class LookupInvoker<
     protected void preCommands(C context) throws Exception {
         Options mavenOptions = context.invokerRequest.options();
         if (mavenOptions.verbose().orElse(false) || mavenOptions.showVersion().orElse(false)) {
-            context.stdOut.println(CLIReportingUtils.showVersion());
+            context.terminal.writer().println(CLIReportingUtils.showVersion());
         }
     }
 
@@ -764,7 +785,7 @@ public abstract class LookupInvoker<
         } else if (context.interactive && !logFile) {
             return new SimplexTransferListener(new ConsoleMavenTransferListener(
                     context.invokerRequest.messageBuilderFactory(),
-                    context.stdOut,
+                    context.terminal.writer(),
                     context.invokerRequest.options().verbose().orElse(false)));
         } else {
             return new Slf4jMavenTransferListener();

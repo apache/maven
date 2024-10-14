@@ -18,23 +18,17 @@
  */
 package org.apache.maven.logging;
 
-import java.io.PrintWriter;
+import java.util.function.Consumer;
 
 import org.apache.maven.execution.ExecutionEvent;
 import org.eclipse.aether.transfer.TransferEvent;
 
 public class SimpleBuildEventListener implements BuildEventListener {
 
-    final PrintWriter writer;
-    final boolean autoflush;
+    final Consumer<String> output;
 
-    public SimpleBuildEventListener(PrintWriter writer) {
-        this(writer, false);
-    }
-
-    public SimpleBuildEventListener(PrintWriter writer, boolean autoflush) {
-        this.writer = writer;
-        this.autoflush = autoflush;
+    public SimpleBuildEventListener(Consumer<String> output) {
+        this.output = output;
     }
 
     @Override
@@ -65,10 +59,7 @@ public class SimpleBuildEventListener implements BuildEventListener {
 
     @Override
     public void log(String msg) {
-        writer.println(msg);
-        if (autoflush) {
-            writer.flush();
-        }
+        output.accept(msg);
     }
 
     @Override

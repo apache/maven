@@ -25,7 +25,6 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.jline.MessageUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import static java.util.Objects.requireNonNull;
@@ -65,8 +64,6 @@ public abstract class ClingSupport<O extends Options, R extends InvokerRequest<O
      * The main entry point.
      */
     public int run(String[] args) throws IOException {
-        MessageUtils.systemInstall();
-        MessageUtils.registerShutdownHook();
         try (Invoker<R> invoker = createInvoker()) {
             return invoker.invoke(parseArguments(args));
         } catch (ParserException e) {
@@ -75,12 +72,8 @@ public abstract class ClingSupport<O extends Options, R extends InvokerRequest<O
         } catch (InvokerException e) {
             return 1;
         } finally {
-            try {
-                if (classWorldManaged) {
-                    classWorld.close();
-                }
-            } finally {
-                MessageUtils.systemUninstall();
+            if (classWorldManaged) {
+                classWorld.close();
             }
         }
     }
