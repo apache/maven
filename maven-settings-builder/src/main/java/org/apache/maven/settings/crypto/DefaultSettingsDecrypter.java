@@ -59,46 +59,52 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
         for (Server server : request.getServers()) {
             server = server.clone();
 
-            try {
-                if (isLegacy(server.getPassword())) {
+            String password = server.getPassword();
+            if (password != null && !password.isBlank() && !password.startsWith("${")) {
+                try {
+                    if (isLegacy(password)) {
+                        problems.add(new DefaultSettingsProblem(
+                                "Legacy/insecurely encrypted password detected for server " + server.getId(),
+                                Severity.WARNING,
+                                "server: " + server.getId(),
+                                -1,
+                                -1,
+                                null));
+                    }
+                    server.setPassword(decrypt(password));
+                } catch (SecDispatcherException | IOException e) {
                     problems.add(new DefaultSettingsProblem(
-                            "Legacy/insecurely encrypted password detected for server " + server.getId(),
-                            Severity.WARNING,
+                            "Failed to decrypt password for server " + server.getId() + ": " + e.getMessage(),
+                            Severity.ERROR,
                             "server: " + server.getId(),
                             -1,
                             -1,
-                            null));
+                            e));
                 }
-                server.setPassword(decrypt(server.getPassword()));
-            } catch (SecDispatcherException | IOException e) {
-                problems.add(new DefaultSettingsProblem(
-                        "Failed to decrypt password for server " + server.getId() + ": " + e.getMessage(),
-                        Severity.ERROR,
-                        "server: " + server.getId(),
-                        -1,
-                        -1,
-                        e));
             }
 
-            try {
-                if (isLegacy(server.getPassphrase())) {
+            String passphrase = server.getPassphrase();
+            if (passphrase != null && !passphrase.isBlank() && !passphrase.startsWith("${")) {
+                try {
+                    if (isLegacy(passphrase)) {
+                        problems.add(new DefaultSettingsProblem(
+                                "Legacy/insecurely encrypted passphrase detected for server " + server.getId(),
+                                Severity.WARNING,
+                                "server: " + server.getId(),
+                                -1,
+                                -1,
+                                null));
+                    }
+                    server.setPassphrase(decrypt(passphrase));
+                } catch (SecDispatcherException | IOException e) {
                     problems.add(new DefaultSettingsProblem(
-                            "Legacy/insecurely encrypted passphrase detected for server " + server.getId(),
-                            Severity.WARNING,
+                            "Failed to decrypt passphrase for server " + server.getId() + ": " + e.getMessage(),
+                            Severity.ERROR,
                             "server: " + server.getId(),
                             -1,
                             -1,
-                            null));
+                            e));
                 }
-                server.setPassphrase(decrypt(server.getPassphrase()));
-            } catch (SecDispatcherException | IOException e) {
-                problems.add(new DefaultSettingsProblem(
-                        "Failed to decrypt passphrase for server " + server.getId() + ": " + e.getMessage(),
-                        Severity.ERROR,
-                        "server: " + server.getId(),
-                        -1,
-                        -1,
-                        e));
             }
 
             servers.add(server);
@@ -107,25 +113,28 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
         List<Proxy> proxies = new ArrayList<>();
 
         for (Proxy proxy : request.getProxies()) {
-            try {
-                if (isLegacy(proxy.getPassword())) {
+            String password = proxy.getPassword();
+            if (password != null && !password.isBlank() && !password.startsWith("${")) {
+                try {
+                    if (isLegacy(password)) {
+                        problems.add(new DefaultSettingsProblem(
+                                "Legacy/insecurely encrypted password detected for proxy " + proxy.getId(),
+                                Severity.WARNING,
+                                "proxy: " + proxy.getId(),
+                                -1,
+                                -1,
+                                null));
+                    }
+                    proxy.setPassword(decrypt(password));
+                } catch (SecDispatcherException | IOException e) {
                     problems.add(new DefaultSettingsProblem(
-                            "Legacy/insecurely encrypted password detected for proxy " + proxy.getId(),
-                            Severity.WARNING,
+                            "Failed to decrypt password for proxy " + proxy.getId() + ": " + e.getMessage(),
+                            Severity.ERROR,
                             "proxy: " + proxy.getId(),
                             -1,
                             -1,
-                            null));
+                            e));
                 }
-                proxy.setPassword(decrypt(proxy.getPassword()));
-            } catch (SecDispatcherException | IOException e) {
-                problems.add(new DefaultSettingsProblem(
-                        "Failed to decrypt password for proxy " + proxy.getId() + ": " + e.getMessage(),
-                        Severity.ERROR,
-                        "proxy: " + proxy.getId(),
-                        -1,
-                        -1,
-                        e));
             }
 
             proxies.add(proxy);
