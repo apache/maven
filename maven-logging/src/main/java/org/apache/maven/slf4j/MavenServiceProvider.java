@@ -22,6 +22,7 @@ import java.util.ServiceLoader;
 
 import org.slf4j.ILoggerFactory;
 import org.slf4j.IMarkerFactory;
+import org.slf4j.helpers.BasicMDCAdapter;
 import org.slf4j.helpers.BasicMarkerFactory;
 import org.slf4j.helpers.NOPMDCAdapter;
 import org.slf4j.spi.MDCAdapter;
@@ -39,7 +40,7 @@ public class MavenServiceProvider implements SLF4JServiceProvider {
 
     private MavenLoggerFactory loggerFactory = loadMavenLoggerFactory();
     private IMarkerFactory markerFactory = new BasicMarkerFactory();
-    private MDCAdapter mdcAdapter = new NOPMDCAdapter();
+    private MDCAdapter mdcAdapter = new BasicMDCAdapter();
 
     protected MavenLoggerFactory loadMavenLoggerFactory() {
         return ServiceLoader.load(MavenLoggerFactory.class).findFirst().orElseGet(MavenLoggerFactory::new);
