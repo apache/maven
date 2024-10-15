@@ -123,6 +123,11 @@ public abstract class LayeredOptions<O extends Options> implements Options {
     }
 
     @Override
+    public Optional<Boolean> rawStreams() {
+        return returnFirstPresentOrEmpty(Options::rawStreams);
+    }
+
+    @Override
     public Optional<String> color() {
         return returnFirstPresentOrEmpty(Options::color);
     }

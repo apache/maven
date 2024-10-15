@@ -167,6 +167,14 @@ public interface Options {
     Optional<String> logFile();
 
     /**
+     * Returns whether raw streams should be logged.
+     *
+     * @return a boolean indicating whether raw streams should be logged
+     */
+    @Nonnull
+    Optional<Boolean> rawStreams();
+
+    /**
      * Returns the color setting for console output.
      *
      * @return an {@link Optional} containing the color setting, or empty if not set

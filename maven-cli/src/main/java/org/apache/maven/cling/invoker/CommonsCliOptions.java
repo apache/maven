@@ -182,6 +182,14 @@ public abstract class CommonsCliOptions implements Options {
     }
 
     @Override
+    public Optional<Boolean> rawStreams() {
+        if (commandLine.hasOption(CLIManager.RAW_STREAMS)) {
+            return Optional.of(Boolean.TRUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<String> color() {
         if (commandLine.hasOption(CLIManager.COLOR)) {
             if (commandLine.getOptionValue(CLIManager.COLOR) != null) {
@@ -262,6 +270,7 @@ public abstract class CommonsCliOptions implements Options {
 
         public static final String ALTERNATE_INSTALLATION_TOOLCHAINS = "it";
         public static final String LOG_FILE = "l";
+        public static final String RAW_STREAMS = "raw-streams";
         public static final String COLOR = "color";
         public static final String HELP = "h";
 
@@ -347,6 +356,10 @@ public abstract class CommonsCliOptions implements Options {
                     .longOpt("log-file")
                     .hasArg()
                     .desc("Log file where all build output will go (disables output color)")
+                    .build());
+            options.addOption(Option.builder()
+                    .longOpt(RAW_STREAMS)
+                    .desc("Do not decorate standard output and error streams")
                     .build());
             options.addOption(Option.builder(SHOW_VERSION)
                     .longOpt("show-version")

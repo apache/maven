@@ -32,8 +32,6 @@ import org.apache.maven.execution.BuildSummary;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.logwrapper.LogLevelRecorder;
-import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -79,13 +77,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     }
 
     private static String chars(char c, int count) {
-        StringBuilder buffer = new StringBuilder(count);
-
-        for (int i = count; i > 0; i--) {
-            buffer.append(c);
-        }
-
-        return buffer.toString();
+        return String.valueOf(c).repeat(Math.max(0, count));
     }
 
     private void infoLine(char c) {
@@ -137,9 +129,8 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             }
 
             final List<MavenProject> allProjects = event.getSession().getAllProjects();
-            final int projectsSkipped = allProjects.size() - projects.size();
 
-            currentVisitedProjectCount = projectsSkipped;
+            currentVisitedProjectCount = allProjects.size() - projects.size();
             totalProjects = allProjects.size();
         }
     }
@@ -154,16 +145,13 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
             ILoggerFactory iLoggerFactory = LoggerFactory.getILoggerFactory();
 
-            if (iLoggerFactory instanceof MavenSlf4jWrapperFactory) {
-                MavenSlf4jWrapperFactory loggerFactory = (MavenSlf4jWrapperFactory) iLoggerFactory;
-                loggerFactory
-                        .getLogLevelRecorder()
-                        .filter(LogLevelRecorder::metThreshold)
-                        .ifPresent(recorder -> event.getSession()
-                                .getResult()
-                                .addException(new Exception(
-                                        "Build failed due to log statements with a higher severity than allowed. "
-                                                + "Fix the logged issues or remove flag --fail-on-severity (-fos).")));
+            if (iLoggerFactory instanceof org.apache.maven.logging.api.LogLevelRecorder recorder
+                    && recorder.hasReachedMaxLevel()) {
+                event.getSession()
+                        .getResult()
+                        .addException(
+                                new Exception("Build failed due to log statements with a higher severity than allowed. "
+                                        + "Fix the logged issues or remove flag --fail-on-severity (-fos)."));
             }
 
             logResult(event.getSession());
@@ -297,7 +285,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             infoLine('-');
             String name = event.getProject().getName();
             infoMain("Skipping " + name);
-            logger.info(name + " was not built because a module it depends on failed to build.");
+            logger.info("{} was not built because a module it depends on failed to build.", name);
 
             infoLine('-');
         }

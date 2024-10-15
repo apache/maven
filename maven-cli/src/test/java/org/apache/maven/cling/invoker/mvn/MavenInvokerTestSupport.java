@@ -39,8 +39,11 @@ public abstract class MavenInvokerTestSupport<O extends MavenOptions, R extends 
 
     protected void invoke(Path cwd, Collection<String> goals) throws Exception {
         // works only in recent Maven4
-        Assumptions.assumeTrue(Files.isRegularFile(
-                Paths.get(System.getProperty("maven.home")).resolve("conf").resolve("maven.properties")));
+        Assumptions.assumeTrue(
+                Files.isRegularFile(Paths.get(System.getProperty("maven.home"))
+                        .resolve("conf")
+                        .resolve("maven.properties")),
+                "${maven.home}/conf/maven.properties must be a file");
 
         Files.createDirectory(cwd.resolve(".mvn"));
 

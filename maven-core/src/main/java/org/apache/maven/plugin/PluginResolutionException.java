@@ -44,8 +44,7 @@ public class PluginResolutionException extends Exception {
                         + System.lineSeparator() + "\t"
                         + exceptions.stream()
                                 .map(Throwable::getMessage)
-                                .collect(Collectors.joining(System.lineSeparator() + "\t"))
-                        + System.lineSeparator(),
+                                .collect(Collectors.joining(System.lineSeparator() + "\t")),
                 cause);
         this.plugin = plugin;
     }

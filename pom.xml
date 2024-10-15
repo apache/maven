@@ -109,14 +109,13 @@ under the License.
     <module>maven-di</module>
     <module>maven-xml-impl</module>
     <module>maven-jline</module>
+    <module>maven-logging</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
     <module>maven-artifact</module>
     <module>maven-resolver-provider</module>
     <module>maven-repository-metadata</module>
-    <module>maven-slf4j-provider</module>
-    <module>maven-slf4j-wrapper</module>
     <module>maven-embedder</module>
     <module>maven-cli</module>
     <module>maven-compat</module>
@@ -213,6 +212,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-jline</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-logging</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -342,22 +346,12 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-slf4j-wrapper</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
         <artifactId>maven-xml-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-compat</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-slf4j-provider</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
