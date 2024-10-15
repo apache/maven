@@ -32,7 +32,7 @@ public class MavenTestHelper {
     public static DefaultRepositorySystemSession createSession(
             MavenRepositorySystem repositorySystem, PlexusContainer container) {
         DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
-        DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest(true);
+        DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenSession mavenSession = new MavenSession(repoSession, request, new DefaultMavenExecutionResult());
         DefaultSession session =
                 new DefaultSession(mavenSession, null, null, repositorySystem, new DefaultLookup(container), null);

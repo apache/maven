@@ -90,7 +90,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
     }
 
     protected MavenExecutionRequest createMavenExecutionRequest(File pom) throws Exception {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest(true)
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setPom(pom)
                 .setProjectPresent(true)
                 .setShowErrors(true)
@@ -102,7 +102,6 @@ public abstract class AbstractCoreMavenComponentTestCase {
 
         if (pom != null) {
             request.setMultiModuleProjectDirectory(pom.getParentFile());
-            request.setRootDirectory(pom.getParentFile().toPath());
         }
 
         return request;
