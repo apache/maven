@@ -73,11 +73,8 @@ public class DefaultEncryptInvoker
         }
     }
 
-    private final Terminal terminal;
-
     public DefaultEncryptInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
-        this.terminal = protoLookup.lookup(Terminal.class);
     }
 
     @Override
@@ -119,11 +116,11 @@ public class DefaultEncryptInvoker
         context.addInHeader("");
         try {
             Thread executeThread = Thread.currentThread();
-            terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
+            context.terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
             ConsolePrompt.UiConfig config;
-            if (terminal.getType().equals(Terminal.TYPE_DUMB)
-                    || terminal.getType().equals(Terminal.TYPE_DUMB_COLOR)) {
-                System.out.println(terminal.getName() + ": " + terminal.getType());
+            if (context.terminal.getType().equals(Terminal.TYPE_DUMB)
+                    || context.terminal.getType().equals(Terminal.TYPE_DUMB_COLOR)) {
+                System.out.println(context.terminal.getName() + ": " + context.terminal.getType());
                 throw new IllegalStateException("Dumb terminal detected.\nThis tool requires real terminal to work!\n"
                         + "Note: On Windows Jansi or JNA library must be included in classpath.");
             } else if (OSUtils.IS_WINDOWS) {
@@ -133,8 +130,9 @@ public class DefaultEncryptInvoker
             }
             config.setCancellableFirstPrompt(true);
 
-            context.reader = LineReaderBuilder.builder().terminal(terminal).build();
-            context.prompt = new ConsolePrompt(context.reader, terminal, config);
+            context.reader =
+                    LineReaderBuilder.builder().terminal(context.terminal).build();
+            context.prompt = new ConsolePrompt(context.reader, context.terminal, config);
 
             if (context.invokerRequest.options().goals().isEmpty()
                     || context.invokerRequest.options().goals().get().size() != 1) {
