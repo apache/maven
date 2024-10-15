@@ -413,6 +413,7 @@ public abstract class LookupInvoker<
             } else {
                 context.terminal.writer().println(CLIReportingUtils.showVersion());
             }
+            context.terminal.writer().flush();
             throw new ExitException(0);
         }
     }
