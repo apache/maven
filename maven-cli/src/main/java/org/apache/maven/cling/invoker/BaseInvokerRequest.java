@@ -129,6 +129,11 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
     }
 
     @Override
+    public Optional<OutputStream> err() {
+        return Optional.ofNullable(err);
+    }
+
+    @Override
     public Optional<List<CoreExtension>> coreExtensions() {
         return Optional.ofNullable(coreExtensions);
     }

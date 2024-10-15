@@ -150,6 +150,14 @@ public interface InvokerRequest<O extends Options> {
     Optional<OutputStream> out();
 
     /**
+     * Returns the error stream for the Maven execution, if running in embedded mode.
+     *
+     * @return an {@link Optional} containing the error stream, or empty if not applicable
+     */
+    @Nonnull
+    Optional<OutputStream> err();
+
+    /**
      * Returns a list of core extensions, if configured in the .mvn/extensions.xml file.
      *
      * @return an {@link Optional} containing the list of core extensions, or empty if not configured
