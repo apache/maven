@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4720">MNG-4720</a>.
  *
  * @author Benjamin Bentmann
+ * @author Ddiier Loiseau
  */
 public class MavenITmng4720DependencyManagementExclusionMergeTest extends AbstractMavenIntegrationTestCase {
 
@@ -39,11 +40,13 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
     /**
      * Verify the effective exclusions applied during transitive dependency resolution when both the regular
      * dependency section and dependency management declare exclusions for a particular dependency.
+     * <p>
+     * By default, the dependency management of transitive dependencies is now taken into account.
      *
      * @throws Exception in case of failure
      */
     @Test
-    public void testit() throws Exception {
+    public void testitWithTransitiveDependencyManager() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4720");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
@@ -63,7 +66,45 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
 
         assertFalse(classpath.toString(), classpath.contains("b-0.1.jar"));
 
-        // should better have been excluded as well, now it's a matter of backward-compat
+        // dependency management in a excludes d
+        if (matchesVersionRange("[4.0.0-beta-5,)")) {
+            assertFalse(classpath.toString(), classpath.contains("d-0.1.jar"));
+        } else {
+            assertTrue(classpath.toString(), classpath.contains("d-0.1.jar"));
+        }
+    }
+
+    /**
+     * Verify the effective exclusions applied during transitive dependency resolution when both the regular
+     * dependency section and dependency management declare exclusions for a particular dependency.
+     * <p>
+     * This tests the same behaviour with dependency manager transitivity disabled.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testitWithTransitiveDependencyManagerDisabled() throws Exception {
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4720");
+
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4720");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.addCliArgument("-Dmaven.resolver.dependencyManagerTransitivity=false");
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
+
+        assertTrue(classpath.toString(), classpath.contains("a-0.1.jar"));
+        assertTrue(classpath.toString(), classpath.contains("c-0.1.jar"));
+
+        assertFalse(classpath.toString(), classpath.contains("b-0.1.jar"));
+
+        // backward-compat: dependency management is ignored except in root pom
         assertTrue(classpath.toString(), classpath.contains("d-0.1.jar"));
     }
 }
