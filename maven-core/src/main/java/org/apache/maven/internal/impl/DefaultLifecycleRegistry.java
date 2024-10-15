@@ -204,42 +204,71 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
                 @Override
                 public Collection<Phase> phases() {
-                    return lifecycle.getPhases().stream()
-                            .map(name -> (Phase) new Phase() {
-                                @Override
-                                public String name() {
-                                    return name;
-                                }
+                    List<String> names = lifecycle.getPhases();
+                    List<Phase> phases = new ArrayList<>();
+                    for (int i = 0; i < names.size(); i++) {
+                        String name = names.get(i);
+                        String prev = i > 0 ? names.get(i - 1) : null;
+                        phases.add(new Phase() {
+                            @Override
+                            public String name() {
+                                return name;
+                            }
 
-                                @Override
-                                public List<Phase> phases() {
+                            @Override
+                            public List<Phase> phases() {
+                                return List.of();
+                            }
+
+                            @Override
+                            public Stream<Phase> allPhases() {
+                                return Stream.concat(
+                                        Stream.of(this), phases().stream().flatMap(Lifecycle.Phase::allPhases));
+                            }
+
+                            @Override
+                            public List<Plugin> plugins() {
+                                Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
+                                LifecyclePhase phase = lfPhases != null ? lfPhases.get(name) : null;
+                                if (phase != null) {
+                                    Map<String, Plugin> plugins = new LinkedHashMap<>();
+                                    DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(plugins, name, phase);
+                                    return plugins.values().stream().toList();
+                                }
+                                return List.of();
+                            }
+
+                            @Override
+                            public Collection<Link> links() {
+                                if (prev == null) {
                                     return List.of();
-                                }
+                                } else {
+                                    return List.of(new Link() {
+                                        @Override
+                                        public Kind kind() {
+                                            return Kind.AFTER;
+                                        }
 
-                                @Override
-                                public Stream<Phase> allPhases() {
-                                    return Stream.concat(
-                                            Stream.of(this), phases().stream().flatMap(Lifecycle.Phase::allPhases));
-                                }
+                                        @Override
+                                        public Pointer pointer() {
+                                            return new Pointer() {
+                                                @Override
+                                                public String phase() {
+                                                    return prev;
+                                                }
 
-                                @Override
-                                public List<Plugin> plugins() {
-                                    Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
-                                    LifecyclePhase phase = lfPhases != null ? lfPhases.get(name) : null;
-                                    if (phase != null) {
-                                        Map<String, Plugin> plugins = new LinkedHashMap<>();
-                                        DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(plugins, name, phase);
-                                        return plugins.values().stream().toList();
-                                    }
-                                    return List.of();
+                                                @Override
+                                                public Type type() {
+                                                    return Type.PROJECT;
+                                                }
+                                            };
+                                        }
+                                    });
                                 }
-
-                                @Override
-                                public Collection<Link> links() {
-                                    return List.of();
-                                }
-                            })
-                            .toList();
+                            }
+                        });
+                    }
+                    return phases;
                 }
 
                 @Override
