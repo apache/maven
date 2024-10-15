@@ -38,55 +38,65 @@ public abstract class ConfiguredGoalSupport extends GoalSupport {
 
     @Override
     public int execute(DefaultEncryptInvoker.LocalContext context) throws Exception {
-        if (!validateConfiguration()) {
-            logger.error(messageBuilderFactory
-                    .builder()
-                    .error("Maven Encryption is not configured, run `mvnenc init` first.")
-                    .build());
+        if (!validateConfiguration(context)) {
+            context.terminal
+                    .writer()
+                    .println(messageBuilderFactory
+                            .builder()
+                            .error("Maven Encryption is not configured, run `mvnenc init` first.")
+                            .build());
             return ERROR;
         }
         return doExecute(context);
     }
 
-    protected boolean validateConfiguration() {
+    protected boolean validateConfiguration(DefaultEncryptInvoker.LocalContext context) {
         SecDispatcher.ValidationResponse response = secDispatcher.validateConfiguration();
-        if (!response.isValid() || logger.isDebugEnabled()) {
-            dumpResponse("", response);
+        if (!response.isValid() || context.invokerRequest.options().verbose().orElse(false)) {
+            dumpResponse(context, "", response);
         }
         return response.isValid();
     }
 
-    protected void dumpResponse(String indent, SecDispatcher.ValidationResponse response) {
-        logger.info(
-                response.isValid()
-                        ? messageBuilderFactory
-                                .builder()
-                                .success("{}Configuration validation of {}: {}")
-                                .build()
-                        : messageBuilderFactory
-                                .builder()
-                                .failure("{}Configuration validation of {}: {}")
-                                .build(),
-                indent,
-                response.getSource(),
-                response.isValid() ? "VALID" : "INVALID");
+    protected void dumpResponse(
+            DefaultEncryptInvoker.LocalContext context, String indent, SecDispatcher.ValidationResponse response) {
+        context.terminal
+                .writer()
+                .println(messageBuilderFactory
+                        .builder()
+                        .format(
+                                response.isValid()
+                                        ? messageBuilderFactory
+                                                .builder()
+                                                .success("%sConfiguration validation of %s: %s")
+                                                .build()
+                                        : messageBuilderFactory
+                                                .builder()
+                                                .failure("%sConfiguration validation of %s: %s")
+                                                .build(),
+                                indent,
+                                response.getSource(),
+                                response.isValid() ? "VALID" : "INVALID"));
         for (Map.Entry<SecDispatcher.ValidationResponse.Level, List<String>> entry :
                 response.getReport().entrySet()) {
-            Consumer<String> consumer =
-                    s -> logger.info(messageBuilderFactory.builder().info(s).build());
+            Consumer<String> consumer = s -> context.terminal
+                    .writer()
+                    .println(messageBuilderFactory.builder().info(s).build());
             if (entry.getKey() == SecDispatcher.ValidationResponse.Level.ERROR) {
-                consumer = s ->
-                        logger.error(messageBuilderFactory.builder().error(s).build());
+                consumer = s -> context.terminal
+                        .writer()
+                        .println(messageBuilderFactory.builder().error(s).build());
             } else if (entry.getKey() == SecDispatcher.ValidationResponse.Level.WARNING) {
-                consumer = s ->
-                        logger.warn(messageBuilderFactory.builder().warning(s).build());
+                consumer = s -> context.terminal
+                        .writer()
+                        .println(messageBuilderFactory.builder().warning(s).build());
             }
             for (String line : entry.getValue()) {
                 consumer.accept(indent + "  " + line);
             }
         }
         for (SecDispatcher.ValidationResponse subsystem : response.getSubsystems()) {
-            dumpResponse(indent + "  ", subsystem);
+            dumpResponse(context, indent + "  ", subsystem);
         }
     }
 

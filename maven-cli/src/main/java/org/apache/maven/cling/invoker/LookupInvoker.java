@@ -405,6 +405,7 @@ public abstract class LookupInvoker<
         R invokerRequest = context.invokerRequest;
         if (invokerRequest.options().help().isPresent()) {
             invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), context.terminal.writer());
+            context.terminal.writer().flush();
             throw new ExitException(0);
         }
         if (invokerRequest.options().showVersionAndExit().isPresent()) {
@@ -413,6 +414,7 @@ public abstract class LookupInvoker<
             } else {
                 context.terminal.writer().println(CLIReportingUtils.showVersion());
             }
+            context.terminal.writer().flush();
             throw new ExitException(0);
         }
     }

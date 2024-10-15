@@ -42,7 +42,7 @@ public class Encrypt extends ConfiguredGoalSupport {
     @Override
     protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
         String cleartext = context.reader.readLine("Enter the password to encrypt: ", '*');
-        logger.info(secDispatcher.encrypt(cleartext, null));
+        context.terminal.writer().println(secDispatcher.encrypt(cleartext, null));
         return OK;
     }
 }

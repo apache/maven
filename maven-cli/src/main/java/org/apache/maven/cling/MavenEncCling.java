@@ -30,10 +30,7 @@ import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptParser;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
-import org.apache.maven.jline.MessageUtils;
 import org.codehaus.plexus.classworlds.ClassWorld;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 
 /**
  * Maven encrypt CLI "new-gen".
@@ -55,8 +52,6 @@ public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRe
         return new MavenEncCling(world).run(args);
     }
 
-    private Terminal terminal;
-
     public MavenEncCling() {
         super();
     }
@@ -66,23 +61,9 @@ public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRe
     }
 
     @Override
-    public int run(String[] args) throws IOException {
-        terminal = TerminalBuilder.builder().build();
-        MessageUtils.systemInstall(terminal);
-        MessageUtils.registerShutdownHook();
-        try {
-            return super.run(args);
-        } finally {
-            MessageUtils.systemUninstall();
-        }
-    }
-
-    @Override
     protected Invoker<EncryptInvokerRequest> createInvoker() {
-        return new DefaultEncryptInvoker(ProtoLookup.builder()
-                .addMapping(ClassWorld.class, classWorld)
-                .addMapping(Terminal.class, terminal)
-                .build());
+        return new DefaultEncryptInvoker(
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
     }
 
     @Override
