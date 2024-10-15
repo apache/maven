@@ -452,6 +452,4 @@ public abstract class CommonsCliOptions implements Options {
             return command + " [options] [goals]";
         }
     }
-
-
 }
