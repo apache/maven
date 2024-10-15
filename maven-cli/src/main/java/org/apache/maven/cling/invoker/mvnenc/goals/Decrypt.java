@@ -44,10 +44,10 @@ public class Decrypt extends ConfiguredGoalSupport {
     protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
         String encrypted = context.reader.readLine("Enter the password to decrypt: ");
         if (secDispatcher.isAnyEncryptedString(encrypted)) {
-            logger.info(secDispatcher.decrypt(encrypted));
+            context.terminal.writer().println(secDispatcher.decrypt(encrypted));
             return OK;
         } else {
-            logger.error("Malformed encrypted string");
+            context.terminal.writer().println(messageBuilderFactory.builder().error("Malformed encrypted string"));
             return BAD_OPERATION;
         }
     }

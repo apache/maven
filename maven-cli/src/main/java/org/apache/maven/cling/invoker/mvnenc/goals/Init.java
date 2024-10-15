@@ -71,9 +71,13 @@ public class Init extends GoalSupport {
         boolean yes = context.invokerRequest.options().yes().orElse(false);
 
         if (configExists() && !force) {
-            System.out.println(messageBuilderFactory
-                    .builder()
-                    .error("Error: configuration exist. Use --force if you want to reset existing configuration."));
+            context.terminal
+                    .writer()
+                    .println(
+                            messageBuilderFactory
+                                    .builder()
+                                    .error(
+                                            "Error: configuration exist. Use --force if you want to reset existing configuration."));
             return BAD_OPERATION;
         }
 
@@ -89,11 +93,13 @@ public class Init extends GoalSupport {
             throw new InterruptedException();
         }
         if (NONE.equals(result.get("defaultDispatcher").getResult())) {
-            logger.warn(messageBuilderFactory
-                    .builder()
-                    .warning(
-                            "Maven4 SecDispatcher disabled; Maven3 fallback may still work, use `mvnenc diag` to check")
-                    .build());
+            context.terminal
+                    .writer()
+                    .println(messageBuilderFactory
+                            .builder()
+                            .warning(
+                                    "Maven4 SecDispatcher disabled; Maven3 fallback may still work, use `mvnenc diag` to check")
+                            .build());
             secDispatcher.writeConfiguration(config);
             return OK;
         }
@@ -177,16 +183,20 @@ public class Init extends GoalSupport {
                     context.header, confirmPrompt(prompt.getPromptBuilder()).build());
             ConfirmResult confirm = (ConfirmResult) result.get("confirm");
             if (confirm.getConfirmed() == ConfirmChoice.ConfirmationValue.YES) {
-                logger.info(messageBuilderFactory
-                        .builder()
-                        .info("Writing out the configuration...")
-                        .build());
+                context.terminal
+                        .writer()
+                        .println(messageBuilderFactory
+                                .builder()
+                                .info("Writing out the configuration...")
+                                .build());
                 secDispatcher.writeConfiguration(config);
             } else {
-                logger.warn(messageBuilderFactory
-                        .builder()
-                        .warning("Values not accepted; not saving configuration.")
-                        .build());
+                context.terminal
+                        .writer()
+                        .println(messageBuilderFactory
+                                .builder()
+                                .warning("Values not accepted; not saving configuration.")
+                                .build());
                 return BAD_OPERATION;
             }
         }

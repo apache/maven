@@ -98,29 +98,34 @@ public class DefaultEncryptInvoker
     public static final int CANCELED = 3; // user canceled
 
     protected int doExecute(LocalContext context) throws Exception {
-        if (!context.interactive) {
-            System.out.println("This tool works only in interactive mode!");
-            System.out.println("Tool purpose is to configure password management on developer workstations.");
-            System.out.println(
-                    "Note: Generated configuration can be moved/copied to headless environments, if configured as such.");
-            return BAD_OPERATION;
-        }
-
-        context.header = new ArrayList<>();
-        context.style = new AttributedStyle();
-        context.addInHeader(
-                context.style.italic().bold().foreground(Colors.rgbColor("green")),
-                "Maven Encryption " + CLIReportingUtils.showVersionMinimal());
-        context.addInHeader("Tool for secure password management on workstations.");
-        context.addInHeader("This tool is part of Apache Maven 4 distribution.");
-        context.addInHeader("");
         try {
+            if (!context.interactive) {
+                context.terminal.writer().println("This tool works only in interactive mode!");
+                context.terminal
+                        .writer()
+                        .println("Tool purpose is to configure password management on developer workstations.");
+                context.terminal
+                        .writer()
+                        .println(
+                                "Note: Generated configuration can be moved/copied to headless environments, if configured as such.");
+                return BAD_OPERATION;
+            }
+
+            context.header = new ArrayList<>();
+            context.style = new AttributedStyle();
+            context.addInHeader(
+                    context.style.italic().bold().foreground(Colors.rgbColor("green")),
+                    "Maven Encryption " + CLIReportingUtils.showVersionMinimal());
+            context.addInHeader("Tool for secure password management on workstations.");
+            context.addInHeader("This tool is part of Apache Maven 4 distribution.");
+            context.addInHeader("");
+
             Thread executeThread = Thread.currentThread();
             context.terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
             ConsolePrompt.UiConfig config;
             if (context.terminal.getType().equals(Terminal.TYPE_DUMB)
                     || context.terminal.getType().equals(Terminal.TYPE_DUMB_COLOR)) {
-                System.out.println(context.terminal.getName() + ": " + context.terminal.getType());
+                context.terminal.writer().println(context.terminal.getName() + ": " + context.terminal.getType());
                 throw new IllegalStateException("Dumb terminal detected.\nThis tool requires real terminal to work!\n"
                         + "Note: On Windows Jansi or JNA library must be included in classpath.");
             } else if (OSUtils.IS_WINDOWS) {
@@ -148,22 +153,25 @@ public class DefaultEncryptInvoker
 
             return goal.execute(context);
         } catch (InterruptedException | InterruptedIOException | UserInterruptException e) {
-            System.out.println("Goal canceled by user.");
+            context.terminal.writer().println("Goal canceled by user.");
             return CANCELED;
         } catch (Exception e) {
             if (context.invokerRequest.options().showErrors().orElse(false)) {
-                context.logger.error(e.getMessage(), e);
+                context.terminal.writer().println(e.getMessage());
+                e.printStackTrace(context.terminal.writer());
             } else {
-                context.logger.error(e.getMessage());
+                context.terminal.writer().println(e.getMessage());
             }
             return ERROR;
+        } finally {
+            context.terminal.writer().flush();
         }
     }
 
     protected int badGoalsErrorMessage(String message, LocalContext context) {
-        System.out.println(message);
-        System.out.println("Supported goals are: " + String.join(", ", context.goals.keySet()));
-        System.out.println("Use -h to display help.");
+        context.terminal.writer().println(message);
+        context.terminal.writer().println("Supported goals are: " + String.join(", ", context.goals.keySet()));
+        context.terminal.writer().println("Use -h to display help.");
         return BAD_OPERATION;
     }
 }
