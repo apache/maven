@@ -99,13 +99,10 @@ public class PlexusContainerCapsuleFactory<
                 .setName("maven");
         customizeContainerConfiguration(context, cc);
 
-        Set<String> exportedArtifacts = new HashSet<>(coreEntry.getExportedArtifacts());
-        Set<String> exportedPackages = new HashSet<>(coreEntry.getExportedPackages());
-        for (CoreExtensionEntry extension : extensions) {
-            exportedArtifacts.addAll(extension.getExportedArtifacts());
-            exportedPackages.addAll(extension.getExportedPackages());
-        }
-        CoreExports exports = new CoreExports(containerRealm, exportedArtifacts, exportedPackages);
+        CoreExports exports = new CoreExports(
+                containerRealm,
+                collectExportedArtifacts(coreEntry, extensions),
+                collectExportedPackages(coreEntry, extensions));
         Thread.currentThread().setContextClassLoader(containerRealm);
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, getCustomModule(context, exports));
 
@@ -151,6 +148,24 @@ public class PlexusContainerCapsuleFactory<
                 .log(message);
 
         return container;
+    }
+
+    protected Set<String> collectExportedArtifacts(
+            CoreExtensionEntry coreEntry, List<CoreExtensionEntry> extensionEntries) {
+        Set<String> exportedArtifacts = new HashSet<>(coreEntry.getExportedArtifacts());
+        for (CoreExtensionEntry extension : extensionEntries) {
+            exportedArtifacts.addAll(extension.getExportedArtifacts());
+        }
+        return exportedArtifacts;
+    }
+
+    protected Set<String> collectExportedPackages(
+            CoreExtensionEntry coreEntry, List<CoreExtensionEntry> extensionEntries) {
+        Set<String> exportedPackages = new HashSet<>(coreEntry.getExportedPackages());
+        for (CoreExtensionEntry extension : extensionEntries) {
+            exportedPackages.addAll(extension.getExportedPackages());
+        }
+        return exportedPackages;
     }
 
     /**

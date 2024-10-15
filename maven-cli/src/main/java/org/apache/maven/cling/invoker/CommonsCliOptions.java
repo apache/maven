@@ -437,7 +437,7 @@ public abstract class CommonsCliOptions implements Options {
             formatter.printHelp(
                     pw,
                     width,
-                    command + " [args]",
+                    commandLineSyntax(command),
                     System.lineSeparator() + "Options:",
                     options,
                     HelpFormatter.DEFAULT_LEFT_PAD,
@@ -446,6 +446,10 @@ public abstract class CommonsCliOptions implements Options {
                     false);
 
             pw.flush();
+        }
+
+        protected String commandLineSyntax(String command) {
+            return command + " [options] [goals]";
         }
     }
 }
