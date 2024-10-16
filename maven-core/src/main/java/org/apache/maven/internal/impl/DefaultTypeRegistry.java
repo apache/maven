@@ -91,7 +91,7 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                 ArtifactHandler handler = manager.getArtifactHandler(id);
                 type = new DefaultType(
                         id,
-                        languageRegistry.require(handler.getLanguage()),
+                        languageRegistry.lookup(handler.getLanguage()).orElseGet(() -> handler::getLanguage),
                         handler.getExtension(),
                         handler.getClassifier(),
                         handler.isIncludesDependencies(),
