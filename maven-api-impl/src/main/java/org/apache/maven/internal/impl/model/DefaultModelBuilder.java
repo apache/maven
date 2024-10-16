@@ -1132,12 +1132,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throw newModelBuilderException();
             }
 
-            inputModel = activateFileModel(inputModel);
-
             setRootModel(inputModel);
 
+            Model activatedFileModel = activateFileModel(inputModel);
+
             // profile activation
-            DefaultProfileActivationContext profileActivationContext = getProfileActivationContext(request, inputModel);
+            DefaultProfileActivationContext profileActivationContext =
+                    getProfileActivationContext(request, activatedFileModel);
 
             List<Profile> activeExternalProfiles = result.getActiveExternalProfiles();
 
@@ -1150,7 +1151,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationContext.setUserProperties(profileProps);
             }
 
-            Model parentModel = readParent(inputModel);
+            Model parentModel = readParent(activatedFileModel);
             // Now that we have read the parent, we can set the relative
             // path correctly if it was not set in the input model
             if (inputModel.getParent() != null && inputModel.getParent().getRelativePath() == null) {
