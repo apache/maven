@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -148,6 +147,43 @@ class XmlNodeImplTest {
         XmlNode mergeResult = leftDom.merge(rightDom);
 
         assertEquals(toXmlNode(result), mergeResult);
+    }
+
+    @Test
+    void testAppend() throws Exception {
+        String lhs =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <compilerArgs combine.children="append">
+                    <arg>-Xmaxerrs</arg>
+                    <arg>100</arg>
+                    <arg>-Xmaxwarns</arg>
+                    <arg>100</arg>
+                </compilerArgs>
+                """;
+        String result =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <compilerArgs combine.children="append">
+                  <arg>-Xmaxerrs</arg>
+                  <arg>100</arg>
+                  <arg>-Xmaxwarns</arg>
+                  <arg>100</arg>
+                  <arg>-Xmaxerrs</arg>
+                  <arg>100</arg>
+                  <arg>-Xmaxwarns</arg>
+                  <arg>100</arg>
+                </compilerArgs>""";
+
+        XmlNode dom = toXmlNode(lhs);
+        XmlNode res = toXmlNode(result);
+
+        XmlNode mergeResult1 = dom.merge(dom, false);
+        assertEquals(res, mergeResult1);
+        XmlNode mergeResult2 = dom.merge(dom, (Boolean) null);
+        assertEquals(res, mergeResult2);
+        XmlNode mergeResult3 = dom.merge(dom, true);
+        assertEquals(dom, mergeResult3);
     }
 
     /**
@@ -285,38 +321,36 @@ class XmlNodeImplTest {
      * <p>testShouldPerformAppendAtFirstSubElementLevel.</p>
      */
     @Test
-    void testShouldPerformAppendAtFirstSubElementLevel() {
-        // create the dominant DOM
-        Xpp3Dom t1 = new Xpp3Dom("top");
-        t1.setAttribute(Xpp3Dom.CHILDREN_COMBINATION_MODE_ATTRIBUTE, Xpp3Dom.CHILDREN_COMBINATION_APPEND);
-        t1.setInputLocation("t1top");
+    void testShouldPerformAppendAtFirstSubElementLevel() throws XMLStreamException {
+        String lhs =
+                """
+                <top combine.children="append">
+                  <topsub1>t1s1Value</topsub1>
+                  <topsub1>t1s2Value</topsub1>
+                </top>
+                """;
+        String rhs =
+                """
+                <top>
+                    <topsub1>t2s1Value</topsub1>
+                    <topsub1>t2s2Value</topsub1>
+                </top>
+                """;
+        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        Xpp3Dom t1s1 = new Xpp3Dom("topsub1");
-        t1s1.setValue("t1s1Value");
-        t1s1.setInputLocation("t1s1");
+        XmlNode result = XmlNode.merge(leftDom, rightDom);
+        assertEquals(4, getChildren(result, "topsub1").size());
+        assertEquals("t2s1Value", getChildren(result, "topsub1").get(0).getValue());
+        assertEquals("t2s2Value", getChildren(result, "topsub1").get(1).getValue());
+        assertEquals("t1s1Value", getChildren(result, "topsub1").get(2).getValue());
+        assertEquals("t1s2Value", getChildren(result, "topsub1").get(3).getValue());
 
-        t1.addChild(t1s1);
-
-        // create the recessive DOM
-        Xpp3Dom t2 = new Xpp3Dom("top");
-        t2.setInputLocation("t2top");
-
-        Xpp3Dom t2s1 = new Xpp3Dom("topsub1");
-        t2s1.setValue("t2s1Value");
-        t2s1.setInputLocation("t2s1");
-
-        t2.addChild(t2s1);
-
-        // merge and check results.
-        Xpp3Dom result = Xpp3Dom.mergeXpp3Dom(t1, t2);
-
-        assertEquals(2, result.getChildren("topsub1").length);
-        assertEquals("t2s1Value", result.getChildren("topsub1")[0].getValue());
-        assertEquals("t1s1Value", result.getChildren("topsub1")[1].getValue());
-
-        assertEquals("t1top", result.getInputLocation());
-        assertEquals("t2s1", result.getChildren("topsub1")[0].getInputLocation());
-        assertEquals("t1s1", result.getChildren("topsub1")[1].getInputLocation());
+        assertEquals("left", result.getInputLocation());
+        assertEquals("right", getChildren(result, "topsub1").get(0).getInputLocation());
+        assertEquals("right", getChildren(result, "topsub1").get(1).getInputLocation());
+        assertEquals("left", getChildren(result, "topsub1").get(2).getInputLocation());
+        assertEquals("left", getChildren(result, "topsub1").get(3).getInputLocation());
     }
 
     /**
@@ -627,7 +661,7 @@ class XmlNodeImplTest {
     }
 
     private static List<XmlNode> getChildren(XmlNode node, String name) {
-        return node.getChildren().stream().filter(n -> n.getName().equals(name)).collect(Collectors.toList());
+        return node.getChildren().stream().filter(n -> n.getName().equals(name)).toList();
     }
 
     private static XmlNode getNthChild(XmlNode node, String name, int nth) {
