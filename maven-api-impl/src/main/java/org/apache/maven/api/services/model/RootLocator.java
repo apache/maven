@@ -22,6 +22,7 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Interface used to locate the root directory for a given project.
@@ -39,6 +40,9 @@ public interface RootLocator extends Service {
     String UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE = "Unable to find the root directory. "
             + "Create a .mvn directory in the root directory or add the root=\"true\""
             + " attribute on the root project's model to identify it.";
+
+    @Nullable
+    Path findRoot(@Nonnull Path basedir);
 
     @Nonnull
     Path findMandatoryRoot(@Nonnull Path basedir);

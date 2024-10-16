@@ -42,8 +42,8 @@ public abstract class BaseMavenParser<O extends MavenOptions, R extends MavenInv
         // CLI args
         result.add(parseMavenCliOptions(context.parserRequest.args()));
         // maven.config; if exists
-        Path mavenConfig = context.rootDirectory.resolve(".mvn/maven.config");
-        if (Files.isRegularFile(mavenConfig)) {
+        Path mavenConfig = context.rootDirectory != null ? context.rootDirectory.resolve(".mvn/maven.config") : null;
+        if (mavenConfig != null && Files.isRegularFile(mavenConfig)) {
             result.add(parseMavenConfigOptions(mavenConfig));
         }
         return result;

@@ -43,6 +43,7 @@ import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.cling.invoker.Utils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -271,13 +272,21 @@ public abstract class DefaultMavenInvoker<
 
         Path pom = determinePom(context);
         request.setPom(pom != null ? pom.toFile() : null);
+        if (pom != null) {
+            if (request.getRootDirectory() == null) {
+                // now warn about "no root found"
+                Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
+                request.setMultiModuleProjectDirectory(rootDirectory.toFile());
+                request.setRootDirectory(rootDirectory);
+            }
+            if (pom.getParent() != null) {
+                request.setBaseDirectory(pom.getParent().toFile());
+            }
+        }
+
         request.setTransferListener(
                 determineTransferListener(context, options.noTransferProgress().orElse(false)));
         request.setExecutionListener(determineExecutionListener(context));
-
-        if ((request.getPom() != null) && (request.getPom().getParentFile() != null)) {
-            request.setBaseDirectory(request.getPom().getParentFile());
-        }
 
         request.setResumeFrom(options.resumeFrom().orElse(null));
         request.setResume(options.resume().orElse(false));

@@ -25,8 +25,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.function.Function;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -115,6 +120,7 @@ public final class Utils {
         };
     }
 
+    @SafeVarargs
     public static Function<String, String> or(Function<String, String>... callbacks) {
         return s -> {
             for (Function<String, String> cb : callbacks) {
@@ -143,5 +149,38 @@ public final class Utils {
             case INFO -> Logger.LEVEL_INFO;
             case ERROR -> Logger.LEVEL_ERROR;
         };
+    }
+
+    @Nullable
+    public static Path findRoot(Path topDirectory) throws ParserException {
+        requireNonNull(topDirectory, "topDirectory");
+        Path rootDirectory = null;
+        for (RootLocator rootLocator : ServiceLoader.load(RootLocator.class).stream()
+                .map(ServiceLoader.Provider::get)
+                .toList()) {
+            rootDirectory = rootLocator.findRoot(topDirectory);
+            if (rootDirectory != null) {
+                break;
+            }
+        }
+        if (rootDirectory != null) {
+            return getCanonicalPath(rootDirectory);
+        }
+        return null;
+    }
+
+    @Nonnull
+    public static Path findMandatoryRoot(Path topDirectory) throws ParserException {
+        requireNonNull(topDirectory, "topDirectory");
+        Path rootDirectory;
+        for (RootLocator rootLocator : ServiceLoader.load(RootLocator.class).stream()
+                .map(ServiceLoader.Provider::get)
+                .toList()) {
+            rootDirectory = rootLocator.findMandatoryRoot(topDirectory);
+            if (rootDirectory != null) {
+                return getCanonicalPath(rootDirectory);
+            }
+        }
+        throw new IllegalStateException("how did we get here?");
     }
 }
