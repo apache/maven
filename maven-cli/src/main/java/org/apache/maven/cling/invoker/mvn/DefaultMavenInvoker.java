@@ -261,7 +261,6 @@ public abstract class DefaultMavenInvoker<
     protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
         super.populateRequest(context, request);
         if (context.invokerRequest.rootDirectory().isEmpty()) {
-            // now warn about "no root found"
             Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
             request.setMultiModuleProjectDirectory(rootDirectory.toFile());
             request.setRootDirectory(rootDirectory);
@@ -277,8 +276,8 @@ public abstract class DefaultMavenInvoker<
         request.setGlobalChecksumPolicy(determineGlobalChecksumPolicy(context));
 
         Path pom = determinePom(context);
-        request.setPom(pom != null ? pom.toFile() : null);
         if (pom != null) {
+            request.setPom(pom.toFile());
             if (pom.getParent() != null) {
                 request.setBaseDirectory(pom.getParent().toFile());
             }
