@@ -621,7 +621,7 @@ public abstract class LookupInvoker<
         }
         // settings
         userDefinedLocalRepo = context.effectiveSettings.getLocalRepository();
-        if (userDefinedLocalRepo != null) {
+        if (userDefinedLocalRepo != null && !userDefinedLocalRepo.isEmpty()) {
             return context.userResolver.apply(userDefinedLocalRepo);
         }
         // defaults
