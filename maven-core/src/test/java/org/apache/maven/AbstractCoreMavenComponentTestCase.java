@@ -21,7 +21,6 @@ package org.apache.maven;
 import javax.inject.Inject;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -91,8 +90,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
 
     protected MavenExecutionRequest createMavenExecutionRequest(File pom) throws Exception {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-                .setRootDirectory(
-                        pom != null ? pom.toPath().getParent() : Paths.get("").toAbsolutePath())
+                .setRootDirectory(pom != null ? pom.toPath().getParent() : null)
                 .setPom(pom)
                 .setProjectPresent(true)
                 .setShowErrors(true)

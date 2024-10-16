@@ -105,6 +105,7 @@ import org.apache.maven.api.services.model.PluginManagementInjector;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileInjector;
 import org.apache.maven.api.services.model.ProfileSelector;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
@@ -631,7 +632,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             top = top.toAbsolutePath().normalize();
 
             // Obtain the root directory, resolving it if necessary
-            Path rootDirectory = session.getRootDirectory();
+            Path rootDirectory;
+            try {
+                rootDirectory = session.getRootDirectory();
+            } catch (IllegalStateException e) {
+                rootDirectory = session.getService(RootLocator.class).findMandatoryRoot(top);
+            }
 
             // Locate and normalize the root POM if it exists, fallback to top otherwise
             Path root = modelProcessor.locateExistingPom(rootDirectory);
@@ -1232,11 +1238,19 @@ public class DefaultModelBuilder implements ModelBuilder {
         Model doReadFileModel() throws ModelBuilderException {
             ModelSource modelSource = request.getSource();
             Model model;
-            Path rootDirectory = request.getSession().getRootDirectory();
+            Path rootDirectory;
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             try {
                 boolean strict = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM;
+                try {
+                    rootDirectory = request.getSession().getRootDirectory();
+                } catch (IllegalStateException ignore) {
+                    rootDirectory = modelSource.getPath();
+                    while (rootDirectory != null && !Files.isDirectory(rootDirectory)) {
+                        rootDirectory = rootDirectory.getParent();
+                    }
+                }
                 try (InputStream is = modelSource.openStream()) {
                     model = modelProcessor.read(XmlReaderRequest.builder()
                             .strict(strict)
@@ -1647,7 +1661,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return null;
             }
 
-            Path rootDirectory = request.getSession().getRootDirectory();
+            Path rootDirectory;
+            try {
+                rootDirectory = request.getSession().getRootDirectory();
+            } catch (IllegalStateException e) {
+                rootDirectory = null;
+            }
             if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM && rootDirectory != null) {
                 Path sourcePath = importSource.getPath();
                 if (sourcePath != null && sourcePath.startsWith(rootDirectory)) {

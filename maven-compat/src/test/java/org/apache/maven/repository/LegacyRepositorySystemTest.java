@@ -123,7 +123,7 @@ class LegacyRepositorySystemTest {
                 new LocalRepository(request.getLocalRepository().getBasedir());
         session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
         LegacySupport legacySupport = container.lookup(LegacySupport.class);
-        DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest(true);
+        DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         MavenSession mavenSession =
                 new MavenSession(container, session, mavenExecutionRequest, new DefaultMavenExecutionResult());
         legacySupport.setSession(mavenSession);

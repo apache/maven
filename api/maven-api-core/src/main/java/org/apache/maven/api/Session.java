@@ -158,6 +158,7 @@ public interface Session {
      * Gets the root directory of the session, which is the root directory for the top directory project.
      *
      * @return the root directory, never {@code null}
+     * @throws IllegalStateException if the root directory could not be found
      * @see #getTopDirectory()
      * @see Project#getRootDirectory()
      * @see Project#isRootProject()
