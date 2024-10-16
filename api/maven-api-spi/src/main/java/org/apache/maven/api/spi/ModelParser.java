@@ -33,8 +33,13 @@ import org.apache.maven.api.services.Source;
 /**
  * The {@code ModelParser} interface is used to locate and read {@link Model}s from the file system.
  * This allows plugging in additional syntaxes for the main model read by Maven when building a project.
+ * <p>
+ * Note: to provide Maven model "dialect", that can have models translated from-to, implement {@link ModelDialectProvider}
+ * that compose pairs of parser and writer (make dialect symmetrical).
  *
  * @since 4.0.0
+ * @see ModelDialectProvider
+ * @see DialectProvider
  */
 @Experimental
 @Consumer
