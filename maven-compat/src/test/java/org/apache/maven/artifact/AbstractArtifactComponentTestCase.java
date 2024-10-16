@@ -29,8 +29,10 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -42,9 +44,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.plugin.LegacySupport;
-import org.apache.maven.repository.internal.scopes.MavenDependencyContextRefiner;
-import org.apache.maven.repository.internal.scopes.MavenScopeDeriver;
-import org.apache.maven.repository.internal.scopes.MavenScopeSelector;
+import org.apache.maven.repository.internal.artifact.FatArtifactTraverser;
+import org.apache.maven.repository.internal.scopes.Maven4ScopeManagerConfiguration;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.PlexusContainer;
@@ -57,17 +58,20 @@ import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.internal.impl.scope.ManagedDependencyContextRefiner;
+import org.eclipse.aether.internal.impl.scope.ManagedScopeDeriver;
+import org.eclipse.aether.internal.impl.scope.ManagedScopeSelector;
+import org.eclipse.aether.internal.impl.scope.OptionalDependencySelector;
+import org.eclipse.aether.internal.impl.scope.ScopeDependencySelector;
+import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
-import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
-import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
-import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -78,6 +82,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  */
 @PlexusTest
+@Deprecated
 public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCase
  {
     @Inject
@@ -105,12 +110,12 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
         RepositorySystemSession repoSession = initRepoSession();
         MavenSession session = new MavenSession(
                 getContainer(), repoSession, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
-        new DefaultSessionFactory(
+        session.setSession(new DefaultSessionFactory(
                         getContainer().lookup(RepositorySystem.class),
                         getContainer().lookup(MavenRepositorySystem.class),
                         new DefaultLookup(getContainer()),
                         getContainer().lookup(RuntimeInformation.class))
-                .getSession(session);
+                .newSession(session));
 
         legacySupport.setSession(session);
     }
@@ -299,24 +304,29 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
     }
 
     protected DefaultRepositorySystemSession initRepoSession() throws Exception {
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false);
+        session.setScopeManager(new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE));
         session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser(depTraverser);
 
-        DependencyManager depManager = new ClassicDependencyManager();
+        DependencyManager depManager = new ClassicDependencyManager(true, session.getScopeManager());
         session.setDependencyManager(depManager);
 
         DependencySelector depFilter = new AndDependencySelector(
-                new ScopeDependencySelector("test", "provided"),
-                new OptionalDependencySelector(),
+                ScopeDependencySelector.legacy(
+                        null, Arrays.asList(DependencyScope.TEST.id(), DependencyScope.PROVIDED.id())),
+                OptionalDependencySelector.fromDirect(),
                 new ExclusionDependencySelector());
         session.setDependencySelector(depFilter);
 
+        ScopeManagerImpl scopeManager = new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE);
+        session.setScopeManager(scopeManager);
         DependencyGraphTransformer transformer = new ConflictResolver(
-                new NearestVersionSelector(), new MavenScopeSelector(),
-                new SimpleOptionalitySelector(), new MavenScopeDeriver());
-        transformer = new ChainedDependencyGraphTransformer(transformer, new MavenDependencyContextRefiner());
+                new NearestVersionSelector(), new ManagedScopeSelector(scopeManager),
+                new SimpleOptionalitySelector(), new ManagedScopeDeriver(scopeManager));
+        transformer =
+                new ChainedDependencyGraphTransformer(transformer, new ManagedDependencyContextRefiner(scopeManager));
         session.setDependencyGraphTransformer(transformer);
 
         LocalRepository localRepo = new LocalRepository(localRepository().getBasedir());
@@ -326,7 +336,7 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
 
     private static final char[] hexCode = "0123456789ABCDEF".toCharArray();
 
-    private static final String printHexBinary(byte[] data) {
+    private static String printHexBinary(byte[] data) {
         StringBuilder r = new StringBuilder(data.length * 2);
         for (byte b : data) {
             r.append(hexCode[(b >> 4) & 0xF]);

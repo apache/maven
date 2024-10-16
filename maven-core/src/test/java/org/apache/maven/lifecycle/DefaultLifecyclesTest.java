@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.impl.DefaultLookup;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -50,15 +51,15 @@ class DefaultLifecyclesTest {
     @Test
     void testDefaultLifecycles() {
         final List<Lifecycle> lifecycles = defaultLifeCycles.getLifeCycles();
-        assertThat(lifecycles, hasSize(4));
-        assertThat(DefaultLifecycles.STANDARD_LIFECYCLES, arrayWithSize(4));
+        assertThat(lifecycles, hasSize(3));
+        assertThat(DefaultLifecycles.STANDARD_LIFECYCLES, arrayWithSize(3));
     }
 
     @Test
     void testDefaultLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("default");
         assertThat(lifecycle.getId(), is("default"));
-        assertThat(lifecycle.getPhases(), hasSize(23));
+        assertThat(lifecycle.getPhases(), hasSize(54));
     }
 
     @Test
@@ -72,14 +73,7 @@ class DefaultLifecyclesTest {
     void testSiteLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("site");
         assertThat(lifecycle.getId(), is("site"));
-        assertThat(lifecycle.getPhases(), hasSize(4));
-    }
-
-    @Test
-    void testWrapperLifecycle() {
-        final Lifecycle lifecycle = getLifeCycleById("wrapper");
-        assertThat(lifecycle.getId(), is("wrapper"));
-        assertThat(lifecycle.getPhases(), hasSize(1));
+        assertThat(lifecycle.getPhases(), hasSize(6));
     }
 
     @Test
@@ -94,13 +88,15 @@ class DefaultLifecyclesTest {
         PlexusContainer mockedPlexusContainer = mock(PlexusContainer.class);
         when(mockedPlexusContainer.lookupMap(Lifecycle.class)).thenReturn(lifeCycles);
 
-        DefaultLifecycles dl = new DefaultLifecycles(new DefaultLookup(mockedPlexusContainer));
+        DefaultLifecycles dl = new DefaultLifecycles(
+                new DefaultLifecycleRegistry(
+                        List.of(new DefaultLifecycleRegistry.LifecycleWrapperProvider(mockedPlexusContainer))),
+                new DefaultLookup(mockedPlexusContainer));
 
         assertThat(dl.getLifeCycles().get(0).getId(), is("clean"));
         assertThat(dl.getLifeCycles().get(1).getId(), is("default"));
         assertThat(dl.getLifeCycles().get(2).getId(), is("site"));
-        assertThat(dl.getLifeCycles().get(3).getId(), is("wrapper"));
-        assertThat(dl.getLifeCycles().get(4).getId(), is("etl"));
+        assertThat(dl.getLifeCycles().get(3).getId(), is("etl"));
     }
 
     private Lifecycle getLifeCycleById(String id) {

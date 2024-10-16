@@ -31,6 +31,8 @@ import org.apache.maven.api.xml.XmlNode;
  * An instance of this object is bound to the {@link org.apache.maven.api.di.MojoExecutionScoped}
  * and available as {@code mojoExecution} within {@link org.apache.maven.api.plugin.annotations.Parameter}
  * expressions.
+ *
+ * @since 4.0.0
  */
 @Experimental
 public interface MojoExecution {

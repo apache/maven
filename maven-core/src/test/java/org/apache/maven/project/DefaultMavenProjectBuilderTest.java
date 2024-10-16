@@ -25,8 +25,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+import org.apache.maven.api.SessionData;
+import org.apache.maven.api.services.model.ModelCache;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -320,6 +324,11 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         final Path pom = projectRoot.resolve("pom.xml");
         final ProjectBuildingRequest buildingRequest = newBuildingRequest();
 
+        InternalMavenSession.from(InternalSession.from(buildingRequest.getRepositorySession()))
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(projectRoot);
+
         try (InputStream pomResource =
                 DefaultMavenProjectBuilderTest.class.getResourceAsStream("/projects/reread/pom1.xml")) {
             Files.copy(pomResource, pom, StandardCopyOption.REPLACE_EXISTING);
@@ -328,6 +337,12 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         MavenProject project =
                 projectBuilder.build(pom.toFile(), buildingRequest).getProject();
         assertThat(project.getName(), is("aid")); // inherited from artifactId
+
+        // clear the cache
+        InternalSession.from(buildingRequest.getRepositorySession())
+                .getData()
+                .get(SessionData.key(ModelCache.class))
+                .clear();
 
         try (InputStream pomResource =
                 DefaultMavenProjectBuilderTest.class.getResourceAsStream("/projects/reread/pom2.xml")) {
@@ -404,5 +419,25 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         MavenProject mp = this.getProjectFromRemoteRepository(f1);
 
         assertEquals("1.0-SNAPSHOT", mp.getVersion());
+    }
+
+    @Test
+    public void testSubprojectDiscovery() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/subprojects-discover/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        assertEquals(2, results.size());
+        MavenProject p1 = results.get(0).getProject();
+        MavenProject p2 = results.get(1).getProject();
+        MavenProject parent = p1.getArtifactId().equals("parent") ? p1 : p2;
+        MavenProject child = p1.getArtifactId().equals("parent") ? p2 : p1;
+        assertEquals(List.of("child"), parent.getModel().getDelegate().getSubprojects());
     }
 }

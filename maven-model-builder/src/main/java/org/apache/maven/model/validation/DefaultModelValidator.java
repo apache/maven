@@ -24,18 +24,30 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
+import org.apache.maven.api.model.ActivationOS;
+import org.apache.maven.api.model.ActivationProperty;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.BuildBase;
 import org.apache.maven.api.model.Dependency;
@@ -61,12 +73,17 @@ import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.v4.MavenModelVersion;
+import org.apache.maven.model.v4.MavenTransformer;
 
 /**
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultModelValidator implements ModelValidator {
+    public static final String BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION =
+            "maven.build.allowExpressionInEffectiveProjectVersion";
 
     public static final List<String> VALID_MODEL_VERSIONS =
             Collections.unmodifiableList(Arrays.asList("4.0.0", "4.1.0"));
@@ -82,6 +99,196 @@ public class DefaultModelValidator implements ModelValidator {
 
     private static final String EMPTY = "";
 
+    private record ActivationFrame(String location, Optional<? extends InputLocationTracker> parent) {}
+
+    private static class ActivationWalker extends MavenTransformer {
+
+        private final Deque<ActivationFrame> stk;
+
+        ActivationWalker(Deque<ActivationFrame> stk, UnaryOperator<String> transformer) {
+            super(transformer);
+            this.stk = stk;
+        }
+
+        private ActivationFrame nextFrame(String property) {
+            return new ActivationFrame(property, Optional.empty());
+        }
+
+        private <P> ActivationFrame nextFrame(String property, Function<P, InputLocationTracker> child) {
+            @SuppressWarnings("unchecked")
+            final Optional<P> parent = (Optional<P>) stk.peek().parent;
+            return new ActivationFrame(property, parent.map(child));
+        }
+
+        @Override
+        public Activation transformActivation(Activation target) {
+            stk.push(new ActivationFrame("activation", Optional.of(target)));
+            try {
+                return super.transformActivation(target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected Activation.Builder transformActivation_ActiveByDefault(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+            return builder;
+        }
+
+        @Override
+        protected Activation.Builder transformActivation_File(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+            stk.push(nextFrame("file", Activation::getFile));
+            Optional.ofNullable(target.getFile());
+            try {
+                return super.transformActivation_File(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected ActivationFile.Builder transformActivationFile_Exists(
+                Supplier<? extends ActivationFile.Builder> creator,
+                ActivationFile.Builder builder,
+                ActivationFile target) {
+            stk.push(nextFrame("exists"));
+            try {
+                return super.transformActivationFile_Exists(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected ActivationFile.Builder transformActivationFile_Missing(
+                Supplier<? extends ActivationFile.Builder> creator,
+                ActivationFile.Builder builder,
+                ActivationFile target) {
+            stk.push(nextFrame("missing"));
+            try {
+                return super.transformActivationFile_Missing(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected Activation.Builder transformActivation_Jdk(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+            stk.push(nextFrame("jdk"));
+            try {
+                return super.transformActivation_Jdk(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected Activation.Builder transformActivation_Os(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+            stk.push(nextFrame("os", Activation::getOs));
+            try {
+                return super.transformActivation_Os(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected ActivationOS.Builder transformActivationOS_Arch(
+                Supplier<? extends ActivationOS.Builder> creator, ActivationOS.Builder builder, ActivationOS target) {
+            stk.push(nextFrame("arch"));
+            try {
+                return super.transformActivationOS_Arch(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected ActivationOS.Builder transformActivationOS_Family(
+                Supplier<? extends ActivationOS.Builder> creator, ActivationOS.Builder builder, ActivationOS target) {
+            stk.push(nextFrame("family"));
+            try {
+                return super.transformActivationOS_Family(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected ActivationOS.Builder transformActivationOS_Name(
+                Supplier<? extends ActivationOS.Builder> creator, ActivationOS.Builder builder, ActivationOS target) {
+            stk.push(nextFrame("name"));
+            try {
+                return super.transformActivationOS_Name(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected ActivationOS.Builder transformActivationOS_Version(
+                Supplier<? extends ActivationOS.Builder> creator, ActivationOS.Builder builder, ActivationOS target) {
+            stk.push(nextFrame("version"));
+            try {
+                return super.transformActivationOS_Version(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected Activation.Builder transformActivation_Packaging(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+            stk.push(nextFrame("packaging"));
+            try {
+                return super.transformActivation_Packaging(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected Activation.Builder transformActivation_Property(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+            stk.push(nextFrame("property", Activation::getProperty));
+            try {
+                return super.transformActivation_Property(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected ActivationProperty.Builder transformActivationProperty_Name(
+                Supplier<? extends ActivationProperty.Builder> creator,
+                ActivationProperty.Builder builder,
+                ActivationProperty target) {
+            stk.push(nextFrame("name"));
+            try {
+                return super.transformActivationProperty_Name(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+
+        @Override
+        protected ActivationProperty.Builder transformActivationProperty_Value(
+                Supplier<? extends ActivationProperty.Builder> creator,
+                ActivationProperty.Builder builder,
+                ActivationProperty target) {
+            stk.push(nextFrame("value"));
+            try {
+                return super.transformActivationProperty_Value(creator, builder, target);
+            } finally {
+                stk.pop();
+            }
+        }
+    }
+
     private final Set<String> validCoordinateIds = new HashSet<>();
 
     private final Set<String> validProfileIds = new HashSet<>();
@@ -94,6 +301,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:MethodLength")
     public void validateFileModel(Model ma, ModelBuildingRequest request, ModelProblemCollector problems) {
 
         org.apache.maven.api.model.Model m = ma.getDelegate();
@@ -288,42 +496,52 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validate30RawProfileActivation(ModelProblemCollector problems, Activation activation, String prefix) {
-        if (activation == null || activation.getFile() == null) {
+        if (activation == null) {
             return;
         }
+        final Deque<ActivationFrame> stk = new LinkedList<>();
 
-        ActivationFile file = activation.getFile();
+        final Supplier<String> pathSupplier = () -> {
+            final boolean parallel = false;
+            return StreamSupport.stream(((Iterable<ActivationFrame>) stk::descendingIterator).spliterator(), parallel)
+                    .map(ActivationFrame::location)
+                    .collect(Collectors.joining("."));
+        };
+        final Supplier<InputLocation> locationSupplier = () -> {
+            if (stk.size() < 2) {
+                return null;
+            }
+            Iterator<ActivationFrame> f = stk.iterator();
 
-        String path;
-        String location;
+            String location = f.next().location;
+            ActivationFrame parent = f.next();
 
-        if (file.getExists() != null && !file.getExists().isEmpty()) {
-            path = file.getExists();
-            location = "exists";
-        } else if (file.getMissing() != null && !file.getMissing().isEmpty()) {
-            path = file.getMissing();
-            location = "missing";
-        } else {
-            return;
-        }
+            return parent.parent.map(p -> p.getLocation(location)).orElse(null);
+        };
+        final UnaryOperator<String> transformer = s -> {
+            if (hasProjectExpression(s)) {
+                String path = pathSupplier.get();
+                Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(s);
+                while (matcher.find()) {
+                    String propertyName = matcher.group(0);
 
-        if (hasProjectExpression(path)) {
-            Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(path);
-            while (matcher.find()) {
-                String propertyName = matcher.group(0);
-                if (!"${project.basedir}".equals(propertyName)) {
+                    if (path.startsWith("activation.file.") && "${project.basedir}".equals(propertyName)) {
+                        continue;
+                    }
                     addViolation(
                             problems,
                             Severity.WARNING,
                             Version.V30,
-                            prefix + "activation.file." + location,
+                            prefix + path,
                             null,
-                            "Failed to interpolate file location " + path + ": " + propertyName
+                            "Failed to interpolate profile activation property " + s + ": " + propertyName
                                     + " expressions are not supported during profile activation.",
-                            file.getLocation(location));
+                            locationSupplier.get());
                 }
             }
-        }
+            return s;
+        };
+        new ActivationWalker(stk, transformer).transformActivation(activation);
     }
 
     private void validate20RawPlugins(
@@ -410,6 +628,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:MethodLength")
     public void validateEffectiveModel(Model ma, ModelBuildingRequest request, ModelProblemCollector problems) {
         org.apache.maven.api.model.Model m = ma.getDelegate();
 
@@ -476,6 +695,22 @@ public class DefaultModelValidator implements ModelValidator {
             validateBannedCharacters(
                     EMPTY, "version", problems, errOn31, Version.V20, m.getVersion(), null, m, ILLEGAL_VERSION_CHARS);
             validate20ProperSnapshotVersion("version", problems, errOn31, Version.V20, m.getVersion(), null, m);
+            if (hasExpression(m.getVersion())) {
+                Severity versionExpressionSeverity = Severity.ERROR;
+                if (m.getProperties() != null
+                        && Boolean.parseBoolean(
+                                m.getProperties().get(BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION))) {
+                    versionExpressionSeverity = Severity.WARNING;
+                }
+                addViolation(
+                        problems,
+                        versionExpressionSeverity,
+                        Version.V20,
+                        "version",
+                        null,
+                        "must be a constant version but is '" + m.getVersion() + "'.",
+                        m);
+            }
 
             Build build = m.getBuild();
             if (build != null) {
@@ -572,6 +807,54 @@ public class DefaultModelValidator implements ModelValidator {
                         distMgmt.getSnapshotRepository(),
                         "distributionManagement.snapshotRepository.",
                         request);
+            }
+        }
+    }
+
+    @Override
+    public void validateExternalProfiles(
+            List<org.apache.maven.model.Profile> activeExternalProfiles,
+            Model ma,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems) {
+        org.apache.maven.api.model.Model m = ma.getDelegate();
+        // check for id clashes in repositories
+        for (Profile profile : activeExternalProfiles.stream()
+                .map(org.apache.maven.model.Profile::getDelegate)
+                .collect(Collectors.toList())) {
+            String externalRepositoriesSource = "external profile with id '" + profile.getId() + "' in settings.xml";
+            validateUniqueRepositoryIds(
+                    false, m.getRepositories(), profile.getRepositories(), externalRepositoriesSource, problems);
+            validateUniqueRepositoryIds(
+                    true,
+                    m.getPluginRepositories(),
+                    profile.getPluginRepositories(),
+                    externalRepositoriesSource,
+                    problems);
+        }
+    }
+
+    private void validateUniqueRepositoryIds(
+            boolean isPluginRepository,
+            Collection<Repository> pomRepositories,
+            Collection<Repository> externalRepositories,
+            String externalRepositoriesSource,
+            ModelProblemCollector problems) {
+        for (Repository externalRepository : externalRepositories) {
+            Optional<Repository> clashingPomRepository = pomRepositories.stream()
+                    .filter(r -> Objects.equals(r.getId(), externalRepository.getId()))
+                    .filter(r -> !Objects.equals(r.getUrl(), externalRepository.getUrl()))
+                    .findFirst();
+            if (clashingPomRepository.isPresent()) {
+                addViolation(
+                        problems,
+                        Severity.WARNING,
+                        Version.BASE,
+                        isPluginRepository ? "pluginRepositories.repository" : "repositories.repository",
+                        clashingPomRepository.get().getId(),
+                        "is overwritten by the repository with same id but having a different url from "
+                                + externalRepositoriesSource,
+                        clashingPomRepository.get());
             }
         }
     }
@@ -982,10 +1265,12 @@ public class DefaultModelValidator implements ModelValidator {
                     repository.getUrl(),
                     null,
                     repository)) {
-                // only allow ${basedir} and ${project.basedir}
+                // only allow ${basedir}, ${project.basedir} or ${project.baseUri}
                 Matcher m = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
                 while (m.find()) {
-                    if (!("basedir".equals(m.group(1)) || "project.basedir".equals(m.group(1)))) {
+                    if (!("basedir".equals(m.group(1))
+                            || "project.basedir".equals(m.group(1))
+                            || "project.baseUri".equals(m.group(1)))) {
                         validateStringNoExpression(
                                 prefix + prefix2 + "[" + repository.getId() + "].url",
                                 problems,
@@ -1355,7 +1640,7 @@ public class DefaultModelValidator implements ModelValidator {
             return false;
         }
 
-        if (string.length() > 0) {
+        if (!string.isEmpty()) {
             return true;
         }
 
@@ -1427,7 +1712,7 @@ public class DefaultModelValidator implements ModelValidator {
             String string,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1458,7 +1743,7 @@ public class DefaultModelValidator implements ModelValidator {
             String sourceHint,
             InputLocationTracker tracker,
             String... validValues) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1483,7 +1768,7 @@ public class DefaultModelValidator implements ModelValidator {
     @SuppressWarnings("checkstyle:parameternumber")
     private boolean validateModelVersion(
             ModelProblemCollector problems, String string, InputLocationTracker tracker, List<String> validVersions) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1598,7 +1883,7 @@ public class DefaultModelValidator implements ModelValidator {
             String string,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1626,7 +1911,7 @@ public class DefaultModelValidator implements ModelValidator {
             String string,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (string == null || string.length() <= 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 
@@ -1663,7 +1948,7 @@ public class DefaultModelValidator implements ModelValidator {
             return false;
         }
 
-        if (string.length() <= 0 || "RELEASE".equals(string) || "LATEST".equals(string)) {
+        if (string.isEmpty() || "RELEASE".equals(string) || "LATEST".equals(string)) {
             addViolation(
                     problems,
                     errOn30,

@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Function;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -114,7 +115,7 @@ public class ${className} {
     /**
      * Field stringFormatter.
      */
-    protected InputLocation.StringFormatter stringFormatter;
+    protected Function<InputLocation, String> stringFormatter;
 
 #end
       //-----------/
@@ -161,9 +162,9 @@ public class ${className} {
      *
      * @param stringFormatter
      */
-    public void setStringFormatter(InputLocation.StringFormatter stringFormatter) {
+    public void setStringFormatter(Function<InputLocation, String> stringFormatter) {
         this.stringFormatter = stringFormatter;
-    } //-- void setStringFormatter(InputLocation.StringFormatter)
+    } //-- void setStringFormatter(Function<InputLocation, String>)
 
 #end
     /**
@@ -226,6 +227,9 @@ public class ${className} {
   #foreach ( $field in $allFields )
     #if ( $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).format )
       #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
+      #if ( ! $fieldTagName )
+        #set ( $fieldTagName = $field.name )
+      #end
       #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
       #if ( $field.type == "String" )
             writeAttr("$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer);
@@ -236,6 +240,8 @@ public class ${className} {
         #else
             writeAttr("$fieldTagName", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer);
         #end
+      #elseif ( $field.type == "int" || $field.type == "Integer" )
+            writeAttr("$fieldTagName", Integer.toString(${classLcapName}.get${fieldCapName}()), serializer);
       #else
             // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
@@ -432,7 +438,7 @@ public class ${className} {
      */
     protected String toString(InputLocation location) {
         if (stringFormatter != null) {
-            return stringFormatter.toString(location);
+            return stringFormatter.apply(location);
         }
         if (location.getSource() != null) {
             return ' ' + location.getSource().toString() + ':' + location.getLineNumber() + ' ';

@@ -21,6 +21,7 @@ package org.apache.maven.api.feature;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
 
@@ -32,32 +33,27 @@ import org.apache.maven.api.annotations.Nullable;
  */
 public final class Features {
 
-    /**
-     * Name of the Maven user property to enable or disable the build/consumer POM feature.
-     */
-    public static final String BUILDCONSUMER = "maven.buildconsumer";
-
     private Features() {}
 
     /**
-     * Check if the build/consumer POM feature is active.
+     * Check if the consumer POM feature is active.
      */
-    public static boolean buildConsumer(@Nullable Properties userProperties) {
-        return doGet(userProperties, BUILDCONSUMER, true);
+    public static boolean consumerPom(@Nullable Properties userProperties) {
+        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM, true);
     }
 
     /**
-     * Check if the build/consumer POM feature is active.
+     * Check if the consumer POM feature is active.
      */
-    public static boolean buildConsumer(@Nullable Map<String, String> userProperties) {
-        return doGet(userProperties, BUILDCONSUMER, true);
+    public static boolean consumerPom(@Nullable Map<String, String> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM, true);
     }
 
     /**
-     * Check if the build/consumer POM feature is active.
+     * Check if the consumer POM feature is active.
      */
-    public static boolean buildConsumer(@Nullable Session session) {
-        return buildConsumer(session != null ? session.getUserProperties() : null);
+    public static boolean consumerPom(@Nullable Session session) {
+        return consumerPom(session != null ? session.getUserProperties() : null);
     }
 
     private static boolean doGet(Properties userProperties, String key, boolean def) {

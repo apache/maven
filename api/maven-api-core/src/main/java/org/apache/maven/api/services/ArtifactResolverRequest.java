@@ -19,13 +19,16 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
+import java.util.List;
 
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
+import org.apache.maven.api.annotations.Nullable;
 
 import static org.apache.maven.api.services.BaseRequest.nonNull;
 
@@ -41,7 +44,10 @@ public interface ArtifactResolverRequest {
     Session getSession();
 
     @Nonnull
-    Collection<? extends ArtifactCoordinate> getCoordinates();
+    Collection<? extends ArtifactCoordinates> getCoordinates();
+
+    @Nonnull
+    List<RemoteRepository> getRepositories();
 
     @Nonnull
     static ArtifactResolverRequestBuilder builder() {
@@ -50,17 +56,30 @@ public interface ArtifactResolverRequest {
 
     @Nonnull
     static ArtifactResolverRequest build(
-            @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinate> coordinates) {
+            @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinates> coordinates) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
                 .coordinates(nonNull(coordinates, "coordinates cannot be null"))
                 .build();
     }
 
+    @Nonnull
+    static ArtifactResolverRequest build(
+            @Nonnull Session session,
+            @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
+            List<RemoteRepository> repositories) {
+        return builder()
+                .session(nonNull(session, "session cannot be null"))
+                .coordinates(nonNull(coordinates, "coordinates cannot be null"))
+                .repositories(repositories)
+                .build();
+    }
+
     @NotThreadSafe
     class ArtifactResolverRequestBuilder {
         Session session;
-        Collection<? extends ArtifactCoordinate> coordinates;
+        Collection<? extends ArtifactCoordinates> coordinates;
+        List<RemoteRepository> repositories;
 
         ArtifactResolverRequestBuilder() {}
 
@@ -71,30 +90,48 @@ public interface ArtifactResolverRequest {
         }
 
         @Nonnull
-        public ArtifactResolverRequestBuilder coordinates(Collection<? extends ArtifactCoordinate> coordinates) {
+        public ArtifactResolverRequestBuilder coordinates(Collection<? extends ArtifactCoordinates> coordinates) {
             this.coordinates = coordinates;
             return this;
         }
 
         @Nonnull
+        public ArtifactResolverRequestBuilder repositories(List<RemoteRepository> repositories) {
+            this.repositories = repositories;
+            return this;
+        }
+
+        @Nonnull
         public ArtifactResolverRequest build() {
-            return new DefaultArtifactResolverRequest(session, coordinates);
+            return new DefaultArtifactResolverRequest(session, coordinates, repositories);
         }
 
         private static class DefaultArtifactResolverRequest extends BaseRequest implements ArtifactResolverRequest {
             @Nonnull
-            private final Collection<? extends ArtifactCoordinate> coordinates;
+            private final Collection<? extends ArtifactCoordinates> coordinates;
+
+            @Nullable
+            private final List<RemoteRepository> repositories;
 
             DefaultArtifactResolverRequest(
-                    @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinate> coordinates) {
+                    @Nonnull Session session,
+                    @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
+                    @Nonnull List<RemoteRepository> repositories) {
                 super(session);
                 this.coordinates = unmodifiable(nonNull(coordinates, "coordinates cannot be null"));
+                this.repositories = repositories;
             }
 
             @Nonnull
             @Override
-            public Collection<? extends ArtifactCoordinate> getCoordinates() {
+            public Collection<? extends ArtifactCoordinates> getCoordinates() {
                 return coordinates;
+            }
+
+            @Nullable
+            @Override
+            public List<RemoteRepository> getRepositories() {
+                return repositories;
             }
         }
     }

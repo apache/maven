@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.spi.PropertyContributor;
 import org.apache.maven.execution.MavenExecutionRequest;
 
@@ -37,22 +38,25 @@ import org.apache.maven.execution.MavenExecutionRequest;
 @Named
 @Singleton
 class PropertyContributorExtender implements MavenExecutionRequestExtender {
-    private final Map<String, PropertyContributor> effectivePropertyContributors;
+    private final Lookup lookup;
 
     @Inject
-    PropertyContributorExtender(Map<String, PropertyContributor> effectivePropertyContributors) {
-        this.effectivePropertyContributors = effectivePropertyContributors;
+    PropertyContributorExtender(Lookup lookup) {
+        this.lookup = lookup;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void extend(MavenExecutionRequest mavenExecutionRequest) {
-        HashMap<String, String> userPropertiesMap = new HashMap<>((Map) mavenExecutionRequest.getUserProperties());
-        for (PropertyContributor contributor : effectivePropertyContributors.values()) {
-            contributor.contribute(userPropertiesMap);
+        Map<String, PropertyContributor> effectivePropertyContributors = lookup.lookupMap(PropertyContributor.class);
+        if (!effectivePropertyContributors.isEmpty()) {
+            HashMap<String, String> userPropertiesMap = new HashMap<>((Map) mavenExecutionRequest.getUserProperties());
+            for (PropertyContributor contributor : effectivePropertyContributors.values()) {
+                contributor.contribute(userPropertiesMap);
+            }
+            Properties newProperties = new Properties();
+            newProperties.putAll(userPropertiesMap);
+            mavenExecutionRequest.setUserProperties(newProperties);
         }
-        Properties newProperties = new Properties();
-        newProperties.putAll(userPropertiesMap);
-        mavenExecutionRequest.setUserProperties(newProperties);
     }
 }

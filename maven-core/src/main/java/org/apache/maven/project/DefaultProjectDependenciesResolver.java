@@ -22,14 +22,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
-import org.apache.maven.repository.internal.scopes.MavenDependencyScopes;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -40,11 +43,11 @@ import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.graph.DependencyVisitor;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
+import org.eclipse.aether.util.graph.visitor.DependencyGraphDumper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +129,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                 Dependency dependency = dependencies.get(key);
                 Collection<Exclusion> exclusions = dependency != null ? dependency.getExclusions() : null;
                 org.eclipse.aether.graph.Dependency dep = RepositoryUtils.toDependency(artifact, exclusions);
-                if (!MavenDependencyScopes.SYSTEM.equals(dep.getScope())
+                if (!DependencyScope.SYSTEM.is(dep.getScope())
                         && dep.getArtifact().getFile() != null) {
                     // enable re-resolution
                     org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
@@ -157,7 +160,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             result.setCollectionErrors(e.getResult().getExceptions());
 
             throw new DependencyResolutionException(
-                    result, "Could not resolve dependencies for project " + project.getId() + ": " + e.getMessage(), e);
+                    result, "Could not collect dependencies for project " + project.getId(), e);
         }
 
         depRequest.setRoot(node);
@@ -165,19 +168,20 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         if (logger.isWarnEnabled()) {
             for (DependencyNode child : node.getChildren()) {
                 if (!child.getRelocations().isEmpty()) {
-                    org.eclipse.aether.artifact.Artifact relocated =
+                    org.eclipse.aether.artifact.Artifact artifact =
                             child.getDependency().getArtifact();
-                    String message = relocated instanceof org.apache.maven.repository.internal.RelocatedArtifact
-                            ? ((org.apache.maven.repository.internal.RelocatedArtifact) relocated).getMessage()
-                            : null;
-                    logger.warn("The artifact " + child.getRelocations().get(0) + " has been relocated to " + relocated
+                    String message =
+                            artifact instanceof org.apache.maven.internal.impl.resolver.RelocatedArtifact relocated
+                                    ? relocated.getMessage()
+                                    : null;
+                    logger.warn("The artifact " + child.getRelocations().get(0) + " has been relocated to " + artifact
                             + (message != null ? ": " + message : ""));
                 }
             }
         }
 
         if (logger.isDebugEnabled()) {
-            node.accept(new GraphLogger(project));
+            node.accept(new DependencyGraphDumper(logger::debug));
         }
 
         try {
@@ -186,7 +190,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             process(result, e.getResult().getArtifactResults());
 
             throw new DependencyResolutionException(
-                    result, "Could not resolve dependencies for project " + project.getId() + ": " + e.getMessage(), e);
+                    result, "Could not resolve dependencies for project " + project.getId(), e);
         }
 
         return result;
@@ -210,92 +214,6 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             } else {
                 result.setResolutionErrors(node.getDependency(), ar.getExceptions());
             }
-        }
-    }
-
-    // Keep this class in sync with org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver.GraphLogger
-    class GraphLogger implements DependencyVisitor {
-
-        private final MavenProject project;
-
-        private String indent = "";
-
-        GraphLogger(MavenProject project) {
-            this.project = project;
-        }
-
-        public boolean visitEnter(DependencyNode node) {
-            StringBuilder buffer = new StringBuilder(128);
-            buffer.append(indent);
-            org.eclipse.aether.graph.Dependency dep = node.getDependency();
-            if (dep != null) {
-                org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
-
-                buffer.append(art);
-                if (dep.getScope() != null && !dep.getScope().isEmpty()) {
-                    buffer.append(':').append(dep.getScope());
-                }
-
-                if (dep.isOptional()) {
-                    buffer.append(" (optional)");
-                }
-
-                // TODO We currently cannot tell which <dependencyManagement> section contained the management
-                //      information. When the resolver provides this information, these log messages should be updated
-                //      to contain it.
-                if ((node.getManagedBits() & DependencyNode.MANAGED_SCOPE) == DependencyNode.MANAGED_SCOPE) {
-                    final String premanagedScope = DependencyManagerUtils.getPremanagedScope(node);
-                    buffer.append(" (scope managed from ");
-                    buffer.append(Objects.toString(premanagedScope, "default"));
-                    buffer.append(')');
-                }
-
-                if ((node.getManagedBits() & DependencyNode.MANAGED_VERSION) == DependencyNode.MANAGED_VERSION) {
-                    final String premanagedVersion = DependencyManagerUtils.getPremanagedVersion(node);
-                    buffer.append(" (version managed from ");
-                    buffer.append(Objects.toString(premanagedVersion, "default"));
-                    buffer.append(')');
-                }
-
-                if ((node.getManagedBits() & DependencyNode.MANAGED_OPTIONAL) == DependencyNode.MANAGED_OPTIONAL) {
-                    final Boolean premanagedOptional = DependencyManagerUtils.getPremanagedOptional(node);
-                    buffer.append(" (optionality managed from ");
-                    buffer.append(Objects.toString(premanagedOptional, "default"));
-                    buffer.append(')');
-                }
-
-                if ((node.getManagedBits() & DependencyNode.MANAGED_EXCLUSIONS) == DependencyNode.MANAGED_EXCLUSIONS) {
-                    final Collection<org.eclipse.aether.graph.Exclusion> premanagedExclusions =
-                            DependencyManagerUtils.getPremanagedExclusions(node);
-
-                    buffer.append(" (exclusions managed from ");
-                    buffer.append(Objects.toString(premanagedExclusions, "default"));
-                    buffer.append(')');
-                }
-
-                if ((node.getManagedBits() & DependencyNode.MANAGED_PROPERTIES) == DependencyNode.MANAGED_PROPERTIES) {
-                    final Map<String, String> premanagedProperties =
-                            DependencyManagerUtils.getPremanagedProperties(node);
-
-                    buffer.append(" (properties managed from ");
-                    buffer.append(Objects.toString(premanagedProperties, "default"));
-                    buffer.append(')');
-                }
-            } else {
-                buffer.append(project.getGroupId());
-                buffer.append(':').append(project.getArtifactId());
-                buffer.append(':').append(project.getPackaging());
-                buffer.append(':').append(project.getVersion());
-            }
-
-            logger.debug(buffer.toString());
-            indent += "   ";
-            return true;
-        }
-
-        public boolean visitLeave(DependencyNode node) {
-            indent = indent.substring(0, indent.length() - 3);
-            return true;
         }
     }
 }

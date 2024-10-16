@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.MetadataStaxWriter;
+import org.apache.maven.metadata.v4.MetadataStaxWriter;
 
 /**
  * Provide public methods from {@link MetadataStaxWriter}

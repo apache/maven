@@ -29,7 +29,9 @@ import org.apache.maven.settings.Settings;
 /**
  * Handles serialization of settings into some kind of textual format like XML.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.xml.SettingsXmlFactory} instead
  */
+@Deprecated(since = "4.0.0")
 public interface SettingsWriter {
 
     /**

@@ -23,13 +23,23 @@ import java.io.PrintStream;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * @since 3.1.0
  */
 public class Slf4jStdoutLogger implements Logger {
     private static final String ERROR = "[ERROR] ";
 
-    private PrintStream out = System.out;
+    private final PrintStream out;
+
+    public Slf4jStdoutLogger() {
+        this(System.out);
+    }
+
+    public Slf4jStdoutLogger(PrintStream out) {
+        this.out = requireNonNull(out);
+    }
 
     //
     // These are the only methods we need in our primordial logger

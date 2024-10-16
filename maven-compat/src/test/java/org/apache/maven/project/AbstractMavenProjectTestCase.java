@@ -26,12 +26,22 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultLookup;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -42,11 +52,18 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  */
 @PlexusTest
+@Deprecated
 public abstract class AbstractMavenProjectTestCase {
     protected ProjectBuilder projectBuilder;
 
     @Inject
     protected RepositorySystem repositorySystem;
+
+    @Inject
+    protected org.eclipse.aether.RepositorySystem resolverRepositorySystem;
+
+    @Inject
+    protected MavenRepositorySystem mavenRepositorySystem;
 
     @Inject
     protected PlexusContainer container;
@@ -109,7 +126,7 @@ public abstract class AbstractMavenProjectTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository(getLocalRepository());
         configuration.setRemoteRepositories(Arrays.asList(new ArtifactRepository[] {}));
-        configuration.setProcessPlugins(false);
+        configuration.setProcessPlugins(true);
         configuration.setResolveDependencies(true);
         initRepoSession(configuration);
 
@@ -138,10 +155,23 @@ public abstract class AbstractMavenProjectTestCase {
         return projectBuilder.build(pom, configuration).getProject();
     }
 
-    protected void initRepoSession(ProjectBuildingRequest request) {
+    protected void initRepoSession(ProjectBuildingRequest request) throws Exception {
         File localRepo = new File(request.getLocalRepository().getBasedir());
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
         session.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
         request.setRepositorySession(session);
+
+        DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest(true);
+        MavenSession msession =
+                new MavenSession(getContainer(), session, mavenExecutionRequest, new DefaultMavenExecutionResult());
+        DefaultSession iSession = new DefaultSession(
+                msession, resolverRepositorySystem, null, mavenRepositorySystem, new DefaultLookup(container), null);
+        InternalSession.associate(session, iSession);
+
+        SessionScope sessionScope = container.lookup(SessionScope.class);
+        sessionScope.enter();
+        sessionScope.seed(MavenSession.class, msession);
+        sessionScope.seed(InternalMavenSession.class, iSession);
+        sessionScope.seed(Session.class, iSession);
     }
 }

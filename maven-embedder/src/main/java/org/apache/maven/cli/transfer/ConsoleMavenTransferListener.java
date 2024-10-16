@@ -19,9 +19,9 @@
 package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -31,19 +31,25 @@ import org.eclipse.aether.transfer.TransferResource;
 
 /**
  * Console download progress meter.
- *
+ * <p>
+ * This listener is not thread-safe and should be wrapped in the {@link SimplexTransferListener} in a multi-threaded scenario.
  */
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    private Map<TransferResource, Long> transfers = new LinkedHashMap<>();
-    private FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH); // use in a synchronized fashion
-    private StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
+    private final Map<TransferResourceIdentifier, TransferResourceAndSize> transfers = new LinkedHashMap<>();
+    private final FileSizeFormat format = new FileSizeFormat(); // use in a synchronized fashion
+    private final StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
 
-    private boolean printResourceNames;
+    private final boolean printResourceNames;
     private int lastLength;
 
     public ConsoleMavenTransferListener(
             MessageBuilderFactory messageBuilderFactory, PrintStream out, boolean printResourceNames) {
+        this(messageBuilderFactory, new PrintWriter(out), printResourceNames);
+    }
+
+    public ConsoleMavenTransferListener(
+            MessageBuilderFactory messageBuilderFactory, PrintWriter out, boolean printResourceNames) {
         super(messageBuilderFactory, out);
         this.printResourceNames = printResourceNames;
     }
@@ -65,18 +71,19 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     @Override
     public void transferProgressed(TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
-        transfers.put(resource, event.getTransferredBytes());
+        transfers.put(
+                new TransferResourceIdentifier(resource),
+                new TransferResourceAndSize(resource, event.getTransferredBytes()));
 
         buffer.append("Progress (").append(transfers.size()).append("): ");
 
-        Iterator<Map.Entry<TransferResource, Long>> entries =
-                transfers.entrySet().iterator();
+        Iterator<TransferResourceAndSize> entries = transfers.values().iterator();
         while (entries.hasNext()) {
-            Map.Entry<TransferResource, Long> entry = entries.next();
-            long total = entry.getKey().getContentLength();
-            Long complete = entry.getValue();
+            TransferResourceAndSize entry = entries.next();
+            long total = entry.resource.getContentLength();
+            Long complete = entry.transferredBytes;
 
-            String resourceName = entry.getKey().getResourceName();
+            String resourceName = entry.resource.getResourceName();
 
             if (printResourceNames) {
                 int idx = resourceName.lastIndexOf('/');
@@ -120,7 +127,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     @Override
     public void transferSucceeded(TransferEvent event) {
-        transfers.remove(event.getResource());
+        transfers.remove(new TransferResourceIdentifier(event.getResource()));
         overridePreviousTransfer(event);
 
         super.transferSucceeded(event);
@@ -128,7 +135,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     @Override
     public void transferFailed(TransferEvent event) {
-        transfers.remove(event.getResource());
+        transfers.remove(new TransferResourceIdentifier(event.getResource()));
         overridePreviousTransfer(event);
 
         super.transferFailed(event);
@@ -144,4 +151,6 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
             buffer.setLength(0);
         }
     }
+
+    private record TransferResourceAndSize(TransferResource resource, long transferredBytes) {}
 }

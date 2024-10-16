@@ -25,7 +25,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
@@ -53,7 +55,7 @@ public interface ProjectManager extends Service {
      * Returns an immutable collection of attached artifacts for given project.
      */
     @Nonnull
-    Collection<Artifact> getAttachedArtifacts(Project project);
+    Collection<ProducedArtifact> getAttachedArtifacts(Project project);
 
     /**
      * Returns project's all artifacts as immutable collection. The list contains all artifacts, even the attached ones,
@@ -67,40 +69,64 @@ public interface ProjectManager extends Service {
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
-    Collection<Artifact> getAllArtifacts(Project project);
+    Collection<ProducedArtifact> getAllArtifacts(Project project);
 
     default void attachArtifact(Session session, Project project, Path path) {
         String name = path.getFileName().toString();
         int dot = name.lastIndexOf('.');
         String ext = dot >= 1 ? name.substring(dot + 1) : "";
-        Artifact artifact =
-                session.createArtifact(project.getGroupId(), project.getArtifactId(), project.getVersion(), ext);
+        ProducedArtifact artifact = session.createProducedArtifact(
+                project.getGroupId(), project.getArtifactId(), project.getVersion(), ext);
         attachArtifact(project, artifact, path);
     }
 
     default void attachArtifact(Session session, Project project, String type, Path path) {
-        Artifact artifact = session.createArtifact(
+        ProducedArtifact artifact = session.createProducedArtifact(
                 project.getGroupId(), project.getArtifactId(), project.getVersion(), null, null, type);
         attachArtifact(project, artifact, path);
     }
 
-    void attachArtifact(Project project, Artifact artifact, Path path);
+    void attachArtifact(Project project, ProducedArtifact artifact, Path path);
 
-    List<String> getCompileSourceRoots(Project project);
+    /**
+     * Obtain an immutable list of compile source roots for the given project and scope.
+     * Paths are absolute.
+     *
+     * @param project the project
+     * @param scope the scope, i.e. usually main or test
+     * @return the list of compile source roots
+     */
+    @Nonnull
+    List<Path> getCompileSourceRoots(@Nonnull Project project, @Nonnull ProjectScope scope);
 
-    void addCompileSourceRoot(Project project, String sourceRoot);
+    /**
+     * Add a compilation source root to the given project for the given scope.
+     * The path will be transformed into an absolute path and added to the list for the given scope,
+     * if not already present.
+     *
+     * @param project the project
+     * @param scope the scope, i.e. usually main or test
+     * @param sourceRoot the new source root
+     */
+    void addCompileSourceRoot(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Path sourceRoot);
 
-    List<String> getTestCompileSourceRoots(Project project);
+    /**
+     * Get the list of resources for the given project and scope
+     *
+     * @param project the project
+     * @param scope the scope, i.e. usually main or test
+     * @return the list of resources
+     */
+    List<Resource> getResources(@Nonnull Project project, @Nonnull ProjectScope scope);
 
-    void addTestCompileSourceRoot(Project project, String sourceRoot);
-
-    List<Resource> getResources(Project project);
-
-    void addResource(Project project, Resource resource);
-
-    List<Resource> getTestResources(Project project);
-
-    void addTestResource(Project project, Resource resource);
+    /**
+     * Add a resource set to the given project for the given scope.
+     *
+     * @param project the project
+     * @param scope the scope, i.e. usually main or test
+     * @param resource the resource set to add
+     */
+    void addResource(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Resource resource);
 
     /**
      * Returns an immutable list of project remote repositories (directly specified or inherited).

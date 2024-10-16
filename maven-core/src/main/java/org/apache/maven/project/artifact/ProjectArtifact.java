@@ -62,30 +62,38 @@ public class ProjectArtifact extends DefaultArtifact implements ArtifactWithDepe
 
     // TODO: this is duplicate of PomArtifactHandlerProvider provided one
     static class PomArtifactHandler implements ArtifactHandler {
+        @Override
         public String getClassifier() {
             return null;
         }
 
+        @Override
         public String getDirectory() {
             return null;
         }
 
+        @Override
         public String getExtension() {
             return "pom";
         }
 
+        @Override
         public String getLanguage() {
             return "none";
         }
 
+        @Override
         public String getPackaging() {
             return "pom";
         }
 
+        @Override
+        @Deprecated
         public boolean isAddedToClasspath() {
             return false;
         }
 
+        @Override
         public boolean isIncludesDependencies() {
             return false;
         }

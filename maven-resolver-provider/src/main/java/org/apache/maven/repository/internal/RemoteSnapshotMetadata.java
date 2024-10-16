@@ -19,6 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,7 +37,10 @@ import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Maven remote GAV level metadata.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
     public static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
 
@@ -44,17 +48,27 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
 
     private final Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
-    RemoteSnapshotMetadata(Artifact artifact, Date timestamp) {
+    private final Integer buildNumber;
+
+    RemoteSnapshotMetadata(Artifact artifact, Date timestamp, Integer buildNumber) {
         super(createRepositoryMetadata(artifact), null, timestamp);
+        this.buildNumber = buildNumber;
     }
 
-    private RemoteSnapshotMetadata(Metadata metadata, File file, Date timestamp) {
-        super(metadata, file, timestamp);
+    private RemoteSnapshotMetadata(Metadata metadata, Path path, Date timestamp, Integer buildNumber) {
+        super(metadata, path, timestamp);
+        this.buildNumber = buildNumber;
+    }
+
+    @Deprecated
+    @Override
+    public MavenMetadata setFile(File file) {
+        return new RemoteSnapshotMetadata(metadata, file.toPath(), timestamp, buildNumber);
     }
 
     @Override
-    public MavenMetadata setFile(File file) {
-        return new RemoteSnapshotMetadata(metadata, file, timestamp);
+    public MavenMetadata setPath(Path path) {
+        return new RemoteSnapshotMetadata(metadata, path, timestamp, buildNumber);
     }
 
     public String getExpandedVersion(Artifact artifact) {
@@ -73,7 +87,7 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
             utcDateFormatter.setTimeZone(DEFAULT_SNAPSHOT_TIME_ZONE);
 
             snapshot = new Snapshot();
-            snapshot.setBuildNumber(getBuildNumber(recessive) + 1);
+            snapshot.setBuildNumber(buildNumber != null ? buildNumber : getBuildNumber(recessive) + 1);
             snapshot.setTimestamp(utcDateFormatter.format(timestamp));
 
             Versioning versioning = new Versioning();
@@ -117,6 +131,11 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
         }
 
         metadata.getVersioning().setSnapshotVersions(new ArrayList<>(versions.values()));
+
+        // just carry-on as-is
+        if (!recessive.getPlugins().isEmpty()) {
+            metadata.setPlugins(new ArrayList<>(recessive.getPlugins()));
+        }
     }
 
     private static int getBuildNumber(Metadata metadata) {

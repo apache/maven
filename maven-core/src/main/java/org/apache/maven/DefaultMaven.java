@@ -60,7 +60,7 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.graph.ProjectSelector;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
-import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
@@ -91,8 +91,6 @@ public class DefaultMaven implements Maven {
 
     private final Lookup lookup;
 
-    private final LifecycleStarter lifecycleStarter;
-
     private final ExecutionEventCatapult eventCatapult;
 
     private final LegacySupport legacySupport;
@@ -119,7 +117,6 @@ public class DefaultMaven implements Maven {
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultMaven(
             Lookup lookup,
-            LifecycleStarter lifecycleStarter,
             ExecutionEventCatapult eventCatapult,
             LegacySupport legacySupport,
             SessionScope sessionScope,
@@ -131,7 +128,6 @@ public class DefaultMaven implements Maven {
             DefaultSessionFactory defaultSessionFactory,
             @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader) {
         this.lookup = lookup;
-        this.lifecycleStarter = lifecycleStarter;
         this.eventCatapult = eventCatapult;
         this.legacySupport = legacySupport;
         this.sessionScope = sessionScope;
@@ -218,11 +214,11 @@ public class DefaultMaven implements Maven {
                 new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
         try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
             MavenSession session = new MavenSession(closeableSession, request, result);
-            session.setSession(defaultSessionFactory.getSession(session));
+            session.setSession(defaultSessionFactory.newSession(session));
 
             sessionScope.seed(MavenSession.class, session);
             sessionScope.seed(Session.class, session.getSession());
-            sessionScope.seed(InternalSession.class, InternalSession.from(session.getSession()));
+            sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
 
             legacySupport.setSession(session);
 
@@ -308,6 +304,9 @@ public class DefaultMaven implements Maven {
             }
 
             validateOptionalProfiles(session, request.getProfileActivation());
+
+            LifecycleStarter lifecycleStarter = lookup.lookupOptional(LifecycleStarter.class, request.getBuilderId())
+                    .orElseGet(() -> lookup.lookup(LifecycleStarter.class));
 
             lifecycleStarter.execute(session);
 

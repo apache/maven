@@ -61,6 +61,7 @@ import org.eclipse.sisu.Priority;
 @Named
 @Singleton
 @Priority(10)
+@Deprecated
 public class TestRepositorySystem implements RepositorySystem {
 
     private final ModelReader modelReader;
@@ -77,6 +78,7 @@ public class TestRepositorySystem implements RepositorySystem {
         this.artifactFactory = artifactFactory;
     }
 
+    @Override
     public ArtifactRepository buildArtifactRepository(Repository repository) throws InvalidRepositoryException {
         return new MavenArtifactRepository(
                 repository.getId(),
@@ -86,14 +88,17 @@ public class TestRepositorySystem implements RepositorySystem {
                 new ArtifactRepositoryPolicy());
     }
 
+    @Override
     public Artifact createArtifact(String groupId, String artifactId, String version, String packaging) {
         return createArtifact(groupId, artifactId, version, null, packaging);
     }
 
+    @Override
     public Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type) {
         return new DefaultArtifact(groupId, artifactId, version, scope, type, null, new TestArtifactHandler(type));
     }
 
+    @Override
     public ArtifactRepository createArtifactRepository(
             String id,
             String url,
@@ -103,16 +108,19 @@ public class TestRepositorySystem implements RepositorySystem {
         return new MavenArtifactRepository(id, url, repositoryLayout, snapshots, releases);
     }
 
+    @Override
     public Artifact createArtifactWithClassifier(
             String groupId, String artifactId, String version, String type, String classifier) {
         return new DefaultArtifact(groupId, artifactId, version, null, type, classifier, new TestArtifactHandler(type));
     }
 
+    @Override
     public ArtifactRepository createDefaultLocalRepository() throws InvalidRepositoryException {
         return createLocalRepository(
                 new File(System.getProperty("basedir", "."), "target/local-repo").getAbsoluteFile());
     }
 
+    @Override
     public ArtifactRepository createDefaultRemoteRepository() throws InvalidRepositoryException {
         return new MavenArtifactRepository(
                 DEFAULT_REMOTE_REPO_ID,
@@ -126,6 +134,7 @@ public class TestRepositorySystem implements RepositorySystem {
                 new ArtifactRepositoryPolicy());
     }
 
+    @Override
     public Artifact createDependencyArtifact(Dependency dependency) {
         Artifact artifact = new DefaultArtifact(
                 dependency.getGroupId(),
@@ -144,6 +153,7 @@ public class TestRepositorySystem implements RepositorySystem {
         return artifact;
     }
 
+    @Override
     public ArtifactRepository createLocalRepository(File localRepository) throws InvalidRepositoryException {
         return new MavenArtifactRepository(
                 MavenRepositorySystem.DEFAULT_LOCAL_REPO_ID,
@@ -153,6 +163,7 @@ public class TestRepositorySystem implements RepositorySystem {
                 new ArtifactRepositoryPolicy());
     }
 
+    @Override
     public Artifact createPluginArtifact(Plugin plugin) {
         VersionRange versionRange;
         try {
@@ -168,24 +179,31 @@ public class TestRepositorySystem implements RepositorySystem {
         return artifactFactory.createPluginArtifact(plugin.getGroupId(), plugin.getArtifactId(), versionRange);
     }
 
+    @Override
     public Artifact createProjectArtifact(String groupId, String artifactId, String version) {
         return createArtifact(groupId, artifactId, version, "pom");
     }
 
+    @Override
     public List<ArtifactRepository> getEffectiveRepositories(List<ArtifactRepository> repositories) {
         return repositories;
     }
 
+    @Override
     public Mirror getMirror(ArtifactRepository repository, List<Mirror> mirrors) {
         return null;
     }
 
+    @Override
     public void injectAuthentication(List<ArtifactRepository> repositories, List<Server> servers) {}
 
+    @Override
     public void injectMirror(List<ArtifactRepository> repositories, List<Mirror> mirrors) {}
 
+    @Override
     public void injectProxy(List<ArtifactRepository> repositories, List<Proxy> proxies) {}
 
+    @Override
     public void publish(
             ArtifactRepository repository, File source, String remotePath, ArtifactTransferListener transferListener)
             throws ArtifactTransferFailedException {
@@ -193,6 +211,7 @@ public class TestRepositorySystem implements RepositorySystem {
 
     }
 
+    @Override
     public ArtifactResolutionResult resolve(ArtifactResolutionRequest request) {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
 
@@ -282,6 +301,7 @@ public class TestRepositorySystem implements RepositorySystem {
         artifact.setResolved(true);
     }
 
+    @Override
     public void retrieve(
             ArtifactRepository repository,
             File destination,
@@ -292,9 +312,12 @@ public class TestRepositorySystem implements RepositorySystem {
 
     }
 
+    @Override
     public void injectMirror(RepositorySystemSession session, List<ArtifactRepository> repositories) {}
 
+    @Override
     public void injectProxy(RepositorySystemSession session, List<ArtifactRepository> repositories) {}
 
+    @Override
     public void injectAuthentication(RepositorySystemSession session, List<ArtifactRepository> repositories) {}
 }

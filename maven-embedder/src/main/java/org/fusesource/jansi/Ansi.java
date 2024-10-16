@@ -28,7 +28,7 @@ import java.util.ArrayList;
  * with maven-shared-utils, while Maven has migrated to JLine (into which Jansi has been merged
  * since JLine 3.25.0).
  */
-@SuppressWarnings({"checkstyle:MagicNumber", "unused"})
+@SuppressWarnings("unused")
 public class Ansi implements Appendable {
 
     private static final char FIRST_ESC_CHAR = 27;
@@ -160,7 +160,11 @@ public class Ansi implements Appendable {
     }
 
     public static boolean isEnabled() {
-        return org.apache.maven.cli.jline.MessageUtils.isColorEnabled() && org.jline.jansi.Ansi.isEnabled();
+        return org.apache.maven.jline.MessageUtils.isColorEnabled() && org.jline.jansi.Ansi.isEnabled();
+    }
+
+    public static void setEnabled(final boolean flag) {
+        org.jline.jansi.Ansi.setEnabled(flag);
     }
 
     public static Ansi ansi() {
@@ -821,7 +825,7 @@ public class Ansi implements Appendable {
 
     public Ansi newline() {
         flushAttributes();
-        builder.append(System.getProperty("line.separator"));
+        builder.append(System.lineSeparator());
         return this;
     }
 

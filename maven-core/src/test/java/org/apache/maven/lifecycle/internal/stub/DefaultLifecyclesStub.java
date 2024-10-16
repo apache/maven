@@ -24,13 +24,28 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.*;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.CLEAN;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.COMPILE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.INITIALIZE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.INSTALL;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PACKAGE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.POST_CLEAN;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.POST_SITE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PRE_CLEAN;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PRE_SITE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PROCESS_RESOURCES;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.PROCESS_TEST_RESOURCES;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.SITE;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.SITE_DEPLOY;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.TEST;
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.VALIDATE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,10 +72,8 @@ public class DefaultLifecyclesStub {
         List<String> stubSiteCycle =
                 Arrays.asList(PRE_SITE.getPhase(), SITE.getPhase(), POST_SITE.getPhase(), SITE_DEPLOY.getPhase());
 
-        List<String> stubWrapperCycle = Arrays.asList(WRAPPER.getPhase());
-
-        Iterator<List<String>> lcs = Arrays.asList(stubDefaultCycle, stubCleanCycle, stubSiteCycle, stubWrapperCycle)
-                .iterator();
+        Iterator<List<String>> lcs =
+                Arrays.asList(stubDefaultCycle, stubCleanCycle, stubSiteCycle).iterator();
 
         Map<String, Lifecycle> lifeCycles = new HashMap<>();
         for (String s : DefaultLifecycles.STANDARD_LIFECYCLES) {
@@ -71,6 +84,7 @@ public class DefaultLifecyclesStub {
         PlexusContainer mockedContainer = mock(PlexusContainer.class);
         when(mockedContainer.lookupMap(Lifecycle.class)).thenReturn(lifeCycles);
 
-        return new DefaultLifecycles(new DefaultLookup(mockedContainer));
+        DefaultLifecycleRegistry reg = new DefaultLifecycleRegistry();
+        return new DefaultLifecycles(reg, new DefaultLookup(mockedContainer));
     }
 }

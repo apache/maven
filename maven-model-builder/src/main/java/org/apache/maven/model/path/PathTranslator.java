@@ -19,11 +19,14 @@
 package org.apache.maven.model.path;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Resolves relative paths against a specific base directory.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface PathTranslator {
 
     /**
@@ -34,6 +37,20 @@ public interface PathTranslator {
      * @param path The path to resolve, may be {@code null}.
      * @param basedir The base directory to resolve relative paths against, may be {@code null}.
      * @return The resolved path or {@code null} if the input path was {@code null}.
+     * @deprecated Use {@link #alignToBaseDirectory(String, Path)} instead.
      */
+    @Deprecated
     String alignToBaseDirectory(String path, File basedir);
+
+    /**
+     * Resolves the specified path against the given base directory. The resolved path will be absolute and uses the
+     * platform-specific file separator if a base directory is given. Otherwise, the input path will be returned
+     * unaltered.
+     *
+     * @param path The path to resolve, may be {@code null}.
+     * @param basedir The base directory to resolve relative paths against, may be {@code null}.
+     * @return The resolved path or {@code null} if the input path was {@code null}.
+     * @since 4.0.0
+     */
+    String alignToBaseDirectory(String path, Path basedir);
 }

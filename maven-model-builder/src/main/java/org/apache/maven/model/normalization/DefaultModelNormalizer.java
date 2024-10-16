@@ -39,9 +39,11 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles normalization of a model.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultModelNormalizer implements ModelNormalizer {
 
     private DuplicateMerger merger = new DuplicateMerger();

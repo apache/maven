@@ -20,15 +20,17 @@ package org.apache.maven.cli;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.DeprecatedAttributes;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.cli.jline.MessageUtils;
+import org.apache.maven.jline.MessageUtils;
 
 /**
  */
@@ -79,11 +81,17 @@ public class CLIManager {
 
     public static final String ALTERNATE_PROJECT_SETTINGS = "ps";
 
+    @Deprecated
     public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
+
+    public static final String ALTERNATE_INSTALLATION_SETTINGS = "is";
 
     public static final char ALTERNATE_USER_TOOLCHAINS = 't';
 
+    @Deprecated
     public static final String ALTERNATE_GLOBAL_TOOLCHAINS = "gt";
+
+    public static final String ALTERNATE_INSTALLATION_TOOLCHAINS = "it";
 
     public static final String FAIL_FAST = "ff";
 
@@ -124,13 +132,14 @@ public class CLIManager {
     public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
     /** This option is deprecated and may be repurposed as Java debug in a future version.
-     * Use {@code -X/--verbose} instead. */
+     * Use {@code -X,--verbose} instead. */
     @Deprecated
     public static final String DEBUG = "debug";
 
     protected Options options;
+    protected final Set<Option> usedDeprecatedOptions = new LinkedHashSet<>();
 
-    @SuppressWarnings("checkstyle:linelength")
+    @SuppressWarnings("checkstyle:MethodLength")
     public CLIManager() {
         options = new Options();
         options.addOption(Option.builder(Character.toString(HELP))
@@ -217,9 +226,9 @@ public class CLIManager {
                 .desc("Alternate path for the project settings file")
                 .hasArg()
                 .build());
-        options.addOption(Option.builder(ALTERNATE_GLOBAL_SETTINGS)
-                .longOpt("global-settings")
-                .desc("Alternate path for the global settings file")
+        options.addOption(Option.builder(ALTERNATE_INSTALLATION_SETTINGS)
+                .longOpt("install-settings")
+                .desc("Alternate path for the installation settings file")
                 .hasArg()
                 .build());
         options.addOption(Option.builder(Character.toString(ALTERNATE_USER_TOOLCHAINS))
@@ -227,9 +236,9 @@ public class CLIManager {
                 .desc("Alternate path for the user toolchains file")
                 .hasArg()
                 .build());
-        options.addOption(Option.builder(ALTERNATE_GLOBAL_TOOLCHAINS)
-                .longOpt("global-toolchains")
-                .desc("Alternate path for the global toolchains file")
+        options.addOption(Option.builder(ALTERNATE_INSTALLATION_TOOLCHAINS)
+                .longOpt("install-toolchains")
+                .desc("Alternate path for the installation toolchains file")
                 .hasArg()
                 .build());
         options.addOption(Option.builder(FAIL_ON_SEVERITY)
@@ -333,13 +342,42 @@ public class CLIManager {
         // Adding this back to make Maven fail if used
         options.addOption(Option.builder("llr")
                 .longOpt("legacy-local-repository")
-                .desc("UNSUPPORTED: Use of this option will make Maven invocation fail.")
+                .desc("<deprecated> Use Maven 2 Legacy Local Repository behaviour.")
+                .deprecated(DeprecatedAttributes.builder()
+                        .setSince("3.9.1")
+                        .setDescription("UNSUPPORTED: Use of this option will make Maven invocation fail.")
+                        .get())
                 .build());
 
         // Deprecated
         options.addOption(Option.builder()
                 .longOpt(DEBUG)
-                .desc("Produce execution verbose output (deprecated; only kept for backward compatibility)")
+                .desc("<deprecated> Produce execution verbose output.")
+                .deprecated(DeprecatedAttributes.builder()
+                        .setForRemoval(true)
+                        .setSince("4.0.0")
+                        .setDescription("Use -X,--verbose instead.")
+                        .get())
+                .build());
+        options.addOption(Option.builder(ALTERNATE_GLOBAL_SETTINGS)
+                .longOpt("global-settings")
+                .desc("<deprecated> Alternate path for the global settings file.")
+                .hasArg()
+                .deprecated(DeprecatedAttributes.builder()
+                        .setForRemoval(true)
+                        .setSince("4.0.0")
+                        .setDescription("Use -is,--install-settings instead.")
+                        .get())
+                .build());
+        options.addOption(Option.builder(ALTERNATE_GLOBAL_TOOLCHAINS)
+                .longOpt("global-toolchains")
+                .desc("<deprecated> Alternate path for the global toolchains file.")
+                .hasArg()
+                .deprecated(DeprecatedAttributes.builder()
+                        .setForRemoval(true)
+                        .setSince("4.0.0")
+                        .setDescription("Use -it,--install-toolchains instead.")
+                        .get())
                 .build());
     }
 
@@ -347,22 +385,33 @@ public class CLIManager {
         // We need to eat any quotes surrounding arguments...
         String[] cleanArgs = CleanArgument.cleanArgs(args);
 
-        CommandLineParser parser = new DefaultParser();
+        DefaultParser parser = DefaultParser.builder()
+                .setDeprecatedHandler(usedDeprecatedOptions::add)
+                .build();
 
-        return parser.parse(options, cleanArgs);
+        CommandLine commandLine = parser.parse(options, cleanArgs);
+        // to trigger deprecation handler, so we can report deprecation BEFORE we actually use options
+        options.getOptions().forEach(commandLine::hasOption);
+        return commandLine;
+    }
+
+    public Set<Option> getUsedDeprecatedOptions() {
+        return usedDeprecatedOptions;
     }
 
     public void displayHelp(PrintStream stdout) {
-        stdout.println();
+        displayHelp(new PrintWriter(stdout));
+    }
 
-        PrintWriter pw = new PrintWriter(stdout);
-
+    public void displayHelp(PrintWriter pw) {
         HelpFormatter formatter = new HelpFormatter();
 
         int width = MessageUtils.getTerminalWidth();
         if (width <= 0) {
             width = HelpFormatter.DEFAULT_WIDTH;
         }
+
+        pw.println();
 
         formatter.printHelp(
                 pw,

@@ -65,6 +65,34 @@ class ConsumerPomArtifactTransformerTest {
 
             t.transform(project, systemSessionMock, beforePomFile, tempFile);
         }
+        XmlAssert.assertThat(tempFile.toFile()).and(afterPomFile.toFile()).areIdentical();
+    }
+
+    @Test
+    void transformJarConsumerPom() throws Exception {
+        RepositorySystemSession systemSessionMock = Mockito.mock(RepositorySystemSession.class);
+        SessionData sessionDataMock = Mockito.mock(SessionData.class);
+        when(systemSessionMock.getData()).thenReturn(sessionDataMock);
+        when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
+
+        Path beforePomFile = Paths.get("src/test/resources/projects/transform/jar/before.pom")
+                .toAbsolutePath();
+        Path afterPomFile =
+                Paths.get("src/test/resources/projects/transform/jar/after.pom").toAbsolutePath();
+        Path tempFile = Files.createTempFile("", ".pom");
+        Files.delete(tempFile);
+        try (InputStream expected = Files.newInputStream(beforePomFile)) {
+            Model model = new Model(new MavenStaxReader().read(expected));
+            MavenProject project = new MavenProject(model);
+            project.setOriginalModel(model);
+            DefaultConsumerPomArtifactTransformer t = new DefaultConsumerPomArtifactTransformer((s, p, f) -> {
+                try (InputStream is = Files.newInputStream(f)) {
+                    return DefaultConsumerPomBuilder.transform(new MavenStaxReader().read(is), project);
+                }
+            });
+
+            t.transform(project, systemSessionMock, beforePomFile, tempFile);
+        }
         XmlAssert.assertThat(afterPomFile.toFile()).and(tempFile.toFile()).areIdentical();
     }
 

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -27,6 +29,14 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 public class LookupException extends MavenException {
+
+    @Serial
+    private static final long serialVersionUID = -6259322450070320286L;
+
+    public LookupException(String message) {
+        super(message);
+    }
+
     /**
      * @param message the message to give
      * @param e the {@link Exception}

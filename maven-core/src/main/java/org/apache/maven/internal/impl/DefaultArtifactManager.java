@@ -21,7 +21,6 @@ package org.apache.maven.internal.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
@@ -30,11 +29,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Typed
@@ -42,19 +44,19 @@ import org.eclipse.sisu.Typed;
 public class DefaultArtifactManager implements ArtifactManager {
 
     @Nonnull
-    private final InternalSession session;
+    private final InternalMavenSession session;
 
     private final Map<String, Path> paths = new ConcurrentHashMap<>();
 
     @Inject
-    public DefaultArtifactManager(@Nonnull InternalSession session) {
+    public DefaultArtifactManager(@Nonnull InternalMavenSession session) {
         this.session = session;
     }
 
     @Nonnull
     @Override
     public Optional<Path> getPath(@Nonnull Artifact artifact) {
-        String id = id(artifact);
+        String id = id(nonNull(artifact, "artifact"));
         if (session.getMavenSession().getAllProjects() != null) {
             for (MavenProject project : session.getMavenSession().getAllProjects()) {
                 if (id.equals(id(project.getArtifact()))
@@ -65,17 +67,14 @@ public class DefaultArtifactManager implements ArtifactManager {
         }
         Path path = paths.get(id);
         if (path == null && artifact instanceof DefaultArtifact) {
-            File file = ((DefaultArtifact) artifact).getArtifact().getFile();
-            if (file != null) {
-                path = file.toPath();
-            }
+            path = ((DefaultArtifact) artifact).getArtifact().getPath();
         }
         return Optional.ofNullable(path);
     }
 
     @Override
-    public void setPath(@Nonnull Artifact artifact, Path path) {
-        String id = id(artifact);
+    public void setPath(@Nonnull ProducedArtifact artifact, Path path) {
+        String id = id(nonNull(artifact, "artifact"));
         if (session.getMavenSession().getAllProjects() != null) {
             session.getMavenSession().getAllProjects().stream()
                     .flatMap(this::getProjectArtifacts)

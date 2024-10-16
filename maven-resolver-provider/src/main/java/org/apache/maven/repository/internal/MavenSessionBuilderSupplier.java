@@ -18,32 +18,37 @@
  */
 package org.apache.maven.repository.internal;
 
+import java.util.Arrays;
 import java.util.function.Supplier;
 
-import org.apache.maven.repository.internal.scopes.MavenDependencyContextRefiner;
-import org.apache.maven.repository.internal.scopes.MavenScopeDeriver;
-import org.apache.maven.repository.internal.scopes.MavenScopeSelector;
+import org.apache.maven.api.DependencyScope;
+import org.apache.maven.repository.internal.artifact.FatArtifactTraverser;
+import org.apache.maven.repository.internal.scopes.Maven4ScopeManagerConfiguration;
+import org.apache.maven.repository.internal.type.DefaultTypeProvider;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
-import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
+import org.eclipse.aether.impl.scope.InternalScopeManager;
+import org.eclipse.aether.internal.impl.scope.ManagedDependencyContextRefiner;
+import org.eclipse.aether.internal.impl.scope.ManagedScopeDeriver;
+import org.eclipse.aether.internal.impl.scope.ManagedScopeSelector;
+import org.eclipse.aether.internal.impl.scope.OptionalDependencySelector;
+import org.eclipse.aether.internal.impl.scope.ScopeDependencySelector;
+import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
 import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
-import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
-import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
-import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 import static java.util.Objects.requireNonNull;
@@ -56,12 +61,29 @@ import static java.util.Objects.requireNonNull;
  * Extend this class and override methods to customize, if needed.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     protected final RepositorySystem repositorySystem;
+    protected final InternalScopeManager scopeManager;
 
     public MavenSessionBuilderSupplier(RepositorySystem repositorySystem) {
         this.repositorySystem = requireNonNull(repositorySystem);
+        this.scopeManager = new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE);
+    }
+
+    /**
+     * Package protected constructor, only for use with {@link MavenRepositorySystemUtils}.
+     */
+    @Deprecated
+    MavenSessionBuilderSupplier() {
+        this.repositorySystem = null;
+        this.scopeManager = new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE);
+    }
+
+    protected InternalScopeManager getScopeManager() {
+        return scopeManager;
     }
 
     protected DependencyTraverser getDependencyTraverser() {
@@ -69,38 +91,41 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     }
 
     protected DependencyManager getDependencyManager() {
-        return new ClassicDependencyManager(true); // same default as in Maven4
+        return getDependencyManager(true); // same default as in Maven4
+    }
+
+    public DependencyManager getDependencyManager(boolean transitive) {
+        return new ClassicDependencyManager(transitive, getScopeManager());
     }
 
     protected DependencySelector getDependencySelector() {
         return new AndDependencySelector(
-                new ScopeDependencySelector("test", "provided"),
-                new OptionalDependencySelector(),
+                ScopeDependencySelector.legacy(
+                        null, Arrays.asList(DependencyScope.TEST.id(), DependencyScope.PROVIDED.id())),
+                OptionalDependencySelector.fromDirect(),
                 new ExclusionDependencySelector());
     }
 
     protected DependencyGraphTransformer getDependencyGraphTransformer() {
         return new ChainedDependencyGraphTransformer(
                 new ConflictResolver(
-                        new NearestVersionSelector(), new MavenScopeSelector(),
-                        new SimpleOptionalitySelector(), new MavenScopeDeriver()),
-                new MavenDependencyContextRefiner());
+                        new NearestVersionSelector(), new ManagedScopeSelector(getScopeManager()),
+                        new SimpleOptionalitySelector(), new ManagedScopeDeriver(getScopeManager())),
+                new ManagedDependencyContextRefiner(getScopeManager()));
     }
 
+    /**
+     * This method produces "surrogate" type registry that is static: it aims users that want to use
+     * Maven-Resolver without involving Maven Core and related things.
+     * <p>
+     * This type registry is NOT used by Maven Core: Maven replaces it during Session creation with a type registry
+     * that supports extending it (i.e. via Maven Extensions).
+     * <p>
+     * Important: this "static" list of types should be in-sync with core provided types.
+     */
     protected ArtifactTypeRegistry getArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        stereotypes.add(new DefaultArtifactType("pom"));
-        stereotypes.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("jar", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb", "jar", "", "java"));
-        stereotypes.add(new DefaultArtifactType("ejb-client", "jar", "client", "java"));
-        stereotypes.add(new DefaultArtifactType("test-jar", "jar", "tests", "java"));
-        stereotypes.add(new DefaultArtifactType("javadoc", "jar", "javadoc", "java"));
-        stereotypes.add(new DefaultArtifactType("java-source", "jar", "sources", "java", false, false));
-        stereotypes.add(new DefaultArtifactType("war", "war", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("ear", "ear", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("rar", "rar", "", "java", false, true));
-        stereotypes.add(new DefaultArtifactType("par", "par", "", "java", false, true));
+        new DefaultTypeProvider().types().forEach(stereotypes::add);
         return stereotypes;
     }
 
@@ -115,6 +140,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
         session.setDependencyGraphTransformer(getDependencyGraphTransformer());
         session.setArtifactTypeRegistry(getArtifactTypeRegistry());
         session.setArtifactDescriptorPolicy(getArtifactDescriptorPolicy());
+        session.setScopeManager(getScopeManager());
     }
 
     /**
@@ -129,6 +155,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
      */
     @Override
     public SessionBuilder get() {
+        requireNonNull(repositorySystem, "repositorySystem");
         SessionBuilder builder = repositorySystem.createSessionBuilder();
         configureSessionBuilder(builder);
         return builder;

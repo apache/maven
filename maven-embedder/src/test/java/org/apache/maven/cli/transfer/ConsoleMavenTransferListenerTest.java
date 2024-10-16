@@ -19,14 +19,14 @@
 package org.apache.maven.cli.transfer;
 
 import java.io.File;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.maven.cli.jline.JLineMessageBuilderFactory;
+import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -51,7 +51,7 @@ class ConsoleMavenTransferListenerTest {
 
         TransferListener listener = new SimplexTransferListener(new ConsoleMavenTransferListener(
                 new JLineMessageBuilderFactory(),
-                new PrintStream(System.out) {
+                new PrintWriter(System.out) {
 
                     @Override
                     public void print(Object o) {

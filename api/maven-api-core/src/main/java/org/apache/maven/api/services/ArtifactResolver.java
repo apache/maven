@@ -19,14 +19,16 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
+import java.util.List;
 
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Resolves the artifact, i.e download the file when required and attach it to the artifact
+ * Resolves the artifact, i.e. download the file when required and attach it to the artifact
  *
  * @since 4.0.0
  */
@@ -43,14 +45,34 @@ public interface ArtifactResolver extends Service {
     ArtifactResolverResult resolve(ArtifactResolverRequest request);
 
     /**
+     * Resolves several artifacts from their coordinates.
+     *
      * @param session {@link Session}
-     * @param coordinates array of {@link ArtifactCoordinate}
+     * @param coordinates array of {@link ArtifactCoordinates}
      * @return {@link ArtifactResolverResult}
      * @throws ArtifactResolverException in case of an error.
      * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
-     *             parameter {@code coordinate} is {@code null} or invalid
+     *             parameter {@code coordinates} is {@code null} or invalid
      */
-    default ArtifactResolverResult resolve(Session session, Collection<? extends ArtifactCoordinate> coordinates) {
+    default ArtifactResolverResult resolve(Session session, Collection<? extends ArtifactCoordinates> coordinates) {
         return resolve(ArtifactResolverRequest.build(session, coordinates));
+    }
+
+    /**
+     * Resolves several artifacts from their coordinates.
+     *
+     * @param session {@link Session}
+     * @param repositories the list of remote repositories or {@code null} to use the session repositories
+     * @param coordinates array of {@link ArtifactCoordinates}
+     * @return {@link ArtifactResolverResult}
+     * @throws ArtifactResolverException in case of an error.
+     * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
+     *             parameter {@code coordinates} is {@code null} or invalid
+     */
+    default ArtifactResolverResult resolve(
+            Session session,
+            Collection<? extends ArtifactCoordinates> coordinates,
+            List<RemoteRepository> repositories) {
+        return resolve(ArtifactResolverRequest.build(session, coordinates, repositories));
     }
 }

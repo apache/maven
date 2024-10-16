@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cli.transfer;
 
-import java.util.Locale;
-
 import org.apache.maven.api.services.MessageBuilder;
 
 /**
@@ -101,8 +99,6 @@ public class FileSizeFormat {
         }
     }
 
-    public FileSizeFormat(Locale locale) {}
-
     public String format(long size) {
         return format(size, null);
     }
@@ -125,7 +121,6 @@ public class FileSizeFormat {
         format(builder, size, unit, false);
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     private void format(StringBuilder builder, long size, ScaleUnit unit, boolean omitSymbol) {
         if (size < 0L) {
             throw new IllegalArgumentException("file size cannot be negative: " + size);
@@ -157,7 +152,6 @@ public class FileSizeFormat {
         format(builder, size, unit, false);
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     private void format(MessageBuilder builder, long size, ScaleUnit unit, boolean omitSymbol) {
         if (size < 0L) {
             throw new IllegalArgumentException("file size cannot be negative: " + size);

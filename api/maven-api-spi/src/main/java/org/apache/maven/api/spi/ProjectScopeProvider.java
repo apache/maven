@@ -19,5 +19,14 @@
 package org.apache.maven.api.spi;
 
 import org.apache.maven.api.ProjectScope;
+import org.apache.maven.api.annotations.Consumer;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.di.Named;
 
+/**
+ * @since 4.0.0
+ */
+@Experimental
+@Consumer
+@Named
 public interface ProjectScopeProvider extends ExtensibleEnumProvider<ProjectScope> {}

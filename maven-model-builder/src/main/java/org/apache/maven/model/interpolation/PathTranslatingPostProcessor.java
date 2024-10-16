@@ -18,7 +18,7 @@
  */
 package org.apache.maven.model.interpolation;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,18 +28,20 @@ import org.codehaus.plexus.interpolation.util.ValueSourceUtils;
 
 /**
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class PathTranslatingPostProcessor implements InterpolationPostProcessor {
 
     private final Collection<String> unprefixedPathKeys;
-    private final File projectDir;
+    private final Path projectDir;
     private final PathTranslator pathTranslator;
     private final List<String> expressionPrefixes;
 
     PathTranslatingPostProcessor(
             List<String> expressionPrefixes,
             Collection<String> unprefixedPathKeys,
-            File projectDir,
+            Path projectDir,
             PathTranslator pathTranslator) {
         this.expressionPrefixes = expressionPrefixes;
         this.unprefixedPathKeys = unprefixedPathKeys;

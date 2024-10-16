@@ -19,16 +19,12 @@
 package org.apache.maven.execution.scope.internal;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.LinkedList;
-import java.util.Map;
 
 import com.google.inject.Key;
-import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
-import com.google.inject.util.Providers;
+import com.google.inject.name.Named;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.WeakMojoExecutionListener;
@@ -37,85 +33,22 @@ import org.apache.maven.plugin.MojoExecutionException;
 /**
  * MojoExecutionScope
  */
-public class MojoExecutionScope implements Scope, MojoExecutionListener {
-    private static final Provider<Object> SEEDED_KEY_PROVIDER = () -> {
-        throw new IllegalStateException();
-    };
-
-    private static final class ScopeState {
-        private final Map<Key<?>, Provider<?>> seeded = new HashMap<>();
-
-        private final Map<Key<?>, Object> provided = new HashMap<>();
-    }
-
-    private final ThreadLocal<LinkedList<ScopeState>> values = new ThreadLocal<>();
-
-    public MojoExecutionScope() {}
-
-    public void enter() {
-        LinkedList<ScopeState> stack = values.get();
-        if (stack == null) {
-            stack = new LinkedList<>();
-            values.set(stack);
-        }
-        stack.addFirst(new ScopeState());
-    }
-
-    private ScopeState getScopeState() {
-        LinkedList<ScopeState> stack = values.get();
-        if (stack == null || stack.isEmpty()) {
-            throw new IllegalStateException();
-        }
-        return stack.getFirst();
-    }
-
-    public void exit() throws MojoExecutionException {
-        final LinkedList<ScopeState> stack = values.get();
-        if (stack == null || stack.isEmpty()) {
-            throw new IllegalStateException();
-        }
-        stack.removeFirst();
-        if (stack.isEmpty()) {
-            values.remove();
-        }
-    }
+public class MojoExecutionScope extends org.apache.maven.internal.impl.di.MojoExecutionScope
+        implements Scope, MojoExecutionListener {
 
     public <T> void seed(Class<T> clazz, Provider<T> value) {
-        getScopeState().seeded.put(Key.get(clazz), value);
+        getScopeState().seed(clazz, value::get);
     }
 
-    public <T> void seed(Class<T> clazz, final T value) {
-        getScopeState().seeded.put(Key.get(clazz), Providers.of(value));
+    public <T> Provider<T> scope(final Key<T> key, Provider<T> unscoped) {
+        Object qualifier = key.getAnnotation() instanceof Named n ? n.value() : key.getAnnotation();
+        org.apache.maven.di.Key<T> k =
+                org.apache.maven.di.Key.ofType(key.getTypeLiteral().getType(), qualifier);
+        return scope(k, unscoped::get)::get;
     }
 
-    public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
-        return () -> {
-            LinkedList<ScopeState> stack = values.get();
-            if (stack == null || stack.isEmpty()) {
-                throw new OutOfScopeException("Cannot access " + key + " outside of a scoping block");
-            }
-
-            ScopeState state = stack.getFirst();
-
-            Provider<?> seeded = state.seeded.get(key);
-
-            if (seeded != null) {
-                return (T) seeded.get();
-            }
-
-            T provided = (T) state.provided.get(key);
-            if (provided == null && unscoped != null) {
-                provided = unscoped.get();
-                state.provided.put(key, provided);
-            }
-
-            return provided;
-        };
-    }
-
-    @SuppressWarnings({"unchecked"})
-    public static <T> Provider<T> seededKeyProvider() {
-        return (Provider<T>) SEEDED_KEY_PROVIDER;
+    public static <T> Provider<T> seededKeyProvider(Class<? extends T> clazz) {
+        return MojoExecutionScope.<T>seededKeySupplier(clazz)::get;
     }
 
     public void beforeMojoExecution(MojoExecutionEvent event) throws MojoExecutionException {
@@ -140,7 +73,7 @@ public class MojoExecutionScope implements Scope, MojoExecutionListener {
         // the same instance can be provided multiple times under different Key's
         // deduplicate instances to avoid redundant beforeXXX/afterXXX callbacks
         IdentityHashMap<WeakMojoExecutionListener, Object> listeners = new IdentityHashMap<>();
-        for (Object provided : getScopeState().provided.values()) {
+        for (Object provided : getScopeState().provided()) {
             if (provided instanceof WeakMojoExecutionListener) {
                 listeners.put((WeakMojoExecutionListener) provided, null);
             }

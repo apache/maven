@@ -42,7 +42,10 @@ import org.codehaus.plexus.interpolation.AbstractValueSource;
  * supplied object is the root. Expressions like 'child.name' will translate into
  * 'rootObject.getChild().getName()' for non-boolean properties, and
  * 'rootObject.getChild().isName()' for boolean properties.
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class ObjectBasedValueSource extends AbstractValueSource {
 
     private final Object root;

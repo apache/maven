@@ -18,12 +18,12 @@
  */
 package org.apache.maven.internal.xml;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import java.io.IOException;
 import java.io.StringReader;
 
-import com.ctc.wstx.stax.WstxInputFactory;
 import org.apache.maven.api.xml.XmlNode;
 import org.junit.jupiter.api.Test;
 
@@ -49,8 +49,8 @@ class XmlNodeBuilderTest {
     void testWithNamespace() throws Exception {
         String doc = "<?xml version='1.0'?><doc xmlns='foo:bar'/>";
         StringReader r = new StringReader(doc);
-        XMLStreamReader xsr = WstxInputFactory.newFactory().createXMLStreamReader(r);
-        XmlNode node = XmlNodeBuilder.build(xsr);
+        XMLStreamReader xsr = XMLInputFactory.newFactory().createXMLStreamReader(r);
+        XmlNode node = XmlNodeStaxBuilder.build(xsr);
         assertEquals("doc", node.getName());
         assertEquals(1, node.getAttributes().size());
         assertEquals("foo:bar", node.getAttribute("xmlns"));

@@ -22,7 +22,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-13-SNAPSHOT</version>
+    <version>4.0.0-beta-5-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-plugin</artifactId>
@@ -33,7 +33,16 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-meta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -85,7 +94,7 @@ under the License.
             <phase>generate-sources</phase>
             <configuration>
               <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
-              <version>1.0.0</version>
+              <version>2.0.0</version>
               <models>
                 <model>src/main/mdo/lifecycle.mdo</model>
               </models>

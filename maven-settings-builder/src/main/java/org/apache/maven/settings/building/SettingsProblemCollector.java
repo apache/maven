@@ -21,7 +21,9 @@ package org.apache.maven.settings.building;
 /**
  * Collects problems that are encountered during settings building.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.SettingsBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface SettingsProblemCollector {
 
     /**

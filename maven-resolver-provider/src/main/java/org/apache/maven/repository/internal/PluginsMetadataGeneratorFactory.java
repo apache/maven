@@ -29,9 +29,12 @@ import org.eclipse.aether.installation.InstallRequest;
 
 /**
  * Maven G level metadata generator factory.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Named(PluginsMetadataGeneratorFactory.NAME)
 @Singleton
+@Deprecated(since = "4.0.0")
 public class PluginsMetadataGeneratorFactory implements MetadataGeneratorFactory {
     public static final String NAME = "plugins";
 
@@ -45,7 +48,6 @@ public class PluginsMetadataGeneratorFactory implements MetadataGeneratorFactory
         return new PluginsMetadataGenerator(session, request);
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     @Override
     public float getPriority() {
         return 10; // G level MD should be deployed as 3rd MD

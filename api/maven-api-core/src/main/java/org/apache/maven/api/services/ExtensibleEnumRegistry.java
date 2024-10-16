@@ -26,9 +26,10 @@ import org.apache.maven.api.annotations.Nonnull;
 
 public interface ExtensibleEnumRegistry<T extends ExtensibleEnum> extends Service {
     @Nonnull
-    Optional<T> lookup(String id);
+    Optional<T> lookup(@Nonnull String id);
 
-    default T require(String id) {
+    @Nonnull
+    default T require(@Nonnull String id) {
         return lookup(id).orElseThrow(() -> new IllegalArgumentException("Unknown extensible enum value '" + id + "'"));
     }
 }

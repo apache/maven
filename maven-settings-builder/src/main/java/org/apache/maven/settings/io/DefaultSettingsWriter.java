@@ -36,9 +36,11 @@ import org.apache.maven.settings.v4.SettingsStaxWriter;
 /**
  * Handles serialization of settings into the default textual format.
  *
+ * @deprecated since 4.0.0, use {@link SettingsStaxWriter} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultSettingsWriter implements SettingsWriter {
 
     @Override

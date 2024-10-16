@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-13-SNAPSHOT</version>
+    <version>4.0.0-beta-5-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-maven</artifactId>
@@ -37,6 +37,10 @@ under the License.
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-cli</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-embedder</artifactId>
@@ -95,11 +99,19 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-slf4j-provider</artifactId>
+      <artifactId>maven-logging</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jline</groupId>
-      <artifactId>jline</artifactId>
+      <artifactId>jline-reader</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-terminal-jni</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-terminal-ffm</artifactId>
     </dependency>
 
     <!-- DI Runtime -->
@@ -122,6 +134,11 @@ under the License.
       <artifactId>asm</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <pluginRepositories>
@@ -139,28 +156,6 @@ under the License.
 
   <build>
     <finalName>${distributionFileName}</finalName>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <configuration>
-            <excludes combine.children="append">
-              <exclude>src/assembly/maven/bin/m2.conf</exclude>
-              <!-- these are partial scripts, resulting in mvn scripts -->
-              <exclude>src/assembly/shared/init</exclude>
-              <exclude>src/assembly/shared/init.cmd</exclude>
-              <exclude>src/assembly/shared/mvnlauncher</exclude>
-              <exclude>src/assembly/shared/mvnlauncher.cmd</exclude>
-              <exclude>src/assembly/shared/mvnvalidate</exclude>
-              <exclude>src/assembly/shared/mvnvalidate.cmd</exclude>
-              <exclude>src/assembly/shared/run</exclude>
-              <exclude>src/assembly/shared/run.cmd</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

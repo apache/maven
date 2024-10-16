@@ -30,7 +30,12 @@ import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.lifecycle.internal.*;
+import org.apache.maven.lifecycle.internal.DefaultLifecyclePluginAnalyzer;
+import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
+import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
+import org.apache.maven.lifecycle.internal.ProjectBuildList;
+import org.apache.maven.lifecycle.internal.ProjectSegment;
+import org.apache.maven.lifecycle.internal.Task;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
@@ -87,10 +92,6 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
     public static final MojoDescriptor POST_SITE = createMojoDescriptor("post-site");
 
     public static final MojoDescriptor SITE_DEPLOY = createMojoDescriptor("site-deploy");
-
-    // wrapper
-
-    public static final MojoDescriptor WRAPPER = createMojoDescriptor("wrapper");
 
     /**
      * @deprecated instead use {@link #getNumberOfExecutions(ProjectBuildList)}

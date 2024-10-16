@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,20 +31,22 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.building.DefaultSettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
+import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
+import org.codehaus.plexus.components.secdispatcher.SecDispatcherException;
 
 /**
  * Decrypts passwords in the settings.
  *
+ * @deprecated since 4.0.0
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultSettingsDecrypter implements SettingsDecrypter {
     private final SecDispatcher securityDispatcher;
 
     @Inject
-    public DefaultSettingsDecrypter(@Named("maven") SecDispatcher securityDispatcher) {
+    public DefaultSettingsDecrypter(SecDispatcher securityDispatcher) {
         this.securityDispatcher = securityDispatcher;
     }
 
@@ -56,28 +59,52 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
         for (Server server : request.getServers()) {
             server = server.clone();
 
-            try {
-                server.setPassword(decrypt(server.getPassword()));
-            } catch (SecDispatcherException e) {
-                problems.add(new DefaultSettingsProblem(
-                        "Failed to decrypt password for server " + server.getId() + ": " + e.getMessage(),
-                        Severity.ERROR,
-                        "server: " + server.getId(),
-                        -1,
-                        -1,
-                        e));
+            String password = server.getPassword();
+            if (securityDispatcher.isAnyEncryptedString(password)) {
+                try {
+                    if (securityDispatcher.isLegacyEncryptedString(password)) {
+                        problems.add(new DefaultSettingsProblem(
+                                "Legacy/insecurely encrypted password detected for server " + server.getId(),
+                                Severity.WARNING,
+                                "server: " + server.getId(),
+                                -1,
+                                -1,
+                                null));
+                    }
+                    server.setPassword(securityDispatcher.decrypt(password));
+                } catch (SecDispatcherException | IOException e) {
+                    problems.add(new DefaultSettingsProblem(
+                            "Failed to decrypt password for server " + server.getId() + ": " + e.getMessage(),
+                            Severity.ERROR,
+                            "server: " + server.getId(),
+                            -1,
+                            -1,
+                            e));
+                }
             }
 
-            try {
-                server.setPassphrase(decrypt(server.getPassphrase()));
-            } catch (SecDispatcherException e) {
-                problems.add(new DefaultSettingsProblem(
-                        "Failed to decrypt passphrase for server " + server.getId() + ": " + e.getMessage(),
-                        Severity.ERROR,
-                        "server: " + server.getId(),
-                        -1,
-                        -1,
-                        e));
+            String passphrase = server.getPassphrase();
+            if (securityDispatcher.isAnyEncryptedString(passphrase)) {
+                try {
+                    if (securityDispatcher.isLegacyEncryptedString(passphrase)) {
+                        problems.add(new DefaultSettingsProblem(
+                                "Legacy/insecurely encrypted passphrase detected for server " + server.getId(),
+                                Severity.WARNING,
+                                "server: " + server.getId(),
+                                -1,
+                                -1,
+                                null));
+                    }
+                    server.setPassphrase(securityDispatcher.decrypt(passphrase));
+                } catch (SecDispatcherException | IOException e) {
+                    problems.add(new DefaultSettingsProblem(
+                            "Failed to decrypt passphrase for server " + server.getId() + ": " + e.getMessage(),
+                            Severity.ERROR,
+                            "server: " + server.getId(),
+                            -1,
+                            -1,
+                            e));
+                }
             }
 
             servers.add(server);
@@ -86,25 +113,33 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
         List<Proxy> proxies = new ArrayList<>();
 
         for (Proxy proxy : request.getProxies()) {
-            try {
-                proxy.setPassword(decrypt(proxy.getPassword()));
-            } catch (SecDispatcherException e) {
-                problems.add(new DefaultSettingsProblem(
-                        "Failed to decrypt password for proxy " + proxy.getId() + ": " + e.getMessage(),
-                        Severity.ERROR,
-                        "proxy: " + proxy.getId(),
-                        -1,
-                        -1,
-                        e));
+            String password = proxy.getPassword();
+            if (securityDispatcher.isAnyEncryptedString(password)) {
+                try {
+                    if (securityDispatcher.isLegacyEncryptedString(password)) {
+                        problems.add(new DefaultSettingsProblem(
+                                "Legacy/insecurely encrypted password detected for proxy " + proxy.getId(),
+                                Severity.WARNING,
+                                "proxy: " + proxy.getId(),
+                                -1,
+                                -1,
+                                null));
+                    }
+                    proxy.setPassword(securityDispatcher.decrypt(password));
+                } catch (SecDispatcherException | IOException e) {
+                    problems.add(new DefaultSettingsProblem(
+                            "Failed to decrypt password for proxy " + proxy.getId() + ": " + e.getMessage(),
+                            Severity.ERROR,
+                            "proxy: " + proxy.getId(),
+                            -1,
+                            -1,
+                            e));
+                }
             }
 
             proxies.add(proxy);
         }
 
         return new DefaultSettingsDecryptionResult(servers, proxies, problems);
-    }
-
-    private String decrypt(String str) throws SecDispatcherException {
-        return (str == null) ? null : securityDispatcher.decrypt(str);
     }
 }

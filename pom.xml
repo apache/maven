@@ -24,12 +24,12 @@ under the License.
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
     <!-- when upgrading parent, also upgrade maven-bom's parent -->
-    <version>41</version>
+    <version>43</version>
     <relativePath />
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>4.0.0-alpha-13-SNAPSHOT</version>
+  <version>4.0.0-beta-5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -100,33 +100,36 @@ under the License.
   </contributors>
 
   <modules>
+    <module>api</module>
+    <module>maven-api-impl</module>
     <module>maven-plugin-api</module>
     <module>maven-builder-support</module>
     <module>maven-model</module>
     <module>maven-model-builder</module>
-    <module>api</module>
     <module>maven-di</module>
     <module>maven-xml-impl</module>
+    <module>maven-jline</module>
+    <module>maven-logging</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
     <module>maven-artifact</module>
     <module>maven-resolver-provider</module>
     <module>maven-repository-metadata</module>
-    <module>maven-slf4j-provider</module>
-    <module>maven-slf4j-wrapper</module>
     <module>maven-embedder</module>
+    <module>maven-cli</module>
     <module>maven-compat</module>
     <module>apache-maven</module>
     <module>maven-toolchain-model</module>
     <module>maven-toolchain-builder</module>
     <module>maven-bom</module>
+    <module>maven-docgen</module>
   </modules>
 
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>maven-4.0.0-alpha-10</tag>
+    <tag>maven-4.0.0-beta-3</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -146,7 +149,11 @@ under the License.
   </distributionManagement>
 
   <properties>
-    <javaVersion>8</javaVersion>
+    <javaVersion>17</javaVersion>
+    <maven.compiler.source>${javaVersion}</maven.compiler.source>
+    <maven.compiler.target>${javaVersion}</maven.compiler.target>
+    <maven.compiler.release>${javaVersion}</maven.compiler.release>
+    <maven.compiler.proc>full</maven.compiler.proc>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <maven.baseline>3.8.8</maven.baseline>
     <!-- Control the name of the distribution and information output by mvn -->
@@ -154,37 +161,36 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2024-01-12T09:41:50Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2024-08-30T12:59:00Z</project.build.outputTimestamp>
     <!-- various versions -->
-    <asmVersion>9.6</asmVersion>
-    <byteBuddyVersion>1.14.9</byteBuddyVersion>
-    <cipherVersion>2.0</cipherVersion>
-    <classWorldsVersion>2.6.0</classWorldsVersion>
-    <commonsCliVersion>1.5.0</commonsCliVersion>
-    <commonsIoVersion>2.11.0</commonsIoVersion>
+    <assertjVersion>3.26.3</assertjVersion>
+    <asmVersion>9.7.1</asmVersion>
+    <byteBuddyVersion>1.15.4</byteBuddyVersion>
+    <classWorldsVersion>2.8.0</classWorldsVersion>
+    <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
-    <guavaVersion>32.1.3-jre</guavaVersion>
+    <guavaVersion>33.3.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
-    <hamcrestVersion>2.2</hamcrestVersion>
+    <hamcrestVersion>3.0</hamcrestVersion>
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
-    <jlineVersion>3.25.1</jlineVersion>
-    <junitVersion>5.10.1</junitVersion>
+    <jlineVersion>3.27.0</jlineVersion>
+    <junitVersion>5.11.2</junitVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <logbackClassicVersion>1.2.13</logbackClassicVersion>
-    <mockitoVersion>5.7.0</mockitoVersion>
-    <plexusInteractivityVersion>1.1</plexusInteractivityVersion>
-    <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusTestingVersion>1.0.0</plexusTestingVersion>
-    <plexusXmlVersion>4.0.1</plexusXmlVersion>
-    <resolverVersion>2.0.0-alpha-7</resolverVersion>
-    <securityDispatcherVersion>2.0</securityDispatcherVersion>
-    <sisuVersion>0.9.0.M2</sisuVersion>
-    <slf4jVersion>2.0.11</slf4jVersion>
-    <stax2ApiVersion>4.2.1</stax2ApiVersion>
+    <logbackClassicVersion>1.5.10</logbackClassicVersion>
+    <mockitoVersion>5.14.1</mockitoVersion>
+    <plexusInteractivityVersion>1.3</plexusInteractivityVersion>
+    <plexusInterpolationVersion>1.27</plexusInterpolationVersion>
+    <plexusTestingVersion>1.4.0</plexusTestingVersion>
+    <plexusXmlVersion>4.0.4</plexusXmlVersion>
+    <resolverVersion>2.0.1</resolverVersion>
+    <securityDispatcherVersion>4.0.1</securityDispatcherVersion>
+    <sisuVersion>0.9.0.M3</sisuVersion>
+    <slf4jVersion>2.0.16</slf4jVersion>
+    <stax2ApiVersion>4.2.2</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
-    <woodstoxVersion>6.5.1</woodstoxVersion>
-    <xmlunitVersion>2.9.1</xmlunitVersion>
+    <woodstoxVersion>7.0.0</woodstoxVersion>
+    <xmlunitVersion>2.10.0</xmlunitVersion>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -205,12 +211,32 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
+        <artifactId>maven-jline</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-logging</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
         <artifactId>maven-embedder</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -265,6 +291,16 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-metadata</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
         <artifactId>maven-di</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -310,22 +346,12 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-slf4j-wrapper</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
         <artifactId>maven-xml-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-compat</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-slf4j-provider</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
@@ -400,6 +426,11 @@ under the License.
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${sisuVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>org.eclipse.sisu.inject</artifactId>
+        <version>${sisuVersion}</version>
         <classifier>no_asm</classifier>
       </dependency>
       <dependency>
@@ -434,7 +465,37 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.jline</groupId>
-        <artifactId>jline</artifactId>
+        <artifactId>jline-reader</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-style</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-builtins</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-console-ui</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-terminal-ffm</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-terminal-jni</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jansi-core</artifactId>
         <version>${jlineVersion}</version>
       </dependency>
       <dependency>
@@ -493,6 +554,11 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-named-locks</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-connector-basic</artifactId>
         <version>${resolverVersion}</version>
       </dependency>
@@ -523,11 +589,6 @@ under the License.
         <version>${commonsCliVersion}</version>
       </dependency>
       <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>${commonsIoVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>commons-jxpath</groupId>
         <artifactId>commons-jxpath</artifactId>
         <version>${jxpathVersion}</version>
@@ -536,11 +597,6 @@ under the License.
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
         <version>${securityDispatcherVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-cipher</artifactId>
-        <version>${cipherVersion}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
@@ -583,6 +639,11 @@ under the License.
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertjVersion}</version>
+      </dependency>
+      <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-testing</artifactId>
         <version>${plexusTestingVersion}</version>
@@ -611,7 +672,7 @@ under the License.
     <!--bootstrap-start-comment-->
   </dependencyManagement>
   <!--bootstrap-end-comment-->
-  <!--bootstrap-start-comment-->
+  <!--
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -624,70 +685,39 @@ under the License.
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <!--bootstrap-end-comment-->
+  -->
 
   <build>
     <pluginManagement>
       <plugins>
-        <!-- Remove when Parent 41 used -->
-        <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>2.40.0</version>
-          <configuration>
-            <java>
-              <!-- orders of used formatters are important MPOM-376 -->
-              <!-- eg. palantir override importOrder, so should be first -->
-              <palantirJavaFormat>
-                <version>2.38.0</version>
-              </palantirJavaFormat>
-              <removeUnusedImports />
-              <importOrder>
-                <file>config/maven-eclipse-importorder.txt</file>
-              </importOrder>
-              <licenseHeader>
-                <file>config/maven-header-plain.txt</file>
-              </licenseHeader>
-            </java>
-            <pom>
-              <sortPom>
-                <expandEmptyElements>false</expandEmptyElements>
-                <!-- https://issues.apache.org/jira/browse/MRELEASE-1111 -->
-                <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
-              </sortPom>
-            </pom>
-            <upToDateChecking>
-              <enabled>true</enabled>
-            </upToDateChecking>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <proc>none</proc>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-            <autoVersionSubmodules>true</autoVersionSubmodules>
-          </configuration>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <argLine>-Xmx256m</argLine>
-            <environmentVariables>
-              <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
-            </environmentVariables>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
+          <configuration>
+            <licenseText>Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.</licenseText>
+          </configuration>
           <executions>
             <execution>
               <id>modello-site-docs</id>
@@ -703,7 +733,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.17.2</version>
+          <version>0.23.0</version>
           <executions>
             <execution>
               <goals>
@@ -726,12 +756,12 @@ under the License.
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.4.0</version>
+          <version>3.6.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.2.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -745,7 +775,7 @@ under the License.
             <charter>The mission of the Apache Maven project is to create and maintain software
             libraries that provide a widely-used project build tool, targeting mainly Java
             development. Apache Maven promotes the use of dependencies via a
-            standardized coordinate system, binary plugins, and a standard build
+            standardized coordinates system, binary plugins, and a standard build
             lifecycle.</charter>
           </asfExtOptions>
         </configuration>
@@ -764,6 +794,7 @@ under the License.
                 <exclude>src/test/projects/**</exclude>
                 <exclude>src/test/remote-repo/**</exclude>
                 <exclude>**/*.odg</exclude>
+                <exclude>**/*.svg</exclude>
                 <exclude>.asf.yaml</exclude>
                 <exclude>.mvn/**</exclude>
                 <!--
@@ -808,15 +839,15 @@ under the License.
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[11,)</version>
+                  <version>[17,)</version>
                 </requireJavaVersion>
                 <enforceBytecodeVersion>
-                  <maxJdkVersion>${maven.compiler.target}</maxJdkVersion>
+                  <maxJdkVersion>${maven.compiler.release}</maxJdkVersion>
                   <ignoredScopes>
                     <ignoredScope>test</ignoredScope>
                   </ignoredScopes>
                   <excludes>
-                    <exclude>org.jline:jline</exclude>
+                    <exclude>org.jline:jline-terminal-ffm</exclude>
                   </excludes>
                 </enforceBytecodeVersion>
               </rules>
@@ -864,6 +895,48 @@ under the License.
                   <head>Provisional:</head>
                 </tag>
               </tags>
+              <groups>
+                <group>
+                  <title>Maven 4 API - Core</title>
+                  <packages>org.apache.maven.api*</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Plugin</title>
+                  <packages>org.apache.maven.api.plugin.descriptor*</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Model</title>
+                  <packages>org.apache.maven.api.model</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Settings</title>
+                  <packages>org.apache.maven.api.settings</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Toolchain</title>
+                  <packages>org.apache.maven.api.toolchain</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Meta</title>
+                  <packages>org.apache.maven.api.annotations</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - DI</title>
+                  <packages>org.apache.maven.api.di</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - Metadata</title>
+                  <packages>org.apache.maven.api.metadata</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - SPI</title>
+                  <packages>org.apache.maven.api.spi</packages>
+                </group>
+                <group>
+                  <title>Maven 4 API - XML</title>
+                  <packages>org.apache.maven.api.xml</packages>
+                </group>
+              </groups>
             </configuration>
             <reportSets>
               <reportSet>

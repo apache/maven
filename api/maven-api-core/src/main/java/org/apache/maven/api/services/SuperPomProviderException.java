@@ -18,12 +18,17 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 /**
  * Exceptions thrown by the {@link SuperPomProvider} service.
  *
  * @since 4.0.0
  */
 public class SuperPomProviderException extends MavenException {
+
+    @Serial
+    private static final long serialVersionUID = -8659892034004509331L;
 
     public SuperPomProviderException() {
         super();

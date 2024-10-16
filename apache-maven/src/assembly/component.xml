@@ -83,7 +83,9 @@ under the License.
       <outputDirectory>bin</outputDirectory>
       <includes>
         <include>mvn</include>
+        <include>mvnenc</include>
         <include>mvnDebug</include>
+        <include>mvnencDebug</include>
         <!-- This is so that CI systems can periodically run the profiler -->
         <include>mvnyjp</include>
       </includes>
@@ -99,34 +101,4 @@ under the License.
       <outputDirectory>lib</outputDirectory>
     </fileSet>
   </fileSets>
-
-  <files>
-    <file>
-      <sources>
-        <source>src/assembly/shared/validate.cmd</source>
-        <source>src/assembly/shared/mvnvalidate.cmd</source>
-        <source>src/assembly/shared/init.cmd</source>
-        <source>src/assembly/shared/mvnlauncher.cmd</source>
-        <source>src/assembly/shared/run.cmd</source>
-      </sources>
-      <destName>mvn.cmd</destName>
-      <outputDirectory>bin</outputDirectory>
-      <lineEnding>dos</lineEnding>
-      <filtered>true</filtered>
-    </file>
-    <file>
-      <sources>
-        <source>src/assembly/shared/validate</source>
-        <source>src/assembly/shared/mvnvalidate</source>
-        <source>src/assembly/shared/init</source>
-        <source>src/assembly/shared/mvnlauncher</source>
-        <source>src/assembly/shared/run</source>
-      </sources>
-      <destName>mvn</destName>
-      <outputDirectory>bin</outputDirectory>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0755</fileMode>
-      <filtered>true</filtered>
-    </file>
-  </files>
 </component>

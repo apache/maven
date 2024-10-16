@@ -25,15 +25,39 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.model.Plugin;
-import org.apache.maven.cli.internal.extension.model.CoreExtension;
+import org.apache.maven.api.services.ArtifactCoordinatesFactory;
+import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.api.services.ArtifactResolver;
+import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.InterpolatorException;
+import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.VersionParser;
+import org.apache.maven.api.services.VersionRangeResolver;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
+import org.apache.maven.internal.impl.DefaultArtifactCoordinatesFactory;
+import org.apache.maven.internal.impl.DefaultArtifactManager;
+import org.apache.maven.internal.impl.DefaultArtifactResolver;
+import org.apache.maven.internal.impl.DefaultModelVersionParser;
+import org.apache.maven.internal.impl.DefaultRepositoryFactory;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.DefaultVersionParser;
+import org.apache.maven.internal.impl.DefaultVersionRangeResolver;
+import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
 import org.apache.maven.resolver.MavenChainedWorkspaceReader;
@@ -42,19 +66,20 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.Interpolator;
-import org.codehaus.plexus.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.interpolation.StringSearchInterpolator;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
+import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,19 +107,23 @@ public class BootstrapCoreExtensionManager {
 
     private final WorkspaceReader ideWorkspaceReader;
 
+    private final RepositorySystem repoSystem;
+
     @Inject
     public BootstrapCoreExtensionManager(
             DefaultPluginDependenciesResolver pluginDependenciesResolver,
             RepositorySystemSessionFactory repositorySystemSessionFactory,
             CoreExports coreExports,
             PlexusContainer container,
-            @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader) {
+            @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader,
+            RepositorySystem repoSystem) {
         this.pluginDependenciesResolver = pluginDependenciesResolver;
         this.repositorySystemSessionFactory = repositorySystemSessionFactory;
         this.coreExports = coreExports;
         this.classWorld = ((DefaultPlexusContainer) container).getClassWorld();
         this.parentRealm = container.getContainerRealm();
         this.ideWorkspaceReader = ideWorkspaceReader;
+        this.repoSystem = repoSystem;
     }
 
     public List<CoreExtensionEntry> loadCoreExtensions(
@@ -104,8 +133,12 @@ public class BootstrapCoreExtensionManager {
                 .newRepositorySessionBuilder(request)
                 .setWorkspaceReader(new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader))
                 .build()) {
+            MavenSession mSession = new MavenSession(repoSession, request, new DefaultMavenExecutionResult());
+            InternalSession iSession = new SimpleSession(mSession, repoSystem, null);
+            InternalSession.associate(repoSession, iSession);
+
             List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
-            Interpolator interpolator = createInterpolator(request);
+            Function<String, String> interpolator = createInterpolator(request);
 
             return resolveCoreExtensions(repoSession, repositories, providedArtifacts, extensions, interpolator);
         }
@@ -116,7 +149,7 @@ public class BootstrapCoreExtensionManager {
             List<RemoteRepository> repositories,
             Set<String> providedArtifacts,
             List<CoreExtension> configuration,
-            Interpolator interpolator)
+            Function<String, String> interpolator)
             throws Exception {
         List<CoreExtensionEntry> extensions = new ArrayList<>();
 
@@ -174,7 +207,7 @@ public class BootstrapCoreExtensionManager {
             RepositorySystemSession repoSession,
             List<RemoteRepository> repositories,
             DependencyFilter dependencyFilter,
-            Interpolator interpolator)
+            Function<String, String> interpolator)
             throws ExtensionResolutionException {
         try {
             /* TODO: Enhance the PluginDependenciesResolver to provide a
@@ -182,9 +215,9 @@ public class BootstrapCoreExtensionManager {
              * object instead of a Plugin as this makes no sense.
              */
             Plugin plugin = Plugin.newBuilder()
-                    .groupId(interpolator.interpolate(extension.getGroupId()))
-                    .artifactId(interpolator.interpolate(extension.getArtifactId()))
-                    .version(interpolator.interpolate(extension.getVersion()))
+                    .groupId(interpolator.apply(extension.getGroupId()))
+                    .artifactId(interpolator.apply(extension.getArtifactId()))
+                    .version(interpolator.apply(extension.getVersion()))
                     .build();
 
             DependencyResult result = pluginDependenciesResolver.resolveCoreExtension(
@@ -193,17 +226,58 @@ public class BootstrapCoreExtensionManager {
                     .filter(ArtifactResult::isResolved)
                     .map(ArtifactResult::getArtifact)
                     .collect(Collectors.toList());
-        } catch (PluginResolutionException e) {
-            throw new ExtensionResolutionException(extension, e.getCause());
-        } catch (InterpolationException e) {
+        } catch (PluginResolutionException | InterpolatorException e) {
             throw new ExtensionResolutionException(extension, e);
         }
     }
 
-    private static Interpolator createInterpolator(MavenExecutionRequest request) {
-        StringSearchInterpolator interpolator = new StringSearchInterpolator();
-        interpolator.addValueSource(new MapBasedValueSource(request.getUserProperties()));
-        interpolator.addValueSource(new MapBasedValueSource(request.getSystemProperties()));
-        return interpolator;
+    private static Function<String, String> createInterpolator(MavenExecutionRequest request) {
+        Interpolator interpolator = new DefaultInterpolator();
+        Function<String, String> callback = v -> {
+            String r = request.getUserProperties().getProperty(v);
+            if (r == null) {
+                r = request.getSystemProperties().getProperty(v);
+            }
+            return r != null ? r : v;
+        };
+        return v -> interpolator.interpolate(v, callback);
+    }
+
+    static class SimpleSession extends DefaultSession {
+        SimpleSession(
+                MavenSession session,
+                RepositorySystem repositorySystem,
+                List<org.apache.maven.api.RemoteRepository> repositories) {
+            super(session, repositorySystem, repositories, null, null, null);
+        }
+
+        @Override
+        protected Session newSession(
+                MavenSession mavenSession, List<org.apache.maven.api.RemoteRepository> repositories) {
+            return new SimpleSession(mavenSession, getRepositorySystem(), repositories);
+        }
+
+        @Override
+        public <T extends Service> T getService(Class<T> clazz) throws NoSuchElementException {
+            if (clazz == ArtifactCoordinatesFactory.class) {
+                return (T) new DefaultArtifactCoordinatesFactory();
+            } else if (clazz == VersionParser.class) {
+                return (T) new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()));
+            } else if (clazz == VersionRangeResolver.class) {
+                return (T) new DefaultVersionRangeResolver(repositorySystem);
+            } else if (clazz == ArtifactResolver.class) {
+                return (T) new DefaultArtifactResolver();
+            } else if (clazz == ArtifactManager.class) {
+                return (T) new DefaultArtifactManager(this);
+            } else if (clazz == RepositoryFactory.class) {
+                return (T) new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
+                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider()));
+            } else if (clazz == Interpolator.class) {
+                return (T) new DefaultInterpolator();
+                // } else if (clazz == ModelResolver.class) {
+                //    return (T) new DefaultModelResolver();
+            }
+            throw new NoSuchElementException("No service for " + clazz.getName());
+        }
     }
 }

@@ -25,9 +25,10 @@ import org.apache.maven.model.Model;
 /**
  * Context used to transform a pom file.
  *
- *
  * @since 4.0.0
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface TransformerContext {
     /**
      * Key to get the TransformerContext from the SessionData

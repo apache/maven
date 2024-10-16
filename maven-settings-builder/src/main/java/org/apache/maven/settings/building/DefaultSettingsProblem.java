@@ -23,7 +23,9 @@ package org.apache.maven.settings.building;
  * thrown or a simple string message. In addition, a problem carries a hint about its source, e.g. the settings file
  * that exhibits the problem.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.SettingsBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class DefaultSettingsProblem implements SettingsProblem {
 
     private final String source;
@@ -78,7 +80,7 @@ public class DefaultSettingsProblem implements SettingsProblem {
     public String getLocation() {
         StringBuilder buffer = new StringBuilder(256);
 
-        if (getSource().length() > 0) {
+        if (!getSource().isEmpty()) {
             if (buffer.length() > 0) {
                 buffer.append(", ");
             }
@@ -111,7 +113,7 @@ public class DefaultSettingsProblem implements SettingsProblem {
     public String getMessage() {
         String msg;
 
-        if (message != null && message.length() > 0) {
+        if (message != null && !message.isEmpty()) {
             msg = message;
         } else {
             msg = exception.getMessage();

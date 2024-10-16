@@ -22,18 +22,29 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.di.Named;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Source;
 
 /**
  * The {@code ModelParser} interface is used to locate and read {@link Model}s from the file system.
  * This allows plugging in additional syntaxes for the main model read by Maven when building a project.
+ *
+ * @since 4.0.0
  */
 @Experimental
-public interface ModelParser {
+@Consumer
+@Named
+public interface ModelParser extends SpiService {
+
+    /**
+     * Option that can be specified in the options map.  The value should be a Boolean.
+     */
+    String STRICT = "strict";
 
     /**
      * Locates the pom in the given directory.
@@ -64,6 +75,7 @@ public interface ModelParser {
      * @return an optional parsed {@link Model} or {@code null} if none could be found
      * @throws ModelParserException if the located model cannot be parsed
      */
+    @Nonnull
     default Optional<Model> locateAndParse(@Nonnull Path dir, @Nullable Map<String, ?> options)
             throws ModelParserException {
         return locate(dir).map(s -> parse(s, options));

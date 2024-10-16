@@ -19,13 +19,16 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.maven.model.Model;
 
 /**
  * Builds the effective model from a POM.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelBuilder {
 
     /**
@@ -52,11 +55,31 @@ public interface ModelBuilder {
 
     /**
      * Performs only the part of {@link ModelBuilder#build(ModelBuildingRequest)} that loads the raw model
+     *
+     * @deprecated Use {@link #buildRawModel(Path, int, boolean)} instead.
      */
+    @Deprecated
     Result<? extends Model> buildRawModel(File pomFile, int validationLevel, boolean locationTracking);
 
+    /**
+     * Performs only the part of {@link ModelBuilder#build(ModelBuildingRequest)} that loads the raw model
+     *
+     * @since 4.0.0
+     */
+    Result<? extends Model> buildRawModel(Path pomFile, int validationLevel, boolean locationTracking);
+
+    /**
+     * @deprecated Use {@link #buildRawModel(Path, int, boolean, TransformerContext)} instead.
+     */
+    @Deprecated
     Result<? extends Model> buildRawModel(
             File pomFile, int validationLevel, boolean locationTracking, TransformerContext context);
+
+    /**
+     * @since 4.0.0
+     */
+    Result<? extends Model> buildRawModel(
+            Path pomFile, int validationLevel, boolean locationTracking, TransformerContext context);
 
     TransformerContextBuilder newTransformerContextBuilder();
 }

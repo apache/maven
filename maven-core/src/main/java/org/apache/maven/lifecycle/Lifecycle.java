@@ -18,10 +18,17 @@
  */
 package org.apache.maven.lifecycle;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
+
+import static org.apache.maven.api.Lifecycle.AFTER;
+import static org.apache.maven.api.Lifecycle.BEFORE;
 
 /**
  * Lifecycle definition, with eventual plugin bindings (when they are not packaging-specific).
@@ -33,6 +40,16 @@ public class Lifecycle {
         this.id = id;
         this.phases = phases;
         this.defaultPhases = defaultPhases;
+    }
+
+    public Lifecycle(
+            org.apache.maven.api.services.LifecycleRegistry registry, org.apache.maven.api.Lifecycle lifecycle) {
+        this.lifecycle = lifecycle;
+        this.id = lifecycle.id();
+        this.phases = registry.computePhases(lifecycle).stream()
+                .flatMap(p -> Stream.of(BEFORE + p, p, AFTER + p))
+                .toList();
+        this.defaultPhases = getDefaultPhases(lifecycle);
     }
 
     // <lifecycle>
@@ -53,12 +70,29 @@ public class Lifecycle {
 
     private Map<String, LifecyclePhase> defaultPhases;
 
+    private org.apache.maven.api.Lifecycle lifecycle;
+
     public String getId() {
-        return this.id;
+        return id;
+    }
+
+    public org.apache.maven.api.Lifecycle getDelegate() {
+        return lifecycle;
     }
 
     public List<String> getPhases() {
-        return this.phases;
+        return phases;
+    }
+
+    static Map<String, LifecyclePhase> getDefaultPhases(org.apache.maven.api.Lifecycle lifecycle) {
+        Map<String, List<String>> goals = new HashMap<>();
+        lifecycle.allPhases().forEach(phase -> phase.plugins()
+                .forEach(plugin -> plugin.getExecutions().forEach(exec -> exec.getGoals()
+                        .forEach(goal -> goals.computeIfAbsent(phase.name(), n -> new ArrayList<>())
+                                .add(plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion()
+                                        + ":" + goal)))));
+        return goals.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> new LifecyclePhase(String.join(",", e.getValue()))));
     }
 
     public Map<String, LifecyclePhase> getDefaultLifecyclePhases() {
@@ -72,6 +106,10 @@ public class Lifecycle {
 
     @Override
     public String toString() {
-        return id + " -> " + phases;
+        return id + " -> "
+                + lifecycle
+                        .allPhases()
+                        .map(org.apache.maven.api.Lifecycle.Phase::name)
+                        .collect(Collectors.joining(", ", "[", "]"));
     }
 }

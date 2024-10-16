@@ -18,25 +18,30 @@
  */
 package org.apache.maven.internal.aether;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import java.io.File;
-import java.util.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Constants;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.internal.impl.resolver.MavenSessionBuilderSupplier;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
-import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
@@ -57,11 +62,13 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
-import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
-import org.eclipse.aether.util.graph.version.*;
+import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
+import org.eclipse.aether.util.graph.version.ContextualSnapshotVersionFilter;
+import org.eclipse.aether.util.graph.version.HighestVersionFilter;
+import org.eclipse.aether.util.graph.version.LowestVersionFilter;
+import org.eclipse.aether.util.graph.version.PredicateVersionFilter;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
-import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
@@ -81,67 +88,15 @@ import static java.util.Objects.requireNonNull;
  */
 @Named
 @Singleton
-class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
-    /**
-     * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
-     * filter is applied (like in Maven 3).
-     * <p>
-     * Supported filters:
-     * <ul>
-     *     <li>"h" or "h(num)" - highest version or top list of highest ones filter</li>
-     *     <li>"l" or "l(num)" - lowest version or bottom list of lowest ones filter</li>
-     *     <li>"s" - contextual snapshot filter</li>
-     *     <li>"e(G:A:V)" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li>
-     * </ul>
-     * Example filter expression: {@code "h(5);s;e(org.foo:bar:1)} will cause: ranges are filtered for "top 5" (instead
-     * full range), snapshots are banned if root project is not a snapshot, and if range for {@code org.foo:bar} is
-     * being processed, version 1 is omitted.
-     *
-     * @since 4.0.0
-     */
-    private static final String MAVEN_VERSION_FILTERS = "maven.versionFilters";
+public class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
 
-    /**
-     * User property for chained LRM: list of "tail" local repository paths (separated by comma), to be used with
-     * {@link ChainedLocalRepositoryManager}.
-     * Default value: {@code null}, no chained LRM is used.
-     *
-     * @since 3.9.0
-     */
-    private static final String MAVEN_REPO_LOCAL_TAIL = "maven.repo.local.tail";
+    public static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
 
-    /**
-     * User property for reverse dependency tree. If enabled, Maven will record ".tracking" directory into local
-     * repository with "reverse dependency tree", essentially explaining WHY given artifact is present in local
-     * repository.
-     * Default: {@code false}, will not record anything.
-     *
-     * @since 3.9.0
-     */
-    private static final String MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE = "maven.repo.local.recordReverseTree";
+    public static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
 
-    /**
-     * User property for selecting dependency manager behaviour regarding transitive dependencies and dependency
-     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven2, hence it ignored
-     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default, hence
-     * unlike Maven2, obeys dependency management entries deep in dependency graph as well.
-     * <p>
-     * Default: {@code "true"}.
-     *
-     * @since 4.0.0
-     */
-    private static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY =
-            "maven.resolver.dependencyManagerTransitivity";
+    public static final String MAVEN_RESOLVER_TRANSPORT_APACHE = "apache";
 
-    private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
-
-    private static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
-
-    private static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
-
-    private static final String MAVEN_RESOLVER_TRANSPORT_APACHE = "apache";
-
-    private static final String MAVEN_RESOLVER_TRANSPORT_JDK = "jdk";
+    public static final String MAVEN_RESOLVER_TRANSPORT_JDK = "jdk";
 
     /**
      * This name for Apache HttpClient transport is deprecated.
@@ -151,7 +106,7 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
     @Deprecated
     private static final String MAVEN_RESOLVER_TRANSPORT_NATIVE = "native";
 
-    private static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
+    public static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
 
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
@@ -164,8 +119,6 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
     private static final String RESOLVER_MAX_PRIORITY = String.valueOf(Float.MAX_VALUE);
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private final ArtifactHandlerManager artifactHandlerManager;
 
     private final RepositorySystem repoSystem;
 
@@ -186,7 +139,6 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
     DefaultRepositorySystemSessionFactory(
-            ArtifactHandlerManager artifactHandlerManager,
             RepositorySystem repoSystem,
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
@@ -195,7 +147,6 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
             VersionScheme versionScheme,
             Map<String, MavenExecutionRequestExtender> requestExtenders,
             Map<String, RepositorySystemSessionExtender> sessionExtenders) {
-        this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
@@ -220,8 +171,9 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
             requestExtender.extend(request);
         }
 
-        SessionBuilder sessionBuilder = new MavenSessionBuilderSupplier(repoSystem).get();
-        sessionBuilder.setArtifactTypeRegistry(new TypeRegistryAdapter(typeRegistry));
+        MavenSessionBuilderSupplier supplier = new MavenSessionBuilderSupplier(repoSystem);
+        SessionBuilder sessionBuilder = supplier.get();
+        sessionBuilder.setArtifactTypeRegistry(new TypeRegistryAdapter(typeRegistry)); // dynamic
         sessionBuilder.setCache(request.getRepositoryCache());
 
         // this map is read ONLY to get config from (profiles + env + system + user)
@@ -253,21 +205,24 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         sessionBuilder.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
                 request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
-        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(MAVEN_VERSION_FILTERS));
+        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(Constants.MAVEN_VERSION_FILTERS));
         if (versionFilter != null) {
             sessionBuilder.setVersionFilter(versionFilter);
         }
-
-        sessionBuilder.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
 
         DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
         decrypt.setProxies(request.getProxies());
         decrypt.setServers(request.getServers());
         SettingsDecryptionResult decrypted = settingsDecrypter.decrypt(decrypt);
-
-        if (logger.isDebugEnabled()) {
-            for (SettingsProblem problem : decrypted.getProblems()) {
-                logger.debug(problem.getMessage(), problem.getException());
+        for (SettingsProblem problem : decrypted.getProblems()) {
+            if (problem.getSeverity() == SettingsProblem.Severity.WARNING) {
+                logger.warn(problem.getMessage());
+            } else if (problem.getSeverity() == SettingsProblem.Severity.ERROR) {
+                logger.error(
+                        problem.getMessage(),
+                        request.isShowErrors()
+                                ? problem.getException()
+                                : problem.getException().getMessage());
             }
         }
 
@@ -388,7 +343,8 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         }
         sessionBuilder.setAuthenticationSelector(authSelector);
 
-        Object transport = mergedProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
+        Object transport =
+                mergedProps.getOrDefault(Constants.MAVEN_RESOLVER_TRANSPORT, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
         if (MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals(transport)) {
             // The "default" mode (user did not set anything) from now on defaults to AUTO
         } else if (MAVEN_RESOLVER_TRANSPORT_JDK.equals(transport)) {
@@ -423,24 +379,25 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         RepositoryListener repositoryListener = eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger));
 
         boolean recordReverseTree = Boolean.parseBoolean(
-                mergedProps.getOrDefault(MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE, Boolean.FALSE.toString()));
+                mergedProps.getOrDefault(Constants.MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE, Boolean.FALSE.toString()));
         if (recordReverseTree) {
             repositoryListener = new ChainedRepositoryListener(repositoryListener, new ReverseTreeRepositoryListener());
         }
         sessionBuilder.setRepositoryListener(repositoryListener);
 
-        String resolverDependencyManagerTransitivity =
-                mergedProps.getOrDefault(MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY_KEY, Boolean.TRUE.toString());
+        // may be overridden
+        String resolverDependencyManagerTransitivity = mergedProps.getOrDefault(
+                Constants.MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY, Boolean.TRUE.toString());
         sessionBuilder.setDependencyManager(
-                new ClassicDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
+                supplier.getDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
-        ArrayList<File> paths = new ArrayList<>();
-        paths.add(new File(request.getLocalRepository().getBasedir()));
-        String localRepoTail = mergedProps.get(MAVEN_REPO_LOCAL_TAIL);
+        ArrayList<Path> paths = new ArrayList<>();
+        paths.add(Paths.get(request.getLocalRepository().getBasedir()));
+        String localRepoTail = mergedProps.get(Constants.MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
                     .filter(p -> p != null && !p.trim().isEmpty())
-                    .map(File::new)
+                    .map(Paths::get)
                     .forEach(paths::add);
         }
         sessionBuilder.withLocalRepositoryBaseDirectories(paths);
@@ -467,7 +424,7 @@ class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFa
         if (filterExpression != null) {
             List<String> expressions = Arrays.stream(filterExpression.split(";"))
                     .filter(s -> s != null && !s.trim().isEmpty())
-                    .collect(Collectors.toList());
+                    .toList();
             for (String expression : expressions) {
                 if ("h".equals(expression)) {
                     filters.add(new HighestVersionFilter());

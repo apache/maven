@@ -32,7 +32,6 @@ import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
-import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -146,6 +145,6 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
     // Site 3.x
     public List<MavenProject> executeForkedExecutions(MojoExecution mojoExecution, MavenSession session)
             throws LifecycleExecutionException {
-        return mojoExecutor.executeForkedExecutions(mojoExecution, session, new ProjectIndex(session.getProjects()));
+        return mojoExecutor.executeForkedExecutions(mojoExecution, session);
     }
 }

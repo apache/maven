@@ -19,14 +19,46 @@
 package org.apache.maven.di.impl;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
+import org.apache.maven.di.Key;
 import org.junit.jupiter.api.Test;
 
-import static org.apache.maven.di.impl.TypeUtils.simplifyType;
+import static org.apache.maven.di.impl.Types.simplifyType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TypeUtilsTest {
+
+    TreeSet<String> aField;
+
+    @Test
+    void testGetSuperTypes() {
+        Type type = new Key<TreeSet<String>>() {}.getType();
+        Set<Type> types = Types.getAllSuperTypes(type);
+        assertNotNull(types);
+        List<String> typesStr = types.stream().map(Type::toString).sorted().collect(Collectors.toList());
+        typesStr.remove("java.util.SequencedSet<java.lang.String>");
+        typesStr.remove("java.util.SequencedCollection<java.lang.String>");
+        assertEquals(
+                Arrays.asList(
+                        "class java.lang.Object",
+                        "interface java.io.Serializable",
+                        "interface java.lang.Cloneable",
+                        "java.lang.Iterable<java.lang.String>",
+                        "java.util.AbstractCollection<java.lang.String>",
+                        "java.util.AbstractSet<java.lang.String>",
+                        "java.util.Collection<java.lang.String>",
+                        "java.util.NavigableSet<java.lang.String>",
+                        "java.util.Set<java.lang.String>",
+                        "java.util.SortedSet<java.lang.String>",
+                        "java.util.TreeSet<java.lang.String>"),
+                typesStr);
+    }
 
     @Test
     public void testSimplifyType() {
@@ -36,96 +68,96 @@ public class TypeUtilsTest {
         }
 
         {
-            Type type = new TypeT<Set<Integer>>() {}.getType();
+            Type type = new Key<Set<Integer>>() {}.getType();
             assertEquals(type, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<Set<Set<Integer>>>>() {}.getType();
+            Type type = new Key<Set<Set<Set<Integer>>>>() {}.getType();
             assertEquals(type, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<? extends Integer>>() {}.getType();
-            Type expected = new TypeT<Set<Integer>>() {}.getType();
+            Type type = new Key<Set<? extends Integer>>() {}.getType();
+            Type expected = new Key<Set<Integer>>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<? extends Set<? extends Set<? extends Integer>>>>() {}.getType();
-            Type expected = new TypeT<Set<Set<Set<Integer>>>>() {}.getType();
+            Type type = new Key<Set<? extends Set<? extends Set<? extends Integer>>>>() {}.getType();
+            Type expected = new Key<Set<Set<Set<Integer>>>>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<Set<? extends Set<Integer>>>>() {}.getType();
-            Type expected = new TypeT<Set<Set<Set<Integer>>>>() {}.getType();
+            Type type = new Key<Set<Set<? extends Set<Integer>>>>() {}.getType();
+            Type expected = new Key<Set<Set<Set<Integer>>>>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<? super Integer>>() {}.getType();
-            Type expected = new TypeT<Set<Integer>>() {}.getType();
+            Type type = new Key<Set<? super Integer>>() {}.getType();
+            Type expected = new Key<Set<Integer>>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<? super Set<? super Set<? super Integer>>>>() {}.getType();
-            Type expected = new TypeT<Set<Set<Set<Integer>>>>() {}.getType();
+            Type type = new Key<Set<? super Set<? super Set<? super Integer>>>>() {}.getType();
+            Type expected = new Key<Set<Set<Set<Integer>>>>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<Set<? super Set<Integer>>>>() {}.getType();
-            Type expected = new TypeT<Set<Set<Set<Integer>>>>() {}.getType();
+            Type type = new Key<Set<Set<? super Set<Integer>>>>() {}.getType();
+            Type expected = new Key<Set<Set<Set<Integer>>>>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<? extends Set<? super Set<? extends Integer>>>>() {}.getType();
-            Type expected = new TypeT<Set<Set<Set<Integer>>>>() {}.getType();
+            Type type = new Key<Set<? extends Set<? super Set<? extends Integer>>>>() {}.getType();
+            Type expected = new Key<Set<Set<Set<Integer>>>>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<? extends Integer>[]>() {}.getType();
-            Type expected = new TypeT<Set<Integer>[]>() {}.getType();
+            Type type = new Key<Set<? extends Integer>[]>() {}.getType();
+            Type expected = new Key<Set<Integer>[]>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<Set<? super Integer>[]>() {}.getType();
-            Type expected = new TypeT<Set<Integer>[]>() {}.getType();
+            Type type = new Key<Set<? super Integer>[]>() {}.getType();
+            Type expected = new Key<Set<Integer>[]>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<TestInterface<? extends Integer, ? extends Integer>>() {}.getType();
-            Type expected = new TypeT<TestInterface<Integer, Integer>>() {}.getType();
+            Type type = new Key<TestInterface<? extends Integer, ? extends Integer>>() {}.getType();
+            Type expected = new Key<TestInterface<Integer, Integer>>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<TestInterface<Integer, Integer>>() {}.getType();
-            Type expected = new TypeT<TestInterface<Integer, Integer>>() {}.getType();
+            Type type = new Key<TestInterface<Integer, Integer>>() {}.getType();
+            Type expected = new Key<TestInterface<Integer, Integer>>() {}.getType();
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<TestClass<?, ?, ?, ?, ?, ?, ?, ?, ?>>() {}.getType();
+            Type type = new Key<TestClass<?, ?, ?, ?, ?, ?, ?, ?, ?>>() {}.getType();
             Type expected = TestClass.class;
             assertEquals(expected, simplifyType(type));
         }
 
         {
-            Type type = new TypeT<TestClass<?, ?, ?, Object, ?, ?, ?, ?, ?>>() {}.getType();
+            Type type = new Key<TestClass<?, ?, ?, Object, ?, ?, ?, ?, ?>>() {}.getType();
             Type expected = TestClass.class;
             assertEquals(expected, simplifyType(type));
         }
 
         {
             //noinspection TypeParameterExplicitlyExtendsObject
-            Type type = new TypeT<
+            Type type = new Key<
                     TestClass<
                             Integer,
                             ? extends Integer,
@@ -136,7 +168,7 @@ public class TypeUtilsTest {
                             ?,
                             Set<? extends TestInterface<Integer, ? extends Integer>>,
                             Set<? super TestInterface<Integer, ? super Integer>>>>() {}.getType();
-            Type expected = new TypeT<
+            Type expected = new Key<
                     TestClass<
                             Integer,
                             Integer,

@@ -27,6 +27,7 @@ import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 
 @Named("classpath")
 @Singleton
+@Deprecated
 public class TestMavenRepositorySystem extends LegacyRepositorySystem {
     @Inject
     private ArtifactResolver artifactResolver;

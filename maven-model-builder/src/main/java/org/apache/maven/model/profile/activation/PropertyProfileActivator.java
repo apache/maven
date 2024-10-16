@@ -34,9 +34,11 @@ import org.apache.maven.model.profile.ProfileActivationContext;
  * Determines profile activation based on the existence or value of some execution property.
  *
  * @see ActivationProperty
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("property")
 @Singleton
+@Deprecated(since = "4.0.0")
 public class PropertyProfileActivator implements ProfileActivator {
 
     @Override
@@ -61,7 +63,7 @@ public class PropertyProfileActivator implements ProfileActivator {
             name = name.substring(1);
         }
 
-        if (name == null || name.length() <= 0) {
+        if (name == null || name.isEmpty()) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
                     .setMessage("The property name is required to activate the profile " + profile.getId())
                     .setLocation(property.getLocation("")));

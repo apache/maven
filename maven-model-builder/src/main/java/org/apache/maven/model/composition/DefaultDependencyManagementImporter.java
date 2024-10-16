@@ -21,7 +21,14 @@ package org.apache.maven.model.composition;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -35,9 +42,11 @@ import org.apache.maven.model.building.ModelProblemCollectorRequest;
 /**
  * Handles the import of dependency management from other models into the target model.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultDependencyManagementImporter implements DependencyManagementImporter {
 
     @Override
@@ -70,7 +79,7 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                         problems.add(new ModelProblemCollectorRequest(
                                         ModelProblem.Severity.WARNING, ModelProblem.Version.V40)
                                 .setMessage("Ignored POM import for: " + toString(dependency) + " as already imported "
-                                        + toString(present) + ".  Add a the conflicting managed dependency directly "
+                                        + toString(present) + ". Add the conflicting managed dependency directly "
                                         + "to the dependencyManagement section of the POM."));
                     }
                 }

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.repository.internal;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -27,14 +27,16 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 abstract class MavenSnapshotMetadata extends MavenMetadata {
     static final String SNAPSHOT = "SNAPSHOT";
 
     protected final Collection<Artifact> artifacts = new ArrayList<>();
 
-    protected MavenSnapshotMetadata(Metadata metadata, File file, Date timestamp) {
-        super(metadata, file, timestamp);
+    protected MavenSnapshotMetadata(Metadata metadata, Path path, Date timestamp) {
+        super(metadata, path, timestamp);
     }
 
     protected static Metadata createRepositoryMetadata(Artifact artifact) {

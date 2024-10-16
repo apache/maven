@@ -40,10 +40,12 @@ import org.apache.maven.model.merge.MavenModelMerger;
 /**
  * Handles injection of plugin management into the model.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @SuppressWarnings({"checkstyle:methodname"})
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultPluginManagementInjector implements PluginManagementInjector {
 
     private ManagementModelMerger merger = new ManagementModelMerger();

@@ -32,7 +32,7 @@ Configuration levels in maven
 
 * Site configuration
 
- At the site level all configuration is achieved by tweaking the the various files that
+ At the site level all configuration is achieved by tweaking the various files that
  are available in the ${maven.home}/site-configuration directory
 
 +-----+

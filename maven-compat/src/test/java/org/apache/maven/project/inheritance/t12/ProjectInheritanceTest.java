@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * Verifies that plugin execution sections in the parent POM that have
  * inherit == false are not inherited to the child POM.
  */
+@Deprecated
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //

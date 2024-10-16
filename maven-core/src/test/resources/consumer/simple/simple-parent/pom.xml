@@ -17,7 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0-alpha-8.xsd">
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
   <parent>
     <groupId>org.sonatype.mavenbook.multi</groupId>
     <artifactId>parent</artifactId>
@@ -26,15 +26,15 @@ under the License.
   <packaging>pom</packaging>
   <name>Multi Chapter Simple Parent Project</name>
 
-  <modules>
-    <module>simple-weather</module>
-    <module>simple-webapp</module>
+  <subprojects>
+    <subproject>simple-weather</subproject>
+    <subproject>simple-webapp</subproject>
 
     <!-- On purpose at the end, project graph is responsible for ordering -->
     <!-- Build/consumer should not be effected by reverse order -->
-    <module>simple-testutils</module>
-    <module>utils-parent</module>
-  </modules>
+    <subproject>simple-testutils</subproject>
+    <subproject>utils-parent</subproject>
+  </subprojects>
 
   <build>
     <pluginManagement>

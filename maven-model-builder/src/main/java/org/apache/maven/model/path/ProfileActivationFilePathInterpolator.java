@@ -36,9 +36,11 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 /**
  * Finds an absolute path for {@link ActivationFile#getExists()} or {@link ActivationFile#getMissing()}
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated
 public class ProfileActivationFilePathInterpolator {
 
     private final PathTranslator pathTranslator;
@@ -82,7 +84,7 @@ public class ProfileActivationFilePathInterpolator {
         interpolator.addValueSource(new AbstractValueSource(false) {
             @Override
             public Object getValue(String expression) {
-                if ("rootDirectory".equals(expression)) {
+                if ("project.rootDirectory".equals(expression)) {
                     Path base = basedir != null ? basedir.toPath() : null;
                     Path root = rootLocator.findMandatoryRoot(base);
                     return root.toFile().getAbsolutePath();

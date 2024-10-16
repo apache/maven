@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -40,14 +41,21 @@ import org.eclipse.aether.impl.MetadataGenerator;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.util.ConfigUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maven G level metadata generator.
  * <p>
  * Plugin metadata contains G level list of "prefix" to A mapping for plugins present under this G.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 class PluginsMetadataGenerator implements MetadataGenerator {
     private static final String PLUGIN_DESCRIPTOR_LOCATION = "META-INF/maven/plugin.xml";
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Map<Object, PluginsMetadata> processedPlugins;
 
@@ -115,8 +123,8 @@ class PluginsMetadataGenerator implements MetadataGenerator {
         if (artifact != null
                 && "jar".equals(artifact.getExtension())
                 && "".equals(artifact.getClassifier())
-                && artifact.getFile() != null) {
-            Path artifactPath = artifact.getFile().toPath();
+                && artifact.getPath() != null) {
+            Path artifactPath = artifact.getPath();
             if (Files.isRegularFile(artifactPath)) {
                 try (JarFile artifactJar = new JarFile(artifactPath.toFile(), false)) {
                     ZipEntry pluginDescriptorEntry = artifactJar.getEntry(PLUGIN_DESCRIPTOR_LOCATION);
@@ -129,17 +137,41 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                             // - maven-plugin-api (for model)
                             // - Plexus Container (for model supporting classes and exceptions)
                             XmlNode root = XmlNodeBuilder.build(is, null);
-                            String groupId = root.getChild("groupId").getValue();
-                            String artifactId = root.getChild("artifactId").getValue();
-                            String goalPrefix = root.getChild("goalPrefix").getValue();
-                            String name = root.getChild("name").getValue();
-                            return new PluginInfo(groupId, artifactId, goalPrefix, name);
+                            String groupId = mayGetChild(root, "groupId");
+                            String artifactId = mayGetChild(root, "artifactId");
+                            String goalPrefix = mayGetChild(root, "goalPrefix");
+                            String name = mayGetChild(root, "name");
+                            // sanity check: plugin descriptor extracted from artifact must have same GA
+                            if (Objects.equals(artifact.getGroupId(), groupId)
+                                    && Objects.equals(artifact.getArtifactId(), artifactId)) {
+                                // here groupId and artifactId cannot be null
+                                return new PluginInfo(groupId, artifactId, goalPrefix, name);
+                            } else {
+                                logger.warn(
+                                        "Artifact {}:{}"
+                                                + " JAR (about to be installed/deployed) contains Maven Plugin metadata for"
+                                                + " conflicting coordinates: {}:{}."
+                                                + " Your JAR contains rogue Maven Plugin metadata."
+                                                + " Possible causes may be: shaded into this JAR some Maven Plugin or some rogue resource.",
+                                        artifact.getGroupId(),
+                                        artifact.getArtifactId(),
+                                        groupId,
+                                        artifactId);
+                            }
                         }
                     }
                 } catch (Exception e) {
                     // here we can have: IO. ZIP or Plexus Conf Ex: but we should not interfere with user intent
                 }
             }
+        }
+        return null;
+    }
+
+    private static String mayGetChild(XmlNode node, String child) {
+        XmlNode c = node.getChild(child);
+        if (c != null) {
+            return c.getValue();
         }
         return null;
     }

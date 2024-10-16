@@ -29,9 +29,12 @@ import org.eclipse.aether.installation.InstallRequest;
 
 /**
  * Maven GA level metadata generator factory.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Named(VersionsMetadataGeneratorFactory.NAME)
 @Singleton
+@Deprecated(since = "4.0.0")
 public class VersionsMetadataGeneratorFactory implements MetadataGeneratorFactory {
     public static final String NAME = "versions";
 
@@ -45,7 +48,6 @@ public class VersionsMetadataGeneratorFactory implements MetadataGeneratorFactor
         return new VersionsMetadataGenerator(session, request);
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     @Override
     public float getPriority() {
         return 20; // GA level metadata should be deployed 2nd MD

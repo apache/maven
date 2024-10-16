@@ -18,37 +18,37 @@
  */
 package org.apache.maven.di.impl;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import org.apache.maven.di.Key;
 
 import static java.util.stream.Collectors.toSet;
 
 public abstract class BindingInitializer<T> {
 
-    private final Set<Key<?>> dependencies;
+    private final Set<Dependency<?>> dependencies;
 
-    protected BindingInitializer(Set<Key<?>> dependencies) {
+    protected BindingInitializer(Set<Dependency<?>> dependencies) {
         this.dependencies = dependencies;
     }
 
-    public Set<Key<?>> getDependencies() {
+    public Set<Dependency<?>> getDependencies() {
         return dependencies;
     }
 
-    public abstract Consumer<T> compile(Function<Key<?>, Supplier<?>> compiler);
+    public abstract Consumer<T> compile(Function<Dependency<?>, Supplier<?>> compiler);
 
     public static <T> BindingInitializer<T> combine(List<BindingInitializer<T>> bindingInitializers) {
-        Set<Key<?>> deps = bindingInitializers.stream()
+        Set<Dependency<?>> deps = bindingInitializers.stream()
                 .map(BindingInitializer::getDependencies)
                 .flatMap(Collection::stream)
                 .collect(toSet());
-        return new BindingInitializer<T>(deps) {
+        return new BindingInitializer<>(deps) {
             @Override
-            public Consumer<T> compile(Function<Key<?>, Supplier<?>> compiler) {
+            public Consumer<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
                 return instance -> bindingInitializers.stream()
                         .map(bindingInitializer -> bindingInitializer.compile(compiler))
                         .forEach(i -> i.accept(instance));

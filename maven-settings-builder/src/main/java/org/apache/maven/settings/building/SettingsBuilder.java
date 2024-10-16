@@ -22,7 +22,9 @@ package org.apache.maven.settings.building;
  * Builds the effective settings from a user settings file, a project settings file
  * and/or a global settings file.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.SettingsBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface SettingsBuilder {
 
     /**

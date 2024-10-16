@@ -28,14 +28,18 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParserException;
-import org.apache.maven.model.version.ModelVersionParser;
+import org.apache.maven.api.services.model.ModelVersionParser;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.VersionScheme;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
+ */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultModelVersionParser implements ModelVersionParser {
     private static final String SNAPSHOT = "SNAPSHOT";
     private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");

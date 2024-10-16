@@ -20,14 +20,20 @@ package org.apache.maven.api.spi;
 
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.di.Named;
 
 /**
  * Component able to contribute to Maven session user properties. This SPI component is invoked
  * very early, while there is no session created yet.
+ *
+ * @since 4.0.0
  */
 @Experimental
-public interface PropertyContributor {
+@Consumer
+@Named
+public interface PropertyContributor extends SpiService {
     /**
      * Invoked just before session is created with a mutable map that carries collected user properties so far.
      *

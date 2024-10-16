@@ -29,9 +29,12 @@ import org.eclipse.aether.installation.InstallRequest;
 
 /**
  * Maven GAV level metadata generator factory.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Named(SnapshotMetadataGeneratorFactory.NAME)
 @Singleton
+@Deprecated(since = "4.0.0")
 public class SnapshotMetadataGeneratorFactory implements MetadataGeneratorFactory {
     public static final String NAME = "snapshot";
 
@@ -45,7 +48,6 @@ public class SnapshotMetadataGeneratorFactory implements MetadataGeneratorFactor
         return new RemoteSnapshotMetadataGenerator(session, request);
     }
 
-    @SuppressWarnings("checkstyle:magicnumber")
     @Override
     public float getPriority() {
         return 30; // GAV level metadata should be deployed 1st MD

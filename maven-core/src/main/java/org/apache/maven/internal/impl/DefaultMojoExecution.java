@@ -41,10 +41,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyNode;
 
 public class DefaultMojoExecution implements MojoExecution {
-    private final InternalSession session;
+    private final InternalMavenSession session;
     private final org.apache.maven.plugin.MojoExecution delegate;
 
-    public DefaultMojoExecution(InternalSession session, org.apache.maven.plugin.MojoExecution delegate) {
+    public DefaultMojoExecution(InternalMavenSession session, org.apache.maven.plugin.MojoExecution delegate) {
         this.session = session;
         this.delegate = delegate;
     }

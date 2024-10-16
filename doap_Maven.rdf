@@ -88,6 +88,39 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2024-08-17</created>
+        <revision>3.9.9</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.9/source/apache-maven-3.9.9-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.9/source/apache-maven-3.9.9-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.8</name>
+        <created>2024-06-17</created>
+        <revision>3.9.8</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.8/binaries/apache-maven-3.9.8-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.8/binaries/apache-maven-3.9.8-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.8/source/apache-maven-3.9.8-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.8/source/apache-maven-3.9.8-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.7</name>
+        <created>2024-05-22</created>
+        <revision>3.9.7</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.7/source/apache-maven-3.9.7-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.7/source/apache-maven-3.9.7-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.6</name>
         <created>2023-12-01</created>
         <revision>3.9.6</revision>
         <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.zip</file-release>

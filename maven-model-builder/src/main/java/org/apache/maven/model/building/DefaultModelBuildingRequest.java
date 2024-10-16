@@ -33,11 +33,13 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 /**
  * Collects settings that control building of effective models.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     private Model fileModel;
 
-    private File pomFile;
+    private Path pomPath;
 
     private ModelSource modelSource;
 
@@ -84,7 +86,7 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
      * @param request The request to copy, must not be {@code null}.
      */
     public DefaultModelBuildingRequest(ModelBuildingRequest request) {
-        setPomFile(request.getPomFile());
+        setPomPath(request.getPomPath());
         setModelSource(request.getModelSource());
         setValidationLevel(request.getValidationLevel());
         setProcessPlugins(request.isProcessPlugins());
@@ -104,22 +106,34 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
         setRootDirectory(request.getRootDirectory());
     }
 
+    @Deprecated
     @Override
     public File getPomFile() {
-        return pomFile;
+        return pomPath != null ? pomPath.toFile() : null;
     }
 
     @Override
-    public DefaultModelBuildingRequest setPomFile(File pomFile) {
-        this.pomFile = (pomFile != null) ? pomFile.getAbsoluteFile() : null;
+    public Path getPomPath() {
+        return pomPath;
+    }
 
+    @Deprecated
+    @Override
+    public DefaultModelBuildingRequest setPomFile(File pomFile) {
+        this.pomPath = (pomFile != null) ? pomFile.toPath().toAbsolutePath() : null;
+        return this;
+    }
+
+    @Override
+    public DefaultModelBuildingRequest setPomPath(Path pomPath) {
+        this.pomPath = (pomPath != null) ? pomPath.toAbsolutePath() : null;
         return this;
     }
 
     @Override
     public synchronized ModelSource getModelSource() {
-        if (modelSource == null && pomFile != null) {
-            modelSource = new FileModelSource(pomFile);
+        if (modelSource == null && pomPath != null) {
+            modelSource = new FileModelSource(pomPath);
         }
         return modelSource;
     }

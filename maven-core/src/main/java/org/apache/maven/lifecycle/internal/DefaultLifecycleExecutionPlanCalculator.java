@@ -24,7 +24,15 @@ import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.api.plugin.descriptor.lifecycle.Execution;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Phase;
@@ -467,7 +475,14 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         }
 
         for (Phase phase : lifecycleOverlay.getPhases()) {
-            List<MojoExecution> forkedExecutions = lifecycleMappings.get(phase.getId());
+            String phaseId = defaultLifecycles.getLifeCycles().stream()
+                    .flatMap(l -> l.getDelegate().aliases().stream())
+                    .filter(a -> phase.getId().equals(a.v3Phase()))
+                    .findFirst()
+                    .map(a -> a.v4Phase())
+                    .orElse(phase.getId());
+
+            List<MojoExecution> forkedExecutions = lifecycleMappings.get(phaseId);
 
             if (forkedExecutions != null) {
                 for (Execution execution : phase.getExecutions()) {

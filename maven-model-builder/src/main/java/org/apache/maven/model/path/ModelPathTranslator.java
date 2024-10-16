@@ -19,6 +19,7 @@
 package org.apache.maven.model.path;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -26,7 +27,9 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 /**
  * Resolves relative paths of a model against a specific base directory.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ModelPathTranslator {
 
     /**
@@ -36,6 +39,19 @@ public interface ModelPathTranslator {
      * @param model The model whose paths should be resolved, may be {@code null}.
      * @param basedir The base directory to resolve relative paths against, may be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
+     * @deprecated Use {@link #alignToBaseDirectory(Model, Path, ModelBuildingRequest)} instead.
      */
+    @Deprecated
     void alignToBaseDirectory(Model model, File basedir, ModelBuildingRequest request);
+
+    /**
+     * Resolves the well-known paths of the specified model against the given base directory. Paths within plugin
+     * configuration are not processed.
+     *
+     * @param model The model whose paths should be resolved, may be {@code null}.
+     * @param basedir The base directory to resolve relative paths against, may be {@code null}.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @since 4.0.0
+     */
+    void alignToBaseDirectory(Model model, Path basedir, ModelBuildingRequest request);
 }

@@ -60,5 +60,23 @@ under the License.
       </activation>
     </profile>
 
+    <profile>
+      <id>dynamic-property-available</id>
+      <activation>
+        <property>
+          <name>${activationProperty}</name>
+        </property>
+      </activation>
+    </profile>
+
+    <profile>
+      <id>matches-another-property</id>
+      <activation>
+        <property>
+          <name>foo</name>
+          <value>${bar}</value>
+        </property>
+      </activation>
+    </profile>
   </profiles>
 </project>

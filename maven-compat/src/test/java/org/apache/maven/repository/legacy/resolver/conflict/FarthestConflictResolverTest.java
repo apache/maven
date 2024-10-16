@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
  *
  * @see FarthestConflictResolver
  */
+@Deprecated
 class FarthestConflictResolverTest extends AbstractConflictResolverTest {
     // constructors -----------------------------------------------------------
 

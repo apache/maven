@@ -24,7 +24,9 @@ import java.util.Properties;
 /**
  * Collects settings that control the building of effective settings.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.SettingsBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface SettingsBuildingRequest {
 
     /**

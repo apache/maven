@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.di.impl.ReflectionUtils;
-import org.apache.maven.di.impl.TypeUtils;
 import org.apache.maven.di.impl.Types;
 import org.apache.maven.di.impl.Utils;
 
@@ -32,7 +31,7 @@ import org.apache.maven.di.impl.Utils;
  * The key defines an identity of a binding. In any DI, a key is usually a type of the object along
  * with some optional tag to distinguish between bindings which make objects of the same type.
  * <p>
- * In ActiveJ Inject, a key is also a type token - special abstract class that can store type information
+ * In Maven Inject, a key is also a type token - special abstract class that can store type information
  * with the shortest syntax possible in Java.
  * <p>
  * For example, to create a key of type Map&lt;String, List&lt;Integer&gt;&gt;, you can just use
@@ -54,12 +53,12 @@ public abstract class Key<T> {
     }
 
     protected Key(@Nullable Object qualifier) {
-        this.type = TypeUtils.simplifyType(getTypeParameter());
+        this.type = Types.simplifyType(getTypeParameter());
         this.qualifier = qualifier;
     }
 
     protected Key(Type type, @Nullable Object qualifier) {
-        this.type = TypeUtils.simplifyType(type);
+        this.type = Types.simplifyType(type);
         this.qualifier = qualifier;
     }
 
@@ -129,8 +128,15 @@ public abstract class Key<T> {
      * and prepended qualifier display string if this key has a qualifier.
      */
     public String getDisplayString() {
-        return (qualifier != null ? Utils.getDisplayString(qualifier) + " " : "")
-                + ReflectionUtils.getDisplayName(type);
+        return (qualifier != null ? getQualifierDisplayString() + " " : "") + ReflectionUtils.getDisplayName(type);
+    }
+
+    private String getQualifierDisplayString() {
+        if (qualifier instanceof String s) {
+            return s.isEmpty() ? "@Named" : "@Named(\"" + s + "\")";
+        }
+        String s = Utils.getDisplayString(qualifier);
+        return s;
     }
 
     @Override
@@ -156,6 +162,6 @@ public abstract class Key<T> {
 
     @Override
     public String toString() {
-        return (qualifier != null ? qualifier + " " : "") + type.getTypeName();
+        return getDisplayString();
     }
 }

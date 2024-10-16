@@ -68,6 +68,6 @@ public class ExecutionPlanItem {
 
     @Override
     public String toString() {
-        return "ExecutionPlanItem{" + ", mojoExecution=" + mojoExecution + '}' + super.toString();
+        return "ExecutionPlanItem{" + mojoExecution.toString() + "}@" + Integer.toHexString(hashCode());
     }
 }

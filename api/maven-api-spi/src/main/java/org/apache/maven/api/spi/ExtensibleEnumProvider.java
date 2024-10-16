@@ -21,8 +21,24 @@ package org.apache.maven.api.spi;
 import java.util.Collection;
 
 import org.apache.maven.api.ExtensibleEnum;
+import org.apache.maven.api.annotations.Consumer;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
-public interface ExtensibleEnumProvider<T extends ExtensibleEnum> {
+/**
+ * An SPI interface to extend Maven with a new enum value.
+ *
+ * @param <T> The type of extensible enum to extend
+ */
+@Experimental
+@Consumer
+public interface ExtensibleEnumProvider<T extends ExtensibleEnum> extends SpiService {
 
+    /**
+     * Registers new values for the T extensible enum.
+     *
+     * @return a collection of T instances to register
+     */
+    @Nonnull
     Collection<T> provides();
 }

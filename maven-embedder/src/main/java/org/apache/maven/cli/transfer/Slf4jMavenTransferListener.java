@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cli.transfer;
 
-import java.util.Locale;
-
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -75,7 +73,7 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
 
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        FileSizeFormat format = new FileSizeFormat();
 
         StringBuilder message = new StringBuilder();
         message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());

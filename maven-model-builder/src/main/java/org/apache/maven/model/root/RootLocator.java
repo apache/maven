@@ -35,7 +35,9 @@ import org.apache.maven.api.annotations.Nullable;
  * or a {@code pom.xml} containing the {@code root="true"} attribute.
  *
  * @see DefaultRootLocator
+ * @deprecated use {@link org.apache.maven.api.services.model.RootLocator} instead
  */
+@Deprecated(since = "4.0.0")
 public interface RootLocator {
 
     String UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE = "Unable to find the root directory. "

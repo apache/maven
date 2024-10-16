@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-13-SNAPSHOT</version>
+    <version>4.0.0-beta-5-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-core</artifactId>
@@ -77,15 +77,23 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-resolver-provider</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-spi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-jline</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-logging</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
@@ -135,6 +143,21 @@ under the License.
 
     <!-- Test -->
     <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
@@ -150,11 +173,6 @@ under the License.
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-params</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-testing</artifactId>
       <scope>test</scope>
@@ -163,11 +181,6 @@ under the License.
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
       <version>${mockitoVersion}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -300,6 +313,8 @@ under the License.
               <!-- END default constructor on Plexus/JSR 330 components -->
               <!-- system property with that name no longer evaluated -->
               <exclude>org.apache.maven.project.DefaultProjectBuilder#DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY</exclude>
+              <exclude>org.apache.maven.project.DefaultModelBuildingListener</exclude>
+              <exclude>org.apache.maven.project.ProjectModelResolver#ProjectModelResolver(org.eclipse.aether.RepositorySystemSession,org.eclipse.aether.RequestTrace,org.eclipse.aether.RepositorySystem,org.eclipse.aether.impl.RemoteRepositoryManager,java.util.List,org.apache.maven.project.ProjectBuildingRequest$RepositoryMerging,org.apache.maven.project.ReactorModelPool):CONSTRUCTOR_REMOVED</exclude>
               <!-- was only a workaround for Plexus Container, hopefully never used by anyone else -->
               <exclude>org.apache.maven.plugin.DefaultBuildPluginManager#setMojoExecutionListeners(java.util.List)</exclude>
               <!-- could have never been used due to usage of non-export class (CoreExportsProvider) -->

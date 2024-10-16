@@ -29,19 +29,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Model;
+import org.apache.maven.internal.impl.resolver.MavenWorkspaceReader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
-import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
@@ -92,9 +101,9 @@ class ReactorReader implements MavenWorkspaceReader {
         MavenProject project = getProject(artifact);
 
         if (project != null) {
-            File file = findArtifact(project, artifact);
+            File file = findArtifact(project, artifact, true);
             if (file == null && project != project.getExecutionProject()) {
-                file = findArtifact(project.getExecutionProject(), artifact);
+                file = findArtifact(project.getExecutionProject(), artifact, true);
             }
             return file;
         }
@@ -124,7 +133,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
                 .values()
                 .stream()
-                .filter(p -> Objects.nonNull(findArtifact(p, artifact)))
+                .filter(p -> Objects.nonNull(findArtifact(p, artifact, false)))
                 .map(MavenProject::getVersion)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
@@ -132,35 +141,35 @@ class ReactorReader implements MavenWorkspaceReader {
     @Override
     public Model findModel(Artifact artifact) {
         MavenProject project = getProject(artifact);
-        return project == null ? null : project.getModel();
+        return project == null ? null : project.getModel().getDelegate();
     }
 
     //
     // Implementation
     //
 
-    private File findArtifact(MavenProject project, Artifact artifact) {
+    private File findArtifact(MavenProject project, Artifact artifact, boolean checkUptodate) {
         // POMs are always returned from the file system
         if ("pom".equals(artifact.getExtension())) {
             return project.getFile();
-        }
-
-        // First check in the project local repository
-        File packagedArtifactFile = findInProjectLocalRepository(artifact);
-        if (packagedArtifactFile != null
-                && packagedArtifactFile.exists()
-                && isPackagedArtifactUpToDate(project, packagedArtifactFile)) {
-            return packagedArtifactFile;
         }
 
         // Get the matching artifact from the project
         Artifact projectArtifact = findMatchingArtifact(project, artifact);
         if (projectArtifact != null) {
             // If the artifact has been associated to a file, use it
-            packagedArtifactFile = projectArtifact.getFile();
+            File packagedArtifactFile = projectArtifact.getFile();
             if (packagedArtifactFile != null && packagedArtifactFile.exists()) {
                 return packagedArtifactFile;
             }
+        }
+
+        // Check in the project local repository
+        File packagedArtifactFile = findInProjectLocalRepository(artifact);
+        if (packagedArtifactFile != null
+                && packagedArtifactFile.exists()
+                && (!checkUptodate || isPackagedArtifactUpToDate(project, packagedArtifactFile))) {
+            return packagedArtifactFile;
         }
 
         if (!hasBeenPackagedDuringThisSession(project)) {
@@ -270,9 +279,8 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private Path relativizeOutputFile(final Path outputFile) {
-        Path projectBaseDirectory =
-                Paths.get(session.getRequest().getMultiModuleProjectDirectory().toURI());
-        return projectBaseDirectory.relativize(outputFile);
+        Path rootDirectory = session.getRequest().getRootDirectory();
+        return rootDirectory.relativize(outputFile);
     }
 
     /**
@@ -409,7 +417,7 @@ class ReactorReader implements MavenWorkspaceReader {
             LOGGER.info("Copying {} to project local repository", artifact);
             Files.createDirectories(target.getParent());
             Files.copy(
-                    artifact.getFile().toPath(),
+                    artifact.getPath(),
                     target,
                     StandardCopyOption.REPLACE_EXISTING,
                     StandardCopyOption.COPY_ATTRIBUTES);
@@ -436,7 +444,7 @@ class ReactorReader implements MavenWorkspaceReader {
 
     private Path getProjectLocalRepo() {
         if (projectLocalRepository == null) {
-            Path root = session.getRequest().getMultiModuleProjectDirectory().toPath();
+            Path root = session.getRequest().getRootDirectory();
             List<MavenProject> projects = session.getProjects();
             if (projects != null) {
                 projectLocalRepository = projects.stream()
@@ -515,7 +523,6 @@ class ReactorReader implements MavenWorkspaceReader {
         public void init(Context context) throws Exception {}
 
         @Override
-        @SuppressWarnings("checkstyle:MissingSwitchDefault")
         public void onEvent(Object event) throws Exception {
             if (event instanceof ExecutionEvent) {
                 ReactorReader reactorReader = lookup.lookup(ReactorReader.class);

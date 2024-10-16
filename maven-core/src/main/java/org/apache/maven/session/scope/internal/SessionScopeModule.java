@@ -25,7 +25,7 @@ import com.google.inject.AbstractModule;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Session;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.InternalMavenSession;
 
 /**
  * SessionScopeModule
@@ -55,8 +55,8 @@ public class SessionScopeModule extends AbstractModule {
         bind(Session.class)
                 .toProvider(SessionScope.seededKeyProvider(Session.class))
                 .in(scope);
-        bind(InternalSession.class)
-                .toProvider(SessionScope.seededKeyProvider(InternalSession.class))
+        bind(InternalMavenSession.class)
+                .toProvider(SessionScope.seededKeyProvider(InternalMavenSession.class))
                 .in(scope);
     }
 }

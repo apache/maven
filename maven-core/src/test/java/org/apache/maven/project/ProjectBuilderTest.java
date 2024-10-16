@@ -28,16 +28,16 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.api.SessionData;
+import org.apache.maven.api.services.model.ModelCache;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelSource;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -83,10 +83,9 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         MavenSession mavenSession = createMavenSession(pomFile);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
-        ModelSource modelSource = new FileModelSource(pomFile);
         ProjectBuildingResult result = getContainer()
                 .lookup(org.apache.maven.project.ProjectBuilder.class)
-                .build(modelSource, configuration);
+                .build(pomFile, configuration);
 
         assertNotNull(result.getProject().getParentFile());
     }
@@ -169,8 +168,10 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // TODO a similar test should be created to test the dependency management (basically all usages
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
 
-        FileUtils.copyDirectory(new File("src/test/resources/projects/grandchild-check"), tempDir.toFile());
+        FileUtils.copyDirectoryStructure(new File("src/test/resources/projects/grandchild-check"), tempDir.toFile());
+
         MavenSession mavenSession = createMavenSession(null);
+        mavenSession.getRequest().setRootDirectory(tempDir);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
         org.apache.maven.project.ProjectBuilder projectBuilder =
@@ -178,6 +179,12 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         File child = new File(tempDir.toFile(), "child/pom.xml");
         // build project once
         projectBuilder.build(child, configuration);
+        // clear the cache
+        mavenSession
+                .getSession()
+                .getData()
+                .get(SessionData.key(ModelCache.class))
+                .clear();
         // modify parent
         File parent = new File(tempDir.toFile(), "pom.xml");
         String parentContent = new String(Files.readAllBytes(parent.toPath()), StandardCharsets.UTF_8);
@@ -214,7 +221,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // multi projects build entry point
         ProjectBuildingException ex2 = assertThrows(
                 ProjectBuildingException.class,
-                () -> projectBuilder.build(Collections.singletonList(pomFile), false, configuration));
+                () -> projectBuilder.build(Collections.singletonList(pomFile), true, configuration));
 
         assertEquals(1, ex2.getResults().size());
         MavenProject project2 = ex2.getResults().get(0).getProject();
@@ -310,7 +317,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
         configuration.setResolveDependencies(true);
-        List<ProjectBuildingResult> result = projectBuilder.build(Collections.singletonList(file), true, configuration);
+        List<ProjectBuildingResult> result =
+                projectBuilder.build(Collections.singletonList(file), false, configuration);
         MavenProject project = result.get(0).getProject();
         // verify a few typical parameters are not duplicated
         assertEquals(1, project.getTestCompileSourceRoots().size());
@@ -337,10 +345,9 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
-        ModelSource modelSource = new FileModelSource(pomFile);
         ProjectBuildingResult result = getContainer()
                 .lookup(org.apache.maven.project.ProjectBuilder.class)
-                .build(modelSource, configuration);
+                .build(pomFile, configuration);
 
         assertEquals(
                 pomFile.getAbsoluteFile(),

@@ -18,14 +18,22 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.ArtifactCoordinate;
+import java.util.List;
+
+import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
+import org.apache.maven.api.annotations.Nullable;
 
 import static org.apache.maven.api.services.BaseRequest.nonNull;
 
+/**
+ *
+ * @since 4.0.0
+ */
 @Experimental
 public interface VersionResolverRequest {
 
@@ -33,13 +41,28 @@ public interface VersionResolverRequest {
     Session getSession();
 
     @Nonnull
-    ArtifactCoordinate getArtifactCoordinate();
+    ArtifactCoordinates getArtifactCoordinates();
+
+    @Nullable
+    List<RemoteRepository> getRepositories();
 
     @Nonnull
-    static VersionResolverRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinate artifactCoordinate) {
+    static VersionResolverRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinates artifactCoordinates) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
-                .artifactCoordinate(nonNull(artifactCoordinate, "artifactCoordinate cannot be null"))
+                .artifactCoordinates(nonNull(artifactCoordinates, "artifactCoordinates cannot be null"))
+                .build();
+    }
+
+    @Nonnull
+    static VersionResolverRequest build(
+            @Nonnull Session session,
+            @Nonnull ArtifactCoordinates artifactCoordinates,
+            @Nullable List<RemoteRepository> repositories) {
+        return builder()
+                .session(nonNull(session, "session cannot be null"))
+                .artifactCoordinates(nonNull(artifactCoordinates, "artifactCoordinates cannot be null"))
+                .repositories(repositories)
                 .build();
     }
 
@@ -51,35 +74,52 @@ public interface VersionResolverRequest {
     @NotThreadSafe
     class VersionResolverRequestBuilder {
         Session session;
-        ArtifactCoordinate artifactCoordinate;
+        ArtifactCoordinates artifactCoordinates;
+        List<RemoteRepository> repositories;
 
         public VersionResolverRequestBuilder session(Session session) {
             this.session = session;
             return this;
         }
 
-        public VersionResolverRequestBuilder artifactCoordinate(ArtifactCoordinate artifactCoordinate) {
-            this.artifactCoordinate = artifactCoordinate;
+        public VersionResolverRequestBuilder artifactCoordinates(ArtifactCoordinates artifactCoordinates) {
+            this.artifactCoordinates = artifactCoordinates;
+            return this;
+        }
+
+        public VersionResolverRequestBuilder repositories(List<RemoteRepository> repositories) {
+            this.repositories = repositories;
             return this;
         }
 
         public VersionResolverRequest build() {
-            return new DefaultVersionResolverRequest(session, artifactCoordinate);
+            return new DefaultVersionResolverRequest(session, artifactCoordinates, repositories);
         }
 
         private static class DefaultVersionResolverRequest extends BaseRequest implements VersionResolverRequest {
-            private final ArtifactCoordinate artifactCoordinate;
+            private final ArtifactCoordinates artifactCoordinates;
+            private final List<RemoteRepository> repositories;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
-            DefaultVersionResolverRequest(@Nonnull Session session, @Nonnull ArtifactCoordinate artifactCoordinate) {
+            DefaultVersionResolverRequest(
+                    @Nonnull Session session,
+                    @Nonnull ArtifactCoordinates artifactCoordinates,
+                    @Nullable List<RemoteRepository> repositories) {
                 super(session);
-                this.artifactCoordinate = artifactCoordinate;
+                this.artifactCoordinates = artifactCoordinates;
+                this.repositories = repositories;
             }
 
             @Nonnull
             @Override
-            public ArtifactCoordinate getArtifactCoordinate() {
-                return artifactCoordinate;
+            public ArtifactCoordinates getArtifactCoordinates() {
+                return artifactCoordinates;
+            }
+
+            @Nullable
+            @Override
+            public List<RemoteRepository> getRepositories() {
+                return repositories;
             }
         }
     }

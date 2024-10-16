@@ -23,20 +23,25 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.model.Model;
+import org.apache.maven.internal.impl.resolver.ArtifactDescriptorUtils;
 import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
-import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -56,6 +61,8 @@ import org.eclipse.aether.resolution.VersionRangeResult;
  *
  */
 public class ProjectModelResolver implements ModelResolver {
+
+    private static final int MAX_CAP = 0x7fff;
 
     private final RepositorySystemSession session;
 
@@ -79,6 +86,9 @@ public class ProjectModelResolver implements ModelResolver {
 
     private final ProjectBuildingRequest.RepositoryMerging repositoryMerging;
 
+    private final Map<String, Future<Result>> parentCache;
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public ProjectModelResolver(
             RepositorySystemSession session,
             RequestTrace trace,
@@ -86,7 +96,8 @@ public class ProjectModelResolver implements ModelResolver {
             RemoteRepositoryManager remoteRepositoryManager,
             List<RemoteRepository> repositories,
             ProjectBuildingRequest.RepositoryMerging repositoryMerging,
-            ReactorModelPool modelPool) {
+            ReactorModelPool modelPool,
+            Map<String, Object> parentCache) {
         this.session = session;
         this.trace = trace;
         this.resolver = resolver;
@@ -98,6 +109,7 @@ public class ProjectModelResolver implements ModelResolver {
         this.repositoryMerging = repositoryMerging;
         this.repositoryIds = new HashSet<>();
         this.modelPool = modelPool;
+        this.parentCache = parentCache != null ? (Map) parentCache : new ConcurrentHashMap<>();
     }
 
     private ProjectModelResolver(ProjectModelResolver original) {
@@ -111,6 +123,7 @@ public class ProjectModelResolver implements ModelResolver {
         this.repositoryMerging = original.repositoryMerging;
         this.repositoryIds = new HashSet<>(original.repositoryIds);
         this.modelPool = original.modelPool;
+        this.parentCache = original.parentCache;
     }
 
     public void addRepository(Repository repository) throws InvalidRepositoryException {
@@ -129,8 +142,8 @@ public class ProjectModelResolver implements ModelResolver {
             removeMatchingRepository(pomRepositories, repository.getId());
         }
 
-        List<RemoteRepository> newRepositories = Collections.singletonList(
-                ArtifactDescriptorUtils.toRemoteRepository(new org.apache.maven.model.Repository(repository)));
+        List<RemoteRepository> newRepositories =
+                Collections.singletonList(ArtifactDescriptorUtils.toRemoteRepository(repository));
 
         if (ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals(repositoryMerging)) {
             repositories = remoteRepositoryManager.aggregateRepositories(session, repositories, newRepositories, true);
@@ -171,8 +184,65 @@ public class ProjectModelResolver implements ModelResolver {
         return new ArtifactModelSource(pomArtifact.getFile(), groupId, artifactId, version);
     }
 
+    record Result(ModelSource source, Parent parent, Exception e) {}
+
     @Override
     public ModelSource resolveModel(final Parent parent, AtomicReference<Parent> modified)
+            throws UnresolvableModelException {
+        Result result;
+        try {
+            Future<Result> future = parentCache.computeIfAbsent(parent.getId(), id -> {
+                ForkJoinPool pool = new ForkJoinPool(MAX_CAP);
+                ForkJoinTask<Result> task = new ForkJoinTask<>() {
+                    Result result;
+
+                    @Override
+                    public Result getRawResult() {
+                        return result;
+                    }
+
+                    @Override
+                    protected void setRawResult(Result result) {
+                        this.result = result;
+                    }
+
+                    @Override
+                    protected boolean exec() {
+                        try {
+                            AtomicReference<Parent> modified = new AtomicReference<>();
+                            ModelSource source = doResolveModel(parent, modified);
+                            result = new Result(source, modified.get(), null);
+                        } catch (Exception e) {
+                            result = new Result(null, null, e);
+                        } finally {
+                            pool.shutdown();
+                        }
+                        return true;
+                    }
+                };
+                pool.submit(task);
+                return task;
+            });
+            result = future.get();
+        } catch (Exception e) {
+            throw new UnresolvableModelException(e, parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
+        }
+        if (result.e != null) {
+            uncheckedThrow(result.e);
+            return null;
+        } else {
+            if (result.parent != null && modified != null) {
+                modified.set(result.parent);
+            }
+            return result.source;
+        }
+    }
+
+    static <T extends Throwable> void uncheckedThrow(Throwable t) throws T {
+        throw (T) t; // rely on vacuous cast
+    }
+
+    private ModelSource doResolveModel(Parent parent, AtomicReference<Parent> modified)
             throws UnresolvableModelException {
         try {
             final Artifact artifact =

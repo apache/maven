@@ -22,9 +22,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.inject.OutOfScopeException;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Session;
+import org.apache.maven.internal.impl.di.OutOfScopeException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -74,6 +74,7 @@ public class SessionScopeProxyTest {
         assertNotNull(bean.myBean.getSession());
         assertNotNull(bean.myBean.getAnotherBean());
         assertSame(bean.myBean.getAnotherBean().getClass(), AnotherBean.class);
+        assertThrows(TestException.class, () -> bean.myBean.throwException());
     }
 
     @Named
@@ -102,6 +103,8 @@ public class SessionScopeProxyTest {
         Session getSession();
 
         BeanItf2 getAnotherBean();
+
+        void throwException() throws TestException;
     }
 
     interface BeanItf2 {}
@@ -127,5 +130,11 @@ public class SessionScopeProxyTest {
         public BeanItf2 getAnotherBean() {
             return anotherBean;
         }
+
+        public void throwException() throws TestException {
+            throw new TestException();
+        }
     }
+
+    static class TestException extends Exception {}
 }

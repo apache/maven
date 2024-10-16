@@ -26,12 +26,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Version;
-import org.apache.maven.model.version.ModelVersionParser;
+import org.apache.maven.api.services.model.ModelVersionParser;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  */

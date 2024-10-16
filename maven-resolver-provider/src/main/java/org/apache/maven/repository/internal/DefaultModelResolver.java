@@ -53,7 +53,9 @@ import org.eclipse.aether.resolution.VersionRangeResult;
  * been initially specified and repositories discovered in dependency POMs are recessively merged into the search chain.
  *
  * @see DefaultArtifactDescriptorReader
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 class DefaultModelResolver implements ModelResolver {
 
     private final RepositorySystemSession session;
@@ -159,7 +161,7 @@ class DefaultModelResolver implements ModelResolver {
             throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
         }
 
-        return new ArtifactModelSource(pomArtifact.getFile(), groupId, artifactId, version);
+        return new ArtifactModelSource(pomArtifact.getPath(), groupId, artifactId, version);
     }
 
     @Override

@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.internal.impl.SettingsUtilsV4;
 import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -41,7 +42,6 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtilsV4;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
@@ -87,7 +87,6 @@ public class MavenSession implements Cloneable {
      * ({@link PluginDescriptor#getPluginLookupKey()}). Plugin contexts itself are mappings of {@link String} keys to
      * {@link Object} values.
      */
-    @SuppressWarnings("checkstyle:linelength")
     private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>>
             pluginContextsByProjectAndPluginKey = new ConcurrentHashMap<>();
 

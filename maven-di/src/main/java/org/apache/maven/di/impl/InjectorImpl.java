@@ -18,16 +18,37 @@
  */
 package org.apache.maven.di.impl;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.*;
+import java.net.URL;
+import java.util.AbstractList;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.di.Qualifier;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.di.Typed;
 import org.apache.maven.di.Injector;
@@ -37,18 +58,21 @@ import org.apache.maven.di.Scope;
 public class InjectorImpl implements Injector {
 
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
-    private final Map<Class<? extends Annotation>, Scope> scopes = new HashMap<>();
+    private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
+    private final Set<String> loadedUrls = new HashSet<>();
 
     public InjectorImpl() {
         bindScope(Singleton.class, new SingletonScope());
     }
 
+    @Override
     public <T> T getInstance(Class<T> key) {
         return getInstance(Key.of(key));
     }
 
+    @Override
     public <T> T getInstance(Key<T> key) {
-        return getCompiledBinding(key).get();
+        return getCompiledBinding(new Dependency<>(key, false)).get();
     }
 
     @SuppressWarnings("unchecked")
@@ -59,7 +83,37 @@ public class InjectorImpl implements Injector {
                 .accept(instance);
     }
 
+    @Override
+    public Injector discover(ClassLoader classLoader) {
+        try {
+            Enumeration<URL> enumeration = classLoader.getResources("META-INF/maven/org.apache.maven.api.di.Inject");
+            while (enumeration.hasMoreElements()) {
+                URL url = enumeration.nextElement();
+                if (loadedUrls.add(url.toExternalForm())) {
+                    try (InputStream is = url.openStream();
+                            BufferedReader reader =
+                                    new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
+                        for (String line :
+                                reader.lines().filter(l -> !l.startsWith("#")).toList()) {
+                            Class<?> clazz = classLoader.loadClass(line);
+                            bindImplicit(clazz);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DIException("Error while discovering DI classes from classLoader", e);
+        }
+        return this;
+    }
+
+    @Override
     public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope) {
+        return bindScope(scopeAnnotation, () -> scope);
+    }
+
+    @Override
+    public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Supplier<Scope> scope) {
         if (scopes.put(scopeAnnotation, scope) != null) {
             throw new DIException(
                     "Cannot rebind scope annotation class to a different implementation: " + scopeAnnotation);
@@ -67,6 +121,7 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
+    @Override
     public <U> Injector bindInstance(Class<U> clazz, U instance) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
         Binding<U> binding = Binding.toInstance(instance);
@@ -76,19 +131,39 @@ public class InjectorImpl implements Injector {
     @Override
     public Injector bindImplicit(Class<?> clazz) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
-        Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
-        return doBind(key, binding);
-    }
-
-    private Injector doBind(Key<?> key, Binding<?> binding) {
-        doBindImplicit(key, binding);
-        Class<?> cls = key.getRawType().getSuperclass();
-        while (cls != Object.class && cls != null) {
-            key = Key.of(cls, key.getQualifier());
-            doBindImplicit(key, binding);
-            cls = cls.getSuperclass();
+        if (clazz.isInterface()) {
+            bindings.computeIfAbsent(key, $ -> new HashSet<>());
+            if (key.getQualifier() != null) {
+                bindings.computeIfAbsent(Key.ofType(clazz), $ -> new HashSet<>());
+            }
+        } else if (!Modifier.isAbstract(clazz.getModifiers())) {
+            Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
+            doBind(key, binding);
         }
         return this;
+    }
+
+    private final LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
+
+    private Injector doBind(Key<?> key, Binding<?> binding) {
+        if (!current.add(key)) {
+            current.add(key);
+            throw new DIException("Circular references: " + current);
+        }
+        try {
+            doBindImplicit(key, binding);
+            Class<?> cls = key.getRawType().getSuperclass();
+            while (cls != Object.class && cls != null) {
+                doBindImplicit(Key.of(cls, key.getQualifier()), binding);
+                if (key.getQualifier() != null) {
+                    bind(Key.ofType(cls), binding);
+                }
+                cls = cls.getSuperclass();
+            }
+            return this;
+        } finally {
+            current.remove(key);
+        }
     }
 
     protected <U> Injector bind(Key<U> key, Binding<U> b) {
@@ -98,13 +173,22 @@ public class InjectorImpl implements Injector {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private <T> Set<Binding<T>> getBindings(Key<T> key) {
+    protected <T> Set<Binding<T>> getBindings(Key<T> key) {
         return (Set) bindings.get(key);
     }
 
-    public <Q> Supplier<Q> getCompiledBinding(Key<Q> key) {
+    protected Set<Key<?>> getBoundKeys() {
+        return bindings.keySet();
+    }
+
+    public Map<Key<?>, Set<Binding<?>>> getBindings() {
+        return bindings;
+    }
+
+    public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
+        Key<Q> key = dep.key();
         Set<Binding<Q>> res = getBindings(key);
-        if (res != null) {
+        if (res != null && !res.isEmpty()) {
             List<Binding<Q>> bindingList = new ArrayList<>(res);
             Comparator<Binding<Q>> comparing = Comparator.comparing(Binding::getPriority);
             bindingList.sort(comparing.reversed());
@@ -114,10 +198,9 @@ public class InjectorImpl implements Injector {
         if (key.getRawType() == List.class) {
             Set<Binding<Object>> res2 = getBindings(key.getTypeParameter(0));
             if (res2 != null) {
-                List<Supplier<Object>> bindingList =
-                        res2.stream().map(this::compile).collect(Collectors.toList());
+                List<Supplier<Object>> list = res2.stream().map(this::compile).collect(Collectors.toList());
                 //noinspection unchecked
-                return () -> (Q) new WrappingList<>(bindingList, Supplier::get);
+                return () -> (Q) list(list, Supplier::get);
             }
         }
         if (key.getRawType() == Map.class) {
@@ -126,21 +209,34 @@ public class InjectorImpl implements Injector {
             Set<Binding<Object>> res2 = getBindings(v);
             if (k.getRawType() == String.class && res2 != null) {
                 Map<String, Supplier<Object>> map = res2.stream()
-                        .filter(b -> b.getOriginalKey().getQualifier() == null
+                        .filter(b -> b.getOriginalKey() == null
+                                || b.getOriginalKey().getQualifier() == null
                                 || b.getOriginalKey().getQualifier() instanceof String)
                         .collect(Collectors.toMap(
-                                b -> (String) b.getOriginalKey().getQualifier(), this::compile));
+                                b -> (String)
+                                        (b.getOriginalKey() != null
+                                                ? b.getOriginalKey().getQualifier()
+                                                : null),
+                                this::compile));
                 //noinspection unchecked
-                return (() -> (Q) new WrappingMap<>(map, Supplier::get));
+                return () -> (Q) map(map, Supplier::get);
             }
+        }
+        if (dep.optional()) {
+            return () -> null;
         }
         throw new DIException("No binding to construct an instance for key "
                 + key.getDisplayString() + ".  Existing bindings:\n"
-                + bindings.keySet().stream().map(Key::toString).collect(Collectors.joining("\n - ", " - ", "")));
+                + getBoundKeys().stream()
+                        .map(Key::toString)
+                        .map(String::trim)
+                        .sorted()
+                        .distinct()
+                        .collect(Collectors.joining("\n - ", " - ", "")));
     }
 
     @SuppressWarnings("unchecked")
-    private <Q> Supplier<Q> compile(Binding<Q> binding) {
+    protected <Q> Supplier<Q> compile(Binding<Q> binding) {
         Supplier<Q> compiled = binding.compile(this::getCompiledBinding);
         if (binding.getScope() != null) {
             Scope scope = scopes.entrySet().stream()
@@ -148,8 +244,9 @@ public class InjectorImpl implements Injector {
                     .map(Map.Entry::getValue)
                     .findFirst()
                     .orElseThrow(() -> new DIException("Scope not bound for annotation "
-                            + binding.getScope().getClass()));
-            compiled = scope.scope((Key<Q>) binding.getOriginalKey(), binding.getScope(), compiled);
+                            + binding.getScope().annotationType()))
+                    .get();
+            compiled = scope.scope((Key<Q>) binding.getOriginalKey(), compiled);
         }
         return compiled;
     }
@@ -157,116 +254,66 @@ public class InjectorImpl implements Injector {
     protected void doBindImplicit(Key<?> key, Binding<?> binding) {
         if (binding != null) {
             // For non-explicit bindings, also bind all their base classes and interfaces according to the @Type
-            Set<Key<?>> toBind = new HashSet<>();
-            Deque<Key<?>> todo = new ArrayDeque<>();
-            todo.add(key);
-
-            Set<Class<?>> types;
-            Typed typed = key.getRawType().getAnnotation(Typed.class);
-            if (typed != null) {
-                Class<?>[] typesArray = typed.value();
-                if (typesArray == null || typesArray.length == 0) {
-                    types = new HashSet<>(Arrays.asList(key.getRawType().getInterfaces()));
-                    types.add(Object.class);
-                } else {
-                    types = new HashSet<>(Arrays.asList(typesArray));
-                }
-            } else {
-                types = null;
-            }
-
-            Set<Key<?>> done = new HashSet<>();
-            while (!todo.isEmpty()) {
-                Key<?> type = todo.remove();
-                if (done.add(type)) {
-                    Class<?> cls = Types.getRawType(type.getType());
-                    Type[] interfaces = cls.getGenericInterfaces();
-                    Arrays.stream(interfaces)
-                            .map(t -> Key.ofType(t, key.getQualifier()))
-                            .forEach(todo::add);
-                    Type supercls = cls.getGenericSuperclass();
-                    if (supercls != null) {
-                        todo.add(Key.ofType(supercls, key.getQualifier()));
-                    }
-                    if (types == null || types.contains(cls)) {
-                        toBind.add(type);
+            Object qualifier = key.getQualifier();
+            Class<?> type = key.getRawType();
+            Set<Class<?>> types = getBoundTypes(type.getAnnotation(Typed.class), type);
+            for (Type t : Types.getAllSuperTypes(type)) {
+                if (types == null || types.contains(Types.getRawType(t))) {
+                    bind(Key.ofType(t, qualifier), binding);
+                    if (qualifier != null) {
+                        bind(Key.ofType(t), binding);
                     }
                 }
             }
-            // Also bind without the qualifier
-            if (key.getQualifier() != null) {
-                new HashSet<>(toBind).forEach(k -> toBind.add(Key.ofType(k.getType())));
-            }
-            toBind.forEach((k -> bind((Key<Object>) k, (Binding<Object>) binding)));
         }
         // Bind inner classes
         for (Class<?> inner : key.getRawType().getDeclaredClasses()) {
-            bindImplicit(inner);
+            boolean hasQualifier = Stream.of(inner.getAnnotations())
+                    .anyMatch(ann -> ann.annotationType().isAnnotationPresent(Qualifier.class));
+            if (hasQualifier) {
+                bindImplicit(inner);
+            }
         }
         // Bind inner providers
         for (Method method : key.getRawType().getDeclaredMethods()) {
             if (method.isAnnotationPresent(Provides.class)) {
-                Object qualifier = ReflectionUtils.qualifierOf(method);
-                Annotation scope = ReflectionUtils.scopeOf(method);
-
-                TypeVariable<Method>[] methodTypeParameters = method.getTypeParameters();
-                if (methodTypeParameters.length != 0) {
+                if (method.getTypeParameters().length != 0) {
                     throw new DIException("Parameterized method are not supported " + method);
                 }
-                Map<TypeVariable<?>, Type> mapping = new HashMap<>();
-                for (TypeVariable<Method> methodTypeParameter : methodTypeParameters) {
-                    mapping.put(methodTypeParameter, methodTypeParameter);
-                }
-                mapping.putAll(Types.getAllTypeBindings(key.getRawType()));
-
-                Type returnType = Types.bind(method.getGenericReturnType(), mapping);
-                Key<Object> rkey = Key.ofType(returnType, qualifier);
-
-                Set<Class<?>> types;
-                Typed typed = method.getAnnotation(Typed.class);
-                if (typed != null) {
-                    Class<?>[] typesArray = typed.value();
-                    if (typesArray == null || typesArray.length == 0) {
-                        types = new HashSet<>(Arrays.asList(rkey.getRawType().getInterfaces()));
-                        types.add(Object.class);
-                    } else {
-                        types = new HashSet<>(Arrays.asList(typesArray));
-                    }
-                } else {
-                    types = null;
-                }
-
-                Set<Key<?>> toBind = new HashSet<>();
-                Deque<Key<?>> todo = new ArrayDeque<>();
-                todo.add(rkey);
-
-                Set<Key<?>> done = new HashSet<>();
-                while (!todo.isEmpty()) {
-                    Key<?> type = todo.remove();
-                    if (done.add(type)) {
-                        Class<?> cls = Types.getRawType(type.getType());
-                        Type[] interfaces = cls.getGenericInterfaces();
-                        Arrays.stream(interfaces)
-                                .map(t -> Key.ofType(t, qualifier))
-                                .forEach(todo::add);
-                        Type supercls = cls.getGenericSuperclass();
-                        if (supercls != null) {
-                            todo.add(Key.ofType(supercls, qualifier));
-                        }
-                        if (types == null || types.contains(cls)) {
-                            toBind.add(type);
-                        }
-                    }
-                }
-                // Also bind without the qualifier
-                if (qualifier != null) {
-                    new HashSet<>(toBind).forEach(k -> toBind.add(Key.ofType(k.getType())));
-                }
-
+                Object qualifier = ReflectionUtils.qualifierOf(method);
+                Annotation scope = ReflectionUtils.scopeOf(method);
+                Type returnType = method.getGenericReturnType();
+                Set<Class<?>> types = getBoundTypes(method.getAnnotation(Typed.class), Types.getRawType(returnType));
                 Binding<Object> bind = ReflectionUtils.bindingFromMethod(method).scope(scope);
-                toBind.forEach((k -> bind((Key<Object>) k, bind)));
+                for (Type t : Types.getAllSuperTypes(returnType)) {
+                    if (types == null || types.contains(Types.getRawType(t))) {
+                        bind(Key.ofType(t, qualifier), bind);
+                        if (qualifier != null) {
+                            bind(Key.ofType(t), bind);
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private static Set<Class<?>> getBoundTypes(Typed typed, Class<?> clazz) {
+        if (typed != null) {
+            Class<?>[] typesArray = typed.value();
+            if (typesArray == null || typesArray.length == 0) {
+                Set<Class<?>> types = new HashSet<>(Arrays.asList(clazz.getInterfaces()));
+                types.add(Object.class);
+                return types;
+            } else {
+                return new HashSet<>(Arrays.asList(typesArray));
+            }
+        } else {
+            return null;
+        }
+    }
+
+    protected <K, V, T> Map<K, V> map(Map<K, T> map, Function<T, V> mapper) {
+        return new WrappingMap<>(map, mapper);
     }
 
     private static class WrappingMap<K, V, T> extends AbstractMap<K, V> {
@@ -279,14 +326,13 @@ public class InjectorImpl implements Injector {
             this.mapper = mapper;
         }
 
-        @SuppressWarnings("NullableProblems")
         @Override
         public Set<Entry<K, V>> entrySet() {
-            return new AbstractSet<Entry<K, V>>() {
+            return new AbstractSet<>() {
                 @Override
                 public Iterator<Entry<K, V>> iterator() {
                     Iterator<Entry<K, T>> it = delegate.entrySet().iterator();
-                    return new Iterator<Entry<K, V>>() {
+                    return new Iterator<>() {
                         @Override
                         public boolean hasNext() {
                             return it.hasNext();
@@ -306,6 +352,10 @@ public class InjectorImpl implements Injector {
                 }
             };
         }
+    }
+
+    protected <Q, T> List<Q> list(List<T> bindingList, Function<T, Q> mapper) {
+        return new WrappingList<>(bindingList, mapper);
     }
 
     private static class WrappingList<Q, T> extends AbstractList<Q> {
@@ -330,12 +380,11 @@ public class InjectorImpl implements Injector {
     }
 
     private static class SingletonScope implements Scope {
-        Map<Key<?>, java.util.function.Supplier<?>> cache = new HashMap<>();
+        Map<Key<?>, java.util.function.Supplier<?>> cache = new ConcurrentHashMap<>();
 
         @SuppressWarnings("unchecked")
         @Override
-        public <T> java.util.function.Supplier<T> scope(
-                Key<T> key, Annotation scope, java.util.function.Supplier<T> unscoped) {
+        public <T> java.util.function.Supplier<T> scope(Key<T> key, java.util.function.Supplier<T> unscoped) {
             return (java.util.function.Supplier<T>)
                     cache.computeIfAbsent(key, k -> new java.util.function.Supplier<T>() {
                         volatile T instance;

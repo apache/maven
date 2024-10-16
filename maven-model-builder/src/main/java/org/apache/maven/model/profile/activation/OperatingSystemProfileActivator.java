@@ -21,6 +21,8 @@ package org.apache.maven.model.profile.activation;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.Locale;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.Profile;
@@ -32,10 +34,14 @@ import org.apache.maven.utils.Os;
  * Determines profile activation based on the operating system of the current runtime platform.
  *
  * @see ActivationOS
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("os")
 @Singleton
+@Deprecated(since = "4.0.0")
 public class OperatingSystemProfileActivator implements ProfileActivator {
+
+    private static final String REGEX_PREFIX = "regex:";
 
     @Override
     public boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
@@ -53,17 +59,27 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
 
         boolean active = ensureAtLeastOneNonNull(os);
 
+        String actualOsName = context.getSystemProperties()
+                .getOrDefault("os.name", Os.OS_NAME)
+                .toLowerCase(Locale.ENGLISH);
+        String actualOsArch = context.getSystemProperties()
+                .getOrDefault("os.arch", Os.OS_ARCH)
+                .toLowerCase(Locale.ENGLISH);
+        String actualOsVersion = context.getSystemProperties()
+                .getOrDefault("os.version", Os.OS_VERSION)
+                .toLowerCase(Locale.ENGLISH);
+
         if (active && os.getFamily() != null) {
-            active = determineFamilyMatch(os.getFamily());
+            active = determineFamilyMatch(os.getFamily(), actualOsName);
         }
         if (active && os.getName() != null) {
-            active = determineNameMatch(os.getName());
+            active = determineNameMatch(os.getName(), actualOsName);
         }
         if (active && os.getArch() != null) {
-            active = determineArchMatch(os.getArch());
+            active = determineArchMatch(os.getArch(), actualOsArch);
         }
         if (active && os.getVersion() != null) {
-            active = determineVersionMatch(os.getVersion());
+            active = determineVersionMatch(os.getVersion(), actualOsVersion);
         }
 
         return active;
@@ -86,22 +102,25 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
         return os.getArch() != null || os.getFamily() != null || os.getName() != null || os.getVersion() != null;
     }
 
-    private boolean determineVersionMatch(String version) {
-        String test = version;
+    private boolean determineVersionMatch(String expectedVersion, String actualVersion) {
+        String test = expectedVersion;
         boolean reverse = false;
-
-        if (test.startsWith("!")) {
-            reverse = true;
-            test = test.substring(1);
+        final boolean result;
+        if (test.startsWith(REGEX_PREFIX)) {
+            result = actualVersion.matches(test.substring(REGEX_PREFIX.length()));
+        } else {
+            if (test.startsWith("!")) {
+                reverse = true;
+                test = test.substring(1);
+            }
+            result = actualVersion.equalsIgnoreCase(test);
         }
-
-        boolean result = Os.OS_VERSION.equals(test);
 
         return reverse != result;
     }
 
-    private boolean determineArchMatch(String arch) {
-        String test = arch;
+    private boolean determineArchMatch(String expectedArch, String actualArch) {
+        String test = expectedArch.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
 
         if (test.startsWith("!")) {
@@ -109,13 +128,13 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
             test = test.substring(1);
         }
 
-        boolean result = Os.OS_ARCH.equals(test);
+        boolean result = actualArch.equals(test);
 
         return reverse != result;
     }
 
-    private boolean determineNameMatch(String name) {
-        String test = name;
+    private boolean determineNameMatch(String expectedName, String actualName) {
+        String test = expectedName.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
 
         if (test.startsWith("!")) {
@@ -123,13 +142,13 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
             test = test.substring(1);
         }
 
-        boolean result = Os.OS_NAME.equals(test);
+        boolean result = actualName.equals(test);
 
         return reverse != result;
     }
 
-    private boolean determineFamilyMatch(String family) {
-        String test = family;
+    private boolean determineFamilyMatch(String family, String actualName) {
+        String test = family.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
 
         if (test.startsWith("!")) {
@@ -137,7 +156,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
             test = test.substring(1);
         }
 
-        boolean result = Os.isFamily(test);
+        boolean result = Os.isFamily(test, actualName);
 
         return reverse != result;
     }

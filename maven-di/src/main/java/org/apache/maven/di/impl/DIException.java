@@ -25,7 +25,7 @@ import org.apache.maven.di.Injector;
  * (missing or cyclic dependencies, incorrect annotations etc.) or in runtime when
  * you ask an {@link Injector} for an instance it does not have a {@link Binding binding} for.
  */
-public final class DIException extends RuntimeException {
+public class DIException extends RuntimeException {
     public DIException(String message) {
         super(message);
     }

@@ -28,7 +28,9 @@ import org.apache.maven.settings.building.SettingsProblem;
 /**
  * Collects the output of the settings decrypter.
  *
+ * @deprecated since 4.0.0
  */
+@Deprecated(since = "4.0.0")
 class DefaultSettingsDecryptionResult implements SettingsDecryptionResult {
 
     private List<Server> servers;

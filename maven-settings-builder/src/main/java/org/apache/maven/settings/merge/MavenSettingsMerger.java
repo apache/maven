@@ -27,9 +27,9 @@ import org.apache.maven.settings.IdentifiableBase;
 import org.apache.maven.settings.Settings;
 
 /**
- * @deprecated use {@link org.apache.maven.settings.v4.SettingsMerger}
+ * @deprecated since 4.0.0, use {@link org.apache.maven.settings.v4.SettingsMerger} instead
  */
-@Deprecated
+@Deprecated(since = "4.0.0")
 public class MavenSettingsMerger {
 
     /**

@@ -39,9 +39,11 @@ import org.apache.maven.model.profile.activation.ProfileActivator;
 /**
  * Calculates the active profiles among a given collection of profiles.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultProfileSelector implements ProfileSelector {
 
     private final List<ProfileActivator> activators;
@@ -119,7 +121,8 @@ public class DefaultProfileSelector implements ProfileSelector {
                     }
                 } catch (RuntimeException e) {
                     problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                            .setMessage("Failed to determine activation for profile " + profile.getId())
+                            .setMessage("Failed to determine activation for profile " + profile.getId() + ": "
+                                    + e.getMessage())
                             .setLocation(profile.getLocation(""))
                             .setException(e));
                     return false;

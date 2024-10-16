@@ -22,7 +22,9 @@ package org.apache.maven.model.building;
  * Assists in firing events from a generic method by abstracting from the actual callback method to be called on the
  * listener.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 interface ModelBuildingEventCatapult {
 
     /**

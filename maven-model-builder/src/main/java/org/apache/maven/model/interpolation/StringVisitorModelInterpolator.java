@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +48,11 @@ import org.codehaus.plexus.interpolation.ValueSource;
  * StringVisitorModelInterpolator
  *
  * @since 3.6.2
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class StringVisitorModelInterpolator extends AbstractStringBasedModelInterpolator {
     @Inject
     public StringVisitorModelInterpolator(
@@ -61,9 +64,16 @@ public class StringVisitorModelInterpolator extends AbstractStringBasedModelInte
         String interpolate(String value);
     }
 
+    @Deprecated
     @Override
     public Model interpolateModel(
             Model model, File projectDir, ModelBuildingRequest config, ModelProblemCollector problems) {
+        return interpolateModel(model, projectDir != null ? projectDir.toPath() : null, config, problems);
+    }
+
+    @Override
+    public Model interpolateModel(
+            Model model, Path projectDir, ModelBuildingRequest config, ModelProblemCollector problems) {
         List<? extends ValueSource> valueSources = createValueSources(model, projectDir, config, problems);
         List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors(model, projectDir, config);
 

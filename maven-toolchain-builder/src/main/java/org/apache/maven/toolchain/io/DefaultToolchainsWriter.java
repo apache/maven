@@ -33,9 +33,11 @@ import org.apache.maven.toolchain.v4.MavenToolchainsStaxWriter;
 /**
  * Handles serialization of toolchains into the default textual format.
  *
+ * @deprecated since 4.0.0, use {@link MavenToolchainsStaxWriter} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultToolchainsWriter implements ToolchainsWriter {
 
     @Override

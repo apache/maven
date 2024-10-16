@@ -37,7 +37,6 @@ import java.util.Optional;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
-import org.apache.maven.building.Source;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.locator.ModelLocator;
@@ -67,10 +66,13 @@ import org.eclipse.sisu.Typed;
  * As a non-default component this now gets a negative priority relative to other implementations
  * of the same interface. Since we want to allow overriding this doesn't matter in this case.
  * (if it did we could add @Priority of 0 to match the priority given to default components.)
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("core-default")
 @Singleton
 @Typed(ModelProcessor.class)
+@Deprecated(since = "4.0.0")
 public class DefaultModelProcessor implements ModelProcessor {
 
     private final Collection<ModelParser> modelParsers;
@@ -78,18 +80,19 @@ public class DefaultModelProcessor implements ModelProcessor {
     private final ModelReader modelReader;
 
     @Inject
-    public DefaultModelProcessor(
-            Collection<ModelParser> modelParsers, ModelLocator modelLocator, ModelReader modelReader) {
+    public DefaultModelProcessor(List<ModelParser> modelParsers, ModelLocator modelLocator, ModelReader modelReader) {
         this.modelParsers = modelParsers;
         this.modelLocator = modelLocator;
         this.modelReader = modelReader;
     }
 
+    @Deprecated
     @Override
     public File locatePom(File projectDirectory) {
         return locatePom(projectDirectory.toPath()).toFile();
     }
 
+    @Override
     public Path locatePom(Path projectDirectory) {
         // Note that the ModelProcessor#locatePom never returns null
         // while the ModelParser#locatePom needs to return an existing path!
@@ -99,30 +102,31 @@ public class DefaultModelProcessor implements ModelProcessor {
                         .orElse(null))
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElseGet(
-                        () -> modelLocator.locatePom(projectDirectory.toFile()).toPath());
+                .orElseGet(() -> modelLocator.locatePom(projectDirectory));
         if (!pom.equals(projectDirectory) && !pom.getParent().equals(projectDirectory)) {
             throw new IllegalArgumentException("The POM found does not belong to the given directory: " + pom);
         }
         return pom;
     }
 
+    @Deprecated
+    @Override
     public File locateExistingPom(File projectDirectory) {
         Path path = locateExistingPom(projectDirectory.toPath());
         return path != null ? path.toFile() : null;
     }
 
+    @Override
     public Path locateExistingPom(Path projectDirectory) {
         // Note that the ModelProcessor#locatePom never returns null
         // while the ModelParser#locatePom needs to return an existing path!
         Path pom = modelParsers.stream()
-                .map(m -> m.locate(projectDirectory).map(s -> s.getPath()).orElse(null))
+                .map(m -> m.locate(projectDirectory)
+                        .map(org.apache.maven.api.services.Source::getPath)
+                        .orElse(null))
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElseGet(() -> {
-                    File f = modelLocator.locateExistingPom(projectDirectory.toFile());
-                    return f != null ? f.toPath() : null;
-                });
+                .orElseGet(() -> modelLocator.locateExistingPom(projectDirectory));
         if (pom != null && !pom.equals(projectDirectory) && !pom.getParent().equals(projectDirectory)) {
             throw new IllegalArgumentException("The POM found does not belong to the given directory: " + pom);
         }
@@ -131,10 +135,6 @@ public class DefaultModelProcessor implements ModelProcessor {
 
     protected org.apache.maven.api.model.Model read(
             Path pomFile, InputStream input, Reader reader, Map<String, ?> options) throws IOException {
-        Source source = (Source) options.get(ModelProcessor.SOURCE);
-        if (pomFile == null && source instanceof org.apache.maven.building.FileSource) {
-            pomFile = ((org.apache.maven.building.FileSource) source).getFile().toPath();
-        }
         if (pomFile != null) {
             Path projectDirectory = pomFile.getParent();
             List<ModelParserException> exceptions = new ArrayList<>();
@@ -162,7 +162,7 @@ public class DefaultModelProcessor implements ModelProcessor {
     private org.apache.maven.api.model.Model readXmlModel(
             Path pomFile, InputStream input, Reader reader, Map<String, ?> options) throws IOException {
         if (pomFile != null) {
-            return modelReader.read(pomFile.toFile(), options).getDelegate();
+            return modelReader.read(pomFile, options).getDelegate();
         } else if (input != null) {
             return modelReader.read(input, options).getDelegate();
         } else {
@@ -170,10 +170,16 @@ public class DefaultModelProcessor implements ModelProcessor {
         }
     }
 
+    @Deprecated
     @Override
     public org.apache.maven.model.Model read(File file, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(file, "file cannot be null");
-        Path path = file.toPath();
+        return read(file.toPath(), options);
+    }
+
+    @Override
+    public org.apache.maven.model.Model read(Path path, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(path, "path cannot be null");
         org.apache.maven.api.model.Model model = read(path, null, null, options);
         return new org.apache.maven.model.Model(model);
     }

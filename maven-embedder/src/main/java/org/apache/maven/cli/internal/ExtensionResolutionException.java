@@ -18,7 +18,7 @@
  */
 package org.apache.maven.cli.internal;
 
-import org.apache.maven.cli.internal.extension.model.CoreExtension;
+import org.apache.maven.api.cli.extensions.CoreExtension;
 
 /**
  * Exception occurring trying to resolve a plugin.

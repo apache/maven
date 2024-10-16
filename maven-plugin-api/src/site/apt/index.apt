@@ -23,9 +23,9 @@
  2012-06-02
  -----
 
-Maven Plugin API
+Maven 3 Plugin API
 
- The API for plugins - composed of goals implemented by Mojos - development:
+ The API for Maven 3 plugins - composed of goals implemented by Mojos - development:
 
  * goal code extends {{{./apidocs/org/apache/maven/plugin/AbstractMojo.html}<<<AbstractMojo>>> base class}} that implements {{{./apidocs/org/apache/maven/plugin/Mojo.html}<<<Mojo>>> interface}},
 

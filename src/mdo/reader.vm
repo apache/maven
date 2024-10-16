@@ -358,7 +358,7 @@ public class ${className} {
      * @return ${root.name}
      */
     public ${root.name} read(Reader reader, boolean strict) throws IOException, XMLStreamException {
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        XMLInputFactory factory = XMLInputFactory.newFactory();
         factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
         XMLStreamReader parser = null;
         try {
@@ -392,7 +392,7 @@ public class ${className} {
      * @return ${root.name}
      */
     public ${root.name} read(InputStream in, boolean strict) throws IOException, XMLStreamException {
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        XMLInputFactory factory = XMLInputFactory.newFactory();
         factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
         StreamSource streamSource = new StreamSource(in, null);
         XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
@@ -409,7 +409,7 @@ public class ${className} {
      * @return ${root.name}
      */
     public ${root.name} read(InputStream in) throws IOException, XMLStreamException {
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
+        XMLInputFactory factory = XMLInputFactory.newFactory();
         factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
         StreamSource streamSource = new StreamSource(in, null);
         XMLStreamReader parser = factory.createXMLStreamReader(streamSource);

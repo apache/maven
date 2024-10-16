@@ -30,7 +30,9 @@ import org.apache.maven.model.Model;
  * before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to query the
  * details of the failure.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class ModelBuildingException extends Exception {
 
     private final ModelBuildingResult result;
@@ -137,7 +139,7 @@ public class ModelBuildingException extends Exception {
         writer.print(problems.size());
         writer.print((problems.size() == 1) ? " problem was " : " problems were ");
         writer.print("encountered while building the effective model");
-        if (modelId != null && modelId.length() > 0) {
+        if (modelId != null && !modelId.isEmpty()) {
             writer.print(" for ");
             writer.print(modelId);
         }

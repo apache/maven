@@ -19,7 +19,9 @@
 package org.apache.maven.di;
 
 import java.lang.annotation.Annotation;
+import java.util.function.Supplier;
 
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.di.impl.InjectorImpl;
 
 public interface Injector {
@@ -28,23 +30,35 @@ public interface Injector {
     // Builder API
     //
 
+    @Nonnull
     static Injector create() {
         return new InjectorImpl();
     }
 
-    Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope);
+    @Nonnull
+    Injector discover(@Nonnull ClassLoader classLoader);
 
-    Injector bindImplicit(Class<?> cls);
+    @Nonnull
+    Injector bindScope(@Nonnull Class<? extends Annotation> scopeAnnotation, @Nonnull Scope scope);
 
-    <T> Injector bindInstance(Class<T> cls, T instance);
+    @Nonnull
+    Injector bindScope(@Nonnull Class<? extends Annotation> scopeAnnotation, @Nonnull Supplier<Scope> scope);
+
+    @Nonnull
+    Injector bindImplicit(@Nonnull Class<?> cls);
+
+    @Nonnull
+    <T> Injector bindInstance(@Nonnull Class<T> cls, @Nonnull T instance);
 
     //
     // Bean access
     //
 
-    <T> void injectInstance(T instance);
+    <T> void injectInstance(@Nonnull T instance);
 
-    <T> T getInstance(Class<T> key);
+    @Nonnull
+    <T> T getInstance(@Nonnull Class<T> key);
 
-    <T> T getInstance(Key<T> key);
+    @Nonnull
+    <T> T getInstance(@Nonnull Key<T> key);
 }

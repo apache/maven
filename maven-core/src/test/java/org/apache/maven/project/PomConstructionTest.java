@@ -21,14 +21,19 @@ package org.apache.maven.project;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.MavenTestHelper;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -37,6 +42,7 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
@@ -72,12 +78,16 @@ class PomConstructionTest {
     @Inject
     private MavenRepositorySystem repositorySystem;
 
+    @Inject
+    private PlexusContainer container;
+
     private File testDirectory;
 
     @BeforeEach
     void setUp() throws Exception {
         testDirectory = new File(getBasedir(), BASE_POM_DIR);
         new File(getBasedir(), BASE_MIXIN_DIR);
+        EmptyLifecycleBindingsInjector.useEmpty();
     }
 
     /**
@@ -1218,13 +1228,13 @@ class PomConstructionTest {
     @Test
     void testPropertiesNoDuplication() throws Exception {
         PomTestWrapper pom = buildPom("properties-no-duplication/sub");
-        assertEquals(3, ((Properties) pom.getValue("properties")).size());
+        assertEquals(4, ((Properties) pom.getValue("properties")).size());
         assertEquals("child", pom.getValue("properties/pomProfile"));
     }
 
     @Test
     void testPomInheritance() throws Exception {
-        PomTestWrapper pom = buildPom("pom-inheritance/sub");
+        PomTestWrapper pom = buildPom("pom-inheritance/child-1");
         assertEquals("parent-description", pom.getValue("description"));
         assertEquals("jar", pom.getValue("packaging"));
     }
@@ -1341,10 +1351,11 @@ class PomConstructionTest {
         assertEquals(1, ((List<?>) pom.getValue("modules")).size());
         assertEquals("sub", pom.getValue("modules[1]"));
 
-        assertEquals(3, ((Map<?, ?>) pom.getValue("properties")).size());
+        assertEquals(4, ((Map<?, ?>) pom.getValue("properties")).size());
         assertEquals("project-property", pom.getValue("properties[1]/itProperty"));
         assertEquals("UTF-8", pom.getValue("properties[1]/project.build.sourceEncoding"));
         assertEquals("UTF-8", pom.getValue("properties[1]/project.reporting.outputEncoding"));
+        assertEquals("2001-01-01T00:00:00Z", pom.getValue("properties[1]/project.build.outputTimestamp"));
 
         assertEquals(1, ((List<?>) pom.getValue("dependencyManagement/dependencies")).size());
         assertEquals("org.apache.maven.its", pom.getValue("dependencyManagement/dependencies[1]/groupId"));
@@ -1886,12 +1897,22 @@ class PomConstructionTest {
                         ? ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
                         : ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
 
-        DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
+        DefaultRepositorySystemSession repoSession = MavenTestHelper.createSession(repositorySystem, container);
         LocalRepository localRepo =
                 new LocalRepository(config.getLocalRepository().getBasedir());
         repoSession.setLocalRepositoryManager(
                 new SimpleLocalRepositoryManagerFactory().newInstance(repoSession, localRepo));
         config.setRepositorySession(repoSession);
+
+        InternalSession iSession = InternalSession.from(repoSession);
+        InternalMavenSession mSession = InternalMavenSession.from(iSession);
+        Path root = pomFile.getParentFile().toPath();
+        while (root != null
+                && !Files.isDirectory(root.resolve(".mvn"))
+                && Files.isRegularFile(root.resolve("../pom.xml"))) {
+            root = root.getParent();
+        }
+        mSession.getMavenSession().getRequest().setRootDirectory(root);
 
         return new PomTestWrapper(pomFile, projectBuilder.build(pomFile, config).getProject());
     }

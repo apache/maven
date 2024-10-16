@@ -33,6 +33,17 @@ public class BuildSuccess extends BuildSummary {
      * @param time The build time of the project in milliseconds.
      */
     public BuildSuccess(MavenProject project, long time) {
-        super(project, time);
+        super(project, time, time);
+    }
+
+    /**
+     * Creates a new build summary for the specified project.
+     *
+     * @param project The project being summarized, must not be {@code null}.
+     * @param wallTime The wall time of the project in milliseconds.
+     * @param execTime The exec time of the project in milliseconds.
+     */
+    public BuildSuccess(MavenProject project, long wallTime, long execTime) {
+        super(project, wallTime, execTime);
     }
 }

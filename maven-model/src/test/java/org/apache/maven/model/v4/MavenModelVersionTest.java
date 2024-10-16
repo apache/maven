@@ -70,6 +70,6 @@ class MavenModelVersionTest {
                 .withPlugins(Collections.singleton(Plugin.newInstance()
                         .withExecutions(Collections.singleton(
                                 PluginExecution.newInstance().withPriority(5))))));
-        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
+        assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m));
     }
 }

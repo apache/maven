@@ -22,27 +22,49 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
-import java.util.*;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Dependency;
+import org.apache.maven.api.Node;
+import org.apache.maven.api.PathScope;
+import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.plugin.descriptor.Resolution;
+import org.apache.maven.api.services.DependencyResolver;
+import org.apache.maven.api.services.DependencyResolverResult;
+import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.di.Injector;
+import org.apache.maven.di.Key;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
-import org.apache.maven.internal.impl.InternalSession;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.ContextEnabled;
@@ -133,7 +155,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private final ClassRealmManager classRealmManager;
     private final PluginDescriptorCache pluginDescriptorCache;
     private final PluginRealmCache pluginRealmCache;
-    private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
+    private final PluginDependenciesResolver pluginDependenciesResolver;
     private final ExtensionRealmCache extensionRealmCache;
     private final PluginVersionResolver pluginVersionResolver;
     private final PluginArtifactsCache pluginArtifactsCache;
@@ -151,7 +173,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             ClassRealmManager classRealmManager,
             PluginDescriptorCache pluginDescriptorCache,
             PluginRealmCache pluginRealmCache,
-            DefaultPluginDependenciesResolver pluginDependenciesResolver,
+            PluginDependenciesResolver pluginDependenciesResolver,
             ExtensionRealmCache extensionRealmCache,
             PluginVersionResolver pluginVersionResolver,
             PluginArtifactsCache pluginArtifactsCache,
@@ -340,7 +362,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             pluginDescriptor.setClassRealm(pluginRealm);
             pluginDescriptor.setArtifacts(pluginArtifacts);
         } else {
-            Map<String, ClassLoader> foreignImports = calcImports(project, parent, imports);
+            boolean v4api = pluginDescriptor.getMojos().stream().anyMatch(MojoDescriptor::isV4Api);
+            Map<String, ClassLoader> foreignImports = calcImports(project, parent, imports, v4api);
 
             PluginRealmCache.Key cacheKey = pluginRealmCache.createKey(
                     plugin,
@@ -448,14 +471,16 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         return Collections.unmodifiableList(artifacts);
     }
 
-    private Map<String, ClassLoader> calcImports(MavenProject project, ClassLoader parent, List<String> imports) {
+    private Map<String, ClassLoader> calcImports(
+            MavenProject project, ClassLoader parent, List<String> imports, boolean v4api) {
         Map<String, ClassLoader> foreignImports = new HashMap<>();
 
         ClassLoader projectRealm = project.getClassRealm();
         if (projectRealm != null) {
             foreignImports.put("", projectRealm);
         } else {
-            foreignImports.put("", classRealmManager.getMavenApiRealm());
+            foreignImports.put(
+                    "", v4api ? classRealmManager.getMaven4ApiRealm() : classRealmManager.getMavenApiRealm());
         }
 
         if (parent != null && imports != null) {
@@ -520,30 +545,23 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             throws PluginContainerException, PluginConfigurationException {
         T mojo;
 
-        InternalSession sessionV4 = InternalSession.from(session.getSession());
+        InternalMavenSession sessionV4 = InternalMavenSession.from(session.getSession());
         Project project = sessionV4.getProject(session.getCurrentProject());
+
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
         org.apache.maven.api.plugin.Log log = new DefaultLog(
                 LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));
         try {
-            Set<String> classes = new HashSet<>();
-            try (InputStream is = pluginRealm.getResourceAsStream("META-INF/maven/org.apache.maven.api.di.Inject");
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
-                reader.lines().forEach(classes::add);
-            }
             Injector injector = Injector.create();
+            injector.discover(pluginRealm);
             // Add known classes
             // TODO: get those from the existing plexus scopes ?
             injector.bindInstance(Session.class, sessionV4);
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
             injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
-            // Add plugin classes
-            for (String className : classes) {
-                Class<?> clazz = pluginRealm.loadClass(className);
-                injector.bindImplicit(clazz);
-            }
-            mojo = mojoInterface.cast(injector.getInstance(mojoDescriptor.getImplementationClass()));
+            mojo = mojoInterface.cast(injector.getInstance(
+                    Key.of(mojoDescriptor.getImplementationClass(), mojoDescriptor.getRoleHint())));
 
         } catch (Exception e) {
             throw new PluginContainerException(mojoDescriptor, pluginRealm, "Unable to lookup Mojo", e);
@@ -575,6 +593,78 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 pluginRealm,
                 pomConfiguration,
                 expressionEvaluator);
+
+        for (Resolution resolution : mojoDescriptor.getMojoDescriptorV4().getResolutions()) {
+            Field field = null;
+            for (Class<?> clazz = mojo.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+                try {
+                    field = clazz.getDeclaredField(resolution.getField());
+                    break;
+                } catch (NoSuchFieldException e) {
+                    // continue
+                }
+            }
+            if (field == null) {
+                throw new PluginConfigurationException(
+                        pluginDescriptor,
+                        "Unable to find field '" + resolution.getField() + "' annotated with @Resolution");
+            }
+            field.setAccessible(true);
+            String pathScope = resolution.getPathScope();
+            Object result = null;
+            if (pathScope != null && !pathScope.isEmpty()) {
+                // resolution
+                PathScope ps = sessionV4.getService(PathScopeRegistry.class).require(pathScope);
+                DependencyResolverResult res =
+                        sessionV4.getService(DependencyResolver.class).resolve(sessionV4, project, ps);
+                if (field.getType() == DependencyResolverResult.class) {
+                    result = res;
+                } else if (field.getType() == Node.class) {
+                    result = res.getRoot();
+                } else if (field.getType() == List.class && field.getGenericType() instanceof ParameterizedType pt) {
+                    Type t = pt.getActualTypeArguments()[0];
+                    if (t == Node.class) {
+                        result = res.getNodes();
+                    } else if (t == Path.class) {
+                        result = res.getPaths();
+                    }
+                } else if (field.getType() == Map.class && field.getGenericType() instanceof ParameterizedType pt) {
+                    Type k = pt.getActualTypeArguments()[0];
+                    Type v = pt.getActualTypeArguments()[1];
+                    if (k == PathType.class
+                            && v instanceof ParameterizedType ptv
+                            && ptv.getRawType() == List.class
+                            && ptv.getActualTypeArguments()[0] == Path.class) {
+                        result = res.getDispatchedPaths();
+                    } else if (k == Dependency.class && v == Path.class) {
+                        result = res.getDependencies();
+                    }
+                }
+            } else {
+                // collection
+                DependencyResolverResult res =
+                        sessionV4.getService(DependencyResolver.class).collect(sessionV4, project);
+                if (field.getType() == DependencyResolverResult.class) {
+                    result = res;
+                } else if (field.getType() == Node.class) {
+                    result = res.getRoot();
+                }
+            }
+            if (result == null) {
+                throw new PluginConfigurationException(
+                        pluginDescriptor,
+                        "Unable to inject field '" + resolution.getField()
+                                + "' annotated with @Dependencies. Unsupported type " + field.getGenericType());
+            }
+            try {
+                field.set(mojo, result);
+            } catch (IllegalAccessException e) {
+                throw new PluginConfigurationException(
+                        pluginDescriptor,
+                        "Unable to inject field '" + resolution.getField() + "' annotated with @Dependencies",
+                        e);
+            }
+        }
 
         return mojo;
     }
@@ -666,7 +756,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             pomConfiguration = XmlPlexusConfiguration.toPlexusConfiguration(dom);
         }
 
-        InternalSession sessionV4 = InternalSession.from(session.getSession());
         ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
 
         for (MavenPluginConfigurationValidator validator : configurationValidators) {
@@ -731,6 +820,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     validateParameters(mojoDescriptor, configuration, expressionEvaluator);
                 }
             }
+
         } catch (ComponentConfigurationException e) {
             String message = "Unable to parse configuration of mojo " + mojoDescriptor.getId();
             if (e.getFailedConfiguration() != null) {
@@ -949,7 +1039,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             return this.value;
         }
 
-        @SuppressWarnings("checkstyle:MagicNumber")
         public int hashCode() {
             return 127 * "value".hashCode() ^ this.value.hashCode();
         }

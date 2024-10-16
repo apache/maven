@@ -43,11 +43,15 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.*;
+import org.apache.maven.internal.impl.DefaultLookup;
+import org.apache.maven.internal.impl.DefaultMojoExecution;
+import org.apache.maven.internal.impl.DefaultProject;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.model.reflection.IntrospectionException;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
-import org.apache.maven.model.interpolation.reflection.IntrospectionException;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -413,7 +417,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
         pd.addComponentDescriptor(md);
 
-        return new DefaultMojoExecution((AbstractSession) session, new org.apache.maven.plugin.MojoExecution(md));
+        return new DefaultMojoExecution(
+                InternalMavenSession.from(session), new org.apache.maven.plugin.MojoExecution(md));
     }
 
     private DefaultSession newSession() throws Exception {

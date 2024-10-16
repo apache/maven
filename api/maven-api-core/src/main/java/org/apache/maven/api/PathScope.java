@@ -18,7 +18,7 @@
  */
 package org.apache.maven.api;
 
-import java.util.*;
+import java.util.Set;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -46,6 +46,7 @@ import static org.apache.maven.api.ExtensibleEnums.pathScope;
 @Immutable
 public interface PathScope extends ExtensibleEnum {
 
+    // TODO: what if I simply want all dependencies ?
     @Nonnull
     ProjectScope projectScope();
 
@@ -55,18 +56,16 @@ public interface PathScope extends ExtensibleEnum {
     PathScope MAIN_COMPILE = pathScope(
             "main-compile",
             ProjectScope.MAIN,
-            DependencyScope.EMPTY,
             DependencyScope.COMPILE_ONLY,
             DependencyScope.COMPILE,
             DependencyScope.PROVIDED);
 
-    PathScope MAIN_RUNTIME = pathScope(
-            "main-runtime", ProjectScope.MAIN, DependencyScope.EMPTY, DependencyScope.COMPILE, DependencyScope.RUNTIME);
+    PathScope MAIN_RUNTIME =
+            pathScope("main-runtime", ProjectScope.MAIN, DependencyScope.COMPILE, DependencyScope.RUNTIME);
 
     PathScope TEST_COMPILE = pathScope(
             "test-compile",
             ProjectScope.TEST,
-            DependencyScope.EMPTY,
             DependencyScope.COMPILE,
             DependencyScope.PROVIDED,
             DependencyScope.TEST_ONLY,
@@ -75,7 +74,6 @@ public interface PathScope extends ExtensibleEnum {
     PathScope TEST_RUNTIME = pathScope(
             "test-runtime",
             ProjectScope.TEST,
-            DependencyScope.EMPTY,
             DependencyScope.COMPILE,
             DependencyScope.RUNTIME,
             DependencyScope.PROVIDED,

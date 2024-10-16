@@ -25,10 +25,22 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * The local repository is used to cache artifacts downloaded from {@link RemoteRepository}
- * and to hold artifacts that have been build locally.
+ * <p>The <dfn>local repository</dfn> is a directory on the developer's machine where
+ * Maven stores all the downloaded artifacts (such as dependencies, plugins,
+ * and project artifacts). When Maven builds a project, it first checks the
+ * local repository to see if the required artifacts are already available.
+ * If the artifacts are found locally, Maven uses them directly, which speeds
+ * up the build process by avoiding unnecessary downloads.</p>
+ *
+ * <p>By default, the local repository is located in the {@code .m2/repository}
+ * directory within the user's home directory ({@code ~/.m2/repository} on
+ * Unix-like systems or {@code C:\Users\YourName\.m2\repository} on Windows).
+ * The location of the local repository can be customized in the
+ * {@code settings.xml} file.</p>
  *
  * @since 4.0.0
+ * @see Repository
+ * @see org.apache.maven.api.settings.Settings
  */
 @Experimental
 @Immutable

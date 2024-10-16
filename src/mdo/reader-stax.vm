@@ -71,7 +71,7 @@ import ${packageModelV4}.InputLocation;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.apache.maven.internal.xml.XmlNodeBuilder;
+import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
 import org.apache.maven.api.xml.XmlNode;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -348,6 +348,15 @@ public class ${className} {
         DEFAULT_ENTITIES = Collections.unmodifiableMap(entities);
     }
 
+    static class InputFactoryHolder {
+        static XMLInputFactory XML_INPUT_FACTORY;
+        static {
+            XMLInputFactory factory = XMLInputFactory.newFactory();
+            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+            XML_INPUT_FACTORY = factory;
+        }
+    }
+
     private boolean addDefaultEntities = true;
 #if ( $locationTracking )
     private boolean addLocationInformation = true;
@@ -361,6 +370,15 @@ public class ${className} {
 
     public ${className}(ContentTransformer contentTransformer) {
         this.contentTransformer = contentTransformer;
+    }
+
+    /**
+     * Returns the {@link XMLInputFactory} used by this reader.
+     *
+     * @return the {@link XMLInputFactory} used by this reader.
+     */
+    public XMLInputFactory getXMLInputFactory() {
+        return InputFactoryHolder.XML_INPUT_FACTORY;
     }
 
     /**
@@ -421,13 +439,12 @@ public class ${className} {
 #else
     public ${root.name} read(Reader reader, boolean strict) throws XMLStreamException {
 #end
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
 #if ( $locationTracking )
         StreamSource streamSource = new StreamSource(reader, source != null ? source.getLocation() : null);
 #else
         StreamSource streamSource = new StreamSource(reader);
 #end
+        XMLInputFactory factory = getXMLInputFactory();
         XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
 #if ( $locationTracking )
         return read(parser, strict, source);
@@ -458,13 +475,12 @@ public class ${className} {
 #else
     public ${root.name} read(InputStream in, boolean strict) throws XMLStreamException {
 #end
-        XMLInputFactory factory = new com.ctc.wstx.stax.WstxInputFactory();
-        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
 #if ( $locationTracking )
         StreamSource streamSource = new StreamSource(in, source != null ? source.getLocation() : null);
 #else
         StreamSource streamSource = new StreamSource(in);
 #end
+        XMLInputFactory factory = getXMLInputFactory();
         XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
 #if ( $locationTracking )
         return read(parser, strict, source);
@@ -551,6 +567,9 @@ public class ${className} {
   #foreach ( $field in $allFields )
     #if ( $Helper.xmlFieldMetadata( $field ).attribute )
       #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
+      #if ( ! $fieldTagName )
+        #set ( $fieldTagName = $field.name )
+      #end
       #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
             } else if ("$fieldTagName".equals(name)) {
       #if ( $locationTracking )
@@ -562,6 +581,8 @@ public class ${className} {
                 ${classLcapName}.${field.name}(interpolatedTrimmed(value, "$fieldTagName"));
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
                 ${classLcapName}.${field.name}(getBooleanValue(interpolatedTrimmed(value, "$fieldTagName"), "$fieldTagName", parser, ${field.defaultValue}));
+      #elseif ( $field.type == "int" || $field.type == "Integer" )
+                ${classLcapName}.${field.name}(getIntegerValue(interpolatedTrimmed(value, "$fieldTagName"), "$fieldTagName", parser, strict, ${field.defaultValue}));
       #else
                 // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
@@ -662,7 +683,13 @@ public class ${className} {
         #end
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) )
+        #if ( $locationTracking )
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, source));
+        #elseif ( $needXmlContext )
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, context));
+        #else
                     ${field.name}.add(parse${field.toClass.name}(parser, strict));
+        #end
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" )
                     List<$field.to> ${field.name} = new ArrayList<>();
@@ -897,14 +924,14 @@ public class ${className} {
 
 #if ( $locationTracking )
     private XmlNode buildXmlNode(XMLStreamReader parser, InputSource source) throws XMLStreamException {
-        return XmlNodeBuilder.build(parser,
+        return XmlNodeStaxBuilder.build(parser,
                 addLocationInformation
                         ? p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source)
                         : null);
     }
 #else
     private XmlNode buildXmlNode(XMLStreamReader parser) throws XMLStreamException {
-        return XmlNodeBuilder.build(parser);
+        return XmlNodeStaxBuilder.build(parser);
     }
 #end
 

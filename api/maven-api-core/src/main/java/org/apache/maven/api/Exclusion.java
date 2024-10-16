@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Nullable;
  * A dependency exclusion.
  *
  * @since 4.0.0
- * @see DependencyCoordinate#getExclusions()
+ * @see DependencyCoordinates#getExclusions()
  */
 @Experimental
 public interface Exclusion {

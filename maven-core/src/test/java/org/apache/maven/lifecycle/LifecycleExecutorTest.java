@@ -152,6 +152,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     // We need to take in multiple lifecycles
+    @Test
     public void testCalculationOfBuildPlanTasksOfTheCleanLifecycleAndTheInstallLifecycle() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
@@ -195,6 +196,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     // We need to take in multiple lifecycles
+    @Test
     public void testCalculationOfBuildPlanWithMultipleExecutionsOfModello() throws Exception {
         File pom = getProject("project-with-multiple-executions");
         MavenSession session = createMavenSession(pom);
@@ -300,7 +302,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     void testLifecyclePluginsRetrievalForDefaultLifecycle() throws Exception {
         List<Plugin> plugins = new ArrayList<>(lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles("jar"));
 
-        assertThat(plugins.toString(), plugins, hasSize(9));
+        assertThat(plugins.toString(), plugins, hasSize(8));
     }
 
     @Test

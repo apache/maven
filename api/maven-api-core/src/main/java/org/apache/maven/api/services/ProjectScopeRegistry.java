@@ -19,8 +19,12 @@
 package org.apache.maven.api.services;
 
 import org.apache.maven.api.ProjectScope;
+import org.apache.maven.api.annotations.Experimental;
 
 /**
  * Manager for {@link ProjectScope}.
+ *
+ * @since 4.0.0
  */
+@Experimental
 public interface ProjectScopeRegistry extends ExtensibleEnumRegistry<ProjectScope> {}

@@ -33,7 +33,9 @@ import static java.util.Objects.requireNonNull;
 /**
  * A model builder cache backed by the repository system cache.
  *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 public class DefaultModelCache implements ModelCache {
     private static final String KEY = DefaultModelCache.class.getName();
 

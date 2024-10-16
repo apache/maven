@@ -22,17 +22,25 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Resolves relative paths against a specific base directory.
  *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 public class DefaultPathTranslator implements PathTranslator {
 
     @Override
     public String alignToBaseDirectory(String path, File basedir) {
+        return alignToBaseDirectory(path, basedir != null ? basedir.toPath() : null);
+    }
+
+    @Override
+    public String alignToBaseDirectory(String path, Path basedir) {
         String result = path;
 
         if (path != null && basedir != null) {
@@ -47,7 +55,7 @@ public class DefaultPathTranslator implements PathTranslator {
                 result = file.getAbsolutePath();
             } else {
                 // an ordinary relative path, align with project directory
-                result = new File(new File(basedir, path).toURI().normalize()).getAbsolutePath();
+                result = basedir.resolve(path).normalize().toString();
             }
         }
 

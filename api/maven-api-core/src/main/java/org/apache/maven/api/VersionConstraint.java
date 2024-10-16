@@ -23,8 +23,16 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * Version constraint for dependency. Constraint is either a range ("[1,2)") or recommended version ("1.0").
+ * Version constraint for dependency.
+ * Constraint is either a range ("[1,2)") or recommended version ("1.0").
  *
+ * {@code VersionConstraint} objects are created using the
+ * {@linkplain org.apache.maven.api.services.VersionParser} service.
+ *
+ * @see Version
+ * @see VersionRange
+ * @see org.apache.maven.api.services.VersionParser#parseVersionConstraint(String)
+ * @see org.apache.maven.api.Session#parseVersionConstraint(String)
  * @since 4.0.0
  */
 @Experimental

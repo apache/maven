@@ -195,27 +195,30 @@ public class LifecycleDependencyResolver {
             boolean aggregating,
             Set<Artifact> projectArtifacts)
             throws LifecycleExecutionException {
-        Set<Artifact> resolvedArtifacts;
         ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey(
                 project, scopesToCollect, scopesToResolve, aggregating, session.getRepositorySession());
+
         ProjectArtifactsCache.CacheRecord recordArtifacts;
         recordArtifacts = projectArtifactsCache.get(cacheKey);
-
-        if (recordArtifacts != null) {
-            resolvedArtifacts = recordArtifacts.getArtifacts();
-        } else {
-            try {
-                resolvedArtifacts = getDependencies(
-                        project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
-                recordArtifacts = projectArtifactsCache.put(cacheKey, resolvedArtifacts);
-            } catch (LifecycleExecutionException e) {
-                projectArtifactsCache.put(cacheKey, e);
-                projectArtifactsCache.register(project, cacheKey, recordArtifacts);
-                throw e;
+        if (recordArtifacts == null) {
+            synchronized (cacheKey) {
+                recordArtifacts = projectArtifactsCache.get(cacheKey);
+                if (recordArtifacts == null) {
+                    try {
+                        Set<Artifact> resolvedArtifacts = getDependencies(
+                                project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
+                        recordArtifacts = projectArtifactsCache.put(cacheKey, resolvedArtifacts);
+                    } catch (LifecycleExecutionException e) {
+                        projectArtifactsCache.put(cacheKey, e);
+                        projectArtifactsCache.register(project, cacheKey, recordArtifacts);
+                        throw e;
+                    }
+                }
             }
         }
         projectArtifactsCache.register(project, cacheKey, recordArtifacts);
-        return resolvedArtifacts;
+
+        return recordArtifacts.getArtifacts();
     }
 
     private Set<Artifact> getDependencies(

@@ -40,11 +40,12 @@ import org.slf4j.LoggerFactory;
  * Note: this component should kick-in last regarding relocations.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Singleton
 @Named(DistributionManagementArtifactRelocationSource.NAME)
 @Priority(5)
-@SuppressWarnings("checkstyle:MagicNumber")
+@Deprecated(since = "4.0.0")
 public final class DistributionManagementArtifactRelocationSource implements MavenArtifactRelocationSource {
     public static final String NAME = "distributionManagement";
     private static final Logger LOGGER = LoggerFactory.getLogger(DistributionManagementArtifactRelocationSource.class);

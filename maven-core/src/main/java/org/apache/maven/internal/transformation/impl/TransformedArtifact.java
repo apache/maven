@@ -52,6 +52,7 @@ class TransformedArtifact extends DefaultArtifact {
     private final RepositorySystemSession session;
     private final AtomicReference<String> sourceState;
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     TransformedArtifact(
             DefaultConsumerPomArtifactTransformer defaultConsumerPomArtifactTransformer,
             MavenProject project,
@@ -114,7 +115,7 @@ class TransformedArtifact extends DefaultArtifact {
         } else {
             String current = sha1(src);
             String existing = sourceState.get();
-            if (!Objects.equals(current, existing)) {
+            if (!Files.exists(target) || !Objects.equals(current, existing)) {
                 defaultConsumerPomArtifactTransformer.transform(project, session, src, target);
                 Files.setLastModifiedTime(target, Files.getLastModifiedTime(src));
             }

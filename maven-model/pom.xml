@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-13-SNAPSHOT</version>
+    <version>4.0.0-beta-5-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-model</artifactId>
@@ -38,7 +38,15 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-xml-impl</artifactId>
+      <artifactId>maven-api-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-meta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -46,14 +54,18 @@ under the License.
     </dependency>
 
     <dependency>
-      <groupId>org.openjdk.jmh</groupId>
-      <artifactId>jmh-core</artifactId>
-      <version>1.37</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.openjdk.jmh</groupId>
-      <artifactId>jmh-generator-annprocess</artifactId>
+      <artifactId>jmh-core</artifactId>
       <version>1.37</version>
       <scope>test</scope>
     </dependency>
@@ -108,23 +120,6 @@ under the License.
               </templates>
             </configuration>
           </execution>
-          <execution>
-            <id>model-v4</id>
-            <goals>
-              <goal>velocity</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <version>4.1.0</version>
-              <templates>
-                <template>merger.vm</template>
-                <template>transformer.vm</template>
-                <template>reader-stax.vm</template>
-                <template>writer-stax.vm</template>
-                <template>model-version.vm</template>
-              </templates>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -136,7 +131,6 @@ under the License.
               <exclude>org.apache.maven.model.*#setOtherLocation(java.lang.Object,org.apache.maven.model.InputLocation):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.ConfigurationContainer#isInheritanceApplied():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.ConfigurationContainer#setInherited(boolean):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.model.ConfigurationContainer#unsetInheritanceApplied():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Contributor#addProperty(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Dependency#clearManagementKey():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.ModelBase#addProperty(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
@@ -145,8 +139,6 @@ under the License.
               <exclude>org.apache.maven.model.Notifier#addConfiguration(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Plugin#getGoals():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Plugin#setGoals(java.lang.Object):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.model.Reporting#flushReportPluginMap():METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.model.Reporting#getReportPluginsAsMap():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Resource#initMergeId():METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Scm#setChildScmConnectionInheritAppendPath(boolean):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Scm#setChildScmDeveloperConnectionInheritAppendPath(boolean):METHOD_REMOVED</exclude>

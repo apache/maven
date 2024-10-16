@@ -28,9 +28,9 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Dependency scope.
- * This represents at which time the dependency will be used, for example, at compile time only,
- * at run time or at test time.  For a given dependency, the scope is directly derived from the
+ * Indicates when the dependency will be used.
+ * For example, it may be at compile time only, at runtime, or at test time.
+ * For a given dependency, the scope is directly derived from the
  * {@link org.apache.maven.api.model.Dependency#getScope()} and will be used when using {@link PathScope}
  * and the {@link org.apache.maven.api.services.DependencyResolver}.
  *
@@ -49,9 +49,12 @@ public enum DependencyScope {
     NONE("none", false),
 
     /**
-     * Empty scope.
+     * Undefined. When no scope is explicitly given, UNDEFINED will be used, but its meaning will depend on
+     * whether the DependencyCoordinates is used in dependency management, in which case it means the scope is not
+     * explicitly managed by this managed dependency, or as a real dependency, in which case, the scope
+     * will default to {@link #COMPILE}.
      */
-    EMPTY("", false),
+    UNDEFINED("", false),
 
     /**
      * Compile only.
@@ -86,13 +89,10 @@ public enum DependencyScope {
     /**
      * Test runtime.
      */
-    TEST_RUNTIME("test-runtime", true),
+    TEST_RUNTIME("test-runtime", false),
 
     /**
      * System scope.
-     * <p>
-     * Important: this scope {@code id} MUST BE KEPT in sync with label in
-     * {@code org.eclipse.aether.util.artifact.Scopes#SYSTEM}.
      */
     SYSTEM("system", false);
 
@@ -124,5 +124,9 @@ public enum DependencyScope {
 
     public boolean isTransitive() {
         return transitive;
+    }
+
+    public boolean is(String id) {
+        return id().equals(id);
     }
 }

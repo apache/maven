@@ -20,16 +20,18 @@ package org.apache.maven.internal.transformation.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
@@ -37,41 +39,17 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
-import org.apache.maven.model.building.DefaultModelBuilder;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
-import org.apache.maven.model.building.DefaultModelBuildingRequest;
-import org.apache.maven.model.building.ModelBuildingException;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelBuildingResult;
-import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProcessor;
-import org.apache.maven.model.composition.DependencyManagementImporter;
-import org.apache.maven.model.inheritance.InheritanceAssembler;
-import org.apache.maven.model.interpolation.ModelInterpolator;
-import org.apache.maven.model.management.DependencyManagementInjector;
-import org.apache.maven.model.management.PluginManagementInjector;
-import org.apache.maven.model.normalization.ModelNormalizer;
-import org.apache.maven.model.path.ModelPathTranslator;
-import org.apache.maven.model.path.ModelUrlNormalizer;
-import org.apache.maven.model.plugin.LifecycleBindingsInjector;
-import org.apache.maven.model.plugin.PluginConfigurationExpander;
-import org.apache.maven.model.plugin.ReportConfigurationExpander;
-import org.apache.maven.model.profile.DefaultProfileSelector;
-import org.apache.maven.model.profile.ProfileActivationContext;
-import org.apache.maven.model.profile.ProfileInjector;
-import org.apache.maven.model.profile.ProfileSelector;
-import org.apache.maven.model.superpom.SuperPomProvider;
+import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilderException;
+import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.model.LifecycleBindingsInjector;
+import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
-import org.apache.maven.model.validation.ModelValidator;
-import org.apache.maven.model.version.ModelVersionParser;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.ProjectModelResolver;
-import org.apache.maven.repository.internal.ModelCacheFactory;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.RequestTrace;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
 
 @Named
 class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
@@ -79,66 +57,16 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
     public static final String POM_PACKAGING = "pom";
 
-    @Inject
-    private ModelCacheFactory modelCacheFactory;
+    private final LifecycleBindingsInjector lifecycleBindingsInjector;
 
     @Inject
-    private ProfileInjector profileInjector;
-
-    @Inject
-    private InheritanceAssembler inheritanceAssembler;
-
-    @Inject
-    private DependencyManagementImporter dependencyManagementImporter;
-
-    @Inject
-    private DependencyManagementInjector dependencyManagementInjector;
-
-    @Inject
-    private LifecycleBindingsInjector lifecycleBindingsInjector;
-
-    @Inject
-    private ModelInterpolator modelInterpolator;
-
-    @Inject
-    private ModelNormalizer modelNormalizer;
-
-    @Inject
-    private ModelPathTranslator modelPathTranslator;
-
-    @Inject
-    private ModelProcessor modelProcessor;
-
-    @Inject
-    private ModelUrlNormalizer modelUrlNormalizer;
-
-    @Inject
-    private ModelValidator modelValidator;
-
-    @Inject
-    private PluginConfigurationExpander pluginConfigurationExpander;
-
-    @Inject
-    private PluginManagementInjector pluginManagementInjector;
-
-    @Inject
-    private ReportConfigurationExpander reportConfigurationExpander;
-
-    @Inject
-    private SuperPomProvider superPomProvider;
-
-    @Inject
-    private ModelVersionParser versionParser;
-
-    // To break circular dependency
-    @Inject
-    private Provider<RepositorySystem> repositorySystem;
-
-    @Inject
-    private RemoteRepositoryManager remoteRepositoryManager;
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    DefaultConsumerPomBuilder(LifecycleBindingsInjector lifecycleBindingsInjector) {
+        this.lifecycleBindingsInjector = lifecycleBindingsInjector;
+    }
 
     @Override
-    public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuildingException {
+    public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
         String packaging = model.getPackaging();
         String originalPackaging = project.getOriginalModel().getPackaging();
@@ -150,83 +78,41 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     }
 
     protected Model buildPom(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuildingException {
-        ModelBuildingResult result = buildModel(session, project, src);
-        Model model = result.getRawModel().getDelegate();
+            throws ModelBuilderException {
+        ModelBuilderResult result = buildModel(session, project, src);
+        Model model = result.getRawModel();
         return transform(model, project);
     }
 
     protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuildingException {
-        ModelBuildingResult result = buildModel(session, project, src);
-        Model model = result.getEffectiveModel().getDelegate();
+            throws ModelBuilderException {
+        ModelBuilderResult result = buildModel(session, project, src);
+        Model model = result.getEffectiveModel();
         return transform(model, project);
     }
 
-    private ModelBuildingResult buildModel(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuildingException {
-        ProfileSelector customSelector = new DefaultProfileSelector() {
-            @Override
-            public List<Profile> getActiveProfilesV4(
-                    Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems) {
-                return new ArrayList<>();
-            }
-        };
-        DefaultModelBuilder modelBuilder = new DefaultModelBuilderFactory()
-                .setProfileSelector(customSelector)
-                // apply currently active ModelProcessor etc. to support extensions like jgitver
-                .setProfileInjector(profileInjector)
-                .setInheritanceAssembler(inheritanceAssembler)
-                .setDependencyManagementImporter(dependencyManagementImporter)
-                .setDependencyManagementInjector(dependencyManagementInjector)
-                .setLifecycleBindingsInjector(lifecycleBindingsInjector)
-                .setModelInterpolator(modelInterpolator)
-                .setModelNormalizer(modelNormalizer)
-                .setModelPathTranslator(modelPathTranslator)
-                .setModelProcessor(modelProcessor)
-                .setModelUrlNormalizer(modelUrlNormalizer)
-                .setModelValidator(modelValidator)
-                .setPluginConfigurationExpander(pluginConfigurationExpander)
-                .setPluginManagementInjector(pluginManagementInjector)
-                .setReportConfigurationExpander(reportConfigurationExpander)
-                .setSuperPomProvider(superPomProvider)
-                .setModelVersionParser(versionParser)
-                .newInstance();
-        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
-        try {
-            request.setRootDirectory(project.getRootDirectory());
-        } catch (IllegalStateException e) {
-            // ignore if we don't have a root directory
-        }
-        request.setPomFile(src.toFile());
-        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
-        request.setLocationTracking(false);
-        request.setModelResolver(new ProjectModelResolver(
-                session,
-                new RequestTrace(null),
-                repositorySystem.get(),
-                remoteRepositoryManager,
-                project.getRemoteProjectRepositories(),
-                ProjectBuildingRequest.RepositoryMerging.POM_DOMINANT,
-                null));
-        request.setTransformerContextBuilder(modelBuilder.newTransformerContextBuilder());
-        request.setSystemProperties(toProperties(session.getSystemProperties()));
-        request.setUserProperties(toProperties(session.getUserProperties()));
-        request.setModelCache(modelCacheFactory.createCache(session));
-        return modelBuilder.build(request);
-    }
-
-    private Properties toProperties(Map<String, String> map) {
-        Properties props = new Properties();
-        props.putAll(map);
-        return props;
+    private ModelBuilderResult buildModel(RepositorySystemSession session, MavenProject project, Path src)
+            throws ModelBuilderException {
+        InternalSession iSession = InternalSession.from(session);
+        ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
+        request.requestType(ModelBuilderRequest.RequestType.CONSUMER_POM);
+        request.session(iSession);
+        // in order to resolve parents, we need to fake being at the correct location
+        request.source(new PomConsumerModelSource(project.getModel().getPomPath(), src));
+        request.locationTracking(false);
+        request.systemProperties(session.getSystemProperties());
+        request.userProperties(session.getUserProperties());
+        request.lifecycleBindingsInjector(lifecycleBindingsInjector::injectLifecycleBindings);
+        ModelBuilder.ModelBuilderSession mbSession =
+                iSession.getData().get(SessionData.key(ModelBuilder.ModelBuilderSession.class));
+        return mbSession.build(request.build());
     }
 
     static Model transform(Model model, MavenProject project) {
         String packaging = model.getPackaging();
         if (POM_PACKAGING.equals(packaging)) {
             // raw to consumer transform
-            model = model.withRoot(false).withModules(null);
+            model = model.withRoot(false).withModules(null).withSubprojects(null);
             if (model.getParent() != null) {
                 model = model.withParent(model.getParent().withRelativePath(null));
             }
@@ -254,9 +140,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                             .build(null),
                     model);
             builder.packaging(POM_PACKAGING);
-            builder.profiles(model.getProfiles().stream()
-                    .map(p -> prune(Profile.newBuilder(p, true), p).build())
-                    .collect(Collectors.toList()));
+            builder.profiles(prune(model.getProfiles()));
 
             model = builder.build();
             String modelVersion = new MavenModelVersion().getModelVersion(model);
@@ -269,14 +153,39 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                             .parent(null)
                             .build(null),
                     model);
-            builder.profiles(model.getProfiles().stream()
-                    .map(p -> prune(Profile.newBuilder(p, true), p).build())
-                    .collect(Collectors.toList()));
+            builder.profiles(prune(model.getProfiles()));
+
             model = builder.build();
             String modelVersion = new MavenModelVersion().getModelVersion(model);
             model = model.withModelVersion(modelVersion);
         }
         return model;
+    }
+
+    private static List<Profile> prune(List<Profile> profiles) {
+        return profiles.stream()
+                .map(p -> {
+                    Profile.Builder builder = Profile.newBuilder(p, true);
+                    prune((ModelBase.Builder) builder, p);
+                    return builder.build(null).build();
+                })
+                .filter(p -> !isEmpty(p))
+                .collect(Collectors.toList());
+    }
+
+    private static boolean isEmpty(Profile profile) {
+        return profile.getActivation() == null
+                && profile.getBuild() == null
+                && profile.getDependencies().isEmpty()
+                && (profile.getDependencyManagement() == null
+                        || profile.getDependencyManagement().getDependencies().isEmpty())
+                && profile.getDistributionManagement() == null
+                && profile.getModules().isEmpty()
+                && profile.getSubprojects().isEmpty()
+                && profile.getProperties().isEmpty()
+                && profile.getRepositories().isEmpty()
+                && profile.getPluginRepositories().isEmpty()
+                && profile.getReporting() == null;
     }
 
     private static <T extends ModelBase.Builder> T prune(T builder, ModelBase model) {
@@ -298,5 +207,64 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         return repositories.stream()
                 .filter(r -> !org.apache.maven.api.Repository.CENTRAL_ID.equals(r.getId()))
                 .collect(Collectors.toList());
+    }
+
+    static class PomConsumerModelSource implements ModelSource {
+        final Path path;
+        final Path src;
+
+        PomConsumerModelSource(Path path, Path src) {
+            this.path = path;
+            this.src = src;
+        }
+
+        @Override
+        public Path getPath() {
+            return path;
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return Files.newInputStream(src);
+        }
+
+        @Override
+        public String getLocation() {
+            return src.toString();
+        }
+
+        @Override
+        public Source resolve(String relative) {
+            return ModelSource.fromPath(path.resolve(relative));
+        }
+
+        @Override
+        public ModelSource resolve(ModelLocator locator, String relative) {
+            String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
+            Path path = getPath().getParent().resolve(norm);
+            Path relatedPom = locator.locateExistingPom(path);
+            if (relatedPom != null) {
+                return ModelSource.fromPath(relatedPom);
+            }
+            return null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return this == o
+                    || o.getClass() == getClass()
+                            && Objects.equals(path, ((PomConsumerModelSource) o).path)
+                            && Objects.equals(src, ((PomConsumerModelSource) o).src);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(path, src);
+        }
+
+        @Override
+        public String toString() {
+            return "PomConsumerModelSource[" + "path=" + path + ']';
+        }
     }
 }

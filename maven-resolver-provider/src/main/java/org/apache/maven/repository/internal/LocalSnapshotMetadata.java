@@ -19,6 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -33,17 +34,20 @@ import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Maven local GAV level metadata.
+ *
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
+@Deprecated(since = "4.0.0")
 final class LocalSnapshotMetadata extends MavenMetadata {
 
     private final Collection<Artifact> artifacts = new ArrayList<>();
 
     LocalSnapshotMetadata(Artifact artifact, Date timestamp) {
-        super(createMetadata(artifact), null, timestamp);
+        super(createMetadata(artifact), (Path) null, timestamp);
     }
 
-    LocalSnapshotMetadata(Metadata metadata, File file, Date timestamp) {
-        super(metadata, file, timestamp);
+    LocalSnapshotMetadata(Metadata metadata, Path path, Date timestamp) {
+        super(metadata, path, timestamp);
     }
 
     private static Metadata createMetadata(Artifact artifact) {
@@ -65,9 +69,15 @@ final class LocalSnapshotMetadata extends MavenMetadata {
         artifacts.add(artifact);
     }
 
+    @Deprecated
     @Override
     public MavenMetadata setFile(File file) {
-        return new LocalSnapshotMetadata(metadata, file, timestamp);
+        return new LocalSnapshotMetadata(metadata, file.toPath(), timestamp);
+    }
+
+    @Override
+    public MavenMetadata setPath(Path path) {
+        return new LocalSnapshotMetadata(metadata, path, timestamp);
     }
 
     public Object getKey() {
@@ -106,6 +116,11 @@ final class LocalSnapshotMetadata extends MavenMetadata {
         }
 
         metadata.getVersioning().setSnapshotVersions(new ArrayList<>(versions.values()));
+
+        // just carry-on as-is
+        if (!recessive.getPlugins().isEmpty()) {
+            metadata.setPlugins(new ArrayList<>(recessive.getPlugins()));
+        }
 
         artifacts.clear();
     }

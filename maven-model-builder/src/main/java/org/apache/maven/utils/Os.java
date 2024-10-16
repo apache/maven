@@ -18,12 +18,16 @@
  */
 package org.apache.maven.utils;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.stream.Stream;
 
 /**
  * OS support
+ *
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class Os {
 
     /**
@@ -124,11 +128,6 @@ public class Os {
      */
     private static final String DARWIN = "darwin";
 
-    /**
-     * The path separator.
-     */
-    private static final String PATH_SEP = System.getProperty("path.separator");
-
     static {
         // Those two public constants are initialized here, as they need all the private constants
         // above to be initialized first, but the code style imposes the public constants to be
@@ -148,18 +147,31 @@ public class Os {
      *
      */
     public static boolean isFamily(String family) {
+        return isFamily(family, OS_NAME);
+    }
+
+    /**
+     * Determines if the OS on which Maven is executing matches the
+     * given OS family derived from the given OS name
+     *
+     * @param family the family to check for
+     * @param actualOsName the OS name to check against
+     * @return true if the OS matches
+     *
+     */
+    public static boolean isFamily(String family, String actualOsName) {
         // windows probing logic relies on the word 'windows' in the OS
-        boolean isWindows = OS_NAME.contains(FAMILY_WINDOWS);
+        boolean isWindows = actualOsName.contains(FAMILY_WINDOWS);
         boolean is9x = false;
         boolean isNT = false;
         if (isWindows) {
             // there are only four 9x platforms that we look for
-            is9x = (OS_NAME.contains("95")
-                    || OS_NAME.contains("98")
-                    || OS_NAME.contains("me")
+            is9x = (actualOsName.contains("95")
+                    || actualOsName.contains("98")
+                    || actualOsName.contains("me")
                     // wince isn't really 9x, but crippled enough to
                     // be a muchness. Maven doesnt run on CE, anyway.
-                    || OS_NAME.contains("ce"));
+                    || actualOsName.contains("ce"));
             isNT = !is9x;
         }
         switch (family) {
@@ -170,27 +182,27 @@ public class Os {
             case FAMILY_NT:
                 return isWindows && isNT;
             case FAMILY_OS2:
-                return OS_NAME.contains(FAMILY_OS2);
+                return actualOsName.contains(FAMILY_OS2);
             case FAMILY_NETWARE:
-                return OS_NAME.contains(FAMILY_NETWARE);
+                return actualOsName.contains(FAMILY_NETWARE);
             case FAMILY_DOS:
-                return PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE) && !isWindows;
+                return File.pathSeparatorChar == ';' && !isFamily(FAMILY_NETWARE, actualOsName) && !isWindows;
             case FAMILY_MAC:
-                return OS_NAME.contains(FAMILY_MAC) || OS_NAME.contains(DARWIN);
+                return actualOsName.contains(FAMILY_MAC) || actualOsName.contains(DARWIN);
             case FAMILY_TANDEM:
-                return OS_NAME.contains("nonstop_kernel");
+                return actualOsName.contains("nonstop_kernel");
             case FAMILY_UNIX:
-                return PATH_SEP.equals(":")
-                        && !isFamily(FAMILY_OPENVMS)
-                        && (!isFamily(FAMILY_MAC) || OS_NAME.endsWith("x"));
+                return File.pathSeparatorChar == ':'
+                        && !isFamily(FAMILY_OPENVMS, actualOsName)
+                        && (!isFamily(FAMILY_MAC, actualOsName) || actualOsName.endsWith("x"));
             case FAMILY_ZOS:
-                return OS_NAME.contains(FAMILY_ZOS) || OS_NAME.contains(FAMILY_OS390);
+                return actualOsName.contains(FAMILY_ZOS) || actualOsName.contains(FAMILY_OS390);
             case FAMILY_OS400:
-                return OS_NAME.contains(FAMILY_OS400);
+                return actualOsName.contains(FAMILY_OS400);
             case FAMILY_OPENVMS:
-                return OS_NAME.contains(FAMILY_OPENVMS);
+                return actualOsName.contains(FAMILY_OPENVMS);
             default:
-                return OS_NAME.contains(family.toLowerCase(Locale.US));
+                return actualOsName.contains(family.toLowerCase(Locale.US));
         }
     }
 

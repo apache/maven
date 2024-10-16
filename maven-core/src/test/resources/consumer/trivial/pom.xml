@@ -4,9 +4,9 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>child.xml</module>
-  </modules>
+  <subprojects>
+    <subproject>child</subproject>
+  </subprojects>
 
   <dependencyManagement>
     <dependencies>

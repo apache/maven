@@ -25,14 +25,17 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.maven.api.plugin.MojoException;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.plugin.AbstractMojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.ProjectBuildingException;
@@ -89,13 +92,13 @@ Plugins:
 @Named
 @Singleton
 public class DefaultExceptionHandler implements ExceptionHandler {
-
+    @Override
     public ExceptionSummary handleException(Throwable exception) {
         return handle("", exception);
     }
 
     private ExceptionSummary handle(String message, Throwable exception) {
-        String reference = getReference(exception);
+        String reference = getReference(Collections.newSetFromMap(new IdentityHashMap<>()), exception);
 
         List<ExceptionSummary> children = null;
 
@@ -157,8 +160,11 @@ public class DefaultExceptionHandler implements ExceptionHandler {
         }
     }
 
-    private String getReference(Throwable exception) {
+    private String getReference(Set<Throwable> dejaVu, Throwable exception) {
         String reference = "";
+        if (!dejaVu.add(exception)) {
+            return reference;
+        }
 
         if (exception != null) {
             if (exception instanceof MojoExecutionException) {
@@ -171,8 +177,6 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                         reference = ConnectException.class.getSimpleName();
                     }
                 }
-            } else if (exception instanceof MojoFailureException) {
-                reference = MojoFailureException.class.getSimpleName();
             } else if (exception instanceof LinkageError) {
                 reference = LinkageError.class.getSimpleName();
             } else if (exception instanceof PluginExecutionException) {
@@ -190,14 +194,14 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                 }
 
                 if (reference == null || reference.isEmpty()) {
-                    reference = getReference(cause);
+                    reference = getReference(dejaVu, cause);
                 }
 
                 if (reference == null || reference.isEmpty()) {
                     reference = exception.getClass().getSimpleName();
                 }
             } else if (exception instanceof LifecycleExecutionException) {
-                reference = getReference(exception.getCause());
+                reference = getReference(dejaVu, exception.getCause());
             } else if (isNoteworthyException(exception)) {
                 reference = exception.getClass().getSimpleName();
             }
@@ -225,19 +229,24 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     private String getMessage(String message, Throwable exception) {
         String fullMessage = (message != null) ? message : "";
 
-        // To break out of possible endless loop when getCause returns "this"
+        // To break out of possible endless loop when getCause returns "this", or dejaVu for n-level recursion (n>1)
+        Set<Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
         for (Throwable t = exception; t != null && t != t.getCause(); t = t.getCause()) {
             String exceptionMessage = t.getMessage();
+            String longMessage = null;
 
             if (t instanceof AbstractMojoExecutionException) {
-                String longMessage = ((AbstractMojoExecutionException) t).getLongMessage();
-                if (longMessage != null && !longMessage.isEmpty()) {
-                    if ((exceptionMessage == null || exceptionMessage.isEmpty())
-                            || longMessage.contains(exceptionMessage)) {
-                        exceptionMessage = longMessage;
-                    } else if (!exceptionMessage.contains(longMessage)) {
-                        exceptionMessage = join(exceptionMessage, System.lineSeparator() + longMessage);
-                    }
+                longMessage = ((AbstractMojoExecutionException) t).getLongMessage();
+            } else if (t instanceof MojoException) {
+                longMessage = ((MojoException) t).getLongMessage();
+            }
+
+            if (longMessage != null && !longMessage.isEmpty()) {
+                if ((exceptionMessage == null || exceptionMessage.isEmpty())
+                        || longMessage.contains(exceptionMessage)) {
+                    exceptionMessage = longMessage;
+                } else if (!exceptionMessage.contains(longMessage)) {
+                    exceptionMessage = join(exceptionMessage, System.lineSeparator() + longMessage);
                 }
             }
 
@@ -249,6 +258,11 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                 fullMessage = join(fullMessage, "Unknown host " + exceptionMessage);
             } else if (!fullMessage.contains(exceptionMessage)) {
                 fullMessage = join(fullMessage, exceptionMessage);
+            }
+
+            if (!dejaVu.add(t)) {
+                fullMessage = join(fullMessage, "[CIRCULAR REFERENCE]");
+                break;
             }
         }
 

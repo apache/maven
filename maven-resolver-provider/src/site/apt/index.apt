@@ -31,3 +31,5 @@ Maven Artifact Resolver Provider
  Main component is <<<MavenRepositorySystemUtils>>>
  ({{{./apidocs/org/apache/maven/repository/internal/MavenRepositorySystemUtils.html}javadoc}},
  {{{./xref/org/apache/maven/repository/internal/MavenRepositorySystemUtils.html}source}}).
+
+ See also {{{./dependency-types.html}dependency types}}.

@@ -44,11 +44,12 @@ import org.slf4j.LoggerFactory;
  * Relocation source from user properties.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Singleton
 @Named(UserPropertiesArtifactRelocationSource.NAME)
 @Priority(50)
-@SuppressWarnings("checkstyle:MagicNumber")
+@Deprecated(since = "4.0.0")
 public final class UserPropertiesArtifactRelocationSource implements MavenArtifactRelocationSource {
     public static final String NAME = "userProperties";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserPropertiesArtifactRelocationSource.class);
@@ -194,9 +195,9 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
         }
     }
 
-    private static Artifact parseArtifact(String coord) {
+    private static Artifact parseArtifact(String coords) {
         Artifact s;
-        String[] parts = coord.split(":");
+        String[] parts = coords.split(":");
         switch (parts.length) {
             case 3:
                 s = new DefaultArtifact(parts[0], parts[1], "*", "*", parts[2]);
@@ -208,7 +209,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
                 s = new DefaultArtifact(parts[0], parts[1], parts[2], parts[3], parts[4]);
                 break;
             default:
-                throw new IllegalArgumentException("Bad artifact coordinates " + coord
+                throw new IllegalArgumentException("Bad artifact coordinates " + coords
                         + ", expected format is <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>");
         }
         return s;

@@ -36,9 +36,11 @@ import org.apache.maven.model.Parent;
  * ModelSourceTransformer for the build pom
  *
  * @since 4.0.0
+ * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton
+@Deprecated(since = "4.0.0")
 class BuildModelSourceTransformer implements ModelSourceTransformer {
 
     public static final String NAMESPACE_PREFIX = "http://maven.apache.org/POM/";

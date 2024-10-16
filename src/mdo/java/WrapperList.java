@@ -18,6 +18,8 @@
  */
 package ${package};
 
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-class WrapperList<T, U> extends AbstractList<T> {
+class WrapperList<T, U> extends AbstractList<T> implements Serializable {
     private final Supplier<List<U>> getter;
     private final Consumer<List<U>> setter;
     private final Function<U, T> mapper;
@@ -101,5 +103,9 @@ class WrapperList<T, U> extends AbstractList<T> {
         } else {
             return mapper.apply(getter.get().remove(index));
         }
+    }
+
+    private Object writeReplace() throws ObjectStreamException {
+        return new ArrayList<T>(this);
     }
 }

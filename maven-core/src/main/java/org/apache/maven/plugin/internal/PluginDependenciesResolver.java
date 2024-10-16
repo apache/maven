@@ -27,6 +27,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.DependencyResult;
 
 /**
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility interface
@@ -67,5 +68,13 @@ public interface PluginDependenciesResolver {
             DependencyFilter dependencyFilter,
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
+            throws PluginResolutionException;
+
+    DependencyResult resolvePlugin(
+            Plugin plugin,
+            Artifact artifact,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> remotePluginRepositories,
+            RepositorySystemSession repositorySession)
             throws PluginResolutionException;
 }
