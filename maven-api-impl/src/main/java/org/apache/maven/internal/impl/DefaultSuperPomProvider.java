@@ -62,8 +62,8 @@ public class DefaultSuperPomProvider implements SuperPomProvider {
                     + ", please verify the integrity of your Maven installation");
         }
         try (InputStream is = url.openStream()) {
-            String modelId = "org.apache.maven:maven-model-builder:" + version + "-"
-                    + this.getClass().getPackage().getImplementationVersion() + ":super-pom";
+            String modelId = "org.apache.maven:maven-api-impl:"
+                    + this.getClass().getPackage().getImplementationVersion() + ":super-pom-" + version;
             return modelProcessor.read(XmlReaderRequest.builder()
                     .modelId(modelId)
                     .location(url.toExternalForm())
