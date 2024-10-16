@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.function.Function;
@@ -154,15 +155,8 @@ public final class Utils {
     @Nullable
     public static Path findRoot(Path topDirectory) throws ParserException {
         requireNonNull(topDirectory, "topDirectory");
-        Path rootDirectory = null;
-        for (RootLocator rootLocator : ServiceLoader.load(RootLocator.class).stream()
-                .map(ServiceLoader.Provider::get)
-                .toList()) {
-            rootDirectory = rootLocator.findRoot(topDirectory);
-            if (rootDirectory != null) {
-                break;
-            }
-        }
+        Path rootDirectory =
+                ServiceLoader.load(RootLocator.class).iterator().next().findRoot(topDirectory);
         if (rootDirectory != null) {
             return getCanonicalPath(rootDirectory);
         }
@@ -172,15 +166,8 @@ public final class Utils {
     @Nonnull
     public static Path findMandatoryRoot(Path topDirectory) throws ParserException {
         requireNonNull(topDirectory, "topDirectory");
-        Path rootDirectory;
-        for (RootLocator rootLocator : ServiceLoader.load(RootLocator.class).stream()
-                .map(ServiceLoader.Provider::get)
-                .toList()) {
-            rootDirectory = rootLocator.findMandatoryRoot(topDirectory);
-            if (rootDirectory != null) {
-                return getCanonicalPath(rootDirectory);
-            }
-        }
-        throw new IllegalStateException("how did we get here?");
+        return getCanonicalPath(Optional.ofNullable(
+                        ServiceLoader.load(RootLocator.class).iterator().next().findMandatoryRoot(topDirectory))
+                .orElseThrow());
     }
 }
