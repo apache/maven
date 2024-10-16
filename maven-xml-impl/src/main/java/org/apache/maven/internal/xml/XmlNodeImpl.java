@@ -264,7 +264,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                 for (String name : names) {
                     List<XmlNode> dominantChildren = dominant.getChildren().stream()
                             .filter(n -> n.getName().equals(name))
-                            .collect(Collectors.toList());
+                            .toList();
                     if (!dominantChildren.isEmpty()) {
                         commonChildren.put(name, dominantChildren.iterator());
                     }
@@ -272,6 +272,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
                 String keysValue = recessive.getAttribute(KEYS_COMBINATION_MODE_ATTRIBUTE);
 
+                int recessiveChildIndex = 0;
                 for (XmlNode recessiveChild : recessive.getChildren()) {
                     String idValue = recessiveChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE);
 
@@ -345,11 +346,10 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                         if (children == null) {
                             children = new ArrayList<>(dominant.getChildren());
                         }
-                        int idx = mergeChildren
-                                ? children.size()
-                                : recessive.getChildren().indexOf(recessiveChild);
+                        int idx = mergeChildren ? children.size() : recessiveChildIndex;
                         children.add(idx, recessiveChild);
                     }
+                    recessiveChildIndex++;
                 }
             }
 
