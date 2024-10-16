@@ -176,7 +176,7 @@ class TestApi {
     void testCollectArtifactDependencies() {
         Artifact artifact =
                 session.createArtifact("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "jar");
-        Node root = session.collectDependencies(artifact);
+        Node root = session.collectDependencies(artifact, PathScope.MAIN_RUNTIME);
         assertNotNull(root);
     }
 
@@ -236,7 +236,7 @@ class TestApi {
         assertNotNull(project);
 
         Artifact artifact = session.createArtifact("org.apache.maven.core.test", "test-extension", "1", "jar");
-        Node root = session.collectDependencies(artifact);
+        Node root = session.collectDependencies(artifact, PathScope.MAIN_RUNTIME);
         assertNotNull(root);
 
         DependencyResolverResult result =

@@ -29,6 +29,7 @@ import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Collects, flattens and resolves dependencies.
@@ -37,56 +38,63 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface DependencyResolver extends Service {
 
     /**
-     * Collects the transitive dependencies of some artifacts and builds a dependency graph. Note that this operation is
-     * only concerned about determining the coordinates of the transitive dependencies and does not actually resolve the
-     * artifact files.
+     * Collects the transitive dependencies of some artifacts and builds a dependency graph for the given path scope.
+     * Note that this operation is only concerned about determining the coordinates of the transitive dependencies and
+     * does not actually resolve the artifact files.
      *
      * @param session the {@link Session}, must not be {@code null}
      * @param root the Maven Dependency, must not be {@code null}
+     * @param scope the {link PathScope} to collect dependencies, must not be {@code null}
      * @return the collection result, never {@code null}
      * @throws DependencyResolverException if the dependency tree could not be built
      * @throws IllegalArgumentException if an argument is null or invalid
      * @see #collect(DependencyResolverRequest)
      */
     @Nonnull
-    default DependencyResolverResult collect(@Nonnull Session session, @Nonnull DependencyCoordinates root) {
-        return collect(DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.COLLECT, root));
+    default DependencyResolverResult collect(
+            @Nonnull Session session, @Nonnull DependencyCoordinates root, @Nonnull PathScope scope) {
+        return collect(
+                DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.COLLECT, root, scope));
     }
 
     /**
-     * Collects the transitive dependencies of some artifacts and builds a dependency graph. Note that this operation is
-     * only concerned about determining the coordinates of the transitive dependencies and does not actually resolve the
-     * artifact files.
+     * Collects the transitive dependencies of some artifacts and builds a dependency graph for the given path scope.
+     * Note that this operation is only concerned about determining the coordinates of the transitive dependencies and
+     * does not actually resolve the artifact files.
      *
      * @param session the {@link Session}, must not be {@code null}
      * @param project the {@link Project}, must not be {@code null}
+     * @param scope the {link PathScope} to collect dependencies, must not be {@code null}
      * @return the collection result, never {@code null}
      * @throws DependencyResolverException if the dependency tree could not be built
      * @throws IllegalArgumentException if an argument is null or invalid
      * @see #collect(DependencyResolverRequest)
      */
     @Nonnull
-    default DependencyResolverResult collect(@Nonnull Session session, @Nonnull Project project) {
-        return collect(
-                DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.COLLECT, project));
+    default DependencyResolverResult collect(
+            @Nonnull Session session, @Nonnull Project project, @Nonnull PathScope scope) {
+        return collect(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.COLLECT, project, scope));
     }
 
     /**
-     * Collects the transitive dependencies of some artifacts and builds a dependency graph. Note that this operation is
-     * only concerned about determining the coordinates of the transitive dependencies and does not actually resolve the
-     * artifact files.
+     * Collects the transitive dependencies of some artifacts and builds a dependency graph for the given path scope.
+     * Note that this operation is only concerned about determining the coordinates of the transitive dependencies and
+     * does not actually resolve the artifact files.
      *
      * @param session the {@link Session}, must not be {@code null}
      * @param artifact the {@link Artifact}, must not be {@code null}
+     * @param scope the {link PathScope} to collect dependencies, must not be {@code null}
      * @return the collection result, never {@code null}
      * @throws DependencyResolverException if the dependency tree could not be built
      * @throws IllegalArgumentException if an argument is null or invalid
      * @see #collect(DependencyResolverRequest)
      */
     @Nonnull
-    default DependencyResolverResult collect(@Nonnull Session session, @Nonnull Artifact artifact) {
-        return collect(
-                DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.COLLECT, artifact));
+    default DependencyResolverResult collect(
+            @Nonnull Session session, @Nonnull Artifact artifact, @Nonnull PathScope scope) {
+        return collect(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.COLLECT, artifact, scope));
     }
 
     /**
@@ -99,9 +107,9 @@ public interface DependencyResolver extends Service {
      * @throws DependencyResolverException if the dependency tree could not be built
      * @throws IllegalArgumentException if an argument is null or invalid
      *
-     * @see DependencyResolver#collect(Session, Project)
-     * @see DependencyResolver#collect(Session, DependencyCoordinates)
-     * @see DependencyResolver#collect(Session, Artifact)
+     * @see DependencyResolver#collect(Session, Project, PathScope)
+     * @see DependencyResolver#collect(Session, DependencyCoordinates, PathScope)
+     * @see DependencyResolver#collect(Session, Artifact, PathScope)
      */
     @Nonnull
     default DependencyResolverResult collect(@Nonnull DependencyResolverRequest request) {
@@ -113,20 +121,17 @@ public interface DependencyResolver extends Service {
 
     /**
      * Flattens a list of nodes.
+     * Note that the {@code PathScope} argument should usually be null as the dependency tree has been
+     * filtered during collection for the appropriate scope.
      *
-     * @param session
-     * @param node
-     * @param scope
-     * @return
+     * @param session the {@link Session}, must not be {@code null}
+     * @param node the {@link Node} to flatten, must not be {@code null}
+     * @param scope an optional {@link PathScope} to filter out dependencies
+     * @return the flattened list of node
      * @throws DependencyResolverException
      */
-    List<Node> flatten(Session session, Node node, PathScope scope) throws DependencyResolverException;
-
-    @Nonnull
-    default DependencyResolverResult flatten(@Nonnull Session session, @Nonnull Project project) {
-        return flatten(
-                DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.FLATTEN, project));
-    }
+    List<Node> flatten(@Nonnull Session session, @Nonnull Node node, @Nullable PathScope scope)
+            throws DependencyResolverException;
 
     @Nonnull
     default DependencyResolverResult flatten(

@@ -81,7 +81,7 @@ public interface DependencyResolverRequest {
 
     boolean getVerbose();
 
-    @Nullable
+    @Nonnull
     PathScope getPathScope();
 
     /**
@@ -105,11 +105,17 @@ public interface DependencyResolverRequest {
 
     @Nonnull
     static DependencyResolverRequest build(Session session, RequestType requestType, Artifact rootArtifact) {
+        return build(session, requestType, rootArtifact, PathScope.MAIN_RUNTIME);
+    }
+
+    @Nonnull
+    static DependencyResolverRequest build(
+            Session session, RequestType requestType, Artifact rootArtifact, PathScope scope) {
         return new DependencyResolverRequestBuilder()
                 .session(session)
                 .requestType(requestType)
                 .rootArtifact(rootArtifact)
-                .pathScope(PathScope.MAIN_RUNTIME)
+                .pathScope(scope)
                 .build();
     }
 
@@ -395,7 +401,7 @@ public interface DependencyResolverRequest {
                 this.managedDependencies =
                         unmodifiable(nonNull(managedDependencies, "managedDependencies cannot be null"));
                 this.verbose = verbose;
-                this.pathScope = pathScope;
+                this.pathScope = nonNull(pathScope, "pathScope cannot be null");
                 this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;
                 this.repositories = repositories;
                 if (verbose && requestType != RequestType.COLLECT) {

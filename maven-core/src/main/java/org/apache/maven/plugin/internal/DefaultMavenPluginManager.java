@@ -642,8 +642,9 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 }
             } else {
                 // collection
-                DependencyResolverResult res =
-                        sessionV4.getService(DependencyResolver.class).collect(sessionV4, project);
+                DependencyResolverResult res = sessionV4
+                        .getService(DependencyResolver.class)
+                        .collect(sessionV4, project, PathScope.MAIN_RUNTIME);
                 if (field.getType() == DependencyResolverResult.class) {
                     result = res;
                 } else if (field.getType() == Node.class) {
