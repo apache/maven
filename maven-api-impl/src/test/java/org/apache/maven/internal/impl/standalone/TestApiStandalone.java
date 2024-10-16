@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -58,8 +59,8 @@ class TestApiStandalone {
         assertNotNull(res.getPath());
         assertTrue(Files.exists(res.getPath()));
 
-        Node node = session.collectDependencies(session.createDependencyCoordinates(coords));
+        Node node = session.collectDependencies(session.createDependencyCoordinates(coords), PathScope.MAIN_RUNTIME);
         assertNotNull(node);
-        assertEquals(8, node.getChildren().size());
+        assertEquals(6, node.getChildren().size());
     }
 }

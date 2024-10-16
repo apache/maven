@@ -612,25 +612,27 @@ public interface Session {
      * Shortcut for {@code getService(DependencyResolver.class).collect(...)}
      *
      * @param artifact artifact for which to get the dependencies, including transitive ones
+     * @param scope the {link PathScope} to collect dependencies, must not be {@code null}
      * @return root node of the dependency graph for the given artifact
      *
-     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, Artifact)
+     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, Artifact, PathScope)
      * @throws org.apache.maven.api.services.DependencyResolverException if the dependency collection failed
      */
     @Nonnull
-    Node collectDependencies(@Nonnull Artifact artifact);
+    Node collectDependencies(@Nonnull Artifact artifact, @Nonnull PathScope scope);
 
     /**
      * Shortcut for {@code getService(DependencyResolver.class).collect(...)}
      *
      * @param project project for which to get the dependencies, including transitive ones
+     * @param scope the {link PathScope} to collect dependencies, must not be {@code null}
      * @return root node of the dependency graph for the given project
      *
-     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, Project)
+     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, Project, PathScope)
      * @throws org.apache.maven.api.services.DependencyResolverException if the dependency collection failed
      */
     @Nonnull
-    Node collectDependencies(@Nonnull Project project);
+    Node collectDependencies(@Nonnull Project project, @Nonnull PathScope scope);
 
     /**
      * Collects the transitive dependencies of some artifacts and builds a dependency graph. Note that this operation is
@@ -640,13 +642,14 @@ public interface Session {
      * Shortcut for {@code getService(DependencyResolver.class).resolve(...)}
      *
      * @param dependency dependency for which to get transitive dependencies
+     * @param scope the {link PathScope} to collect dependencies, must not be {@code null}
      * @return root node of the dependency graph for the given artifact
      *
-     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, DependencyCoordinates)
+     * @see org.apache.maven.api.services.DependencyResolver#collect(Session, DependencyCoordinates, PathScope)
      * @throws org.apache.maven.api.services.DependencyResolverException if the dependency collection failed
      */
     @Nonnull
-    Node collectDependencies(@Nonnull DependencyCoordinates dependency);
+    Node collectDependencies(@Nonnull DependencyCoordinates dependency, @Nonnull PathScope scope);
 
     /**
      * Shortcut for {@code getService(DependencyResolver.class).flatten(...)}.
