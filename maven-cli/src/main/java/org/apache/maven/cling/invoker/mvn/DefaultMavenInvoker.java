@@ -260,6 +260,12 @@ public abstract class DefaultMavenInvoker<
     @Override
     protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
         super.populateRequest(context, request);
+        if (context.invokerRequest.rootDirectory().isEmpty()) {
+            // now warn about "no root found"
+            Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
+            request.setMultiModuleProjectDirectory(rootDirectory.toFile());
+            request.setRootDirectory(rootDirectory);
+        }
 
         MavenOptions options = context.invokerRequest.options();
         request.setNoSnapshotUpdates(options.suppressSnapshotUpdates().orElse(false));
@@ -273,12 +279,6 @@ public abstract class DefaultMavenInvoker<
         Path pom = determinePom(context);
         request.setPom(pom != null ? pom.toFile() : null);
         if (pom != null) {
-            if (request.getRootDirectory() == null) {
-                // now warn about "no root found"
-                Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
-                request.setMultiModuleProjectDirectory(rootDirectory.toFile());
-                request.setRootDirectory(rootDirectory);
-            }
             if (pom.getParent() != null) {
                 request.setBaseDirectory(pom.getParent().toFile());
             }
