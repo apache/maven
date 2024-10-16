@@ -23,7 +23,6 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <!-- when upgrading parent, also upgrade ${apacheVersion} -->
     <version>43</version>
     <relativePath />
   </parent>
@@ -162,7 +161,6 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2024-08-30T12:59:00Z</project.build.outputTimestamp>
     <!-- various versions -->
-    <apacheVersion>33</apacheVersion>
     <assertjVersion>3.26.3</assertjVersion>
     <asmVersion>9.7.1</asmVersion>
     <byteBuddyVersion>1.15.4</byteBuddyVersion>
@@ -668,12 +666,6 @@ under the License.
         <artifactId>byte-buddy</artifactId>
         <version>${byteBuddyVersion}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache</groupId>
-        <artifactId>apache</artifactId>
-        <version>${apacheVersion}</version>
-        <type>pom</type>
-      </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
   </dependencyManagement>
@@ -878,7 +870,6 @@ under the License.</licenseText>
               <bomVersion>${project.version}</bomVersion>
               <bomName>Maven Dependencies BOM</bomName>
               <bomDescription>Bill Of Materials for Apache Maven dependencies</bomDescription>
-              <bomParentGav>org.apache:apache:${apacheVersion}</bomParentGav>
               <outputFilename>maven-bom.xml</outputFilename>
               <attach>true</attach>
             </configuration>
