@@ -261,9 +261,10 @@ public abstract class DefaultMavenInvoker<
     protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
         super.populateRequest(context, request);
         if (context.invokerRequest.rootDirectory().isEmpty()) {
-            Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
-            request.setMultiModuleProjectDirectory(rootDirectory.toFile());
-            request.setRootDirectory(rootDirectory);
+            // maven requires this to be set; so default it (and see below at POM)
+            request.setMultiModuleProjectDirectory(
+                    context.invokerRequest.topDirectory().toFile());
+            request.setRootDirectory(context.invokerRequest.topDirectory());
         }
 
         MavenOptions options = context.invokerRequest.options();
@@ -280,6 +281,13 @@ public abstract class DefaultMavenInvoker<
             request.setPom(pom.toFile());
             if (pom.getParent() != null) {
                 request.setBaseDirectory(pom.getParent().toFile());
+            }
+
+            // project present, but we could not determine rootDirectory: extra work needed
+            if (context.invokerRequest.rootDirectory().isEmpty()) {
+                Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
+                request.setMultiModuleProjectDirectory(rootDirectory.toFile());
+                request.setRootDirectory(rootDirectory);
             }
         }
 
