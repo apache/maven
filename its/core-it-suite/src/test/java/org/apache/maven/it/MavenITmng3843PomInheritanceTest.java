@@ -81,7 +81,7 @@ public class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTe
             assertEquals("3", props.getProperty("project.properties"));
             assertEquals("UTF-8", props.getProperty("project.properties.project.build.sourceEncoding"));
             assertEquals("UTF-8", props.getProperty("project.properties.project.reporting.outputEncoding"));
-            assertEquals("2001-01-01T00:00:00Z", props.getProperty("project.properties.project.build.outputTimestamp"));
+            assertEquals("1980-02-01T00:00:00Z", props.getProperty("project.properties.project.build.outputTimestamp"));
         } else if (matchesVersionRange("[4.0.0-alpha-6,4.0.0-beta-4]")) {
             assertEquals("2", props.getProperty("project.properties"));
             assertEquals("UTF-8", props.getProperty("project.properties.project.build.sourceEncoding"));
