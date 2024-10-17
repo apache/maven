@@ -225,9 +225,14 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     private Settings interpolate(Settings settings, SettingsBuilderRequest request, List<BuilderProblem> problems) {
-        Map<String, String> userProperties = request.getSession().getUserProperties();
-        Map<String, String> systemProperties = request.getSession().getSystemProperties();
-        Function<String, String> src = Interpolator.chain(List.of(userProperties::get, systemProperties::get));
+        Function<String, String> src;
+        if (request.getInterpolationSource().isPresent()) {
+            src = request.getInterpolationSource().get();
+        } else {
+            Map<String, String> userProperties = request.getSession().getUserProperties();
+            Map<String, String> systemProperties = request.getSession().getSystemProperties();
+            src = Interpolator.chain(userProperties::get, systemProperties::get);
+        }
         return new SettingsTransformer(value -> value != null ? interpolator.interpolate(value, src) : null)
                 .visit(settings);
     }

@@ -32,6 +32,7 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.building.Source;
 import org.apache.maven.building.StringSource;
 import org.apache.maven.internal.impl.DefaultToolchainsXmlFactory;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
@@ -72,7 +73,9 @@ class DefaultToolchainsBuilderTest {
         OperatingSystemUtils.setEnvVarSource(new TestEnvVarSource(envVarMap));
 
         toolchainBuilder = new DefaultToolchainsBuilder(
-                new org.apache.maven.internal.impl.DefaultToolchainsBuilder(), toolchainsXmlFactory);
+                new org.apache.maven.internal.impl.DefaultToolchainsBuilder(
+                        new DefaultInterpolator(), toolchainsXmlFactory),
+                toolchainsXmlFactory);
     }
 
     @Test

@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -64,6 +65,14 @@ public interface SettingsBuilderRequest {
      */
     @Nonnull
     Optional<Source> getUserSettingsSource();
+
+    /**
+     * The optional interpolation source used for interpolation.
+     *
+     * @return the interpolation source for interpolation
+     */
+    @Nonnull
+    Optional<Function<String, String>> getInterpolationSource();
 
     @Nonnull
     static SettingsBuilderRequest build(
@@ -125,6 +134,7 @@ public interface SettingsBuilderRequest {
         Source installationSettingsSource;
         Source projectSettingsSource;
         Source userSettingsSource;
+        Function<String, String> interpolationSource;
 
         public SettingsBuilderRequestBuilder session(Session session) {
             this.session = session;
@@ -146,26 +156,38 @@ public interface SettingsBuilderRequest {
             return this;
         }
 
+        public SettingsBuilderRequestBuilder interpolationSource(Function<String, String> interpolationSource) {
+            this.interpolationSource = interpolationSource;
+            return this;
+        }
+
         public SettingsBuilderRequest build() {
             return new DefaultSettingsBuilderRequest(
-                    session, installationSettingsSource, projectSettingsSource, userSettingsSource);
+                    session,
+                    installationSettingsSource,
+                    projectSettingsSource,
+                    userSettingsSource,
+                    interpolationSource);
         }
 
         private static class DefaultSettingsBuilderRequest extends BaseRequest implements SettingsBuilderRequest {
             private final Source installationSettingsSource;
             private final Source projectSettingsSource;
             private final Source userSettingsSource;
+            private final Function<String, String> interpolationSource;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultSettingsBuilderRequest(
                     @Nonnull Session session,
                     @Nullable Source installationSettingsSource,
                     @Nullable Source projectSettingsSource,
-                    @Nullable Source userSettingsSource) {
+                    @Nullable Source userSettingsSource,
+                    @Nullable Function<String, String> interpolationSource) {
                 super(session);
                 this.installationSettingsSource = installationSettingsSource;
                 this.projectSettingsSource = projectSettingsSource;
                 this.userSettingsSource = userSettingsSource;
+                this.interpolationSource = interpolationSource;
             }
 
             @Nonnull
@@ -184,6 +206,12 @@ public interface SettingsBuilderRequest {
             @Override
             public Optional<Source> getUserSettingsSource() {
                 return Optional.ofNullable(userSettingsSource);
+            }
+
+            @Nonnull
+            @Override
+            public Optional<Function<String, String>> getInterpolationSource() {
+                return Optional.ofNullable(interpolationSource);
             }
         }
     }

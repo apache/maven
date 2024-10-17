@@ -27,7 +27,7 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvoker;
 import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
-import org.apache.maven.utils.Os;
+import org.apache.maven.internal.impl.model.profile.Os;
 
 import static java.util.Objects.requireNonNull;
 

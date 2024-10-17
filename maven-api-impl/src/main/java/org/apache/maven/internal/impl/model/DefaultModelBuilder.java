@@ -1741,7 +1741,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         try {
                             Map<String, String> map1 = context.getUserProperties();
                             Map<String, String> map2 = context.getSystemProperties();
-                            return interpolator.interpolate(s, Interpolator.chain(List.of(map1::get, map2::get)));
+                            return interpolator.interpolate(s, Interpolator.chain(map1::get, map2::get));
                         } catch (InterpolatorException e) {
                             problems.add(Severity.ERROR, Version.BASE, e.getMessage(), e);
                         }
@@ -1873,7 +1873,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Map<String, String> map1 = request.getSession().getUserProperties();
             Map<String, String> map2 = model.getProperties();
             Map<String, String> map3 = request.getSession().getSystemProperties();
-            Function<String, String> cb = Interpolator.chain(List.of(map1::get, map2::get, map3::get));
+            Function<String, String> cb = Interpolator.chain(map1::get, map2::get, map3::get);
             try {
                 String interpolated =
                         interpolator.interpolate(interpolatedModel.getParent().getVersion(), cb);
