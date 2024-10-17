@@ -23,14 +23,11 @@ import java.io.IOException;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.mvnenc.Goal;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The support class for goal implementations.
  */
 public abstract class GoalSupport implements Goal {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final MessageBuilderFactory messageBuilderFactory;
     protected final SecDispatcher secDispatcher;
 

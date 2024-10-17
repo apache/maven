@@ -720,37 +720,42 @@ public abstract class AbstractSession implements InternalSession {
      * Shortcut for <code>getService(DependencyResolver.class).collect(...)</code>
      *
      * @throws DependencyResolverException if the dependency collection failed
-     * @see DependencyResolver#collect(Session, Artifact)
+     * @see DependencyResolver#collect(Session, Artifact, PathScope)
      */
     @Nonnull
     @Override
-    public Node collectDependencies(@Nonnull Artifact artifact) {
-        return getService(DependencyResolver.class).collect(this, artifact).getRoot();
+    public Node collectDependencies(@Nonnull Artifact artifact, @Nonnull PathScope scope) {
+        return getService(DependencyResolver.class)
+                .collect(this, artifact, scope)
+                .getRoot();
     }
 
     /**
      * Shortcut for <code>getService(DependencyResolver.class).collect(...)</code>
      *
      * @throws DependencyResolverException if the dependency collection failed
-     * @see DependencyResolver#collect(Session, Project)
+     * @see DependencyResolver#collect(Session, Project, PathScope)
      */
     @Nonnull
     @Override
-    public Node collectDependencies(@Nonnull Project project) {
-        return getService(DependencyResolver.class).collect(this, project).getRoot();
+    public Node collectDependencies(@Nonnull Project project, @Nonnull PathScope scope) {
+        return getService(DependencyResolver.class)
+                .collect(this, project, scope)
+                .getRoot();
     }
 
     /**
      * Shortcut for <code>getService(DependencyResolver.class).collect(...)</code>
      *
      * @throws DependencyResolverException if the dependency collection failed
-     * @see DependencyResolver#collect(Session, DependencyCoordinates)
+     * @see DependencyResolver#collect(Session, DependencyCoordinates, PathScope)
      */
     @Nonnull
     @Override
-    public Node collectDependencies(@Nonnull DependencyCoordinates dependency) {
-        Node root =
-                getService(DependencyResolver.class).collect(this, dependency).getRoot();
+    public Node collectDependencies(@Nonnull DependencyCoordinates dependency, @Nonnull PathScope scope) {
+        Node root = getService(DependencyResolver.class)
+                .collect(this, dependency, scope)
+                .getRoot();
         return root.getChildren().iterator().next();
     }
 

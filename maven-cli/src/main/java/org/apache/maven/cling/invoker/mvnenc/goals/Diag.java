@@ -41,7 +41,7 @@ public class Diag extends ConfiguredGoalSupport {
 
     @Override
     protected int doExecute(DefaultEncryptInvoker.LocalContext context) {
-        dumpResponse("", secDispatcher.validateConfiguration());
+        dumpResponse(context, "", secDispatcher.validateConfiguration());
         return OK;
     }
 }

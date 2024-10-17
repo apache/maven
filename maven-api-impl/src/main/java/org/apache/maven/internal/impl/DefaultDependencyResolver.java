@@ -39,6 +39,7 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ArtifactResolver;
@@ -56,6 +57,7 @@ import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.scope.ResolutionScope;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
@@ -96,12 +98,20 @@ public class DefaultDependencyResolver implements DependencyResolver {
             remoteRepositories =
                     request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories();
         }
+        ResolutionScope resolutionScope = null;
+        if (request.getPathScope() != null) {
+            resolutionScope = session.getSession()
+                    .getScopeManager()
+                    .getResolutionScope(request.getPathScope().id())
+                    .orElseThrow();
+        }
         CollectRequest collectRequest = new CollectRequest()
                 .setRootArtifact(rootArtifact != null ? session.toArtifact(rootArtifact) : null)
                 .setRoot(root != null ? session.toDependency(root, false) : null)
                 .setDependencies(session.toDependencies(dependencies, false))
                 .setManagedDependencies(session.toDependencies(managedDependencies, true))
                 .setRepositories(session.toRepositories(remoteRepositories));
+        collectRequest.setResolutionScope(resolutionScope);
 
         RepositorySystemSession systemSession = session.getSession();
         if (request.getVerbose()) {
@@ -120,8 +130,10 @@ public class DefaultDependencyResolver implements DependencyResolver {
         }
     }
 
+    @Nonnull
     @Override
-    public List<Node> flatten(Session s, Node node, PathScope scope) throws DependencyResolverException {
+    public List<Node> flatten(@Nonnull Session s, @Nonnull Node node, @Nullable PathScope scope)
+            throws DependencyResolverException {
         InternalSession session = InternalSession.from(s);
         DependencyNode root = cast(AbstractNode.class, node, "node").getDependencyNode();
         List<DependencyNode> dependencies = session.getRepositorySystem()
@@ -131,6 +143,9 @@ public class DefaultDependencyResolver implements DependencyResolver {
     }
 
     private static DependencyFilter getScopeDependencyFilter(PathScope scope) {
+        if (scope == null) {
+            return null;
+        }
         Set<String> scopes =
                 scope.dependencyScopes().stream().map(DependencyScope::id).collect(Collectors.toSet());
         return (n, p) -> {

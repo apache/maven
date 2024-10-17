@@ -93,9 +93,6 @@ public class MultiThreadedBuilder implements Builder {
         ExecutorService executor = Executors.newFixedThreadPool(nThreads, new BuildThreadFactory());
         CompletionService<ProjectSegment> service = new ExecutorCompletionService<>(executor);
 
-        // Currently disabled
-        ThreadOutputMuxer muxer = null; // new ThreadOutputMuxer( analyzer.getProjectBuilds(), System.out );
-
         for (TaskSegment taskSegment : taskSegments) {
             ProjectBuildList segmentProjectBuilds = projectBuilds.getByTaskSegment(taskSegment);
             Map<MavenProject, ProjectSegment> projectBuildMap = projectBuilds.selectSegment(taskSegment);
@@ -103,7 +100,7 @@ public class MultiThreadedBuilder implements Builder {
                 ConcurrencyDependencyGraph analyzer =
                         new ConcurrencyDependencyGraph(segmentProjectBuilds, session.getProjectDependencyGraph());
                 multiThreadedProjectTaskSegmentBuild(
-                        analyzer, reactorContext, session, service, taskSegment, projectBuildMap, muxer);
+                        analyzer, reactorContext, session, service, taskSegment, projectBuildMap);
                 if (reactorContext.getReactorBuildStatus().isHalted()) {
                     break;
                 }
@@ -123,8 +120,7 @@ public class MultiThreadedBuilder implements Builder {
             MavenSession rootSession,
             CompletionService<ProjectSegment> service,
             TaskSegment taskSegment,
-            Map<MavenProject, ProjectSegment> projectBuildList,
-            ThreadOutputMuxer muxer) {
+            Map<MavenProject, ProjectSegment> projectBuildList) {
         // gather artifactIds which are not unique so that the respective thread names can be extended with the groupId
         Set<String> duplicateArtifactIds = projectBuildList.keySet().stream()
                 .map(MavenProject::getArtifactId)
@@ -139,8 +135,8 @@ public class MultiThreadedBuilder implements Builder {
         for (MavenProject mavenProject : analyzer.getRootSchedulableBuilds()) {
             ProjectSegment projectSegment = projectBuildList.get(mavenProject);
             logger.debug("Scheduling: {}", projectSegment.getProject());
-            Callable<ProjectSegment> cb = createBuildCallable(
-                    rootSession, projectSegment, reactorContext, taskSegment, muxer, duplicateArtifactIds);
+            Callable<ProjectSegment> cb =
+                    createBuildCallable(rootSession, projectSegment, reactorContext, taskSegment, duplicateArtifactIds);
             service.submit(cb);
         }
 
@@ -160,12 +156,7 @@ public class MultiThreadedBuilder implements Builder {
                         ProjectSegment scheduledDependent = projectBuildList.get(mavenProject);
                         logger.debug("Scheduling: {}", scheduledDependent);
                         Callable<ProjectSegment> cb = createBuildCallable(
-                                rootSession,
-                                scheduledDependent,
-                                reactorContext,
-                                taskSegment,
-                                muxer,
-                                duplicateArtifactIds);
+                                rootSession, scheduledDependent, reactorContext, taskSegment, duplicateArtifactIds);
                         service.submit(cb);
                     }
                 }
@@ -185,7 +176,6 @@ public class MultiThreadedBuilder implements Builder {
             final ProjectSegment projectBuild,
             final ReactorContext reactorContext,
             final TaskSegment taskSegment,
-            final ThreadOutputMuxer muxer,
             final Set<String> duplicateArtifactIds) {
         return () -> {
             final Thread currentThread = Thread.currentThread();
@@ -198,10 +188,8 @@ public class MultiThreadedBuilder implements Builder {
             currentThread.setName("mvn-builder-" + threadNameSuffix);
 
             try {
-                // muxer.associateThreadWithProjectSegment( projectBuild );
                 lifecycleModuleBuilder.buildProject(
                         projectBuild.getSession(), rootSession, reactorContext, project, taskSegment);
-                // muxer.setThisModuleComplete( projectBuild );
 
                 return projectBuild;
             } finally {

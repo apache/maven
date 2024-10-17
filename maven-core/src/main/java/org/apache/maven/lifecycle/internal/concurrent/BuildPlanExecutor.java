@@ -164,7 +164,6 @@ public class BuildPlanExecutor {
         final MavenSession session;
         final ReactorContext reactorContext;
         final PhasingExecutor executor;
-        final ConcurrentLogOutput appender;
         final Map<Object, Clock> clocks = new ConcurrentHashMap<>();
         final ReadWriteLock lock = new ReentrantReadWriteLock();
         final int threads;
@@ -179,7 +178,6 @@ public class BuildPlanExecutor {
             // Propagate the parallel flag to the root session
             session.setParallel(threads > 1);
             this.executor = new PhasingExecutor(Executors.newFixedThreadPool(threads, new BuildThreadFactory()));
-            this.appender = new ConcurrentLogOutput();
 
             // build initial plan
             this.plan = buildInitialPlan(taskSegments);
@@ -190,7 +188,6 @@ public class BuildPlanExecutor {
             this.reactorContext = null;
             this.threads = 1;
             this.executor = null;
-            this.appender = null;
             this.plan = null;
         }
 
@@ -312,7 +309,6 @@ public class BuildPlanExecutor {
 
         @Override
         public void close() {
-            this.appender.close();
             this.executor.close();
         }
 
@@ -331,7 +327,7 @@ public class BuildPlanExecutor {
                         .forEach(step -> {
                             boolean nextIsPlanning = step.successors.stream().anyMatch(st -> PLAN.equals(st.name));
                             executor.execute(() -> {
-                                try (AutoCloseable ctx = appender.build(step.project)) {
+                                try {
                                     executeStep(step);
                                     if (nextIsPlanning) {
                                         lock.writeLock().lock();

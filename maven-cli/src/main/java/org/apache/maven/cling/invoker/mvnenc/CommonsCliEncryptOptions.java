@@ -116,5 +116,10 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
                     .desc("Should imply user answered \"yes\" to all incoming questions?")
                     .build());
         }
+
+        @Override
+        protected String commandLineSyntax(String command) {
+            return command + " [options] [goal]";
+        }
     }
 }
