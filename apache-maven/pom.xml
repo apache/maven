@@ -250,8 +250,8 @@ under the License.
               <bomGroupId>org.apache.maven</bomGroupId>
               <bomArtifactId>maven-bom</bomArtifactId>
               <bomVersion>${project.version}</bomVersion>
-              <bomName>Maven Dependencies Fat BOM</bomName>
               <bomClassifier>fat</bomClassifier>
+              <bomName>Maven Dependencies Fat BOM</bomName>
               <bomDescription>Bill Of Materials for Apache Maven - All dependencies</bomDescription>
               <outputFilename>maven-fat-bom.xml</outputFilename>
               <useDependencies>true</useDependencies>
