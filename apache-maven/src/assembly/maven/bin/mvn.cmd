@@ -171,6 +171,29 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 
 :endReadJvmConfig
 
+if "%MAVEN_DEBUG_ADDRESS%"=="" set MAVEN_DEBUG_ADDRESS=localhost:8000
+set "args="
+:loopCommandLineArgs
+if "%~1"=="" goto endCommandLineArgs
+if "%~1"=="--debug" (
+    if "%MAVEN_DEBUG_OPTS%"=="" (
+        set "MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%MAVEN_DEBUG_ADDRESS%"
+    )
+) else if "%~1"=="--yjp" (
+    if not exist "%YJPLIB%" (
+        echo Error: Unable to autodetect the YJP library location. Please set YJPLIB variable >&2
+        exit /b 1
+    )
+    set "MAVEN_OPTS=-agentpath:%YJPLIB%=onexit=snapshot,onexit=memory,tracing,onlylocal %MAVEN_OPTS%"
+) else if "%~1"=="--enc" (
+    set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenEncCling"
+) else (
+    set "args=%args% %~1"
+)
+shift
+goto loopCommandLineArgs
+:endCommandLineArgs
+
 for %%i in ("%MAVEN_HOME%"\boot\plexus-classworlds-*) do set LAUNCHER_JAR="%%i"
 set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
@@ -187,7 +210,7 @@ if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCl
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
   %LAUNCHER_CLASS% ^
   %MAVEN_ARGS% ^
-  %*
+  %args%
 if ERRORLEVEL 1 goto error
 goto end
 

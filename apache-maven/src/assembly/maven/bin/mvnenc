@@ -27,4 +27,4 @@
 #   MAVEN_SKIP_RC       (Optional) Flag to disable loading of mavenrc files.
 # -----------------------------------------------------------------------------
 
-env MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenEncCling" "`dirname "$0"`/mvn" "$@"
+"`dirname "$0"`/mvn" --enc "$@"
