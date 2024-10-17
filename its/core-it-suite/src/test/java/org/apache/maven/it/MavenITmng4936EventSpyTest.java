@@ -60,10 +60,16 @@ public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase
         assertTrue(lines.toString(), lines.get(lines.size() - 1).toString().startsWith("close"));
         assertTrue(
                 lines.toString(),
-                lines.contains("event: org.apache.maven.settings.building.DefaultSettingsBuildingRequest"));
+                lines.contains(
+                        matchesVersionRange("[4.0.0-beta-5,)")
+                                ? "event: org.apache.maven.api.services.SettingsBuilderRequest$SettingsBuilderRequestBuilder$DefaultSettingsBuilderRequest"
+                                : "event: org.apache.maven.settings.building.DefaultSettingsBuildingRequest"));
         assertTrue(
                 lines.toString(),
-                lines.contains("event: org.apache.maven.settings.building.DefaultSettingsBuildingResult"));
+                lines.contains(
+                        matchesVersionRange("[4.0.0-beta-5,)")
+                                ? "event: org.apache.maven.internal.impl.DefaultSettingsBuilder$DefaultSettingsBuilderResult"
+                                : "event: org.apache.maven.settings.building.DefaultSettingsBuildingResult"));
         assertTrue(lines.toString(), lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionRequest"));
         assertTrue(lines.toString(), lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionResult"));
         assertTrue(

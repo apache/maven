@@ -58,9 +58,15 @@ public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenInte
         assertTrue(lines.toString(), lines.get(lines.size() - 1).startsWith("close"));
         assertTrue(
                 lines.toString(),
-                lines.contains("event: org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest"));
+                lines.contains(
+                        matchesVersionRange("[4.0.0-beta-5,)")
+                                ? "event: org.apache.maven.api.services.ToolchainsBuilderRequest$ToolchainsBuilderRequestBuilder$DefaultToolchainsBuilderRequest"
+                                : "event: org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest"));
         assertTrue(
                 lines.toString(),
-                lines.contains("event: org.apache.maven.toolchain.building.DefaultToolchainsBuildingResult"));
+                lines.contains(
+                        matchesVersionRange("[4.0.0-beta-5,)")
+                                ? "event: org.apache.maven.internal.impl.DefaultToolchainsBuilder$DefaultToolchainsBuilderResult"
+                                : "event: org.apache.maven.toolchain.building.DefaultToolchainsBuildingResult"));
     }
 }
