@@ -27,9 +27,5 @@
 #   MAVEN_SKIP_RC   (Optional) Flag to disable loading of mavenrc files.
 # -----------------------------------------------------------------------------
 
-if [ ! -f "$YJPLIB" ]; then
-  echo "Error: Unable to autodetect the YJP library location. Please set YJPLIB variable" >&2
-  exit 1
-fi
-
-env MAVEN_OPTS="-agentpath:$YJPLIB=onexit=snapshot,onexit=memory,tracing,onlylocal $MAVEN_OPTS" "`dirname "$0"`/mvn" "$@"
+echo "This script is deprecated for removal, please use 'mvn --yjp' instead"
+"`dirname "$0"`/mvn" --yjp "$@"

@@ -37,8 +37,5 @@ title %0
 
 @setlocal
 
-if "%MAVEN_DEBUG_ADDRESS%"=="" @set MAVEN_DEBUG_ADDRESS=localhost:8000
-
-@set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%MAVEN_DEBUG_ADDRESS%
-
-@call "%~dp0"mvn.cmd %*
+echo "This script is deprecated for removal, please use 'mvn --debug' instead"
+@call "%~dp0"mvn.cmd --debug %*

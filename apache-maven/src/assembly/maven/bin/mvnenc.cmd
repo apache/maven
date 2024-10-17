@@ -36,6 +36,4 @@ title %0
 
 @setlocal
 
-@set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenEncCling
-
-@call "%~dp0"mvn.cmd %*
+@call "%~dp0"mvn.cmd --enc %*
