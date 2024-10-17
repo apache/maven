@@ -180,7 +180,7 @@ if $cygwin || $mingw ; then
   MAVEN_PROJECTBASEDIR=`cygpath --windows "$MAVEN_PROJECTBASEDIR"`
 fi
 
-args=()
+args=""
 while [ $# -gt 0 ]; do
   case $1 in
     --debug)
@@ -201,7 +201,11 @@ while [ $# -gt 0 ]; do
       MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenEncCling"
       ;;
     *)
-      args+=("$1")
+      if [ -z "$args" ]; then
+        args="\"$1\""
+      else
+        args="$args \"$1\""
+      fi
       ;;
   esac
   shift
@@ -221,4 +225,4 @@ exec "$JAVACMD" \
   "-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR" \
   $LAUNCHER_CLASS \
   $MAVEN_ARGS \
-  "${args[@]}"
+  $args
