@@ -23,7 +23,6 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <!-- when upgrading parent, also upgrade maven-bom's parent -->
     <version>43</version>
     <relativePath />
   </parent>
@@ -122,7 +121,6 @@ under the License.
     <module>apache-maven</module>
     <module>maven-toolchain-model</module>
     <module>maven-toolchain-builder</module>
-    <module>maven-bom</module>
     <module>maven-docgen</module>
   </modules>
 
