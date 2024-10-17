@@ -471,7 +471,13 @@ public class DefaultModelValidator implements ModelValidator {
             }
 
             validate20RawDependencies(
-                    problems, m.getDependencies(), "dependencies.dependency.", EMPTY, validationLevel, request);
+                    problems,
+                    m.getDependencies(),
+                    "dependencies.dependency.",
+                    EMPTY,
+                    isModelVersion41OrMore,
+                    validationLevel,
+                    request);
 
             validate20RawDependenciesSelfReferencing(
                     problems, m, m.getDependencies(), "dependencies.dependency", request);
@@ -482,6 +488,7 @@ public class DefaultModelValidator implements ModelValidator {
                         m.getDependencyManagement().getDependencies(),
                         "dependencyManagement.dependencies.dependency.",
                         EMPTY,
+                        isModelVersion41OrMore,
                         validationLevel,
                         request);
             }
@@ -539,6 +546,7 @@ public class DefaultModelValidator implements ModelValidator {
                         profile.getDependencies(),
                         prefix,
                         "dependencies.dependency.",
+                        isModelVersion41OrMore,
                         validationLevel,
                         request);
 
@@ -548,6 +556,7 @@ public class DefaultModelValidator implements ModelValidator {
                             profile.getDependencyManagement().getDependencies(),
                             prefix,
                             "dependencyManagement.dependencies.dependency.",
+                            isModelVersion41OrMore,
                             validationLevel,
                             request);
                 }
@@ -982,6 +991,7 @@ public class DefaultModelValidator implements ModelValidator {
             List<Dependency> dependencies,
             String prefix,
             String prefix2,
+            boolean is41OrBeyond,
             int validationLevel,
             ModelBuilderRequest request) {
         Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
@@ -1002,7 +1012,8 @@ public class DefaultModelValidator implements ModelValidator {
                             key,
                             "must be 'pom' to import the managed dependencies.",
                             dependency);
-                } else if (dependency.getClassifier() != null
+                } else if (!is41OrBeyond
+                        && dependency.getClassifier() != null
                         && !dependency.getClassifier().isEmpty()) {
                     addViolation(
                             problems,
