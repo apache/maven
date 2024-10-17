@@ -854,28 +854,6 @@ under the License.</licenseText>
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>eu.maveniverse.maven.plugins</groupId>
-        <artifactId>bom-builder3</artifactId>
-        <version>1.0.0</version>
-        <executions>
-          <execution>
-            <id>skinny-bom</id>
-            <goals>
-              <goal>build-bom</goal>
-            </goals>
-            <configuration>
-              <bomGroupId>org.apache.maven</bomGroupId>
-              <bomArtifactId>maven-bom</bomArtifactId>
-              <bomVersion>${project.version}</bomVersion>
-              <bomName>Maven Dependencies BOM</bomName>
-              <bomDescription>Bill Of Materials for Apache Maven dependencies</bomDescription>
-              <outputFilename>maven-bom.xml</outputFilename>
-              <attach>true</attach>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 

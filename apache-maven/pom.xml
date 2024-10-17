@@ -220,6 +220,46 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>eu.maveniverse.maven.plugins</groupId>
+        <artifactId>bom-builder3</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <id>skinny-bom</id>
+            <goals>
+              <goal>build-bom</goal>
+            </goals>
+            <configuration>
+              <bomGroupId>org.apache.maven</bomGroupId>
+              <bomArtifactId>maven-bom</bomArtifactId>
+              <bomVersion>${project.version}</bomVersion>
+              <bomName>Maven Dependencies BOM</bomName>
+              <bomClassifier>skinny</bomClassifier>
+              <bomDescription>Bill Of Materials for Apache Maven - Maven JARS only</bomDescription>
+              <outputFilename>maven-skinny-bom.xml</outputFilename>
+              <attach>true</attach>
+            </configuration>
+          </execution>
+          <execution>
+            <id>fat-bom</id>
+            <goals>
+              <goal>build-bom</goal>
+            </goals>
+            <configuration>
+              <bomGroupId>org.apache.maven</bomGroupId>
+              <bomArtifactId>maven-bom</bomArtifactId>
+              <bomVersion>${project.version}</bomVersion>
+              <bomName>Maven Dependencies BOM</bomName>
+              <bomClassifier>fat</bomClassifier>
+              <bomDescription>Bill Of Materials for Apache Maven - All dependencies</bomDescription>
+              <outputFilename>maven-fat-bom.xml</outputFilename>
+              <useDependencies>true</useDependencies>
+              <attach>true</attach>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
