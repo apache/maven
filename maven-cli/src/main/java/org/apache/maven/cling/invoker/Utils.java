@@ -24,9 +24,14 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.function.Function;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -42,6 +47,7 @@ import static java.util.Objects.requireNonNull;
 public final class Utils {
     private Utils() {}
 
+    @Nullable
     public static File toFile(Path path) {
         if (path != null) {
             return path.toFile();
@@ -49,6 +55,7 @@ public final class Utils {
         return null;
     }
 
+    @Nonnull
     public static String stripLeadingAndTrailingQuotes(String str) {
         requireNonNull(str, "str");
         final int length = str.length();
@@ -61,6 +68,7 @@ public final class Utils {
         return str;
     }
 
+    @Nonnull
     public static Path getCanonicalPath(Path path) {
         requireNonNull(path, "path");
         try {
@@ -70,6 +78,7 @@ public final class Utils {
         }
     }
 
+    @Nonnull
     public static Map<String, String> toMap(Properties properties) {
         requireNonNull(properties, "properties");
         HashMap<String, String> map = new HashMap<>();
@@ -79,6 +88,7 @@ public final class Utils {
         return map;
     }
 
+    @Nonnull
     public static Properties toProperties(Map<String, String> properties) {
         requireNonNull(properties, "properties");
         Properties map = new Properties();
@@ -88,6 +98,7 @@ public final class Utils {
         return map;
     }
 
+    @Nonnull
     public static BasicInterpolator createInterpolator(Collection<Map<String, String>> properties) {
         StringSearchInterpolator interpolator = new StringSearchInterpolator();
         interpolator.addValueSource(new AbstractValueSource(false) {
@@ -105,6 +116,7 @@ public final class Utils {
         return interpolator;
     }
 
+    @Nonnull
     public static Function<String, String> prefix(String prefix, Function<String, String> cb) {
         return s -> {
             String v = null;
@@ -115,6 +127,8 @@ public final class Utils {
         };
     }
 
+    @SafeVarargs
+    @Nonnull
     public static Function<String, String> or(Function<String, String>... callbacks) {
         return s -> {
             for (Function<String, String> cb : callbacks) {
@@ -143,5 +157,24 @@ public final class Utils {
             case INFO -> Logger.LEVEL_INFO;
             case ERROR -> Logger.LEVEL_ERROR;
         };
+    }
+
+    @Nullable
+    public static Path findRoot(Path topDirectory) {
+        requireNonNull(topDirectory, "topDirectory");
+        Path rootDirectory =
+                ServiceLoader.load(RootLocator.class).iterator().next().findRoot(topDirectory);
+        if (rootDirectory != null) {
+            return getCanonicalPath(rootDirectory);
+        }
+        return null;
+    }
+
+    @Nonnull
+    public static Path findMandatoryRoot(Path topDirectory) {
+        requireNonNull(topDirectory, "topDirectory");
+        return getCanonicalPath(Optional.ofNullable(
+                        ServiceLoader.load(RootLocator.class).iterator().next().findMandatoryRoot(topDirectory))
+                .orElseThrow());
     }
 }

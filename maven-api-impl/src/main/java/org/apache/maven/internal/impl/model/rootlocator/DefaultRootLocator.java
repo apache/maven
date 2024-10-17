@@ -46,13 +46,19 @@ public class DefaultRootLocator implements RootLocator {
                 .toList();
     }
 
-    @Nonnull
-    public Path findMandatoryRoot(@Nonnull Path basedir) {
+    @Override
+    public Path findRoot(Path basedir) {
         requireNonNull(basedir, "basedir is null");
         Path rootDirectory = basedir;
         while (rootDirectory != null && !isRootDirectory(rootDirectory)) {
             rootDirectory = rootDirectory.getParent();
         }
+        return rootDirectory;
+    }
+
+    @Nonnull
+    public Path findMandatoryRoot(@Nonnull Path basedir) {
+        Path rootDirectory = findRoot(basedir);
         Optional<Path> rdf = getRootDirectoryFallback();
         if (rootDirectory == null) {
             rootDirectory = rdf.orElseThrow(() -> new IllegalStateException(getNoRootMessage()));

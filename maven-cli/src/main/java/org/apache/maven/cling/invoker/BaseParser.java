@@ -32,17 +32,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ServiceLoader;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
-import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cli.props.MavenPropertiesLoader;
@@ -76,14 +75,19 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         public Map<String, String> systemProperties;
         public Map<String, String> userProperties;
         public Path topDirectory;
+
+        @Nullable
         public Path rootDirectory;
+
         public List<CoreExtension> extensions;
         public Options options;
 
         public Map<String, String> extraInterpolationSource() {
             Map<String, String> extra = new HashMap<>();
             extra.put("session.topDirectory", topDirectory.toString());
-            extra.put("session.rootDirectory", rootDirectory.toString());
+            if (rootDirectory != null) {
+                extra.put("session.rootDirectory", rootDirectory.toString());
+            }
             return extra;
         }
     }
@@ -101,7 +105,7 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
 
         // top/root
         context.topDirectory = requireNonNull(getTopDirectory(context));
-        context.rootDirectory = requireNonNull(getRootDirectory(context));
+        context.rootDirectory = getRootDirectory(context);
 
         // options
         List<O> parsedOptions = parseCliOptions(context);
@@ -194,11 +198,9 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         return getCanonicalPath(topDirectory);
     }
 
+    @Nullable
     protected Path getRootDirectory(LocalContext context) throws ParserException {
-        return getCanonicalPath(ServiceLoader.load(RootLocator.class)
-                .iterator()
-                .next()
-                .findMandatoryRoot(requireNonNull(context.topDirectory)));
+        return Utils.findRoot(context.topDirectory);
     }
 
     protected Map<String, String> populateSystemProperties(LocalContext context) throws ParserException {

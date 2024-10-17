@@ -43,6 +43,7 @@ import org.apache.maven.cli.CLIReportingUtils;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.cling.invoker.Utils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -259,6 +260,12 @@ public abstract class DefaultMavenInvoker<
     @Override
     protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
         super.populateRequest(context, request);
+        if (context.invokerRequest.rootDirectory().isEmpty()) {
+            // maven requires this to be set; so default it (and see below at POM)
+            request.setMultiModuleProjectDirectory(
+                    context.invokerRequest.topDirectory().toFile());
+            request.setRootDirectory(context.invokerRequest.topDirectory());
+        }
 
         MavenOptions options = context.invokerRequest.options();
         request.setNoSnapshotUpdates(options.suppressSnapshotUpdates().orElse(false));
@@ -270,14 +277,23 @@ public abstract class DefaultMavenInvoker<
         request.setGlobalChecksumPolicy(determineGlobalChecksumPolicy(context));
 
         Path pom = determinePom(context);
-        request.setPom(pom != null ? pom.toFile() : null);
+        if (pom != null) {
+            request.setPom(pom.toFile());
+            if (pom.getParent() != null) {
+                request.setBaseDirectory(pom.getParent().toFile());
+            }
+
+            // project present, but we could not determine rootDirectory: extra work needed
+            if (context.invokerRequest.rootDirectory().isEmpty()) {
+                Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
+                request.setMultiModuleProjectDirectory(rootDirectory.toFile());
+                request.setRootDirectory(rootDirectory);
+            }
+        }
+
         request.setTransferListener(
                 determineTransferListener(context, options.noTransferProgress().orElse(false)));
         request.setExecutionListener(determineExecutionListener(context));
-
-        if ((request.getPom() != null) && (request.getPom().getParentFile() != null)) {
-            request.setBaseDirectory(request.getPom().getParentFile());
-        }
 
         request.setResumeFrom(options.resumeFrom().orElse(null));
         request.setResume(options.resume().orElse(false));

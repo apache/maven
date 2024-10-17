@@ -114,8 +114,8 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
     }
 
     @Override
-    public Path rootDirectory() {
-        return rootDirectory;
+    public Optional<Path> rootDirectory() {
+        return Optional.ofNullable(rootDirectory);
     }
 
     @Override

@@ -125,13 +125,14 @@ public interface InvokerRequest<O extends Options> {
     Path topDirectory();
 
     /**
-     * Returns the root directory of the Maven invocation.
-     * This is determined by the presence of a .mvn directory or a POM with the root="true" property.
+     * Returns the root directory of the Maven invocation, if found. This is determined by the presence of a
+     * {@code .mvn} directory or a POM with the root="true" property but is not always applicable (ie invocation
+     * from outside a checkout).
      *
-     * @return the root directory path
+     * @return the root directory path, if present
      */
     @Nonnull
-    Path rootDirectory();
+    Optional<Path> rootDirectory();
 
     /**
      * Returns the input stream for the Maven execution, if running in embedded mode.

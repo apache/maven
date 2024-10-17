@@ -643,11 +643,13 @@ public abstract class LookupInvoker<
         request.setBaseDirectory(context.invokerRequest.topDirectory().toFile());
         request.setSystemProperties(toProperties(context.invokerRequest.systemProperties()));
         request.setUserProperties(toProperties(context.invokerRequest.userProperties()));
-        request.setMultiModuleProjectDirectory(
-                context.invokerRequest.rootDirectory().toFile());
 
-        request.setRootDirectory(context.invokerRequest.rootDirectory());
         request.setTopDirectory(context.invokerRequest.topDirectory());
+        if (context.invokerRequest.rootDirectory().isPresent()) {
+            request.setMultiModuleProjectDirectory(
+                    context.invokerRequest.rootDirectory().get().toFile());
+            request.setRootDirectory(context.invokerRequest.rootDirectory().get());
+        }
 
         request.addPluginGroup("org.apache.maven.plugins");
         request.addPluginGroup("org.codehaus.mojo");
