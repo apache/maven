@@ -352,6 +352,7 @@ public class ApiRunner {
 
         // local repository
         String localRepository = settings.getLocalRepository() != null
+                        && !settings.getLocalRepository().isEmpty()
                 ? settings.getLocalRepository()
                 : mavenUserHome.resolve("repository").toString();
         LocalRepositoryManager llm = system.newLocalRepositoryManager(rsession, new LocalRepository(localRepository));

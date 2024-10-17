@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -136,6 +137,11 @@ public interface Interpolator extends Service {
             }
             return null;
         };
+    }
+
+    @SafeVarargs
+    static Function<String, String> chain(Function<String, String>... functions) {
+        return chain(List.of(functions));
     }
 
     /**

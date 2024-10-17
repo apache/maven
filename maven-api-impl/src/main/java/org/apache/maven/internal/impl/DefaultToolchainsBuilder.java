@@ -167,7 +167,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
             PersistedToolchains toolchains, ToolchainsBuilderRequest request, List<BuilderProblem> problems) {
         Map<String, String> userProperties = request.getSession().getUserProperties();
         Map<String, String> systemProperties = request.getSession().getSystemProperties();
-        Function<String, String> src = Interpolator.chain(List.of(userProperties::get, systemProperties::get));
+        Function<String, String> src = Interpolator.chain(userProperties::get, systemProperties::get);
         return new MavenToolchainsTransformer(value -> value != null ? interpolator.interpolate(value, src) : null)
                 .visit(toolchains);
     }

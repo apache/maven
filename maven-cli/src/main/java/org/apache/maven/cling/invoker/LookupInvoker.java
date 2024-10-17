@@ -41,6 +41,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilder;
@@ -544,6 +545,8 @@ public abstract class LookupInvoker<
         context.projectSettingsPath = projectSettingsFile;
         context.userSettingsPath = userSettingsFile;
 
+        Function<String, String> interpolationSource = Interpolator.chain(
+                context.invokerRequest.userProperties()::get, context.invokerRequest.systemProperties()::get);
         SettingsBuilderRequest settingsRequest = SettingsBuilderRequest.builder()
                 .session(context.session)
                 .installationSettingsSource(
@@ -558,6 +561,7 @@ public abstract class LookupInvoker<
                         userSettingsFile != null && Files.exists(userSettingsFile)
                                 ? Source.fromPath(userSettingsFile)
                                 : null)
+                .interpolationSource(interpolationSource)
                 .build();
 
         customizeSettingsRequest(context, settingsRequest);
