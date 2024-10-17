@@ -403,11 +403,6 @@ under the License.
         <artifactId>org.eclipse.sisu.plexus</artifactId>
         <version>${sisuVersion}</version>
         <exclusions>
-          <!-- Remove bad annotations -->
-          <exclusion>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-          </exclusion>
           <!-- Detach them: We want to handle Sisu inject and plexus explicitly -->
           <!-- Once have this, once have that on classpath -->
           <!-- Finally, we may want to use some with classifier -->
