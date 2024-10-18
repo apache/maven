@@ -43,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.eventspy.EventSpy;
@@ -412,7 +413,20 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private void installIntoProjectLocalRepository(Artifact artifact) {
-        Path target = getArtifactPath(artifact);
+        String extension = artifact.getExtension();
+        String classifier = artifact.getClassifier();
+        if (Features.consumerPom(session.getUserProperties())) {
+            if ("pom".equals(extension)) {
+                if (classifier == null || classifier.isEmpty()) {
+                    classifier = "build";
+                } else if (classifier.equals("consumer")) {
+                    classifier = null;
+                }
+            }
+        }
+
+        Path target = getArtifactPath(
+                artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), classifier, extension);
         try {
             LOGGER.info("Copying {} to project local repository", artifact);
             Files.createDirectories(target.getParent());
@@ -432,6 +446,11 @@ class ReactorReader implements MavenWorkspaceReader {
         String version = artifact.getBaseVersion();
         String classifier = artifact.getClassifier();
         String extension = artifact.getExtension();
+        return getArtifactPath(groupId, artifactId, version, classifier, extension);
+    }
+
+    private Path getArtifactPath(
+            String groupId, String artifactId, String version, String classifier, String extension) {
         Path repo = getProjectLocalRepo();
         return repo.resolve(groupId)
                 .resolve(artifactId)
