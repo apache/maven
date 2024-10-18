@@ -178,8 +178,6 @@ if "%MAVEN_DEBUG_ADDRESS%"=="" set MAVEN_DEBUG_ADDRESS=localhost:8000
 
 goto endHandleArgs
 :handleArgs
-:handleArgsLoop
-if "%~1"=="" goto endHandleArgs
 if "%~1"=="--debug" (
     if "%MAVEN_DEBUG_OPTS%"=="" (
         set "MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%MAVEN_DEBUG_ADDRESS%"
@@ -193,11 +191,16 @@ if "%~1"=="--debug" (
 ) else if "%~1"=="--enc" (
     set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenEncCling"
 )
-shift
-goto handleArgsLoop
-:endHandleArgs
+exit /b 0
 
-call :handleArgs %*
+:processArgs
+if "%~1"=="" exit /b 0
+call :handleArgs %1
+shift
+goto processArgs
+
+:endHandleArgs
+call :processArgs %*
 
 for %%i in ("%MAVEN_HOME%"\boot\plexus-classworlds-*) do set LAUNCHER_JAR="%%i"
 set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
