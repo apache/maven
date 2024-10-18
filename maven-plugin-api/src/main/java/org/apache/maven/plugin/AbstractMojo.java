@@ -143,10 +143,6 @@ public abstract class AbstractMojo implements Mojo, ContextEnabled {
     /** Plugin container context */
     private Map pluginContext;
 
-    /**
-     * @deprecated Use SLF4J directly
-     */
-    @Deprecated
     @Override
     public void setLog(Log log) {
         this.log = log;
@@ -164,9 +160,7 @@ public abstract class AbstractMojo implements Mojo, ContextEnabled {
      * method directly whenever you need the logger, it is fast enough and needs no caching.
      *
      * @see org.apache.maven.plugin.Mojo#getLog()
-     * @deprecated Use SLF4J directly
      */
-    @Deprecated
     @Override
     public Log getLog() {
         if (log == null) {

@@ -25,9 +25,7 @@ import java.io.StringWriter;
  * Logger with "standard" output and error output stream.
  *
  *
- * @deprecated Use SLF4J directly
  */
-@Deprecated
 public class SystemStreamLog implements Log {
     /**
      * @see org.apache.maven.plugin.logging.Log#debug(java.lang.CharSequence)
