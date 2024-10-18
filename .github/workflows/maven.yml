@@ -17,63 +17,106 @@
 
 name: Java CI
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 # clear all permissions for GITHUB_TOKEN
 permissions: {}
 
 jobs:
-  build:
-
-    # execute on any push, workflow_dispatch  or pull request from forked repo
-    if: >
-      github.event_name == 'push' ||
-      github.event_name == 'workflow_dispatch' ||
-      ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork )
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
-
+  initial-build:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-java@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'temurin'
-          cache: 'maven'
+
+      - name: Checkout maven
+        uses: actions/checkout@v4
+        with:
+          path: maven/
+          persist-credentials: false
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/cached
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+          enableCrossOsArchive: true
 
       - name: Set up Maven
-        run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.7"
+        shell: bash
+        working-directory: maven
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-beta-4"
 
       - name: Build with Maven
+        shell: bash
+        working-directory: maven
         run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven
 
       - name: Upload built Maven
         uses: actions/upload-artifact@v4
-        if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           name: built-maven
-          path: apache-maven/target/
+          path: maven/apache-maven/target/
 
-  integration-test:
-    needs: build
+      - name: Extract tarball
+        shell: bash
+        working-directory: maven
+        run: |
+          set +e
+          if [ -f ${{ env.TAR_BALL }} ]; then
+            temp_dir=$(mktemp -d)
+            tar -xzf ${{ env.TAR_BALL }} -C "$temp_dir" --strip 1
+            maven_bin_dir=$temp_dir/bin
+            if [ -d $maven_bin_dir ]; then
+              echo "tar.gz file \"${{ env.TAR_BALL }}\" successfully extracted in temporarily directory \"$temp_dir.\""
+              echo "TEMP_MAVEN_BIN_DIR=$maven_bin_dir" >> $GITHUB_ENV
+            else
+              echo "$maven_bin_dir does not exist."
+              exit 1;
+            fi
+          else
+            echo "${{ env.TAR_BALL }} does not exist."
+            exit 1;
+          fi
+        env:
+          TAR_BALL: apache-maven/target/apache-maven-bin.tar.gz
+
+      - name: Build again with Maven SNAPSHOT
+        shell: bash
+        working-directory: maven
+        run: |
+          export PATH=${{ env.TEMP_MAVEN_BIN_DIR }}:$PATH
+          mvn clean verify site -e -B -V -DdistributionFileName=apache-maven -Preporting
+
+
+  matrix-build:
+    needs: initial-build
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [17, 21]
-
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
-
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        java: ['17', '21']
     steps:
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+
+      - name: Checkout maven
+        uses: actions/checkout@v4
+        with:
+          path: maven/
+          persist-credentials: false
+
       - name: Collect environment context variables
         shell: bash
         env:
@@ -113,32 +156,71 @@ jobs:
           ref: ${{ env.REPO_BRANCH }}
           persist-credentials: false
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - name: Cache Maven packages
+        uses: actions/cache@v4
         with:
-          java-version: ${{ matrix.java }}
-          distribution: 'temurin'
-#          cache: 'maven' - don't use cache for integration tests
-
-      - uses: actions/checkout@v4
-        with:
-          path: maven/
-          persist-credentials: false
+          path: ~/.m2/repository/cached
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+          enableCrossOsArchive: true
 
       - name: Set up Maven
-        run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.7"
+        shell: bash
+        working-directory: maven
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-beta-4"
 
-      - name: Build Maven
-        run: ./mvnw install -e -B -V -DdistributionFileName=apache-maven -DskipTests -f maven/pom.xml
+      - name: Build with Maven
+        shell: bash
+        working-directory: maven
+        run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven
+
+      - name: Upload built Maven
+        uses: actions/upload-artifact@v4
+        if: ${{ inputs.upload-distribution }}
+        with:
+          name: built-maven
+          path: maven/apache-maven/target/
+
+      - name: Extract tarball
+        shell: bash
+        working-directory: maven
+        run: |
+          set +e
+          if [ -f ${{ env.TAR_BALL }} ]; then
+            temp_dir=$(mktemp -d)
+            tar -xzf ${{ env.TAR_BALL }} -C "$temp_dir" --strip 1
+            maven_bin_dir=$temp_dir/bin
+            if [ -d $maven_bin_dir ]; then
+              echo "tar.gz file \"${{ env.TAR_BALL }}\" successfully extracted in temporarily directory \"$temp_dir.\""
+              echo "TEMP_MAVEN_BIN_DIR=$maven_bin_dir" >> $GITHUB_ENV
+            else
+              echo "$maven_bin_dir does not exist."
+              exit 1;
+            fi
+          else
+            echo "${{ env.TAR_BALL }} does not exist."
+            exit 1;
+          fi
+        env:
+          TAR_BALL: apache-maven/target/apache-maven-bin.tar.gz
+
+      - name: Build again with Maven SNAPSHOT
+        shell: bash
+        working-directory: maven
+        run: |
+          export PATH=${{ env.TEMP_MAVEN_BIN_DIR }}:$PATH
+          mvn clean verify site -e -B -V -DdistributionFileName=apache-maven -Preporting
 
       - name: Running integration tests
         shell: bash
-        run: ./mvnw install -e -B -V -Prun-its,embedded -DmavenDistro="$GITHUB_WORKSPACE/maven/apache-maven/target/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
+        working-directory: maven-integration-testing
+        run: |
+          export PATH=${{ env.TEMP_MAVEN_BIN_DIR }}:$PATH
+          mvn install -e -B -V -Prun-its,embedded
 
       - name: Upload artifact on integration testing
         uses: actions/upload-artifact@v4
         if: failure() && matrix.os != 'windows-latest'
         with:
-          name: ${{ github.run_number }}-integration-test-artifact-${{ matrix.os }}-${{ matrix.java }}
+          name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
           path: ./maven-integration-testing/core-it-suite/target/test-classes/
