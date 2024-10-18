@@ -231,9 +231,6 @@ under the License.
               <goal>build-bom</goal>
             </goals>
             <configuration>
-              <bomGroupId>org.apache.maven</bomGroupId>
-              <bomArtifactId>maven-bom</bomArtifactId>
-              <bomVersion>${project.version}</bomVersion>
               <bomClassifier>skinny</bomClassifier>
               <bomName>Maven Dependencies Skinny BOM</bomName>
               <bomDescription>Bill Of Materials for Apache Maven - Maven JARS only</bomDescription>
@@ -247,9 +244,6 @@ under the License.
               <goal>build-bom</goal>
             </goals>
             <configuration>
-              <bomGroupId>org.apache.maven</bomGroupId>
-              <bomArtifactId>maven-bom</bomArtifactId>
-              <bomVersion>${project.version}</bomVersion>
               <bomClassifier>fat</bomClassifier>
               <bomName>Maven Dependencies Fat BOM</bomName>
               <bomDescription>Bill Of Materials for Apache Maven - All dependencies</bomDescription>
