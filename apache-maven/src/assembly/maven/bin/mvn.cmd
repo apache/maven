@@ -178,6 +178,7 @@ if "%MAVEN_DEBUG_ADDRESS%"=="" set MAVEN_DEBUG_ADDRESS=localhost:8000
 
 goto endHandleArgs
 :handleArgs
+:handleArgsLoop
 if "%~1"=="" goto endHandleArgs
 if "%~1"=="--debug" (
     if "%MAVEN_DEBUG_OPTS%"=="" (
@@ -193,7 +194,7 @@ if "%~1"=="--debug" (
     set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenEncCling"
 )
 shift
-goto handleArgs
+goto handleArgsLoop
 :endHandleArgs
 
 call :handleArgs %*
