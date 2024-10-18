@@ -534,6 +534,12 @@ under the License.
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-spi</artifactId>
         <version>${resolverVersion}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
