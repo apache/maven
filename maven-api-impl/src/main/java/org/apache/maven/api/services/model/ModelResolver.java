@@ -59,6 +59,7 @@ public interface ModelResolver extends Service {
                 parent.getGroupId(),
                 parent.getArtifactId(),
                 parent.getVersion(),
+                null,
                 version -> modified.set(parent.withVersion(version)));
     }
 
@@ -85,6 +86,7 @@ public interface ModelResolver extends Service {
                 dependency.getGroupId(),
                 dependency.getArtifactId(),
                 dependency.getVersion(),
+                dependency.getClassifier(),
                 version -> modified.set(dependency.withVersion(version)));
     }
 
@@ -95,6 +97,7 @@ public interface ModelResolver extends Service {
             @Nonnull String groupId,
             @Nonnull String artifactId,
             @Nonnull String version,
+            @Nullable String classifier,
             @Nonnull Consumer<String> resolvedVersion)
             throws ModelResolverException;
 }
