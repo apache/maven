@@ -71,6 +71,7 @@ public class DefaultModelResolver implements ModelResolver {
                 parent.getArtifactId(),
                 parent.getVersion(),
                 "parent",
+                null,
                 parent.getLocation("version"),
                 version -> modified.set(parent.withVersion(version)));
     }
@@ -89,6 +90,7 @@ public class DefaultModelResolver implements ModelResolver {
                 dependency.getArtifactId(),
                 dependency.getVersion(),
                 "dependency",
+                dependency.getClassifier(),
                 dependency.getLocation("version"),
                 version -> modified.set(dependency.withVersion(version)));
     }
@@ -100,9 +102,11 @@ public class DefaultModelResolver implements ModelResolver {
             @Nonnull String groupId,
             @Nonnull String artifactId,
             @Nonnull String version,
+            @Nullable String classifier,
             @Nonnull Consumer<String> resolvedVersion)
             throws ModelResolverException {
-        return resolveModel(session, repositories, groupId, artifactId, version, null, null, resolvedVersion);
+        return resolveModel(
+                session, repositories, groupId, artifactId, version, null, classifier, null, resolvedVersion);
     }
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -113,11 +117,13 @@ public class DefaultModelResolver implements ModelResolver {
             String artifactId,
             String version,
             String type,
+            String classifier,
             InputLocation location,
             Consumer<String> resolvedVersion)
             throws ModelResolverException {
         try {
-            ArtifactCoordinates coords = session.createArtifactCoordinates(groupId, artifactId, version, "pom");
+            ArtifactCoordinates coords =
+                    session.createArtifactCoordinates(groupId, artifactId, version, classifier, "pom", null);
             if (coords.getVersionConstraint().getVersionRange() != null
                     && coords.getVersionConstraint().getVersionRange().getUpperBoundary() == null) {
                 // Message below is checked for in the MNG-2199 core IT.
@@ -143,7 +149,7 @@ public class DefaultModelResolver implements ModelResolver {
                 resolvedVersion.accept(newVersion);
             }
 
-            Path path = getPath(session, repositories, groupId, artifactId, newVersion);
+            Path path = getPath(session, repositories, groupId, artifactId, newVersion, classifier);
             return new ResolverModelSource(path, groupId + ":" + artifactId + ":" + newVersion);
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
@@ -163,9 +169,10 @@ public class DefaultModelResolver implements ModelResolver {
             List<RemoteRepository> repositories,
             String groupId,
             String artifactId,
-            String newVersion) {
+            String version,
+            String classifier) {
         DownloadedArtifact resolved = session.resolveArtifact(
-                session.createArtifactCoordinates(groupId, artifactId, newVersion, "pom"), repositories);
+                session.createArtifactCoordinates(groupId, artifactId, version, classifier, "pom", null), repositories);
         return resolved.getPath();
     }
 

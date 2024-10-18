@@ -136,6 +136,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 String groupId,
                 String artifactId,
                 String version,
+                String classifier,
                 Consumer<String> resolvedVersion)
                 throws ModelResolverException {
             String id = groupId + ":" + artifactId + ":" + version;
