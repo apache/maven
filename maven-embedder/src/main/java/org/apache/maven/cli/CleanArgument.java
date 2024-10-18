@@ -26,6 +26,17 @@ import java.util.List;
  */
 public class CleanArgument {
     public static String[] cleanArgs(String[] args) {
+        try {
+            return doCleanArgs(args);
+        } catch (RuntimeException e) {
+            for (String a : args) {
+                System.out.println("Arg: '" + a + "'");
+            }
+            throw e;
+        }
+    }
+
+    private static String[] doCleanArgs(String[] args) {
         List<String> cleaned = new ArrayList<>();
 
         StringBuilder currentArg = null;
@@ -49,7 +60,9 @@ public class CleanArgument {
             if (addedToBuffer && arg.endsWith("\"")) {
                 // if we're building an argument, keep doing so.
                 // if this is the case of "-Dfoo=bar", then we need to adjust the buffer.
-                currentArg.setLength(currentArg.length() - 1);
+                if (!currentArg.isEmpty()) {
+                    currentArg.setLength(currentArg.length() - 1);
+                }
 
                 cleaned.add(currentArg.toString());
 

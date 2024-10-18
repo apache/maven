@@ -22,10 +22,12 @@
 #
 # Environment Variable Prerequisites
 #
-#   JAVA_HOME       (Optional) Points to a Java installation.
-#   MAVEN_ARGS      (Optional) Arguments passed to Maven before CLI arguments.
-#   MAVEN_OPTS      (Optional) Java runtime options used when Maven is executed.
-#   MAVEN_SKIP_RC   (Optional) Flag to disable loading of mavenrc files.
+#   JAVA_HOME           (Optional) Points to a Java installation.
+#   MAVEN_ARGS          (Optional) Arguments passed to Maven before CLI arguments.
+#   MAVEN_OPTS          (Optional) Java runtime options used when Maven is executed.
+#   MAVEN_SKIP_RC       (Optional) Flag to disable loading of mavenrc files.
+#   MAVEN_DEBUG_OPTS    (Optional) Specify the debug options to use. Default value is "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${MAVEN_DEBUG_ADDRESS}" when --debug is used
+#   MAVEN_DEBUG_ADDRESS (Optional) Set the debug address. Default value is "localhost:8000"
 # -----------------------------------------------------------------------------
 
 if [ -z "$MAVEN_SKIP_RC" ] ; then
@@ -167,7 +169,6 @@ MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
 MAVEN_OPTS="$MAVEN_OPTS `concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
 LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/plexus-classworlds-*.jar`
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
-MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
 # For Cygwin and MinGW, switch paths to Windows format before running java(1) command
 if $cygwin || $mingw ; then
@@ -178,6 +179,36 @@ if $cygwin || $mingw ; then
   MAVEN_HOME=`cygpath --windows "$MAVEN_HOME"`
   MAVEN_PROJECTBASEDIR=`cygpath --windows "$MAVEN_PROJECTBASEDIR"`
 fi
+
+handle_args() {
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --debug)
+        if [ -z "$MAVEN_DEBUG_OPTS" ] ; then
+          MAVEN_DEBUG_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${MAVEN_DEBUG_ADDRESS:-localhost:8000}"
+        else
+          echo "Ignoring --debug option as MAVEN_DEBUG_OPTS is already set"
+        fi
+        ;;
+      --yjp)
+        if [ ! -f "$YJPLIB" ]; then
+          echo "Error: Unable to autodetect the YJP library location. Please set YJPLIB variable" >&2
+          exit 1
+        fi
+        MAVEN_OPTS="-agentpath:$YJPLIB=onexit=snapshot,onexit=memory,tracing,onlylocal $MAVEN_OPTS"
+        ;;
+      --enc)
+        MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenEncCling"
+        ;;
+      *)
+        ;;
+    esac
+    shift
+  done
+}
+
+handle_args "$@"
+MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
 exec "$JAVACMD" \
   $MAVEN_OPTS \

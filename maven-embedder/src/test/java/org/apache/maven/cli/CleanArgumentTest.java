@@ -25,6 +25,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  */
 class CleanArgumentTest {
+
+    @Test
+    void cleanArgs() {
+        String[] args = {
+            "\"",
+        };
+        CleanArgument.cleanArgs(args);
+    }
+
     @Test
     void cleanArgsShouldRemoveWrongSurroundingQuotes() {
         String[] args = {"\"-Dfoo=bar", "\"-Dfoo2=bar two\""};
