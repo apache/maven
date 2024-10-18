@@ -564,8 +564,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         // Infer inner reactor dependencies version
         //
         Model transformFileToRaw(Model model) {
-            List<Dependency> newDeps = new ArrayList<>();
-            boolean modified = false;
+            List<Dependency> newDeps = new ArrayList<>(model.getDependencies().size());
             for (Dependency dep : model.getDependencies()) {
                 if (dep.getVersion() == null) {
                     Dependency.Builder depBuilder = null;
@@ -591,13 +590,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                     }
                     if (depBuilder != null) {
                         newDeps.add(depBuilder.build());
-                        modified = true;
                     } else {
                         newDeps.add(dep);
                     }
+                } else {
+                    newDeps.add(dep);
                 }
             }
-            return modified ? model.withDependencies(newDeps) : model;
+            return model.withDependencies(newDeps);
         }
 
         String replaceCiFriendlyVersion(Map<String, String> properties, String version) {
