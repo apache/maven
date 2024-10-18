@@ -131,10 +131,9 @@ public class CLIManager {
 
     public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
-    /** This option is deprecated and may be repurposed as Java debug in a future version.
-     * Use {@code -X,--verbose} instead. */
-    @Deprecated
     public static final String DEBUG = "debug";
+    public static final String ENC = "enc";
+    public static final String YJP = "yjp";
 
     protected Options options;
     protected final Set<Option> usedDeprecatedOptions = new LinkedHashSet<>();
@@ -339,6 +338,20 @@ public class CLIManager {
                 .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
                 .build());
 
+        // Parameters handled by script
+        options.addOption(Option.builder()
+                .longOpt(DEBUG)
+                .desc("Launch the JVM in debug mode (script option).")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(ENC)
+                .desc("Launch the Maven Encryption tool (script option).")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(YJP)
+                .desc("Launch the JVM with Yourkit profiler (script option).")
+                .build());
+
         // Adding this back to make Maven fail if used
         options.addOption(Option.builder("llr")
                 .longOpt("legacy-local-repository")
@@ -350,15 +363,6 @@ public class CLIManager {
                 .build());
 
         // Deprecated
-        options.addOption(Option.builder()
-                .longOpt(DEBUG)
-                .desc("<deprecated> Produce execution verbose output.")
-                .deprecated(DeprecatedAttributes.builder()
-                        .setForRemoval(true)
-                        .setSince("4.0.0")
-                        .setDescription("Use -X,--verbose instead.")
-                        .get())
-                .build());
         options.addOption(Option.builder(ALTERNATE_GLOBAL_SETTINGS)
                 .longOpt("global-settings")
                 .desc("<deprecated> Alternate path for the global settings file.")
