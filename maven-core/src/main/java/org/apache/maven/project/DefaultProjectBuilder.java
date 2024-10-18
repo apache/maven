@@ -323,7 +323,12 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     RepositoryUtils.overlay(request.getLocalRepository(), request.getRepositorySession(), repoSystem);
             InternalSession iSession = InternalSession.from(session);
             this.modelBuilderSession = modelBuilder.newSession();
-            iSession.getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), modelBuilderSession);
+            // Save the ModelBuilderSession for later retrieval by the DefaultConsumerPomBuilder.
+            // Use replace(key, null, value) to make sure the *main* session, i.e. the one used
+            // to load the projects, is stored. This is to avoid the session being overwritten
+            // if a plugin uses the ProjectBuilder.
+            iSession.getData()
+                    .replace(SessionData.key(ModelBuilder.ModelBuilderSession.class), null, modelBuilderSession);
         }
 
         @Override
