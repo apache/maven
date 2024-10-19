@@ -595,6 +595,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     } else {
                         newDeps.add(dep);
                     }
+                } else {
+                    newDeps.add(dep);
                 }
             }
             return modified ? model.withDependencies(newDeps) : model;
