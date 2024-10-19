@@ -564,19 +564,21 @@ public class DefaultModelBuilder implements ModelBuilder {
         // Infer inner reactor dependencies version
         //
         Model transformFileToRaw(Model model) {
+            if (model.getDependencies().isEmpty()) {
+                return model;
+            }
             List<Dependency> newDeps = new ArrayList<>(model.getDependencies().size());
             for (Dependency dep : model.getDependencies()) {
                 if (dep.getVersion() == null) {
-                    Dependency.Builder depBuilder = null;
                     Model depModel = getRawModel(model.getPomFile(), dep.getGroupId(), dep.getArtifactId());
                     if (depModel != null) {
+                        Dependency.Builder depBuilder = Dependency.newBuilder(dep);
                         String version = depModel.getVersion();
                         InputLocation versionLocation = depModel.getLocation("version");
                         if (version == null && depModel.getParent() != null) {
                             version = depModel.getParent().getVersion();
                             versionLocation = depModel.getParent().getLocation("version");
                         }
-                        depBuilder = Dependency.newBuilder(dep);
                         depBuilder.version(version).location("version", versionLocation);
                         if (dep.getGroupId() == null) {
                             String depGroupId = depModel.getGroupId();
@@ -587,8 +589,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                             }
                             depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
                         }
-                    }
-                    if (depBuilder != null) {
                         newDeps.add(depBuilder.build());
                     } else {
                         newDeps.add(dep);
