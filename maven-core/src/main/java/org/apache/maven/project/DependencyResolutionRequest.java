@@ -18,6 +18,8 @@
  */
 package org.apache.maven.project;
 
+import java.util.Collection;
+
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 
@@ -74,4 +76,8 @@ public interface DependencyResolutionRequest {
      * @return This request for chaining, never {@code null}.
      */
     DependencyResolutionRequest setRepositorySession(RepositorySystemSession repositorySession);
+
+    Collection<String> getCollectScopesToExclude();
+
+    Collection<String> getResolveScopesToExclude();
 }
