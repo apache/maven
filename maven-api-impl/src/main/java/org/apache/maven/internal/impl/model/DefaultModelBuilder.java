@@ -564,7 +564,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         // Infer inner reactor dependencies version
         //
         Model transformFileToRaw(Model model) {
-            List<Dependency> newDeps = new ArrayList<>();
+            List<Dependency> newDeps = new ArrayList<>(model.getDependencies().size());
             boolean modified = false;
             for (Dependency dep : model.getDependencies()) {
                 if (dep.getVersion() == null) {
