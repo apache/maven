@@ -568,36 +568,43 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return model;
             }
             List<Dependency> newDeps = new ArrayList<>(model.getDependencies().size());
+            boolean changed = false;
             for (Dependency dep : model.getDependencies()) {
+                Dependency newDep = null;
                 if (dep.getVersion() == null) {
-                    Model depModel = getRawModel(model.getPomFile(), dep.getGroupId(), dep.getArtifactId());
-                    if (depModel != null) {
-                        Dependency.Builder depBuilder = Dependency.newBuilder(dep);
-                        String version = depModel.getVersion();
-                        InputLocation versionLocation = depModel.getLocation("version");
-                        if (version == null && depModel.getParent() != null) {
-                            version = depModel.getParent().getVersion();
-                            versionLocation = depModel.getParent().getLocation("version");
-                        }
-                        depBuilder.version(version).location("version", versionLocation);
-                        if (dep.getGroupId() == null) {
-                            String depGroupId = depModel.getGroupId();
-                            InputLocation groupIdLocation = depModel.getLocation("groupId");
-                            if (depGroupId == null && depModel.getParent() != null) {
-                                depGroupId = depModel.getParent().getGroupId();
-                                groupIdLocation = depModel.getParent().getLocation("groupId");
-                            }
-                            depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
-                        }
-                        newDeps.add(depBuilder.build());
-                    } else {
-                        newDeps.add(dep);
+                    newDep = inferDependencyVersion(model, dep);
+                    if (newDep != null) {
+                        changed = true;
                     }
-                } else {
-                    newDeps.add(dep);
                 }
+                newDeps.add(newDep == null ? dep : newDep);
             }
-            return model.withDependencies(newDeps);
+            return changed ? model.withDependencies(newDeps) : model;
+        }
+
+        private Dependency inferDependencyVersion(Model model, Dependency dep) {
+            Model depModel = getRawModel(model.getPomFile(), dep.getGroupId(), dep.getArtifactId());
+            if (depModel == null) {
+                return null;
+            }
+            Dependency.Builder depBuilder = Dependency.newBuilder(dep);
+            String version = depModel.getVersion();
+            InputLocation versionLocation = depModel.getLocation("version");
+            if (version == null && depModel.getParent() != null) {
+                version = depModel.getParent().getVersion();
+                versionLocation = depModel.getParent().getLocation("version");
+            }
+            depBuilder.version(version).location("version", versionLocation);
+            if (dep.getGroupId() == null) {
+                String depGroupId = depModel.getGroupId();
+                InputLocation groupIdLocation = depModel.getLocation("groupId");
+                if (depGroupId == null && depModel.getParent() != null) {
+                    depGroupId = depModel.getParent().getGroupId();
+                    groupIdLocation = depModel.getParent().getLocation("groupId");
+                }
+                depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
+            }
+            return depBuilder.build();
         }
 
         String replaceCiFriendlyVersion(Map<String, String> properties, String version) {
