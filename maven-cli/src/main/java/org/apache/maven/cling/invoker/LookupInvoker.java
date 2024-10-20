@@ -20,6 +20,8 @@ package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -320,15 +322,36 @@ public abstract class LookupInvoker<
     }
 
     protected Terminal createTerminal(C context) {
-        return new FastTerminal(
-                () -> TerminalBuilder.builder()
-                        .name("Maven")
-                        .streams(
-                                context.invokerRequest.in().orElse(null),
-                                context.invokerRequest.out().orElse(null))
-                        .dumb(true)
-                        .build(),
-                terminal -> doConfigureWithTerminal(context, terminal));
+        if (context.invokerRequest.options().logFile().isPresent()) {
+            Path logFile = context.cwdResolver.apply(
+                    context.invokerRequest.options().logFile().get());
+            try {
+                OutputStream stdout = Files.newOutputStream(logFile);
+                PrintStream ps = new PrintStream(stdout);
+                System.setOut(ps);
+                System.setErr(ps);
+
+                return new FastTerminal(
+                        () -> TerminalBuilder.builder()
+                                .name("Maven")
+                                .streams(context.invokerRequest.in().orElse(null), stdout)
+                                .dumb(true)
+                                .build(),
+                        terminal -> doConfigureWithTerminal(context, terminal));
+            } catch (IOException e) {
+                throw new MavenException("Unable to redirect logging to " + logFile, e);
+            }
+        } else {
+            return new FastTerminal(
+                    () -> TerminalBuilder.builder()
+                            .name("Maven")
+                            .streams(
+                                    context.invokerRequest.in().orElse(null),
+                                    context.invokerRequest.out().orElse(null))
+                            .dumb(true)
+                            .build(),
+                    terminal -> doConfigureWithTerminal(context, terminal));
+        }
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
