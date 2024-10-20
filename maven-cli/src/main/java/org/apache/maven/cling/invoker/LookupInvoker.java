@@ -364,6 +364,7 @@ public abstract class LookupInvoker<
             Path logFile = context.cwdResolver.apply(options.logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile));
+                context.closeables.add(printWriter);
                 bel = new SimpleBuildEventListener(printWriter::println);
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
