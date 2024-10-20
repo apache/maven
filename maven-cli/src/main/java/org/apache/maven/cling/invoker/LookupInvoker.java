@@ -380,26 +380,13 @@ public abstract class LookupInvoker<
     }
 
     protected BuildEventListener doDetermineBuildEventListener(C context) {
-        BuildEventListener bel;
-        O options = context.invokerRequest.options();
-        if (options.logFile().isPresent()) {
-            Path logFile = context.cwdResolver.apply(options.logFile().get());
-            try {
-                PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile));
-                bel = new SimpleBuildEventListener(printWriter::println);
-            } catch (IOException e) {
-                throw new MavenException("Unable to redirect logging to " + logFile, e);
-            }
-        } else {
-            // Given the terminal creation has been offloaded to a different thread,
-            // do not pass directory the terminal writer
-            bel = new SimpleBuildEventListener(msg -> {
-                PrintWriter pw = context.terminal.writer();
-                pw.println(msg);
-                pw.flush();
-            });
-        }
-        return bel;
+        // Given the terminal creation has been offloaded to a different thread,
+        // do not pass directory the terminal writer
+        return new SimpleBuildEventListener(msg -> {
+            PrintWriter pw = context.terminal.writer();
+            pw.println(msg);
+            pw.flush();
+        });
     }
 
     protected void activateLogging(C context) throws Exception {
