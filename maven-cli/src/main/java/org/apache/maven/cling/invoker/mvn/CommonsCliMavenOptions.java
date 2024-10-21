@@ -271,7 +271,6 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String CHECKSUM_FAILURE_POLICY = "C";
         public static final String CHECKSUM_WARNING_POLICY = "c";
         public static final String FAIL_FAST = "ff";
-        public static final String FAIL_ON_SEVERITY = "fos";
         public static final String FAIL_AT_END = "fae";
         public static final String FAIL_NEVER = "fn";
         public static final String RESUME = "r";

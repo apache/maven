@@ -248,10 +248,6 @@ public abstract class CommonsCliOptions implements Options {
         public static final String SHOW_VERSION = "V";
         public static final String QUIET = "q";
         public static final String VERBOSE = "X";
-        /** This option is deprecated and may be repurposed as Java debug in a future version.
-         * Use {@code -X,--verbose} instead. */
-        @Deprecated
-        public static final String DEBUG = "debug";
 
         public static final String SHOW_ERRORS = "e";
         public static final String FAIL_ON_SEVERITY = "fos";
@@ -260,21 +256,25 @@ public abstract class CommonsCliOptions implements Options {
         public static final String FORCE_INTERACTIVE = "force-interactive";
         public static final String ALTERNATE_USER_SETTINGS = "s";
         public static final String ALTERNATE_PROJECT_SETTINGS = "ps";
-
-        @Deprecated
-        public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
-
         public static final String ALTERNATE_INSTALLATION_SETTINGS = "is";
         public static final String ALTERNATE_USER_TOOLCHAINS = "t";
-
-        @Deprecated
-        public static final String ALTERNATE_GLOBAL_TOOLCHAINS = "gt";
-
         public static final String ALTERNATE_INSTALLATION_TOOLCHAINS = "it";
         public static final String LOG_FILE = "l";
         public static final String RAW_STREAMS = "raw-streams";
         public static final String COLOR = "color";
         public static final String HELP = "h";
+
+        // parameters handled by script
+        public static final String DEBUG = "debug";
+        public static final String ENC = "enc";
+        public static final String YJP = "yjp";
+
+        // deprecated ones
+        @Deprecated
+        public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
+
+        @Deprecated
+        public static final String ALTERNATE_GLOBAL_TOOLCHAINS = "gt";
 
         protected org.apache.commons.cli.Options options;
         protected final LinkedHashSet<Option> usedDeprecatedOptions = new LinkedHashSet<>();
@@ -374,16 +374,21 @@ public abstract class CommonsCliOptions implements Options {
                     .desc("Defines the color mode of the output. Supported are 'auto', 'always', 'never'.")
                     .build());
 
-            // Deprecated
+            // Parameters handled by script
             options.addOption(Option.builder()
                     .longOpt(DEBUG)
-                    .desc("<deprecated> Produce execution verbose output.")
-                    .deprecated(DeprecatedAttributes.builder()
-                            .setForRemoval(true)
-                            .setSince("4.0.0")
-                            .setDescription("Use -X,--verbose instead.")
-                            .get())
+                    .desc("Launch the JVM in debug mode (script option).")
                     .build());
+            options.addOption(Option.builder()
+                    .longOpt(ENC)
+                    .desc("Launch the Maven Encryption tool (script option).")
+                    .build());
+            options.addOption(Option.builder()
+                    .longOpt(YJP)
+                    .desc("Launch the JVM with Yourkit profiler (script option).")
+                    .build());
+
+            // Deprecated
             options.addOption(Option.builder(ALTERNATE_GLOBAL_SETTINGS)
                     .longOpt("global-settings")
                     .desc("<deprecated> Alternate path for the global settings file.")
