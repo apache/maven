@@ -190,7 +190,32 @@ public class ReactorGraph {
                     .append(key)
                     .append("</font></td></tr>");
             cluster.nodes().stream().map(MutableNode::name).map(Label::toString).sorted()
-                    .forEach(nodeName -> labelBuilder.append("<tr><td>").append(nodeName).append("</td></tr>"));
+                    .forEach(nodeName -> {
+                        labelBuilder.append("<tr>");
+                        String prefix = null;
+                        switch (clusterName) {
+                            case "MavenAPI": prefix = "../api/"; break;
+                            case "MavenImplementation":
+                            case "MavenCompatibility": prefix = "../"; break;
+                            case "MavenResolver": prefix = "https://maven.apache.org/resolver/"; break;
+                        }
+                        if (prefix != null) {
+                            labelBuilder.append("<td")
+                                    .append(" href=\"")
+                                    .append(prefix)
+                                    .append(nodeName)
+                                    .append("\"")
+                                    .append(" title=\"")
+                                    .append(nodeName)
+                                    .append("\"")
+                                    .append(">")
+                                    .append(nodeName)
+                                    .append("</td>");
+                        } else {
+                            labelBuilder.append("<td>").append(nodeName).append("</td>");
+                        }
+                        labelBuilder.append("</tr>");
+                    });
             labelBuilder.append("</table>");
 
             MutableNode clusterNode = mutNode(clusterName).add(Label.html(labelBuilder.toString()))
