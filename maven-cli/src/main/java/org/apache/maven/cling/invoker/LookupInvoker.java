@@ -320,6 +320,7 @@ public abstract class LookupInvoker<
                                 context.invokerRequest.in().orElse(null),
                                 context.invokerRequest.out().orElse(null))
                         .dumb(true)
+                        .exec(false)
                         .systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut)
                         .build(),
                 terminal -> doConfigureWithTerminal(context, terminal));
