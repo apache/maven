@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,8 +64,11 @@ import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingExecutionListener;
 import org.apache.maven.logging.MavenTransferListener;
+import org.apache.maven.logging.ProjectBuildLogAppender;
+import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositoryCache;
@@ -89,6 +93,7 @@ public abstract class DefaultMavenInvoker<
             super(invoker, invokerRequest);
         }
 
+        public BuildEventListener buildEventListener;
         public MavenExecutionRequest mavenExecutionRequest;
         public EventSpyDispatcher eventSpyDispatcher;
         public MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
@@ -159,6 +164,27 @@ public abstract class DefaultMavenInvoker<
         } else if (invokerRequest.options().strictChecksums().orElse(false)) {
             logger.info("Enabling strict checksum verification on all artifact downloads.");
         }
+    }
+
+    @Override
+    protected void configureLogging(C context) throws Exception {
+        super.configureLogging(context);
+        // Create the build log appender
+        ProjectBuildLogAppender projectBuildLogAppender =
+                new ProjectBuildLogAppender(determineBuildEventListener(context));
+        context.closeables.add(projectBuildLogAppender);
+    }
+
+    protected BuildEventListener determineBuildEventListener(C context) {
+        if (context.buildEventListener == null) {
+            context.buildEventListener = doDetermineBuildEventListener(context);
+        }
+        return context.buildEventListener;
+    }
+
+    protected BuildEventListener doDetermineBuildEventListener(C context) {
+        Consumer<String> writer = determineWriter(context);
+        return new SimpleBuildEventListener(writer);
     }
 
     @Override

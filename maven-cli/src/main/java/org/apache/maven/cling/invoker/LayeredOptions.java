@@ -18,12 +18,12 @@
  */
 package org.apache.maven.cling.invoker;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.api.cli.Options;
@@ -138,10 +138,10 @@ public abstract class LayeredOptions<O extends Options> implements Options {
     }
 
     @Override
-    public void warnAboutDeprecatedOptions(ParserRequest request, PrintWriter printWriter) {}
+    public void warnAboutDeprecatedOptions(ParserRequest request, Consumer<String> printWriter) {}
 
     @Override
-    public void displayHelp(ParserRequest request, PrintWriter printWriter) {
+    public void displayHelp(ParserRequest request, Consumer<String> printWriter) {
         options.get(0).displayHelp(request, printWriter);
     }
 

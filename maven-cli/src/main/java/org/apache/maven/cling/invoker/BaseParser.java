@@ -111,8 +111,8 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         List<O> parsedOptions = parseCliOptions(context);
 
         // warn about deprecated options
-        parsedOptions.forEach(o -> o.warnAboutDeprecatedOptions(
-                parserRequest, new PrintWriter(parserRequest.out() != null ? parserRequest.out() : System.out, true)));
+        PrintWriter printWriter = new PrintWriter(parserRequest.out() != null ? parserRequest.out() : System.out, true);
+        parsedOptions.forEach(o -> o.warnAboutDeprecatedOptions(parserRequest, printWriter::println));
 
         // assemble options if needed
         context.options = assembleOptions(parsedOptions);
