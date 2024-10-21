@@ -74,10 +74,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
-import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
-import org.apache.maven.logging.ProjectBuildLogAppender;
-import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.eclipse.aether.transfer.TransferListener;
@@ -155,7 +152,6 @@ public abstract class LookupInvoker<
         public Slf4jConfiguration.Level loggerLevel;
         public Terminal terminal;
         public Consumer<String> writer;
-        public BuildEventListener buildEventListener;
         public ClassLoader currentThreadContextClassLoader;
         public ContainerCapsule containerCapsule;
         public Lookup lookup;
@@ -314,11 +310,6 @@ public abstract class LookupInvoker<
         // so boot it asynchronously
         context.terminal = createTerminal(context);
         context.closeables.add(MessageUtils::systemUninstall);
-
-        // Create the build log appender
-        ProjectBuildLogAppender projectBuildLogAppender =
-                new ProjectBuildLogAppender(determineBuildEventListener(context));
-        context.closeables.add(projectBuildLogAppender);
     }
 
     protected Terminal createTerminal(C context) {
@@ -350,18 +341,6 @@ public abstract class LookupInvoker<
             System.setErr(new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream());
             // no need to set them back, this is already handled by MessageUtils.systemUninstall() above
         }
-    }
-
-    protected BuildEventListener determineBuildEventListener(C context) {
-        if (context.buildEventListener == null) {
-            context.buildEventListener = doDetermineBuildEventListener(context);
-        }
-        return context.buildEventListener;
-    }
-
-    protected BuildEventListener doDetermineBuildEventListener(C context) {
-        Consumer<String> writer = determineWriter(context);
-        return new SimpleBuildEventListener(writer);
     }
 
     protected Consumer<String> determineWriter(C context) {
