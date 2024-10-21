@@ -796,6 +796,7 @@ under the License.</licenseText>
                 <exclude>**/*.svg</exclude>
                 <exclude>.asf.yaml</exclude>
                 <exclude>.mvn/**</exclude>
+                <exclude>.jbang/**</exclude>
                 <!--
                   ! Excluded the license files itself cause they do not have have a license of themselves.
                 -->
@@ -851,6 +852,50 @@ under the License.</licenseText>
                 </enforceBytecodeVersion>
               </rules>
               <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.fusesource.mvnplugins</groupId>
+        <artifactId>maven-graph-plugin</artifactId>
+        <version>1.45</version>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <id>graph</id>
+            <goals>
+              <goal>reactor</goal>
+            </goals>
+            <phase>pre-site</phase>
+            <configuration>
+              <hideVersion>true</hideVersion>
+              <hideGroupId>true</hideGroupId>
+              <hideScopes>test</hideScopes>
+              <hideTransitive>true</hideTransitive>
+              <keepDot>true</keepDot>
+              <target>${project.build.directory}/graph/reactor-graph.dot</target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>dev.jbang</groupId>
+        <artifactId>jbang-maven-plugin</artifactId>
+        <version>0.0.8</version>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <id>graph</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>pre-site</phase>
+            <configuration>
+              <script>${project.basedir}/src/graph/ReactorGraph.java</script>
+              <jbangargs>
+                <arg>--verbose</arg>
+              </jbangargs>
             </configuration>
           </execution>
         </executions>
