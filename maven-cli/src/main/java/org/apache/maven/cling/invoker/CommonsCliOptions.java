@@ -19,10 +19,12 @@
 package org.apache.maven.cling.invoker;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -210,11 +212,11 @@ public abstract class CommonsCliOptions implements Options {
     }
 
     @Override
-    public void warnAboutDeprecatedOptions(ParserRequest request, PrintWriter printWriter) {
+    public void warnAboutDeprecatedOptions(ParserRequest request, Consumer<String> printWriter) {
         if (cliManager.getUsedDeprecatedOptions().isEmpty()) {
             return;
         }
-        printWriter.println("Detected deprecated option use in " + source);
+        printWriter.accept("Detected deprecated option use in " + source);
         for (Option option : cliManager.getUsedDeprecatedOptions()) {
             StringBuilder sb = new StringBuilder();
             sb.append("The option -").append(option.getOpt());
@@ -231,12 +233,12 @@ public abstract class CommonsCliOptions implements Options {
                         .append(" ")
                         .append(option.getDeprecated().getSince());
             }
-            printWriter.println(sb);
+            printWriter.accept(sb.toString());
         }
     }
 
     @Override
-    public void displayHelp(ParserRequest request, PrintWriter printStream) {
+    public void displayHelp(ParserRequest request, Consumer<String> printStream) {
         cliManager.displayHelp(request.command(), printStream);
     }
 
@@ -424,7 +426,7 @@ public abstract class CommonsCliOptions implements Options {
             return usedDeprecatedOptions;
         }
 
-        public void displayHelp(String command, PrintWriter pw) {
+        public void displayHelp(String command, Consumer<String> pw) {
             HelpFormatter formatter = new HelpFormatter();
 
             int width = MessageUtils.getTerminalWidth();
@@ -432,10 +434,12 @@ public abstract class CommonsCliOptions implements Options {
                 width = HelpFormatter.DEFAULT_WIDTH;
             }
 
-            pw.println();
+            pw.accept("");
 
+            StringWriter sw = new StringWriter();
+            PrintWriter pw2 = new PrintWriter(sw);
             formatter.printHelp(
-                    pw,
+                    pw2,
                     width,
                     commandLineSyntax(command),
                     System.lineSeparator() + "Options:",
@@ -444,8 +448,10 @@ public abstract class CommonsCliOptions implements Options {
                     HelpFormatter.DEFAULT_DESC_PAD,
                     System.lineSeparator(),
                     false);
-
-            pw.flush();
+            pw2.flush();
+            for (String s : sw.toString().split(System.lineSeparator())) {
+                pw.accept(s);
+            }
         }
 
         protected String commandLineSyntax(String command) {

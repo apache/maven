@@ -18,10 +18,10 @@
  */
 package org.apache.maven.api.cli;
 
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -202,14 +202,14 @@ public interface Options {
     /**
      * Emits warning messages if deprecated options are used.
      *
-     * @param printWriter the PrintWriter to use for output
+     * @param printWriter the string consumer to use for output
      */
-    default void warnAboutDeprecatedOptions(@Nonnull ParserRequest request, @Nonnull PrintWriter printWriter) {}
+    default void warnAboutDeprecatedOptions(@Nonnull ParserRequest request, @Nonnull Consumer<String> printWriter) {}
 
     /**
      * Displays help information for these options.
      *
-     * @param printWriter the PrintWriter to use for output
+     * @param printWriter the string consumer to use for output
      */
-    void displayHelp(@Nonnull ParserRequest request, @Nonnull PrintWriter printWriter);
+    void displayHelp(@Nonnull ParserRequest request, @Nonnull Consumer<String> printWriter);
 }

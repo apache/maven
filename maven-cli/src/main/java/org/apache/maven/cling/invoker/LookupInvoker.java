@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
@@ -153,6 +154,7 @@ public abstract class LookupInvoker<
         public Slf4jConfiguration slf4jConfiguration;
         public Slf4jConfiguration.Level loggerLevel;
         public Terminal terminal;
+        public Consumer<String> writer;
         public BuildEventListener buildEventListener;
         public ClassLoader currentThreadContextClassLoader;
         public ContainerCapsule containerCapsule;
@@ -358,27 +360,38 @@ public abstract class LookupInvoker<
     }
 
     protected BuildEventListener doDetermineBuildEventListener(C context) {
-        BuildEventListener bel;
+        Consumer<String> writer = determineWriter(context);
+        return new SimpleBuildEventListener(writer);
+    }
+
+    protected Consumer<String> determineWriter(C context) {
+        Consumer<String> writer = context.writer;
+        if (writer == null) {
+            context.writer = doDetermineWriter(context);
+        }
+        return writer;
+    }
+
+    protected Consumer<String> doDetermineWriter(C context) {
         O options = context.invokerRequest.options();
         if (options.logFile().isPresent()) {
             Path logFile = context.cwdResolver.apply(options.logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile));
                 context.closeables.add(printWriter);
-                bel = new SimpleBuildEventListener(printWriter::println);
+                return printWriter::println;
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
             }
         } else {
             // Given the terminal creation has been offloaded to a different thread,
-            // do not pass directory the terminal writer
-            bel = new SimpleBuildEventListener(msg -> {
+            // do not pass directly the terminal writer
+            return msg -> {
                 PrintWriter pw = context.terminal.writer();
                 pw.println(msg);
                 pw.flush();
-            });
+            };
         }
-        return bel;
     }
 
     protected void activateLogging(C context) throws Exception {
@@ -414,19 +427,18 @@ public abstract class LookupInvoker<
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {
+        Consumer<String> writer = determineWriter(context);
         R invokerRequest = context.invokerRequest;
         if (invokerRequest.options().help().isPresent()) {
-            invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), context.terminal.writer());
-            context.terminal.writer().flush();
+            invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), writer);
             throw new ExitException(0);
         }
         if (invokerRequest.options().showVersionAndExit().isPresent()) {
             if (invokerRequest.options().quiet().orElse(false)) {
-                context.terminal.writer().println(CLIReportingUtils.showVersionMinimal());
+                writer.accept(CLIReportingUtils.showVersionMinimal());
             } else {
-                context.terminal.writer().println(CLIReportingUtils.showVersion());
+                writer.accept(CLIReportingUtils.showVersion());
             }
-            context.terminal.writer().flush();
             throw new ExitException(0);
         }
     }
@@ -434,7 +446,7 @@ public abstract class LookupInvoker<
     protected void preCommands(C context) throws Exception {
         Options mavenOptions = context.invokerRequest.options();
         if (mavenOptions.verbose().orElse(false) || mavenOptions.showVersion().orElse(false)) {
-            context.terminal.writer().println(CLIReportingUtils.showVersion());
+            determineWriter(context).accept(CLIReportingUtils.showVersion());
         }
     }
 
