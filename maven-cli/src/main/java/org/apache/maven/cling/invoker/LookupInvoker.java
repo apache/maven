@@ -150,6 +150,7 @@ public abstract class LookupInvoker<
         public ILoggerFactory loggerFactory;
         public Slf4jConfiguration slf4jConfiguration;
         public Slf4jConfiguration.Level loggerLevel;
+        public Boolean coloredOutput;
         public Terminal terminal;
         public Consumer<String> writer;
         public ClassLoader currentThreadContextClassLoader;
@@ -279,9 +280,9 @@ public abstract class LookupInvoker<
                 .orElse(userProperties.getOrDefault(
                         Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")));
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
-            MessageUtils.setColorEnabled(true);
+            context.coloredOutput = true;
         } else if ("never".equals(styleColor) || "no".equals(styleColor) || "none".equals(styleColor)) {
-            MessageUtils.setColorEnabled(false);
+            context.coloredOutput = false;
         } else if (!"auto".equals(styleColor) && !"tty".equals(styleColor) && !"if-tty".equals(styleColor)) {
             throw new IllegalArgumentException(
                     "Invalid color configuration value '" + styleColor + "'. Supported are 'auto', 'always', 'never'.");
@@ -289,7 +290,7 @@ public abstract class LookupInvoker<
             boolean isBatchMode = !mavenOptions.forceInteractive().orElse(false)
                     && mavenOptions.nonInteractive().orElse(false);
             if (isBatchMode || mavenOptions.logFile().isPresent()) {
-                MessageUtils.setColorEnabled(false);
+                context.coloredOutput = false;
             }
         }
 
@@ -314,15 +315,21 @@ public abstract class LookupInvoker<
 
     protected Terminal createTerminal(C context) {
         return new FastTerminal(
-                () -> TerminalBuilder.builder()
-                        .name("Maven")
-                        .streams(
-                                context.invokerRequest.in().orElse(null),
-                                context.invokerRequest.out().orElse(null))
-                        .dumb(true)
-                        .exec(false)
-                        .systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut)
-                        .build(),
+                () -> {
+                    TerminalBuilder builder = TerminalBuilder.builder()
+                            .name("Maven")
+                            .streams(
+                                    context.invokerRequest.in().orElse(null),
+                                    context.invokerRequest.out().orElse(null))
+                            .dumb(true)
+                            .exec(false)
+                            .systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+                    if (context.coloredOutput != null) {
+                        builder.color(context.coloredOutput);
+                        MessageUtils.setColorEnabled(context.coloredOutput);
+                    }
+                    return builder.build();
+                },
                 terminal -> doConfigureWithTerminal(context, terminal));
     }
 
