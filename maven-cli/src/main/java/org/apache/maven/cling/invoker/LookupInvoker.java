@@ -344,11 +344,10 @@ public abstract class LookupInvoker<
     }
 
     protected Consumer<String> determineWriter(C context) {
-        Consumer<String> writer = context.writer;
-        if (writer == null) {
+        if (context.writer == null) {
             context.writer = doDetermineWriter(context);
         }
-        return writer;
+        return context.writer;
     }
 
     protected Consumer<String> doDetermineWriter(C context) {
