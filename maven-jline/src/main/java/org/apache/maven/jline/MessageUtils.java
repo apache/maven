@@ -18,6 +18,8 @@
  */
 package org.apache.maven.jline;
 
+import java.util.function.Consumer;
+
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.jline.jansi.AnsiConsole;
@@ -41,11 +43,26 @@ public class MessageUtils {
     }
 
     public static void systemInstall() {
+        systemInstall(null, null);
+    }
+
+    public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, Consumer<Terminal> terminalConsumer) {
         MessageUtils.terminal = new FastTerminal(
-                () -> TerminalBuilder.builder().name("Maven").dumb(true).build(), terminal -> {
+                () -> {
+                    TerminalBuilder builder =
+                            TerminalBuilder.builder().name("Maven").dumb(true);
+                    if (builderConsumer != null) {
+                        builderConsumer.accept(builder);
+                    }
+                    return builder.build();
+                },
+                terminal -> {
                     MessageUtils.reader = createReader(terminal);
                     AnsiConsole.setTerminal(terminal);
                     AnsiConsole.systemInstall();
+                    if (terminalConsumer != null) {
+                        terminalConsumer.accept(terminal);
+                    }
                 });
     }
 

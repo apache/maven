@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
@@ -71,16 +72,11 @@ import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.cling.invoker.mvn.ProtoSession;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.SettingsUtilsV4;
-import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
-import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
-import org.apache.maven.logging.ProjectBuildLogAppender;
-import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.eclipse.aether.transfer.TransferListener;
-import org.jline.jansi.AnsiConsole;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.slf4j.ILoggerFactory;
@@ -152,8 +148,9 @@ public abstract class LookupInvoker<
         public ILoggerFactory loggerFactory;
         public Slf4jConfiguration slf4jConfiguration;
         public Slf4jConfiguration.Level loggerLevel;
+        public Boolean coloredOutput;
         public Terminal terminal;
-        public BuildEventListener buildEventListener;
+        public Consumer<String> writer;
         public ClassLoader currentThreadContextClassLoader;
         public ContainerCapsule containerCapsule;
         public Lookup lookup;
@@ -281,9 +278,9 @@ public abstract class LookupInvoker<
                 .orElse(userProperties.getOrDefault(
                         Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")));
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
-            MessageUtils.setColorEnabled(true);
+            context.coloredOutput = true;
         } else if ("never".equals(styleColor) || "no".equals(styleColor) || "none".equals(styleColor)) {
-            MessageUtils.setColorEnabled(false);
+            context.coloredOutput = false;
         } else if (!"auto".equals(styleColor) && !"tty".equals(styleColor) && !"if-tty".equals(styleColor)) {
             throw new IllegalArgumentException(
                     "Invalid color configuration value '" + styleColor + "'. Supported are 'auto', 'always', 'never'.");
@@ -291,7 +288,7 @@ public abstract class LookupInvoker<
             boolean isBatchMode = !mavenOptions.forceInteractive().orElse(false)
                     && mavenOptions.nonInteractive().orElse(false);
             if (isBatchMode || mavenOptions.logFile().isPresent()) {
-                MessageUtils.setColorEnabled(false);
+                context.coloredOutput = false;
             }
         }
 
@@ -312,31 +309,32 @@ public abstract class LookupInvoker<
         // so boot it asynchronously
         context.terminal = createTerminal(context);
         context.closeables.add(MessageUtils::systemUninstall);
-
-        // Create the build log appender
-        ProjectBuildLogAppender projectBuildLogAppender =
-                new ProjectBuildLogAppender(determineBuildEventListener(context));
-        context.closeables.add(projectBuildLogAppender);
+        MessageUtils.registerShutdownHook(); // safety belt
+        if (context.coloredOutput != null) {
+            MessageUtils.setColorEnabled(context.coloredOutput);
+        }
     }
 
     protected Terminal createTerminal(C context) {
-        return new FastTerminal(
-                () -> TerminalBuilder.builder()
-                        .name("Maven")
-                        .streams(
-                                context.invokerRequest.in().orElse(null),
-                                context.invokerRequest.out().orElse(null))
-                        .dumb(true)
-                        .build(),
+        MessageUtils.systemInstall(
+                builder -> {
+                    builder.streams(
+                            context.invokerRequest.in().orElse(null),
+                            context.invokerRequest.out().orElse(null));
+                    builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+                    // The exec builder suffers from https://github.com/jline/jline3/issues/1098
+                    // We could re-enable it when fixed to provide support for non-standard architectures,
+                    // for which JLine does not provide any native library.
+                    builder.exec(false);
+                    if (context.coloredOutput != null) {
+                        builder.color(context.coloredOutput);
+                    }
+                },
                 terminal -> doConfigureWithTerminal(context, terminal));
+        return MessageUtils.getTerminal();
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
-        MessageUtils.systemInstall(terminal);
-        AnsiConsole.setTerminal(terminal);
-        AnsiConsole.systemInstall();
-        MessageUtils.registerShutdownHook(); // safety belt
-
         O options = context.invokerRequest.options();
         if (options.rawStreams().isEmpty() || !options.rawStreams().get()) {
             MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
@@ -349,34 +347,33 @@ public abstract class LookupInvoker<
         }
     }
 
-    protected BuildEventListener determineBuildEventListener(C context) {
-        if (context.buildEventListener == null) {
-            context.buildEventListener = doDetermineBuildEventListener(context);
+    protected Consumer<String> determineWriter(C context) {
+        if (context.writer == null) {
+            context.writer = doDetermineWriter(context);
         }
-        return context.buildEventListener;
+        return context.writer;
     }
 
-    protected BuildEventListener doDetermineBuildEventListener(C context) {
-        BuildEventListener bel;
+    protected Consumer<String> doDetermineWriter(C context) {
         O options = context.invokerRequest.options();
         if (options.logFile().isPresent()) {
             Path logFile = context.cwdResolver.apply(options.logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile));
-                bel = new SimpleBuildEventListener(printWriter::println);
+                context.closeables.add(printWriter);
+                return printWriter::println;
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
             }
         } else {
             // Given the terminal creation has been offloaded to a different thread,
-            // do not pass directory the terminal writer
-            bel = new SimpleBuildEventListener(msg -> {
+            // do not pass directly the terminal writer
+            return msg -> {
                 PrintWriter pw = context.terminal.writer();
                 pw.println(msg);
                 pw.flush();
-            });
+            };
         }
-        return bel;
     }
 
     protected void activateLogging(C context) throws Exception {
@@ -412,19 +409,18 @@ public abstract class LookupInvoker<
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {
+        Consumer<String> writer = determineWriter(context);
         R invokerRequest = context.invokerRequest;
         if (invokerRequest.options().help().isPresent()) {
-            invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), context.terminal.writer());
-            context.terminal.writer().flush();
+            invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), writer);
             throw new ExitException(0);
         }
         if (invokerRequest.options().showVersionAndExit().isPresent()) {
             if (invokerRequest.options().quiet().orElse(false)) {
-                context.terminal.writer().println(CLIReportingUtils.showVersionMinimal());
+                writer.accept(CLIReportingUtils.showVersionMinimal());
             } else {
-                context.terminal.writer().println(CLIReportingUtils.showVersion());
+                writer.accept(CLIReportingUtils.showVersion());
             }
-            context.terminal.writer().flush();
             throw new ExitException(0);
         }
     }
@@ -432,7 +428,7 @@ public abstract class LookupInvoker<
     protected void preCommands(C context) throws Exception {
         Options mavenOptions = context.invokerRequest.options();
         if (mavenOptions.verbose().orElse(false) || mavenOptions.showVersion().orElse(false)) {
-            context.terminal.writer().println(CLIReportingUtils.showVersion());
+            determineWriter(context).accept(CLIReportingUtils.showVersion());
         }
     }
 
