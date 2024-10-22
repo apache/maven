@@ -108,7 +108,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                     // guard against case where best-effort resolution for invalid models is requested
                     continue;
                 }
-                collect.addDependency(RepositoryUtils.toDependency(dependency, stereotypes));
+                mayAddCollectDirectDependency(collect, request, RepositoryUtils.toDependency(dependency, stereotypes));
             }
         } else {
             Map<String, Dependency> dependencies = new HashMap<>();
@@ -136,7 +136,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                     art = art.setFile(null).setVersion(art.getBaseVersion());
                     dep = dep.setArtifact(art);
                 }
-                collect.addDependency(dep);
+                mayAddCollectDirectDependency(collect, request, dep);
             }
         }
 
@@ -194,6 +194,16 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         }
 
         return result;
+    }
+
+    private void mayAddCollectDirectDependency(
+            CollectRequest collectRequest,
+            DependencyResolutionRequest request,
+            org.eclipse.aether.graph.Dependency dependency) {
+        if (request.getCollectScopesToExclude() == null
+                || !request.getCollectScopesToExclude().contains(dependency.getScope())) {
+            collectRequest.addDependency(dependency);
+        }
     }
 
     private void process(DefaultDependencyResolutionResult result, Collection<ArtifactResult> results) {
