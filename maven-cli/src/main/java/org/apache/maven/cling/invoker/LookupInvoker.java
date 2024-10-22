@@ -72,15 +72,12 @@ import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.cling.invoker.mvn.ProtoSession;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.SettingsUtilsV4;
-import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.eclipse.aether.transfer.TransferListener;
-import org.jline.jansi.AnsiConsole;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
@@ -311,34 +308,31 @@ public abstract class LookupInvoker<
         // so boot it asynchronously
         context.terminal = createTerminal(context);
         context.closeables.add(MessageUtils::systemUninstall);
+        MessageUtils.registerShutdownHook(); // safety belt
+        if (context.coloredOutput != null) {
+            MessageUtils.setColorEnabled(context.coloredOutput);
+        }
     }
 
     protected Terminal createTerminal(C context) {
-        return new FastTerminal(
-                () -> {
-                    TerminalBuilder builder = TerminalBuilder.builder()
-                            .name("Maven")
-                            .streams(
-                                    context.invokerRequest.in().orElse(null),
-                                    context.invokerRequest.out().orElse(null))
-                            .dumb(true)
-                            .exec(false)
-                            .systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+        MessageUtils.systemInstall(
+                builder -> {
+                    builder.streams(
+                            context.invokerRequest.in().orElse(null),
+                            context.invokerRequest.out().orElse(null));
+                    // The exec builder suffers from https://github.com/jline/jline3/issues/1098
+                    // We could re-enable it when fixed to provide support for non-standard architectures,
+                    // for which JLine does not provide any native library.
+                    builder.exec(false);
                     if (context.coloredOutput != null) {
                         builder.color(context.coloredOutput);
-                        MessageUtils.setColorEnabled(context.coloredOutput);
                     }
-                    return builder.build();
                 },
                 terminal -> doConfigureWithTerminal(context, terminal));
+        return MessageUtils.getTerminal();
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
-        MessageUtils.systemInstall(terminal);
-        AnsiConsole.setTerminal(terminal);
-        AnsiConsole.systemInstall();
-        MessageUtils.registerShutdownHook(); // safety belt
-
         O options = context.invokerRequest.options();
         if (options.rawStreams().isEmpty() || !options.rawStreams().get()) {
             MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
