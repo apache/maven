@@ -78,6 +78,7 @@ import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.eclipse.aether.transfer.TransferListener;
 import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
@@ -320,6 +321,7 @@ public abstract class LookupInvoker<
                     builder.streams(
                             context.invokerRequest.in().orElse(null),
                             context.invokerRequest.out().orElse(null));
+                    builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
                     // The exec builder suffers from https://github.com/jline/jline3/issues/1098
                     // We could re-enable it when fixed to provide support for non-standard architectures,
                     // for which JLine does not provide any native library.
