@@ -268,66 +268,7 @@ public class DefaultInterpolator implements Interpolator {
         String variable = val.substring(startDelim + DELIM_START.length(), stopDelim);
         String org = variable;
 
-        // Strip expansion modifiers
-        int idx1 = variable.lastIndexOf(":-");
-        int idx2 = variable.lastIndexOf(":+");
-        int idx = idx1 >= 0 ? idx2 >= 0 ? Math.min(idx1, idx2) : idx1 : idx2;
-        String op = null;
-        if (idx >= 0) {
-            op = variable.substring(idx);
-            variable = variable.substring(0, idx);
-        }
-
-        // Verify that this is not a recursive variable reference.
-        if (!cycleMap.add(variable)) {
-            throw new InterpolatorException("recursive variable reference: " + variable);
-        }
-
-        String substValue = null;
-        // Get the value of the deepest nested variable placeholder.
-        // Try to configuration properties first.
-        if (configProps != null) {
-            substValue = configProps.get(variable);
-        }
-        if (substValue == null) {
-            if (!variable.isEmpty()) {
-                if (callback != null) {
-                    String s1 = callback.apply(variable);
-                    String s2 = doSubstVars(
-                            s1, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
-                    substValue = postprocessor != null ? postprocessor.apply(variable, s2) : s2;
-                }
-            }
-        }
-
-        if (op != null) {
-            if (op.startsWith(":-")) {
-                if (substValue == null || substValue.isEmpty()) {
-                    substValue = op.substring(":-".length());
-                }
-            } else if (op.startsWith(":+")) {
-                if (substValue != null && !substValue.isEmpty()) {
-                    substValue = op.substring(":+".length());
-                }
-            } else {
-                throw new InterpolatorException("Bad substitution: ${" + org + "}");
-            }
-        }
-
-        if (substValue == null) {
-            if (defaultsToEmptyString) {
-                substValue = "";
-            } else {
-                // alters the original token to avoid infinite recursion
-                // altered tokens are reverted in unescape()
-                substValue = MARKER + "{" + variable + "}";
-            }
-        }
-
-        // Remove the found variable from the cycle map, since
-        // it may appear more than once in the value and we don't
-        // want such situations to appear as a recursive reference.
-        cycleMap.remove(variable);
+        String substValue = processSubstitution(variable, org, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
 
         // Append the leading characters, the substituted value of
         // the variable, and the trailing characters to get the new
@@ -342,6 +283,107 @@ public class DefaultInterpolator implements Interpolator {
 
         // Return the value.
         return val;
+    }
+
+    private static String processSubstitution(
+            String variable,
+            String org,
+            Set<String> cycleMap,
+            Map<String, String> configProps,
+            Function<String, String> callback,
+            BiFunction<String, String, String> postprocessor,
+            boolean defaultsToEmptyString) {
+
+        // Process chained operators from left to right
+        int startIdx = 0;
+        String currentVar = variable;
+        String substValue = null;
+
+        while (startIdx < variable.length()) {
+            int idx1 = variable.indexOf(":-", startIdx);
+            int idx2 = variable.indexOf(":+", startIdx);
+            int idx = idx1 >= 0 ? idx2 >= 0 ? Math.min(idx1, idx2) : idx1 : idx2;
+
+            if (idx < 0) {
+                // No more operators, process the final variable
+                if (substValue == null) {
+                    currentVar = variable.substring(startIdx);
+                    substValue = resolveVariable(currentVar, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+                }
+                break;
+            }
+
+            // Get the current variable part before the operator
+            String varPart = variable.substring(startIdx, idx);
+            if (substValue == null) {
+                substValue = resolveVariable(varPart, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+            }
+
+            // Find the end of the current operator's value
+            int nextIdx1 = variable.indexOf(":-", idx + 2);
+            int nextIdx2 = variable.indexOf(":+", idx + 2);
+            int nextIdx = nextIdx1 >= 0 ? nextIdx2 >= 0 ? Math.min(nextIdx1, nextIdx2) : nextIdx1 : nextIdx2;
+
+            String op = variable.substring(idx, idx + 2);
+            String opValue = variable.substring(idx + 2, nextIdx >= 0 ? nextIdx : variable.length());
+
+            // Process the operator value through substitution if it contains variables
+            String processedOpValue = doSubstVars(opValue, org, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+
+            // Apply the operator
+            if (":+".equals(op)) {
+                if (substValue != null && !substValue.isEmpty()) {
+                    substValue = processedOpValue;
+                }
+            } else if (":-".equals(op)) {
+                if (substValue == null || substValue.isEmpty()) {
+                    substValue = processedOpValue;
+                }
+            } else {
+                throw new InterpolatorException("Bad substitution operator in: ${" + org + "}");
+            }
+
+            startIdx = nextIdx >= 0 ? nextIdx : variable.length();
+        }
+
+        if (substValue == null) {
+            if (defaultsToEmptyString) {
+                substValue = "";
+            } else {
+                substValue = MARKER + "{" + variable + "}";
+            }
+        }
+
+        return substValue;
+    }
+
+    private static String resolveVariable(
+            String variable,
+            Set<String> cycleMap,
+            Map<String, String> configProps,
+            Function<String, String> callback,
+            BiFunction<String, String, String> postprocessor,
+            boolean defaultsToEmptyString) {
+
+        // Verify that this is not a recursive variable reference
+        if (!cycleMap.add(variable)) {
+            throw new InterpolatorException("recursive variable reference: " + variable);
+        }
+
+        String substValue = null;
+        // Try configuration properties first
+        if (configProps != null) {
+            substValue = configProps.get(variable);
+        }
+        if (substValue == null && !variable.isEmpty() && callback != null) {
+            String s1 = callback.apply(variable);
+            String s2 = doSubstVars(s1, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+            substValue = postprocessor != null ? postprocessor.apply(variable, s2) : s2;
+        }
+
+        // Remove the variable from cycle map
+        cycleMap.remove(variable);
+        return substValue;
     }
 
     /**
