@@ -187,7 +187,7 @@ under the License.
     <slf4jVersion>2.0.16</slf4jVersion>
     <stax2ApiVersion>4.2.2</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
-    <woodstoxVersion>7.0.0</woodstoxVersion>
+    <woodstoxVersion>7.1.0</woodstoxVersion>
     <xmlunitVersion>2.10.0</xmlunitVersion>
   </properties>
 
