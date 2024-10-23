@@ -268,7 +268,8 @@ public class DefaultInterpolator implements Interpolator {
         String variable = val.substring(startDelim + DELIM_START.length(), stopDelim);
         String org = variable;
 
-        String substValue = processSubstitution(variable, org, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+        String substValue = processSubstitution(
+                variable, org, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
 
         // Append the leading characters, the substituted value of
         // the variable, and the trailing characters to get the new
@@ -308,7 +309,8 @@ public class DefaultInterpolator implements Interpolator {
                 // No more operators, process the final variable
                 if (substValue == null) {
                     currentVar = variable.substring(startIdx);
-                    substValue = resolveVariable(currentVar, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+                    substValue = resolveVariable(
+                            currentVar, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
                 }
                 break;
             }
@@ -316,7 +318,8 @@ public class DefaultInterpolator implements Interpolator {
             // Get the current variable part before the operator
             String varPart = variable.substring(startIdx, idx);
             if (substValue == null) {
-                substValue = resolveVariable(varPart, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+                substValue =
+                        resolveVariable(varPart, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
             }
 
             // Find the end of the current operator's value
@@ -328,7 +331,8 @@ public class DefaultInterpolator implements Interpolator {
             String opValue = variable.substring(idx + 2, nextIdx >= 0 ? nextIdx : variable.length());
 
             // Process the operator value through substitution if it contains variables
-            String processedOpValue = doSubstVars(opValue, org, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+            String processedOpValue =
+                    doSubstVars(opValue, org, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
 
             // Apply the operator
             if (":+".equals(op)) {
@@ -377,7 +381,8 @@ public class DefaultInterpolator implements Interpolator {
         }
         if (substValue == null && !variable.isEmpty() && callback != null) {
             String s1 = callback.apply(variable);
-            String s2 = doSubstVars(s1, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+            String s2 =
+                    doSubstVars(s1, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
             substValue = postprocessor != null ? postprocessor.apply(variable, s2) : s2;
         }
 
