@@ -39,7 +39,7 @@ public class ProjectStub implements Project {
     private boolean topProject;
     private Path rootDirectory;
     private Map<String, String> properties = new HashMap<>();
-    private Artifact mainArtifact;
+    private ProducedArtifact mainArtifact;
 
     public void setModel(Model model) {
         this.model = model;
@@ -119,8 +119,8 @@ public class ProjectStub implements Project {
     }
 
     @Override
-    public List<Artifact> getArtifacts() {
-        Artifact pomArtifact = new ArtifactStub(getGroupId(), getArtifactId(), "", getVersion(), "pom");
+    public List<ProducedArtifact> getArtifacts() {
+        ProducedArtifact pomArtifact = new ProducedArtifactStub(getGroupId(), getArtifactId(), "", getVersion(), "pom");
         return mainArtifact != null ? Arrays.asList(pomArtifact, mainArtifact) : Arrays.asList(pomArtifact);
     }
 
@@ -138,13 +138,13 @@ public class ProjectStub implements Project {
 
     @Nonnull
     @Override
-    public List<DependencyCoordinate> getDependencies() {
+    public List<DependencyCoordinates> getDependencies() {
         return null;
     }
 
     @Nonnull
     @Override
-    public List<DependencyCoordinate> getManagedDependencies() {
+    public List<DependencyCoordinates> getManagedDependencies() {
         return null;
     }
 
@@ -212,7 +212,7 @@ public class ProjectStub implements Project {
         return this;
     }
 
-    public ProjectStub setMainArtifact(Artifact mainArtifact) {
+    public ProjectStub setMainArtifact(ProducedArtifact mainArtifact) {
         this.mainArtifact = mainArtifact;
         return this;
     }

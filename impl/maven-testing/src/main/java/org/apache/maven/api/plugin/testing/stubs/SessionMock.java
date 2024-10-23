@@ -34,6 +34,7 @@ import java.util.function.Supplier;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -55,11 +56,11 @@ import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
+import org.apache.maven.internal.impl.DefaultModelVersionParser;
 import org.apache.maven.internal.impl.DefaultModelXmlFactory;
 import org.apache.maven.internal.impl.DefaultVersionParser;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.v4.MavenStaxReader;
-import org.apache.maven.repository.internal.DefaultModelVersionParser;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.mockito.ArgumentMatchers;
 
@@ -223,7 +224,7 @@ public class SessionMock {
                     Project project = iom.getArgument(1, Project.class);
                     String type = iom.getArgument(2, String.class);
                     Path path = iom.getArgument(3, Path.class);
-                    Artifact artifact = session.createArtifact(
+                    ProducedArtifact artifact = session.createProducedArtifact(
                             project.getGroupId(), project.getArtifactId(), project.getVersion(), null, null, type);
                     artifactManager.setPath(artifact, path);
                     attachedArtifacts
@@ -235,7 +236,7 @@ public class SessionMock {
                 .attachArtifact(same(session), any(Project.class), any(), any());
         doAnswer(iom -> {
                     Project project = iom.getArgument(0, Project.class);
-                    Artifact artifact = iom.getArgument(1, Artifact.class);
+                    ProducedArtifact artifact = iom.getArgument(1, ProducedArtifact.class);
                     Path path = iom.getArgument(2, Path.class);
                     artifactManager.setPath(artifact, path);
                     attachedArtifacts
@@ -244,7 +245,7 @@ public class SessionMock {
                     return null;
                 })
                 .when(projectManager)
-                .attachArtifact(any(Project.class), any(Artifact.class), any(Path.class));
+                .attachArtifact(any(Project.class), any(ProducedArtifact.class), any(Path.class));
         when(projectManager.getAttachedArtifacts(any()))
                 .then(iom ->
                         attachedArtifacts.computeIfAbsent(iom.getArgument(0, Project.class), p -> new ArrayList<>()));
@@ -273,6 +274,20 @@ public class SessionMock {
                 extension = type != null ? type : "";
             }
             return new ArtifactStub(
+                    request.getGroupId(), request.getArtifactId(), classifier, request.getVersion(), extension);
+        });
+        when(artifactFactory.createProduced(any())).then(iom -> {
+            ArtifactFactoryRequest request = iom.getArgument(0, ArtifactFactoryRequest.class);
+            String classifier = request.getClassifier();
+            String extension = request.getExtension();
+            String type = request.getType();
+            if (classifier == null) {
+                classifier = "";
+            }
+            if (extension == null) {
+                extension = type != null ? type : "";
+            }
+            return new ProducedArtifactStub(
                     request.getGroupId(), request.getArtifactId(), classifier, request.getVersion(), extension);
         });
         when(session.createArtifact(any(), any(), any(), any(), any(), any())).thenAnswer(iom -> {
@@ -307,6 +322,39 @@ public class SessionMock {
                             .extension(extension)
                             .build());
         });
+        when(session.createProducedArtifact(any(), any(), any(), any(), any(), any()))
+                .thenAnswer(iom -> {
+                    String groupId = iom.getArgument(0, String.class);
+                    String artifactId = iom.getArgument(1, String.class);
+                    String version = iom.getArgument(2, String.class);
+                    String classifier = iom.getArgument(3, String.class);
+                    String extension = iom.getArgument(4, String.class);
+                    String type = iom.getArgument(5, String.class);
+                    return session.getService(ArtifactFactory.class)
+                            .createProduced(ArtifactFactoryRequest.builder()
+                                    .session(session)
+                                    .groupId(groupId)
+                                    .artifactId(artifactId)
+                                    .version(version)
+                                    .classifier(classifier)
+                                    .extension(extension)
+                                    .type(type)
+                                    .build());
+                });
+        when(session.createProducedArtifact(any(), any(), any(), any())).thenAnswer(iom -> {
+            String groupId = iom.getArgument(0, String.class);
+            String artifactId = iom.getArgument(1, String.class);
+            String version = iom.getArgument(2, String.class);
+            String extension = iom.getArgument(3, String.class);
+            return session.getService(ArtifactFactory.class)
+                    .createProduced(ArtifactFactoryRequest.builder()
+                            .session(session)
+                            .groupId(groupId)
+                            .artifactId(artifactId)
+                            .version(version)
+                            .extension(extension)
+                            .build());
+        });
         when(session.getService(ArtifactFactory.class)).thenReturn(artifactFactory);
 
         //
@@ -319,7 +367,7 @@ public class SessionMock {
             Model model = new MavenStaxReader().read(request.getSource().get().openStream());
             ProjectStub projectStub = new ProjectStub();
             projectStub.setModel(model);
-            ArtifactStub artifactStub = new ArtifactStub(
+            ProducedArtifactStub artifactStub = new ProducedArtifactStub(
                     model.getGroupId(), model.getArtifactId(), "", model.getVersion(), model.getPackaging());
             if (!"pom".equals(model.getPackaging())) {
                 projectStub.setMainArtifact(artifactStub);

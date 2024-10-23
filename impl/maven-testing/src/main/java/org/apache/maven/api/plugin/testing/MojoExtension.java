@@ -342,7 +342,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             private Project createProject(InternalSession s) {
                 ProjectStub stub = new ProjectStub();
                 if (!"pom".equals(model.getPackaging())) {
-                    ArtifactStub artifact = new ArtifactStub(
+                    ProducedArtifactStub artifact = new ProducedArtifactStub(
                             model.getGroupId(), model.getArtifactId(), "", model.getVersion(), model.getPackaging());
                     stub.setMainArtifact(artifact);
                 }

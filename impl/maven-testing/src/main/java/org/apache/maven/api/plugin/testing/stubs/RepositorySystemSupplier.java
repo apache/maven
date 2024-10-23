@@ -32,24 +32,25 @@ import org.apache.maven.internal.impl.DefaultModelXmlFactory;
 import org.apache.maven.internal.impl.DefaultPluginConfigurationExpander;
 import org.apache.maven.internal.impl.DefaultSuperPomProvider;
 import org.apache.maven.internal.impl.DefaultUrlNormalizer;
-import org.apache.maven.internal.impl.model.BuildModelTransformer;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementImporter;
 import org.apache.maven.internal.impl.model.DefaultDependencyManagementInjector;
 import org.apache.maven.internal.impl.model.DefaultInheritanceAssembler;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.model.DefaultModelBuilder;
+import org.apache.maven.internal.impl.model.DefaultModelCacheFactory;
 import org.apache.maven.internal.impl.model.DefaultModelInterpolator;
 import org.apache.maven.internal.impl.model.DefaultModelNormalizer;
 import org.apache.maven.internal.impl.model.DefaultModelPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultModelProcessor;
 import org.apache.maven.internal.impl.model.DefaultModelValidator;
-import org.apache.maven.internal.impl.model.DefaultModelVersionProcessor;
 import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultPluginManagementInjector;
 import org.apache.maven.internal.impl.model.DefaultProfileInjector;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
-import org.apache.maven.internal.impl.model.DefaultRootLocator;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
+import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader;
+import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
 import org.apache.maven.internal.impl.resolver.DefaultVersionRangeResolver;
 import org.apache.maven.internal.impl.resolver.DefaultVersionResolver;
 import org.apache.maven.internal.impl.resolver.MavenArtifactRelocationSource;
@@ -79,7 +80,34 @@ import org.eclipse.aether.impl.UpdateCheckManager;
 import org.eclipse.aether.impl.UpdatePolicyAnalyzer;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
-import org.eclipse.aether.internal.impl.*;
+import org.eclipse.aether.internal.impl.DefaultArtifactPredicateFactory;
+import org.eclipse.aether.internal.impl.DefaultArtifactResolver;
+import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
+import org.eclipse.aether.internal.impl.DefaultChecksumProcessor;
+import org.eclipse.aether.internal.impl.DefaultDeployer;
+import org.eclipse.aether.internal.impl.DefaultInstaller;
+import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
+import org.eclipse.aether.internal.impl.DefaultLocalPathPrefixComposerFactory;
+import org.eclipse.aether.internal.impl.DefaultLocalRepositoryProvider;
+import org.eclipse.aether.internal.impl.DefaultMetadataResolver;
+import org.eclipse.aether.internal.impl.DefaultOfflineController;
+import org.eclipse.aether.internal.impl.DefaultPathProcessor;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultRepositoryConnectorProvider;
+import org.eclipse.aether.internal.impl.DefaultRepositoryEventDispatcher;
+import org.eclipse.aether.internal.impl.DefaultRepositoryLayoutProvider;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystemLifecycle;
+import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
+import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
+import org.eclipse.aether.internal.impl.DefaultUpdateCheckManager;
+import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
+import org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory;
+import org.eclipse.aether.internal.impl.LocalPathComposer;
+import org.eclipse.aether.internal.impl.LocalPathPrefixComposerFactory;
+import org.eclipse.aether.internal.impl.Maven2RepositoryLayoutFactory;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.internal.impl.TrackingFileManager;
 import org.eclipse.aether.internal.impl.checksum.DefaultChecksumAlgorithmFactorySelector;
 import org.eclipse.aether.internal.impl.checksum.Md5ChecksumAlgorithmFactory;
 import org.eclipse.aether.internal.impl.checksum.Sha1ChecksumAlgorithmFactory;
@@ -959,9 +987,7 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
     protected ArtifactDescriptorReader createArtifactDescriptorReader() {
         // from maven-resolver-provider
         return new DefaultArtifactDescriptorReader(
-                getRemoteRepositoryManager(),
                 getVersionResolver(),
-                getVersionRangeResolver(),
                 getArtifactResolver(),
                 getModelBuilder(),
                 getRepositoryEventDispatcher(),
@@ -1015,10 +1041,13 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         DefaultModelProcessor modelProcessor = new DefaultModelProcessor(new DefaultModelXmlFactory(), List.of());
         return new DefaultModelBuilder(
                 modelProcessor,
-                new DefaultModelValidator(new DefaultModelVersionProcessor()),
+                new DefaultModelValidator(),
                 new DefaultModelNormalizer(),
                 new DefaultModelInterpolator(
-                        new DefaultPathTranslator(), new DefaultUrlNormalizer(), new DefaultRootLocator()),
+                        new DefaultPathTranslator(),
+                        new DefaultUrlNormalizer(),
+                        new DefaultRootLocator(),
+                        new DefaultInterpolator()),
                 new DefaultModelPathTranslator(new DefaultPathTranslator()),
                 new DefaultModelUrlNormalizer(new DefaultUrlNormalizer()),
                 new DefaultSuperPomProvider(modelProcessor),
@@ -1028,11 +1057,14 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 new DefaultPluginManagementInjector(),
                 new DefaultDependencyManagementInjector(),
                 new DefaultDependencyManagementImporter(),
-                (m, r, b) -> m,
                 new DefaultPluginConfigurationExpander(),
-                new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), new DefaultRootLocator()),
-                new BuildModelTransformer(),
-                new DefaultModelVersionParser(getVersionScheme()));
+                new ProfileActivationFilePathInterpolator(
+                        new DefaultPathTranslator(), new DefaultRootLocator(), new DefaultInterpolator()),
+                new DefaultModelVersionParser(getVersionScheme()),
+                List.of(),
+                new DefaultModelCacheFactory(),
+                new DefaultModelResolver(),
+                new DefaultInterpolator());
     }
 
     private RepositorySystem repositorySystem;
