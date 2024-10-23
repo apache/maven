@@ -214,7 +214,7 @@ if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCl
   "-Dclassworlds.conf=%CLASSWORLDS_CONF%" ^
   "-Dmaven.home=%MAVEN_HOME%" ^
   "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" ^
-  "-Dlibrary.jansi.path=%MAVEN_HOME%\lib\jansi-native" ^
+  "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
   %LAUNCHER_CLASS% ^
   %MAVEN_ARGS% ^
