@@ -521,7 +521,7 @@ public interface Session {
      *
      * @see org.apache.maven.api.services.ArtifactInstaller#install(Session, Collection)
      */
-    void installArtifacts(@Nonnull Artifact... artifacts);
+    void installArtifacts(@Nonnull ProducedArtifact... artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}.
@@ -531,7 +531,7 @@ public interface Session {
      *
      * @see org.apache.maven.api.services.ArtifactInstaller#install(Session, Collection)
      */
-    void installArtifacts(@Nonnull Collection<Artifact> artifacts);
+    void installArtifacts(@Nonnull Collection<ProducedArtifact> artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactDeployer.class).deploy(...)}.
@@ -542,7 +542,7 @@ public interface Session {
      *
      * @see org.apache.maven.api.services.ArtifactDeployer#deploy(Session, RemoteRepository, Collection)
      */
-    void deployArtifact(@Nonnull RemoteRepository repository, @Nonnull Artifact... artifacts);
+    void deployArtifact(@Nonnull RemoteRepository repository, @Nonnull ProducedArtifact... artifacts);
 
     /**
      * Shortcut for {@code getService(ArtifactManager.class).setPath(...)}.

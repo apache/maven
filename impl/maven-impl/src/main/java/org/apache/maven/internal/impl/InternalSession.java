@@ -77,7 +77,7 @@ public interface InternalSession extends Session {
 
     org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinates dependency, boolean managed);
 
-    List<org.eclipse.aether.artifact.Artifact> toArtifacts(Collection<Artifact> artifacts);
+    List<org.eclipse.aether.artifact.Artifact> toArtifacts(Collection<? extends Artifact> artifacts);
 
     org.eclipse.aether.artifact.Artifact toArtifact(Artifact artifact);
 
