@@ -21,7 +21,7 @@ package org.apache.maven.api.services;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -44,7 +44,7 @@ public interface ArtifactInstallerRequest {
     Session getSession();
 
     @Nonnull
-    Collection<Artifact> getArtifacts();
+    Collection<ProducedArtifact> getArtifacts();
 
     @Nonnull
     static ArtifactInstallerRequestBuilder builder() {
@@ -52,7 +52,7 @@ public interface ArtifactInstallerRequest {
     }
 
     @Nonnull
-    static ArtifactInstallerRequest build(Session session, Collection<Artifact> artifacts) {
+    static ArtifactInstallerRequest build(Session session, Collection<ProducedArtifact> artifacts) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
                 .artifacts(nonNull(artifacts, "artifacts cannot be null"))
@@ -62,7 +62,7 @@ public interface ArtifactInstallerRequest {
     @NotThreadSafe
     class ArtifactInstallerRequestBuilder {
         Session session;
-        Collection<Artifact> artifacts = Collections.emptyList();
+        Collection<ProducedArtifact> artifacts = Collections.emptyList();
 
         ArtifactInstallerRequestBuilder() {}
 
@@ -73,7 +73,7 @@ public interface ArtifactInstallerRequest {
         }
 
         @Nonnull
-        public ArtifactInstallerRequestBuilder artifacts(@Nullable Collection<Artifact> artifacts) {
+        public ArtifactInstallerRequestBuilder artifacts(@Nullable Collection<ProducedArtifact> artifacts) {
             this.artifacts = artifacts != null ? artifacts : Collections.emptyList();
             return this;
         }
@@ -85,16 +85,16 @@ public interface ArtifactInstallerRequest {
 
         static class DefaultArtifactInstallerRequest extends BaseRequest implements ArtifactInstallerRequest {
 
-            private final Collection<Artifact> artifacts;
+            private final Collection<ProducedArtifact> artifacts;
 
-            DefaultArtifactInstallerRequest(@Nonnull Session session, @Nonnull Collection<Artifact> artifacts) {
+            DefaultArtifactInstallerRequest(@Nonnull Session session, @Nonnull Collection<ProducedArtifact> artifacts) {
                 super(session);
                 this.artifacts = unmodifiable(nonNull(artifacts, "artifacts cannot be null"));
             }
 
             @Nonnull
             @Override
-            public Collection<Artifact> getArtifacts() {
+            public Collection<ProducedArtifact> getArtifacts() {
                 return artifacts;
             }
         }

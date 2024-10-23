@@ -20,7 +20,7 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
@@ -28,10 +28,10 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Deploys {@link Artifact}s to a {@link RemoteRepository}.
+ * Deploys {@link ProducedArtifact}s to a {@link RemoteRepository}.
  *
  * @since 4.0.0
- * @see Session#deployArtifact(RemoteRepository, Artifact...)
+ * @see Session#deployArtifact(RemoteRepository, ProducedArtifact...)
  */
 @Experimental
 public interface ArtifactDeployer extends Service {
@@ -50,7 +50,9 @@ public interface ArtifactDeployer extends Service {
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
      */
     default void deploy(
-            @Nonnull Session session, @Nonnull RemoteRepository repository, @Nonnull Collection<Artifact> artifacts) {
+            @Nonnull Session session,
+            @Nonnull RemoteRepository repository,
+            @Nonnull Collection<ProducedArtifact> artifacts) {
         deploy(ArtifactDeployerRequest.build(session, repository, artifacts));
     }
 }

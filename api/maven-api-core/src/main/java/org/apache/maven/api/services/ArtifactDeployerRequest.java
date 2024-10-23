@@ -20,7 +20,7 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -45,7 +45,7 @@ public interface ArtifactDeployerRequest {
     RemoteRepository getRepository();
 
     @Nonnull
-    Collection<Artifact> getArtifacts();
+    Collection<ProducedArtifact> getArtifacts();
 
     int getRetryFailedDeploymentCount();
 
@@ -56,7 +56,9 @@ public interface ArtifactDeployerRequest {
 
     @Nonnull
     static ArtifactDeployerRequest build(
-            @Nonnull Session session, @Nonnull RemoteRepository repository, @Nonnull Collection<Artifact> artifacts) {
+            @Nonnull Session session,
+            @Nonnull RemoteRepository repository,
+            @Nonnull Collection<ProducedArtifact> artifacts) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
                 .repository(nonNull(repository, "repository cannot be null"))
@@ -67,7 +69,7 @@ public interface ArtifactDeployerRequest {
     class ArtifactDeployerRequestBuilder {
         Session session;
         RemoteRepository repository;
-        Collection<Artifact> artifacts;
+        Collection<ProducedArtifact> artifacts;
         int retryFailedDeploymentCount;
 
         ArtifactDeployerRequestBuilder() {}
@@ -84,7 +86,7 @@ public interface ArtifactDeployerRequest {
             return this;
         }
 
-        public ArtifactDeployerRequestBuilder artifacts(Collection<Artifact> artifacts) {
+        public ArtifactDeployerRequestBuilder artifacts(Collection<ProducedArtifact> artifacts) {
             this.artifacts = artifacts;
             return this;
         }
@@ -102,13 +104,13 @@ public interface ArtifactDeployerRequest {
         private static class DefaultArtifactDeployerRequest extends BaseRequest implements ArtifactDeployerRequest {
 
             private final RemoteRepository repository;
-            private final Collection<Artifact> artifacts;
+            private final Collection<ProducedArtifact> artifacts;
             private final int retryFailedDeploymentCount;
 
             DefaultArtifactDeployerRequest(
                     @Nonnull Session session,
                     @Nonnull RemoteRepository repository,
-                    @Nonnull Collection<Artifact> artifacts,
+                    @Nonnull Collection<ProducedArtifact> artifacts,
                     int retryFailedDeploymentCount) {
                 super(session);
                 this.repository = nonNull(repository, "repository cannot be null");
@@ -124,7 +126,7 @@ public interface ArtifactDeployerRequest {
 
             @Nonnull
             @Override
-            public Collection<Artifact> getArtifacts() {
+            public Collection<ProducedArtifact> getArtifacts() {
                 return artifacts;
             }
 
