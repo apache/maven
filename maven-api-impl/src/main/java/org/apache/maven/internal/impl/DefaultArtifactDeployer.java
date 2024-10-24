@@ -20,7 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.util.Collection;
 
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
@@ -44,7 +44,7 @@ public class DefaultArtifactDeployer implements ArtifactDeployer {
     public void deploy(@Nonnull ArtifactDeployerRequest request) {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
-        Collection<Artifact> artifacts = nonNull(request.getArtifacts(), "request.artifacts");
+        Collection<ProducedArtifact> artifacts = nonNull(request.getArtifacts(), "request.artifacts");
         RemoteRepository repository = nonNull(request.getRepository(), "request.repository");
         try {
             DeployRequest deployRequest = new DeployRequest()

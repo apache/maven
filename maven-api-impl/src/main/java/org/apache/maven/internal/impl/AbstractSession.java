@@ -344,7 +344,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public List<org.eclipse.aether.artifact.Artifact> toArtifacts(Collection<Artifact> artifacts) {
+    public List<org.eclipse.aether.artifact.Artifact> toArtifacts(Collection<? extends Artifact> artifacts) {
         return artifacts == null ? null : map(artifacts, this::toArtifact);
     }
 
@@ -637,7 +637,7 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactInstaller#install(Session, Collection)
      */
     @Override
-    public void installArtifacts(Artifact... artifacts) {
+    public void installArtifacts(ProducedArtifact... artifacts) {
         installArtifacts(Arrays.asList(artifacts));
     }
 
@@ -648,7 +648,7 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactInstaller#install(Session, Collection)
      */
     @Override
-    public void installArtifacts(Collection<Artifact> artifacts) {
+    public void installArtifacts(Collection<ProducedArtifact> artifacts) {
         getService(ArtifactInstaller.class).install(this, artifacts);
     }
 
@@ -659,7 +659,7 @@ public abstract class AbstractSession implements InternalSession {
      * @see ArtifactDeployer#deploy(Session, RemoteRepository, Collection)
      */
     @Override
-    public void deployArtifact(RemoteRepository repository, Artifact... artifacts) {
+    public void deployArtifact(RemoteRepository repository, ProducedArtifact... artifacts) {
         getService(ArtifactDeployer.class).deploy(this, repository, Arrays.asList(artifacts));
     }
 
