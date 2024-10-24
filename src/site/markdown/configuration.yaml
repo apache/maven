@@ -1,0 +1,180 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+props:
+    - key: maven.build.timestamp.format
+      configurationType: String
+      description: "Build timestamp format."
+      defaultValue: yyyy-MM-dd'T'HH:mm:ssXXX
+      since: 3.0.0
+      configurationSource: Model properties
+    - key: maven.consumer.pom
+      configurationType: Boolean
+      description: "User property for enabling/disabling the consumer POM feature."
+      defaultValue: true
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.ext.class.path
+      configurationType: String
+      description: "Extensions class path."
+      defaultValue: 
+      configurationSource: User properties
+    - key: maven.home
+      configurationType: String
+      description: "Maven home."
+      defaultValue: 
+      since: 3.0.0
+      configurationSource: User properties
+    - key: maven.installation.conf
+      configurationType: String
+      description: "Maven installation configuration directory."
+      defaultValue: ${maven.home}/conf
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.installation.extensions
+      configurationType: String
+      description: "Maven installation extensions."
+      defaultValue: ${maven.installation.conf}/extensions.xml
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.installation.settings
+      configurationType: String
+      description: "Maven installation settings."
+      defaultValue: ${maven.installation.conf}/settings.xml
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.installation.toolchains
+      configurationType: String
+      description: "Maven installation toolchains."
+      defaultValue: ${maven.installation.conf}/toolchains.xml
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.modelBuilder.parallelism
+      configurationType: Integer
+      description: "ProjectBuilder parallelism."
+      defaultValue: cores/2 + 1
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.plugin.validation
+      configurationType: String
+      description: "Plugin validation level."
+      defaultValue: inline
+      since: 3.9.2
+      configurationSource: User properties
+    - key: maven.plugin.validation.excludes
+      configurationType: String
+      description: "Plugin validation exclusions."
+      defaultValue: 
+      since: 3.9.6
+      configurationSource: User properties
+    - key: maven.project.conf
+      configurationType: String
+      description: "Maven project configuration directory."
+      defaultValue: ${session.rootDirectory}/.mvn
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.project.extensions
+      configurationType: String
+      description: "Maven project extensions."
+      defaultValue: ${maven.project.conf}/extensions.xml
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.project.settings
+      configurationType: String
+      description: "Maven project settings."
+      defaultValue: ${maven.project.conf}/settings.xml
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.relocations.entries
+      configurationType: String
+      description: "User controlled relocations. This property is a comma separated list of entries with the syntax <code>GAV&gt;GAV</code>. The first <code>GAV</code> can contain <code>\*</code> for any elem (so <code>\*:\*:\*</code> would mean ALL, something you don't want). The second <code>GAV</code> is either fully specified, or also can contain <code>\*</code>, then it behaves as \"ordinary relocation\": the coordinate is preserved from relocated artifact. Finally, if right hand <code>GAV</code> is absent (line looks like <code>GAV&gt;</code>), the left hand matching <code>GAV</code> is banned fully (from resolving). <br/> Note: the <code>&gt;</code> means project level, while <code>&gt;&gt;</code> means global (whole session level, so even plugins will get relocated artifacts) relocation. <br/> For example, <pre>maven.relocations.entries = org.foo:\*:\*>, \\<br/>    org.here:\*:\*>org.there:\*:\*, \\<br/>    javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5</pre> means: 3 entries, ban <code>org.foo group</code> (exactly, so <code>org.foo.bar</code> is allowed), relocate <code>org.here</code> to <code>org.there</code> and finally globally relocate (see <code>&gt;&gt;</code> above) <code>javax.inject:javax.inject:1</code> to <code>jakarta.inject:jakarta.inject:1.0.5</code>."
+      defaultValue: 
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.repo.central
+      configurationType: String
+      description: "Maven central repository URL. The property will have the value of the <code>MAVEN_REPO_CENTRAL</code> environment variable if it is defined."
+      defaultValue: https://repo.maven.apache.org/maven2
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.repo.local
+      configurationType: String
+      description: "Maven local repository."
+      defaultValue: ${maven.user.conf}/repository
+      since: 3.0.0
+      configurationSource: User properties
+    - key: maven.repo.local.recordReverseTree
+      configurationType: String
+      description: "User property for reverse dependency tree. If enabled, Maven will record \".tracking\" directory into local repository with \"reverse dependency tree\", essentially explaining WHY given artifact is present in local repository. Default: <code>false</code>, will not record anything."
+      defaultValue: false
+      since: 3.9.0
+      configurationSource: User properties
+    - key: maven.repo.local.tail
+      configurationType: String
+      description: "User property for chained LRM: list of \"tail\" local repository paths (separated by comma), to be used with {@code org.eclipse.aether.util.repository.ChainedLocalRepositoryManager} . Default value: <code>null</code>, no chained LRM is used."
+      defaultValue: 
+      since: 3.9.0
+      configurationSource: User properties
+    - key: maven.resolver.dependencyManagerTransitivity
+      configurationType: String
+      description: "User property for selecting dependency manager behaviour regarding transitive dependencies and dependency management entries in their POMs. Maven 3 targeted full backward compatibility with Maven2, hence it ignored dependency management entries in transitive dependency POMs. Maven 4 enables \"transitivity\" by default, hence unlike Maven2, obeys dependency management entries deep in dependency graph as well. <br/> Default: <code>\"true\"</code>."
+      defaultValue: true
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.resolver.transport
+      configurationType: String
+      description: "Resolver transport to use. Can be <code>default</code>, <code>wagon</code>, <code>apache</code>, <code>jdk</code> or <code>auto</code>."
+      defaultValue: default
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.color
+      configurationType: String
+      description: "Maven output color mode. Allowed values are <code>auto</code>, <code>always</code>, <code>never</code>."
+      defaultValue: auto
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.user.conf
+      configurationType: String
+      description: "Maven user configuration directory."
+      defaultValue: ${user.home}/.m2
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.user.extensions
+      configurationType: String
+      description: "Maven user extensions."
+      defaultValue: ${maven.user.conf}/extensions.xml
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.user.settings
+      configurationType: String
+      description: "Maven user settings."
+      defaultValue: ${maven.user.conf}/settings.xml
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.user.toolchains
+      configurationType: String
+      description: "Maven user toolchains."
+      defaultValue: ${maven.user.home}/toolchains.xml
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.versionFilters
+      configurationType: String
+      description: "User property for version filters expression, a semicolon separated list of filters to apply. By default, no version filter is applied (like in Maven 3). <br/> Supported filters: <ul> <li>\"h\" or \"h(num)\" - highest version or top list of highest ones filter</li> <li>\"l\" or \"l(num)\" - lowest version or bottom list of lowest ones filter</li> <li>\"s\" - contextual snapshot filter</li> <li>\"e(G:A:V)\" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li> </ul> Example filter expression: <code>\"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for \"top 5\" (instead full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is being processed, version 1 is omitted."
+      defaultValue: 
+      since: 4.0.0
+      configurationSource: User properties

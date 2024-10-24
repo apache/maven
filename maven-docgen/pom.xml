@@ -80,7 +80,7 @@
                 <argument>--mode=maven</argument>
                 <argument>--templates=configuration.md,configuration.properties,configuration.yaml</argument>
                 <argument>${basedir}/..</argument>
-                <argument>${basedir}/target</argument>
+                <argument>${basedir}/../src/site/markdown/</argument>
               </arguments>
             </configuration>
           </execution>
