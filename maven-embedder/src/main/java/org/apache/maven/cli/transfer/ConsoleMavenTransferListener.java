@@ -80,8 +80,9 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         Iterator<TransferResourceAndSize> entries = transfers.values().iterator();
         while (entries.hasNext()) {
             TransferResourceAndSize entry = entries.next();
-            long total = entry.resource.getContentLength();
-            Long complete = entry.transferredBytes;
+            // just in case, make sure 0 <= complete <= total
+            long complete = Math.max(0, entry.transferredBytes);
+            long total = Math.max(complete, entry.resource.getContentLength());
 
             String resourceName = entry.resource.getResourceName();
 
