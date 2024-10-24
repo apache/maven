@@ -35,7 +35,6 @@ import org.apache.maven.api.Packaging;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.InputLocation;
-import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.PluginExecution;
@@ -43,7 +42,6 @@ import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.spi.PackagingProvider;
-import org.apache.maven.lifecycle.internal.DefaultLifecyclePluginAnalyzer;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.lifecycle.mapping.LifecycleMojo;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
@@ -105,9 +103,7 @@ public class DefaultPackagingRegistry
     }
 
     static void parseLifecyclePhaseDefinitions(Map<String, Plugin> plugins, String phase, LifecyclePhase goals) {
-        InputSource inputSource =
-                new InputSource(DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID, null);
-        InputLocation location = new InputLocation(-1, -1, inputSource, 0);
+        InputLocation location = DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION;
 
         List<LifecycleMojo> mojos = goals.getMojos();
         if (mojos != null) {

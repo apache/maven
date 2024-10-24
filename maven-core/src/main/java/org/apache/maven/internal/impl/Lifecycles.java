@@ -76,7 +76,15 @@ public class Lifecycles {
                         .id("default-" + c[3])
                         .phase(phase)
                         .goals(Collections.singletonList(c[3]))
+                        .location("", DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION)
+                        .location("id", DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION)
+                        .location("phase", DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION)
+                        .location("goals", DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION)
                         .build()))
+                .location("", DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION)
+                .location("groupId", DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION)
+                .location("artifactId", DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION)
+                .location("version", DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION)
                 .build();
     }
 

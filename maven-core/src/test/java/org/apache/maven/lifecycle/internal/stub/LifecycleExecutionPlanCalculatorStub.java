@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.lifecycle.internal.DefaultLifecyclePluginAnalyzer;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.ProjectBuildList;
@@ -210,7 +210,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
 
     private static MojoExecution createMojoExecution(String goal, String executionId, MojoDescriptor mojoDescriptor) {
         InputSource defaultBindings = new InputSource();
-        defaultBindings.setModelId(DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID);
+        defaultBindings.setModelId(DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_MODELID);
 
         final Plugin plugin = mojoDescriptor.getPluginDescriptor().getPlugin();
         plugin.setLocation("version", new InputLocation(12, 34, defaultBindings));
