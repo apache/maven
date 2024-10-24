@@ -921,7 +921,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (candidateSource == null) {
                 candidateSource = resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
             }
-            if (candidateSource == null) {
+            if (candidateSource == null && parentPath == null) {
                 candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, "..");
             }
 
