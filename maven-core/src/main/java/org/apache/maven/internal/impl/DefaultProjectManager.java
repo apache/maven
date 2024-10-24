@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -93,6 +94,32 @@ public class DefaultProjectManager implements ProjectManager {
 
     @Override
     public void attachArtifact(Project project, ProducedArtifact artifact, Path path) {
+        nonNull(project, "project");
+        nonNull(artifact, "artifact");
+        nonNull(path, "path");
+        if (artifact.getGroupId().isEmpty()
+                || artifact.getArtifactId().isEmpty()
+                || artifact.getBaseVersion().asString().isEmpty()) {
+            artifact = session.createProducedArtifact(
+                    artifact.getGroupId().isEmpty() ? project.getGroupId() : artifact.getGroupId(),
+                    artifact.getArtifactId().isEmpty() ? project.getArtifactId() : artifact.getArtifactId(),
+                    artifact.getBaseVersion().asString().isEmpty()
+                            ? session.parseVersion(project.getVersion()).asString()
+                            : artifact.getBaseVersion().asString(),
+                    artifact.getClassifier(),
+                    artifact.getExtension(),
+                    null);
+        }
+        if (!Objects.equals(project.getGroupId(), artifact.getGroupId())
+                || !Objects.equals(project.getArtifactId(), artifact.getArtifactId())
+                || !Objects.equals(
+                        project.getVersion(), artifact.getBaseVersion().asString())) {
+            throw new IllegalArgumentException(
+                    "The produced artifact must have the same groupId/artifactId/version than the project it is attached to. Expecting "
+                            + project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion()
+                            + " but received " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
+                            + artifact.getBaseVersion());
+        }
         getMavenProject(project)
                 .addAttachedArtifact(RepositoryUtils.toArtifact(
                         ((DefaultProject) project).getSession().toArtifact(artifact)));

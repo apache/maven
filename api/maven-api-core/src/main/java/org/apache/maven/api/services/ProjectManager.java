@@ -71,7 +71,16 @@ public interface ProjectManager extends Service {
      */
     Collection<ProducedArtifact> getAllArtifacts(Project project);
 
-    default void attachArtifact(Session session, Project project, Path path) {
+    /**
+     * Attaches an artifact to the project using the given file path. The artifact type will be
+     * determined from the file extension.
+     *
+     * @param session the current build session
+     * @param project the project to attach the artifact to
+     * @param path the path to the artifact file
+     * @throws IllegalArgumentException if the session, project or path is null
+     */
+    default void attachArtifact(@Nonnull Session session, @Nonnull Project project, @Nonnull Path path) {
         String name = path.getFileName().toString();
         int dot = name.lastIndexOf('.');
         String ext = dot >= 1 ? name.substring(dot + 1) : "";
@@ -80,13 +89,33 @@ public interface ProjectManager extends Service {
         attachArtifact(project, artifact, path);
     }
 
-    default void attachArtifact(Session session, Project project, String type, Path path) {
+    /**
+     * Attaches an artifact to the project with an explicitly specified type.
+     *
+     * @param session the current build session
+     * @param project the project to attach the artifact to
+     * @param type the type of the artifact (e.g., "jar", "war", "sources")
+     * @param path the path to the artifact file
+     * @throws IllegalArgumentException if the session, project, type or path is null
+     * @see org.apache.maven.api.Type
+     */
+    default void attachArtifact(
+            @Nonnull Session session, @Nonnull Project project, @Nonnull String type, @Nonnull Path path) {
         ProducedArtifact artifact = session.createProducedArtifact(
                 project.getGroupId(), project.getArtifactId(), project.getVersion(), null, null, type);
         attachArtifact(project, artifact, path);
     }
 
-    void attachArtifact(Project project, ProducedArtifact artifact, Path path);
+    /**
+     * Attaches a produced artifact to the project at the specified path. This is the base method
+     * that the other attachArtifact methods delegate to.
+     *
+     * @param project the project to attach the artifact to
+     * @param artifact the produced artifact to attach
+     * @param path the path to the artifact file
+     * @throws IllegalArgumentException if the project, artifact or path is null
+     */
+    void attachArtifact(@Nonnull Project project, @Nonnull ProducedArtifact artifact, @Nonnull Path path);
 
     /**
      * Obtain an immutable list of compile source roots for the given project and scope.
