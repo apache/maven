@@ -1963,13 +1963,20 @@ public class DefaultModelValidator implements ModelValidator {
         String[] firstSegments = first.split("\\.");
         String[] secondSegments = second.split("\\.");
         for (int i = 0; i < Math.max(firstSegments.length, secondSegments.length); i++) {
-            int result = Long.valueOf(i < firstSegments.length ? firstSegments[i] : "0")
-                    .compareTo(Long.valueOf(i < secondSegments.length ? secondSegments[i] : "0"));
+            int result = asLong(i, firstSegments).compareTo(asLong(i, secondSegments));
             if (result != 0) {
                 return result;
             }
         }
         return 0;
+    }
+
+    private static Long asLong(int index, String[] segments) {
+        try {
+            return Long.valueOf(index < segments.length ? segments[index] : "0");
+        } catch (NumberFormatException e) {
+            return 0L;
+        }
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
