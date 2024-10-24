@@ -219,16 +219,22 @@ public abstract class CommonsCliOptions implements Options {
         printWriter.accept("Detected deprecated option use in " + source);
         for (Option option : cliManager.getUsedDeprecatedOptions()) {
             StringBuilder sb = new StringBuilder();
-            sb.append("The option -").append(option.getOpt());
+            sb.append("The option ");
+            if (option.getOpt() != null) {
+                sb.append("-").append(option.getOpt());
+            }
             if (option.getLongOpt() != null) {
-                sb.append(",--").append(option.getLongOpt());
+                if (option.getOpt() != null) {
+                    sb.append(",");
+                }
+                sb.append("--").append(option.getLongOpt());
             }
             sb.append(" is deprecated ");
             if (option.getDeprecated().isForRemoval()) {
                 sb.append("and will be removed in a future version");
             }
             if (option.getDeprecated().getSince() != null) {
-                sb.append("since ")
+                sb.append(" since ")
                         .append(request.commandName())
                         .append(" ")
                         .append(option.getDeprecated().getSince());
@@ -415,12 +421,16 @@ public abstract class CommonsCliOptions implements Options {
             // We need to eat any quotes surrounding arguments...
             String[] cleanArgs = CleanArgument.cleanArgs(args);
             DefaultParser parser = DefaultParser.builder()
-                    .setDeprecatedHandler(usedDeprecatedOptions::add)
+                    .setDeprecatedHandler(this::addDeprecatedOption)
                     .build();
             CommandLine commandLine = parser.parse(options, cleanArgs);
             // to trigger deprecation handler, so we can report deprecation BEFORE we actually use options
             options.getOptions().forEach(commandLine::hasOption);
             return commandLine;
+        }
+
+        protected void addDeprecatedOption(Option option) {
+            usedDeprecatedOptions.add(option);
         }
 
         public org.apache.commons.cli.Options getOptions() {

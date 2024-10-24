@@ -170,6 +170,38 @@ class DefaultInterpolatorTest {
         assertEquals("", props.get("c_cp"));
     }
 
+    @Test
+    void testXdg() {
+        Map<String, String> props;
+
+        props = new LinkedHashMap<>();
+        props.put("user.home", "/Users/gnodet");
+        props.put(
+                "maven.user.config",
+                "${env.MAVEN_XDG:+${env.XDG_CONFIG_HOME:-${user.home}/.config/maven}:-${user.home}/.m2}");
+        performSubstitution(props);
+        assertEquals("/Users/gnodet/.m2", props.get("maven.user.config"));
+
+        props = new LinkedHashMap<>();
+        props.put("user.home", "/Users/gnodet");
+        props.put(
+                "maven.user.config",
+                "${env.MAVEN_XDG:+${env.XDG_CONFIG_HOME:-${user.home}/.config/maven}:-${user.home}/.m2}");
+        props.put("env.MAVEN_XDG", "true");
+        performSubstitution(props);
+        assertEquals("/Users/gnodet/.config/maven", props.get("maven.user.config"));
+
+        props = new LinkedHashMap<>();
+        props.put("user.home", "/Users/gnodet");
+        props.put(
+                "maven.user.config",
+                "${env.MAVEN_XDG:+${env.XDG_CONFIG_HOME:-${user.home}/.config/maven}:-${user.home}/.m2}");
+        props.put("env.MAVEN_XDG", "true");
+        props.put("env.XDG_CONFIG_HOME", "/Users/gnodet/.xdg/maven");
+        performSubstitution(props);
+        assertEquals("/Users/gnodet/.xdg/maven", props.get("maven.user.config"));
+    }
+
     private void performSubstitution(Map<String, String> props) {
         performSubstitution(props, null);
     }

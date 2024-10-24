@@ -49,6 +49,10 @@ public final class CLIReportingUtils {
     public static final String BUILD_VERSION_PROPERTY = "version";
 
     public static String showVersion() {
+        return showVersion(null, null);
+    }
+
+    public static String showVersion(String commandLine, String terminal) {
         final String ls = System.lineSeparator();
         Properties properties = getBuildProperties();
         StringBuilder version = new StringBuilder(256);
@@ -78,6 +82,13 @@ public final class CLIReportingUtils {
                 .append("\", family: \"")
                 .append(Os.OS_FAMILY)
                 .append('\"');
+        // Add process information using modern Java API
+        if (commandLine != null) {
+            version.append(ls).append("Command line: ").append(commandLine);
+        }
+        if (terminal != null) {
+            version.append(ls).append("Terminal: ").append(terminal);
+        }
         return version.toString();
     }
 

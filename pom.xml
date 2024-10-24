@@ -163,7 +163,7 @@ under the License.
     <!-- various versions -->
     <assertjVersion>3.26.3</assertjVersion>
     <asmVersion>9.7.1</asmVersion>
-    <byteBuddyVersion>1.15.5</byteBuddyVersion>
+    <byteBuddyVersion>1.15.7</byteBuddyVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
@@ -173,7 +173,7 @@ under the License.
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
     <jlineVersion>3.27.1</jlineVersion>
-    <junitVersion>5.11.2</junitVersion>
+    <junitVersion>5.11.3</junitVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <logbackClassicVersion>1.5.11</logbackClassicVersion>
     <mockitoVersion>5.14.2</mockitoVersion>
@@ -187,7 +187,7 @@ under the License.
     <slf4jVersion>2.0.16</slf4jVersion>
     <stax2ApiVersion>4.2.2</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
-    <woodstoxVersion>7.0.0</woodstoxVersion>
+    <woodstoxVersion>7.1.0</woodstoxVersion>
     <xmlunitVersion>2.10.0</xmlunitVersion>
   </properties>
 
@@ -796,6 +796,7 @@ under the License.</licenseText>
                 <exclude>**/*.svg</exclude>
                 <exclude>.asf.yaml</exclude>
                 <exclude>.mvn/**</exclude>
+                <exclude>.jbang/**</exclude>
                 <!--
                   ! Excluded the license files itself cause they do not have have a license of themselves.
                 -->
@@ -851,6 +852,50 @@ under the License.</licenseText>
                 </enforceBytecodeVersion>
               </rules>
               <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.fusesource.mvnplugins</groupId>
+        <artifactId>maven-graph-plugin</artifactId>
+        <version>1.45</version>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <id>graph</id>
+            <goals>
+              <goal>reactor</goal>
+            </goals>
+            <phase>pre-site</phase>
+            <configuration>
+              <hideVersion>true</hideVersion>
+              <hideGroupId>true</hideGroupId>
+              <hideScopes>test</hideScopes>
+              <hideTransitive>true</hideTransitive>
+              <keepDot>true</keepDot>
+              <target>${project.build.directory}/graph/reactor-graph.dot</target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>dev.jbang</groupId>
+        <artifactId>jbang-maven-plugin</artifactId>
+        <version>0.0.8</version>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <id>graph</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>pre-site</phase>
+            <configuration>
+              <script>${project.basedir}/src/graph/ReactorGraph.java</script>
+              <jbangargs>
+                <arg>--verbose</arg>
+              </jbangargs>
             </configuration>
           </execution>
         </executions>

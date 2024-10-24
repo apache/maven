@@ -72,10 +72,12 @@ under the License.
       <lineEnding>dos</lineEnding>
     </fileSet>
     <fileSet>
-      <directory>target/dependency/org/fusesource/jansi/internal/native</directory>
-      <outputDirectory>lib/jansi-native</outputDirectory>
+      <directory>target/dependency/org/jline/nativ</directory>
+      <outputDirectory>lib/jline-native</outputDirectory>
       <includes>
-        <include>**</include>
+        <include>**/*.so</include>
+        <include>**/*.jnilib</include>
+        <include>**/*.dll</include>
       </includes>
     </fileSet>
 	<fileSet>

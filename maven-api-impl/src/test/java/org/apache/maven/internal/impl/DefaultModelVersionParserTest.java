@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -16,22 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
-export default {
-    js2svg: {
-        indent: 1,
-        pretty: true,
-      },
-    plugins: [
-      'preset-default',
-      {
-        name: "removeAttrs",
-        params: {
-          attrs: [
-            "g:class",
-            "path:class",
-          ]
-        }
-      },
-      ],
-  };
+import org.apache.maven.api.Version;
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class DefaultModelVersionParserTest {
+
+    @Test
+    void parseVersion() {
+        Version v = new DefaultModelVersionParser(new GenericVersionScheme()).parseVersion("");
+        assertNotNull(v);
+        assertEquals("", v.asString());
+    }
+}

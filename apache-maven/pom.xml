@@ -162,13 +162,13 @@ under the License.
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>unpack-jansi-native</id>
+            <id>unpack-jline-native</id>
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>jansi</includeArtifactIds>
-              <includes>org/fusesource/jansi/internal/native/Windows/**</includes>
+              <includeArtifactIds>jline-native</includeArtifactIds>
+              <includes>org/jline/nativ/**</includes>
             </configuration>
           </execution>
         </executions>
