@@ -49,40 +49,17 @@
     </dependency>
 
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.forge.roaster</groupId>
-      <artifactId>roaster-api</artifactId>
-      <version>2.29.0.Final</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.forge.roaster</groupId>
-      <artifactId>roaster-jdt</artifactId>
-      <version>2.29.0.Final</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity-engine-core</artifactId>
-      <version>2.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-tools</artifactId>
+      <version>${resolverVersion}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-nop</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
-    <!-- Not needed during compile -->
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.17.0</version>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -99,10 +76,12 @@
             </goals>
             <phase>verify</phase>
             <configuration>
-              <mainClass>org.apache.maven.tools.CollectConfiguration</mainClass>
+              <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
               <arguments>
+                <argument>--mode=maven</argument>
+                <argument>--templates=own-page.md,configuration.properties,configuration.yaml</argument>
                 <argument>${basedir}/..</argument>
-                <argument>${basedir}/../src/site/markdown/configuration.md</argument>
+                <argument>${basedir}/target</argument>
               </arguments>
             </configuration>
           </execution>
