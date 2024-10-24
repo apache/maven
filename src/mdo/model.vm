@@ -49,7 +49,11 @@
     #set ( $dummy = $imports.add( "java.util.Collections" ) )
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "java.util.Objects" ) )
+    #set ( $dummy = $imports.add( "java.util.Optional" ) )
     #set ( $dummy = $imports.add( "java.util.Set" ) )
+    #set ( $dummy = $imports.add( "java.util.stream.Collectors" ) )
+    #set ( $dummy = $imports.add( "java.util.stream.Stream" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Experimental" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Immutable" ) )
@@ -138,13 +142,11 @@ public class ${class.name}
       #end
     final ${type} $field.name;
     #end
-    #if ( $locationTracking )
-    /** Locations (this potentially hides the same name field from the super class) */
+    #if ( $locationTracking && ! $class.superClass )
+    /** Locations */
     final Map<Object, InputLocation> locations;
-      #if ( ! $class.superClass )
     /** Location tracking */
     final InputLocation importedFrom;
-      #end
     #end
 
     /**
@@ -170,20 +172,13 @@ public class ${class.name}
         #end
       #end
     #end
-    #if ( $locationTracking )
-        Map<Object, InputLocation> newlocs = builder.locations != null ? builder.locations : Collections.emptyMap();
-        Map<Object, InputLocation> oldlocs = builder.base != null && builder.base.locations != null ? builder.base.locations : Collections.emptyMap();
-      #if ( ! $class.superClass )
-        Map<Object, InputLocation> mutableLocations = new HashMap<>();
-        this.importedFrom = builder.importedFrom;
-        mutableLocations.put("", newlocs.containsKey("") ? newlocs.get("") : oldlocs.get(""));
+    #if ( $locationTracking && ! $class.superClass )
+      #if ( ! $class.getFields($version).isEmpty() )
+        this.locations = builder.computeLocations();
       #else
-        Map<Object, InputLocation> mutableLocations = new HashMap<>(super.locations);
+        this.locations = Map.of();
       #end
-        #foreach ( $field in $class.getFields($version) )
-        mutableLocations.put("${field.name}", newlocs.containsKey("${field.name}") ? newlocs.get("${field.name}") : oldlocs.get("${field.name}"));
-        #end
-        this.locations = Collections.unmodifiableMap(mutableLocations);
+        this.importedFrom = builder.importedFrom;
     #end
     }
 
@@ -243,22 +238,55 @@ public class ${class.name}
     }
 
     #end
-    #if ( $locationTracking )
+    #if ( $locationTracking && !$class.superClass )
     /**
      * Gets the location of the specified field in the input source.
      */
     public InputLocation getLocation(Object key) {
-        return locations != null ? locations.get(key) : null;
+      #if ( $class.getFields($version).isEmpty() )
+        #if ( $class.superClass )
+        return super.getLocation(key);
+        #else
+        return null;
+        #end
+      #elseif ( $class.superClass )
+        return locations.containsKey(key) ? locations.get(key) : super.getLocation(key);
+      #else
+        return locations.get(key);
+      #end
     }
 
     /**
-    * Gets the keys of the locations of the input source.
-    */
+     * Gets the keys of the locations of the input source.
+     */
     public Set<Object> getLocationKeys() {
-        return locations != null ? locations.keySet() : null;
+      #if ( $class.getFields($version).isEmpty() )
+        #if ( $class.superClass )
+        return super.getLocationKeys();
+        #else
+        return Set.of();
+        #end
+      #elseif ( $class.superClass )
+        return getLocationKeyStream().collect(Collectors.toUnmodifiableSet());
+      #else
+        return locations.keySet();
+      #end
     }
 
-    #if ( !$class.superClass )
+    protected Stream<Object> getLocationKeyStream() {
+      #if ( $class.getFields($version).isEmpty() )
+        #if ( $class.superClass )
+        return super.getLocationKeyStream();
+        #else
+        return Stream.empty();
+        #end
+      #elseif ( $class.superClass )
+        return Stream.concat(locations.keySet().stream(), super.getLocationKeyStream());
+      #else
+        return locations.keySet().stream();
+      #end
+    }
+
     /**
      * Gets the input location that caused this model to be read.
      */
@@ -267,7 +295,6 @@ public class ${class.name}
         return importedFrom;
     }
 
-    #end
     #end
     /**
      * Creates a new builder with this object as the basis.
@@ -504,6 +531,26 @@ public class ${class.name}
             }
             return new ${class.name}(this);
         }
+
+    #if ( $locationTracking && ! $class.superClass )
+        Map<Object, InputLocation> computeLocations() {
+      #if ( ! $class.getFields($version).isEmpty() )
+            Map<Object, InputLocation> newlocs = locations != null ? locations : Map.of();
+            Map<Object, InputLocation> oldlocs = base != null ? base.locations : Map.of();
+            if (newlocs.isEmpty()) {
+                return Map.copyOf(oldlocs);
+            }
+            if (oldlocs.isEmpty()) {
+                return Map.copyOf(newlocs);
+            }
+            return Stream.concat(newlocs.entrySet().stream(), oldlocs.entrySet().stream())
+                    // Keep value from newlocs in case of duplicates
+                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1));
+      #else
+            return Map.of();
+      #end
+        }
+    #end
     }
 
     #foreach ( $cs in $class.getCodeSegments($version) )
