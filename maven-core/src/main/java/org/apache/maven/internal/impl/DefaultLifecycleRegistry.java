@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.LookupException;
@@ -79,6 +81,13 @@ import static org.apache.maven.internal.impl.Lifecycles.plugin;
 public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     private static final String MAVEN_PLUGINS = "org.apache.maven.plugins:";
+
+    public static final String DEFAULT_LIFECYCLE_MODELID = "org.apache.maven:maven-core:"
+            + DefaultLifecycleRegistry.class.getPackage().getImplementationVersion()
+            + ":default-lifecycle-bindings";
+
+    public static final InputLocation DEFAULT_LIFECYCLE_INPUT_LOCATION =
+            new InputLocation(new InputSource(DEFAULT_LIFECYCLE_MODELID, null));
 
     private final List<LifecycleProvider> providers;
 

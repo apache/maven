@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
@@ -32,11 +31,11 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.MultilineMessageHelper;
+import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.lifecycle.internal.DefaultLifecyclePluginAnalyzer;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleDebugLogger;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
@@ -139,7 +138,7 @@ public class BuilderCommon {
             }
         }
 
-        final String defaulModelId = DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID;
+        final String defaulModelId = DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_MODELID;
 
         List<String> unversionedPlugins = executionPlan.getMojoExecutions().stream()
                 .map(MojoExecution::getPlugin)
@@ -149,7 +148,7 @@ public class BuilderCommon {
                                 p.getLocation("version").getSource().getModelId()))
                 .distinct()
                 .map(Plugin::getArtifactId) // managed by us, groupId is always o.a.m.plugins
-                .collect(Collectors.toList());
+                .toList();
 
         if (!unversionedPlugins.isEmpty()) {
             logger.warn("Version not locked for default bindings plugins " + unversionedPlugins

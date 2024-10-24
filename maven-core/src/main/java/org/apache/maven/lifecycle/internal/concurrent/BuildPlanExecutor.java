@@ -53,6 +53,7 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.internal.MultilineMessageHelper;
+import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.impl.util.PhasingExecutor;
 import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
 import org.apache.maven.internal.xml.XmlNodeImpl;
@@ -62,7 +63,6 @@ import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.lifecycle.internal.BuildThreadFactory;
 import org.apache.maven.lifecycle.internal.CompoundProjectExecutionListener;
-import org.apache.maven.lifecycle.internal.DefaultLifecyclePluginAnalyzer;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.GoalTask;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
@@ -238,7 +238,7 @@ public class BuildPlanExecutor {
         }
 
         private void checkUnboundVersions(BuildPlan buildPlan) {
-            String defaulModelId = DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID;
+            String defaulModelId = DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_MODELID;
             List<String> unversionedPlugins = buildPlan
                     .allSteps()
                     .flatMap(step -> step.mojos.values().stream().flatMap(map -> map.values().stream()))

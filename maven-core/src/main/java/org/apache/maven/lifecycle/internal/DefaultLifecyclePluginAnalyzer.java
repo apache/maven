@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.lifecycle.Lifecycle;
@@ -54,9 +55,6 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 @Named
 public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
-    public static final String DEFAULTLIFECYCLEBINDINGS_MODELID = "org.apache.maven:maven-core:"
-            + DefaultLifecyclePluginAnalyzer.class.getPackage().getImplementationVersion()
-            + ":default-lifecycle-bindings";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -131,7 +129,7 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
 
     private void parseLifecyclePhaseDefinitions(Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals) {
         InputSource inputSource = new InputSource();
-        inputSource.setModelId(DEFAULTLIFECYCLEBINDINGS_MODELID);
+        inputSource.setModelId(DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_MODELID);
         InputLocation location = new InputLocation(-1, -1, inputSource);
         location.setLocation(0, location);
 
