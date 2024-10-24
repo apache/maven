@@ -114,6 +114,10 @@ under the License.
               </templates>
             </configuration>
           </execution>
+          <execution>
+            <id>modello-site-docs</id>
+            <phase>none</phase>
+          </execution>
         </executions>
       </plugin>
       <plugin>
