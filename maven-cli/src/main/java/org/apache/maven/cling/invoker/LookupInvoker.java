@@ -72,6 +72,7 @@ import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.cling.invoker.mvn.ProtoSession;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.SettingsUtilsV4;
+import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.api.LogLevelRecorder;
@@ -79,6 +80,8 @@ import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.eclipse.aether.transfer.TransferListener;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.terminal.impl.AbstractPosixTerminal;
+import org.jline.terminal.spi.TerminalExt;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
@@ -409,26 +412,56 @@ public abstract class LookupInvoker<
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {
-        Consumer<String> writer = determineWriter(context);
         R invokerRequest = context.invokerRequest;
         if (invokerRequest.options().help().isPresent()) {
+            Consumer<String> writer = determineWriter(context);
             invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), writer);
             throw new ExitException(0);
         }
         if (invokerRequest.options().showVersionAndExit().isPresent()) {
-            if (invokerRequest.options().quiet().orElse(false)) {
-                writer.accept(CLIReportingUtils.showVersionMinimal());
-            } else {
-                writer.accept(CLIReportingUtils.showVersion());
-            }
+            showVersion(context);
             throw new ExitException(0);
         }
     }
 
+    protected void showVersion(C context) {
+        Consumer<String> writer = determineWriter(context);
+        R invokerRequest = context.invokerRequest;
+        if (invokerRequest.options().quiet().orElse(false)) {
+            writer.accept(CLIReportingUtils.showVersionMinimal());
+        } else if (invokerRequest.options().verbose().orElse(false)) {
+            writer.accept(CLIReportingUtils.showVersion(
+                    ProcessHandle.current().info().commandLine().orElse(null), describe(context.terminal)));
+
+        } else {
+            writer.accept(CLIReportingUtils.showVersion());
+        }
+    }
+
+    protected String describe(Terminal terminal) {
+        if (terminal == null) {
+            return null;
+        }
+        if (terminal instanceof FastTerminal ft) {
+            terminal = ft.getTerminal();
+        }
+        List<String> subs = new ArrayList<>();
+        subs.add("type=" + terminal.getType());
+        if (terminal instanceof TerminalExt te) {
+            subs.add("provider=" + te.getProvider().name());
+        }
+        if (terminal instanceof AbstractPosixTerminal pt) {
+            subs.add("pty=" + pt.getPty().getClass().getName());
+        }
+        return terminal.getClass().getSimpleName() + " (" + String.join(", ", subs) + ")";
+    }
+
     protected void preCommands(C context) throws Exception {
         Options mavenOptions = context.invokerRequest.options();
-        if (mavenOptions.verbose().orElse(false) || mavenOptions.showVersion().orElse(false)) {
-            determineWriter(context).accept(CLIReportingUtils.showVersion());
+        boolean verbose = mavenOptions.verbose().orElse(false);
+        boolean version = mavenOptions.showVersion().orElse(false);
+        if (verbose || version) {
+            showVersion(context);
         }
     }
 
