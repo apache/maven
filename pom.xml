@@ -102,7 +102,6 @@ under the License.
     <module>api</module>
     <module>impl</module>
     <module>compat</module>
-    <module>maven-docgen</module>
     <module>apache-maven</module>
   </modules>
 
@@ -163,7 +162,7 @@ under the License.
     <plexusInterpolationVersion>1.27</plexusInterpolationVersion>
     <plexusTestingVersion>1.4.0</plexusTestingVersion>
     <plexusXmlVersion>4.0.4</plexusXmlVersion>
-    <resolverVersion>2.0.2</resolverVersion>
+    <resolverVersion>2.0.3-20241025.075423-18</resolverVersion>
     <securityDispatcherVersion>4.0.1</securityDispatcherVersion>
     <sisuVersion>0.9.0.M3</sisuVersion>
     <slf4jVersion>2.0.16</slf4jVersion>
