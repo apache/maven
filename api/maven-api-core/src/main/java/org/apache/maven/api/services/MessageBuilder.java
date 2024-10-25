@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.services;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
@@ -37,7 +38,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder trace(Object message) {
-        return style(".trace:-bold,f:magenta", message);
+        return style("." + Constants.MAVEN_STYLE_TRACE_NAME + ":-" + Constants.MAVEN_STYLE_TRACE_DEFAULT, message);
     }
 
     /**
@@ -49,7 +50,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder debug(Object message) {
-        return style(".debug:-bold,f:cyan", message);
+        return style("." + Constants.MAVEN_STYLE_DEBUG_NAME + ":-" + Constants.MAVEN_STYLE_DEBUG_DEFAULT, message);
     }
 
     /**
@@ -61,7 +62,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder info(Object message) {
-        return style(".info:-bold,f:blue", message);
+        return style("." + Constants.MAVEN_STYLE_INFO_NAME + ":-" + Constants.MAVEN_STYLE_INFO_DEFAULT, message);
     }
 
     /**
@@ -73,7 +74,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder warning(Object message) {
-        return style(".warning:-bold,f:yellow", message);
+        return style("." + Constants.MAVEN_STYLE_WARNING_NAME + ":-" + Constants.MAVEN_STYLE_WARNING_DEFAULT, message);
     }
 
     /**
@@ -85,7 +86,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder error(Object message) {
-        return style(".error:-bold,f:red", message);
+        return style("." + Constants.MAVEN_STYLE_ERROR_NAME + ":-" + Constants.MAVEN_STYLE_ERROR_DEFAULT, message);
     }
 
     /**
@@ -97,7 +98,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder success(Object message) {
-        return style(".success:-bold,f:green", message);
+        return style("." + Constants.MAVEN_STYLE_DEBUG_NAME + ":-" + Constants.MAVEN_STYLE_DEBUG_DEFAULT, message);
     }
 
     /**
@@ -109,7 +110,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder failure(Object message) {
-        return style(".failure:-bold,f:red", message);
+        return style("." + Constants.MAVEN_STYLE_FAILURE_NAME + ":-" + Constants.MAVEN_STYLE_FAILURE_DEFAULT, message);
     }
 
     /**
@@ -121,7 +122,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder strong(Object message) {
-        return style(".strong:-bold", message);
+        return style("." + Constants.MAVEN_STYLE_STRONG_NAME + ":-" + Constants.MAVEN_STYLE_STRONG_DEFAULT, message);
     }
 
     /**
@@ -133,7 +134,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder mojo(Object message) {
-        return style(".mojo:-f:green", message);
+        return style("." + Constants.MAVEN_STYLE_MOJO_NAME + ":-" + Constants.MAVEN_STYLE_MOJO_DEFAULT, message);
     }
 
     /**
@@ -145,7 +146,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder project(Object message) {
-        return style(".project:-f:cyan", message);
+        return style("." + Constants.MAVEN_STYLE_PROJECT_NAME + ":-" + Constants.MAVEN_STYLE_PROJECT_DEFAULT, message);
     }
 
     @Nonnull
