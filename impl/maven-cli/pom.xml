@@ -30,8 +30,8 @@ under the License.
 
   <artifactId>maven-cli</artifactId>
 
-  <name>Maven CLI</name>
-  <description>Maven CLI component, with CLI and logging support.</description>
+  <name>Maven 4 CLI</name>
+  <description>Maven 4 CLI component, with CLI and logging support.</description>
 
   <dependencies>
     <dependency>

@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven-jline</artifactId>
-  <name>Maven JLine integration</name>
+  <name>Maven 4 JLine integration</name>
   <description>Provides the JLine integration in Maven</description>
 
   <dependencies>

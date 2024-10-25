@@ -28,8 +28,8 @@ under the License.
   </parent>
 
   <artifactId>maven-xml</artifactId>
-  <name>Maven XML API Implementation</name>
-  <description>Provides the implementation classes for the Maven API XML</description>
+  <name>Maven 4 XML Implementation</name>
+  <description>Provides the implementation classes for the Maven XML</description>
 
   <dependencies>
     <dependency>

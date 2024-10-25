@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven-impl</artifactId>
-  <name>Maven API Implementation</name>
+  <name>Maven 4 API Implementation</name>
   <description>Provides the implementation classes for the Maven API</description>
 
   <properties>
