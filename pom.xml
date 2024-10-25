@@ -100,28 +100,10 @@ under the License.
 
   <modules>
     <module>api</module>
-    <module>maven-api-impl</module>
-    <module>maven-plugin-api</module>
-    <module>maven-builder-support</module>
-    <module>maven-model</module>
-    <module>maven-model-builder</module>
-    <module>maven-di</module>
-    <module>maven-xml-impl</module>
-    <module>maven-jline</module>
-    <module>maven-logging</module>
-    <module>maven-core</module>
-    <module>maven-settings</module>
-    <module>maven-settings-builder</module>
-    <module>maven-artifact</module>
-    <module>maven-resolver-provider</module>
-    <module>maven-repository-metadata</module>
-    <module>maven-embedder</module>
-    <module>maven-cli</module>
-    <module>maven-compat</module>
-    <module>apache-maven</module>
-    <module>maven-toolchain-model</module>
-    <module>maven-toolchain-builder</module>
+    <module>impl</module>
+    <module>compat</module>
     <module>maven-docgen</module>
+    <module>apache-maven</module>
   </modules>
 
   <scm>
@@ -224,7 +206,7 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-api-impl</artifactId>
+        <artifactId>maven-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -344,7 +326,7 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-xml-impl</artifactId>
+        <artifactId>maven-xml</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
