@@ -148,6 +148,72 @@ props:
       defaultValue: auto
       since: 4.0.0
       configurationSource: User properties
+    - key: maven.style.debug
+      configurationType: String
+      description: "Color style for debug messages."
+      defaultValue: bold,f:cyan
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.error
+      configurationType: String
+      description: "Color style for error messages."
+      defaultValue: bold,f:red
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.failure
+      configurationType: String
+      description: "Color style for failure messages."
+      defaultValue: bold,f:red
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.info
+      configurationType: String
+      description: "Color style for info messages."
+      defaultValue: bold,f:blue
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.mojo
+      configurationType: String
+      description: "Color style for mojo messages."
+      defaultValue: f:green
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.project
+      configurationType: String
+      description: "Color style for project messages."
+      defaultValue: f:cyan
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.strong
+      configurationType: String
+      description: "Color style for strong messages."
+      defaultValue: bold
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.success
+      configurationType: String
+      description: "Color style for success messages."
+      defaultValue: bold,f:green
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.trace
+      configurationType: String
+      description: "Color style for trace messages."
+      defaultValue: bold,f:magenta
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.transfer
+      configurationType: String
+      description: "Color style for transfer messages."
+      defaultValue: f:bright-black
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.style.warning
+      configurationType: String
+      description: "Color style for warning messages."
+      defaultValue: bold,f:yellow
+      since: 4.0.0
+      configurationSource: User properties
     - key: maven.user.conf
       configurationType: String
       description: "Maven user configuration directory."

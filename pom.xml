@@ -102,7 +102,6 @@ under the License.
     <module>api</module>
     <module>impl</module>
     <module>compat</module>
-    <module>maven-docgen</module>
     <module>apache-maven</module>
   </modules>
 
