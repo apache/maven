@@ -282,6 +282,11 @@ under the License.
               <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
               <arguments>
                 <argument>--mode=maven</argument>
+                <!--
+                TODO: templates are loaded from classpath, in "normal" JAR project local template would override docgen one,
+                but in this case the packaging=pom all I could do is use additionalClasspathElement that APPENDS classpath,
+                hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
+                -->
                 <argument>--templates=maven-configuration.md,configuration.properties,configuration.yaml</argument>
                 <argument>${basedir}/..</argument>
                 <argument>${basedir}/../src/site/markdown/</argument>
