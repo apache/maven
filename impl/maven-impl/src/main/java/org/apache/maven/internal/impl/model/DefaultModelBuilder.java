@@ -1199,9 +1199,13 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // profile injection
             List<Profile> activePomProfiles = getActiveProfiles(interpolatedProfiles, profileActivationContext);
-            result.setActivePomProfiles(activePomProfiles);
             model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
             model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
+
+            List<Profile> allProfiles = new ArrayList<>(parentActivePomProfiles.size() + activePomProfiles.size());
+            allProfiles.addAll(parentActivePomProfiles);
+            allProfiles.addAll(activePomProfiles);
+            result.setActivePomProfiles(allProfiles);
 
             // model interpolation
             Model resultModel = model;
