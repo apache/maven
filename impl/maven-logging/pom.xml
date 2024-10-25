@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven-logging</artifactId>
-  <name>Maven Logging</name>
+  <name>Maven 4 Logging</name>
   <description>Provides the Maven Logging infrastructure</description>
 
   <dependencies>

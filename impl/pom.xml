@@ -28,7 +28,7 @@ under the License.
   <artifactId>maven-impl-modules</artifactId>
   <packaging>pom</packaging>
 
-  <name>Maven Implementation Modules</name>
+  <name>Maven 4 Implementation Modules</name>
 
   <modules>
     <module>maven-impl</module>

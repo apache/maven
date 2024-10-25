@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven-di</artifactId>
-  <name>Maven Dependency Injection</name>
+  <name>Maven 4 Dependency Injection</name>
   <description>Provides the implementation for the Dependency Injection mechanism in Maven</description>
 
   <dependencies>
