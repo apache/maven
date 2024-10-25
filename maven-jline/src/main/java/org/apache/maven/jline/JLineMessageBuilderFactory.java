@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -279,7 +280,13 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompt
         private final Map<String, AttributedStyle> styles = new ConcurrentHashMap<>();
 
         MavenStyleResolver() {
-            super(s -> System.getProperty("style." + s));
+            super(key -> {
+                String v = System.getProperty(Constants.MAVEN_STYLE_PREFIX + key);
+                if (v == null) {
+                    v = System.getProperty("style." + key);
+                }
+                return v;
+            });
         }
 
         @Override
