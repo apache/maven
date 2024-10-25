@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" root="true" xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0-beta-4.xsd">
+  <parent>
+    <groupId>org.apache.maven.its.mng8341</groupId>
+    <artifactId>parent</artifactId>
+    <version>1-SNAPSHOT</version>
+  </parent>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>root</artifactId>
+  <version>1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>parent</module>
+    <module>child1</module>
+    <module>child2</module>
+  </modules>
+</project>
