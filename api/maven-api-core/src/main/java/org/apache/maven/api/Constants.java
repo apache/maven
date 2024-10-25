@@ -161,7 +161,7 @@ public final class Constants {
     public static final String MAVEN_STYLE_PROJECT_NAME = "project";
 
     // Default Values
-    public static final String MAVEN_STYLE_TRANSFER_DEFAULT = "f:faint";
+    public static final String MAVEN_STYLE_TRANSFER_DEFAULT = "f:bright-black";
     public static final String MAVEN_STYLE_TRACE_DEFAULT = "bold,f:magenta";
     public static final String MAVEN_STYLE_DEBUG_DEFAULT = "bold,f:cyan";
     public static final String MAVEN_STYLE_INFO_DEFAULT = "bold,f:blue";

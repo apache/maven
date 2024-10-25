@@ -56,7 +56,7 @@ under the License.
 | 29. | `maven.style.strong` | `String` | Color style for strong messages. |  `bold`  | 4.0.0 | User properties |
 | 30. | `maven.style.success` | `String` | Color style for success messages. |  `bold,f:green`  | 4.0.0 | User properties |
 | 31. | `maven.style.trace` | `String` | Color style for trace messages. |  `bold,f:magenta`  | 4.0.0 | User properties |
-| 32. | `maven.style.transfer` | `String` | Color style for transfer messages. |  `f:faint`  | 4.0.0 | User properties |
+| 32. | `maven.style.transfer` | `String` | Color style for transfer messages. |  `f:bright-black`  | 4.0.0 | User properties |
 | 33. | `maven.style.warning` | `String` | Color style for warning messages. |  `bold,f:yellow`  | 4.0.0 | User properties |
 | 34. | `maven.user.conf` | `String` | Maven user configuration directory. |  `${user.home}/.m2`  | 4.0.0 | User properties |
 | 35. | `maven.user.extensions` | `String` | Maven user extensions. |  `${maven.user.conf}/extensions.xml`  | 4.0.0 | User properties |
