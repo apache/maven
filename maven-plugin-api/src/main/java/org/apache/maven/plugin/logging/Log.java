@@ -27,9 +27,7 @@ package org.apache.maven.plugin.logging;
  * rather than formatting first by calling <code>toString()</code>.
  *
  *
- * @deprecated Use SLF4J directly
  */
-@Deprecated
 public interface Log {
     /**
      * @return true if the <b>debug</b> error level is enabled
