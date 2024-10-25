@@ -16,3 +16,4 @@ jvz-*
 dependency-reduced-pom.xml
 .factorypath
 .java-version
+build-cache/

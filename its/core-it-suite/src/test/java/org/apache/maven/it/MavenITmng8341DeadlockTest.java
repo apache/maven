@@ -23,6 +23,7 @@ import java.io.File;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8341">MNG-8341</a>.
@@ -36,6 +37,7 @@ class MavenITmng8341DeadlockTest extends AbstractMavenIntegrationTestCase {
     /**
      *  Verify that the build succeeds
      */
+    @Timeout(value = 60)
     @Test
     void testDeadlock() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8341-deadlock");
