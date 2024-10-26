@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -92,7 +94,6 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class MavenProject implements Cloneable {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MavenProject.class);
 
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
@@ -101,96 +102,215 @@ public class MavenProject implements Cloneable {
 
     public static final String EMPTY_PROJECT_VERSION = "0";
 
+    @Nonnull
     private Model model;
 
+    @Nullable
     private MavenProject parent;
 
+    /**
+     * The path to the {@code pom.xml} file. By default, this file is located in {@link #basedir}.
+     */
+    @Nullable
     private File file;
 
+    /**
+     * The project base directory.
+     * By default, this is the parent of the {@linkplain #getFile() <abbr>POM</abbr> file}.
+     */
+    @Nullable
     private File basedir;
 
+    // TODO: what is the difference with {@code basedir}?
+    @Nullable
     private Path rootDirectory;
 
+    /**
+     * The artifacts specified by {@code setResolvedArtifacts(Set)}. This is for Maven internal usage only.
+     * This collection should be handled as if it was <em>immutable</em>,
+     * because it may be shared by cloned {@code MavenProject} instances.
+     */
+    @Nullable
     private Set<Artifact> resolvedArtifacts;
 
+    /**
+     * The filter to apply on {@link #resolvedArtifacts} when {@link #artifacts} is lazily populated.
+     * May be {@code null} to <em>exclude</em> all resolved artifacts.
+     */
+    @Nullable
     private ArtifactFilter artifactFilter;
 
+    /**
+     * All dependencies that this project has, including transitive ones.
+     * May be lazily computed from {@link #resolvedArtifacts}.
+     * This is an <em>immutable</em> collection potentially shared by cloned {@code MavenProject} instances.
+     */
+    @Nullable // Computed when first requested.
     private Set<Artifact> artifacts;
 
+    @Nullable
     private Artifact parentArtifact;
 
+    /**
+     * The plugin dependencies that this project has.
+     * This is an <em>immutable</em> collection potentially shared by cloned {@code MavenProject} instances.
+     */
+    @Nonnull
     private Set<Artifact> pluginArtifacts;
 
+    /**
+     * The artifact repositories of this project.
+     * This is an <em>immutable</em> collection potentially shared by cloned {@code MavenProject} instances.
+     */
+    @Nonnull
     private List<ArtifactRepository> remoteArtifactRepositories;
 
+    /**
+     * The plugin repositories of this project.
+     * This is an <em>immutable</em> collection potentially shared by cloned {@code MavenProject} instances.
+     */
+    @Nonnull
     private List<ArtifactRepository> pluginArtifactRepositories;
 
+    /**
+     * Cached value computed from {@link #remoteArtifactRepositories} when first requested.
+     * This is an <em>immutable</em> collection potentially shared by cloned {@code MavenProject} instances.
+     */
+    @Nullable // Computed when first requested.
     private List<RemoteRepository> remoteProjectRepositories;
 
+    /**
+     * Cached value computed from {@link #pluginArtifactRepositories} when first requested.
+     * This is an <em>immutable</em> collection potentially shared by cloned {@code MavenProject} instances.
+     */
+    @Nullable // Computed when first requested.
     private List<RemoteRepository> remotePluginRepositories;
 
+    /**
+     * List of the attached artifacts to this project.
+     */
+    @Nonnull
     private List<Artifact> attachedArtifacts = new ArrayList<>();
 
+    @Nullable
     private MavenProject executionProject;
 
+    /**
+     * The collected projects.
+     * This is an <em>immutable</em> collection potentially shared by cloned {@code MavenProject} instances.
+     */
+    @Nonnull
     private List<MavenProject> collectedProjects;
 
+    /**
+     * Root directories of source codes to compile.
+     */
+    @Nonnull
     private List<String> compileSourceRoots = new ArrayList<>();
 
+    /**
+     * Root directories of test codes to compile.
+     */
+    @Nonnull
     private List<String> testCompileSourceRoots = new ArrayList<>();
 
+    /**
+     * Root directories of scriot codes.
+     */
+    @Nonnull
     private List<String> scriptSourceRoots = new ArrayList<>();
 
+    @Nullable
     private ArtifactRepository releaseArtifactRepository;
 
+    @Nullable
     private ArtifactRepository snapshotArtifactRepository;
 
+    /**
+     * The active profiles.
+     * This is an <em>immutable</em> collection potentially shared by cloned {@code MavenProject} instances.
+     */
+    @Nonnull
     private List<Profile> activeProfiles = new ArrayList<>();
 
+    /**
+     * The identifiers of all profiles that contributed to this project's effective model.
+     */
+    @Nonnull
     private Map<String, List<String>> injectedProfileIds = new LinkedHashMap<>();
 
+    /**
+     * Direct dependencies that this project has.
+     * This is an <em>immutable</em> collection potentially shared by cloned {@code MavenProject} instances.
+     */
+    @Nullable // For compatibility with previous behavior.
+    @Deprecated
     private Set<Artifact> dependencyArtifacts;
 
+    @Nullable
     private Artifact artifact;
 
-    // calculated.
+    @Nullable // calculated when first requested.
     private Map<String, Artifact> artifactMap;
 
+    @Nullable
     private Model originalModel;
 
+    @Nullable // Computed when first requested.
     private Map<String, Artifact> pluginArtifactMap;
 
+    @Nonnull
     private Set<Artifact> reportArtifacts;
 
+    @Nullable
     private Map<String, Artifact> reportArtifactMap;
 
+    @Nonnull
     private Set<Artifact> extensionArtifacts;
 
+    @Nullable // Computed when first requested.
     private Map<String, Artifact> extensionArtifactMap;
 
+    @Nonnull
     private Map<String, Artifact> managedVersionMap;
 
+    /**
+     * Projects by identifiers.
+     */
+    @Nonnull
     private Map<String, MavenProject> projectReferences = new HashMap<>();
 
     private boolean executionRoot;
 
+    @Nullable
     private File parentFile;
 
+    /**
+     * Key-value pairs providing context.
+     */
+    @Nonnull
     private Map<String, Object> context;
 
+    @Nullable
     private ClassRealm classRealm;
 
+    @Nullable
     private DependencyFilter extensionDependencyFilter;
 
+    /**
+     * The life cycle phases.
+     */
+    @Nonnull
     private final Set<String> lifecyclePhases = Collections.synchronizedSet(new LinkedHashSet<>());
 
+    /**
+     * Creates an initially empty project.
+     */
     public MavenProject() {
         Model model = new Model();
-
         model.setGroupId(EMPTY_PROJECT_GROUP_ID);
         model.setArtifactId(EMPTY_PROJECT_ARTIFACT_ID);
         model.setVersion(EMPTY_PROJECT_VERSION);
-
         setModel(model);
     }
 
@@ -198,19 +318,32 @@ public class MavenProject implements Cloneable {
         this(new Model(model));
     }
 
-    public MavenProject(Model model) {
+    /**
+     * Creates a project derived from the given model.
+     *
+     * @param model the model to wrap in a maven project
+     */
+    public MavenProject(@Nonnull Model model) {
         setModel(model);
     }
 
-    public MavenProject(MavenProject project) {
+    /**
+     * Creates a copy of the given project.
+     *
+     * @param project the project to copy
+     * @see #clone()
+     */
+    public MavenProject(@Nonnull MavenProject project) {
         deepCopy(project);
     }
 
+    // TODO: where is the difference with {@code basedir} and {@code rootDirectory}?
+    @Nullable
     public File getParentFile() {
         return parentFile;
     }
 
-    public void setParentFile(File parentFile) {
+    public void setParentFile(@Nullable File parentFile) {
         this.parentFile = parentFile;
     }
 
@@ -218,15 +351,17 @@ public class MavenProject implements Cloneable {
     // Accessors
     // ----------------------------------------------------------------------
 
+    @Nullable
     public Artifact getArtifact() {
         return artifact;
     }
 
-    public void setArtifact(Artifact artifact) {
-        this.artifact = artifact;
+    public void setArtifact(@Nullable Artifact target) {
+        artifact = target;
     }
 
     // TODO I would like to get rid of this. jvz.
+    @Nonnull
     public Model getModel() {
         return model;
     }
@@ -236,11 +371,12 @@ public class MavenProject implements Cloneable {
      *
      * @return the parent, or null if no parent is declared or there was an error building it
      */
+    @Nullable
     public MavenProject getParent() {
         return parent;
     }
 
-    public void setParent(MavenProject parent) {
+    public void setParent(@Nullable MavenProject parent) {
         this.parent = parent;
     }
 
@@ -248,11 +384,21 @@ public class MavenProject implements Cloneable {
         return getParent() != null;
     }
 
+    /**
+     * {@return the path to the {@code pom.xml} file}.
+     * By default, this file is located in the {@linkplain #getBasedir() base directory}.
+     */
+    @Nullable
     public File getFile() {
         return file;
     }
 
-    public void setFile(File file) {
+    /**
+     * Sets the {@code pom.xml} file to the given file, and the base directory to the parent of that file.
+     *
+     * @param file the new {@code pom.xml} file, as a file located in the new base directory
+     */
+    public void setFile(@Nullable File file) {
         this.file = file;
         this.basedir = file != null ? file.getParentFile() : null;
     }
@@ -260,12 +406,18 @@ public class MavenProject implements Cloneable {
     /**
      * Sets project {@code file} without changing project {@code basedir}.
      *
+     * @param file the new {@code pom.xml} file
      * @since 3.2.4
      */
-    public void setPomFile(File file) {
+    public void setPomFile(@Nullable File file) {
         this.file = file;
     }
 
+    /**
+     * {@return the project base directory}.
+     * By default, this is the parent of the {@linkplain #getFile() <abbr>POM</abbr> file}.
+     */
+    @Nullable
     public File getBasedir() {
         return basedir;
     }
@@ -290,15 +442,14 @@ public class MavenProject implements Cloneable {
         if (path != null) {
             path = path.trim();
             if (!path.isEmpty()) {
-                File file = new File(path);
-                if (file.isAbsolute()) {
-                    path = file.getAbsolutePath();
+                File f = new File(path);
+                if (f.isAbsolute()) {
+                    path = f.getAbsolutePath();
                 } else if (".".equals(path)) {
                     path = getBasedir().getAbsolutePath();
                 } else {
                     path = new File(getBasedir(), path).getAbsolutePath();
                 }
-
                 if (!paths.contains(path)) {
                     paths.add(path);
                 }
@@ -306,18 +457,36 @@ public class MavenProject implements Cloneable {
         }
     }
 
-    public void addCompileSourceRoot(String path) {
+    /**
+     * If the given path is non-null, adds it to the source root directories. Otherwise, does nothing.
+     *
+     * @param path the path to add if non-null
+     */
+    public void addCompileSourceRoot(@Nullable String path) {
         addPath(getCompileSourceRoots(), path);
     }
 
-    public void addTestCompileSourceRoot(String path) {
+    /**
+     * If the given path is non-null, adds it to the test root directories. Otherwise, does nothing.
+     *
+     * @param path the path to add if non-null
+     */
+    public void addTestCompileSourceRoot(@Nullable String path) {
         addPath(getTestCompileSourceRoots(), path);
     }
 
+    /**
+     * {@return the source root directories as an unmodifiable list}.
+     */
+    @Nonnull
     public List<String> getCompileSourceRoots() {
         return compileSourceRoots;
     }
 
+    /**
+     * {@return the test root directories as an unmodifiable list}.
+     */
+    @Nonnull
     public List<String> getTestCompileSourceRoots() {
         return testCompileSourceRoots;
     }
@@ -374,7 +543,7 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * Returns the elements placed on the classpath for compilation.
+     * {@return the elements placed on the classpath for compilation}.
      * This method can be invoked when the caller does not support module-path.
      *
      * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
@@ -388,7 +557,7 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * Returns the elements placed on the classpath for tests.
+     * {@return the elements placed on the classpath for tests}.
      * This method can be invoked when the caller does not support module-path.
      *
      * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
@@ -402,7 +571,7 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * Returns the elements placed on the classpath for runtime.
+     * {@return the elements placed on the classpath for runtime}.
      * This method can be invoked when the caller does not support module-path.
      *
      * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
@@ -437,11 +606,9 @@ public class MavenProject implements Cloneable {
 
     public String getGroupId() {
         String groupId = getModel().getGroupId();
-
         if ((groupId == null) && (getModel().getParent() != null)) {
             groupId = getModel().getParent().getGroupId();
         }
-
         return groupId;
     }
 
@@ -472,11 +639,9 @@ public class MavenProject implements Cloneable {
 
     public String getVersion() {
         String version = getModel().getVersion();
-
         if ((version == null) && (getModel().getParent() != null)) {
             version = getModel().getParent().getVersion();
         }
-
         return version;
     }
 
@@ -628,11 +793,17 @@ public class MavenProject implements Cloneable {
         getModel().addLicense(license);
     }
 
-    public void setArtifacts(Set<Artifact> artifacts) {
+    /**
+     * Sets all dependencies that this project has, including transitive ones.
+     *
+     * <h4>Side effects</h4>
+     * Invoking this method will also modify the values returned by {@link #getArtifactMap()}.
+     *
+     * @param artifacts the new project dependencies
+     */
+    public void setArtifacts(@Nonnull Set<Artifact> artifacts) {
         this.artifacts = artifacts;
-
-        // flush the calculated artifactMap
-        artifactMap = null;
+        artifactMap = null; // flush the calculated artifactMap
     }
 
     /**
@@ -640,9 +811,10 @@ public class MavenProject implements Cloneable {
      * what phases have run dependencies in some scopes won't be included. e.g. if only compile phase has run,
      * dependencies with scope test won't be included.
      *
-     * @return {@link Set} &lt; {@link Artifact} &gt;
-     * @see #getDependencyArtifacts() to get only direct dependencies
+     * @return set of dependencies
      */
+    @Nonnull
+    @SuppressWarnings("ReturnOfCollectionOrArrayField") // The returned set is unmodifiable.
     public Set<Artifact> getArtifacts() {
         if (artifacts == null) {
             if (artifactFilter == null || resolvedArtifacts == null) {
@@ -659,6 +831,7 @@ public class MavenProject implements Cloneable {
         return artifacts;
     }
 
+    @Nonnull
     public Map<String, Artifact> getArtifactMap() {
         if (artifactMap == null) {
             artifactMap = ArtifactUtils.artifactMapByVersionlessId(getArtifacts());
@@ -666,28 +839,43 @@ public class MavenProject implements Cloneable {
         return artifactMap;
     }
 
-    public void setPluginArtifacts(Set<Artifact> pluginArtifacts) {
+    /**
+     * Sets all plugins that this project has, including transitive ones.
+     *
+     * <h4>Side effects</h4>
+     * Invoking this method will also modify the values returned by {@link #getPluginArtifactMap()}.
+     *
+     * @param pluginArtifacts the new project plugins
+     */
+    public void setPluginArtifacts(@Nonnull Set<Artifact> pluginArtifacts) {
         this.pluginArtifacts = pluginArtifacts;
-
         this.pluginArtifactMap = null;
     }
 
+    /**
+     * All plugins that this project has.
+     *
+     * @return unmodifiable set of plugins
+     */
+    @Nonnull
+    @SuppressWarnings("ReturnOfCollectionOrArrayField") // The returned set is unmodifiable.
     public Set<Artifact> getPluginArtifacts() {
         return pluginArtifacts;
     }
 
+    @Nonnull
     public Map<String, Artifact> getPluginArtifactMap() {
         if (pluginArtifactMap == null) {
             pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getPluginArtifacts());
         }
-
         return pluginArtifactMap;
     }
 
-    public void setParentArtifact(Artifact parentArtifact) {
+    public void setParentArtifact(@Nullable Artifact parentArtifact) {
         this.parentArtifact = parentArtifact;
     }
 
+    @Nullable
     public Artifact getParentArtifact() {
         return parentArtifact;
     }
@@ -716,54 +904,65 @@ public class MavenProject implements Cloneable {
 
     public PluginManagement getPluginManagement() {
         PluginManagement pluginMgmt = null;
-
         Build build = getModel().getBuild();
         if (build != null) {
             pluginMgmt = build.getPluginManagement();
         }
-
         return pluginMgmt;
     }
 
     private Build getModelBuild() {
         Build build = getModel().getBuild();
-
         if (build == null) {
             build = new Build();
 
             getModel().setBuild(build);
         }
-
         return build;
     }
 
-    public void setRemoteArtifactRepositories(List<ArtifactRepository> remoteArtifactRepositories) {
+    /**
+     * Sets the artifact repositories of this project.
+     *
+     * @param remoteArtifactRepositories the new artifact repositories
+     */
+    public void setRemoteArtifactRepositories(@Nonnull List<ArtifactRepository> remoteArtifactRepositories) {
         this.remoteArtifactRepositories = remoteArtifactRepositories;
         this.remoteProjectRepositories = RepositoryUtils.toRepos(getRemoteArtifactRepositories());
     }
 
+    /**
+     * {@return the artifact repositories of this project}. The returned list is unmodifiable for ensuring
+     * that {@link #getRemoteProjectRepositories()} stay consistent with the values returned by this method.
+     */
+    @Nonnull
+    @SuppressWarnings("ReturnOfCollectionOrArrayField") // The returned list is unmodifiable.
     public List<ArtifactRepository> getRemoteArtifactRepositories() {
         if (remoteArtifactRepositories == null) {
             remoteArtifactRepositories = new ArrayList<>();
         }
-
         return remoteArtifactRepositories;
     }
 
-    public void setPluginArtifactRepositories(List<ArtifactRepository> pluginArtifactRepositories) {
+    /**
+     * Sets the plugin repositories of this project.
+     *
+     * @param pluginArtifactRepositories the new artifact repositories
+     */
+    public void setPluginArtifactRepositories(@Nonnull List<ArtifactRepository> pluginArtifactRepositories) {
         this.pluginArtifactRepositories = pluginArtifactRepositories;
         this.remotePluginRepositories = RepositoryUtils.toRepos(getPluginArtifactRepositories());
     }
 
     /**
-     * @return a list of ArtifactRepository objects constructed from the Repository objects returned by
-     *         getPluginRepositories.
+     * {@return the plugin repositories of this project}.
      */
+    @Nonnull
+    @SuppressWarnings("ReturnOfCollectionOrArrayField") // The returned list is unmodifiable.
     public List<ArtifactRepository> getPluginArtifactRepositories() {
         if (pluginArtifactRepositories == null) {
             pluginArtifactRepositories = new ArrayList<>();
         }
-
         return pluginArtifactRepositories;
     }
 
@@ -777,23 +976,31 @@ public class MavenProject implements Cloneable {
         return getModel().getPluginRepositories();
     }
 
+    @Nonnull
     public List<RemoteRepository> getRemoteProjectRepositories() {
         return remoteProjectRepositories;
     }
 
+    @Nonnull
     public List<RemoteRepository> getRemotePluginRepositories() {
         return remotePluginRepositories;
     }
 
-    public void setActiveProfiles(List<Profile> activeProfiles) {
+    /**
+     * Sets the active profiles of this project.
+     *
+     * @param activeProfiles the new active profiles of this project
+     */
+    public void setActiveProfiles(@Nonnull List<Profile> activeProfiles) {
         this.activeProfiles = activeProfiles;
     }
 
+    @Nonnull
     public List<Profile> getActiveProfiles() {
         return activeProfiles;
     }
 
-    public void setInjectedProfileIds(String source, List<String> injectedProfileIds) {
+    public void setInjectedProfileIds(@Nonnull String source, @Nullable List<String> injectedProfileIds) {
         if (injectedProfileIds != null) {
             this.injectedProfileIds.put(source, new ArrayList<>(injectedProfileIds));
         } else {
@@ -808,9 +1015,9 @@ public class MavenProject implements Cloneable {
      * {@code <groupId>:<artifactId>:<version>} for a POM profile or {@code external} for profiles from the
      * {@code settings.xml}.
      *
-     * @return The identifiers of all injected profiles, indexed by the source from which the profiles originated, never
-     *         {@code null}.
+     * @return The identifiers of all injected profiles, indexed by the source from which the profiles originated
      */
+    @Nonnull
     public Map<String, List<String>> getInjectedProfileIds() {
         return this.injectedProfileIds;
     }
@@ -826,7 +1033,8 @@ public class MavenProject implements Cloneable {
      * @deprecated Please use {@link MavenProjectHelper}
      * @throws DuplicateArtifactAttachmentException will never happen but leave it for backward compatibility
      */
-    public void addAttachedArtifact(Artifact artifact) throws DuplicateArtifactAttachmentException {
+    @Deprecated
+    public void addAttachedArtifact(@Nonnull Artifact artifact) throws DuplicateArtifactAttachmentException {
         // if already there we remove it and add again
         int index = attachedArtifacts.indexOf(artifact);
         if (index >= 0) {
@@ -842,6 +1050,7 @@ public class MavenProject implements Cloneable {
      *
      * @return the attached artifacts of this project
      */
+    @Nonnull
     public List<Artifact> getAttachedArtifacts() {
         if (attachedArtifacts == null) {
             attachedArtifacts = new ArrayList<>();
@@ -852,12 +1061,10 @@ public class MavenProject implements Cloneable {
     public Xpp3Dom getGoalConfiguration(
             String pluginGroupId, String pluginArtifactId, String executionId, String goalId) {
         Xpp3Dom dom = null;
-
         if (getBuildPlugins() != null) {
             for (Plugin plugin : getBuildPlugins()) {
                 if (pluginGroupId.equals(plugin.getGroupId()) && pluginArtifactId.equals(plugin.getArtifactId())) {
                     dom = (Xpp3Dom) plugin.getConfiguration();
-
                     if (executionId != null) {
                         for (PluginExecution execution : plugin.getExecutions()) {
                             if (executionId.equals(execution.getId())) {
@@ -871,67 +1078,77 @@ public class MavenProject implements Cloneable {
                 }
             }
         }
-
         if (dom != null) {
             // make a copy so the original in the POM doesn't get messed with
             dom = new Xpp3Dom(dom);
         }
-
         return dom;
     }
 
+    @Nonnull
     public MavenProject getExecutionProject() {
         return (executionProject == null ? this : executionProject);
     }
 
-    public void setExecutionProject(MavenProject executionProject) {
+    public void setExecutionProject(@Nullable MavenProject executionProject) {
         this.executionProject = executionProject;
     }
 
+    @Nonnull
     public List<MavenProject> getCollectedProjects() {
         return collectedProjects;
     }
 
-    public void setCollectedProjects(List<MavenProject> collectedProjects) {
+    /**
+     * Sets the collected project.
+     *
+     * @param collectedProjects the collected projects
+     */
+    public void setCollectedProjects(@Nonnull List<MavenProject> collectedProjects) {
         this.collectedProjects = collectedProjects;
     }
 
     /**
-     * Direct dependencies that this project has.
+     * {@return the direct dependencies that this project has, or null if none}.
+     * <em>Note that this method returns {@code null} instead of an empty set when there is no dependencies.</em>
+     * This unusual behavior is kept for compatibility reasons with existing codes, which test for nullity instead
+     * of emptiness.
      *
-     * @return {@link Set} &lt; {@link Artifact} &gt;
      * @see #getArtifacts() to get all transitive dependencies
      */
     @Deprecated
+    @Nullable // For compatibility with previous behavior.
     public Set<Artifact> getDependencyArtifacts() {
         return dependencyArtifacts;
     }
 
     @Deprecated
-    public void setDependencyArtifacts(Set<Artifact> dependencyArtifacts) {
+    public void setDependencyArtifacts(@Nonnull Set<Artifact> dependencyArtifacts) {
         this.dependencyArtifacts = dependencyArtifacts;
     }
 
-    public void setReleaseArtifactRepository(ArtifactRepository releaseArtifactRepository) {
+    public void setReleaseArtifactRepository(@Nullable ArtifactRepository releaseArtifactRepository) {
         this.releaseArtifactRepository = releaseArtifactRepository;
     }
 
-    public void setSnapshotArtifactRepository(ArtifactRepository snapshotArtifactRepository) {
+    public void setSnapshotArtifactRepository(@Nullable ArtifactRepository snapshotArtifactRepository) {
         this.snapshotArtifactRepository = snapshotArtifactRepository;
     }
 
-    public void setOriginalModel(Model originalModel) {
+    public void setOriginalModel(@Nullable Model originalModel) {
         this.originalModel = originalModel;
     }
 
+    @Nullable
     public Model getOriginalModel() {
         return originalModel;
     }
 
-    public void setManagedVersionMap(Map<String, Artifact> map) {
+    public void setManagedVersionMap(@Nonnull Map<String, Artifact> map) {
         managedVersionMap = map;
     }
 
+    @Nonnull
     public Map<String, Artifact> getManagedVersionMap() {
         return managedVersionMap;
     }
@@ -943,9 +1160,7 @@ public class MavenProject implements Cloneable {
         } else if (!(other instanceof MavenProject)) {
             return false;
         }
-
         MavenProject that = (MavenProject) other;
-
         return Objects.equals(getArtifactId(), that.getArtifactId())
                 && Objects.equals(getGroupId(), that.getGroupId())
                 && Objects.equals(getVersion(), that.getVersion());
@@ -965,7 +1180,7 @@ public class MavenProject implements Cloneable {
         }
     }
 
-    public void addProjectReference(MavenProject project) {
+    public void addProjectReference(@Nonnull MavenProject project) {
         projectReferences.put(
                 getProjectReferenceId(project.getGroupId(), project.getArtifactId(), project.getVersion()), project);
     }
@@ -978,6 +1193,7 @@ public class MavenProject implements Cloneable {
         return getBuild().getFilters();
     }
 
+    @Nonnull
     public Map<String, MavenProject> getProjectReferences() {
         return projectReferences;
     }
@@ -999,7 +1215,7 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * Default toString
+     * {@return a string representation for debugging purposes}.
      */
     @Override
     public String toString() {
@@ -1014,12 +1230,15 @@ public class MavenProject implements Cloneable {
             sb.append(" @ ");
             sb.append(getFile().getPath());
         }
-
         return sb.toString();
     }
 
     /**
+     * {@return a deep copy of this object}.
+     *
      * @since 2.0.9
+     *
+     * @see #MavenProject(MavenProject)
      */
     @Override
     public MavenProject clone() {
@@ -1029,119 +1248,113 @@ public class MavenProject implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new UnsupportedOperationException(e);
         }
-
         clone.deepCopy(this);
-
         return clone;
     }
 
-    public void setModel(Model model) {
+    public void setModel(@Nonnull Model model) {
         this.model = model;
     }
 
-    protected void setAttachedArtifacts(List<Artifact> attachedArtifacts) {
+    /**
+     * Sets the artifacts attached to this project.
+     *
+     * @param attachedArtifacts the new artifacts attached to this project
+     */
+    protected void setAttachedArtifacts(@Nonnull List<Artifact> attachedArtifacts) {
         this.attachedArtifacts = attachedArtifacts;
     }
 
-    protected void setCompileSourceRoots(List<String> compileSourceRoots) {
+    /**
+     * Sets the source root directories of this project.
+     *
+     * @param compileSourceRoots the new source root directories
+     */
+    protected void setCompileSourceRoots(@Nonnull List<String> compileSourceRoots) {
         this.compileSourceRoots = compileSourceRoots;
     }
 
-    protected void setTestCompileSourceRoots(List<String> testCompileSourceRoots) {
+    /**
+     * Sets the test source directories of this project.
+     *
+     * @param testCompileSourceRoots the new test source directories
+     */
+    protected void setTestCompileSourceRoots(@Nonnull List<String> testCompileSourceRoots) {
         this.testCompileSourceRoots = testCompileSourceRoots;
     }
 
+    @Nullable
     protected ArtifactRepository getReleaseArtifactRepository() {
         return releaseArtifactRepository;
     }
 
+    @Nullable
     protected ArtifactRepository getSnapshotArtifactRepository() {
         return snapshotArtifactRepository;
     }
 
     private void deepCopy(MavenProject project) {
         // disown the parent
-
         // copy fields
         file = project.file;
         basedir = project.basedir;
-
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be
         // sure!
         if (project.getDependencyArtifacts() != null) {
             setDependencyArtifacts(Collections.unmodifiableSet(project.getDependencyArtifacts()));
         }
-
         if (project.getArtifacts() != null) {
             setArtifacts(Collections.unmodifiableSet(project.getArtifacts()));
         }
-
         if (project.getParentFile() != null) {
             parentFile = new File(project.getParentFile().getAbsolutePath());
         }
-
         if (project.getPluginArtifacts() != null) {
             setPluginArtifacts(Collections.unmodifiableSet(project.getPluginArtifacts()));
         }
-
         if (project.getReportArtifacts() != null) {
             setReportArtifacts(Collections.unmodifiableSet(project.getReportArtifacts()));
         }
-
         if (project.getExtensionArtifacts() != null) {
             setExtensionArtifacts(Collections.unmodifiableSet(project.getExtensionArtifacts()));
         }
-
         setParentArtifact((project.getParentArtifact()));
-
         if (project.getRemoteArtifactRepositories() != null) {
             setRemoteArtifactRepositories(Collections.unmodifiableList(project.getRemoteArtifactRepositories()));
         }
-
         if (project.getPluginArtifactRepositories() != null) {
             setPluginArtifactRepositories(Collections.unmodifiableList(project.getPluginArtifactRepositories()));
         }
-
         if (project.getActiveProfiles() != null) {
             setActiveProfiles((Collections.unmodifiableList(project.getActiveProfiles())));
         }
-
         if (project.getAttachedArtifacts() != null) {
             // clone properties modifiable by plugins in a forked lifecycle
             setAttachedArtifacts(new ArrayList<>(project.getAttachedArtifacts()));
         }
-
         if (project.getCompileSourceRoots() != null) {
             // clone source roots
             setCompileSourceRoots((new ArrayList<>(project.getCompileSourceRoots())));
         }
-
         if (project.getTestCompileSourceRoots() != null) {
             setTestCompileSourceRoots((new ArrayList<>(project.getTestCompileSourceRoots())));
         }
-
         if (project.getScriptSourceRoots() != null) {
             setScriptSourceRoots((new ArrayList<>(project.getScriptSourceRoots())));
         }
-
         if (project.getModel() != null) {
             setModel(project.getModel().clone());
         }
-
         if (project.getOriginalModel() != null) {
             setOriginalModel(project.getOriginalModel());
         }
-
         setExecutionRoot(project.isExecutionRoot());
-
         if (project.getArtifact() != null) {
             setArtifact(ArtifactUtils.copyArtifact(project.getArtifact()));
         }
-
         if (project.getManagedVersionMap() != null) {
             setManagedVersionMap(project.getManagedVersionMap());
         }
-
         lifecyclePhases.addAll(project.lifecyclePhases);
     }
 
@@ -1153,10 +1366,13 @@ public class MavenProject implements Cloneable {
 
     /**
      * Sets the value of the context value of this project identified by the given key. If the supplied value is
-     * <code>null</code>, the context value is removed from this project. Context values are intended to allow core
+     * {@code null}, the context value is removed from this project. Context values are intended to allow core
      * extensions to associate derived state with project instances.
+     *
+     * @param key the key to associate to a value
+     * @param value the value to associate to the given key, or {@code null} for removing the association
      */
-    public void setContextValue(String key, Object value) {
+    public void setContextValue(@Nonnull String key, @Nullable Object value) {
         if (context == null) {
             context = new HashMap<>();
         }
@@ -1169,6 +1385,9 @@ public class MavenProject implements Cloneable {
 
     /**
      * Returns context value of this project associated with the given key or null if this project has no such value.
+     *
+     * @param key the key of the value to get
+     * @return the associated value, or {@code null} if none
      */
     public Object getContextValue(String key) {
         if (context == null) {
@@ -1183,6 +1402,7 @@ public class MavenProject implements Cloneable {
      * without prior notice and must not be used by plugins.
      *
      * @param classRealm The class realm hosting the build extensions of this project, may be {@code null}.
+     * @hidden
      */
     public void setClassRealm(ClassRealm classRealm) {
         this.classRealm = classRealm;
@@ -1195,6 +1415,7 @@ public class MavenProject implements Cloneable {
      * used by plugins.
      *
      * @return The project's class realm or {@code null}.
+     * @hidden
      */
     public ClassRealm getClassRealm() {
         return classRealm;
@@ -1206,6 +1427,7 @@ public class MavenProject implements Cloneable {
      * In particular, this method can be changed or deleted without prior notice and must not be used by plugins.
      *
      * @param extensionDependencyFilter The dependency filter to apply to plugins, may be {@code null}.
+     * @hidden
      */
     public void setExtensionDependencyFilter(DependencyFilter extensionDependencyFilter) {
         this.extensionDependencyFilter = extensionDependencyFilter;
@@ -1218,6 +1440,7 @@ public class MavenProject implements Cloneable {
      * used by plugins.
      *
      * @return The dependency filter or {@code null}.
+     * @hidden
      */
     public DependencyFilter getExtensionDependencyFilter() {
         return extensionDependencyFilter;
@@ -1229,9 +1452,10 @@ public class MavenProject implements Cloneable {
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
      *
-     * @param artifacts The set of artifacts, may be {@code null}.
+     * @param artifacts the set of artifacts, may be {@code null}
+     * @hidden
      */
-    public void setResolvedArtifacts(Set<Artifact> artifacts) {
+    public void setResolvedArtifacts(@Nullable Set<Artifact> artifacts) {
         this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.<Artifact>emptySet();
         this.artifacts = null;
         this.artifactMap = null;
@@ -1243,9 +1467,10 @@ public class MavenProject implements Cloneable {
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
      *
-     * @param artifactFilter The artifact filter, may be {@code null} to exclude all artifacts.
+     * @param artifactFilter the artifact filter, may be {@code null} to exclude all artifacts
+     * @hidden
      */
-    public void setArtifactFilter(ArtifactFilter artifactFilter) {
+    public void setArtifactFilter(@Nullable ArtifactFilter artifactFilter) {
         this.artifactFilter = artifactFilter;
         this.artifacts = null;
         this.artifactMap = null;
@@ -1258,6 +1483,7 @@ public class MavenProject implements Cloneable {
      *
      * @param phase The phase to check for, must not be {@code null}.
      * @return {@code true} if the phase has been seen.
+     * @hidden
      */
     public boolean hasLifecyclePhase(String phase) {
         return lifecyclePhases.contains(phase);
@@ -1269,6 +1495,7 @@ public class MavenProject implements Cloneable {
      * used by plugins.
      *
      * @param lifecyclePhase The lifecycle phase to add, must not be {@code null}.
+     * @hidden
      */
     public void addLifecyclePhase(String lifecyclePhase) {
         lifecyclePhases.add(lifecyclePhase);
@@ -1295,45 +1522,33 @@ public class MavenProject implements Cloneable {
         // FIXME: This is hacky. What if module directory doesn't match artifactid, and parent
         // is coming from the repository??
         String module = moduleProject.getArtifactId();
-
         File moduleFile = moduleProject.getFile();
-
         if (moduleFile != null) {
             File moduleDir = moduleFile.getCanonicalFile().getParentFile();
-
             module = moduleDir.getName();
         }
-
         if (moduleAdjustments == null) {
             moduleAdjustments = new HashMap<>();
-
             List<String> modules = getModules();
             if (modules != null) {
                 for (String modulePath : modules) {
                     String moduleName = modulePath;
-
                     if (moduleName.endsWith("/") || moduleName.endsWith("\\")) {
                         moduleName = moduleName.substring(0, moduleName.length() - 1);
                     }
-
                     int lastSlash = moduleName.lastIndexOf('/');
-
                     if (lastSlash < 0) {
                         lastSlash = moduleName.lastIndexOf('\\');
                     }
-
                     String adjustment = null;
-
                     if (lastSlash > -1) {
                         moduleName = moduleName.substring(lastSlash + 1);
                         adjustment = modulePath.substring(0, lastSlash);
                     }
-
                     moduleAdjustments.put(moduleName, adjustment);
                 }
             }
         }
-
         return moduleAdjustments.get(module);
     }
 
@@ -1344,13 +1559,18 @@ public class MavenProject implements Cloneable {
                 artifactFactory, getModel().getDependencies(), inheritedScope, filter, this);
     }
 
+    /**
+     * Sets the test script directories of this project.
+     *
+     * @param scriptSourceRoots the new test script directories
+     */
     @Deprecated
-    protected void setScriptSourceRoots(List<String> scriptSourceRoots) {
+    protected void setScriptSourceRoots(@Nonnull List<String> scriptSourceRoots) {
         this.scriptSourceRoots = scriptSourceRoots;
     }
 
     @Deprecated
-    public void addScriptSourceRoot(String path) {
+    public void addScriptSourceRoot(@Nullable String path) {
         if (path != null) {
             path = path.trim();
             if (path.length() != 0) {
@@ -1361,15 +1581,16 @@ public class MavenProject implements Cloneable {
         }
     }
 
+    @Nonnull
     @Deprecated
     public List<String> getScriptSourceRoots() {
         return scriptSourceRoots;
     }
 
+    @Nonnull
     @Deprecated
     public List<Artifact> getCompileArtifacts() {
         List<Artifact> list = new ArrayList<>(getArtifacts().size());
-
         for (Artifact a : getArtifacts()) {
             // TODO classpath check doesn't belong here - that's the other method
             if (a.getArtifactHandler().isAddedToClasspath()) {
@@ -1382,16 +1603,14 @@ public class MavenProject implements Cloneable {
         return list;
     }
 
+    @Nonnull
     @Deprecated
     public List<Dependency> getCompileDependencies() {
         Set<Artifact> artifacts = getArtifacts();
-
         if ((artifacts == null) || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
-
         List<Dependency> list = new ArrayList<>(artifacts.size());
-
         for (Artifact a : getArtifacts()) {
             // TODO let the scope handler deal with this
             if (isCompilePathElement(a.getScope())) {
@@ -1410,10 +1629,10 @@ public class MavenProject implements Cloneable {
         return Collections.unmodifiableList(list);
     }
 
+    @Nonnull
     @Deprecated
     public List<Artifact> getTestArtifacts() {
         List<Artifact> list = new ArrayList<>(getArtifacts().size());
-
         for (Artifact a : getArtifacts()) {
             // TODO classpath check doesn't belong here - that's the other method
             if (a.getArtifactHandler().isAddedToClasspath()) {
@@ -1423,19 +1642,16 @@ public class MavenProject implements Cloneable {
         return list;
     }
 
+    @Nonnull
     @Deprecated
     public List<Dependency> getTestDependencies() {
         Set<Artifact> artifacts = getArtifacts();
-
         if ((artifacts == null) || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
-
         List<Dependency> list = new ArrayList<>(artifacts.size());
-
         for (Artifact a : getArtifacts()) {
             Dependency dependency = new Dependency();
-
             dependency.setArtifactId(a.getArtifactId());
             dependency.setGroupId(a.getGroupId());
             dependency.setVersion(a.getVersion());
@@ -1448,38 +1664,34 @@ public class MavenProject implements Cloneable {
         return Collections.unmodifiableList(list);
     }
 
+    @Nonnull
     @Deprecated // used by the Maven ITs
     public List<Dependency> getRuntimeDependencies() {
         Set<Artifact> artifacts = getArtifacts();
-
         if ((artifacts == null) || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
-
         List<Dependency> list = new ArrayList<>(artifacts.size());
-
         for (Artifact a : getArtifacts()) {
             // TODO let the scope handler deal with this
             if (isRuntimePathElement(a.getScope())) {
                 Dependency dependency = new Dependency();
-
                 dependency.setArtifactId(a.getArtifactId());
                 dependency.setGroupId(a.getGroupId());
                 dependency.setVersion(a.getVersion());
                 dependency.setScope(a.getScope());
                 dependency.setType(a.getType());
                 dependency.setClassifier(a.getClassifier());
-
                 list.add(dependency);
             }
         }
         return Collections.unmodifiableList(list);
     }
 
+    @Nonnull
     @Deprecated
     public List<Artifact> getRuntimeArtifacts() {
         List<Artifact> list = new ArrayList<>(getArtifacts().size());
-
         for (Artifact a : getArtifacts()) {
             // TODO classpath check doesn't belong here - that's the other method
             if (a.getArtifactHandler().isAddedToClasspath() && isRuntimePathElement(a.getScope())) {
@@ -1489,15 +1701,14 @@ public class MavenProject implements Cloneable {
         return list;
     }
 
+    @Nonnull
     @Deprecated
     public List<String> getSystemClasspathElements() throws DependencyResolutionRequiredException {
         List<String> list = new ArrayList<>(getArtifacts().size());
-
         String d = getBuild().getOutputDirectory();
         if (d != null) {
             list.add(d);
         }
-
         for (Artifact a : getArtifacts()) {
             if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
@@ -1512,10 +1723,10 @@ public class MavenProject implements Cloneable {
         return list;
     }
 
+    @Nonnull
     @Deprecated
     public List<Artifact> getSystemArtifacts() {
         List<Artifact> list = new ArrayList<>(getArtifacts().size());
-
         for (Artifact a : getArtifacts()) {
             // TODO classpath check doesn't belong here - that's the other method
             if (a.getArtifactHandler().isAddedToClasspath()) {
@@ -1528,28 +1739,24 @@ public class MavenProject implements Cloneable {
         return list;
     }
 
+    @Nonnull
     @Deprecated
     public List<Dependency> getSystemDependencies() {
         Set<Artifact> artifacts = getArtifacts();
-
         if ((artifacts == null) || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
-
         List<Dependency> list = new ArrayList<>(artifacts.size());
-
         for (Artifact a : getArtifacts()) {
             // TODO let the scope handler deal with this
             if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
                 Dependency dependency = new Dependency();
-
                 dependency.setArtifactId(a.getArtifactId());
                 dependency.setGroupId(a.getGroupId());
                 dependency.setVersion(a.getVersion());
                 dependency.setScope(a.getScope());
                 dependency.setType(a.getType());
                 dependency.setClassifier(a.getClassifier());
-
                 list.add(dependency);
             }
         }
@@ -1567,9 +1774,8 @@ public class MavenProject implements Cloneable {
     }
 
     @Deprecated
-    public void setReportArtifacts(Set<Artifact> reportArtifacts) {
+    public void setReportArtifacts(@Nonnull Set<Artifact> reportArtifacts) {
         this.reportArtifacts = reportArtifacts;
-
         reportArtifactMap = null;
     }
 
@@ -1578,33 +1784,34 @@ public class MavenProject implements Cloneable {
         return reportArtifacts;
     }
 
+    @Nonnull
     @Deprecated
     public Map<String, Artifact> getReportArtifactMap() {
         if (reportArtifactMap == null) {
             reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getReportArtifacts());
         }
-
         return reportArtifactMap;
     }
 
     @Deprecated
-    public void setExtensionArtifacts(Set<Artifact> extensionArtifacts) {
+    public void setExtensionArtifacts(@Nonnull Set<Artifact> extensionArtifacts) {
         this.extensionArtifacts = extensionArtifacts;
-
         extensionArtifactMap = null;
     }
 
+    @Nonnull
     @Deprecated
+    @SuppressWarnings("ReturnOfCollectionOrArrayField") // The set is already unmodifiable.
     public Set<Artifact> getExtensionArtifacts() {
         return extensionArtifacts;
     }
 
+    @Nonnull
     @Deprecated
     public Map<String, Artifact> getExtensionArtifactMap() {
         if (extensionArtifactMap == null) {
             extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getExtensionArtifacts());
         }
-
         return extensionArtifactMap;
     }
 
@@ -1619,18 +1826,15 @@ public class MavenProject implements Cloneable {
     @Deprecated
     public Xpp3Dom getReportConfiguration(String pluginGroupId, String pluginArtifactId, String reportSetId) {
         Xpp3Dom dom = null;
-
         // ----------------------------------------------------------------------
         // I would like to be able to look up the Mojo object using a key but
         // we have a limitation in modello that will be remedied shortly. So
         // for now I have to iterate through and see what we have.
         // ----------------------------------------------------------------------
-
         if (getReportPlugins() != null) {
             for (ReportPlugin plugin : getReportPlugins()) {
                 if (pluginGroupId.equals(plugin.getGroupId()) && pluginArtifactId.equals(plugin.getArtifactId())) {
                     dom = (Xpp3Dom) plugin.getConfiguration();
-
                     if (reportSetId != null) {
                         ReportSet reportSet = plugin.getReportSetsAsMap().get(reportSetId);
                         if (reportSet != null) {
@@ -1645,12 +1849,10 @@ public class MavenProject implements Cloneable {
                 }
             }
         }
-
         if (dom != null) {
             // make a copy so the original in the POM doesn't get messed with
             dom = new Xpp3Dom(dom);
         }
-
         return dom;
     }
 
@@ -1702,17 +1904,19 @@ public class MavenProject implements Cloneable {
      * @param projectBuildingRequest The project building request, may be {@code null}.
      * @since 2.1
      */
-    // used by maven-dependency-tree
-    @Deprecated
+    @Deprecated // used by maven-dependency-tree
     public void setProjectBuildingRequest(ProjectBuildingRequest projectBuildingRequest) {
         this.projectBuilderConfiguration = projectBuildingRequest;
     }
 
     /**
+     * TODO: what is the difference with {@code basedir}?
+     *
+     * @return the root directory for this project
+     * @throws IllegalStateException if the root directory cannot be found
      * @since 4.0.0
-     * @return the rootDirectory for this project
-     * @throws IllegalStateException if the rootDirectory cannot be found
      */
+    @Nonnull
     public Path getRootDirectory() {
         if (rootDirectory == null) {
             throw new IllegalStateException(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
@@ -1720,6 +1924,7 @@ public class MavenProject implements Cloneable {
         return rootDirectory;
     }
 
+    @Nullable
     public void setRootDirectory(Path rootDirectory) {
         this.rootDirectory = rootDirectory;
     }
