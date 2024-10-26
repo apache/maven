@@ -30,9 +30,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.annotations.Nonnull;
@@ -58,6 +60,7 @@ import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
@@ -519,18 +522,21 @@ public class MavenProject implements Cloneable {
      */
     private List<String> getClasspathElements(final Predicate<String> scopeFilter, final boolean includeTestDir)
             throws DependencyResolutionRequiredException {
-        final List<String> list = new ArrayList<>(getArtifacts().size() + 2);
+        @SuppressWarnings("LocalVariableHidesMemberVariable") // Usually the same content as the field.
+        Set<Artifact> artifacts = getArtifacts();
+        final var list = new ArrayList<String>(artifacts.size() + 2);
+        final var build = getBuild();
         if (includeTestDir) {
-            String d = getBuild().getTestOutputDirectory();
+            String d = build.getTestOutputDirectory();
             if (d != null) {
                 list.add(d);
             }
         }
-        String d = getBuild().getOutputDirectory();
+        String d = build.getOutputDirectory();
         if (d != null) {
             list.add(d);
         }
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             final File f = a.getFile();
             if (f != null && scopeFilter.test(a.getScope())) {
                 final ArtifactHandler h = a.getArtifactHandler();
@@ -605,9 +611,14 @@ public class MavenProject implements Cloneable {
     }
 
     public String getGroupId() {
-        String groupId = getModel().getGroupId();
-        if ((groupId == null) && (getModel().getParent() != null)) {
-            groupId = getModel().getParent().getGroupId();
+        @SuppressWarnings("LocalVariableHidesMemberVariable") // Usually the same value as the field.
+        Model model = getModel();
+        String groupId = model.getGroupId();
+        if (groupId == null) {
+            Parent mp = model.getParent();
+            if (mp != null) {
+                groupId = mp.getGroupId();
+            }
         }
         return groupId;
     }
@@ -626,8 +637,9 @@ public class MavenProject implements Cloneable {
 
     public String getName() {
         // TODO this should not be allowed to be null.
-        if (getModel().getName() != null) {
-            return getModel().getName();
+        String name = getModel().getName();
+        if (name != null) {
+            return name;
         } else {
             return getArtifactId();
         }
@@ -638,9 +650,14 @@ public class MavenProject implements Cloneable {
     }
 
     public String getVersion() {
-        String version = getModel().getVersion();
-        if ((version == null) && (getModel().getParent() != null)) {
-            version = getModel().getParent().getVersion();
+        @SuppressWarnings("LocalVariableHidesMemberVariable") // Usually the same value as the field.
+        Model model = getModel();
+        String version = model.getVersion();
+        if (version == null) {
+            Parent mp = getModel().getParent();
+            if (mp != null) {
+                version = mp.getVersion();
+            }
         }
         return version;
     }
@@ -889,17 +906,21 @@ public class MavenProject implements Cloneable {
     // ----------------------------------------------------------------------
 
     public List<Plugin> getBuildPlugins() {
-        if (getModel().getBuild() == null) {
+        Build build = getModel().getBuild();
+        if (build == null) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableList(getModel().getBuild().getPlugins());
+        return Collections.unmodifiableList(build.getPlugins());
     }
 
     public List<String> getModules() {
-        if (!getModel().getDelegate().getSubprojects().isEmpty()) {
-            return getModel().getDelegate().getSubprojects();
+        @SuppressWarnings("LocalVariableHidesMemberVariable") // Usually the same value as the field.
+        Model model = getModel();
+        List<String> subprojects = model.getDelegate().getSubprojects();
+        if (!subprojects.isEmpty()) {
+            return subprojects;
         }
-        return getModel().getModules();
+        return model.getModules();
     }
 
     public PluginManagement getPluginManagement() {
@@ -912,11 +933,12 @@ public class MavenProject implements Cloneable {
     }
 
     private Build getModelBuild() {
-        Build build = getModel().getBuild();
+        @SuppressWarnings("LocalVariableHidesMemberVariable") // Usually the same value as the field.
+        Model model = getModel();
+        Build build = model.getBuild();
         if (build == null) {
             build = new Build();
-
-            getModel().setBuild(build);
+            model.setBuild(build);
         }
         return build;
     }
@@ -967,9 +989,13 @@ public class MavenProject implements Cloneable {
     }
 
     public ArtifactRepository getDistributionManagementArtifactRepository() {
-        return getArtifact().isSnapshot() && (getSnapshotArtifactRepository() != null)
-                ? getSnapshotArtifactRepository()
-                : getReleaseArtifactRepository();
+        if (getArtifact().isSnapshot()) {
+            ArtifactRepository sar = getSnapshotArtifactRepository();
+            if (sar != null) {
+                return sar;
+            }
+        }
+        return getReleaseArtifactRepository();
     }
 
     public List<Repository> getPluginRepositories() {
@@ -1061,8 +1087,9 @@ public class MavenProject implements Cloneable {
     public Xpp3Dom getGoalConfiguration(
             String pluginGroupId, String pluginArtifactId, String executionId, String goalId) {
         Xpp3Dom dom = null;
-        if (getBuildPlugins() != null) {
-            for (Plugin plugin : getBuildPlugins()) {
+        List<Plugin> plugins = getBuildPlugins();
+        if (plugins != null) {
+            for (Plugin plugin : plugins) {
                 if (pluginGroupId.equals(plugin.getGroupId()) && pluginArtifactId.equals(plugin.getArtifactId())) {
                     dom = (Xpp3Dom) plugin.getConfiguration();
                     if (executionId != null) {
@@ -1173,11 +1200,13 @@ public class MavenProject implements Cloneable {
 
     public List<Extension> getBuildExtensions() {
         Build build = getBuild();
-        if ((build == null) || (build.getExtensions() == null)) {
-            return Collections.emptyList();
-        } else {
-            return Collections.unmodifiableList(build.getExtensions());
+        if (build != null) {
+            List<Extension> extensions = build.getExtensions();
+            if (extensions != null) {
+                return Collections.unmodifiableList(extensions);
+            }
         }
+        return Collections.emptyList();
     }
 
     public void addProjectReference(@Nonnull MavenProject project) {
@@ -1219,16 +1248,11 @@ public class MavenProject implements Cloneable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(128);
-        sb.append("MavenProject: ");
-        sb.append(getGroupId());
-        sb.append(':');
-        sb.append(getArtifactId());
-        sb.append(':');
-        sb.append(getVersion());
-        if (getFile() != null) {
-            sb.append(" @ ");
-            sb.append(getFile().getPath());
+        StringBuilder sb = new StringBuilder(128).append("MavenProject: ");
+        sb.append(getGroupId()).append(':').append(getArtifactId()).append(':').append(getVersion());
+        File f = getFile();
+        if (f != null) {
+            sb.append(" @ ").append(f.getPath());
         }
         return sb.toString();
     }
@@ -1246,7 +1270,7 @@ public class MavenProject implements Cloneable {
         try {
             clone = (MavenProject) super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new UnsupportedOperationException(e);
+            throw new AssertionError(e); // Should never happen since this class is cloneable.
         }
         clone.deepCopy(this);
         return clone;
@@ -1571,14 +1595,7 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public void addScriptSourceRoot(@Nullable String path) {
-        if (path != null) {
-            path = path.trim();
-            if (path.length() != 0) {
-                if (!getScriptSourceRoots().contains(path)) {
-                    getScriptSourceRoots().add(path);
-                }
-            }
-        }
+        addPath(getScriptSourceRoots(), path);
     }
 
     @Nonnull
@@ -1590,177 +1607,112 @@ public class MavenProject implements Cloneable {
     @Nonnull
     @Deprecated
     public List<Artifact> getCompileArtifacts() {
-        List<Artifact> list = new ArrayList<>(getArtifacts().size());
-        for (Artifact a : getArtifacts()) {
-            // TODO classpath check doesn't belong here - that's the other method
-            if (a.getArtifactHandler().isAddedToClasspath()) {
-                // TODO let the scope handler deal with this
-                if (isCompilePathElement(a.getScope())) {
-                    list.add(a);
-                }
-            }
-        }
-        return list;
+        return getClasspathArtifacts(MavenProject::isCompilePathElement);
     }
 
     @Nonnull
     @Deprecated
     public List<Dependency> getCompileDependencies() {
-        Set<Artifact> artifacts = getArtifacts();
-        if ((artifacts == null) || artifacts.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<Dependency> list = new ArrayList<>(artifacts.size());
-        for (Artifact a : getArtifacts()) {
-            // TODO let the scope handler deal with this
-            if (isCompilePathElement(a.getScope())) {
-                Dependency dependency = new Dependency();
-
-                dependency.setArtifactId(a.getArtifactId());
-                dependency.setGroupId(a.getGroupId());
-                dependency.setVersion(a.getVersion());
-                dependency.setScope(a.getScope());
-                dependency.setType(a.getType());
-                dependency.setClassifier(a.getClassifier());
-
-                list.add(dependency);
-            }
-        }
-        return Collections.unmodifiableList(list);
+        return getDependencies(MavenProject::isCompilePathElement);
     }
 
     @Nonnull
     @Deprecated
     public List<Artifact> getTestArtifacts() {
-        List<Artifact> list = new ArrayList<>(getArtifacts().size());
-        for (Artifact a : getArtifacts()) {
-            // TODO classpath check doesn't belong here - that's the other method
-            if (a.getArtifactHandler().isAddedToClasspath()) {
-                list.add(a);
-            }
-        }
-        return list;
+        return getClasspathArtifacts(MavenProject::isAddedToClasspath);
     }
 
     @Nonnull
     @Deprecated
     public List<Dependency> getTestDependencies() {
-        Set<Artifact> artifacts = getArtifacts();
-        if ((artifacts == null) || artifacts.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<Dependency> list = new ArrayList<>(artifacts.size());
-        for (Artifact a : getArtifacts()) {
-            Dependency dependency = new Dependency();
-            dependency.setArtifactId(a.getArtifactId());
-            dependency.setGroupId(a.getGroupId());
-            dependency.setVersion(a.getVersion());
-            dependency.setScope(a.getScope());
-            dependency.setType(a.getType());
-            dependency.setClassifier(a.getClassifier());
-
-            list.add(dependency);
-        }
-        return Collections.unmodifiableList(list);
+        return getDependencies(MavenProject::isTestPathElement);
     }
 
     @Nonnull
     @Deprecated // used by the Maven ITs
     public List<Dependency> getRuntimeDependencies() {
-        Set<Artifact> artifacts = getArtifacts();
-        if ((artifacts == null) || artifacts.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<Dependency> list = new ArrayList<>(artifacts.size());
-        for (Artifact a : getArtifacts()) {
-            // TODO let the scope handler deal with this
-            if (isRuntimePathElement(a.getScope())) {
-                Dependency dependency = new Dependency();
-                dependency.setArtifactId(a.getArtifactId());
-                dependency.setGroupId(a.getGroupId());
-                dependency.setVersion(a.getVersion());
-                dependency.setScope(a.getScope());
-                dependency.setType(a.getType());
-                dependency.setClassifier(a.getClassifier());
-                list.add(dependency);
-            }
-        }
-        return Collections.unmodifiableList(list);
+        return getDependencies(MavenProject::isRuntimePathElement);
     }
 
     @Nonnull
     @Deprecated
     public List<Artifact> getRuntimeArtifacts() {
-        List<Artifact> list = new ArrayList<>(getArtifacts().size());
-        for (Artifact a : getArtifacts()) {
-            // TODO classpath check doesn't belong here - that's the other method
-            if (a.getArtifactHandler().isAddedToClasspath() && isRuntimePathElement(a.getScope())) {
-                list.add(a);
-            }
-        }
-        return list;
+        return getClasspathArtifacts(MavenProject::isRuntimePathElement);
     }
 
     @Nonnull
     @Deprecated
     public List<String> getSystemClasspathElements() throws DependencyResolutionRequiredException {
-        List<String> list = new ArrayList<>(getArtifacts().size());
-        String d = getBuild().getOutputDirectory();
-        if (d != null) {
-            list.add(d);
-        }
-        for (Artifact a : getArtifacts()) {
-            if (a.getArtifactHandler().isAddedToClasspath()) {
-                // TODO let the scope handler deal with this
-                if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
-                    File f = a.getFile();
-                    if (f != null) {
-                        list.add(f.getPath());
-                    }
-                }
-            }
-        }
-        return list;
+        Stream<String> s1 = Optional.ofNullable(getBuild().getOutputDirectory()).stream();
+        Stream<String> s2 = getArtifacts().stream()
+                .filter(MavenProject::isAddedToClasspath)
+                .filter(MavenProject::isScopeSystem)
+                .map((Artifact::getFile))
+                .filter(Objects::nonNull)
+                .map(File::getPath);
+        return Stream.concat(s1, s2).toList();
     }
 
     @Nonnull
     @Deprecated
     public List<Artifact> getSystemArtifacts() {
-        List<Artifact> list = new ArrayList<>(getArtifacts().size());
-        for (Artifact a : getArtifacts()) {
-            // TODO classpath check doesn't belong here - that's the other method
-            if (a.getArtifactHandler().isAddedToClasspath()) {
-                // TODO let the scope handler deal with this
-                if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
-                    list.add(a);
-                }
-            }
-        }
-        return list;
+        return getClasspathArtifacts(MavenProject::isScopeSystem);
     }
 
     @Nonnull
     @Deprecated
     public List<Dependency> getSystemDependencies() {
-        Set<Artifact> artifacts = getArtifacts();
-        if ((artifacts == null) || artifacts.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<Dependency> list = new ArrayList<>(artifacts.size());
-        for (Artifact a : getArtifacts()) {
-            // TODO let the scope handler deal with this
-            if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
-                Dependency dependency = new Dependency();
-                dependency.setArtifactId(a.getArtifactId());
-                dependency.setGroupId(a.getGroupId());
-                dependency.setVersion(a.getVersion());
-                dependency.setScope(a.getScope());
-                dependency.setType(a.getType());
-                dependency.setClassifier(a.getClassifier());
-                list.add(dependency);
-            }
-        }
-        return Collections.unmodifiableList(list);
+        return getDependencies(MavenProject::isScopeSystem);
+    }
+
+    // TODO let the scope handler deal with this
+    private static boolean isCompilePathElement(Artifact a) {
+        return isCompilePathElement(a.getScope());
+    }
+
+    // TODO let the scope handler deal with this
+    private static boolean isRuntimePathElement(Artifact a) {
+        return isRuntimePathElement(a.getScope());
+    }
+
+    // TODO let the scope handler deal with this
+    private static boolean isTestPathElement(Artifact a) {
+        return isTestPathElement(a.getScope());
+    }
+
+    // TODO let the scope handler deal with this
+    private static boolean isScopeSystem(Artifact a) {
+        return Artifact.SCOPE_SYSTEM.equals(a.getScope());
+    }
+
+    // TODO classpath check doesn't belong here - that's the other method
+    private static boolean isAddedToClasspath(Artifact a) {
+        return a.getArtifactHandler().isAddedToClasspath();
+    }
+
+    private List<Artifact> getClasspathArtifacts(final Predicate<Artifact> filter) {
+        return getArtifacts().stream()
+                .filter(MavenProject::isAddedToClasspath)
+                .filter(filter)
+                .toList();
+    }
+
+    private List<Dependency> getDependencies(final Predicate<Artifact> filter) {
+        return getArtifacts().stream()
+                .filter(filter)
+                .map(MavenProject::toDependency)
+                .toList();
+    }
+
+    private static Dependency toDependency(Artifact a) {
+        Dependency dependency = new Dependency();
+        dependency.setArtifactId(a.getArtifactId());
+        dependency.setGroupId(a.getGroupId());
+        dependency.setVersion(a.getVersion());
+        dependency.setScope(a.getScope());
+        dependency.setType(a.getType());
+        dependency.setClassifier(a.getClassifier());
+        return dependency;
     }
 
     @Deprecated
