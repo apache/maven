@@ -10,13 +10,13 @@ Facts:
 Command to run:
 
 ```
-mvn eu.maveniverse.maven.plugins:toolbox:tree -Dmaven.repo.local.tail=local-repo -Dmaven.repo.local.tail.ignoreAvailability
+mvn eu.maveniverse.maven.plugins:toolbox:tree -Dmaven.repo.local.tail=local-repo
 ```
 
 Example output with 3.9.9: Maven 3 is not transitive regarding dependency management, and it shows 1.0.0 all way down
 except for level5 that has applies depMgt from root.
 ```
-$ mvn -V eu.maveniverse.maven.plugins:toolbox:tree -Dmaven.repo.local.tail=local-repo -Dmaven.repo.local.tail.ignoreAvailability
+$ mvn -V eu.maveniverse.maven.plugins:toolbox:tree -Dmaven.repo.local.tail=local-repo
 Apache Maven 3.9.9 (8e8579a9e76f7d015ee5ec7bfcdc97d260186937)
 Maven home: /home/cstamas/.sdkman/candidates/maven/3.9.9
 Java version: 21.0.4, vendor: Eclipse Adoptium, runtime: /home/cstamas/.sdkman/candidates/java/21.0.4-tem
@@ -49,7 +49,7 @@ $
 Example output with 4.0.0-beta-5: **this version is transitive but broken**, as it applies level2 depMgt onto its own
 dependencies.
 ```
-$ mvn -V eu.maveniverse.maven.plugins:toolbox:tree -Dmaven.repo.local.tail=local-repo -Dmaven.repo.local.tail.ignoreAvailability
+$ mvn -V eu.maveniverse.maven.plugins:toolbox:tree -Dmaven.repo.local.tail=local-repo
 Apache Maven 4.0.0-beta-5 (6e78fcf6f5e76422c0eb358cd11f0c231ecafbad)
 Maven home: /home/cstamas/.sdkman/candidates/maven/4.0.0-beta-5
 Java version: 21.0.4, vendor: Eclipse Adoptium, runtime: /home/cstamas/.sdkman/candidates/java/21.0.4-tem
@@ -96,7 +96,7 @@ The **expected** output is:
 
 Maven 4.0.0-SNAPSHOT + Resolver [2.0.3-SNAPSHOT](https://github.com/apache/maven-resolver/pull/588) output **is expected output**:
 ```
-$ ~/Tools/maven/apache-maven-4.0.0-beta-6-SNAPSHOT/bin/mvn -V eu.maveniverse.maven.plugins:toolbox:tree -Dmaven.repo.local.tail=local-repo -Dmaven.repo.local.tail.ignoreAvailability
+$ ~/Tools/maven/apache-maven-4.0.0-beta-6-SNAPSHOT/bin/mvn -V eu.maveniverse.maven.plugins:toolbox:tree -Dmaven.repo.local.tail=local-repo
 Apache Maven 4.0.0-beta-6-SNAPSHOT (cf94fba0151ff403763bdf23eb73fe74b3d0874d)
 Maven home: /home/cstamas/Tools/maven/apache-maven-4.0.0-beta-6-SNAPSHOT
 Java version: 21.0.4, vendor: Eclipse Adoptium, runtime: /home/cstamas/.sdkman/candidates/java/21.0.4-tem

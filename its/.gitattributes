@@ -1,4 +1,0 @@
-# Auto detect text files and perform LF normalization
-*.jar    binary
-*.war    binary
-

@@ -104,6 +104,7 @@ class PropertiesUtil {
         } else if (value instanceof Map) {
             Map map = (Map) value;
             props.setProperty(key, Integer.toString(map.size()));
+            @SuppressWarnings("checkstyle:UnusedLocalVariable")
             int i = 0;
             for (Iterator it = map.keySet().iterator(); it.hasNext(); i++) {
                 Object k = it.next();

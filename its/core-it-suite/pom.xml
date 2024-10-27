@@ -580,6 +580,13 @@ under the License.
     <profile>
       <id>run-its</id>
       <dependencies>
+        <dependency>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>apache-maven</artifactId>
+          <version>4.0.0-beta-6-SNAPSHOT</version>
+          <classifier>bin</classifier>
+          <type>zip</type>
+        </dependency>
         <!-- not really used but will force download in the local repo used -->
         <dependency>
           <groupId>org.apache.maven.wagon</groupId>

@@ -87,6 +87,7 @@ class PropertyUtil {
             } else if (obj instanceof Map) {
                 Map map = (Map) obj;
                 props.put(key, Integer.toString(map.size()));
+                @SuppressWarnings("checkstyle:UnusedLocalVariable")
                 int index = 0;
                 for (Iterator it = map.entrySet().iterator(); it.hasNext(); index++) {
                     Map.Entry entry = (Map.Entry) it.next();

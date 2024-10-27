@@ -30,19 +30,27 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIntegrationTestCase {
     public MavenITmng8106OverlappingDirectoryRolesTest() {
         // Broken in: 3.9.0..3.9.6 && 4.0.0-alpha-1..4.0.0-alpha-13
-        super("[,3.9.0),(3.9.6,3.999.999],[4.0.0-beta-1,)");
+        super("(3.9.6,3.999.999],[4.0.0-beta-1,)");
     }
 
     @Test
     public void testDirectoryOverlap() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8106");
+        String repo = new File(testDir, "repo").getAbsolutePath();
+        String tailRepo = System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository";
 
         Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
+        verifier.setLocalRepo(repo);
+        verifier.addCliArgument("-X");
+        verifier.addCliArgument("-Dmaven.repo.local.tail=" + tailRepo);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(new File(testDir, "jar").getAbsolutePath());
+        verifier.setLocalRepo(repo);
+        verifier.addCliArgument("-X");
+        verifier.addCliArgument("-Dmaven.repo.local.tail=" + tailRepo);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

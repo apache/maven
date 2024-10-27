@@ -170,6 +170,8 @@ under the License.
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>7.1.0</woodstoxVersion>
     <xmlunitVersion>2.10.0</xmlunitVersion>
+    <!-- maven.version -->
+    <maven-version>${project.version}</maven-version>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -181,157 +183,157 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-builder-support</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-jline</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-logging</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-impl</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-embedder</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-cli</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-core</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-meta</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-model</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-settings</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-spi</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-toolchain</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-plugin</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-xml</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-di</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-metadata</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-cli</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-di</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model-builder</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-repository-metadata</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-resolver-provider</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings-builder</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-toolchain-model</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-toolchain-builder</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-xml</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-compat</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
       <dependency>
@@ -773,6 +775,7 @@ under the License.</licenseText>
                 <exclude>src/test/resources*/**</exclude>
                 <exclude>src/test/projects/**</exclude>
                 <exclude>src/test/remote-repo/**</exclude>
+                <exclude>its/**</exclude>
                 <exclude>**/*.odg</exclude>
                 <exclude>**/*.svg</exclude>
                 <exclude>.asf.yaml</exclude>
@@ -837,54 +840,66 @@ under the License.</licenseText>
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.fusesource.mvnplugins</groupId>
-        <artifactId>maven-graph-plugin</artifactId>
-        <version>1.45</version>
-        <inherited>false</inherited>
-        <executions>
-          <execution>
-            <id>graph</id>
-            <goals>
-              <goal>reactor</goal>
-            </goals>
-            <phase>pre-site</phase>
-            <configuration>
-              <hideVersion>true</hideVersion>
-              <hideGroupId>true</hideGroupId>
-              <hideScopes>test</hideScopes>
-              <hideTransitive>true</hideTransitive>
-              <keepDot>true</keepDot>
-              <target>${project.build.directory}/graph/reactor-graph.dot</target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>dev.jbang</groupId>
-        <artifactId>jbang-maven-plugin</artifactId>
-        <version>0.0.8</version>
-        <inherited>false</inherited>
-        <executions>
-          <execution>
-            <id>graph</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <phase>pre-site</phase>
-            <configuration>
-              <script>${project.basedir}/src/graph/ReactorGraph.java</script>
-              <jbangargs>
-                <arg>--verbose</arg>
-              </jbangargs>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
   <profiles>
+    <profile>
+      <id>graph</id>
+      <activation>
+        <os>
+          <family>!windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.fusesource.mvnplugins</groupId>
+            <artifactId>maven-graph-plugin</artifactId>
+            <version>1.45</version>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <id>graph</id>
+                <goals>
+                  <goal>reactor</goal>
+                </goals>
+                <phase>pre-site</phase>
+                <configuration>
+                  <hideVersion>true</hideVersion>
+                  <hideGroupId>true</hideGroupId>
+                  <hideScopes>test</hideScopes>
+                  <hideTransitive>true</hideTransitive>
+                  <keepDot>true</keepDot>
+                  <target>${project.build.directory}/graph/reactor-graph.dot</target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>dev.jbang</groupId>
+            <artifactId>jbang-maven-plugin</artifactId>
+            <version>0.0.8</version>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <id>graph</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <phase>pre-site</phase>
+                <configuration>
+                  <script>${project.basedir}/src/graph/ReactorGraph.java</script>
+                  <jbangargs>
+                    <arg>--verbose</arg>
+                  </jbangargs>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>apache-release</id>
       <build>
@@ -1013,6 +1028,15 @@ under the License.</licenseText>
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>run-its</id>
+      <modules>
+        <module>its</module>
+      </modules>
+      <properties>
+        <mavenDistro>${session.rootDirectory}/apache-maven/target/apache-maven-${project.version}-bin.zip</mavenDistro>
+      </properties>
     </profile>
   </profiles>
 </project>

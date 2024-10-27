@@ -58,6 +58,7 @@ public class ResolveMojo extends AbstractMojo {
             request.setMavenProject(project);
             request.setRepositorySession(buildingRequest.getRepositorySession());
 
+            @SuppressWarnings("checkstyle:UnusedLocalVariable")
             DependencyResolutionResult result = dependencyResolver.resolve(request);
 
             getLog().info("Resolution successful, resolved ok");

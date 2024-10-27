@@ -22,9 +22,8 @@ under the License.
 
   <parent>
     <groupId>org.apache.maven</groupId>
-    <artifactId>maven-parent</artifactId>
-    <version>41</version>
-    <relativePath />
+    <artifactId>maven</artifactId>
+    <version>4.0.0-beta-6-SNAPSHOT</version>
   </parent>
 
   <groupId>org.apache.maven.its</groupId>
@@ -71,10 +70,10 @@ under the License.
     <maven.site.path>core-its</maven.site.path>
     <maven.site.cache>${user.home}/maven-sites</maven.site.cache>
     <rat.ignoreErrors>true</rat.ignoreErrors>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
+    <!--    <maven.compiler.source>8</maven.compiler.source>-->
+    <!--    <maven.compiler.target>8</maven.compiler.target>-->
 
-    <maven-version>3.8.6</maven-version>
+    <maven-version>4.0.0-beta-6-SNAPSHOT</maven-version>
     <maven-plugin-tools-version>3.6.4</maven-plugin-tools-version>
   </properties>
 

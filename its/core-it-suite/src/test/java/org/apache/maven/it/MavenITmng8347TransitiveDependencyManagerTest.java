@@ -51,7 +51,6 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
         verifier.addCliArgument("-V");
         verifier.addCliArgument("dependency:3.8.0:tree");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + testDir + "/local-repo");
-        verifier.addCliArgument("-Dmaven.repo.local.tail.ignoreAvailability");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -98,7 +97,6 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
         verifier.addCliArgument("-V");
         verifier.addCliArgument("dependency:3.8.0:tree");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + testDir + "/local-repo");
-        verifier.addCliArgument("-Dmaven.repo.local.tail.ignoreAvailability");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -125,7 +123,6 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
         verifier.addCliArgument("-V");
         verifier.addCliArgument("dependency:3.8.0:tree");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + testDir + "/local-repo");
-        verifier.addCliArgument("-Dmaven.repo.local.tail.ignoreAvailability");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

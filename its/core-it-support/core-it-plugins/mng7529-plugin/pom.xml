@@ -32,14 +32,14 @@ under the License.
   <name>Maven IT Plugin :: mng-7529 plugin</name>
 
   <properties>
-    <maven-version>3.6.0</maven-version>
+    <maven3-version>3.6.0</maven3-version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>${maven-version}</version>
+      <version>${maven3-version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -50,13 +50,13 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-      <version>${maven-version}</version>
+      <version>${maven3-version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>${maven-version}</version>
+      <version>${maven3-version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
