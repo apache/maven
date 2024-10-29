@@ -677,8 +677,8 @@ under the License.
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
-      <id>maven-2236</id>
-      <url>https://repository.apache.org/content/repositories/maven-2236</url>
+      <id>maven-2239</id>
+      <url>https://repository.apache.org/content/repositories/maven-2239</url>
     </repository>
   </repositories>
 
