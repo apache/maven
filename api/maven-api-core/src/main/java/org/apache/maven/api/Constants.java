@@ -386,5 +386,26 @@ public final class Constants {
     @Config(type = "java.lang.Boolean", defaultValue = "true")
     public static final String MAVEN_CONSUMER_POM = "maven.consumer.pom";
 
+    /**
+     * User property for disabling version resolver cache.
+     *
+     * @since 3.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_VERSION_RESOLVER_NO_CACHE = "aether.versionResolver.noCache";
+
+    /**
+     * User property for overriding calculated "build number" for snapshot deploys. Caution: this property should
+     * NOT be used only in special situations, like "aligning" several subprojects to perform a "snapshot lock down".
+     * Value given here must be {@code maxRemoteBuildNumber + 1} or greater, otherwise build will fail.
+     * <p>
+     * Note: this feature is present in Maven 3.9.7 but with different key: {@code maven.buildNumber}. In Maven 4
+     * as part of cleanup effort this key was renamed to properly reflect its purpose.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Integer")
+    public static final String MAVEN_DEPLOY_SNAPSHOT_BUILD_NUMBER = "maven.deploy.snapshot.buildNumber";
+
     private Constants() {}
 }

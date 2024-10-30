@@ -17,6 +17,12 @@
 # under the License.
 #
 props:
+    - key: aether.versionResolver.noCache
+      configurationType: Boolean
+      description: "User property for disabling version resolver cache."
+      defaultValue: false
+      since: 3.0.0
+      configurationSource: User properties
     - key: maven.build.timestamp.format
       configurationType: String
       description: "Build timestamp format."
@@ -27,6 +33,12 @@ props:
       configurationType: Boolean
       description: "User property for enabling/disabling the consumer POM feature."
       defaultValue: true
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.deploy.snapshot.buildNumber
+      configurationType: Integer
+      description: "User property for overriding calculated \"build number\" for snapshot deploys. Caution: this property should NOT be used only in special situations, like \"aligning\" several subprojects to perform a \"snapshot lock down\". Value given here must be {@code maxRemoteBuildNumber + 1} or greater, otherwise build will fail. <p> Note: this feature is present in Maven 3.9.7 but with different key: {@code maven.buildNumber} . In Maven 4 as part of cleanup effort this key was renamed to properly reflect its purpose."
+      defaultValue: 
       since: 4.0.0
       configurationSource: User properties
     - key: maven.ext.class.path
