@@ -398,7 +398,7 @@ public final class Constants {
      * User property for overriding calculated "build number" for snapshot deploys. Caution: this property should
      * NOT be used only in special situations, like "aligning" several subprojects to perform a "snapshot lock down".
      * Value given here must be {@code maxRemoteBuildNumber + 1} or greater, otherwise build will fail.
-     * <p>
+     *
      * Note: this feature is present in Maven 3.9.7 but with different key: {@code maven.buildNumber}. In Maven 4
      * as part of cleanup effort this key was renamed to properly reflect its purpose.
      *

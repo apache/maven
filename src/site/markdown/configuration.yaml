@@ -37,7 +37,7 @@ props:
       configurationSource: User properties
     - key: maven.deploy.snapshot.buildNumber
       configurationType: Integer
-      description: "User property for overriding calculated \"build number\" for snapshot deploys. Caution: this property should NOT be used only in special situations, like \"aligning\" several subprojects to perform a \"snapshot lock down\". Value given here must be {@code maxRemoteBuildNumber + 1} or greater, otherwise build will fail. <p> Note: this feature is present in Maven 3.9.7 but with different key: {@code maven.buildNumber} . In Maven 4 as part of cleanup effort this key was renamed to properly reflect its purpose."
+      description: "User property for overriding calculated \"build number\" for snapshot deploys. Caution: this property should NOT be used only in special situations, like \"aligning\" several subprojects to perform a \"snapshot lock down\". Value given here must be {@code maxRemoteBuildNumber + 1} or greater, otherwise build will fail. Note: this feature is present in Maven 3.9.7 but with different key: {@code maven.buildNumber} . In Maven 4 as part of cleanup effort this key was renamed to properly reflect its purpose."
       defaultValue: 
       since: 4.0.0
       configurationSource: User properties
