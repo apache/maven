@@ -47,6 +47,7 @@ import java.util.stream.Stream;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -134,7 +135,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuildingResult build(File pomFile, ProjectBuildingRequest request) throws ProjectBuildingException {
         try (BuildSession bs = new BuildSession(request)) {
             Path path = pomFile.toPath();
-            return bs.build(path, ModelSource.fromPath(path));
+            return bs.build(guessRequestType(pomFile, request), path, ModelSource.fromPath(path));
         }
     }
 
@@ -159,7 +160,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuildingResult build(ModelSource modelSource, ProjectBuildingRequest request)
             throws ProjectBuildingException {
         try (BuildSession bs = new BuildSession(request)) {
-            return bs.build(null, modelSource);
+            return bs.build(guessRequestType(null, request), null, modelSource);
         }
     }
 
@@ -183,6 +184,16 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         try (BuildSession bs = new BuildSession(request)) {
             return bs.build(pomFiles, recursive);
         }
+    }
+
+    private ModelBuilderRequest.RequestType guessRequestType(@Nullable File pomFile, ProjectBuildingRequest request) {
+        ModelBuilderRequest.RequestType type = ModelBuilderRequest.RequestType.DEPENDENCY;
+        if (request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_STRICT) {
+            if (pomFile != null && request.isProcessPlugins()) {
+                type = ModelBuilderRequest.RequestType.BUILD_POM;
+            }
+        }
+        return type;
     }
 
     private static class StubModelSource implements ModelSource {
@@ -334,7 +345,13 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         @Override
         public void close() {}
 
-        ProjectBuildingResult build(Path pomFile, ModelSource modelSource) throws ProjectBuildingException {
+        /**
+         * When this method called, caller should be already knowing "what the intent is", and set the
+         * {@link org.apache.maven.api.services.ModelBuilderRequest.RequestType}.
+         */
+        ProjectBuildingResult build(ModelBuilderRequest.RequestType type, Path pomFile, ModelSource modelSource)
+                throws ProjectBuildingException {
+            Objects.requireNonNull(type, "type");
             ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
             try {
@@ -348,11 +365,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     project.setFile(pomFile != null ? pomFile.toFile() : null);
 
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
-                    ModelBuilderRequest.RequestType type = pomFile != null
-                                    && this.request.isProcessPlugins()
-                                    && this.request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_STRICT
-                            ? ModelBuilderRequest.RequestType.BUILD_POM
-                            : ModelBuilderRequest.RequestType.PARENT_POM;
                     MavenProject theProject = project;
                     ModelBuilderRequest request = builder.source(modelSource)
                             .requestType(type)
@@ -421,7 +433,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 localProject = pomResult.getRepository() instanceof WorkspaceRepository;
             } catch (org.eclipse.aether.resolution.ArtifactResolutionException e) {
                 if (e.getResults().get(0).isMissing() && allowStubModel) {
-                    return build(null, createStubModelSource(artifact));
+                    // not resolvable == not in reactor for sure
+                    return build(ModelBuilderRequest.RequestType.DEPENDENCY, null, createStubModelSource(artifact));
                 }
                 throw new ProjectBuildingException(
                         artifact.getId(), "Error resolving project artifact: " + e.getMessage(), e);
@@ -436,9 +449,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
 
             if (localProject) {
-                return build(pomFile, ModelSource.fromPath(pomFile));
-            } else {
+                // in reactor
                 return build(
+                        this.request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_STRICT
+                                ? ModelBuilderRequest.RequestType.BUILD_POM
+                                : ModelBuilderRequest.RequestType.DEPENDENCY,
+                        pomFile,
+                        ModelSource.fromPath(pomFile));
+            } else {
+                // out of reactor
+                return build(
+                        ModelBuilderRequest.RequestType.DEPENDENCY,
                         null,
                         ModelSource.fromPath(
                                 pomFile,
@@ -740,7 +761,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());
                         try {
-                            parent = build(parentPomFile, ModelSource.fromPath(parentPomFile))
+                            parent = build(
+                                            ModelBuilderRequest.RequestType.PARENT_POM,
+                                            parentPomFile,
+                                            ModelSource.fromPath(parentPomFile))
                                     .getProject();
                         } catch (ProjectBuildingException e) {
                             // MNG-4488 where let invalid parents slide on by
