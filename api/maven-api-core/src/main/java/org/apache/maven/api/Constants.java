@@ -392,12 +392,14 @@ public final class Constants {
      * @since 3.0.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false")
-    public static final String MAVEN_VERSION_RESOLVER_NO_CACHE = "aether.versionResolver.noCache";
+    public static final String MAVEN_VERSION_RESOLVER_NO_CACHE = "maven.versionResolver.noCache";
 
     /**
      * User property for overriding calculated "build number" for snapshot deploys. Caution: this property should
-     * NOT be used only in special situations, like "aligning" several subprojects to perform a "snapshot lock down".
-     * Value given here must be {@code maxRemoteBuildNumber + 1} or greater, otherwise build will fail.
+     * be RARELY used (if used at all). It may help in special cases like "aligning" a reactor build subprojects
+     * build numbers to perform a "snapshot lock down". Value given here must be {@code maxRemoteBuildNumber + 1}
+     * or greater, otherwise build will fail. How the number to be obtained is left to user (ie by inspecting
+     * snapshot repository metadata or alike).
      *
      * Note: this feature is present in Maven 3.9.7 but with different key: {@code maven.buildNumber}. In Maven 4
      * as part of cleanup effort this key was renamed to properly reflect its purpose.
