@@ -815,7 +815,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
 
             // lifecycle bindings injection
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
                 org.apache.maven.api.services.ModelTransformer lifecycleBindingsInjector =
                         request.getLifecycleBindingsInjector();
                 if (lifecycleBindingsInjector != null) {
