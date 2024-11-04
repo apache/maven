@@ -778,10 +778,16 @@ public class MavenProject implements Cloneable {
     }
 
     public List<RemoteRepository> getRemoteProjectRepositories() {
+        if (remoteProjectRepositories == null) {
+            this.remoteProjectRepositories = new ArrayList<>();
+        }
         return remoteProjectRepositories;
     }
 
     public List<RemoteRepository> getRemotePluginRepositories() {
+        if (remotePluginRepositories == null) {
+            this.remotePluginRepositories = new ArrayList<>();
+        }
         return remotePluginRepositories;
     }
 

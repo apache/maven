@@ -184,22 +184,14 @@ public class DefaultProjectManager implements ProjectManager {
 
     @Override
     public List<RemoteRepository> getRemoteProjectRepositories(Project project) {
-        List<org.eclipse.aether.repository.RemoteRepository> remoteRepositories =
-                ((DefaultProject) project).getProject().getRemoteProjectRepositories();
-        if (remoteRepositories == null) {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(new MappedList<>(remoteRepositories, session::getRemoteRepository));
+        return Collections.unmodifiableList(new MappedList<>(
+                ((DefaultProject) project).getProject().getRemoteProjectRepositories(), session::getRemoteRepository));
     }
 
     @Override
     public List<RemoteRepository> getRemotePluginRepositories(Project project) {
-        List<org.eclipse.aether.repository.RemoteRepository> remoteRepositories =
-                ((DefaultProject) project).getProject().getRemoteProjectRepositories();
-        if (remoteRepositories == null) {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(new MappedList<>(remoteRepositories, session::getRemoteRepository));
+        return Collections.unmodifiableList(new MappedList<>(
+                ((DefaultProject) project).getProject().getRemotePluginRepositories(), session::getRemoteRepository));
     }
 
     @Override
