@@ -815,12 +815,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
 
             // lifecycle bindings injection
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
-                org.apache.maven.api.services.ModelTransformer lifecycleBindingsInjector =
-                        request.getLifecycleBindingsInjector();
-                if (lifecycleBindingsInjector != null) {
-                    resultModel = lifecycleBindingsInjector.transform(resultModel, request, this);
-                }
+            org.apache.maven.api.services.ModelTransformer lifecycleBindingsInjector =
+                    request.getLifecycleBindingsInjector();
+            if (lifecycleBindingsInjector != null) {
+                resultModel = lifecycleBindingsInjector.transform(resultModel, request, this);
             }
 
             // dependency management import
@@ -1468,7 +1466,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 rawModel = transformFileToRaw(rawModel);
             }
 
-            for (var transformer : transformers) {
+            for (org.apache.maven.api.spi.ModelTransformer transformer : transformers) {
                 rawModel = transformer.transformRawModel(rawModel);
             }
 

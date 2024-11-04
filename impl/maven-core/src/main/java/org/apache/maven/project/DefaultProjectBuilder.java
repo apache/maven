@@ -921,7 +921,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 project.setClassRealm(record.getRealm());
                 project.setExtensionDependencyFilter(record.getExtensionArtifactFilter());
             } catch (PluginResolutionException | PluginManagerException | PluginVersionResolutionException e) {
-
                 problems.add(Severity.ERROR, Version.BASE, "Unresolvable build extension: " + e.getMessage(), e);
             }
             projectBuildingHelper.selectProjectRealm(project);
@@ -936,6 +935,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
         project.setRemoteArtifactRepositories(remoteRepositories);
 
-        return lifecycleBindingsInjector.injectLifecycleBindings(model3.getDelegate(), request, problems);
+        if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
+            return lifecycleBindingsInjector.injectLifecycleBindings(model3.getDelegate(), request, problems);
+        } else {
+            return model3.getDelegate();
+        }
     }
 }
