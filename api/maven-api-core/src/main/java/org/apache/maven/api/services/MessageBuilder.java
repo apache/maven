@@ -98,7 +98,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder success(Object message) {
-        return style("." + Constants.MAVEN_STYLE_DEBUG_NAME + ":-" + Constants.MAVEN_STYLE_DEBUG_DEFAULT, message);
+        return style("." + Constants.MAVEN_STYLE_SUCCESS_NAME + ":-" + Constants.MAVEN_STYLE_SUCCESS_DEFAULT, message);
     }
 
     /**
