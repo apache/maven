@@ -312,13 +312,24 @@ public final class Constants {
 
     /**
      * User property for chained LRM: list of "tail" local repository paths (separated by comma), to be used with
-     * {@code org.eclipse.aether.util.repository.ChainedLocalRepositoryManager}.
+     * <code>org.eclipse.aether.util.repository.ChainedLocalRepositoryManager</code>.
      * Default value: <code>null</code>, no chained LRM is used.
      *
      * @since 3.9.0
      */
     @Config
     public static final String MAVEN_REPO_LOCAL_TAIL = "maven.repo.local.tail";
+
+    /**
+     * User property for chained LRM: whether to ignore "availability check" in tail or not. Usually you do want
+     * to ignore it. This property is mapped onto corresponding Resolver 2.x property, is like a synonym for it.
+     * Default value: <code>true</code>.
+     *
+     * @since 3.9.0
+     * @see <a href="https://maven.apache.org/resolver/configuration.html">Resolver Configuration: aether.chainedLocalRepository.ignoreTailAvailability</a>
+     */
+    @Config
+    public static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
 
     /**
      * User property for reverse dependency tree. If enabled, Maven will record ".tracking" directory into local
@@ -385,6 +396,29 @@ public final class Constants {
      */
     @Config(type = "java.lang.Boolean", defaultValue = "true")
     public static final String MAVEN_CONSUMER_POM = "maven.consumer.pom";
+
+    /**
+     * User property for disabling version resolver cache.
+     *
+     * @since 3.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_VERSION_RESOLVER_NO_CACHE = "maven.versionResolver.noCache";
+
+    /**
+     * User property for overriding calculated "build number" for snapshot deploys. Caution: this property should
+     * be RARELY used (if used at all). It may help in special cases like "aligning" a reactor build subprojects
+     * build numbers to perform a "snapshot lock down". Value given here must be <code>maxRemoteBuildNumber + 1</code>
+     * or greater, otherwise build will fail. How the number to be obtained is left to user (ie by inspecting
+     * snapshot repository metadata or alike).
+     *
+     * Note: this feature is present in Maven 3.9.7 but with different key: <code>maven.buildNumber</code>. In Maven 4
+     * as part of cleanup effort this key was renamed to properly reflect its purpose.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Integer")
+    public static final String MAVEN_DEPLOY_SNAPSHOT_BUILD_NUMBER = "maven.deploy.snapshot.buildNumber";
 
     private Constants() {}
 }

@@ -29,6 +29,12 @@ props:
       defaultValue: true
       since: 4.0.0
       configurationSource: User properties
+    - key: maven.deploy.snapshot.buildNumber
+      configurationType: Integer
+      description: "User property for overriding calculated \"build number\" for snapshot deploys. Caution: this property should be RARELY used (if used at all). It may help in special cases like \"aligning\" a reactor build subprojects build numbers to perform a \"snapshot lock down\". Value given here must be <code>maxRemoteBuildNumber + 1</code> or greater, otherwise build will fail. How the number to be obtained is left to user (ie by inspecting snapshot repository metadata or alike). Note: this feature is present in Maven 3.9.7 but with different key: <code>maven.buildNumber</code>. In Maven 4 as part of cleanup effort this key was renamed to properly reflect its purpose."
+      defaultValue: 
+      since: 4.0.0
+      configurationSource: User properties
     - key: maven.ext.class.path
       configurationType: String
       description: "Extensions class path."
@@ -126,7 +132,13 @@ props:
       configurationSource: User properties
     - key: maven.repo.local.tail
       configurationType: String
-      description: "User property for chained LRM: list of \"tail\" local repository paths (separated by comma), to be used with {@code org.eclipse.aether.util.repository.ChainedLocalRepositoryManager} . Default value: <code>null</code>, no chained LRM is used."
+      description: "User property for chained LRM: list of \"tail\" local repository paths (separated by comma), to be used with <code>org.eclipse.aether.util.repository.ChainedLocalRepositoryManager</code>. Default value: <code>null</code>, no chained LRM is used."
+      defaultValue: 
+      since: 3.9.0
+      configurationSource: User properties
+    - key: maven.repo.local.tail.ignoreAvailability
+      configurationType: String
+      description: "User property for chained LRM: whether to ignore \"availability check\" in tail or not. Usually you do want to ignore it. This property is mapped onto corresponding Resolver 2.x property, is like a synonym for it. Default value: <code>true</code>."
       defaultValue: 
       since: 3.9.0
       configurationSource: User properties
@@ -243,4 +255,10 @@ props:
       description: "User property for version filters expression, a semicolon separated list of filters to apply. By default, no version filter is applied (like in Maven 3). <br/> Supported filters: <ul> <li>\"h\" or \"h(num)\" - highest version or top list of highest ones filter</li> <li>\"l\" or \"l(num)\" - lowest version or bottom list of lowest ones filter</li> <li>\"s\" - contextual snapshot filter</li> <li>\"e(G:A:V)\" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li> </ul> Example filter expression: <code>\"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for \"top 5\" (instead full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is being processed, version 1 is omitted."
       defaultValue: 
       since: 4.0.0
+      configurationSource: User properties
+    - key: maven.versionResolver.noCache
+      configurationType: Boolean
+      description: "User property for disabling version resolver cache."
+      defaultValue: false
+      since: 3.0.0
       configurationSource: User properties
