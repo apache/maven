@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0027</groupId>
+  <artifactId>maven-it-it0027</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+  <name>Maven Integration Test :: it0027</name>
+  <description>Test @execute with a custom lifecycle, including configuration</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-fork</artifactId>
+        <version>2.1-SNAPSHOT</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>

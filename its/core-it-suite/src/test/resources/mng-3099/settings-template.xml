@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings
+  xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <!--
+  Verify that (active) profiles from the settings are effective even if no POM is in use (e.g. archetype:create).
+  In more detail, this means the plugin can be resolved from the repositories given in the settings and the plugin
+  can access properties defined by the profiles.
+  -->
+
+  <profiles>
+    <profile>
+      <id>local-profile</id>
+      <properties>
+        <touch.outputFile>target/PASSED.txt</touch.outputFile>
+      </properties>
+      <repositories>
+        <repository>
+          <id>maven-core-it</id>
+          <url>@baseurl@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>maven-core-it</id>
+          <url>@baseurl@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>local-profile</activeProfile>
+  </activeProfiles>
+
+</settings>

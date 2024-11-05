@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.it0139</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <groupId>org.apache.maven.its.it0139.child</groupId>
+  <artifactId>child</artifactId>
+  <version>2.0-alpha-1</version>
+  <packaging>jar</packaging>
+
+  <name>child-name</name>
+  <description>child-desc</description>
+  <url>http://child.org/</url>
+  <inceptionYear>2008</inceptionYear>
+  <organization>
+    <name>child-org-name</name>
+  </organization>
+
+  <prerequisites>
+    <maven>2.0.0</maven>
+  </prerequisites>
+
+  <scm>
+    <url>http://scm.org/</url>
+  </scm>
+  <issueManagement>
+    <url>http://issue.org/</url>
+  </issueManagement>
+  <ciManagement>
+    <url>http://ci.org/</url>
+  </ciManagement>
+  <distributionManagement>
+    <repository>
+      <id>maven-core-it</id>
+      <name>child-dist-repo</name>
+      <url>http://dist.org/</url>
+    </repository>
+  </distributionManagement>
+
+  <properties>
+    <!-- this is where we collect all the interpolated values for the POM dump -->
+    <projectDir>${basedir}</projectDir>
+    <projectGroupId>${project.groupId}</projectGroupId>
+    <projectArtifactId>${project.artifactId}</projectArtifactId>
+    <projectVersion>${project.version}</projectVersion>
+    <projectPackaging>${project.packaging}</projectPackaging>
+    <projectName>${project.name}</projectName>
+    <projectDesc>${project.description}</projectDesc>
+    <projectUrl>${project.url}</projectUrl>
+    <projectYear>${project.inceptionYear}</projectYear>
+    <projectOrgName>${project.organization.name}</projectOrgName>
+    <projectPrereqMvn>${project.prerequisites.maven}</projectPrereqMvn>
+    <projectScmUrl>${project.scm.url}</projectScmUrl>
+    <projectIssueUrl>${project.issueManagement.url}</projectIssueUrl>
+    <projectCiUrl>${project.ciManagement.url}</projectCiUrl>
+    <projectDistRepoName>${project.distributionManagement.repository.name}</projectDistRepoName>
+    <projectBuildOut>${project.build.outputDirectory}</projectBuildOut>
+    <projectSiteOut>${project.reporting.outputDirectory}</projectSiteOut>
+    <parentGroupId>${project.parent.groupId}</parentGroupId>
+    <parentArtifactId>${project.parent.artifactId}</parentArtifactId>
+    <parentVersion>${project.parent.version}</parentVersion>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <outputFile>target/interpolated.properties</outputFile>
+              <expressions>
+                <expression>project/properties</expression>
+              </expressions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <outputDirectory>target/bin</outputDirectory>
+  </build>
+
+  <reporting>
+    <outputDirectory>target/doc</outputDirectory>
+  </reporting>
+
+</project>

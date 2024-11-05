@@ -1,0 +1,18 @@
+<settings>
+  <mirrors>
+    <mirror>
+      <id>central</id>
+      <url>@protocol@://www.example.com/</url>
+      <mirrorOf>*</mirrorOf>
+    </mirror>
+  </mirrors>
+  <proxies>
+    <proxy>
+      <id>http-proxy</id>
+      <protocol>http</protocol>
+      <host>localhost</host>
+      <port>@port@</port>
+    </proxy>
+  </proxies>
+</settings>
+

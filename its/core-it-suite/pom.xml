@@ -1,0 +1,931 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its</groupId>
+    <artifactId>core-its</artifactId>
+    <version>2.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>core-it-suite</artifactId>
+
+  <name>Maven Core ITs suite</name>
+  <description>The effective Maven Integration Tests suite.</description>
+
+  <!--
+  By default, the project just packages the tests in an artifact. To actually run them, activate the profile "run-its":
+
+    mvn clean test -Prun-its
+
+  This will subject the Maven version running the build to the integration tests. If you would like to test a different
+  Maven distribution, you can use the system property "mavenHome" to specify the path of the Maven distribution to test:
+
+    mvn clean test -Prun-its -DmavenHome=<maven-under-test>
+
+  Alternatively, you can just specify the version of a previously installed/deployed Maven distribution which will be
+  downloaded, unpacked and tested:
+
+    mvn clean test -Prun-its -DmavenVersion=2.2.1
+
+  It's also possible to point the ITs at an already downloaded Maven distribution:
+
+    mvn clean test -Prun-its -DmavenDistro=<path-to-bin-archive>
+
+  To run the ITs using embedded Maven 3.x, additionally activate the profile "embedded".
+
+  ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
+  Maven dependencies are added to the test class path.
+
+  If you're behind a proxy, use the system properties proxy.host, proxy.port, proxy.user, proxy.pass and
+  proxy.nonProxyHosts to specify the required proxy setup for the ITs. Alternatively, set the system property
+  maven.it.central to a URL of a local repository manager (anonymous authentication only) that proxies the
+  required artifacts.
+  -->
+
+  <properties>
+    <surefireMemory>-Xmx384m</surefireMemory>
+    <!-- The original Maven distribution to test. -->
+    <mavenHome>${maven.home}</mavenHome>
+    <!-- The (possibly instrumented copy of the) Maven distribution we actually
+      use for the tests. -->
+    <preparedMavenHome>${mavenHome}</preparedMavenHome>
+    <!-- default properties used to filter the global settings -->
+    <maven.it.central>https://repo.maven.apache.org/maven2</maven.it.central>
+    <proxy.active>false</proxy.active>
+    <proxy.host>localhost</proxy.host>
+    <proxy.port>80</proxy.port>
+    <proxy.type>none</proxy.type>
+    <proxy.user />
+    <proxy.pass />
+    <proxy.nonProxyHosts>localhost</proxy.nonProxyHosts>
+    <slf4jVersion>1.6.1</slf4jVersion>
+    <jetty9Version>9.4.53.v20231009</jetty9Version>
+
+    <stubPluginVersion>0.1-stub-SNAPSHOT</stubPluginVersion>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <!-- NOTE: Use compile scope for transitivity. -->
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <version>2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>3.3.0</version>
+      <!-- NOTE: Use compile scope for transitivity. -->
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-verifier</artifactId>
+      <!-- TODO: not transitive in tests artifact, so must be left in main
+        scope <scope>test</scope> -->
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-shared-utils</artifactId>
+      <version>0.9</version>
+    </dependency>
+
+    <!-- Jetty (as test HTTP server) -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>${jetty9Version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-security</artifactId>
+      <version>${jetty9Version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-util</artifactId>
+      <version>${jetty9Version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>16.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-repository-metadata</artifactId>
+    </dependency>
+
+    <!-- project dependencies -->
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>maven-it-plugin-bootstrap</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-component</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-toolchain</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-wagon</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>maven-it-helper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-extension</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-javaagent</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-clean-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-deploy-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-ear-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-ejb-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-install-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-javadoc-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-plugin-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-rar-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-resources-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-site-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-source-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-war-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-active-collection</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-ant-based</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-artifact</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-class-loader</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-context-passing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-dependency-collection</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-expression</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-error</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-extension-consumer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-extension-provider</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-fork</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-invalid-descriptor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-log-file</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-model-interpolation</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-no-default-comp</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-no-project</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-online</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-optional-mojos</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-packaging</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plugin-dependency</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-project</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-project-interpolation</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-setter</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-singleton-component</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-site</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-toolchain</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-touch</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-uses-properties</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-uses-wagon</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-all</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plexus-utils-11</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plexus-utils-new</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plexus-component-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-log4j</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-extension1</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-extension2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plexus-lifecycle</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-settings</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5805-pkg-type-mojo-configuration-extension</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5805-pkg-type-mojo-configuration-extension2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5805-pkg-type-mojo-configuration-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5805-pkg-type-mojo-configuration-plugin-dep</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5958-pkg-type-extension</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-6759-resolves-project-dependencies-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <filtering>true</filtering>
+        <directory>src/test/resources-filtered</directory>
+      </testResource>
+    </testResources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <configuration>
+            <java>
+              <includes>
+                <include>src/main/java/**/*.java</include>
+                <include>src/test/java/**/*.java</include>
+                <include>src/test/resources/**/src/main/java/**/*.java</include>
+                <include>src/test/resources/**/src/test/java/**/*.java</include>
+              </includes>
+              <excludes>
+                <exclude>src/test/resources/mng-5208/project/sub-2/src/main/java/Bad.java</exclude>
+              </excludes>
+            </java>
+            <pom>
+              <includes>
+                <include>pom.xml</include>
+                <include>src/test/resources/**/pom.xml</include>
+              </includes>
+              <excludes>
+                <exclude>src/test/resources/mng-2254/latin-1/pom.xml</exclude>
+                <exclude>src/test/resources/mng-2362/latin-1/pom.xml</exclude>
+                <exclude>src/test/resources/mng-3839/pom.xml</exclude>
+              </excludes>
+            </pom>
+          </configuration>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/MavenIT*.java</include>
+          </includes>
+          <!-- test annotated by @Tag("disabled") will be skipped from executions -->
+          <excludedGroups>disabled</excludedGroups>
+          <forkCount>0</forkCount>
+          <reuseForks>true</reuseForks>
+          <skip>true</skip>
+          <systemPropertyVariables>
+            <maven.version>${maven.version}</maven.version>
+            <maven.home>${preparedMavenHome}</maven.home>
+            <!-- TODO: This is for now legacy as Verifier is confused otherwise -->
+            <maven.mainClass>org.apache.maven.cli.MavenCli</maven.mainClass>
+            <maven.it.global-settings.dir>${project.build.testOutputDirectory}</maven.it.global-settings.dir>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>parallel</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <parallel>suitesAndClasses</parallel>
+              <threadCount>6</threadCount>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>run-its</id>
+      <dependencies>
+        <!-- not really used but will force download in the local repo used -->
+        <dependency>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-webdav-jackrabbit</artifactId>
+          <version>3.0.0</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>${slf4jVersion}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>${slf4jVersion}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-repo-local</id>
+      <activation>
+        <property>
+          <name>maven.repo.local</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <!-- Pass this through to the tests (if set!) to have them
+                  pick the right repository -->
+                <maven.repo.local>${maven.repo.local}</maven.repo.local>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-repo-local-layout</id>
+      <activation>
+        <property>
+          <name>maven.repo.local.layout</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <!-- Pass this through to the tests (if set!) to have them
+                  pick the right repository layout -->
+                <maven.repo.local.layout>${maven.repo.local.layout}</maven.repo.local.layout>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>jdk-properties</id>
+      <activation>
+        <jdk>(,1.8)</jdk>
+      </activation>
+      <properties>
+        <surefireMemory>-Xmx384m -XX:MaxPermSize=192m</surefireMemory>
+      </properties>
+    </profile>
+    <profile>
+      <id>embedded</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+              <forkCount>1</forkCount>
+              <reuseForks>true</reuseForks>
+              <argLine>${surefireMemory}
+                -Dcom.sun.management.jmxremote=true</argLine>
+              <!-- NOTE: Maven plugins have access to the system class path
+                so keep it clean -->
+              <useSystemClassLoader>false</useSystemClassLoader>
+              <systemPropertyVariables>
+                <verifier.forkMode>auto</verifier.forkMode>
+                <emma.rt.control>false</emma.rt.control>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-from-repo</id>
+      <activation>
+        <property>
+          <name>mavenVersion</name>
+        </property>
+      </activation>
+      <properties>
+        <mavenHome>${project.build.directory}/apache-maven</mavenHome>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>download-maven-distro</id>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.apache.maven</groupId>
+                      <artifactId>apache-maven</artifactId>
+                      <version>${mavenVersion}</version>
+                      <classifier>bin</classifier>
+                      <type>zip</type>
+                      <destFileName>maven-bin.zip</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-maven-distro</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <target>
+                    <delete dir="${mavenHome}" />
+                    <unzip dest="${mavenHome}" src="${project.build.directory}/maven-bin.zip">
+                      <globmapper from="apache-maven-${mavenVersion}/*" handledirsep="true" to="*" />
+                    </unzip>
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug" perm="ugo+rx" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-distro</id>
+      <activation>
+        <property>
+          <name>mavenDistro</name>
+        </property>
+      </activation>
+      <properties>
+        <mavenHome>${project.build.directory}/apache-maven</mavenHome>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-maven-distro</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <target>
+                    <delete dir="${mavenHome}" />
+                    <unzip dest="${mavenHome}" src="${mavenDistro}">
+                      <regexpmapper from="^([^/]+)/(.*)$" handledirsep="true" to="\2" />
+                    </unzip>
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug" perm="ugo+rx" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>emma</id>
+      <properties>
+        <preparedMavenHome>${project.build.directory}/distro</preparedMavenHome>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-maven-distro</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <phase>process-test-classes</phase>
+                <configuration>
+                  <target>
+                    <delete dir="${preparedMavenHome}" />
+                    <copy overwrite="true" todir="${preparedMavenHome}">
+                      <fileset dir="${mavenHome}" />
+                    </copy>
+                    <chmod dir="${preparedMavenHome}/bin" includes="mvn,mvnDebug" perm="ugo+rx" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>inject-emma-into-core-realm</id>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <phase>process-test-classes</phase>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>emma</groupId>
+                      <artifactId>emma</artifactId>
+                      <version>2.1.5320</version>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${preparedMavenHome}/lib</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.maven.plugin</groupId>
+            <artifactId>emma4it-maven-plugin</artifactId>
+            <version>1.2</version>
+            <configuration>
+              <jarSets>
+                <jarSet>
+                  <directory>${preparedMavenHome}/lib</directory>
+                  <includes>
+                    <include>maven*.jar</include>
+                  </includes>
+                </jarSet>
+              </jarSets>
+              <includes>
+                <include>org.apache.maven.*</include>
+              </includes>
+              <excludes>
+                <exclude>*.io.xpp3.*</exclude>
+                <exclude>*Exception</exclude>
+              </excludes>
+            </configuration>
+            <executions>
+              <execution>
+                <id>instrument</id>
+                <goals>
+                  <goal>instrument</goal>
+                </goals>
+                <phase>process-test-classes</phase>
+              </execution>
+              <execution>
+                <id>report</id>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+                <phase>test</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${basedir}</directory>
+                  <includes>
+                    <include>coverage.ec</include>
+                  </includes>
+                </fileset>
+              </filesets>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>proxy</id>
+      <activation>
+        <property>
+          <name>proxy.host</name>
+        </property>
+      </activation>
+      <properties>
+        <proxy.type>http</proxy.type>
+        <proxy.active>true</proxy.active>
+      </properties>
+    </profile>
+  </profiles>
+</project>

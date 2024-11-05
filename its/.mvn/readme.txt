@@ -1,0 +1,1 @@
+.mvn directory should exist in project root

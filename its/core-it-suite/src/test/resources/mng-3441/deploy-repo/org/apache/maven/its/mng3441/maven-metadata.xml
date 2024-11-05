@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <plugins>
+    <plugin>
+      <name>Other Name</name>
+      <prefix>other-plugin</prefix>
+      <artifactId>other-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

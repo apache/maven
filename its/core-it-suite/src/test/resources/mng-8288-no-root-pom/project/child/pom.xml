@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>myGroup</groupId>
+    <artifactId>parent</artifactId>
+    <version>1</version>
+  </parent>
+
+  <artifactId>child</artifactId>
+</project>

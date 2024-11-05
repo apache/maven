@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0044</groupId>
+  <artifactId>maven-it-it0044</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Maven Integration Test :: it0044</name>
+  <description>Test --settings CLI option</description>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <pluginItem>${test}</pluginItem>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

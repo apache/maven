@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+    <groupId>org.apache.maven.its.mng7819</groupId>
+    <artifactId>dependency</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <versioning>
+        <snapshot>
+            <timestamp>20221014.203717</timestamp>
+            <buildNumber>12</buildNumber>
+        </snapshot>
+        <lastUpdated>20221014203717</lastUpdated>
+        <snapshotVersions>
+            <snapshotVersion>
+                <extension>jar</extension>
+                <value>1.0.0-20221014.203717-12</value>
+                <updated>20221014203717</updated>
+            </snapshotVersion>
+            <snapshotVersion>
+                <extension>pom</extension>
+                <value>1.0.0-20221014.203717-12</value>
+                <updated>20221014203717</updated>
+            </snapshotVersion>
+        </snapshotVersions>
+    </versioning>
+</metadata>

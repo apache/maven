@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3740</groupId>
+  <artifactId>projects</artifactId>
+  <version>2</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>maven-mng3740-plugin</module>
+  </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.mng3740</groupId>
+        <artifactId>maven-mng3740-plugin</artifactId>
+        <version>1</version>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+            <phase>install</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

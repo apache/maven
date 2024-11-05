@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.it0072</groupId>
+  <artifactId>maven-it-it0072</artifactId>
+  <!-- interpolate here -->
+  <version>${m2.version}</version>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: it0072</name>
+  <description>Verifies that property references with dotted notation work within POM interpolation.</description>
+
+  <properties>
+    <m2.version>1.0-SNAPSHOT</m2.version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <outputFile>target/pom.properties</outputFile>
+          <expressions>
+            <expression>project/version</expression>
+          </expressions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

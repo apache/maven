@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng2720</groupId>
+  <artifactId>project-hierarchy</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+
+  <name>MNG-2720 Project Hierarchy</name>
+
+  <modules>
+    <module>child1</module>
+    <module>child2</module>
+    <module>child3</module>
+  </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>package</id>
+            <goals>
+              <goal>compile</goal>
+              <goal>runtime</goal>
+              <goal>test</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <compileClassPath>${project.build.directory}/compile.txt</compileClassPath>
+              <runtimeClassPath>${project.build.directory}/runtime.txt</runtimeClassPath>
+              <testClassPath>${project.build.directory}/test.txt</testClassPath>
+              <significantPathLevels>1</significantPathLevels>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

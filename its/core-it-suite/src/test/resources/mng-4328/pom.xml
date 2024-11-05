@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4328</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>Maven Integration Test :: MNG-4328</name>
+  <description>Verify that plugin parameters that are of primitive types like boolean (not java.lang.Boolean) can be populated
+    from expressions. In other words, the subtle difference between the runtime type of the expression value (which
+    will always be a primitive wrapper class due to reflection) and the actual parameter type should not matter.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>test-1</id>
+            <goals>
+              <goal>config</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <propertiesFile>target/config1.properties</propertiesFile>
+              <primitiveBooleanParam>${settings.offline}</primitiveBooleanParam>
+            </configuration>
+          </execution>
+          <execution>
+            <id>test-2</id>
+            <goals>
+              <goal>config</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <propertiesFile>target/config2.properties</propertiesFile>
+              <primitiveBooleanParam>${project.executionRoot}</primitiveBooleanParam>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>Maven Integration Test :: MNG-2926 :: Custom Plugin</name>
+      <prefix>mng-2926</prefix>
+      <artifactId>mng-2926</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

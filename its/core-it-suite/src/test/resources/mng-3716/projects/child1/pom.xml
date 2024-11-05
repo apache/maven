@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.its.mng3716</groupId>
+    <artifactId>projects</artifactId>
+    <version>1</version>
+  </parent>
+  <groupId>org.apache.maven.its.mng3716</groupId>
+  <artifactId>child1</artifactId>
+  <version>1</version>
+  <name>child1</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

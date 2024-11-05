@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0124</groupId>
+  <artifactId>maven-it-it0124</artifactId>
+  <version>1.0</version>
+  <name>Maven Integration Test :: it0124</name>
+  <description>Test that ensures the POM extensions can override default component implementations.</description>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.it0124</groupId>
+        <artifactId>maven-it-it0124-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>lookup</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-verifier-plugin</artifactId>
+        <configuration>
+          <verificationFile>src/test/verifier/verifications-test.xml</verificationFile>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its.it0124</groupId>
+        <artifactId>maven-it-it0124-extension</artifactId>
+        <version>1.0</version>
+      </extension>
+    </extensions>
+  </build>
+</project>

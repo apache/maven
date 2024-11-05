@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng3890</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0</version>
+
+  <name>Maven Integration Test :: MNG-3890</name>
+  <description>Test that transitive dependencies whose scope has been updated from "compile" to "provided" by a consumer
+    remain in "provided" scope when depending on this consumer with scope "compile".</description>
+
+  <!-- Below are the dependency trees for the artifacts of this test with Maven 2.0.9:
+[INFO] ========================================================================
+[INFO] [dependency:tree]
+[INFO] org.apache.maven.its.mng3890:b:jar:0.1
+[INFO] \- org.apache.maven.its.mng3890:a:jar:0.1:compile
+[INFO] ========================================================================
+[INFO] [dependency:tree]
+[INFO] org.apache.maven.its.mng3890:c:jar:0.1
+[INFO] +- org.apache.maven.its.mng3890:a:jar:0.1:provided (scope not updated to compile)
+[INFO] \- org.apache.maven.its.mng3890:b:jar:0.1:compile
+[INFO] ========================================================================
+[INFO] [dependency:tree]
+[INFO] org.apache.maven.its.mng3890:test:jar:1.0
+[INFO] \- org.apache.maven.its.mng3890:c:jar:0.1:compile
+[INFO]    \- org.apache.maven.its.mng3890:b:jar:0.1:compile
+[INFO]       \- org.apache.maven.its.mng3890:a:jar:0.1:compile  << ERROR: Should be excluded because declared as provided by c
+[INFO] ========================================================================
+-->
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng3890</groupId>
+      <artifactId>c</artifactId>
+      <version>0.1</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <testArtifacts>target/artifacts.txt</testArtifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

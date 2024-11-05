@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF8"?>
+
+<toolchains>
+  <toolchain>
+    <type>jdk</type>
+    <provides>
+      <version>1.5</version>
+      <vendor>sun</vendor>
+      <id>default</id>
+    </provides>
+    <configuration>
+      <jdkHome>@javaHome@</jdkHome>
+    </configuration>
+  </toolchain>
+</toolchains>
+

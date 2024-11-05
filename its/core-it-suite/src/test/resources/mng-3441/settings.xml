@@ -1,0 +1,9 @@
+<settings>
+  <mirrors>
+    <mirror>
+      <id>test.deployment.repository.mirror</id>
+      <mirrorOf>test.deployment.repository</mirrorOf>
+      <url>INVALID</url>
+    </mirror>
+  </mirrors>
+</settings>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>mng-5840-relative-path-reactor-matching</groupId>
+    <artifactId>parent</artifactId>
+    <version>1</version>
+    <relativePath>../parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>child</artifactId>
+  <version>1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <maven-enforcer-plugin.version>3.0.0</maven-enforcer-plugin.version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${maven-enforcer-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>validate</phase>
+            <inherited>false</inherited>
+            <configuration>
+              <rules>
+                <alwaysFail />
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- JDK 7 require older version of enforcer -->
+  <profiles>
+    <profile>
+      <id>jdk7</id>
+      <activation>
+        <jdk>(,1.8)</jdk>
+      </activation>
+      <properties>
+        <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
+      </properties>
+    </profile>
+  </profiles>
+</project>

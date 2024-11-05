@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.bootstrap</groupId>
+  <artifactId>maven-it-boostrap</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: Boostrap</name>
+  <description>This project pulls down all the artifacts/plugins required for the IT suite. Due to MNG-2974, snapshot versions of
+        plugins cannot be downloaded by Maven from non-default repositories configured in the POM if the plugin is invoked
+        directly from the command line. Also, having this in a central place spares us from copying the snapshot repo
+        config all around in the IT POMs.
+
+        Each module does:
+        - boostrap - resolves all artifacts provided in bootstrap file
+        - packaging-* - resolves build plugins provided by tested Maven default lifecycle(s)</description>
+
+  <modules>
+    <module>bootstrap</module>
+    <module>packaging-jar</module>
+    <module>packaging-maven-plugin</module>
+    <module>packaging-war</module>
+  </modules>
+
+  <build>
+    <plugins>
+      <!-- This merely locks the plugin versions to disable auto-update -->
+      <plugin>
+        <groupId>org.apache.maven.its</groupId>
+        <artifactId>maven-it-plugin-bootstrap</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>download</goal>
+            </goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <file>${file}</file>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

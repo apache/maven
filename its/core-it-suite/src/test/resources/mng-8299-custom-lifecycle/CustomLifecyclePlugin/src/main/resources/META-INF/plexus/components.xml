@@ -1,0 +1,20 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.Lifecycle</role>
+      <role-hint>customLifecyclePlugin_PackagingType</role-hint>
+      <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+      <configuration>
+        <id>customLifecyclePlugin_LifecycleID</id>
+        <phases>
+          <phase>phase1</phase>
+          <phase>phase2</phase>
+          <phase>phase3</phase>
+        </phases>
+        <default-phases>
+          <phase1>com.nextmetaphor.plugin:CustomLifecyclePlugin:phase1Goal</phase1>
+        </default-phases>
+      </configuration>
+    </component>
+  </components>
+</component-set>
