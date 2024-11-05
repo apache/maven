@@ -69,6 +69,7 @@ import org.eclipse.aether.util.graph.version.LowestVersionFilter;
 import org.eclipse.aether.util.graph.version.PredicateVersionFilter;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
+import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
@@ -401,6 +402,12 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                     .forEach(paths::add);
         }
         sessionBuilder.withLocalRepositoryBaseDirectories(paths);
+        // Pass over property supported by Maven 3.9.x
+        if (mergedProps.containsKey(Constants.MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)) {
+            configProps.put(
+                    ChainedLocalRepositoryManager.CONFIG_PROP_IGNORE_TAIL_AVAILABILITY,
+                    mergedProps.get(Constants.MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
+        }
 
         for (RepositorySystemSessionExtender extender : sessionExtenders.values()) {
             extender.extend(request, configProps, mirrorSelector, proxySelector, authSelector);

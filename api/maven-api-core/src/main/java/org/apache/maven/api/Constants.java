@@ -321,6 +321,17 @@ public final class Constants {
     public static final String MAVEN_REPO_LOCAL_TAIL = "maven.repo.local.tail";
 
     /**
+     * User property for chained LRM: whether to ignore "availability check" in tail or not. Usually you do want
+     * to ignore it. This property is mapped onto corresponding Resolver 2.x property, is like a synonym for it.
+     * Default value: <code>true</code>.
+     *
+     * @since 3.9.0
+     * @see <a href="https://maven.apache.org/resolver/configuration.html">Resolver Configuration: aether.chainedLocalRepository.ignoreTailAvailability</a>
+     */
+    @Config
+    public static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
+
+    /**
      * User property for reverse dependency tree. If enabled, Maven will record ".tracking" directory into local
      * repository with "reverse dependency tree", essentially explaining WHY given artifact is present in local
      * repository.
