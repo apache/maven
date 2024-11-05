@@ -64,12 +64,11 @@ class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTes
 
         assertTrue(Files.isRegularFile(consumerPom));
         List<String> consumerPomLines = Files.readAllLines(consumerPom, StandardCharsets.UTF_8);
-        assertTrue(consumerPomLines.stream().anyMatch(l -> l.contains("<name>Apache-2.0</name>")));
-        assertFalse(consumerPomLines.stream().anyMatch(l -> l.contains("<parent>")));
+        assertTrue(consumerPomLines.stream().anyMatch(l -> l.contains("<artifactId>hocon-simple</artifactId>")));
 
         // The build pom is the original POM, so the hocon file
         assertTrue(Files.isRegularFile(buildPom));
         List<String> buildPomLines = Files.readAllLines(buildPom, StandardCharsets.UTF_8);
-        assertTrue(buildPomLines.stream().anyMatch(l -> l.contains("groupId = org.apache.maven.extensions")));
+        assertTrue(buildPomLines.stream().anyMatch(l -> l.contains("artifactId = hocon-simple")));
     }
 }

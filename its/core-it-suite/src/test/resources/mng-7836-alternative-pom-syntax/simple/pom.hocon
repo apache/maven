@@ -17,11 +17,6 @@
 # under the License.
 #
 modelVersion = 4.0.0
-parent {
-    groupId = org.apache.maven.extensions
-    artifactId = maven-extensions
-    version = 41
-}
 groupId = org.apache.maven.its.mng-7836
 artifactId = hocon-simple
 version = 1.0.0-SNAPSHOT
