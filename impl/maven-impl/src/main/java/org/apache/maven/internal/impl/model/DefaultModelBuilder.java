@@ -221,7 +221,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     session = mainSession.derive(request, new DefaultModelBuilderResult());
                 }
                 // Build the request
-                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
                     // build the build poms
                     session.buildBuildPom();
                 } else {
@@ -815,7 +815,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
 
             // lifecycle bindings injection
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
+            if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
                 org.apache.maven.api.services.ModelTransformer lifecycleBindingsInjector =
                         request.getLifecycleBindingsInjector();
                 if (lifecycleBindingsInjector != null) {
@@ -831,7 +831,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             resultModel = modelNormalizer.injectDefaultValues(resultModel, request, this);
 
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
+            if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
                 // plugins configuration
                 resultModel = pluginConfigurationExpander.expandPluginConfiguration(resultModel, request, this);
             }
@@ -853,7 +853,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // effective model validation
             modelValidator.validateEffectiveModel(
                     resultModel,
-                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
                             ? ModelValidator.VALIDATION_LEVEL_STRICT
                             : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     request,
@@ -896,8 +896,8 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private Model resolveParent(Model childModel) {
             Model parentModel = null;
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                    || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM) {
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE) {
                 parentModel = readParentLocally(childModel);
             }
             if (parentModel == null) {
@@ -1056,7 +1056,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     buffer.append(" for ").append(ModelProblemUtils.toId(childModel));
                 }
                 buffer.append(": ").append(e.getMessage());
-                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
                     buffer.append(" and parent could not be found in reactor");
                 }
 
@@ -1065,7 +1065,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             ModelBuilderRequest lenientRequest = ModelBuilderRequest.builder(request)
-                    .requestType(ModelBuilderRequest.RequestType.PARENT_POM)
+                    .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
                     .source(modelSource)
                     .build();
 
@@ -1164,8 +1164,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (inputModel.getParent() != null && inputModel.getParent().getRelativePath() == null) {
                 String relPath;
                 if (parentModel.getPomFile() != null
-                        && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                                || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM)) {
+                        && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                                || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)) {
                     relPath = inputModel
                             .getPomFile()
                             .getParent()
@@ -1234,7 +1234,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private List<Profile> getActiveProfiles(
                 Collection<Profile> interpolatedProfiles, DefaultProfileActivationContext profileActivationContext) {
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_POM) {
+            if (request.getRequestType() != ModelBuilderRequest.RequestType.BUILD_EFFECTIVE) {
                 return profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
             } else {
                 return List.of();
@@ -1256,7 +1256,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             try {
-                boolean strict = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM;
+                boolean strict = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT;
                 try {
                     rootDirectory = request.getSession().getRootDirectory();
                 } catch (IllegalStateException ignore) {
@@ -1337,8 +1337,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
 
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                    || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM) {
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE) {
                 model = model.withPomFile(modelSource.getPath());
 
                 Parent parent = model.getParent();
@@ -1439,7 +1439,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(model);
             modelValidator.validateFileModel(
                     model,
-                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
                             ? ModelValidator.VALIDATION_LEVEL_STRICT
                             : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     request,
@@ -1465,8 +1465,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model rawModel = readFileModel();
 
             if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion())
-                    && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                            || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM)) {
+                    && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                            || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)) {
                 rawModel = transformFileToRaw(rawModel);
             }
 
@@ -1476,7 +1476,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             modelValidator.validateRawModel(
                     rawModel,
-                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
                             ? ModelValidator.VALIDATION_LEVEL_STRICT
                             : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     request,
@@ -1681,7 +1681,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             } catch (IllegalStateException e) {
                 rootDirectory = null;
             }
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM && rootDirectory != null) {
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT && rootDirectory != null) {
                 Path sourcePath = importSource.getPath();
                 if (sourcePath != null && sourcePath.startsWith(rootDirectory)) {
                     add(
@@ -1696,7 +1696,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             try {
                 ModelBuilderRequest importRequest = ModelBuilderRequest.builder()
                         .session(request.getSession())
-                        .requestType(ModelBuilderRequest.RequestType.DEPENDENCY)
+                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
                         .systemProperties(request.getSystemProperties())
                         .userProperties(request.getUserProperties())
                         .source(importSource)

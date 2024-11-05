@@ -49,21 +49,21 @@ public interface ModelBuilderRequest {
      */
     enum RequestType {
         /**
-         * The request is for building a model from a POM file in a project on the filesystem.
+         * The request is for building an initial model from a POM file in a project on the filesystem.
          */
-        BUILD_POM,
+        BUILD_PROJECT,
         /**
-         * The request is for building the consumer POM.
+         * The request is for rebuilding the effective POM in a project on the filesystem.
          */
-        CONSUMER_POM,
+        BUILD_EFFECTIVE,
         /**
          * The request is for building a model from a parent POM file from a downloaded artifact.
          */
-        PARENT_POM,
+        CONSUMER_PARENT,
         /**
          * The request is for building a model from a dependency POM file from a downloaded artifact.
          */
-        DEPENDENCY
+        CONSUMER_DEPENDENCY
     }
 
     /**

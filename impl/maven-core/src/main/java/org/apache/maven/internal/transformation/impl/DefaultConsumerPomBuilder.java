@@ -95,7 +95,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
-        request.requestType(ModelBuilderRequest.RequestType.CONSUMER_POM);
+        request.requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE);
         request.session(iSession);
         // in order to resolve parents, we need to fake being at the correct location
         request.source(new PomConsumerModelSource(project.getModel().getPomPath(), src));

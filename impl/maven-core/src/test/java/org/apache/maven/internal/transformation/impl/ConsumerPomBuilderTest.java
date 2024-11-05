@@ -77,7 +77,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         Model orgModel = mbs.build(ModelBuilderRequest.builder()
                         .session(InternalSession.from(session))
                         .source(ModelSource.fromPath(file))
-                        .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .build())
                 .getEffectiveModel();
 
@@ -103,7 +103,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         Model orgModel = mbs.build(ModelBuilderRequest.builder()
                         .session(InternalSession.from(session))
                         .source(ModelSource.fromPath(file))
-                        .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .build())
                 .getEffectiveModel();
 
