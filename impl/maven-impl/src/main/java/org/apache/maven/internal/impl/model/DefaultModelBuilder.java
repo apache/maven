@@ -815,7 +815,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
 
             // lifecycle bindings injection
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
                 org.apache.maven.api.services.ModelTransformer lifecycleBindingsInjector =
                         request.getLifecycleBindingsInjector();
                 if (lifecycleBindingsInjector != null) {
@@ -836,7 +836,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 resultModel = pluginConfigurationExpander.expandPluginConfiguration(resultModel, request, this);
             }
 
-            for (var transformer : transformers) {
+            for (org.apache.maven.api.spi.ModelTransformer transformer : transformers) {
                 resultModel = transformer.transformEffectiveModel(resultModel);
             }
 
