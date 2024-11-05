@@ -167,8 +167,13 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 InternalSession.from(nonNull(request, "request").getSession());
         DependencyResolverResult result;
         DependencyResolverResult collectorResult = collect(request);
-        List<RemoteRepository> repositories =
-                request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories();
+        List<RemoteRepository> repositories = request.getRepositories() != null
+                ? request.getRepositories()
+                : request.getProject().isPresent()
+                        ? session.getService(ProjectManager.class)
+                                .getRemoteProjectRepositories(
+                                        request.getProject().get())
+                        : session.getRemoteRepositories();
         if (request.getRequestType() == DependencyResolverRequest.RequestType.COLLECT) {
             result = collectorResult;
         } else {
