@@ -29,7 +29,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * <p>
  * The cache implementation could be annotated with {@code SessionScoped} to be created once per session, but
  * this would make tests more complicated to write as they would all need to enter the session scope.
- * This is similar to the {@code CIFriendlyVersionModelTransformer}.
  *
  * @since 4.0.0
  */
