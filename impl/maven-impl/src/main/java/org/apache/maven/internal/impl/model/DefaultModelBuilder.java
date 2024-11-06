@@ -1169,7 +1169,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     relPath = inputModel
                             .getPomFile()
                             .getParent()
-                            .relativize(parentModel.getPomFile().getParent())
+                            .toAbsolutePath()
+                            .relativize(
+                                    parentModel.getPomFile().toAbsolutePath().getParent())
                             .toString();
                 } else {
                     relPath = "..";
