@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.internal;
+package org.apache.maven.cling.extensions;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -190,9 +190,9 @@ public class BootstrapCoreExtensionManager {
             if (providedArtifacts.contains(id)) {
                 log.debug("  Excluded {}", id);
             } else {
-                File file = artifact.getFile();
+                Path file = artifact.getPath();
                 log.debug("  Included {} located at {}", id, file);
-                realm.addURL(file.toURI().toURL());
+                realm.addURL(file.toUri().toURL());
             }
         }
         return CoreExtensionEntry.discoverFrom(

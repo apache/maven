@@ -42,9 +42,9 @@ import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
-import org.apache.maven.cli.CLIReportingUtils;
-import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
-import org.apache.maven.cli.props.MavenPropertiesLoader;
+import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
+import org.apache.maven.cling.props.MavenPropertiesLoader;
+import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 

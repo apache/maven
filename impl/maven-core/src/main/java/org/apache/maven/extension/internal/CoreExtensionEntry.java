@@ -18,10 +18,10 @@
  */
 package org.apache.maven.extension.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -124,13 +124,13 @@ public class CoreExtensionEntry {
     }
 
     public static CoreExtensionEntry discoverFrom(
-            ClassRealm loader, Collection<File> classpath, String key, XmlNode configuration) {
+            ClassRealm loader, Collection<Path> classpath, String key, XmlNode configuration) {
         Set<String> artifacts = new LinkedHashSet<>();
         Set<String> packages = new LinkedHashSet<>();
 
         try {
-            for (File entry : classpath) {
-                ExtensionDescriptor descriptor = BUILDER.build(entry);
+            for (Path entry : classpath) {
+                ExtensionDescriptor descriptor = BUILDER.build(entry.toFile());
                 if (descriptor != null) {
                     artifacts.addAll(descriptor.getExportedArtifacts());
                     packages.addAll(descriptor.getExportedPackages());
