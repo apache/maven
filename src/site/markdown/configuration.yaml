@@ -124,6 +124,12 @@ props:
       defaultValue: ${maven.user.conf}/repository
       since: 3.0.0
       configurationSource: User properties
+    - key: maven.repo.local.head
+      configurationType: String
+      description: "User property for chained LRM: the new \"head\" local repository to use, and \"push\" the existing into tail. Similar to <code>maven.repo.local.tail</code>, this property may contain comma separated list of paths to be used as local repositories (combine with chained local repository), but while latter is \"appending\" this one is \"prepending\"."
+      defaultValue: 
+      since: 4.0.0
+      configurationSource: User properties
     - key: maven.repo.local.recordReverseTree
       configurationType: String
       description: "User property for reverse dependency tree. If enabled, Maven will record \".tracking\" directory into local repository with \"reverse dependency tree\", essentially explaining WHY given artifact is present in local repository. Default: <code>false</code>, will not record anything."

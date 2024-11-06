@@ -311,6 +311,17 @@ public final class Constants {
     public static final String MAVEN_VERSION_FILTERS = "maven.versionFilters";
 
     /**
+     * User property for chained LRM: the new "head" local repository to use, and "push" the existing into tail.
+     * Similar to <code>maven.repo.local.tail</code>, this property may contain comma separated list of paths to be
+     * used as local repositories (combine with chained local repository), but while latter is "appending" this
+     * one is "prepending".
+     *
+     * @since 4.0.0
+     */
+    @Config
+    public static final String MAVEN_REPO_LOCAL_HEAD = "maven.repo.local.head";
+
+    /**
      * User property for chained LRM: list of "tail" local repository paths (separated by comma), to be used with
      * <code>org.eclipse.aether.util.repository.ChainedLocalRepositoryManager</code>.
      * Default value: <code>null</code>, no chained LRM is used.

@@ -393,12 +393,19 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                 supplier.getDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
         ArrayList<Path> paths = new ArrayList<>();
+        String localRepoHead = mergedProps.get(Constants.MAVEN_REPO_LOCAL_HEAD);
+        if (localRepoHead != null) {
+            Arrays.stream(localRepoHead.split(","))
+                    .filter(p -> p != null && !p.trim().isEmpty())
+                    .map(this::resolve)
+                    .forEach(paths::add);
+        }
         paths.add(Paths.get(request.getLocalRepository().getBasedir()));
         String localRepoTail = mergedProps.get(Constants.MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
                     .filter(p -> p != null && !p.trim().isEmpty())
-                    .map(Paths::get)
+                    .map(this::resolve)
                     .forEach(paths::add);
         }
         sessionBuilder.withLocalRepositoryBaseDirectories(paths);
@@ -424,6 +431,19 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setConfigProperties(finalConfigProperties);
 
         return sessionBuilder;
+    }
+
+    private Path resolve(String string) {
+        if (string.startsWith("~/") || string.startsWith("~\\")) {
+            // resolve based on $HOME
+            return Paths.get(System.getProperty("user.home"))
+                    .resolve(string.substring(2))
+                    .normalize()
+                    .toAbsolutePath();
+        } else {
+            // resolve based on $CWD
+            return Paths.get(string).normalize().toAbsolutePath();
+        }
     }
 
     private VersionFilter buildVersionFilter(String filterExpression) {
