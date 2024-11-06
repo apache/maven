@@ -44,9 +44,8 @@ jobs:
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
-          path: ~/.m2/repository/cached
+          path: ~/.m2/repository/
           key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: maven-
           enableCrossOsArchive: true
 
       - name: Set up Maven
@@ -101,6 +100,13 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          enableCrossOsArchive: true
+
       - name: Download Maven distribution
         uses: actions/download-artifact@v4
         with:
@@ -146,6 +152,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          enableCrossOsArchive: true
 
       - name: Download Maven distribution
         uses: actions/download-artifact@v4
