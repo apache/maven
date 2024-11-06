@@ -50,7 +50,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-shared-utils</artifactId>
-      <version>0.1</version>
+      <version>3.3.3</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
