@@ -29,8 +29,9 @@ import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.DefaultMavenInvoker;
 
 /**
- * Local invoker implementation, when Maven CLI is being run. System uses ClassWorld launcher, and class world
- * instance is passed in via "enhanced" main method. Hence, this class expects fully setup ClassWorld via constructor.
+ * Local resident invoker implementation, similar to "local" but keeps Maven instance resident. This implies, that
+ * things like environment, system properties, extensions etc. are loaded only once. It is caller duty to ensure
+ * that subsequent call is right for the resident instance (ie no env change or different extension needed).
  */
 public class DefaultResidentMavenInvoker
         extends DefaultMavenInvoker<

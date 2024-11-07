@@ -22,7 +22,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.cli.mvn.MavenInvoker;
 
 /**
- * Local Maven invoker.
+ * Forked Maven invoker.
  *
  * @since 4.0.0
  */
