@@ -25,7 +25,7 @@ import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 
 /**
- * Resident invoker. Instance is shut down when this instance is closed.
+ * Resident Maven invoker, similar to local. Instance is shut down when this instance is closed.
  *
  * @since 4.0.0
  */
