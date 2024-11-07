@@ -18,8 +18,13 @@
  */
 package org.apache.maven.cling.invoker.mvn.forked;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.ParserException;
@@ -30,6 +35,9 @@ import org.apache.maven.cling.invoker.mvn.BaseMavenParser;
 import org.apache.maven.cling.invoker.mvn.CommonsCliMavenOptions;
 import org.apache.maven.cling.invoker.mvn.LayeredMavenOptions;
 
+/**
+ * Forked invoker that invokes Maven in a child process.
+ */
 public class DefaultForkedMavenParser extends BaseMavenParser<MavenOptions, ForkedMavenInvokerRequest>
         implements ForkedMavenParser {
 
@@ -55,8 +63,17 @@ public class DefaultForkedMavenParser extends BaseMavenParser<MavenOptions, Fork
 
     protected List<String> getJvmArguments(Path rootDirectory) {
         if (rootDirectory != null) {
-            // TODO: do this
-            return null;
+            Path jvmConfig = rootDirectory.resolve(".mvn/jvm.config");
+            if (Files.exists(jvmConfig)) {
+                try {
+                    return Files.readAllLines(jvmConfig).stream()
+                            .filter(l -> !l.isBlank() && !l.startsWith("#"))
+                            .flatMap(l -> Arrays.stream(l.split(" ")))
+                            .collect(Collectors.toList());
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
         }
         return null;
     }

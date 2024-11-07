@@ -24,6 +24,12 @@ import org.apache.maven.api.cli.mvn.local.LocalMavenInvoker;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.DefaultMavenInvoker;
 
+/**
+ * Local invoker implementation, when Maven CLI is being run. System uses ClassWorld launcher, and class world
+ * instance is passed in via "enhanced" main method. Hence, this class expects fully setup ClassWorld via constructor.
+ *
+ * @see org.apache.maven.cling.MavenCling
+ */
 public class DefaultLocalMavenInvoker
         extends DefaultMavenInvoker<
                 MavenOptions, MavenInvokerRequest<MavenOptions>, DefaultLocalMavenInvoker.LocalContext>
