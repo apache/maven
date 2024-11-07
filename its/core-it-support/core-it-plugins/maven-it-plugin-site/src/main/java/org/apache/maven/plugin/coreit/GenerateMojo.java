@@ -33,6 +33,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.reporting.MavenReport;
+import org.apache.maven.reporting.MavenReportException;
 
 /**
  * Generates the available/configured reports.
@@ -88,19 +89,23 @@ public class GenerateMojo extends AbstractMojo {
         for (Object report1 : reports) {
             MavenReport report = (MavenReport) report1;
 
-            if (report.canGenerateReport()) {
-                getLog().info("[MAVEN-CORE-IT-LOG] Generating report " + report);
-                try {
-                    report.setReportOutputDirectory(outputDirectory);
-                    report.generate(sink, locale);
-                } catch (Throwable e) {
-                    getLog().warn("[MAVEN-CORE-IT-LOG]   " + e, e);
-                    if (!ignoreErrors) {
-                        throw new MojoExecutionException("Failed to generate report " + report, e);
+            try {
+                if (report.canGenerateReport()) {
+                    getLog().info("[MAVEN-CORE-IT-LOG] Generating report " + report);
+                    try {
+                        report.setReportOutputDirectory(outputDirectory);
+                        report.generate(sink, locale);
+                    } catch (Throwable e) {
+                        getLog().warn("[MAVEN-CORE-IT-LOG]   " + e, e);
+                        if (!ignoreErrors) {
+                            throw new MojoExecutionException("Failed to generate report " + report, e);
+                        }
                     }
+                } else {
+                    getLog().info("[MAVEN-CORE-IT-LOG] Skipping report " + report);
                 }
-            } else {
-                getLog().info("[MAVEN-CORE-IT-LOG] Skipping report " + report);
+            } catch (MavenReportException e) {
+                getLog().info("[MAVEN-CORE-IT-LOG] Failing report " + report);
             }
         }
     }
