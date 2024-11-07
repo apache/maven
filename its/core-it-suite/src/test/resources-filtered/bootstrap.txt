@@ -78,6 +78,7 @@ org.apache.maven.plugin-tools:maven-plugin-annotations:3.3
 org.apache.maven.plugins:maven-antrun-plugin:3.0.0
 org.apache.maven.plugins:maven-antrun-plugin:3.1.0
 org.apache.maven.plugins:maven-assembly-plugin:3.1.0
+org.apache.maven.plugins:maven-assembly-plugin:3.4.0
 org.apache.maven.plugins:maven-clean-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-clean-plugin:2.5
 org.apache.maven.plugins:maven-clean-plugin:3.1.0
