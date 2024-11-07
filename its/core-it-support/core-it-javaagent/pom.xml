@@ -41,7 +41,7 @@ under the License.
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm-util</artifactId>
-      <version>7.3.1</version>
+      <version>9.7.1</version>
     </dependency>
   </dependencies>
 
