@@ -24,7 +24,7 @@ import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 
 /**
- * Local Maven invoker.
+ * Local Maven invoker, it expects all the Maven be present in classpath.
  *
  * @since 4.0.0
  */

@@ -51,29 +51,12 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-api</artifactId>
-      <version>3.1.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>doxia</groupId>
-          <artifactId>doxia-sink-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.doxia</groupId>
-      <artifactId>doxia-sink-api</artifactId>
-      <version>1.0</version>
+      <version>4.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-exec</artifactId>
-      <version>1.6.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>2.0.0</version>
     </dependency>
   </dependencies>
 </project>
