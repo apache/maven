@@ -32,12 +32,13 @@ import org.slf4j.LoggerFactory;
  */
 public class Slf4jLoggerManager implements LoggerManager {
 
-    private ILoggerFactory loggerFactory;
+    private final ILoggerFactory loggerFactory;
 
     public Slf4jLoggerManager() {
         loggerFactory = LoggerFactory.getILoggerFactory();
     }
 
+    @Override
     public Logger getLoggerForComponent(String role) {
         return new Slf4jLogger(loggerFactory.getLogger(role));
     }
@@ -47,6 +48,7 @@ public class Slf4jLoggerManager implements LoggerManager {
      * <b>Warning</b>: this does not conform to logger name as class name convention.
      * (and what about <code>null</code> and <code>default</code> hint equivalence?)
      */
+    @Override
     public Logger getLoggerForComponent(String role, String hint) {
         return (null == hint
                 ? getLoggerForComponent(role)
@@ -60,16 +62,19 @@ public class Slf4jLoggerManager implements LoggerManager {
     /**
      * <b>Warning</b>: ignored.
      */
+    @Override
     public void returnComponentLogger(String role) {}
 
     /**
      * <b>Warning</b>: ignored.
      */
+    @Override
     public void returnComponentLogger(String role, String hint) {}
 
     /**
      * <b>Warning</b>: ignored (always return <code>0</code>).
      */
+    @Override
     public int getThreshold() {
         return 0;
     }
@@ -77,16 +82,19 @@ public class Slf4jLoggerManager implements LoggerManager {
     /**
      * <b>Warning</b>: ignored.
      */
+    @Override
     public void setThreshold(int threshold) {}
 
     /**
      * <b>Warning</b>: ignored.
      */
+    @Override
     public void setThresholds(int threshold) {}
 
     /**
      * <b>Warning</b>: ignored (always return <code>0</code>).
      */
+    @Override
     public int getActiveLoggerCount() {
         return 0;
     }

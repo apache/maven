@@ -42,6 +42,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @since 4.0.0
  */
+@Deprecated
 public final class SimplexTransferListener extends AbstractTransferListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplexTransferListener.class);
     private static final int QUEUE_SIZE = 1024;

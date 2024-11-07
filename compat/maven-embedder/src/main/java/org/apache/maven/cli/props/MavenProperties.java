@@ -50,6 +50,7 @@ import org.apache.maven.internal.impl.model.DefaultInterpolator;
  * Enhancement of the standard <code>Properties</code>
  * managing the maintain of comments, etc.
  */
+@Deprecated
 public class MavenProperties extends AbstractMap<String, String> {
 
     /** Constant for the supported comment characters.*/

@@ -32,6 +32,7 @@ import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
+@Deprecated
 public class ExtensionConfigurationModule implements Module {
 
     private final CoreExtensionEntry extension;

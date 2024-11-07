@@ -28,6 +28,7 @@ import org.eclipse.aether.transfer.TransferResource;
  * The {@link TransferResource} is not immutable and does not implement {@code Objects#equals} and {@code Objects#hashCode} methods,
  * making it not very suitable for usage in collections.
  */
+@Deprecated
 record TransferResourceIdentifier(String repositoryId, String repositoryUrl, String resourceName, @Nullable File file) {
     TransferResourceIdentifier(TransferResource resource) {
         this(resource.getRepositoryId(), resource.getRepositoryUrl(), resource.getResourceName(), resource.getFile());

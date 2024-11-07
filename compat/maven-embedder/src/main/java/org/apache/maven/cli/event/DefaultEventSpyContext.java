@@ -26,6 +26,7 @@ import org.apache.maven.eventspy.EventSpy;
 /**
  * DefaultEventSpyContext
  */
+@Deprecated
 public class DefaultEventSpyContext implements EventSpy.Context {
 
     private final Map<String, Object> data = new HashMap<>();

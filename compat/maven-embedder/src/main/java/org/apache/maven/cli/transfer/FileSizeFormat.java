@@ -30,6 +30,7 @@ import org.apache.maven.api.services.MessageBuilder;
  * @see <a
  *      href="https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
  */
+@Deprecated
 public class FileSizeFormat {
     public enum ScaleUnit {
         BYTE {

@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 /**
  * Resolve relative file path against the given base directory
  */
+@Deprecated
 public class ResolveFile {
     public static File resolveFile(File file, String baseDirectory) {
         if (file == null) {

@@ -29,80 +29,95 @@ import org.codehaus.plexus.logging.Logger;
  */
 public class Slf4jLogger implements Logger {
 
-    private org.slf4j.Logger logger;
-    private String projectId;
+    private final org.slf4j.Logger logger;
+    private final String projectId;
 
     public Slf4jLogger(org.slf4j.Logger logger) {
         this.logger = logger;
         this.projectId = ProjectBuildLogAppender.getProjectId();
     }
 
+    @Override
     public void debug(String message) {
         setMdc();
         logger.debug(message);
     }
 
+    @Override
     public void debug(String message, Throwable throwable) {
         setMdc();
         logger.debug(message, throwable);
     }
 
+    @Override
     public boolean isDebugEnabled() {
         return logger.isDebugEnabled();
     }
 
+    @Override
     public void info(String message) {
         setMdc();
         logger.info(message);
     }
 
+    @Override
     public void info(String message, Throwable throwable) {
         setMdc();
         logger.info(message, throwable);
     }
 
+    @Override
     public boolean isInfoEnabled() {
         return logger.isInfoEnabled();
     }
 
+    @Override
     public void warn(String message) {
         setMdc();
         logger.warn(message);
     }
 
+    @Override
     public void warn(String message, Throwable throwable) {
         setMdc();
         logger.warn(message, throwable);
     }
 
+    @Override
     public boolean isWarnEnabled() {
         return logger.isWarnEnabled();
     }
 
+    @Override
     public void error(String message) {
         setMdc();
         logger.error(message);
     }
 
+    @Override
     public void error(String message, Throwable throwable) {
         setMdc();
         logger.error(message, throwable);
     }
 
+    @Override
     public boolean isErrorEnabled() {
         return logger.isErrorEnabled();
     }
 
+    @Override
     public void fatalError(String message) {
         setMdc();
         logger.error(message);
     }
 
+    @Override
     public void fatalError(String message, Throwable throwable) {
         setMdc();
         logger.error(message, throwable);
     }
 
+    @Override
     public boolean isFatalErrorEnabled() {
         return logger.isErrorEnabled();
     }
@@ -110,6 +125,7 @@ public class Slf4jLogger implements Logger {
     /**
      * <b>Warning</b>: ignored (always return <code>0 == Logger.LEVEL_DEBUG</code>).
      */
+    @Override
     public int getThreshold() {
         return 0;
     }
@@ -117,15 +133,18 @@ public class Slf4jLogger implements Logger {
     /**
      * <b>Warning</b>: ignored.
      */
+    @Override
     public void setThreshold(int threshold) {}
 
     /**
      * <b>Warning</b>: ignored (always return <code>null</code>).
      */
+    @Override
     public Logger getChildLogger(String name) {
         return null;
     }
 
+    @Override
     public String getName() {
         return logger.getName();
     }

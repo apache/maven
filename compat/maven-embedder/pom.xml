@@ -30,13 +30,17 @@ under the License.
 
   <artifactId>maven-embedder</artifactId>
 
-  <name>Maven Embedder</name>
+  <name>Maven Embedder (deprecated)</name>
   <description>Maven embeddable component, with CLI and logging support.</description>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-cli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-cli</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -206,7 +210,6 @@ under the License.
             <id>modello</id>
             <goals>
               <goal>velocity</goal>
-              <goal>xsd</goal>
             </goals>
           </execution>
         </executions>

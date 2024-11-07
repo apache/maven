@@ -29,10 +29,12 @@ import org.slf4j.LoggerFactory;
 public class BaseSlf4jConfiguration implements Slf4jConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSlf4jConfiguration.class);
 
+    @Override
     public void setRootLoggerLevel(Level level) {
         LOGGER.warn("setRootLoggerLevel: operation not supported");
     }
 
+    @Override
     public void activate() {
         LOGGER.warn("activate(): operation not supported");
     }
