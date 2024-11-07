@@ -31,17 +31,17 @@ under the License.
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
-      <version>9.7.1</version>
+      <version>${asmVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm-commons</artifactId>
-      <version>7.3.1</version>
+      <version>${asmVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm-util</artifactId>
-      <version>7.3.1</version>
+      <version>${asmVersion}</version>
     </dependency>
   </dependencies>
 
@@ -62,7 +62,6 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.4.1</version>
         <executions>
           <execution>
             <goals>
