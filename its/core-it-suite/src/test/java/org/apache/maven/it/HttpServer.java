@@ -30,7 +30,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.Collections;
 
-import com.google.common.io.ByteStreams;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -217,7 +216,7 @@ public class HttpServer {
             response.setStatus(HttpServletResponse.SC_OK);
             try (InputStream in = source.stream(target.substring(1));
                     OutputStream out = response.getOutputStream()) {
-                ByteStreams.copy(in, out);
+                in.transferTo(out);
             }
             baseRequest.setHandled(true);
         }

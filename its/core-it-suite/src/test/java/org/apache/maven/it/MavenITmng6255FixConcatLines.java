@@ -19,11 +19,9 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Properties;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.io.Files;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
@@ -89,7 +87,7 @@ public class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCa
     }
 
     protected void createJvmConfigFile(File jvmConfig, String lineEndings, String... lines) throws Exception {
-        String content = Joiner.on(lineEndings).join(lines);
-        Files.write(content, jvmConfig, Charsets.UTF_8);
+        String content = String.join(lineEndings, lines);
+        Files.writeString(jvmConfig.toPath(), content);
     }
 }

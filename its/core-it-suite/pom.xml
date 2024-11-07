@@ -77,7 +77,6 @@ under the License.
     <proxy.user />
     <proxy.pass />
     <proxy.nonProxyHosts>localhost</proxy.nonProxyHosts>
-    <slf4jVersion>1.6.1</slf4jVersion>
     <jetty9Version>9.4.55.v20240627</jetty9Version>
 
     <stubPluginVersion>0.1-stub-SNAPSHOT</stubPluginVersion>
@@ -129,11 +128,6 @@ under the License.
       <version>${jetty9Version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>16.0</version>
-    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository-metadata</artifactId>
@@ -597,13 +591,11 @@ under the License.
         <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
-          <version>${slf4jVersion}</version>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-simple</artifactId>
-          <version>${slf4jVersion}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
