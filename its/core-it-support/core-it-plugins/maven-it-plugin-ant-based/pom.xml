@@ -102,7 +102,7 @@ under the License.
           <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-tools-ant</artifactId>
-            <version>2.4.2</version>
+            <version>3.15.1</version>
           </dependency>
         </dependencies>
       </plugin>
