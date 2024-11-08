@@ -200,40 +200,42 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     public ModelBuilderSession newSession() {
-        return new ModelBuilderSession() {
-            DefaultModelBuilderSession mainSession;
-
-            /**
-             * Builds a model based on the provided ModelBuilderRequest.
-             *
-             * @param request The request containing the parameters for building the model.
-             * @return The result of the model building process.
-             * @throws ModelBuilderException If an error occurs during model building.
-             */
-            @Override
-            public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
-                // Create or derive a session based on the request
-                DefaultModelBuilderSession session;
-                if (mainSession == null) {
-                    mainSession = new DefaultModelBuilderSession(request);
-                    session = mainSession;
-                } else {
-                    session = mainSession.derive(request, new DefaultModelBuilderResult());
-                }
-                // Build the request
-                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
-                    // build the build poms
-                    session.buildBuildPom();
-                } else {
-                    // simply build the effective model
-                    session.buildEffectiveModel(new LinkedHashSet<>());
-                }
-                return session.result;
-            }
-        };
+        return new ModelBuilderSessionImpl();
     }
 
-    protected class DefaultModelBuilderSession implements ModelProblemCollector {
+    protected class ModelBuilderSessionImpl implements ModelBuilderSession {
+        ModelBuilderSessionState mainSession;
+
+        /**
+         * Builds a model based on the provided ModelBuilderRequest.
+         *
+         * @param request The request containing the parameters for building the model.
+         * @return The result of the model building process.
+         * @throws ModelBuilderException If an error occurs during model building.
+         */
+        @Override
+        public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
+            // Create or derive a session based on the request
+            ModelBuilderSessionState session;
+            if (mainSession == null) {
+                mainSession = new ModelBuilderSessionState(request);
+                session = mainSession;
+            } else {
+                session = mainSession.derive(request, new DefaultModelBuilderResult());
+            }
+            // Build the request
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                // build the build poms
+                session.buildBuildPom();
+            } else {
+                // simply build the effective model
+                session.buildEffectiveModel(new LinkedHashSet<>());
+            }
+            return session.result;
+        }
+    }
+
+    protected class ModelBuilderSessionState implements ModelProblemCollector {
         private static final Pattern REGEX = Pattern.compile("\\$\\{([^}]+)}");
 
         final Session session;
@@ -251,7 +253,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> externalRepositories;
         List<RemoteRepository> repositories;
 
-        DefaultModelBuilderSession(ModelBuilderRequest request) {
+        ModelBuilderSessionState(ModelBuilderRequest request) {
             this(
                     request.getSession(),
                     request,
@@ -274,7 +276,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         @SuppressWarnings("checkstyle:ParameterNumber")
-        private DefaultModelBuilderSession(
+        private ModelBuilderSessionState(
                 Session session,
                 ModelBuilderRequest request,
                 DefaultModelBuilderResult result,
@@ -296,26 +298,26 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.result.setSource(this.request.getSource());
         }
 
-        DefaultModelBuilderSession derive(ModelSource source) {
+        ModelBuilderSessionState derive(ModelSource source) {
             return derive(source, new DefaultModelBuilderResult(result));
         }
 
-        DefaultModelBuilderSession derive(ModelSource source, DefaultModelBuilderResult result) {
+        ModelBuilderSessionState derive(ModelSource source, DefaultModelBuilderResult result) {
             return derive(ModelBuilderRequest.build(request, source), result);
         }
 
         /**
          * Creates a new session, sharing cached datas and propagating errors.
          */
-        DefaultModelBuilderSession derive(ModelBuilderRequest request) {
+        ModelBuilderSessionState derive(ModelBuilderRequest request) {
             return derive(request, new DefaultModelBuilderResult(result));
         }
 
-        DefaultModelBuilderSession derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
+        ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
             if (session != request.getSession()) {
                 throw new IllegalArgumentException("Session mismatch");
             }
-            return new DefaultModelBuilderSession(
+            return new ModelBuilderSessionState(
                     session,
                     request,
                     result,
@@ -669,7 +671,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             try (PhasingExecutor executor = createExecutor()) {
                 for (DefaultModelBuilderResult r : allResults) {
                     executor.execute(() -> {
-                        DefaultModelBuilderSession mbs = derive(r.getSource(), r);
+                        ModelBuilderSessionState mbs = derive(r.getSource(), r);
                         try {
                             mbs.buildEffectiveModel(new LinkedHashSet<>());
                         } catch (ModelBuilderException e) {
@@ -1689,7 +1691,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .source(importSource)
                         .repositories(repositories)
                         .build();
-                DefaultModelBuilderSession modelBuilderSession = derive(importRequest);
+                ModelBuilderSessionState modelBuilderSession = derive(importRequest);
                 // build the effective model
                 modelBuilderSession.buildEffectiveModel(importIds);
                 importResult = modelBuilderSession.result;
@@ -1816,7 +1818,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
-        DefaultModelBuilderSession build = new DefaultModelBuilderSession(request);
+        ModelBuilderSessionState build = new ModelBuilderSessionState(request);
         Model model = build.readRawModel();
         if (((ModelProblemCollector) build).hasErrors()) {
             throw build.newModelBuilderException();
