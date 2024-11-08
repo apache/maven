@@ -16,43 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.logging.impl;
+package org.apache.maven.cling.logging;
 
-import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
-import org.apache.maven.slf4j.MavenLoggerFactory;
-import org.slf4j.ILoggerFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Configuration for slf4j-simple.
+ * Abstract implementation.
  *
  * @since 3.1.0
  */
-public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
+public class BaseSlf4jConfiguration implements Slf4jConfiguration {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseSlf4jConfiguration.class);
+
     @Override
     public void setRootLoggerLevel(Level level) {
-        String value;
-        switch (level) {
-            case DEBUG:
-                value = "debug";
-                break;
-
-            case INFO:
-                value = "info";
-                break;
-
-            default:
-                value = "error";
-                break;
-        }
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", value);
+        LOGGER.warn("setRootLoggerLevel: operation not supported");
     }
 
     @Override
     public void activate() {
-        ILoggerFactory lf = LoggerFactory.getILoggerFactory();
-        if (lf instanceof MavenLoggerFactory mlf) {
-            mlf.reconfigure();
-        }
+        LOGGER.warn("activate(): operation not supported");
     }
 }

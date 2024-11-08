@@ -16,26 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli;
+package org.apache.maven.cling.logging.impl;
 
-import java.io.File;
-import java.nio.file.Paths;
+import java.net.URL;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
 
 /**
- * Resolve relative file path against the given base directory
+ * Pseudo-configuration for unsupported SLF4J binding.
+ *
+ * @since 3.2.4
  */
-@Deprecated
-public class ResolveFile {
-    public static File resolveFile(File file, String baseDirectory) {
-        if (file == null) {
-            return null;
-        } else if (file.isAbsolute()) {
-            return file;
-        } else if (file.getPath().startsWith(File.separator)) {
-            // drive-relative Windows path
-            return file.getAbsoluteFile();
-        } else {
-            return Paths.get(baseDirectory, file.getPath()).normalize().toFile();
-        }
-    }
+public class UnsupportedSlf4jBindingConfiguration extends BaseSlf4jConfiguration {
+
+    /**
+     * @deprecated the arguments are ignored. Use the no-args constructor.
+     */
+    @Deprecated
+    public UnsupportedSlf4jBindingConfiguration(String slf4jBinding, Map<URL, Set<Object>> supported) {}
+
+    public UnsupportedSlf4jBindingConfiguration() {}
+
+    @Override
+    public void activate() {}
 }

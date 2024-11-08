@@ -30,6 +30,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 /**
  * CliRequest
  */
+@Deprecated
 public class CliRequest {
     String[] args;
 

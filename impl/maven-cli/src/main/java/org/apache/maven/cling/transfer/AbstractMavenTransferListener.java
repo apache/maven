@@ -16,29 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.transfer;
+package org.apache.maven.cling.transfer;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
+
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Slf4jMavenTransferListener
+ * AbstractMavenTransferListener
  */
-@Deprecated
-public class Slf4jMavenTransferListener extends AbstractTransferListener {
+public abstract class AbstractMavenTransferListener extends AbstractTransferListener {
+    public static final String STYLE = ".transfer:-faint";
 
-    protected final Logger out;
+    protected final MessageBuilderFactory messageBuilderFactory;
+    protected final PrintWriter out;
 
-    public Slf4jMavenTransferListener() {
-        this.out = LoggerFactory.getLogger(Slf4jMavenTransferListener.class);
+    protected AbstractMavenTransferListener(MessageBuilderFactory messageBuilderFactory, PrintStream out) {
+        this(messageBuilderFactory, new PrintWriter(out));
     }
 
-    // TODO should we deprecate?
-    public Slf4jMavenTransferListener(Logger out) {
+    protected AbstractMavenTransferListener(MessageBuilderFactory messageBuilderFactory, PrintWriter out) {
+        this.messageBuilderFactory = messageBuilderFactory;
         this.out = out;
     }
 
@@ -48,23 +52,21 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
-        StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
-        message.append(": ");
-        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
+        MessageBuilder message = messageBuilderFactory.builder();
+        message.style(STYLE).append(action).append(' ').append(direction).append(' ');
+        message.resetStyle().append(resource.getRepositoryId());
+        message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
+        message.resetStyle().append(resource.getResourceName());
 
-        out.info(message.toString());
+        out.println(message.toString());
     }
 
     @Override
     public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
-        out.warn(
-                "{} from {} for {}{}",
-                event.getException().getMessage(),
-                resource.getRepositoryId(),
-                resource.getRepositoryUrl(),
-                resource.getResourceName());
+        // TODO This needs to be colorized
+        out.println("[WARNING] " + event.getException().getMessage() + " from " + resource.getRepositoryId() + " for "
+                + resource.getRepositoryUrl() + resource.getResourceName());
     }
 
     @Override
@@ -76,13 +78,12 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
         long contentLength = event.getTransferredBytes();
         FileSizeFormat format = new FileSizeFormat();
 
-        StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
-        message.append(": ");
-        message.append(resource.getRepositoryUrl())
-                .append(resource.getResourceName())
-                .append(" (");
-        format.format(message, contentLength);
+        MessageBuilder message = messageBuilderFactory.builder();
+        message.append(action).style(STYLE).append(' ').append(direction).append(' ');
+        message.resetStyle().append(resource.getRepositoryId());
+        message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
+        message.resetStyle().append(resource.getResourceName());
+        message.style(STYLE).append(" (").append(format.format(contentLength));
 
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
         if (duration > 0L) {
@@ -92,7 +93,7 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
             message.append("/s");
         }
 
-        message.append(')');
-        out.info(message.toString());
+        message.append(')').resetStyle();
+        out.println(message.toString());
     }
 }

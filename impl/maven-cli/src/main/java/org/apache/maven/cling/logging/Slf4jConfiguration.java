@@ -16,24 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.logging;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.apache.maven.cling.logging;
 
 /**
- * Abstract implementation.
+ * Interface for configuration operations on loggers, which are not available in slf4j, then require per-slf4f-binding
+ * implementation.
  *
  * @since 3.1.0
  */
-public class BaseSlf4jConfiguration implements Slf4jConfiguration {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseSlf4jConfiguration.class);
-
-    public void setRootLoggerLevel(Level level) {
-        LOGGER.warn("setRootLoggerLevel: operation not supported");
+public interface Slf4jConfiguration {
+    /**
+     * Level
+     */
+    enum Level {
+        DEBUG,
+        INFO,
+        ERROR
     }
 
-    public void activate() {
-        LOGGER.warn("activate(): operation not supported");
-    }
+    /**
+     * Set root logging level.
+     *
+     * @param level the level
+     */
+    void setRootLoggerLevel(Level level);
+
+    /**
+     * Activate logging implementation configuration (if necessary).
+     */
+    void activate();
 }

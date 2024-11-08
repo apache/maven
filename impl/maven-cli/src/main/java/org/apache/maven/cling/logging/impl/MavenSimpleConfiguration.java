@@ -16,39 +16,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.logging.impl;
+package org.apache.maven.cling.logging.impl;
 
-import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
-import org.slf4j.Logger;
+import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
+import org.apache.maven.slf4j.MavenLoggerFactory;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 /**
- * Configuration for slf4j-logback.
+ * Configuration for slf4j-simple.
  *
  * @since 3.1.0
  */
-public class LogbackConfiguration extends BaseSlf4jConfiguration {
+public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
     @Override
     public void setRootLoggerLevel(Level level) {
-        ch.qos.logback.classic.Level value;
+        String value;
         switch (level) {
             case DEBUG:
-                value = ch.qos.logback.classic.Level.DEBUG;
+                value = "debug";
                 break;
 
             case INFO:
-                value = ch.qos.logback.classic.Level.INFO;
+                value = "info";
                 break;
 
             default:
-                value = ch.qos.logback.classic.Level.ERROR;
+                value = "error";
                 break;
         }
-        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(value);
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", value);
     }
 
     @Override
     public void activate() {
-        // no op
+        ILoggerFactory lf = LoggerFactory.getILoggerFactory();
+        if (lf instanceof MavenLoggerFactory mlf) {
+            mlf.reconfigure();
+        }
     }
 }

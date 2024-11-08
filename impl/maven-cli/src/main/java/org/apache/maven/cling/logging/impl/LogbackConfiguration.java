@@ -16,33 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.logging.impl;
+package org.apache.maven.cling.logging.impl;
 
-import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
+import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Configuration for slf4j-log4j2.
+ * Configuration for slf4j-logback.
  *
  * @since 3.1.0
  */
-public class Log4j2Configuration extends BaseSlf4jConfiguration {
+public class LogbackConfiguration extends BaseSlf4jConfiguration {
     @Override
     public void setRootLoggerLevel(Level level) {
-        String value;
+        ch.qos.logback.classic.Level value;
         switch (level) {
             case DEBUG:
-                value = "debug";
+                value = ch.qos.logback.classic.Level.DEBUG;
                 break;
 
             case INFO:
-                value = "info";
+                value = ch.qos.logback.classic.Level.INFO;
                 break;
 
             default:
-                value = "error";
+                value = ch.qos.logback.classic.Level.ERROR;
                 break;
         }
-        System.setProperty("maven.logging.root.level", value);
+        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(value);
     }
 
     @Override

@@ -16,29 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.logging.impl;
+package org.apache.maven.cling.logging.impl;
 
-import java.net.URL;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
+import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
 
 /**
- * Pseudo-configuration for unsupported SLF4J binding.
+ * Configuration for slf4j-log4j2.
  *
- * @since 3.2.4
+ * @since 3.1.0
  */
-public class UnsupportedSlf4jBindingConfiguration extends BaseSlf4jConfiguration {
+public class Log4j2Configuration extends BaseSlf4jConfiguration {
+    @Override
+    public void setRootLoggerLevel(Level level) {
+        String value;
+        switch (level) {
+            case DEBUG:
+                value = "debug";
+                break;
 
-    /**
-     * @deprecated the arguments are ignored. Use the no-args constructor.
-     */
-    @Deprecated
-    public UnsupportedSlf4jBindingConfiguration(String slf4jBinding, Map<URL, Set<Object>> supported) {}
+            case INFO:
+                value = "info";
+                break;
 
-    public UnsupportedSlf4jBindingConfiguration() {}
+            default:
+                value = "error";
+                break;
+        }
+        System.setProperty("maven.logging.root.level", value);
+    }
 
     @Override
-    public void activate() {}
+    public void activate() {
+        // no op
+    }
 }

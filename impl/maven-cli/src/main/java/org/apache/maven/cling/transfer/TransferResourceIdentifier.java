@@ -16,33 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.logging;
+package org.apache.maven.cling.transfer;
+
+import java.nio.file.Path;
+
+import org.apache.maven.api.annotations.Nullable;
+import org.eclipse.aether.transfer.TransferResource;
 
 /**
- * Interface for configuration operations on loggers, which are not available in slf4j, then require per-slf4f-binding
- * implementation.
- *
- * @since 3.1.0
+ * Immutable identifier of a {@link TransferResource}.
+ * The {@link TransferResource} is not immutable and does not implement {@code Objects#equals} and {@code Objects#hashCode} methods,
+ * making it not very suitable for usage in collections.
  */
-public interface Slf4jConfiguration {
-    /**
-     * Level
-     */
-    enum Level {
-        DEBUG,
-        INFO,
-        ERROR
+record TransferResourceIdentifier(String repositoryId, String repositoryUrl, String resourceName, @Nullable Path file) {
+    TransferResourceIdentifier(TransferResource resource) {
+        this(resource.getRepositoryId(), resource.getRepositoryUrl(), resource.getResourceName(), resource.getPath());
     }
-
-    /**
-     * Set root logging level.
-     *
-     * @param level the level
-     */
-    void setRootLoggerLevel(Level level);
-
-    /**
-     * Activate logging implementation configuration (if necessary).
-     */
-    void activate();
 }

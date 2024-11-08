@@ -34,6 +34,7 @@ import org.apache.maven.jline.MessageUtils;
 
 /**
  */
+@Deprecated
 public class CLIManager {
     public static final char ALTERNATE_POM_FILE = 'f';
 

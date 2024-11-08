@@ -70,16 +70,16 @@ import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
-import org.apache.maven.cli.internal.extension.io.CoreExtensionsStaxReader;
-import org.apache.maven.cli.logging.Slf4jConfiguration;
-import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
-import org.apache.maven.cli.logging.Slf4jLoggerManager;
 import org.apache.maven.cli.logging.Slf4jStdoutLogger;
 import org.apache.maven.cli.props.MavenPropertiesLoader;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.SimplexTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
+import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
+import org.apache.maven.cling.logging.Slf4jConfiguration;
+import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
+import org.apache.maven.cling.logging.Slf4jLoggerManager;
 import org.apache.maven.di.Injector;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
@@ -141,6 +141,7 @@ import static org.apache.maven.cli.ResolveFile.resolveFile;
 
 /**
  */
+@Deprecated
 public class MavenCli {
 
     public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";

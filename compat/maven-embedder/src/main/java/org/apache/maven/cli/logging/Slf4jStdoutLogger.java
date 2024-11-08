@@ -28,6 +28,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * @since 3.1.0
  */
+@Deprecated
 public class Slf4jStdoutLogger implements Logger {
     private static final String ERROR = "[ERROR] ";
 

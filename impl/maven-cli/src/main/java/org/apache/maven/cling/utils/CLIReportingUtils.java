@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli;
+package org.apache.maven.cling.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,14 +26,13 @@ import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.maven.jline.MessageUtils;
-import org.apache.maven.utils.Os;
+import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
  *
  */
-@Deprecated
 public final class CLIReportingUtils {
     // CHECKSTYLE_OFF: MagicNumber
     public static final long MB = 1024 * 1024;
@@ -133,7 +132,7 @@ public final class CLIReportingUtils {
         Properties properties = new Properties();
 
         try (InputStream resourceAsStream =
-                MavenCli.class.getResourceAsStream("/org/apache/maven/messages/build.properties")) {
+                CLIReportingUtils.class.getResourceAsStream("/org/apache/maven/messages/build.properties")) {
 
             if (resourceAsStream != null) {
                 properties.load(resourceAsStream);

@@ -32,7 +32,7 @@ import java.util.function.Function;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.model.RootLocator;
-import org.apache.maven.cli.logging.Slf4jConfiguration;
+import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.BasicInterpolator;

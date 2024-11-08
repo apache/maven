@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli;
+package org.apache.maven.cling.extensions;
 
 import java.util.function.Function;
 
@@ -32,7 +32,6 @@ import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-@Deprecated
 public class ExtensionConfigurationModule implements Module {
 
     private final CoreExtensionEntry extension;

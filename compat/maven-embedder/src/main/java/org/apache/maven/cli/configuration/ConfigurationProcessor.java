@@ -23,6 +23,7 @@ import org.apache.maven.cli.CliRequest;
 /**
  * ConfigurationProcessor
  */
+@Deprecated
 public interface ConfigurationProcessor {
     void process(CliRequest request) throws Exception;
 }

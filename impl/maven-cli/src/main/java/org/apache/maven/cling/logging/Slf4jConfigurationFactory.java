@@ -16,15 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.logging;
+package org.apache.maven.cling.logging;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.maven.cli.logging.impl.UnsupportedSlf4jBindingConfiguration;
+import org.apache.maven.cling.logging.impl.UnsupportedSlf4jBindingConfiguration;
 import org.slf4j.ILoggerFactory;
 
 /**
@@ -56,9 +57,15 @@ public class Slf4jConfigurationFactory {
                     }
                     String impl = properties.getProperty(slf4jBinding);
                     if (impl != null) {
-                        return (Slf4jConfiguration) Class.forName(impl).newInstance();
+                        return (Slf4jConfiguration)
+                                Class.forName(impl).getDeclaredConstructor().newInstance();
                     }
-                } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
+                } catch (IOException
+                        | ClassNotFoundException
+                        | NoSuchMethodException
+                        | InvocationTargetException
+                        | IllegalAccessException
+                        | InstantiationException ex) {
                     // ignore and move on to the next
                 }
             }

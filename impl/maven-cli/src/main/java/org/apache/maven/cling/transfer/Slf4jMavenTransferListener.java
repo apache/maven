@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.transfer;
+package org.apache.maven.cling.transfer;
 
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Slf4jMavenTransferListener
  */
-@Deprecated
 public class Slf4jMavenTransferListener extends AbstractTransferListener {
 
     protected final Logger out;

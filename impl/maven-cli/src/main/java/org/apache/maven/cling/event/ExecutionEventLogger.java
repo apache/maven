@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.event;
+package org.apache.maven.cling.event;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -39,14 +39,13 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
-import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
+import static org.apache.maven.cling.utils.CLIReportingUtils.formatDuration;
+import static org.apache.maven.cling.utils.CLIReportingUtils.formatTimestamp;
 
 /**
  * Logs execution events to logger, eventually user-supplied.
  *
  */
-@Deprecated
 public class ExecutionEventLogger extends AbstractExecutionListener {
     private static final int MAX_LOG_PREFIX_SIZE = 8; // "[ERROR] "
     private static final int PROJECT_STATUS_SUFFIX_SIZE = 20; // "SUCCESS [  0.000 s]"

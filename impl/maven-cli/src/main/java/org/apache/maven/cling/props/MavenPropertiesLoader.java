@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.props;
+package org.apache.maven.cling.props;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,7 +28,6 @@ import java.util.function.Function;
 
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 
-@Deprecated
 public class MavenPropertiesLoader {
 
     public static final String INCLUDES_PROPERTY = "${includes}"; // includes

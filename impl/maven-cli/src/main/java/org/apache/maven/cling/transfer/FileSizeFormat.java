@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.transfer;
+package org.apache.maven.cling.transfer;
 
 import org.apache.maven.api.services.MessageBuilder;
 
@@ -30,7 +30,6 @@ import org.apache.maven.api.services.MessageBuilder;
  * @see <a
  *      href="https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
  */
-@Deprecated
 public class FileSizeFormat {
     public enum ScaleUnit {
         BYTE {

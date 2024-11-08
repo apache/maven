@@ -58,6 +58,7 @@ import static org.apache.maven.cli.ResolveFile.resolveFile;
  */
 @Named(SettingsXmlConfigurationProcessor.HINT)
 @Singleton
+@Deprecated
 public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor {
     public static final String HINT = "settings";
 

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.transfer;
+package org.apache.maven.cling.transfer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,6 @@ import static java.util.Objects.requireNonNull;
  *
  * @since 4.0.0
  */
-@Deprecated
 public final class SimplexTransferListener extends AbstractTransferListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplexTransferListener.class);
     private static final int QUEUE_SIZE = 1024;

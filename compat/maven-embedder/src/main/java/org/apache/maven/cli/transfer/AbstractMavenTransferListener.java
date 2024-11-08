@@ -31,6 +31,7 @@ import org.eclipse.aether.transfer.TransferResource;
 /**
  * AbstractMavenTransferListener
  */
+@Deprecated
 public abstract class AbstractMavenTransferListener extends AbstractTransferListener {
     public static final String STYLE = ".transfer:-faint";
 

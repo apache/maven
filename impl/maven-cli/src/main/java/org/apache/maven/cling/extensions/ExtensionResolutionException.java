@@ -16,26 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli;
+package org.apache.maven.cling.extensions;
 
-import java.io.File;
-import java.nio.file.Paths;
+import org.apache.maven.api.cli.extensions.CoreExtension;
 
 /**
- * Resolve relative file path against the given base directory
+ * Exception occurring trying to resolve a plugin.
+ *
  */
-@Deprecated
-public class ResolveFile {
-    public static File resolveFile(File file, String baseDirectory) {
-        if (file == null) {
-            return null;
-        } else if (file.isAbsolute()) {
-            return file;
-        } else if (file.getPath().startsWith(File.separator)) {
-            // drive-relative Windows path
-            return file.getAbsoluteFile();
-        } else {
-            return Paths.get(baseDirectory, file.getPath()).normalize().toFile();
-        }
+public class ExtensionResolutionException extends Exception {
+
+    private final CoreExtension extension;
+
+    public ExtensionResolutionException(CoreExtension extension, Throwable cause) {
+        super(
+                "Extension " + extension.getId() + " or one of its dependencies could not be resolved: "
+                        + cause.getMessage(),
+                cause);
+        this.extension = extension;
+    }
+
+    public CoreExtension getExtension() {
+        return extension;
     }
 }

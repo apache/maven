@@ -16,26 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli;
+package org.apache.maven.cling.transfer;
 
-import java.io.File;
-import java.nio.file.Paths;
+import org.eclipse.aether.transfer.AbstractTransferListener;
 
 /**
- * Resolve relative file path against the given base directory
  */
-@Deprecated
-public class ResolveFile {
-    public static File resolveFile(File file, String baseDirectory) {
-        if (file == null) {
-            return null;
-        } else if (file.isAbsolute()) {
-            return file;
-        } else if (file.getPath().startsWith(File.separator)) {
-            // drive-relative Windows path
-            return file.getAbsoluteFile();
-        } else {
-            return Paths.get(baseDirectory, file.getPath()).normalize().toFile();
-        }
-    }
-}
+public class QuietMavenTransferListener extends AbstractTransferListener {}

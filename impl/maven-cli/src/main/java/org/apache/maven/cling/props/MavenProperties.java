@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.props;
+package org.apache.maven.cling.props;
 
 import java.io.FilterWriter;
 import java.io.IOException;
@@ -50,7 +50,6 @@ import org.apache.maven.internal.impl.model.DefaultInterpolator;
  * Enhancement of the standard <code>Properties</code>
  * managing the maintain of comments, etc.
  */
-@Deprecated
 public class MavenProperties extends AbstractMap<String, String> {
 
     /** Constant for the supported comment characters.*/

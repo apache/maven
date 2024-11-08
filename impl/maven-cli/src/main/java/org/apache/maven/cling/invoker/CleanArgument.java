@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli;
+package org.apache.maven.cling.invoker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,6 @@ import java.util.List;
 /**
  * CleanArgument
  */
-@Deprecated
 public class CleanArgument {
     public static String[] cleanArgs(String[] args) {
         try {

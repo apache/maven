@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.logging;
+package org.apache.maven.cling.logging;
 
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -24,20 +24,21 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 /**
- * Use an SLF4J {@link org.slf4j.ILoggerFactory} as a backing for a Plexus
- * {@link org.codehaus.plexus.logging.LoggerManager},
+ * Use an SLF4J {@link ILoggerFactory} as a backing for a Plexus
+ * {@link LoggerManager},
  * ignoring Plexus logger API parts that are not classical and probably not really used.
  *
  * @since 3.1
  */
 public class Slf4jLoggerManager implements LoggerManager {
 
-    private ILoggerFactory loggerFactory;
+    private final ILoggerFactory loggerFactory;
 
     public Slf4jLoggerManager() {
         loggerFactory = LoggerFactory.getILoggerFactory();
     }
 
+    @Override
     public Logger getLoggerForComponent(String role) {
         return new Slf4jLogger(loggerFactory.getLogger(role));
     }
@@ -47,6 +48,7 @@ public class Slf4jLoggerManager implements LoggerManager {
      * <b>Warning</b>: this does not conform to logger name as class name convention.
      * (and what about <code>null</code> and <code>default</code> hint equivalence?)
      */
+    @Override
     public Logger getLoggerForComponent(String role, String hint) {
         return (null == hint
                 ? getLoggerForComponent(role)
@@ -60,16 +62,19 @@ public class Slf4jLoggerManager implements LoggerManager {
     /**
      * <b>Warning</b>: ignored.
      */
+    @Override
     public void returnComponentLogger(String role) {}
 
     /**
      * <b>Warning</b>: ignored.
      */
+    @Override
     public void returnComponentLogger(String role, String hint) {}
 
     /**
      * <b>Warning</b>: ignored (always return <code>0</code>).
      */
+    @Override
     public int getThreshold() {
         return 0;
     }
@@ -77,16 +82,19 @@ public class Slf4jLoggerManager implements LoggerManager {
     /**
      * <b>Warning</b>: ignored.
      */
+    @Override
     public void setThreshold(int threshold) {}
 
     /**
      * <b>Warning</b>: ignored.
      */
+    @Override
     public void setThresholds(int threshold) {}
 
     /**
      * <b>Warning</b>: ignored (always return <code>0</code>).
      */
+    @Override
     public int getActiveLoggerCount() {
         return 0;
     }

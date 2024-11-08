@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.transfer;
+package org.apache.maven.cling.transfer;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -34,7 +34,6 @@ import org.eclipse.aether.transfer.TransferResource;
  * <p>
  * This listener is not thread-safe and should be wrapped in the {@link SimplexTransferListener} in a multi-threaded scenario.
  */
-@Deprecated
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
     private final Map<TransferResourceIdentifier, TransferResourceAndSize> transfers = new LinkedHashMap<>();
