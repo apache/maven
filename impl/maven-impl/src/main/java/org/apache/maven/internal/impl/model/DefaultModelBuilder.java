@@ -853,9 +853,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // effective model validation
             modelValidator.validateEffectiveModel(
                     resultModel,
-                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
-                            ? ModelValidator.VALIDATION_LEVEL_STRICT
-                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     request,
                     this);
 
@@ -896,8 +894,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private Model resolveParent(Model childModel) {
             Model parentModel = null;
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
-                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE) {
+            if (isBuildRequest()) {
                 parentModel = readParentLocally(childModel);
             }
             if (parentModel == null) {
@@ -1163,9 +1160,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // path correctly if it was not set in the input model
             if (inputModel.getParent() != null && inputModel.getParent().getRelativePath() == null) {
                 String relPath;
-                if (parentModel.getPomFile() != null
-                        && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
-                                || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)) {
+                if (parentModel.getPomFile() != null && isBuildRequest()) {
                     relPath = inputModel
                             .getPomFile()
                             .getParent()
@@ -1234,7 +1229,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private List<Profile> getActiveProfiles(
                 Collection<Profile> interpolatedProfiles, DefaultProfileActivationContext profileActivationContext) {
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.BUILD_EFFECTIVE) {
+            if (isBuildRequestWithActivation()) {
                 return profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
             } else {
                 return List.of();
@@ -1256,7 +1251,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             try {
-                boolean strict = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT;
+                boolean strict = isBuildRequest();
                 try {
                     rootDirectory = request.getSession().getRootDirectory();
                 } catch (IllegalStateException ignore) {
@@ -1337,8 +1332,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
 
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
-                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE) {
+            if (isBuildRequest()) {
                 model = model.withPomFile(modelSource.getPath());
 
                 Parent parent = model.getParent();
@@ -1439,9 +1433,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(model);
             modelValidator.validateFileModel(
                     model,
-                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
-                            ? ModelValidator.VALIDATION_LEVEL_STRICT
-                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     request,
                     this);
             if (hasFatalErrors()) {
@@ -1461,12 +1453,9 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private Model doReadRawModel() throws ModelBuilderException {
-            ModelBuilderRequest request = this.request;
             Model rawModel = readFileModel();
 
-            if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion())
-                    && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
-                            || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)) {
+            if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion()) && isBuildRequest()) {
                 rawModel = transformFileToRaw(rawModel);
             }
 
@@ -1476,9 +1465,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             modelValidator.validateRawModel(
                     rawModel,
-                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
-                            ? ModelValidator.VALIDATION_LEVEL_STRICT
-                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     request,
                     this);
 
@@ -1738,6 +1725,17 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private <T> T cache(Source source, String tag, Supplier<T> supplier) {
             return cache.computeIfAbsent(source, tag, supplier);
+        }
+
+        boolean isBuildRequest() {
+            return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER;
+        }
+
+        boolean isBuildRequestWithActivation() {
+            return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE;
         }
 
         private List<Profile> interpolateActivations(

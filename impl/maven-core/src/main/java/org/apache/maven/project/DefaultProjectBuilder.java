@@ -351,7 +351,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     ModelBuilderRequest.RequestType type = pomFile != null
                                     && this.request.isProcessPlugins()
                                     && this.request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_STRICT
-                            ? ModelBuilderRequest.RequestType.BUILD_PROJECT
+                            ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
                             : ModelBuilderRequest.RequestType.CONSUMER_PARENT;
                     MavenProject theProject = project;
                     ModelBuilderRequest request = builder.source(modelSource)

@@ -57,6 +57,11 @@ public interface ModelBuilderRequest {
          */
         BUILD_EFFECTIVE,
         /**
+         * The request is used specifically to parse the POM used as a basis for creating the consumer POM.
+         * This POM will not ungergo any profile activation.
+         */
+        BUILD_CONSUMER,
+        /**
          * The request is for building a model from a parent POM file from a downloaded artifact.
          */
         CONSUMER_PARENT,
