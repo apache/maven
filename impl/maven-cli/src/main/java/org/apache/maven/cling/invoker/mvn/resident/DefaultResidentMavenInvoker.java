@@ -62,8 +62,13 @@ public class DefaultResidentMavenInvoker
             LocalContext shadow = new LocalContext((DefaultResidentMavenInvoker) invoker, invokerRequest);
 
             shadow.logger = logger;
-            shadow.loggerFactory = loggerFactory;
-            shadow.loggerLevel = loggerLevel;
+            // shadow.slf4jConfiguration = slf4jConfiguration;
+            // shadow.loggerFactory = loggerFactory;
+            // shadow.loggerLevel = loggerLevel;
+            // shadow.coloredOutput = coloredOutput;
+            // shadow.terminal = terminal;
+            // shadow.writer = writer; -- per call and is null-check protected
+            shadow.currentThreadContextClassLoader = currentThreadContextClassLoader;
             shadow.containerCapsule = containerCapsule;
             shadow.lookup = lookup;
             shadow.settingsBuilder = settingsBuilder;
@@ -75,6 +80,7 @@ public class DefaultResidentMavenInvoker
             shadow.userSettingsPath = userSettingsPath;
             shadow.effectiveSettings = effectiveSettings;
 
+            shadow.buildEventListener = buildEventListener;
             shadow.mavenExecutionRequest = mavenExecutionRequest;
             shadow.eventSpyDispatcher = eventSpyDispatcher;
             shadow.mavenExecutionRequestPopulator = mavenExecutionRequestPopulator;
