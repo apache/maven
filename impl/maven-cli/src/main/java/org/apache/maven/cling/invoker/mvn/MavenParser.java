@@ -19,11 +19,14 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.ParseException;
@@ -65,6 +68,31 @@ public class MavenParser extends BaseParser {
         }
     }
 
+    protected MavenOptions parseArgs(String source, List<String> args) throws ParserException {
+        try {
+            return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
+        } catch (ParseException e) {
+            throw new ParserException("Failed to parse source " + source + ": " + e.getMessage(), e.getCause());
+        }
+    }
+
+    protected List<String> getJvmArguments(Path rootDirectory) {
+        if (rootDirectory != null) {
+            Path jvmConfig = rootDirectory.resolve(".mvn/jvm.config");
+            if (Files.exists(jvmConfig)) {
+                try {
+                    return Files.readAllLines(jvmConfig).stream()
+                            .filter(l -> !l.isBlank() && !l.startsWith("#"))
+                            .flatMap(l -> Arrays.stream(l.split(" ")))
+                            .collect(Collectors.toList());
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     protected MavenInvokerRequest getInvokerRequest(LocalContext context) {
         return new MavenInvokerRequest(
@@ -80,16 +108,8 @@ public class MavenParser extends BaseParser {
                 context.parserRequest.out(),
                 context.parserRequest.err(),
                 context.extensions,
-                null,
+                getJvmArguments(context.rootDirectory),
                 (MavenOptions) context.options);
-    }
-
-    protected MavenOptions parseArgs(String source, List<String> args) throws ParserException {
-        try {
-            return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
-        } catch (ParseException e) {
-            throw new ParserException("Failed to parse source " + source + ": " + e.getMessage(), e.getCause());
-        }
     }
 
     @Override
