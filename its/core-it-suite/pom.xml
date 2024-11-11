@@ -108,7 +108,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-shared-utils</artifactId>
-      <version>0.9</version>
+      <version>3.4.2</version>
     </dependency>
 
     <!-- Jetty (as test HTTP server) -->
