@@ -36,13 +36,11 @@ import org.apache.maven.api.services.MessageBuilderFactory;
  * Represents a Maven execution request, encapsulating all necessary information
  * for invoking a Maven build or command.
  *
- * @param <O> the type of {@link Options} used for this request, extending the base {@link Options} interface
- *
  * @since 4.0.0
  */
 @Immutable
 @Experimental
-public interface InvokerRequest<O extends Options> {
+public interface InvokerRequest {
     /**
      * The parser request this instance was created from.
      */
@@ -167,10 +165,20 @@ public interface InvokerRequest<O extends Options> {
     Optional<List<CoreExtension>> coreExtensions();
 
     /**
+     * Returns the list of extra JVM arguments to be passed to the forked Maven process.
+     * These arguments allow for customization of the JVM environment in which Maven will run.
+     * This property is used ONLY by invokers that spawn a new JVM and is fully ignored by others.
+     *
+     * @return an Optional containing the list of extra JVM arguments, or empty if not specified
+     */
+    @Nonnull
+    Optional<List<String>> jvmArguments();
+
+    /**
      * Returns the options associated with this invocation request.
      *
      * @return the options object
      */
     @Nonnull
-    O options();
+    Options options();
 }

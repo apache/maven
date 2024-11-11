@@ -26,10 +26,8 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.mvn.DefaultMavenParser;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
@@ -47,7 +45,7 @@ public class DefaultResidentMavenInvokerTest
 
     @Override
     protected Invoker<MavenInvokerRequest<MavenOptions>> createInvoker() {
-        return new DefaultResidentMavenInvoker(ProtoLookup.builder()
+        return new ResidentMavenInvoker(ProtoLookup.builder()
                 .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
                 .build());
     }

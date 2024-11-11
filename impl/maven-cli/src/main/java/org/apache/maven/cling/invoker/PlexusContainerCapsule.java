@@ -18,6 +18,8 @@
  */
 package org.apache.maven.cling.invoker;
 
+import java.util.Optional;
+
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.internal.impl.DefaultLookup;
 import org.codehaus.plexus.PlexusContainer;
@@ -41,6 +43,11 @@ public class PlexusContainerCapsule implements ContainerCapsule {
     @Override
     public Lookup getLookup() {
         return lookup;
+    }
+
+    @Override
+    public Optional<ClassLoader> currentThreadClassLoader() {
+        return Optional.of(plexusContainer.getContainerRealm());
     }
 
     @Override

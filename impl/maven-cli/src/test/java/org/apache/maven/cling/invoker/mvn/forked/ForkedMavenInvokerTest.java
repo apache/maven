@@ -24,7 +24,6 @@ import java.util.Arrays;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
@@ -33,16 +32,16 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Forked UT: it cannot use jimFS as it runs in child process.
  */
-public class DefaultForkedMavenInvokerTest extends MavenInvokerTestSupport<MavenOptions, ForkedMavenInvokerRequest> {
+public class ForkedMavenInvokerTest extends MavenInvokerTestSupport<MavenOptions, ForkedMavenInvokerRequest> {
 
     @Override
     protected Invoker<ForkedMavenInvokerRequest> createInvoker() {
-        return new DefaultForkedMavenInvoker();
+        return new ForkedMavenInvoker();
     }
 
     @Override
     protected Parser<ForkedMavenInvokerRequest> createParser() {
-        return new DefaultForkedMavenParser();
+        return new ForkedMavenParser();
     }
 
     @Test

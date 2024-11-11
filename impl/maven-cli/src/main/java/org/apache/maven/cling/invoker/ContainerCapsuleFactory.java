@@ -20,21 +20,15 @@ package org.apache.maven.cling.invoker;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.InvokerException;
-import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.services.Lookup;
 
 /**
  * Container capsule factory.
- *
- * @param <O> the options type
- * @param <R> the invoker request type
- * @param <C> the invoker context type
  */
-public interface ContainerCapsuleFactory<
-        O extends Options, R extends InvokerRequest<O>, C extends LookupInvoker.LookupInvokerContext<O, R, C>> {
+public interface ContainerCapsuleFactory {
     /**
      * Creates container capsule.
      */
     @Nonnull
-    ContainerCapsule createContainerCapsule(C context) throws InvokerException;
+    ContainerCapsule createContainerCapsule(Lookup invokerLookup, LookupInvokerContext context) throws InvokerException;
 }

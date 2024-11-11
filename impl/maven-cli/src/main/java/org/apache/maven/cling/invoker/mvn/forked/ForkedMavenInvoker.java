@@ -23,21 +23,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
+import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvoker;
-import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
 import org.apache.maven.internal.impl.model.profile.Os;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Forked invoker implementation, it spawns a subprocess with Maven.
+ * Forked invoker implementation, that spawns a subprocess with Maven.
  */
-public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
+public class ForkedMavenInvoker implements Invoker {
     @SuppressWarnings("MethodLength")
     @Override
-    public int invoke(ForkedMavenInvokerRequest invokerRequest) throws InvokerException {
+    public int invoke(InvokerRequest invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
         validate(invokerRequest);
 
@@ -51,7 +51,7 @@ public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
                                 : invokerRequest.parserRequest().command())
                 .toString());
 
-        MavenOptions mavenOptions = invokerRequest.options();
+        MavenOptions mavenOptions = (MavenOptions) invokerRequest.options();
         if (mavenOptions.userProperties().isPresent()) {
             for (Map.Entry<String, String> entry :
                     mavenOptions.userProperties().get().entrySet()) {
@@ -216,5 +216,5 @@ public class DefaultForkedMavenInvoker implements ForkedMavenInvoker {
         }
     }
 
-    protected void validate(ForkedMavenInvokerRequest invokerRequest) throws InvokerException {}
+    protected void validate(InvokerRequest invokerRequest) throws InvokerException {}
 }

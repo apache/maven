@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.api.cli.mvnenc.EncryptInvoker;
-import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
+import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.LookupInvoker;
+import org.apache.maven.cling.invoker.LookupInvokerContext;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.jline.consoleui.prompt.ConsolePrompt;
@@ -41,18 +41,14 @@ import org.jline.utils.Colors;
 import org.jline.utils.OSUtils;
 
 /**
- * Encrypt invoker implementation, when Encrypt CLI is being run. System uses ClassWorld launcher, and class world
- * instance is passed in via "enhanced" main method. Hence, this class expects fully setup ClassWorld via constructor.
+ * mvnenc invoker implementation.
  */
-public class DefaultEncryptInvoker
-        extends LookupInvoker<EncryptOptions, EncryptInvokerRequest, DefaultEncryptInvoker.LocalContext>
-        implements EncryptInvoker {
+public class DefaultEncryptInvoker extends LookupInvoker<DefaultEncryptInvoker.LocalContext> {
 
     @SuppressWarnings("VisibilityModifier")
-    public static class LocalContext
-            extends LookupInvokerContext<EncryptOptions, EncryptInvokerRequest, DefaultEncryptInvoker.LocalContext> {
-        protected LocalContext(DefaultEncryptInvoker invoker, EncryptInvokerRequest invokerRequest) {
-            super(invoker, invokerRequest);
+    public static class LocalContext extends LookupInvokerContext {
+        protected LocalContext(DefaultEncryptInvokerRequest invokerRequest) {
+            super(invokerRequest);
         }
 
         public Map<String, Goal> goals;
@@ -83,8 +79,8 @@ public class DefaultEncryptInvoker
     }
 
     @Override
-    protected LocalContext createContext(EncryptInvokerRequest invokerRequest) {
-        return new LocalContext(this, invokerRequest);
+    protected LocalContext createContext(InvokerRequest invokerRequest) {
+        return new LocalContext((DefaultEncryptInvokerRequest) invokerRequest);
     }
 
     @Override
@@ -139,12 +135,12 @@ public class DefaultEncryptInvoker
                     LineReaderBuilder.builder().terminal(context.terminal).build();
             context.prompt = new ConsolePrompt(context.reader, context.terminal, config);
 
-            if (context.invokerRequest.options().goals().isEmpty()
-                    || context.invokerRequest.options().goals().get().size() != 1) {
+            EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
+            if (options.goals().isEmpty() || options.goals().get().size() != 1) {
                 return badGoalsErrorMessage("No goal or multiple goals specified, specify only one goal.", context);
             }
 
-            String goalName = context.invokerRequest.options().goals().get().get(0);
+            String goalName = options.goals().get().get(0);
             Goal goal = context.goals.get(goalName);
 
             if (goal == null) {

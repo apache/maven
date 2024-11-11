@@ -28,13 +28,12 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 
 import static java.util.Objects.requireNonNull;
 
-public abstract class BaseInvokerRequest<T extends Options> implements InvokerRequest<T> {
+public abstract class BaseInvokerRequest implements InvokerRequest {
     private final ParserRequest parserRequest;
     private final Path cwd;
     private final Path installationDirectory;
@@ -48,6 +47,7 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
     private final OutputStream out;
     private final OutputStream err;
     private final List<CoreExtension> coreExtensions;
+    private final List<String> jvmArguments;
 
     @SuppressWarnings("ParameterNumber")
     public BaseInvokerRequest(
@@ -62,7 +62,8 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
             @Nullable InputStream in,
             @Nullable OutputStream out,
             @Nullable OutputStream err,
-            @Nullable List<CoreExtension> coreExtensions) {
+            @Nullable List<CoreExtension> coreExtensions,
+            @Nullable List<String> jvmArguments) {
         this.parserRequest = requireNonNull(parserRequest);
         this.cwd = requireNonNull(cwd);
         this.installationDirectory = requireNonNull(installationDirectory);
@@ -76,6 +77,7 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
         this.out = out;
         this.err = err;
         this.coreExtensions = coreExtensions;
+        this.jvmArguments = jvmArguments;
     }
 
     @Override
@@ -136,5 +138,10 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
     @Override
     public Optional<List<CoreExtension>> coreExtensions() {
         return Optional.ofNullable(coreExtensions);
+    }
+
+    @Override
+    public Optional<List<String>> jvmArguments() {
+        return Optional.ofNullable(jvmArguments);
     }
 }

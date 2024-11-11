@@ -21,12 +21,11 @@ package org.apache.maven.cling;
 import java.io.IOException;
 
 import org.apache.maven.api.cli.Invoker;
+import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
-import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.mvn.DefaultMavenParser;
 import org.apache.maven.cling.invoker.mvn.local.DefaultLocalMavenInvoker;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -34,7 +33,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 /**
  * Maven CLI "new-gen".
  */
-public class MavenCling extends ClingSupport<MavenOptions, MavenInvokerRequest<MavenOptions>> {
+public class MavenCling extends ClingSupport {
     /**
      * "Normal" Java entry point. Note: Maven uses ClassWorld Launcher and this entry point is NOT used under normal
      * circumstances.
@@ -60,13 +59,15 @@ public class MavenCling extends ClingSupport<MavenOptions, MavenInvokerRequest<M
     }
 
     @Override
-    protected Invoker<MavenInvokerRequest<MavenOptions>> createInvoker() {
+    protected Invoker createInvoker() {
         return new DefaultLocalMavenInvoker(
                 ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
     }
 
     @Override
-    protected MavenInvokerRequest<MavenOptions> parseArguments(String[] args) throws ParserException, IOException {
-        return new DefaultMavenParser().mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory());
+    protected InvokerRequest parseArguments(String[] args) throws ParserException, IOException {
+        return new DefaultMavenParser()
+                .parse(ParserRequest.mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory())
+                        .build());
     }
 }

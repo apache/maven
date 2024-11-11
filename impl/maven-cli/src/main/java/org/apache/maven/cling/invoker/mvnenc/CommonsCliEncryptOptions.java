@@ -35,6 +35,9 @@ import org.codehaus.plexus.interpolation.InterpolationException;
 
 import static org.apache.maven.cling.invoker.Utils.createInterpolator;
 
+/**
+ * Implementation of {@link EncryptOptions} (base + mvnenc).
+ */
 public class CommonsCliEncryptOptions extends CommonsCliOptions implements EncryptOptions {
     public static CommonsCliEncryptOptions parse(String[] args) throws ParseException {
         CLIManager cliManager = new CLIManager();

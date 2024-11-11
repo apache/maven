@@ -28,13 +28,12 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
-import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.BaseInvokerRequest;
 
 import static java.util.Objects.requireNonNull;
 
-public class DefaultEncryptInvokerRequest extends BaseInvokerRequest<EncryptOptions> implements EncryptInvokerRequest {
+public class DefaultEncryptInvokerRequest extends BaseInvokerRequest {
     private final EncryptOptions options;
 
     @SuppressWarnings("ParameterNumber")
@@ -64,7 +63,8 @@ public class DefaultEncryptInvokerRequest extends BaseInvokerRequest<EncryptOpti
                 in,
                 out,
                 err,
-                coreExtensions);
+                coreExtensions,
+                null);
         this.options = (EncryptOptions) requireNonNull(options);
     }
 

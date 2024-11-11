@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
 import org.codehaus.plexus.components.secdispatcher.DispatcherMeta;
@@ -67,8 +68,10 @@ public class Init extends GoalSupport {
         context.addInHeader("");
 
         ConsolePrompt prompt = context.prompt;
-        boolean force = context.invokerRequest.options().force().orElse(false);
-        boolean yes = context.invokerRequest.options().yes().orElse(false);
+
+        EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
+        boolean force = options.force().orElse(false);
+        boolean yes = options.yes().orElse(false);
 
         if (configExists() && !force) {
             context.terminal

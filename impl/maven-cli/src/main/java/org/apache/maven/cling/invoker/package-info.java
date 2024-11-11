@@ -16,24 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli.mvn.resident;
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.cli.InvokerException;
-import org.apache.maven.api.cli.mvn.MavenInvoker;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
-import org.apache.maven.api.cli.mvn.MavenOptions;
 
 /**
- * Resident Maven invoker, similar to local. Instance is shut down when this instance is closed.
- *
- * @since 4.0.0
+ * This package contain support (hence abstract) classes mainly, that implements "base" of CLIng.
+ * In packages below you find actual implementations.
  */
-@Experimental
-public interface ResidentMavenInvoker extends MavenInvoker<MavenInvokerRequest<MavenOptions>> {
-    /**
-     * Closes cleanly the daemon.
-     */
-    @Override
-    void close() throws InvokerException;
-}
+package org.apache.maven.cling.invoker;

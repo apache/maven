@@ -27,7 +27,6 @@ import java.util.List;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
@@ -35,7 +34,8 @@ import org.junit.jupiter.api.Assumptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public abstract class MavenInvokerTestSupport<O extends MavenOptions, R extends MavenInvokerRequest<O>> {
+public abstract class MavenInvokerTestSupport<
+        O extends MavenOptions, R extends org.apache.maven.api.cli.InvokerRequest> {
 
     protected void invoke(Path cwd, Collection<String> goals) throws Exception {
         // works only in recent Maven4

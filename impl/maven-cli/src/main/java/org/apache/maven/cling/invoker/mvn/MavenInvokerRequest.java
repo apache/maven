@@ -27,7 +27,6 @@ import java.util.Map;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.BaseInvokerRequest;
 
@@ -35,15 +34,12 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Maven execution request.
- *
- * @param <O> the options type this request carries
  */
-public class DefaultMavenInvokerRequest<O extends MavenOptions> extends BaseInvokerRequest<O>
-        implements MavenInvokerRequest<O> {
-    private final O options;
+public class MavenInvokerRequest extends BaseInvokerRequest {
+    private final MavenOptions options;
 
     @SuppressWarnings("ParameterNumber")
-    public DefaultMavenInvokerRequest(
+    public MavenInvokerRequest(
             ParserRequest parserRequest,
             Path cwd,
             Path installationDirectory,
@@ -56,7 +52,8 @@ public class DefaultMavenInvokerRequest<O extends MavenOptions> extends BaseInvo
             OutputStream out,
             OutputStream err,
             List<CoreExtension> coreExtensions,
-            O options) {
+            List<String> jvmArguments,
+            MavenOptions options) {
         super(
                 parserRequest,
                 cwd,
@@ -69,7 +66,8 @@ public class DefaultMavenInvokerRequest<O extends MavenOptions> extends BaseInvo
                 in,
                 out,
                 err,
-                coreExtensions);
+                coreExtensions,
+                jvmArguments);
         this.options = requireNonNull(options);
     }
 
@@ -77,7 +75,7 @@ public class DefaultMavenInvokerRequest<O extends MavenOptions> extends BaseInvo
      * The mandatory Maven options.
      */
     @Nonnull
-    public O options() {
+    public MavenOptions options() {
         return options;
     }
 }

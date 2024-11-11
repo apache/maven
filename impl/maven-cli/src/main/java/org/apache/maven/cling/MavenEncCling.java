@@ -21,10 +21,9 @@ package org.apache.maven.cling;
 import java.io.IOException;
 
 import org.apache.maven.api.cli.Invoker;
+import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
-import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
@@ -35,7 +34,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 /**
  * Maven encrypt CLI "new-gen".
  */
-public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRequest> {
+public class MavenEncCling extends ClingSupport {
     /**
      * "Normal" Java entry point. Note: Maven uses ClassWorld Launcher and this entry point is NOT used under normal
      * circumstances.
@@ -61,13 +60,13 @@ public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRe
     }
 
     @Override
-    protected Invoker<EncryptInvokerRequest> createInvoker() {
+    protected Invoker createInvoker() {
         return new DefaultEncryptInvoker(
                 ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
     }
 
     @Override
-    protected EncryptInvokerRequest parseArguments(String[] args) throws ParserException, IOException {
+    protected InvokerRequest parseArguments(String[] args) throws ParserException, IOException {
         return new DefaultEncryptParser()
                 .parse(ParserRequest.mvnenc(args, new ProtoLogger(), new JLineMessageBuilderFactory())
                         .build());

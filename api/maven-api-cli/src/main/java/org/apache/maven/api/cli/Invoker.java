@@ -30,12 +30,10 @@ import org.apache.maven.api.annotations.Nonnull;
  * that can handle various types of {@link InvokerRequest InvokerRequests}. It also implements
  * {@link AutoCloseable} to ensure proper resource management.</p>
  *
- * @param <R> The specific type of {@link InvokerRequest} this {@code Invoker} can handle, extending {@link InvokerRequest}
- *
  * @since 4.0.0
  */
 @Experimental
-public interface Invoker<R extends InvokerRequest<? extends Options>> extends AutoCloseable {
+public interface Invoker extends AutoCloseable {
     /**
      * Invokes the Maven application using the provided {@link InvokerRequest}.
      * This method is responsible for executing the Maven command or build
@@ -45,7 +43,7 @@ public interface Invoker<R extends InvokerRequest<? extends Options>> extends Au
      * @return an integer representing the exit code of the invocation (0 typically indicates success)
      * @throws InvokerException if an error occurs during the invocation process
      */
-    int invoke(@Nonnull R invokerRequest) throws InvokerException;
+    int invoke(@Nonnull InvokerRequest invokerRequest) throws InvokerException;
 
     /**
      * Closes and disposes of this {@link Invoker} instance, releasing any resources it may hold.

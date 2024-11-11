@@ -23,7 +23,6 @@ import java.io.IOException;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -31,11 +30,8 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * The CLI "new-gen".
- *
- * @param <O> the options type
- * @param <R> the request type
  */
-public abstract class ClingSupport<O extends Options, R extends InvokerRequest<O>> {
+public abstract class ClingSupport {
     static final String CORE_CLASS_REALM_ID = "plexus.core";
 
     protected final ClassWorld classWorld;
@@ -64,7 +60,7 @@ public abstract class ClingSupport<O extends Options, R extends InvokerRequest<O
      * The main entry point.
      */
     public int run(String[] args) throws IOException {
-        try (Invoker<R> invoker = createInvoker()) {
+        try (Invoker invoker = createInvoker()) {
             return invoker.invoke(parseArguments(args));
         } catch (ParserException e) {
             System.err.println(e.getMessage());
@@ -78,7 +74,7 @@ public abstract class ClingSupport<O extends Options, R extends InvokerRequest<O
         }
     }
 
-    protected abstract Invoker<R> createInvoker();
+    protected abstract Invoker createInvoker();
 
-    protected abstract R parseArguments(String[] args) throws ParserException, IOException;
+    protected abstract InvokerRequest parseArguments(String[] args) throws ParserException, IOException;
 }

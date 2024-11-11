@@ -22,27 +22,25 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.cli.InvokerException;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.cli.mvn.resident.ResidentMavenInvoker;
 import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.mvn.DefaultMavenInvoker;
+import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
 /**
  * Local resident invoker implementation, similar to "local" but keeps Maven instance resident. This implies, that
  * things like environment, system properties, extensions etc. are loaded only once. It is caller duty to ensure
  * that subsequent call is right for the resident instance (ie no env change or different extension needed).
  */
-public class DefaultResidentMavenInvoker
-        extends DefaultMavenInvoker<
-                MavenOptions, MavenInvokerRequest<MavenOptions>, DefaultResidentMavenInvoker.LocalContext>
+public class ResidentMavenInvoker
+        extends MavenInvoker<MavenOptions, MavenInvokerRequest<MavenOptions>, ResidentMavenInvoker.LocalContext>
         implements ResidentMavenInvoker {
 
     public static class LocalContext
-            extends DefaultMavenInvoker.MavenContext<
-                    MavenOptions, MavenInvokerRequest<MavenOptions>, DefaultResidentMavenInvoker.LocalContext> {
+            extends MavenInvoker.MavenContext<
+                    MavenOptions, MavenInvokerRequest<MavenOptions>, ResidentMavenInvoker.LocalContext> {
 
-        protected LocalContext(DefaultResidentMavenInvoker invoker, MavenInvokerRequest<MavenOptions> invokerRequest) {
+        protected LocalContext(ResidentMavenInvoker invoker, MavenInvokerRequest<MavenOptions> invokerRequest) {
             super(invoker, invokerRequest);
         }
 
@@ -59,7 +57,7 @@ public class DefaultResidentMavenInvoker
             if (invokerRequest == this.invokerRequest) {
                 return this;
             }
-            LocalContext shadow = new LocalContext((DefaultResidentMavenInvoker) invoker, invokerRequest);
+            LocalContext shadow = new LocalContext((ResidentMavenInvoker) invoker, invokerRequest);
 
             shadow.logger = logger;
             shadow.loggerFactory = loggerFactory;
@@ -88,7 +86,7 @@ public class DefaultResidentMavenInvoker
 
     private final ConcurrentHashMap<String, LocalContext> residentContext;
 
-    public DefaultResidentMavenInvoker(ProtoLookup protoLookup) {
+    public ResidentMavenInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
         this.residentContext = new ConcurrentHashMap<>();
     }

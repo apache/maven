@@ -22,15 +22,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
-import org.apache.maven.api.cli.mvnenc.EncryptOptions;
-import org.apache.maven.api.cli.mvnenc.EncryptParser;
 import org.apache.maven.cling.invoker.BaseParser;
 
-public class DefaultEncryptParser extends BaseParser<EncryptOptions, EncryptInvokerRequest> implements EncryptParser {
+public class DefaultEncryptParser extends BaseParser {
     @Override
-    protected EncryptInvokerRequest getInvokerRequest(LocalContext context) {
+    protected DefaultEncryptInvokerRequest getInvokerRequest(LocalContext context) {
         return new DefaultEncryptInvokerRequest(
                 context.parserRequest,
                 context.cwd,
@@ -48,7 +46,7 @@ public class DefaultEncryptParser extends BaseParser<EncryptOptions, EncryptInvo
     }
 
     @Override
-    protected List<EncryptOptions> parseCliOptions(LocalContext context) throws ParserException {
+    protected List<Options> parseCliOptions(LocalContext context) throws ParserException {
         return Collections.singletonList(parseEncryptCliOptions(context.parserRequest.args()));
     }
 
@@ -61,7 +59,7 @@ public class DefaultEncryptParser extends BaseParser<EncryptOptions, EncryptInvo
     }
 
     @Override
-    protected EncryptOptions assembleOptions(List<EncryptOptions> parsedOptions) {
+    protected Options assembleOptions(List<Options> parsedOptions) {
         // nothing to assemble, we deal with CLI only
         return parsedOptions.get(0);
     }

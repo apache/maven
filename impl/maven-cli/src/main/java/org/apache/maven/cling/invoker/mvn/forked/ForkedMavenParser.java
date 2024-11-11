@@ -16,21 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn;
+package org.apache.maven.cling.invoker.mvn.forked;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.commons.cli.ParseException;
-import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.api.cli.mvn.MavenParser;
+import org.apache.maven.cling.invoker.mvn.MavenInvokerRequest;
+import org.apache.maven.cling.invoker.mvn.MavenParser;
 
-public class DefaultMavenParser extends BaseMavenParser<MavenOptions, MavenInvokerRequest<MavenOptions>>
-        implements MavenParser<MavenInvokerRequest<MavenOptions>> {
+/**
+ * Forked invoker parser that collects JVM arguments as well.
+ */
+public class ForkedMavenParser extends MavenParser {
+
+    @SuppressWarnings("ParameterNumber")
     @Override
-    protected DefaultMavenInvokerRequest<MavenOptions> getInvokerRequest(LocalContext context) {
-        return new DefaultMavenInvokerRequest<>(
+    protected MavenInvokerRequest getInvokerRequest(LocalContext context) {
+        return new MavenInvokerRequest(
                 context.parserRequest,
                 context.cwd,
                 context.installationDirectory,
@@ -43,20 +51,24 @@ public class DefaultMavenParser extends BaseMavenParser<MavenOptions, MavenInvok
                 context.parserRequest.out(),
                 context.parserRequest.err(),
                 context.extensions,
+                getJvmArguments(context.rootDirectory),
                 (MavenOptions) context.options);
     }
 
-    @Override
-    protected MavenOptions parseArgs(String source, List<String> args) throws ParserException {
-        try {
-            return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
-        } catch (ParseException e) {
-            throw new ParserException("Failed to parse source " + source + ": " + e.getMessage(), e.getCause());
+    protected List<String> getJvmArguments(Path rootDirectory) {
+        if (rootDirectory != null) {
+            Path jvmConfig = rootDirectory.resolve(".mvn/jvm.config");
+            if (Files.exists(jvmConfig)) {
+                try {
+                    return Files.readAllLines(jvmConfig).stream()
+                            .filter(l -> !l.isBlank() && !l.startsWith("#"))
+                            .flatMap(l -> Arrays.stream(l.split(" ")))
+                            .collect(Collectors.toList());
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
         }
-    }
-
-    @Override
-    protected MavenOptions assembleOptions(List<MavenOptions> parsedOptions) {
-        return LayeredMavenOptions.layerMavenOptions(parsedOptions);
+        return null;
     }
 }
