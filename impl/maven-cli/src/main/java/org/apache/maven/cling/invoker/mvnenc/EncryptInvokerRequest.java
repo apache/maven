@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
@@ -50,7 +49,8 @@ public class EncryptInvokerRequest extends BaseInvokerRequest {
             OutputStream out,
             OutputStream err,
             List<CoreExtension> coreExtensions,
-            Options options) {
+            List<String> jvmArguments,
+            EncryptOptions options) {
         super(
                 parserRequest,
                 cwd,
@@ -64,8 +64,8 @@ public class EncryptInvokerRequest extends BaseInvokerRequest {
                 out,
                 err,
                 coreExtensions,
-                null);
-        this.options = (EncryptOptions) requireNonNull(options);
+                jvmArguments);
+        this.options = requireNonNull(options);
     }
 
     /**

@@ -68,7 +68,7 @@ public class MavenCling extends ClingSupport {
     @Override
     protected InvokerRequest parseArguments(String[] args) throws ParserException, IOException {
         return new MavenParser()
-                .parse(ParserRequest.mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory())
+                .parseInvocation(ParserRequest.mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory())
                         .build());
     }
 }

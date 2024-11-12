@@ -68,7 +68,7 @@ public class MavenEncCling extends ClingSupport {
     @Override
     protected InvokerRequest parseArguments(String[] args) throws ParserException, IOException {
         return new EncryptParser()
-                .parse(ParserRequest.mvnenc(args, new ProtoLogger(), new JLineMessageBuilderFactory())
+                .parseInvocation(ParserRequest.mvnenc(args, new ProtoLogger(), new JLineMessageBuilderFactory())
                         .build());
     }
 }

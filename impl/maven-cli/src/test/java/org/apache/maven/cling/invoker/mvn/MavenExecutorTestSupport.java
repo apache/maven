@@ -18,12 +18,7 @@
  */
 package org.apache.maven.cling.invoker.mvn;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
-
+import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
@@ -31,11 +26,17 @@ import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.junit.jupiter.api.Assumptions;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public abstract class MavenInvokerTestSupport {
+public abstract class MavenExecutorTestSupport {
 
-    protected void invoke(Path cwd, Collection<String> goals) throws Exception {
+    protected void execute(Path cwd, Collection<String> goals) throws Exception {
         // works only in recent Maven4
         Assumptions.assumeTrue(
                 Files.isRegularFile(Paths.get(System.getProperty("maven.home"))
@@ -97,10 +98,10 @@ public abstract class MavenInvokerTestSupport {
         Files.writeString(appJava, appJavaString);
 
         Parser parser = createParser();
-        try (Invoker invoker = createInvoker()) {
+        try (Executor invoker = createExecutor()) {
             for (String goal : goals) {
                 Path logFile = cwd.resolve(goal + "-build.log").toAbsolutePath();
-                int exitCode = invoker.invoke(parser.parseInvocation(ParserRequest.mvn(
+                int exitCode = invoker.execute(parser.parseExecution(ParserRequest.mvn(
                                 List.of("-l", logFile.toString(), goal),
                                 new ProtoLogger(),
                                 new JLineMessageBuilderFactory())
@@ -112,7 +113,7 @@ public abstract class MavenInvokerTestSupport {
         }
     }
 
-    protected abstract Invoker createInvoker();
+    protected abstract Executor createExecutor();
 
     protected abstract Parser createParser();
 }

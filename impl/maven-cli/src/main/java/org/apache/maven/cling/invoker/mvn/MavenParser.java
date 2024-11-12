@@ -19,14 +19,11 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.ParseException;
@@ -74,23 +71,6 @@ public class MavenParser extends BaseParser {
         } catch (ParseException e) {
             throw new ParserException("Failed to parse source " + source + ": " + e.getMessage(), e.getCause());
         }
-    }
-
-    protected List<String> getJvmArguments(Path rootDirectory) {
-        if (rootDirectory != null) {
-            Path jvmConfig = rootDirectory.resolve(".mvn/jvm.config");
-            if (Files.exists(jvmConfig)) {
-                try {
-                    return Files.readAllLines(jvmConfig).stream()
-                            .filter(l -> !l.isBlank() && !l.startsWith("#"))
-                            .flatMap(l -> Arrays.stream(l.split(" ")))
-                            .collect(Collectors.toList());
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            }
-        }
-        return null;
     }
 
     @Override

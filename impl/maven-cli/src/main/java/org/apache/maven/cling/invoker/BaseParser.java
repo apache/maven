@@ -33,9 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.Parser;
@@ -93,7 +95,26 @@ public abstract class BaseParser implements Parser {
     }
 
     @Override
-    public InvokerRequest parse(ParserRequest parserRequest) throws ParserException, IOException {
+    public ExecutorRequest parseExecution(ParserRequest parserRequest) throws ParserException, IOException {
+        requireNonNull(parserRequest);
+
+        LocalContext context = new LocalContext(parserRequest);
+
+        // the basics
+        context.cwd = requireNonNull(getCwd(context));
+        context.installationDirectory = requireNonNull(getInstallationDirectory(context));
+        context.userHomeDirectory = requireNonNull(getUserHomeDirectory(context));
+
+        return getExecutionRequest(context);
+    }
+
+    protected ExecutorRequest getExecutionRequest(LocalContext context) {
+        return new BaseExecutorRequest(
+                context.parserRequest, context.cwd, context.installationDirectory, context.userHomeDirectory, null);
+    }
+
+    @Override
+    public InvokerRequest parseInvocation(ParserRequest parserRequest) throws ParserException, IOException {
         requireNonNull(parserRequest);
 
         LocalContext context = new LocalContext(parserRequest);
@@ -303,5 +324,22 @@ public abstract class BaseParser implements Parser {
         } catch (XMLStreamException e) {
             throw new ParserException("Failed to parse extensions file: " + extensionsFile, e);
         }
+    }
+
+    protected List<String> getJvmArguments(Path rootDirectory) throws ParserException {
+        if (rootDirectory != null) {
+            Path jvmConfig = rootDirectory.resolve(".mvn/jvm.config");
+            if (Files.exists(jvmConfig)) {
+                try {
+                    return Files.readAllLines(jvmConfig).stream()
+                            .filter(l -> !l.isBlank() && !l.startsWith("#"))
+                            .flatMap(l -> Arrays.stream(l.split(" ")))
+                            .collect(Collectors.toList());
+                } catch (IOException e) {
+                    throw new ParserException("Failed to read JVM configuration file: " + jvmConfig, e);
+                }
+            }
+        }
+        return null;
     }
 }

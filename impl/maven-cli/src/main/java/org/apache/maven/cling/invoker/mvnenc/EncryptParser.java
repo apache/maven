@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class EncryptParser extends BaseParser {
@@ -42,7 +43,8 @@ public class EncryptParser extends BaseParser {
                 context.parserRequest.out(),
                 context.parserRequest.err(),
                 context.extensions,
-                context.options);
+                getJvmArguments(context.rootDirectory),
+                (EncryptOptions) context.options);
     }
 
     @Override

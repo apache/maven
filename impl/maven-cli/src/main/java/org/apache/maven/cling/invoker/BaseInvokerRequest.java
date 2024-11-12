@@ -33,21 +33,15 @@ import org.apache.maven.api.cli.extensions.CoreExtension;
 
 import static java.util.Objects.requireNonNull;
 
-public abstract class BaseInvokerRequest implements InvokerRequest {
-    private final ParserRequest parserRequest;
-    private final Path cwd;
-    private final Path installationDirectory;
-    private final Path userHomeDirectory;
+public abstract class BaseInvokerRequest extends BaseExecutorRequest implements InvokerRequest {
     private final Map<String, String> userProperties;
     private final Map<String, String> systemProperties;
     private final Path topDirectory;
     private final Path rootDirectory;
-
+    private final List<CoreExtension> coreExtensions;
     private final InputStream in;
     private final OutputStream out;
     private final OutputStream err;
-    private final List<CoreExtension> coreExtensions;
-    private final List<String> jvmArguments;
 
     @SuppressWarnings("ParameterNumber")
     public BaseInvokerRequest(
@@ -64,40 +58,16 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
             @Nullable OutputStream err,
             @Nullable List<CoreExtension> coreExtensions,
             @Nullable List<String> jvmArguments) {
-        this.parserRequest = requireNonNull(parserRequest);
-        this.cwd = requireNonNull(cwd);
-        this.installationDirectory = requireNonNull(installationDirectory);
-        this.userHomeDirectory = requireNonNull(userHomeDirectory);
+        super(parserRequest, cwd, installationDirectory, userHomeDirectory, jvmArguments);
         this.userProperties = requireNonNull(userProperties);
         this.systemProperties = requireNonNull(systemProperties);
         this.topDirectory = requireNonNull(topDirectory);
         this.rootDirectory = rootDirectory;
+        this.coreExtensions = coreExtensions;
 
         this.in = in;
         this.out = out;
         this.err = err;
-        this.coreExtensions = coreExtensions;
-        this.jvmArguments = jvmArguments;
-    }
-
-    @Override
-    public ParserRequest parserRequest() {
-        return parserRequest;
-    }
-
-    @Override
-    public Path cwd() {
-        return cwd;
-    }
-
-    @Override
-    public Path installationDirectory() {
-        return installationDirectory;
-    }
-
-    @Override
-    public Path userHomeDirectory() {
-        return userHomeDirectory;
     }
 
     @Override
@@ -138,10 +108,5 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     @Override
     public Optional<List<CoreExtension>> coreExtensions() {
         return Optional.ofNullable(coreExtensions);
-    }
-
-    @Override
-    public Optional<List<String>> jvmArguments() {
-        return Optional.ofNullable(jvmArguments);
     }
 }
