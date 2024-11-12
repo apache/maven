@@ -910,18 +910,28 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             Parent parent = childModel.getParent();
             String parentPath = parent.getRelativePath();
-            if (parentPath != null && !parentPath.isEmpty()) {
-                candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
-                if (candidateSource == null) {
-                    wrongParentRelativePath(childModel);
-                    return null;
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                if (parentPath != null && !parentPath.isEmpty()) {
+                    candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
+                    if (candidateSource == null) {
+                        wrongParentRelativePath(childModel);
+                        return null;
+                    }
+                } else {
+                    candidateSource =
+                            resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
+                    if (candidateSource == null && parentPath == null) {
+                        candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, "..");
+                    }
                 }
-            }
-            if (candidateSource == null) {
+            } else {
                 candidateSource = resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
-            }
-            if (candidateSource == null && parentPath == null) {
-                candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, "..");
+                if (candidateSource == null) {
+                    if (parentPath == null) {
+                        parentPath = "..";
+                    }
+                    candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
+                }
             }
 
             if (candidateSource == null) {
