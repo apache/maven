@@ -107,6 +107,7 @@ public abstract class MavenInvokerTestSupport {
                         .cwd(cwd)
                         .build()));
                 String log = Files.readString(logFile);
+                System.out.println(log);
                 assertEquals(0, exitCode, log);
             }
         }

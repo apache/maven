@@ -73,15 +73,11 @@ public class EmbeddedMavenExecutor implements Executor {
     public int execute(ExecutorRequest executorRequest) throws ExecutorException {
         requireNonNull(executorRequest);
         validate(executorRequest);
-
-        Path installation = executorRequest.installationDirectory();
-        if (!Files.isDirectory(installation)) {
-            throw new IllegalArgumentException("Installation directory must point to existing directory");
-        }
-        Context context = mayCreate(installation);
+        Context context = mayCreate(executorRequest);
 
         System.setProperties(context.properties);
-        Thread.currentThread().setContextClassLoader(context.bootClassLoader);
+        Thread.currentThread()
+                .setContextClassLoader(context.mainMethod.getDeclaringClass().getClassLoader());
         try {
             return (int) context.mainMethod.invoke(
                     null, executorRequest.parserRequest().args().toArray(new String[0]), context.classWorld);
@@ -93,7 +89,11 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
-    protected Context mayCreate(Path installation) {
+    protected Context mayCreate(ExecutorRequest executorRequest) {
+        Path installation = executorRequest.installationDirectory();
+        if (!Files.isDirectory(installation)) {
+            throw new IllegalArgumentException("Installation directory must point to existing directory");
+        }
         return contexts.computeIfAbsent(installation, k -> {
             Path mavenHome = installation.toAbsolutePath().normalize();
             Path boot = mavenHome.resolve("boot");
@@ -103,6 +103,16 @@ public class EmbeddedMavenExecutor implements Executor {
             }
 
             Properties properties = System.getProperties();
+            properties.put(
+                    "user.dir",
+                    executorRequest.cwd().toAbsolutePath().normalize().toString());
+            properties.put(
+                    "user.home",
+                    executorRequest
+                            .userHomeDirectory()
+                            .toAbsolutePath()
+                            .normalize()
+                            .toString());
             properties.put("maven.home", mavenHome.toString());
             properties.put("maven.mainClass", "org.apache.maven.cling.MavenCling");
             properties.put(
