@@ -120,7 +120,9 @@ public class EmbeddedMavenExecutor implements Executor {
             properties.put(
                     "user.dir",
                     executorRequest.cwd().toAbsolutePath().normalize().toString());
-            properties.put("maven.multiModuleProjectDirectory", executorRequest.cwd().toAbsolutePath().normalize().toString());
+            properties.put(
+                    "maven.multiModuleProjectDirectory",
+                    executorRequest.cwd().toAbsolutePath().normalize().toString());
             properties.put(
                     "user.home",
                     executorRequest
