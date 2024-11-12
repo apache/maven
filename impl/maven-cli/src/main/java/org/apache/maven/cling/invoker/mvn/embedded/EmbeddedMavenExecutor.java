@@ -21,6 +21,8 @@ package org.apache.maven.cling.invoker.mvn.embedded;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.cli.Executor;
@@ -48,14 +51,24 @@ public class EmbeddedMavenExecutor implements Executor {
     protected static final class Context {
         private final Properties properties;
         private final URLClassLoader bootClassLoader;
+        private final String version;
         private final Object classWorld;
-        private final Method mainMethod;
+        private final ClassLoader tccl;
+        private final Function<ExecutorRequest, Integer> exec;
 
-        public Context(Properties properties, URLClassLoader bootClassLoader, Object classWorld, Method mainMethod) {
+        public Context(
+                Properties properties,
+                URLClassLoader bootClassLoader,
+                String version,
+                Object classWorld,
+                ClassLoader tccl,
+                Function<ExecutorRequest, Integer> exec) {
             this.properties = properties;
             this.bootClassLoader = bootClassLoader;
+            this.version = version;
             this.classWorld = classWorld;
-            this.mainMethod = mainMethod;
+            this.tccl = tccl;
+            this.exec = exec;
         }
     }
 
@@ -76,11 +89,9 @@ public class EmbeddedMavenExecutor implements Executor {
         Context context = mayCreate(executorRequest);
 
         System.setProperties(context.properties);
-        Thread.currentThread()
-                .setContextClassLoader(context.mainMethod.getDeclaringClass().getClassLoader());
+        Thread.currentThread().setContextClassLoader(context.tccl);
         try {
-            return (int) context.mainMethod.invoke(
-                    null, executorRequest.parserRequest().args().toArray(new String[0]), context.classWorld);
+            return context.exec.apply(executorRequest);
         } catch (Exception e) {
             throw new ExecutorException("Failed to execute", e);
         } finally {
@@ -102,7 +113,8 @@ public class EmbeddedMavenExecutor implements Executor {
                 throw new IllegalArgumentException("Installation directory does not point to Maven installation");
             }
 
-            Properties properties = System.getProperties();
+            Properties properties = new Properties();
+            properties.putAll(System.getProperties());
             properties.put(
                     "user.dir",
                     executorRequest.cwd().toAbsolutePath().normalize().toString());
@@ -123,7 +135,6 @@ public class EmbeddedMavenExecutor implements Executor {
             Thread.currentThread().setContextClassLoader(bootClassLoader);
             try {
                 Class<?> launcherClass = bootClassLoader.loadClass("org.codehaus.plexus.classworlds.launcher.Launcher");
-                Class<?> classWorldClass = bootClassLoader.loadClass("org.codehaus.plexus.classworlds.ClassWorld");
                 Object launcher = launcherClass.getDeclaredConstructor().newInstance();
                 Method configure = launcherClass.getMethod("configure", InputStream.class);
                 try (InputStream inputStream = Files.newInputStream(m2conf)) {
@@ -132,9 +143,41 @@ public class EmbeddedMavenExecutor implements Executor {
                 Object classWorld = launcherClass.getMethod("getWorld").invoke(launcher);
                 Class<?> cliClass =
                         (Class<?>) launcherClass.getMethod("getMainClass").invoke(launcher);
-                Method mainMethod = cliClass.getMethod("main", String[].class, classWorldClass);
+                String version = getMavenVersion(cliClass.getClassLoader());
+                Function<ExecutorRequest, Integer> exec;
 
-                return new Context(properties, bootClassLoader, classWorld, mainMethod);
+                if (version.startsWith("3.")) {
+                    // 3.x
+                    Constructor<?> newMavenCli = cliClass.getConstructor(classWorld.getClass());
+                    Object mavenCli = newMavenCli.newInstance(classWorld);
+                    Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
+                    Method doMain = cliClass.getMethod("doMain", parameterTypes);
+                    exec = r -> {
+                        try {
+                            return (int) doMain.invoke(mavenCli, new Object[] {
+                                r.parserRequest().args().toArray(new String[0]),
+                                r.cwd().toString(),
+                                null,
+                                null
+                            });
+                        } catch (Exception e) {
+                            throw new ExecutorException("Failed to execute", e);
+                        }
+                    };
+                } else {
+                    // assume 4.x
+                    Method mainMethod = cliClass.getMethod("main", String[].class, classWorld.getClass());
+                    exec = r -> {
+                        try {
+                            return (int) mainMethod.invoke(
+                                    null, r.parserRequest().args().toArray(new String[0]), classWorld);
+                        } catch (Exception e) {
+                            throw new ExecutorException("Failed to execute", e);
+                        }
+                    };
+                }
+
+                return new Context(properties, bootClassLoader, version, classWorld, cliClass.getClassLoader(), exec);
             } catch (Exception e) {
                 throw new ExecutorException("Failed to create executor", e);
             } finally {
@@ -169,9 +212,9 @@ public class EmbeddedMavenExecutor implements Executor {
         Thread.currentThread().setContextClassLoader(context.bootClassLoader);
         try {
             try {
-                context.bootClassLoader.close();
-            } finally {
                 ((Closeable) context.classWorld).close();
+            } finally {
+                context.bootClassLoader.close();
             }
         } finally {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
@@ -200,5 +243,20 @@ public class EmbeddedMavenExecutor implements Executor {
         }
         return new URLClassLoader(
                 urls.toArray(new URL[0]), ClassLoader.getSystemClassLoader().getParent());
+    }
+
+    public String getMavenVersion(ClassLoader classLoader) throws IOException {
+        Properties props = new Properties();
+        try (InputStream is =
+                classLoader.getResourceAsStream("/META-INF/maven/org.apache.maven/maven-core/pom.properties")) {
+            if (is != null) {
+                props.load(is);
+            }
+            String version = props.getProperty("version");
+            if (version != null) {
+                return version;
+            }
+            return "unknown";
+        }
     }
 }
