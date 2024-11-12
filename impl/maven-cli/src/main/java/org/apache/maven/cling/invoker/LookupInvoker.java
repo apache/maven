@@ -104,7 +104,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try (C context = createContext(invokerRequest)) {
             try {
-                if (context.containerCapsule.currentThreadClassLoader().isPresent()) {
+                if (context.containerCapsule != null
+                        && context.containerCapsule.currentThreadClassLoader().isPresent()) {
                     Thread.currentThread()
                             .setContextClassLoader(context.containerCapsule
                                     .currentThreadClassLoader()
