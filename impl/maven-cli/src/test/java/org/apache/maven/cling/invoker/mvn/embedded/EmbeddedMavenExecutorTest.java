@@ -18,6 +18,9 @@
  */
 package org.apache.maven.cling.invoker.mvn.embedded;
 
+import java.nio.file.Path;
+import java.util.List;
+
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.cling.invoker.mvn.MavenExecutorTestSupport;
@@ -26,9 +29,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
-
-import java.nio.file.Path;
-import java.util.List;
 
 /**
  * Forked UT: it cannot use jimFS as it runs in child process.

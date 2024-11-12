@@ -18,19 +18,18 @@
  */
 package org.apache.maven.cling.invoker.mvn;
 
-import org.apache.maven.api.cli.Executor;
-import org.apache.maven.api.cli.Invoker;
-import org.apache.maven.api.cli.Parser;
-import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.cling.invoker.ProtoLogger;
-import org.apache.maven.jline.JLineMessageBuilderFactory;
-import org.junit.jupiter.api.Assumptions;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+
+import org.apache.maven.api.cli.Executor;
+import org.apache.maven.api.cli.Parser;
+import org.apache.maven.api.cli.ParserRequest;
+import org.apache.maven.cling.invoker.ProtoLogger;
+import org.apache.maven.jline.JLineMessageBuilderFactory;
+import org.junit.jupiter.api.Assumptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
