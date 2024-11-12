@@ -48,7 +48,6 @@ public class ResidentMavenContext extends MavenContext {
         shadow.loggerLevel = loggerLevel;
         shadow.containerCapsule = containerCapsule;
         shadow.lookup = lookup;
-        shadow.settingsBuilder = settingsBuilder;
 
         shadow.interactive = interactive;
         shadow.localRepositoryPath = localRepositoryPath;

@@ -369,7 +369,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
         context.closeables.add(context.containerCapsule);
         context.lookup = context.containerCapsule.getLookup();
-        context.settingsBuilder = context.lookup.lookup(SettingsBuilder.class);
 
         // refresh logger in case container got customized by spy
         org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
@@ -413,7 +412,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void settings(C context) throws Exception {
-        settings(context, context.settingsBuilder);
+        settings(context, context.lookup.lookup(SettingsBuilder.class));
     }
 
     protected void settings(C context, SettingsBuilder settingsBuilder) throws Exception {

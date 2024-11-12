@@ -32,7 +32,6 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.services.Lookup;
-import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.invoker.mvn.ProtoSession;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
@@ -74,7 +73,6 @@ public class LookupContext implements AutoCloseable {
     public Consumer<String> writer;
     public ContainerCapsule containerCapsule;
     public Lookup lookup;
-    public SettingsBuilder settingsBuilder;
 
     public boolean interactive;
     public Path localRepositoryPath;
