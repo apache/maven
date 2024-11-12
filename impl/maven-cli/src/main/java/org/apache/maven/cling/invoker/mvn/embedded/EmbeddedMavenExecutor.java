@@ -44,8 +44,10 @@ import org.apache.maven.api.cli.ExecutorRequest;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Embedded invoker implementation, that invokes Maven from installation directory within this same JVM but in isolated
- * classloader.
+ * Embedded executor implementation, that invokes Maven from installation directory within this same JVM but in isolated
+ * classloader. This class supports Maven 4.x and Maven 3.x as well.
+ * The class world with Maven is kept in memory as long as instance of this class is not closed. Subsequent execution
+ * requests over same installation home are cached.
  */
 public class EmbeddedMavenExecutor implements Executor {
     protected static final class Context {

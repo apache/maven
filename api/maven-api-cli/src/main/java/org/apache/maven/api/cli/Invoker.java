@@ -24,7 +24,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Defines the contract for a component responsible for invoking a Maven application
  * using the information provided in an {@link InvokerRequest}. This interface is central
- * to the execution of Maven commands and builds.
+ * to the construction and invocation of Maven commands and builds, and it fully parses arguments.
  *
  * <p>The Invoker is designed to be flexible, allowing for different implementations
  * that can handle various types of {@link InvokerRequest InvokerRequests}. It also implements

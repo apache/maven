@@ -24,7 +24,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Defines the contract for a component responsible for executing a Maven tool
  * using the information provided in an {@link ExecutorRequest}. This interface is central
- * to the execution of Maven commands and builds.
+ * to the execution of Maven commands and builds, but it does not construct nor fully parses arguments.
  *
  * @since 4.0.0
  */
