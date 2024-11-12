@@ -32,7 +32,7 @@ import org.apache.maven.internal.impl.model.profile.Os;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Forked invoker implementation, that spawns a subprocess with Maven.
+ * Forked invoker implementation, that spawns a subprocess with Maven from the installation directory.
  */
 public class ForkedMavenInvoker implements Invoker {
     @SuppressWarnings("MethodLength")

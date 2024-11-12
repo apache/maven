@@ -27,7 +27,7 @@ import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
 /**
- * Local resident invoker implementation, similar to "local" but keeps Maven instance resident. This implies, that
+ * Resident invoker implementation, similar to "local", but keeps Maven instance resident. This implies, that
  * things like environment, system properties, extensions etc. are loaded only once. It is caller duty to ensure
  * that subsequent call is right for the resident instance (ie no env change or different extension needed).
  */
