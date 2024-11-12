@@ -59,7 +59,6 @@ public class ResidentMavenContext extends MavenContext {
         shadow.mavenExecutionRequest = mavenExecutionRequest;
         shadow.eventSpyDispatcher = eventSpyDispatcher;
         shadow.mavenExecutionRequestPopulator = mavenExecutionRequestPopulator;
-        shadow.toolchainsBuilder = toolchainsBuilder;
         shadow.modelProcessor = modelProcessor;
         shadow.maven = maven;
 

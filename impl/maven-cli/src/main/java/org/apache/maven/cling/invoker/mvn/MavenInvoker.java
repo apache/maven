@@ -116,7 +116,6 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
     protected void lookup(C context) throws Exception {
         context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
         context.mavenExecutionRequestPopulator = context.lookup.lookup(MavenExecutionRequestPopulator.class);
-        context.toolchainsBuilder = context.lookup.lookup(ToolchainsBuilder.class);
         context.modelProcessor = context.lookup.lookup(ModelProcessor.class);
         context.maven = context.lookup.lookup(Maven.class);
     }
@@ -241,7 +240,8 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         context.logger.debug("Reading installation toolchains from '" + installationToolchainsFile + "'");
         context.logger.debug("Reading user toolchains from '" + userToolchainsFile + "'");
 
-        ToolchainsBuilderResult toolchainsResult = context.toolchainsBuilder.build(toolchainsRequest);
+        ToolchainsBuilderResult toolchainsResult =
+                context.lookup.lookup(ToolchainsBuilder.class).build(toolchainsRequest);
 
         context.eventSpyDispatcher.onEvent(toolchainsResult);
 
