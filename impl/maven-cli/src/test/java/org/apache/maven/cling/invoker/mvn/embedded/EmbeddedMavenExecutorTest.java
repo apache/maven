@@ -52,4 +52,10 @@ public class EmbeddedMavenExecutorTest extends MavenExecutorTestSupport {
         System.setProperty("maven.home", "/home/cstamas/Tools/maven/apache-maven-4.0.0-beta-6-SNAPSHOT");
         execute(tempDir, List.of("verify"));
     }
+
+    @Test
+    void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
+        System.setProperty("maven.home", "/home/cstamas/.sdkman/candidates/maven/3.9.9");
+        execute(tempDir, List.of("verify"));
+    }
 }
