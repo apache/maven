@@ -18,7 +18,7 @@
  */
 
 /**
- * This package contain support (hence abstract) classes mainly, that implements "base" of CLIng.
+ * This package contain support (mostly abstract) classes, that implement "base" of CLIng.
  * In packages below you find actual implementations.
  */
 package org.apache.maven.cling.invoker;

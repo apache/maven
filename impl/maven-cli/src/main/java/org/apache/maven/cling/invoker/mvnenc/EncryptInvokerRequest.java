@@ -33,11 +33,11 @@ import org.apache.maven.cling.invoker.BaseInvokerRequest;
 
 import static java.util.Objects.requireNonNull;
 
-public class DefaultEncryptInvokerRequest extends BaseInvokerRequest {
+public class EncryptInvokerRequest extends BaseInvokerRequest {
     private final EncryptOptions options;
 
     @SuppressWarnings("ParameterNumber")
-    public DefaultEncryptInvokerRequest(
+    public EncryptInvokerRequest(
             ParserRequest parserRequest,
             Path cwd,
             Path installationDirectory,

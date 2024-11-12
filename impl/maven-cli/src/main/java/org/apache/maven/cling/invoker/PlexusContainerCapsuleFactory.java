@@ -34,7 +34,6 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.extensions.CoreExtension;
-import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.cling.extensions.BootstrapCoreExtensionManager;
@@ -64,25 +63,27 @@ import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
 
 /**
  * Container capsule backed by Plexus Container.
+ *
+ * @param <C> The context type.
  */
-public class PlexusContainerCapsuleFactory implements ContainerCapsuleFactory {
+public class PlexusContainerCapsuleFactory<C extends LookupContext> implements ContainerCapsuleFactory<C> {
     @Override
-    public ContainerCapsule createContainerCapsule(Lookup invokerLookup, LookupInvokerContext context)
-            throws InvokerException {
+    public ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws InvokerException {
         try {
             return new PlexusContainerCapsule(
-                    Thread.currentThread().getContextClassLoader(), container(invokerLookup, context));
+                    Thread.currentThread().getContextClassLoader(), container(invoker, context));
         } catch (Exception e) {
             throw new InvokerException("Failed to create plexus container capsule", e);
         }
     }
 
-    protected PlexusContainer container(Lookup invokerLookup, LookupInvokerContext context) throws Exception {
-        ClassWorld classWorld = invokerLookup.lookup(ClassWorld.class);
+    protected PlexusContainer container(LookupInvoker<C> invoker, C context) throws Exception {
+        ClassWorld classWorld = invoker.protoLookup.lookup(ClassWorld.class);
         ClassRealm coreRealm = classWorld.getClassRealm("plexus.core");
         List<Path> extClassPath = parseExtClasspath(context);
         CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom(coreRealm);
-        List<CoreExtensionEntry> extensions = loadCoreExtensions(context, coreRealm, coreEntry.getExportedArtifacts());
+        List<CoreExtensionEntry> extensions =
+                loadCoreExtensions(invoker, context, coreRealm, coreEntry.getExportedArtifacts());
         ClassRealm containerRealm =
                 setupContainerRealm(context.logger, classWorld, coreRealm, extClassPath, extensions);
         ContainerConfiguration cc = new DefaultContainerConfiguration()
@@ -104,7 +105,6 @@ public class PlexusContainerCapsuleFactory implements ContainerCapsuleFactory {
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm(null);
-        context.currentThreadContextClassLoader = container.getContainerRealm();
         Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
         container.setLoggerManager(createLoggerManager());
@@ -169,7 +169,7 @@ public class PlexusContainerCapsuleFactory implements ContainerCapsuleFactory {
      * where the components are on index (are annotated with JSR330 annotations and Sisu index is created) and, they
      * have priorities set.
      */
-    protected Module getCustomModule(LookupInvokerContext context, CoreExports exports) {
+    protected Module getCustomModule(C context, CoreExports exports) {
         return new AbstractModule() {
             @Override
             protected void configure() {
@@ -184,12 +184,11 @@ public class PlexusContainerCapsuleFactory implements ContainerCapsuleFactory {
         return new Slf4jLoggerManager();
     }
 
-    protected void customizeContainerConfiguration(LookupInvokerContext context, ContainerConfiguration configuration)
-            throws Exception {}
+    protected void customizeContainerConfiguration(C context, ContainerConfiguration configuration) throws Exception {}
 
-    protected void customizeContainer(LookupInvokerContext context, PlexusContainer container) throws Exception {}
+    protected void customizeContainer(C context, PlexusContainer container) throws Exception {}
 
-    protected List<Path> parseExtClasspath(LookupInvokerContext context) throws Exception {
+    protected List<Path> parseExtClasspath(C context) throws Exception {
         InvokerRequest invokerRequest = context.invokerRequest;
         String extClassPath = invokerRequest.userProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
         if (extClassPath == null) {
@@ -252,7 +251,8 @@ public class PlexusContainerCapsuleFactory implements ContainerCapsuleFactory {
     }
 
     protected List<CoreExtensionEntry> loadCoreExtensions(
-            LookupInvokerContext context, ClassRealm containerRealm, Set<String> providedArtifacts) throws Exception {
+            LookupInvoker<C> invoker, C context, ClassRealm containerRealm, Set<String> providedArtifacts)
+            throws Exception {
         InvokerRequest invokerRequest = context.invokerRequest;
         if (invokerRequest.coreExtensions().isEmpty()
                 || invokerRequest.coreExtensions().get().isEmpty()) {
@@ -283,10 +283,10 @@ public class PlexusContainerCapsuleFactory implements ContainerCapsuleFactory {
             container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
             Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
-            context.invoker.settings(context, container.lookup(SettingsBuilder.class));
+            invoker.settings(context, container.lookup(SettingsBuilder.class));
 
             MavenExecutionRequest mer = new DefaultMavenExecutionRequest();
-            context.invoker.populateRequest(context, mer);
+            invoker.populateRequest(context, mer);
             mer = container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(mer);
             return Collections.unmodifiableList(container
                     .lookup(BootstrapCoreExtensionManager.class)

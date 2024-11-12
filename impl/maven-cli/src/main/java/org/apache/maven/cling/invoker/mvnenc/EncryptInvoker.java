@@ -20,22 +20,16 @@ package org.apache.maven.cling.invoker.mvnenc;
 
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.LookupInvokerContext;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.jline.consoleui.prompt.ConsolePrompt;
-import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
-import org.jline.utils.AttributedString;
-import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.Colors;
 import org.jline.utils.OSUtils;
@@ -43,48 +37,24 @@ import org.jline.utils.OSUtils;
 /**
  * mvnenc invoker implementation.
  */
-public class DefaultEncryptInvoker extends LookupInvoker<DefaultEncryptInvoker.LocalContext> {
+public class EncryptInvoker extends LookupInvoker<EncryptContext> {
 
-    @SuppressWarnings("VisibilityModifier")
-    public static class LocalContext extends LookupInvokerContext {
-        protected LocalContext(DefaultEncryptInvokerRequest invokerRequest) {
-            super(invokerRequest);
-        }
-
-        public Map<String, Goal> goals;
-
-        public List<AttributedString> header;
-        public AttributedStyle style;
-        public LineReader reader;
-        public ConsolePrompt prompt;
-
-        public void addInHeader(String text) {
-            addInHeader(AttributedStyle.DEFAULT, text);
-        }
-
-        public void addInHeader(AttributedStyle style, String text) {
-            AttributedStringBuilder asb = new AttributedStringBuilder();
-            asb.style(style).append(text);
-            header.add(asb.toAttributedString());
-        }
-    }
-
-    public DefaultEncryptInvoker(ProtoLookup protoLookup) {
+    public EncryptInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
     }
 
     @Override
-    protected int execute(LocalContext context) throws Exception {
+    protected int execute(EncryptContext context) throws Exception {
         return doExecute(context);
     }
 
     @Override
-    protected LocalContext createContext(InvokerRequest invokerRequest) {
-        return new LocalContext((DefaultEncryptInvokerRequest) invokerRequest);
+    protected EncryptContext createContext(InvokerRequest invokerRequest) {
+        return new EncryptContext(invokerRequest);
     }
 
     @Override
-    protected void lookup(LocalContext context) {
+    protected void lookup(EncryptContext context) {
         context.goals = context.lookup.lookupMap(Goal.class);
     }
 
@@ -93,7 +63,7 @@ public class DefaultEncryptInvoker extends LookupInvoker<DefaultEncryptInvoker.L
     public static final int BAD_OPERATION = 2; // bad user input or alike
     public static final int CANCELED = 3; // user canceled
 
-    protected int doExecute(LocalContext context) throws Exception {
+    protected int doExecute(EncryptContext context) throws Exception {
         try {
             if (!context.interactive) {
                 context.terminal.writer().println("This tool works only in interactive mode!");
@@ -164,7 +134,7 @@ public class DefaultEncryptInvoker extends LookupInvoker<DefaultEncryptInvoker.L
         }
     }
 
-    protected int badGoalsErrorMessage(String message, LocalContext context) {
+    protected int badGoalsErrorMessage(String message, EncryptContext context) {
         context.terminal.writer().println(message);
         context.terminal.writer().println("Supported goals are: " + String.join(", ", context.goals.keySet()));
         context.terminal.writer().println("Use -h to display help.");

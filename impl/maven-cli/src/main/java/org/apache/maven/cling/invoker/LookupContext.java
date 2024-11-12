@@ -42,14 +42,14 @@ import org.slf4j.ILoggerFactory;
 import static java.util.Objects.requireNonNull;
 
 @SuppressWarnings("VisibilityModifier")
-public class LookupInvokerContext implements AutoCloseable {
+public class LookupContext implements AutoCloseable {
     public final InvokerRequest invokerRequest;
     public final Function<String, Path> cwdResolver;
     public final Function<String, Path> installationResolver;
     public final Function<String, Path> userResolver;
     public final Session session;
 
-    protected LookupInvokerContext(InvokerRequest invokerRequest) {
+    protected LookupContext(InvokerRequest invokerRequest) {
         this.invokerRequest = requireNonNull(invokerRequest);
         this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
         this.installationResolver = s ->

@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -48,7 +47,6 @@ import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.LookupInvokerContext;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.Utils;
 import org.apache.maven.cling.utils.CLIReportingUtils;
@@ -80,42 +78,23 @@ import static org.apache.maven.cling.invoker.Utils.toProperties;
 
 /**
  * The "local" Maven invoker, that expects whole Maven on classpath and invokes it.
+ *
+ * @param <C> The context type.
  */
-public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
-
-    @SuppressWarnings("VisibilityModifier")
-    public static class MavenContext extends LookupInvokerContext {
-        protected MavenContext(InvokerRequest invokerRequest) {
-            super(invokerRequest);
-        }
-
-        public BuildEventListener buildEventListener;
-        public MavenExecutionRequest mavenExecutionRequest;
-        public EventSpyDispatcher eventSpyDispatcher;
-        public MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
-        public ToolchainsBuilder toolchainsBuilder;
-        public ModelProcessor modelProcessor;
-        public Maven maven;
-    }
-
+public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker<C> {
     public MavenInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
     }
 
     @Override
-    protected MavenContext createContext(InvokerRequest invokerRequest) throws InvokerException {
-        return new MavenContext(invokerRequest);
-    }
-
-    @Override
-    protected int execute(MavenContext context) throws Exception {
+    protected int execute(C context) throws Exception {
         toolchains(context);
         populateRequest(context, context.mavenExecutionRequest);
         return doExecute(context);
     }
 
     @Override
-    protected void prepare(MavenContext context) throws Exception {
+    protected void prepare(C context) throws Exception {
         // explicitly fill in "defaults"?
         DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         mavenExecutionRequest.setRepositoryCache(new DefaultRepositoryCache());
@@ -134,7 +113,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
     }
 
     @Override
-    protected void lookup(MavenContext context) throws Exception {
+    protected void lookup(C context) throws Exception {
         context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
         context.mavenExecutionRequestPopulator = context.lookup.lookup(MavenExecutionRequestPopulator.class);
         context.toolchainsBuilder = context.lookup.lookup(ToolchainsBuilder.class);
@@ -143,7 +122,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
     }
 
     @Override
-    protected void init(MavenContext context) throws Exception {
+    protected void init(C context) throws Exception {
         InvokerRequest invokerRequest = context.invokerRequest;
         Map<String, Object> data = new HashMap<>();
         data.put("plexus", context.lookup.lookup(PlexusContainer.class));
@@ -155,20 +134,21 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
     }
 
     @Override
-    protected void postCommands(MavenContext context) throws Exception {
+    protected void postCommands(C context) throws Exception {
         super.postCommands(context);
 
         InvokerRequest invokerRequest = context.invokerRequest;
+        MavenOptions options = (MavenOptions) invokerRequest.options();
         Logger logger = context.logger;
-        if (invokerRequest.options().relaxedChecksums().orElse(false)) {
+        if (options.relaxedChecksums().orElse(false)) {
             logger.info("Disabling strict checksum verification on all artifact downloads.");
-        } else if (invokerRequest.options().strictChecksums().orElse(false)) {
+        } else if (options.strictChecksums().orElse(false)) {
             logger.info("Enabling strict checksum verification on all artifact downloads.");
         }
     }
 
     @Override
-    protected void configureLogging(MavenContext context) throws Exception {
+    protected void configureLogging(C context) throws Exception {
         super.configureLogging(context);
         // Create the build log appender
         ProjectBuildLogAppender projectBuildLogAppender =
@@ -176,34 +156,33 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         context.closeables.add(projectBuildLogAppender);
     }
 
-    protected BuildEventListener determineBuildEventListener(MavenContext context) {
+    protected BuildEventListener determineBuildEventListener(C context) {
         if (context.buildEventListener == null) {
             context.buildEventListener = doDetermineBuildEventListener(context);
         }
         return context.buildEventListener;
     }
 
-    protected BuildEventListener doDetermineBuildEventListener(MavenContext context) {
+    protected BuildEventListener doDetermineBuildEventListener(C context) {
         Consumer<String> writer = determineWriter(context);
         return new SimpleBuildEventListener(writer);
     }
 
     @Override
-    protected void customizeSettingsRequest(MavenContext context, SettingsBuilderRequest settingsBuilderRequest) {
+    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) {
         if (context.eventSpyDispatcher != null) {
             context.eventSpyDispatcher.onEvent(settingsBuilderRequest);
         }
     }
 
     @Override
-    protected void customizeSettingsResult(MavenContext context, SettingsBuilderResult settingsBuilderResult)
-            throws Exception {
+    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception {
         if (context.eventSpyDispatcher != null) {
             context.eventSpyDispatcher.onEvent(settingsBuilderResult);
         }
     }
 
-    protected void toolchains(MavenContext context) throws Exception {
+    protected void toolchains(C context) throws Exception {
         Path userToolchainsFile = null;
 
         if (context.invokerRequest.options().altUserToolchains().isPresent()) {
@@ -283,7 +262,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
     }
 
     @Override
-    protected void populateRequest(MavenContext context, MavenExecutionRequest request) throws Exception {
+    protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
         super.populateRequest(context, request);
         if (context.invokerRequest.rootDirectory().isEmpty()) {
             // maven requires this to be set; so default it (and see below at POM)
@@ -365,11 +344,11 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         }
     }
 
-    protected Path determinePom(MavenContext context) {
+    protected Path determinePom(C context) {
         Path current = context.invokerRequest.cwd();
-        if (context.invokerRequest.options().alternatePomFile().isPresent()) {
-            current = context.cwdResolver.apply(
-                    context.invokerRequest.options().alternatePomFile().get());
+        MavenOptions options = (MavenOptions) context.invokerRequest.options();
+        if (options.alternatePomFile().isPresent()) {
+            current = context.cwdResolver.apply(options.alternatePomFile().get());
         }
         if (context.modelProcessor != null) {
             return context.modelProcessor.locateExistingPom(current);
@@ -378,7 +357,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         }
     }
 
-    protected String determineReactorFailureBehaviour(MavenContext context) {
+    protected String determineReactorFailureBehaviour(C context) {
         MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
         if (mavenOptions.failFast().isPresent()) {
             return MavenExecutionRequest.REACTOR_FAIL_FAST;
@@ -391,7 +370,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         }
     }
 
-    protected String determineGlobalChecksumPolicy(MavenContext context) {
+    protected String determineGlobalChecksumPolicy(C context) {
         MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
         if (mavenOptions.strictChecksums().orElse(false)) {
             return MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
@@ -402,7 +381,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         }
     }
 
-    protected ExecutionListener determineExecutionListener(MavenContext context) {
+    protected ExecutionListener determineExecutionListener(C context) {
         ExecutionListener listener = new ExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
         if (context.eventSpyDispatcher != null) {
             listener = context.eventSpyDispatcher.chainListener(listener);
@@ -411,12 +390,12 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         return listener;
     }
 
-    protected TransferListener determineTransferListener(MavenContext context, boolean noTransferProgress) {
+    protected TransferListener determineTransferListener(C context, boolean noTransferProgress) {
         TransferListener delegate = super.determineTransferListener(context, noTransferProgress);
         return new MavenTransferListener(delegate, determineBuildEventListener(context));
     }
 
-    protected String determineMakeBehavior(MavenContext context) {
+    protected String determineMakeBehavior(C context) {
         MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
         if (mavenOptions.alsoMake().isPresent()
                 && mavenOptions.alsoMakeDependents().isEmpty()) {
@@ -432,7 +411,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         }
     }
 
-    protected void performProjectActivation(MavenContext context, ProjectActivation projectActivation) {
+    protected void performProjectActivation(C context, ProjectActivation projectActivation) {
         MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
         if (mavenOptions.projects().isPresent()
                 && !mavenOptions.projects().get().isEmpty()) {
@@ -460,7 +439,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         }
     }
 
-    protected void performProfileActivation(MavenContext context, ProfileActivation profileActivation) {
+    protected void performProfileActivation(C context, ProfileActivation profileActivation) {
         MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
         if (mavenOptions.activatedProfiles().isPresent()
                 && !mavenOptions.activatedProfiles().get().isEmpty()) {
@@ -488,7 +467,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         }
     }
 
-    protected int doExecute(MavenContext context) throws Exception {
+    protected int doExecute(C context) throws Exception {
         MavenExecutionRequest request = context.mavenExecutionRequest;
 
         context.eventSpyDispatcher.onEvent(request);
@@ -551,7 +530,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
                 }
             }
 
-            if (context.invokerRequest.options().failNever().orElse(false)) {
+            if (((MavenOptions) context.invokerRequest.options()).failNever().orElse(false)) {
                 context.logger.info("Build failures were ignored.");
                 return 0;
             } else {
@@ -562,7 +541,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
         }
     }
 
-    protected void logBuildResumeHint(MavenContext context, String resumeBuildHint) {
+    protected void logBuildResumeHint(C context, String resumeBuildHint) {
         context.logger.error("");
         context.logger.error("After correcting the problems, you can resume the build with the command");
         context.logger.error(
@@ -605,8 +584,7 @@ public class MavenInvoker extends LookupInvoker<MavenInvoker.MavenContext> {
 
     protected static final String ANSI_RESET = "\u001B\u005Bm";
 
-    protected void logSummary(
-            MavenContext context, ExceptionSummary summary, Map<String, String> references, String indent) {
+    protected void logSummary(C context, ExceptionSummary summary, Map<String, String> references, String indent) {
         String referenceKey = "";
 
         if (summary.getReference() != null && !summary.getReference().isEmpty()) {

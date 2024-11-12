@@ -89,7 +89,7 @@ import static org.apache.maven.cling.invoker.Utils.toProperties;
  *
  * @param <C> The context type.
  */
-public abstract class LookupInvoker<C extends LookupInvokerContext> implements Invoker {
+public abstract class LookupInvoker<C extends LookupContext> implements Invoker {
     protected final ProtoLookup protoLookup;
 
     public LookupInvoker(ProtoLookup protoLookup) {
@@ -365,7 +365,7 @@ public abstract class LookupInvoker<C extends LookupInvokerContext> implements I
     }
 
     protected void container(C context) throws Exception {
-        context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(protoLookup, context);
+        context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
         context.closeables.add(context.containerCapsule);
         context.lookup = context.containerCapsule.getLookup();
         context.settingsBuilder = context.lookup.lookup(SettingsBuilder.class);
@@ -377,8 +377,8 @@ public abstract class LookupInvoker<C extends LookupInvokerContext> implements I
                 .log(message);
     }
 
-    protected ContainerCapsuleFactory createContainerCapsuleFactory() {
-        return new PlexusContainerCapsuleFactory();
+    protected ContainerCapsuleFactory<C> createContainerCapsuleFactory() {
+        return new PlexusContainerCapsuleFactory<>();
     }
 
     protected void lookup(C context) throws Exception {}

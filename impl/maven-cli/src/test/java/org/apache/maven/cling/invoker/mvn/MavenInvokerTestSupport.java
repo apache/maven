@@ -27,15 +27,13 @@ import java.util.List;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.junit.jupiter.api.Assumptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public abstract class MavenInvokerTestSupport<
-        O extends MavenOptions, R extends org.apache.maven.api.cli.InvokerRequest> {
+public abstract class MavenInvokerTestSupport {
 
     protected void invoke(Path cwd, Collection<String> goals) throws Exception {
         // works only in recent Maven4
@@ -98,8 +96,8 @@ public abstract class MavenInvokerTestSupport<
         Files.createDirectories(appJava.getParent());
         Files.writeString(appJava, appJavaString);
 
-        Parser<R> parser = createParser();
-        try (Invoker<R> invoker = createInvoker()) {
+        Parser parser = createParser();
+        try (Invoker invoker = createInvoker()) {
             for (String goal : goals) {
                 Path logFile = cwd.resolve(goal + "-build.log").toAbsolutePath();
                 int exitCode = invoker.invoke(parser.parse(ParserRequest.mvn(
@@ -114,7 +112,7 @@ public abstract class MavenInvokerTestSupport<
         }
     }
 
-    protected abstract Invoker<R> createInvoker();
+    protected abstract Invoker createInvoker();
 
-    protected abstract Parser<R> createParser();
+    protected abstract Parser createParser();
 }

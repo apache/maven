@@ -26,9 +26,9 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
-import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
+import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -40,18 +40,17 @@ import org.junit.jupiter.api.io.TempDir;
  */
 @Disabled(
         "The tests reuse properties from the JVM being launched, thus may lead to failures depending on which options are used")
-public class DefaultLocalMavenInvokerTest
-        extends MavenInvokerTestSupport<MavenOptions, MavenInvokerRequest<MavenOptions>> {
+public class DefaultLocalMavenInvokerTest extends MavenInvokerTestSupport {
     @Override
-    protected Invoker<MavenInvokerRequest<MavenOptions>> createInvoker() {
-        return new DefaultLocalMavenInvoker(ProtoLookup.builder()
+    protected Invoker createInvoker() {
+        return new LocalMavenInvoker(ProtoLookup.builder()
                 .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
                 .build());
     }
 
     @Override
-    protected Parser<MavenInvokerRequest<MavenOptions>> createParser() {
-        return new DefaultMavenParser();
+    protected Parser createParser() {
+        return new MavenParser();
     }
 
     @Test

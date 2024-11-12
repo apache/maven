@@ -23,10 +23,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
+import org.apache.maven.cling.invoker.mvnenc.EncryptContext;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
-import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
+import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.OK;
 
 /**
  * The "encrypt" goal.
@@ -40,7 +40,7 @@ public class Encrypt extends ConfiguredGoalSupport {
     }
 
     @Override
-    protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
+    protected int doExecute(EncryptContext context) throws Exception {
         String cleartext = context.reader.readLine("Enter the password to encrypt: ", '*');
         context.terminal.writer().println(secDispatcher.encrypt(cleartext, null));
         return OK;

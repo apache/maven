@@ -26,10 +26,10 @@ import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.cling.invoker.BaseParser;
 
-public class DefaultEncryptParser extends BaseParser {
+public class EncryptParser extends BaseParser {
     @Override
-    protected DefaultEncryptInvokerRequest getInvokerRequest(LocalContext context) {
-        return new DefaultEncryptInvokerRequest(
+    protected EncryptInvokerRequest getInvokerRequest(LocalContext context) {
+        return new EncryptInvokerRequest(
                 context.parserRequest,
                 context.cwd,
                 context.installationDirectory,
