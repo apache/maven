@@ -930,7 +930,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     if (parentPath == null) {
                         parentPath = "..";
                     }
-                    candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
+                    if (!parentPath.isEmpty()) {
+                        candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
+                    }
                 }
             }
 
