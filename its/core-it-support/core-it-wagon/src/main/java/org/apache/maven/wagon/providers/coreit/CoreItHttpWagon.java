@@ -43,6 +43,7 @@ import org.codehaus.plexus.component.annotations.Component;
  */
 @Component(role = org.apache.maven.wagon.Wagon.class, hint = "http-coreit", instantiationStrategy = "per-lookup")
 public class CoreItHttpWagon extends AbstractWagon {
+    @Override
     public void get(String resourceName, File destination)
             throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
         InputData inputData = new InputData();
@@ -67,11 +68,13 @@ public class CoreItHttpWagon extends AbstractWagon {
         getTransfer(inputData.getResource(), destination, is);
     }
 
+    @Override
     public boolean getIfNewer(String resourceName, File destination, long timestamp)
             throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
         return false;
     }
 
+    @Override
     public void put(File source, String resourceName)
             throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
         OutputData outputData = new OutputData();
@@ -94,6 +97,7 @@ public class CoreItHttpWagon extends AbstractWagon {
         putTransfer(outputData.getResource(), source, os, true);
     }
 
+    @Override
     public void closeConnection() throws ConnectionException {
         File f = new File("target/wagon-data");
         try {
@@ -149,7 +153,13 @@ public class CoreItHttpWagon extends AbstractWagon {
         outputData.setOutputStream(new ByteArrayOutputStream());
     }
 
+    @Override
     public void openConnection() throws ConnectionException, AuthenticationException {
+        // ignore
+    }
+
+    @Override
+    protected void openConnectionInternal() throws ConnectionException, AuthenticationException {
         // ignore
     }
 }
