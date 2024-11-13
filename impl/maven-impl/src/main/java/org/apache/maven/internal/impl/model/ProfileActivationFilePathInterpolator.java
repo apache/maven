@@ -61,7 +61,7 @@ public class ProfileActivationFilePathInterpolator {
             return null;
         }
 
-        Path basedir = context.getProjectDirectory();
+        Path basedir = context.getModel().getProjectDirectory();
 
         String absolutePath = interpolator.interpolate(path, s -> {
             if ("basedir".equals(s) || "project.basedir".equals(s)) {

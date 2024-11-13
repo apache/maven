@@ -1052,14 +1052,15 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 new DefaultModelUrlNormalizer(new DefaultUrlNormalizer()),
                 new DefaultSuperPomProvider(modelProcessor),
                 new DefaultInheritanceAssembler(),
-                new DefaultProfileSelector(),
+                new DefaultProfileSelector(
+                        new DefaultInterpolator(),
+                        new ProfileActivationFilePathInterpolator(
+                                new DefaultPathTranslator(), new DefaultRootLocator(), new DefaultInterpolator())),
                 new DefaultProfileInjector(),
                 new DefaultPluginManagementInjector(),
                 new DefaultDependencyManagementInjector(),
                 new DefaultDependencyManagementImporter(),
                 new DefaultPluginConfigurationExpander(),
-                new ProfileActivationFilePathInterpolator(
-                        new DefaultPathTranslator(), new DefaultRootLocator(), new DefaultInterpolator()),
                 new DefaultModelVersionParser(getVersionScheme()),
                 List.of(),
                 new DefaultModelCacheFactory(),

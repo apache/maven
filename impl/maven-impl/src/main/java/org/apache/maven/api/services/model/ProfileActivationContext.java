@@ -18,27 +18,29 @@
  */
 package org.apache.maven.api.services.model;
 
-import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.
  *
+ * The {@link Model} is available from the activation context, but only static parts of it
+ * are allowed to be used, i.e. those that do not change between file model and effective model.
+ *
  */
 public interface ProfileActivationContext {
-    /**
-     * Key of the property containing the project's packaging.
-     * Available in {@link #getUserProperties()}.
-     * @since 4.0.0
-     */
-    String PROPERTY_NAME_PACKAGING = "packaging";
 
     /**
      * Gets the identifiers of those profiles that should be activated by explicit demand.
      *
      * @return The identifiers of those profiles to activate, never {@code null}.
      */
+    @Nonnull
     List<String> getActiveProfileIds();
 
     /**
@@ -46,6 +48,7 @@ public interface ProfileActivationContext {
      *
      * @return The identifiers of those profiles to deactivate, never {@code null}.
      */
+    @Nonnull
     List<String> getInactiveProfileIds();
 
     /**
@@ -54,6 +57,7 @@ public interface ProfileActivationContext {
      *
      * @return The execution properties, never {@code null}.
      */
+    @Nonnull
     Map<String, String> getSystemProperties();
 
     /**
@@ -63,14 +67,8 @@ public interface ProfileActivationContext {
      *
      * @return The user properties, never {@code null}.
      */
+    @Nonnull
     Map<String, String> getUserProperties();
-
-    /**
-     * Gets the base directory of the current project (if any).
-     *
-     * @return The base directory of the current project or {@code null} if none.
-     */
-    Path getProjectDirectory();
 
     /**
      * Gets current calculated project properties
@@ -78,4 +76,19 @@ public interface ProfileActivationContext {
      * @return The project properties, never {@code null}.
      */
     Map<String, String> getProjectProperties();
+
+    /**
+     * Inject properties from newly activated profiles in order to trigger the cascading mechanism.
+     *
+     * @param activatedProfiles The collection of profiles that have been activated that may trigger the cascading effect.
+     */
+    void addProfileProperties(Collection<Profile> activatedProfiles);
+
+    /**
+     * Gets the model which is being activated.
+     *
+     * @return The project model, never {@code null}.
+     */
+    @Nonnull
+    Model getModel();
 }

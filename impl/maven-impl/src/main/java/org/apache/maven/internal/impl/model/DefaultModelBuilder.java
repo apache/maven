@@ -34,7 +34,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -43,7 +42,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -58,8 +56,6 @@ import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.model.Activation;
-import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
@@ -72,7 +68,6 @@ import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.Interpolator;
-import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -102,7 +97,6 @@ import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.services.model.ModelVersionParser;
 import org.apache.maven.api.services.model.PluginConfigurationExpander;
 import org.apache.maven.api.services.model.PluginManagementInjector;
-import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileInjector;
 import org.apache.maven.api.services.model.ProfileSelector;
 import org.apache.maven.api.services.model.RootLocator;
@@ -111,7 +105,6 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.internal.impl.util.PhasingExecutor;
-import org.apache.maven.model.v4.MavenTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,7 +140,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final DependencyManagementInjector dependencyManagementInjector;
     private final DependencyManagementImporter dependencyManagementImporter;
     private final PluginConfigurationExpander pluginConfigurationExpander;
-    private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelVersionParser versionParser;
     private final List<ModelTransformer> transformers;
     private final ModelCacheFactory modelCacheFactory;
@@ -171,7 +163,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             DependencyManagementInjector dependencyManagementInjector,
             DependencyManagementImporter dependencyManagementImporter,
             PluginConfigurationExpander pluginConfigurationExpander,
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelVersionParser versionParser,
             List<ModelTransformer> transformers,
             ModelCacheFactory modelCacheFactory,
@@ -191,7 +182,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.dependencyManagementInjector = dependencyManagementInjector;
         this.dependencyManagementImporter = dependencyManagementImporter;
         this.pluginConfigurationExpander = pluginConfigurationExpander;
-        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.versionParser = versionParser;
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;
@@ -734,7 +724,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 // keep all loaded file models in memory, those will be needed
                 // during the raw to build transformation
                 putSource(getGroupId(model), model.getArtifactId(), src);
-                Model activated = activateFileModel(model);
+                setRootModel(model);
+                Model activated = activateModel(model, List.of(), false);
                 for (String subproject : getSubprojects(activated)) {
                     if (subproject == null || subproject.isEmpty()) {
                         continue;
@@ -794,12 +785,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (r != result) {
                 r.getProblems().forEach(result::addProblem);
             }
-        }
-
-        static <T> Set<T> concat(Set<T> a, T b) {
-            Set<T> result = new HashSet<>(a);
-            result.add(b);
-            return Set.copyOf(result);
         }
 
         void buildEffectiveModel(Collection<String> importIds) throws ModelBuilderException {
@@ -1094,42 +1079,38 @@ public class DefaultModelBuilder implements ModelBuilder {
             return parentModel;
         }
 
-        Model activateFileModel(Model inputModel) throws ModelBuilderException {
-            setRootModel(inputModel);
-
-            // profile activation
-            DefaultProfileActivationContext profileActivationContext = getProfileActivationContext(request, inputModel);
-
-            setSource("(external profiles)");
-            List<Profile> activeExternalProfiles = getActiveProfiles(request.getProfiles(), profileActivationContext);
-
-            result.setActiveExternalProfiles(activeExternalProfiles);
-
-            if (!activeExternalProfiles.isEmpty()) {
-                Properties profileProps = new Properties();
-                for (Profile profile : activeExternalProfiles) {
-                    profileProps.putAll(profile.getProperties());
+        Model activateModel(Model model, List<Profile> parentProfiles, boolean saveInfo) throws ModelBuilderException {
+            int nbProfiles = request.getProfiles().size()
+                    + parentProfiles.size()
+                    + model.getProfiles().size();
+            if (nbProfiles == 0) {
+                if (saveInfo) {
+                    result.setActivePomProfiles(List.of());
+                    result.setActiveExternalProfiles(List.of());
                 }
-                profileProps.putAll(profileActivationContext.getUserProperties());
-                profileActivationContext.setUserProperties(profileProps);
+                return model;
             }
 
-            profileActivationContext.setProjectProperties(inputModel.getProperties());
-            setSource(inputModel);
-            List<Profile> activePomProfiles = getActiveProfiles(inputModel.getProfiles(), profileActivationContext);
+            DefaultProfileActivationContext profileActivationContext = getProfileActivationContext(request, model);
 
-            // model normalization
-            setSource(inputModel);
-            inputModel = modelNormalizer.mergeDuplicates(inputModel, request, this);
+            List<Profile> profiles = new ArrayList<>(nbProfiles);
+            profiles.addAll(model.getProfiles());
+            profiles.addAll(parentProfiles);
+            profiles.addAll(request.getProfiles());
 
-            Map<String, Activation> interpolatedActivations = getProfileActivations(inputModel);
-            inputModel = injectProfileActivations(inputModel, interpolatedActivations);
+            boolean cascade = !MODEL_VERSION_4_0_0.equals(model.getModelVersion());
+            List<Profile> activated =
+                    profileSelector.getActiveProfiles(profiles, profileActivationContext, this, cascade);
+
+            if (saveInfo) {
+                Map<Boolean, List<Profile>> partitioned = activated.stream()
+                        .collect(Collectors.partitioningBy(p -> Profile.SOURCE_POM.equals(p.getSource())));
+                result.setActivePomProfiles(partitioned.get(true));
+                result.setActiveExternalProfiles(partitioned.get(false));
+            }
 
             // profile injection
-            inputModel = profileInjector.injectProfiles(inputModel, activePomProfiles, request, this);
-            inputModel = profileInjector.injectProfiles(inputModel, activeExternalProfiles, request, this);
-
-            return inputModel;
+            return profileInjector.injectProfiles(model, activated, request, this);
         }
 
         @SuppressWarnings("checkstyle:methodlength")
@@ -1141,71 +1122,15 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             setRootModel(inputModel);
 
-            Model activatedFileModel = activateFileModel(inputModel);
+            Model parentModel = readParent(inputModel);
 
-            // profile activation
-            DefaultProfileActivationContext profileActivationContext =
-                    getProfileActivationContext(request, activatedFileModel);
-
-            List<Profile> activeExternalProfiles = result.getActiveExternalProfiles();
-
-            if (!activeExternalProfiles.isEmpty()) {
-                Properties profileProps = new Properties();
-                for (Profile profile : activeExternalProfiles) {
-                    profileProps.putAll(profile.getProperties());
-                }
-                profileProps.putAll(profileActivationContext.getUserProperties());
-                profileActivationContext.setUserProperties(profileProps);
-            }
-
-            Model parentModel = readParent(activatedFileModel);
-            // Now that we have read the parent, we can set the relative
-            // path correctly if it was not set in the input model
-            if (inputModel.getParent() != null && inputModel.getParent().getRelativePath() == null) {
-                String relPath;
-                if (parentModel.getPomFile() != null
-                        && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                                || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM)) {
-                    relPath = inputModel
-                            .getPomFile()
-                            .getParent()
-                            .relativize(parentModel.getPomFile().getParent())
-                            .toString();
-                } else {
-                    relPath = "..";
-                }
-                inputModel = inputModel.withParent(inputModel.getParent().withRelativePath(relPath));
-            }
-
-            List<Profile> parentInterpolatedProfiles =
-                    interpolateActivations(parentModel.getProfiles(), profileActivationContext, this);
-            // profile injection
-            List<Profile> parentActivePomProfiles =
-                    getActiveProfiles(parentInterpolatedProfiles, profileActivationContext);
-            Model injectedParentModel = profileInjector
-                    .injectProfiles(parentModel, parentActivePomProfiles, request, this)
-                    .withProfiles(List.of());
-
-            Model model = inheritanceAssembler.assembleModelInheritance(inputModel, injectedParentModel, request, this);
+            Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
 
             // model normalization
             model = modelNormalizer.mergeDuplicates(model, request, this);
 
             // profile activation
-            profileActivationContext.setProjectProperties(model.getProperties());
-
-            List<Profile> interpolatedProfiles =
-                    interpolateActivations(model.getProfiles(), profileActivationContext, this);
-
-            // profile injection
-            List<Profile> activePomProfiles = getActiveProfiles(interpolatedProfiles, profileActivationContext);
-            model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
-            model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
-
-            List<Profile> allProfiles = new ArrayList<>(parentActivePomProfiles.size() + activePomProfiles.size());
-            allProfiles.addAll(parentActivePomProfiles);
-            allProfiles.addAll(activePomProfiles);
-            result.setActivePomProfiles(allProfiles);
+            model = activateModel(model, parentModel.getProfiles(), true);
 
             // model interpolation
             Model resultModel = model;
@@ -1228,15 +1153,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             return resultModel;
-        }
-
-        private List<Profile> getActiveProfiles(
-                Collection<Profile> interpolatedProfiles, DefaultProfileActivationContext profileActivationContext) {
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_POM) {
-                return profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
-            } else {
-                return List.of();
-            }
         }
 
         Model readFileModel() throws ModelBuilderException {
@@ -1737,73 +1653,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         private <T> T cache(Source source, String tag, Supplier<T> supplier) {
             return cache.computeIfAbsent(source, tag, supplier);
         }
-
-        private List<Profile> interpolateActivations(
-                List<Profile> profiles, DefaultProfileActivationContext context, ModelProblemCollector problems) {
-            if (profiles.stream()
-                    .map(org.apache.maven.api.model.Profile::getActivation)
-                    .noneMatch(Objects::nonNull)) {
-                return profiles;
-            }
-            Interpolator interpolator = request.getSession().getService(Interpolator.class);
-
-            class ProfileInterpolator extends MavenTransformer implements UnaryOperator<Profile> {
-                ProfileInterpolator() {
-                    super(s -> {
-                        try {
-                            Map<String, String> map1 = context.getUserProperties();
-                            Map<String, String> map2 = context.getSystemProperties();
-                            return interpolator.interpolate(s, Interpolator.chain(map1::get, map2::get));
-                        } catch (InterpolatorException e) {
-                            problems.add(Severity.ERROR, Version.BASE, e.getMessage(), e);
-                        }
-                        return s;
-                    });
-                }
-
-                @Override
-                public Profile apply(Profile p) {
-                    return Profile.newBuilder(p)
-                            .activation(transformActivation(p.getActivation()))
-                            .build();
-                }
-
-                @Override
-                protected ActivationFile.Builder transformActivationFile_Missing(
-                        Supplier<? extends ActivationFile.Builder> creator,
-                        ActivationFile.Builder builder,
-                        ActivationFile target) {
-                    String path = target.getMissing();
-                    String xformed = transformPath(path, target, "missing");
-                    return xformed != path ? (builder != null ? builder : creator.get()).missing(xformed) : builder;
-                }
-
-                @Override
-                protected ActivationFile.Builder transformActivationFile_Exists(
-                        Supplier<? extends ActivationFile.Builder> creator,
-                        ActivationFile.Builder builder,
-                        ActivationFile target) {
-                    final String path = target.getExists();
-                    final String xformed = transformPath(path, target, "exists");
-                    return xformed != path ? (builder != null ? builder : creator.get()).exists(xformed) : builder;
-                }
-
-                private String transformPath(String path, ActivationFile target, String locationKey) {
-                    try {
-                        return profileActivationFilePathInterpolator.interpolate(path, context);
-                    } catch (InterpolatorException e) {
-                        problems.add(
-                                Severity.ERROR,
-                                Version.BASE,
-                                "Failed to interpolate file location " + path + ": " + e.getMessage(),
-                                target.getLocation(locationKey),
-                                e);
-                    }
-                    return path;
-                }
-            }
-            return profiles.stream().map(new ProfileInterpolator()).toList();
-        }
     }
 
     @SuppressWarnings("deprecation")
@@ -1842,40 +1691,12 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private DefaultProfileActivationContext getProfileActivationContext(ModelBuilderRequest request, Model model) {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext();
-
         context.setActiveProfileIds(request.getActiveProfileIds());
         context.setInactiveProfileIds(request.getInactiveProfileIds());
         context.setSystemProperties(request.getSystemProperties());
-        // enrich user properties with project packaging
-        Map<String, String> userProperties = new HashMap<>(request.getUserProperties());
-        if (!userProperties.containsKey(ProfileActivationContext.PROPERTY_NAME_PACKAGING)) {
-            userProperties.put(ProfileActivationContext.PROPERTY_NAME_PACKAGING, model.getPackaging());
-        }
-        context.setUserProperties(userProperties);
-        context.setProjectDirectory(model.getProjectDirectory());
-
+        context.setUserProperties(request.getUserProperties());
+        context.setModel(model);
         return context;
-    }
-
-    private Map<String, Activation> getProfileActivations(Model model) {
-        return model.getProfiles().stream()
-                .filter(p -> p.getActivation() != null)
-                .collect(Collectors.toMap(Profile::getId, Profile::getActivation));
-    }
-
-    private Model injectProfileActivations(Model model, Map<String, Activation> activations) {
-        List<Profile> profiles = new ArrayList<>();
-        boolean modified = false;
-        for (Profile profile : model.getProfiles()) {
-            Activation activation = profile.getActivation();
-            if (activation != null) {
-                // restore activation
-                profile = profile.withActivation(activations.get(profile.getId()));
-                modified = true;
-            }
-            profiles.add(profile);
-        }
-        return modified ? model.withProfiles(profiles) : model;
     }
 
     private Model interpolateModel(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
@@ -1918,8 +1739,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private static org.apache.maven.api.model.Dependency addExclusions(
             org.apache.maven.api.model.Dependency candidate, List<Exclusion> exclusions) {
-        return candidate.withExclusions(Stream.concat(candidate.getExclusions().stream(), exclusions.stream())
-                .toList());
+        return candidate.withExclusions(concat(candidate.getExclusions(), exclusions));
     }
 
     private boolean match(Exclusion exclusion, Dependency candidate) {
@@ -1936,6 +1756,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                 && (groupId == null || message.contains(groupId))
                 && (artifactId == null || message.contains(artifactId))
                 && (version == null || message.contains(version));
+    }
+
+    private static <T> List<T> concat(Collection<T> l1, Collection<T> l2) {
+        return Stream.concat(l1.stream(), l2.stream()).toList();
+    }
+
+    private static <T> Set<T> concat(Set<T> a, T b) {
+        Set<T> result = new HashSet<>(a);
+        result.add(b);
+        return Set.copyOf(result);
     }
 
     record GAKey(String groupId, String artifactId) {}

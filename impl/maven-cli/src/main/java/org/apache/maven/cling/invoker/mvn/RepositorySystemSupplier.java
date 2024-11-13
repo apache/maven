@@ -47,7 +47,6 @@ import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultPluginManagementInjector;
 import org.apache.maven.internal.impl.model.DefaultProfileInjector;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader;
 import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
@@ -1049,14 +1048,12 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 new DefaultModelUrlNormalizer(new DefaultUrlNormalizer()),
                 new DefaultSuperPomProvider(modelProcessor),
                 new DefaultInheritanceAssembler(),
-                new DefaultProfileSelector(),
+                new DefaultProfileSelector(null, null),
                 new DefaultProfileInjector(),
                 new DefaultPluginManagementInjector(),
                 new DefaultDependencyManagementInjector(),
                 new DefaultDependencyManagementImporter(),
                 new DefaultPluginConfigurationExpander(),
-                new ProfileActivationFilePathInterpolator(
-                        new DefaultPathTranslator(), new DefaultRootLocator(), new DefaultInterpolator()),
                 new DefaultModelVersionParser(getVersionScheme()),
                 List.of(),
                 new DefaultModelCacheFactory(),

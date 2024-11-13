@@ -2742,10 +2742,79 @@
     <class>
       <name>Activation</name>
       <version>4.0.0+</version>
-      <description>The conditions within the build runtime environment which will trigger the
-        automatic inclusion of the build profile. Multiple conditions can be defined, which must
-        be all satisfied to activate the profile.
-      </description>
+      <description><![CDATA[
+            The conditions within the build runtime environment which will trigger the
+            automatic inclusion of the build profile. Multiple conditions can be defined, which must
+            be all satisfied to activate the profile.
+
+            <p>In addition to the traditional activation mechanisms (JDK version, OS properties,
+            file existence, etc.), Maven now supports a powerful condition-based activation
+            through the {@code condition} field. This new mechanism allows for more flexible
+            and expressive profile activation rules.</p>
+
+            <h2>Condition Syntax</h2>
+
+            <p>The condition is specified as a string expression that can include various
+            functions, comparisons, and logical operators. Some key features include:</p>
+
+            <ul>
+            <li>Property access: {@code ${property.name}}</li>
+            <li>Comparison operators: {@code ==}, {@code !=}, {@code <}, {@code >}, {@code <=}, {@code >=}</li>
+            <li>Logical operators: {@code &&} (AND), {@code ||} (OR), {@code not(...)}</li>
+            <li>Functions: {@code exists(...)}, {@code missing(...)}, {@code matches(...)}, {@code inrange(...)}, and more</li>
+            </ul>
+
+            <h2>Supported Functions</h2>
+
+            <p>The following functions are supported in condition expressions:</p>
+
+            <ul>
+            <li>{@code length(string)}: Returns the length of the given string.</li>
+            <li>{@code upper(string)}: Converts the string to uppercase.</li>
+            <li>{@code lower(string)}: Converts the string to lowercase.</li>
+            <li>{@code substring(string, start, [end])}: Returns a substring of the given string.</li>
+            <li>{@code indexOf(string, substring)}: Returns the index of the first occurrence of substring in string, or -1 if not found.</li>
+            <li>{@code contains(string, substring)}: Checks if the string contains the substring.</li>
+            <li>{@code matches(string, regex)}: Checks if the string matches the given regular expression.</li>
+            <li>{@code not(condition)}: Negates the given condition.</li>
+            <li>{@code if(condition, trueValue, falseValue)}: Returns trueValue if the condition is true, falseValue otherwise.</li>
+            <li>{@code exists(path)}: Checks if a file matching the given glob pattern exists.</li>
+            <li>{@code missing(path)}: Checks if a file matching the given glob pattern does not exist.</li>
+            <li>{@code inrange(version, range)}: Checks if the given version is within the specified version range.</li>
+            </ul>
+
+            <h2>Supported properties</h2>
+
+            <p>The following properties are supported in expressions:</p>
+
+            <ul>
+            <li>`project.basedir`: The project directory</li>
+            <li>`project.rootDirectory`: The root directory of the project</li>
+            <li>`project.artifactId`: The artifactId of the project</li>
+            <li>`project.packaging`: The packaging of the project</li>
+            <li>user properties</li>
+            <li>system properties (including environment variables prefixed with `env.`)</li>
+            </ul>
+
+            <h2>Examples</h2>
+
+            <ul>
+            <li>JDK version range: {@code inrange(${java.version}, '[11,)')} (JDK 11 or higher)</li>
+            <li>OS check: {@code ${os.name} == 'windows'}</li>
+            <li>File existence: {@code exists('${project.basedir}/src/**}{@code /*.xsd')}</li>
+            <li>Property check: {@code ${my.property} != 'some-value'}</li>
+            <li>Regex matching: {@code matches(${os.version}, '.*aws')}</li>
+            <li>Complex condition: {@code ${os.name} == 'windows' && ${os.arch} != 'amd64' && inrange(${os.version}, '[10,)')}</li>
+            <li>String length check: {@code length(${user.name}) > 5}</li>
+            <li>Substring with version: {@code substring(${java.version}, 0, 3) == '1.8'}</li>
+            <li>Using indexOf: {@code indexOf(${java.version}, '-') > 0}</li>
+            <li>Conditional logic: {@code if(contains(${java.version}, '-'), substring(${java.version}, 0, indexOf(${java.version}, '-')), ${java.version})}</li>
+            </ul>
+
+            <p>This flexible condition mechanism allows for more precise control over profile
+            activation, enabling developers to create profiles that respond to a wide range of
+            environmental factors and project states.</p>
+       ]]></description>
       <fields>
         <field>
           <name>activeByDefault</name>
@@ -2797,6 +2866,12 @@
           <version>4.1.0+</version>
           <type>String</type>
           <description>Specifies that this profile will be activated based on the project's packaging.</description>
+        </field>
+        <field>
+          <name>condition</name>
+          <version>4.1.0+</version>
+          <type>String</type>
+          <description>The condition which must be satisfied to activate the profile.</description>
         </field>
         <!--
         This could be included once we teach Maven to deal with multiple versions of the model
