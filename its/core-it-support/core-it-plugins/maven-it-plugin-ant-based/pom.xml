@@ -39,19 +39,9 @@ under the License.
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven</groupId>
+      <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-script-ant</artifactId>
-      <version>2.2.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>ant</groupId>
-          <artifactId>ant</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>ant</groupId>
-          <artifactId>ant-launcher</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>3.15.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
@@ -89,11 +79,14 @@ under the License.
         resources that have a leading slash).
         NOTE: We use a version that is different from the version used by the other modules to workaround MNG-1323
         via MNG-3284.
+
+        cstamas: this above is untrue anymore, plugin and suite updated to 3.x as part of Maven 4 work.
         -->
-        <version>2.4.2</version>
+        <version>3.15.1</version>
         <configuration>
           <!-- NOTE: We use a handwritten descriptor to decouple from MPLUGIN-136/MNG-3741 so dump the generated one -->
           <outputDirectory>${project.build.directory}</outputDirectory>
+          <goalPrefix>maven-it-plugin-ant-based</goalPrefix>
           <extractors>
             <extractor>ant</extractor>
           </extractors>
@@ -102,7 +95,7 @@ under the License.
           <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-tools-ant</artifactId>
-            <version>2.4.2</version>
+            <version>3.15.1</version>
           </dependency>
         </dependencies>
       </plugin>
