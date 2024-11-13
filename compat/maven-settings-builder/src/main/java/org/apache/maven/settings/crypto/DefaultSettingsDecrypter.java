@@ -64,7 +64,8 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
                 try {
                     if (securityDispatcher.isLegacyEncryptedString(password)) {
                         problems.add(new DefaultSettingsProblem(
-                                "Legacy/insecurely encrypted password detected for server " + server.getId(),
+                                "Pre-Maven 4 legacy encrypted password detected for server " + server.getId()
+                                        + " - configure password encryption with the help of mvnenc to be compatible with Maven 4.",
                                 Severity.WARNING,
                                 "server: " + server.getId(),
                                 -1,

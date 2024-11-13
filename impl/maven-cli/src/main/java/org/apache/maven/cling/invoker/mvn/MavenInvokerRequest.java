@@ -16,30 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.forked;
+package org.apache.maven.cling.invoker.mvn;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.api.cli.mvn.forked.ForkedMavenInvokerRequest;
-import org.apache.maven.cling.invoker.mvn.DefaultMavenInvokerRequest;
+import org.apache.maven.cling.invoker.BaseInvokerRequest;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Maven execution request.
  */
-public class DefaultForkedMavenInvokerRequest extends DefaultMavenInvokerRequest<MavenOptions>
-        implements ForkedMavenInvokerRequest {
-    private final List<String> jvmArguments;
+public class MavenInvokerRequest extends BaseInvokerRequest {
+    private final MavenOptions options;
 
     @SuppressWarnings("ParameterNumber")
-    public DefaultForkedMavenInvokerRequest(
+    public MavenInvokerRequest(
             ParserRequest parserRequest,
             Path cwd,
             Path installationDirectory,
@@ -67,12 +67,15 @@ public class DefaultForkedMavenInvokerRequest extends DefaultMavenInvokerRequest
                 out,
                 err,
                 coreExtensions,
-                options);
-        this.jvmArguments = jvmArguments;
+                jvmArguments);
+        this.options = requireNonNull(options);
     }
 
-    @Override
-    public Optional<List<String>> jvmArguments() {
-        return Optional.ofNullable(jvmArguments);
+    /**
+     * The mandatory Maven options.
+     */
+    @Nonnull
+    public MavenOptions options() {
+        return options;
     }
 }

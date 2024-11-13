@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn;
+package org.apache.maven.cling.invoker.mvnenc;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,23 +27,16 @@ import java.util.Map;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
-import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.BaseInvokerRequest;
 
 import static java.util.Objects.requireNonNull;
 
-/**
- * Maven execution request.
- *
- * @param <O> the options type this request carries
- */
-public class DefaultMavenInvokerRequest<O extends MavenOptions> extends BaseInvokerRequest<O>
-        implements MavenInvokerRequest<O> {
-    private final O options;
+public class EncryptInvokerRequest extends BaseInvokerRequest {
+    private final EncryptOptions options;
 
     @SuppressWarnings("ParameterNumber")
-    public DefaultMavenInvokerRequest(
+    public EncryptInvokerRequest(
             ParserRequest parserRequest,
             Path cwd,
             Path installationDirectory,
@@ -56,7 +49,8 @@ public class DefaultMavenInvokerRequest<O extends MavenOptions> extends BaseInvo
             OutputStream out,
             OutputStream err,
             List<CoreExtension> coreExtensions,
-            O options) {
+            List<String> jvmArguments,
+            EncryptOptions options) {
         super(
                 parserRequest,
                 cwd,
@@ -69,15 +63,16 @@ public class DefaultMavenInvokerRequest<O extends MavenOptions> extends BaseInvo
                 in,
                 out,
                 err,
-                coreExtensions);
+                coreExtensions,
+                jvmArguments);
         this.options = requireNonNull(options);
     }
 
     /**
-     * The mandatory Maven options.
+     * The mandatory Encrypt options.
      */
     @Nonnull
-    public O options() {
+    public EncryptOptions options() {
         return options;
     }
 }

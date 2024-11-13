@@ -26,19 +26,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.api.cli.mvn.MavenParser;
 import org.apache.maven.cling.invoker.BaseParser;
 
-public abstract class BaseMavenParser<O extends MavenOptions, R extends MavenInvokerRequest<O>> extends BaseParser<O, R>
-        implements MavenParser<R> {
+public class MavenParser extends BaseParser {
 
     @Override
-    protected List<O> parseCliOptions(LocalContext context) throws ParserException, IOException {
-        ArrayList<O> result = new ArrayList<>();
+    protected List<Options> parseCliOptions(LocalContext context) throws ParserException, IOException {
+        ArrayList<Options> result = new ArrayList<>();
         // CLI args
         result.add(parseMavenCliOptions(context.parserRequest.args()));
         // maven.config; if exists
@@ -49,15 +47,15 @@ public abstract class BaseMavenParser<O extends MavenOptions, R extends MavenInv
         return result;
     }
 
-    protected O parseMavenCliOptions(List<String> args) throws ParserException {
+    protected MavenOptions parseMavenCliOptions(List<String> args) throws ParserException {
         return parseArgs(Options.SOURCE_CLI, args);
     }
 
-    protected O parseMavenConfigOptions(Path configFile) throws ParserException, IOException {
+    protected MavenOptions parseMavenConfigOptions(Path configFile) throws ParserException, IOException {
         try (Stream<String> lines = Files.lines(configFile, Charset.defaultCharset())) {
             List<String> args =
                     lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toList();
-            O options = parseArgs("maven.config", args);
+            MavenOptions options = parseArgs("maven.config", args);
             if (options.goals().isPresent()) {
                 // This file can only contain options, not args (goals or phases)
                 throw new ParserException("Unrecognized maven.config file entries: "
@@ -67,5 +65,36 @@ public abstract class BaseMavenParser<O extends MavenOptions, R extends MavenInv
         }
     }
 
-    protected abstract O parseArgs(String source, List<String> args) throws ParserException;
+    protected MavenOptions parseArgs(String source, List<String> args) throws ParserException {
+        try {
+            return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
+        } catch (ParseException e) {
+            throw new ParserException("Failed to parse source " + source + ": " + e.getMessage(), e.getCause());
+        }
+    }
+
+    @Override
+    protected MavenInvokerRequest getInvokerRequest(LocalContext context) {
+        return new MavenInvokerRequest(
+                context.parserRequest,
+                context.cwd,
+                context.installationDirectory,
+                context.userHomeDirectory,
+                context.userProperties,
+                context.systemProperties,
+                context.topDirectory,
+                context.rootDirectory,
+                context.parserRequest.in(),
+                context.parserRequest.out(),
+                context.parserRequest.err(),
+                context.extensions,
+                getJvmArguments(context.rootDirectory),
+                (MavenOptions) context.options);
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    protected MavenOptions assembleOptions(List<Options> parsedOptions) {
+        return LayeredMavenOptions.layerMavenOptions((List) parsedOptions);
+    }
 }

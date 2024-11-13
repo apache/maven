@@ -16,36 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.local;
+package org.apache.maven.cling.invoker.mvn.embedded;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.List;
 
-import com.google.common.jimfs.Configuration;
-import com.google.common.jimfs.Jimfs;
-import org.apache.maven.api.cli.Invoker;
+import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.Parser;
-import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
+import org.apache.maven.cling.invoker.mvn.MavenExecutorTestSupport;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
-import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Local UT.
+ * Forked UT: it cannot use jimFS as it runs in child process.
  */
 @Disabled(
         "The tests reuse properties from the JVM being launched, thus may lead to failures depending on which options are used")
-public class DefaultLocalMavenInvokerTest extends MavenInvokerTestSupport {
+public class EmbeddedMavenExecutorTest extends MavenExecutorTestSupport {
+
     @Override
-    protected Invoker createInvoker() {
-        return new LocalMavenInvoker(ProtoLookup.builder()
-                .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
-                .build());
+    protected Executor createExecutor() {
+        return new EmbeddedMavenExecutor();
     }
 
     @Override
@@ -55,14 +49,13 @@ public class DefaultLocalMavenInvokerTest extends MavenInvokerTestSupport {
 
     @Test
     void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        invoke(tempDir, Arrays.asList("clean", "verify"));
+        System.setProperty("maven.home", "/home/cstamas/Tools/maven/apache-maven-4.0.0-beta-6-SNAPSHOT");
+        execute(tempDir, List.of("verify"));
     }
 
-    @Disabled("Until we move off fully from File")
     @Test
-    void jimFs() throws Exception {
-        try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
-            invoke(fs.getPath("/"), Arrays.asList("clean", "verify"));
-        }
+    void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
+        System.setProperty("maven.home", "/home/cstamas/.sdkman/candidates/maven/3.9.9");
+        execute(tempDir, List.of("verify"));
     }
 }

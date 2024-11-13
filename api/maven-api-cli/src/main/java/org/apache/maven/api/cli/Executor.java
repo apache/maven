@@ -22,38 +22,34 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Defines the contract for a component responsible for invoking a Maven application
- * using the information provided in an {@link InvokerRequest}. This interface is central
- * to the construction and invocation of Maven commands and builds, and it fully parses arguments.
- *
- * <p>The Invoker is designed to be flexible, allowing for different implementations
- * that can handle various types of {@link InvokerRequest InvokerRequests}. It also implements
- * {@link AutoCloseable} to ensure proper resource management.</p>
+ * Defines the contract for a component responsible for executing a Maven tool
+ * using the information provided in an {@link ExecutorRequest}. This interface is central
+ * to the execution of Maven commands and builds, but it does not construct nor fully parses arguments.
  *
  * @since 4.0.0
  */
 @Experimental
-public interface Invoker extends AutoCloseable {
+public interface Executor extends AutoCloseable {
     /**
-     * Invokes the Maven application using the provided {@link InvokerRequest}.
-     * This method is responsible for executing the Maven command or build
+     * Invokes the tool application using the provided {@link ExecutorRequest}.
+     * This method is responsible for executing the command or build
      * process based on the information contained in the request.
      *
-     * @param invokerRequest the request containing all necessary information for the invocation
-     * @return an integer representing the exit code of the invocation (0 typically indicates success)
-     * @throws InvokerException if an error occurs during the invocation process
+     * @param executorRequest the request containing all necessary information for the execution
+     * @return an integer representing the exit code of the execution (0 typically indicates success)
+     * @throws ExecutorException if an error occurs during the execution process
      */
-    int invoke(@Nonnull InvokerRequest invokerRequest) throws InvokerException;
+    int execute(@Nonnull ExecutorRequest executorRequest) throws ExecutorException;
 
     /**
-     * Closes and disposes of this {@link Invoker} instance, releasing any resources it may hold.
+     * Closes and disposes of this {@link Executor} instance, releasing any resources it may hold.
      * This method is called automatically when using try-with-resources statements.
      *
      * <p>The default implementation does nothing. Subclasses should override this method
      * if they need to perform cleanup operations.</p>
      *
-     * @throws InvokerException if an error occurs while closing the {@link Invoker}
+     * @throws ExecutorException if an error occurs while closing the {@link Executor}
      */
     @Override
-    default void close() throws InvokerException {}
+    default void close() throws ExecutorException {}
 }

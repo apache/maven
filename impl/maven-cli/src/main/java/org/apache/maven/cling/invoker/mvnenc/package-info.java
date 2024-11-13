@@ -16,17 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli.mvn.local;
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.cli.mvn.MavenInvoker;
-import org.apache.maven.api.cli.mvn.MavenInvokerRequest;
-import org.apache.maven.api.cli.mvn.MavenOptions;
 
 /**
- * Local Maven invoker, it expects all the Maven be present in classpath.
- *
- * @since 4.0.0
+ * This package contains the {@code mvnenc} tool implementation.
  */
-@Experimental
-public interface LocalMavenInvoker extends MavenInvoker<MavenInvokerRequest<MavenOptions>> {}
+package org.apache.maven.cling.invoker.mvnenc;

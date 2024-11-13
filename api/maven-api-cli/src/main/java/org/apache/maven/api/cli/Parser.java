@@ -22,47 +22,35 @@ import java.io.IOException;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.services.MessageBuilderFactory;
 
 /**
- * Defines the contract for parsing Maven command-line arguments and creating an InvokerRequest.
- * This interface is responsible for interpreting the command-line input and constructing
- * the appropriate {@link InvokerRequest} object.
- *
- * @param <R> the type of {@link InvokerRequest} produced by this parser, extending {@link InvokerRequest}
+ * Defines the contract for parsing Maven command-line arguments and creating an execution or invoker requests.
  *
  * @since 4.0.0
  */
 @Experimental
-public interface Parser<R extends InvokerRequest<? extends Options>> {
+public interface Parser {
     /**
-     * Parses the given Maven arguments to create an InvokerRequest.
-     * This is a convenience method that internally creates a ParserRequest using
-     * {@link ParserRequest#mvn(String[], Logger, MessageBuilderFactory)}.
-     *
-     * @param args the command-line arguments
-     * @param logger the logger to use during parsing
-     * @param messageBuilderFactory the factory for creating message builders
-     * @return the parsed InvokerRequest
-     * @throws ParserException if there's an error during parsing of the command or arguments
-     * @throws IOException if there's an I/O error during the parsing process
-     */
-    @Nonnull
-    default R mvn(@Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory)
-            throws ParserException, IOException {
-        return parse(ParserRequest.mvn(args, logger, messageBuilderFactory).build());
-    }
-
-    /**
-     * Parses the given ParserRequest to create an InvokerRequest.
-     * This method is responsible for interpreting the contents of the ParserRequest
-     * and constructing the appropriate InvokerRequest object.
+     * Parses the given ParserRequest to create an {@link ExecutorRequest}.
+     * This method does not interpret tool arguments.
      *
      * @param parserRequest the request containing all necessary information for parsing
-     * @return the parsed InvokerRequest
+     * @return the parsed executor request
      * @throws ParserException if there's an error during parsing of the request
      * @throws IOException if there's an I/O error during the parsing process
      */
     @Nonnull
-    R parse(@Nonnull ParserRequest parserRequest) throws ParserException, IOException;
+    ExecutorRequest parseExecution(@Nonnull ParserRequest parserRequest) throws ParserException, IOException;
+
+    /**
+     * Parses the given ParserRequest to create an {@link InvokerRequest}.
+     * This method does interpret tool arguments.
+     *
+     * @param parserRequest the request containing all necessary information for parsing
+     * @return the parsed invoker request
+     * @throws ParserException if there's an error during parsing of the request
+     * @throws IOException if there's an I/O error during the parsing process
+     */
+    @Nonnull
+    InvokerRequest parseInvocation(@Nonnull ParserRequest parserRequest) throws ParserException, IOException;
 }

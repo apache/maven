@@ -21,21 +21,20 @@ package org.apache.maven.cling;
 import java.io.IOException;
 
 import org.apache.maven.api.cli.Invoker;
+import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.mvnenc.EncryptInvokerRequest;
-import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
-import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptParser;
+import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
+import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Maven encrypt CLI "new-gen".
  */
-public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRequest> {
+public class MavenEncCling extends ClingSupport {
     /**
      * "Normal" Java entry point. Note: Maven uses ClassWorld Launcher and this entry point is NOT used under normal
      * circumstances.
@@ -61,15 +60,15 @@ public class MavenEncCling extends ClingSupport<EncryptOptions, EncryptInvokerRe
     }
 
     @Override
-    protected Invoker<EncryptInvokerRequest> createInvoker() {
-        return new DefaultEncryptInvoker(
+    protected Invoker createInvoker() {
+        return new EncryptInvoker(
                 ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
     }
 
     @Override
-    protected EncryptInvokerRequest parseArguments(String[] args) throws ParserException, IOException {
-        return new DefaultEncryptParser()
-                .parse(ParserRequest.mvnenc(args, new ProtoLogger(), new JLineMessageBuilderFactory())
+    protected InvokerRequest parseArguments(String[] args) throws ParserException, IOException {
+        return new EncryptParser()
+                .parseInvocation(ParserRequest.mvnenc(args, new ProtoLogger(), new JLineMessageBuilderFactory())
                         .build());
     }
 }

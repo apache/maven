@@ -23,12 +23,12 @@ Java version: 21.0.4, vendor: Eclipse Adoptium, runtime: /home/cstamas/.sdkman/c
 Default locale: en_US, platform encoding: UTF-8
 OS name: "linux", version: "6.11.4-201.fc40.x86_64", arch: "amd64", family: "unix"
 [INFO] Scanning for projects...
-[INFO] 
+[INFO]
 [INFO] ---------------< org.apache.maven.it.mresolver614:root >----------------
 [INFO] Building root 1.0.0
 [INFO]   from pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
+[INFO]
 [INFO] --- toolbox:0.3.5:tree (default-cli) @ root ---
 [INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0
 [INFO] ╰─org.apache.maven.it.mresolver614:level1:jar:1.0.0 [compile]
@@ -43,7 +43,7 @@ OS name: "linux", version: "6.11.4-201.fc40.x86_64", arch: "amd64", family: "uni
 [INFO] Total time:  0.192 s
 [INFO] Finished at: 2024-10-24T19:20:39+02:00
 [INFO] ------------------------------------------------------------------------
-$ 
+$
 ```
 
 Example output with 4.0.0-beta-5: **this version is transitive but broken**, as it applies level2 depMgt onto its own
@@ -56,15 +56,15 @@ Java version: 21.0.4, vendor: Eclipse Adoptium, runtime: /home/cstamas/.sdkman/c
 Default locale: en_US, platform encoding: UTF-8
 OS name: "linux", version: "6.11.4-201.fc40.x86_64", arch: "amd64", family: "unix"
 [WARNING] Unable to find the root directory. Create a .mvn directory in the root directory or add the root="true" attribute on the root project's model to identify it.
-[WARNING] Legacy/insecurely encrypted password detected for server my-legacy-server
-[WARNING] Legacy/insecurely encrypted password detected for server my-legacy-broken-server
+[WARNING] Pre-Maven 4 legacy encrypted password detected for server my-legacy-server - configure password encryption with the help of mvnenc to be compatible with Maven 4.
+[WARNING] Pre-Maven 4 legacy encrypted password detected for server my-legacy-broken-server - configure password encryption with the help of mvnenc to be compatible with Maven 4.
 [INFO] Scanning for projects...
-[INFO] 
+[INFO]
 [INFO] ----------------------------------------< org.apache.maven.it.mresolver614:root >-----------------------------------------
 [INFO] Building root 1.0.0
 [INFO]   from pom.xml
 [INFO] ---------------------------------------------------------[ jar ]----------------------------------------------------------
-[INFO] 
+[INFO]
 [INFO] --- toolbox:0.3.5:tree (default-cli) @ root ---
 [INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0
 [INFO] ╰─org.apache.maven.it.mresolver614:level1:jar:1.0.0 [compile]
@@ -79,7 +79,7 @@ OS name: "linux", version: "6.11.4-201.fc40.x86_64", arch: "amd64", family: "uni
 [INFO] Total time:  0.285 s
 [INFO] Finished at: 2024-10-24T19:21:10+02:00
 [INFO] --------------------------------------------------------------------------------------------------------------------------
-$ 
+$
 ```
 
 The **expected** output is:
@@ -103,15 +103,15 @@ Java version: 21.0.4, vendor: Eclipse Adoptium, runtime: /home/cstamas/.sdkman/c
 Default locale: en_US, platform encoding: UTF-8
 OS name: "linux", version: "6.11.4-201.fc40.x86_64", arch: "amd64", family: "unix"
 [WARNING] Unable to find the root directory. Create a .mvn directory in the root directory or add the root="true" attribute on the root project's model to identify it.
-[WARNING] Legacy/insecurely encrypted password detected for server my-legacy-server
-[WARNING] Legacy/insecurely encrypted password detected for server my-legacy-broken-server
+[WARNING] Pre-Maven 4 legacy encrypted password detected for server my-legacy-server - configure password encryption with the help of mvnenc to be compatible with Maven 4.
+[WARNING] Pre-Maven 4 legacy encrypted password detected for server my-legacy-broken-server - configure password encryption with the help of mvnenc to be compatible with Maven 4.
 [INFO] Scanning for projects...
-[INFO] 
+[INFO]
 [INFO] ----------------------------------------< org.apache.maven.it.mresolver614:root >-----------------------------------------
 [INFO] Building root 1.0.0
 [INFO]   from pom.xml
 [INFO] ---------------------------------------------------------[ jar ]----------------------------------------------------------
-[INFO] 
+[INFO]
 [INFO] --- toolbox:0.3.5:tree (default-cli) @ root ---
 [INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0
 [INFO] ╰─org.apache.maven.it.mresolver614:level1:jar:1.0.0 [compile]
@@ -126,5 +126,5 @@ OS name: "linux", version: "6.11.4-201.fc40.x86_64", arch: "amd64", family: "uni
 [INFO] Total time:  0.312 s
 [INFO] Finished at: 2024-10-24T21:11:21+02:00
 [INFO] --------------------------------------------------------------------------------------------------------------------------
-$ 
+$
 ```
