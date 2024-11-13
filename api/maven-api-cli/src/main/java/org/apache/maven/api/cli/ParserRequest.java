@@ -60,6 +60,7 @@ public interface ParserRequest {
      *
      * @return the command (human) name
      */
+    @Nonnull
     String commandName();
 
     /**
