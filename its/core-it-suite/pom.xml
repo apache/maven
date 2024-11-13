@@ -77,7 +77,7 @@ under the License.
     <proxy.user />
     <proxy.pass />
     <proxy.nonProxyHosts>localhost</proxy.nonProxyHosts>
-    <jetty9Version>9.4.55.v20240627</jetty9Version>
+    <jetty9Version>12.0.15</jetty9Version>
 
     <stubPluginVersion>0.1-stub-SNAPSHOT</stubPluginVersion>
   </properties>
