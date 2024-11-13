@@ -33,9 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.Parser;
@@ -57,7 +59,7 @@ import static org.apache.maven.cling.invoker.Utils.prefix;
 import static org.apache.maven.cling.invoker.Utils.stripLeadingAndTrailingQuotes;
 import static org.apache.maven.cling.invoker.Utils.toMap;
 
-public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>> implements Parser<R> {
+public abstract class BaseParser implements Parser {
 
     @SuppressWarnings("VisibilityModifier")
     public static class LocalContext {
@@ -93,7 +95,26 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
     }
 
     @Override
-    public R parse(ParserRequest parserRequest) throws ParserException, IOException {
+    public ExecutorRequest parseExecution(ParserRequest parserRequest) throws ParserException, IOException {
+        requireNonNull(parserRequest);
+
+        LocalContext context = new LocalContext(parserRequest);
+
+        // the basics
+        context.cwd = requireNonNull(getCwd(context));
+        context.installationDirectory = requireNonNull(getInstallationDirectory(context));
+        context.userHomeDirectory = requireNonNull(getUserHomeDirectory(context));
+
+        return getExecutionRequest(context);
+    }
+
+    protected ExecutorRequest getExecutionRequest(LocalContext context) {
+        return new BaseExecutorRequest(
+                context.parserRequest, context.cwd, context.installationDirectory, context.userHomeDirectory, null);
+    }
+
+    @Override
+    public InvokerRequest parseInvocation(ParserRequest parserRequest) throws ParserException, IOException {
         requireNonNull(parserRequest);
 
         LocalContext context = new LocalContext(parserRequest);
@@ -108,7 +129,7 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         context.rootDirectory = getRootDirectory(context);
 
         // options
-        List<O> parsedOptions = parseCliOptions(context);
+        List<Options> parsedOptions = parseCliOptions(context);
 
         // warn about deprecated options
         PrintWriter printWriter = new PrintWriter(parserRequest.out() != null ? parserRequest.out() : System.out, true);
@@ -131,7 +152,7 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         return getInvokerRequest(context);
     }
 
-    protected abstract R getInvokerRequest(LocalContext context);
+    protected abstract InvokerRequest getInvokerRequest(LocalContext context);
 
     protected Path getCwd(LocalContext context) throws ParserException {
         if (context.parserRequest.cwd() != null) {
@@ -271,9 +292,9 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         return toMap(userProperties);
     }
 
-    protected abstract List<O> parseCliOptions(LocalContext context) throws ParserException, IOException;
+    protected abstract List<Options> parseCliOptions(LocalContext context) throws ParserException, IOException;
 
-    protected abstract O assembleOptions(List<O> parsedOptions);
+    protected abstract Options assembleOptions(List<Options> parsedOptions);
 
     protected List<CoreExtension> readCoreExtensionsDescriptor(LocalContext context)
             throws ParserException, IOException {
@@ -303,5 +324,22 @@ public abstract class BaseParser<O extends Options, R extends InvokerRequest<O>>
         } catch (XMLStreamException e) {
             throw new ParserException("Failed to parse extensions file: " + extensionsFile, e);
         }
+    }
+
+    protected List<String> getJvmArguments(Path rootDirectory) throws ParserException {
+        if (rootDirectory != null) {
+            Path jvmConfig = rootDirectory.resolve(".mvn/jvm.config");
+            if (Files.exists(jvmConfig)) {
+                try {
+                    return Files.readAllLines(jvmConfig).stream()
+                            .filter(l -> !l.isBlank() && !l.startsWith("#"))
+                            .flatMap(l -> Arrays.stream(l.split(" ")))
+                            .collect(Collectors.toList());
+                } catch (IOException e) {
+                    throw new ParserException("Failed to read JVM configuration file: " + jvmConfig, e);
+                }
+            }
+        }
+        return null;
     }
 }

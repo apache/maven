@@ -61,7 +61,7 @@ public class ProtoLogger implements Logger {
     public void log(Level level, String message, Throwable error) {
         PrintWriter pw = level == Level.ERROR ? err : level == Level.WARN ? out : null;
         if (pw != null) {
-            pw.print(level.name() + " " + message);
+            pw.println(level.name() + " " + message);
             if (error != null) {
                 error.printStackTrace(pw);
             }

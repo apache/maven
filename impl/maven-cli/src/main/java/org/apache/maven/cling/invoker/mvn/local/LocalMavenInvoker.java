@@ -16,22 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli.mvnenc;
+package org.apache.maven.cling.invoker.mvn.local;
 
-import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.cling.invoker.mvn.MavenContext;
+import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
 /**
- * Represents a request to invoke the Maven encryption tool.
- * This interface extends the general InvokerRequest, specializing it for encryption-related operations.
- *
- * <p>An EncryptInvokerRequest encapsulates all the necessary information needed to perform
- * an encryption operation, including any encryption-specific options defined in EncryptOptions.</p>
- *
- * @since 4.0.0
+ * Local Maven invoker implementation, that expects all the Maven to be on classpath.
  */
-@Experimental
-public interface EncryptInvokerRequest extends InvokerRequest<EncryptOptions> {
-    // This interface doesn't declare any additional methods beyond those inherited from InvokerRequest.
-    // It serves to type-specify the Options as EncryptOptions for encryption-related requests.
+public class LocalMavenInvoker extends MavenInvoker<MavenContext> {
+    public LocalMavenInvoker(ProtoLookup protoLookup) {
+        super(protoLookup);
+    }
+
+    @Override
+    protected MavenContext createContext(InvokerRequest invokerRequest) throws InvokerException {
+        return new MavenContext(invokerRequest);
+    }
 }

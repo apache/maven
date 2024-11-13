@@ -26,8 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
+import org.apache.maven.cling.invoker.mvnenc.EncryptContext;
 import org.codehaus.plexus.components.secdispatcher.DispatcherMeta;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.components.secdispatcher.model.Config;
@@ -45,8 +46,8 @@ import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 import org.jline.utils.Colors;
 
-import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.BAD_OPERATION;
-import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
+import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.BAD_OPERATION;
+import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.OK;
 
 /**
  * The "init" goal.
@@ -62,13 +63,15 @@ public class Init extends GoalSupport {
     }
 
     @Override
-    public int execute(DefaultEncryptInvoker.LocalContext context) throws Exception {
+    public int execute(EncryptContext context) throws Exception {
         context.addInHeader(context.style.italic().bold().foreground(Colors.rgbColor("yellow")), "goal: init");
         context.addInHeader("");
 
         ConsolePrompt prompt = context.prompt;
-        boolean force = context.invokerRequest.options().force().orElse(false);
-        boolean yes = context.invokerRequest.options().yes().orElse(false);
+
+        EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
+        boolean force = options.force().orElse(false);
+        boolean yes = options.yes().orElse(false);
 
         if (configExists() && !force) {
             context.terminal
@@ -238,8 +241,7 @@ public class Init extends GoalSupport {
     }
 
     private PromptBuilder configureDispatcher(
-            DefaultEncryptInvoker.LocalContext context, DispatcherMeta dispatcherMeta, PromptBuilder promptBuilder)
-            throws Exception {
+            EncryptContext context, DispatcherMeta dispatcherMeta, PromptBuilder promptBuilder) throws Exception {
         context.addInHeader(
                 context.style.italic().bold().foreground(Colors.rgbColor("yellow")),
                 "Configure " + dispatcherMeta.displayName());

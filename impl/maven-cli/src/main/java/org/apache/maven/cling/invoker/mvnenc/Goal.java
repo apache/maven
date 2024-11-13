@@ -22,5 +22,5 @@ package org.apache.maven.cling.invoker.mvnenc;
  * The mvnenc tool goal.
  */
 public interface Goal {
-    int execute(DefaultEncryptInvoker.LocalContext context) throws Exception;
+    int execute(EncryptContext context) throws Exception;
 }

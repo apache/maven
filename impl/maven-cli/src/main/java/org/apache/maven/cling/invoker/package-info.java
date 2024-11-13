@@ -16,15 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli.mvn.forked;
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.cli.mvn.MavenInvoker;
 
 /**
- * Forked Maven invoker.
- *
- * @since 4.0.0
+ * This package contain support (mostly abstract) classes, that implement "base" of CLIng.
+ * In packages below you find actual implementations.
  */
-@Experimental
-public interface ForkedMavenInvoker extends MavenInvoker<ForkedMavenInvokerRequest> {}
+package org.apache.maven.cling.invoker;

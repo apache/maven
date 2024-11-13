@@ -23,11 +23,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
+import org.apache.maven.cling.invoker.mvnenc.EncryptContext;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
-import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.BAD_OPERATION;
-import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.OK;
+import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.BAD_OPERATION;
+import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.OK;
 
 /**
  * The "decrypt" goal.
@@ -41,7 +41,7 @@ public class Decrypt extends ConfiguredGoalSupport {
     }
 
     @Override
-    protected int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception {
+    protected int doExecute(EncryptContext context) throws Exception {
         String encrypted = context.reader.readLine("Enter the password to decrypt: ");
         if (secDispatcher.isAnyEncryptedString(encrypted)) {
             context.terminal.writer().println(secDispatcher.decrypt(encrypted));
