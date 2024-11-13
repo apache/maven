@@ -200,40 +200,42 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     public ModelBuilderSession newSession() {
-        return new ModelBuilderSession() {
-            DefaultModelBuilderSession mainSession;
-
-            /**
-             * Builds a model based on the provided ModelBuilderRequest.
-             *
-             * @param request The request containing the parameters for building the model.
-             * @return The result of the model building process.
-             * @throws ModelBuilderException If an error occurs during model building.
-             */
-            @Override
-            public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
-                // Create or derive a session based on the request
-                DefaultModelBuilderSession session;
-                if (mainSession == null) {
-                    mainSession = new DefaultModelBuilderSession(request);
-                    session = mainSession;
-                } else {
-                    session = mainSession.derive(request, new DefaultModelBuilderResult());
-                }
-                // Build the request
-                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
-                    // build the build poms
-                    session.buildBuildPom();
-                } else {
-                    // simply build the effective model
-                    session.buildEffectiveModel(new LinkedHashSet<>());
-                }
-                return session.result;
-            }
-        };
+        return new ModelBuilderSessionImpl();
     }
 
-    protected class DefaultModelBuilderSession implements ModelProblemCollector {
+    protected class ModelBuilderSessionImpl implements ModelBuilderSession {
+        ModelBuilderSessionState mainSession;
+
+        /**
+         * Builds a model based on the provided ModelBuilderRequest.
+         *
+         * @param request The request containing the parameters for building the model.
+         * @return The result of the model building process.
+         * @throws ModelBuilderException If an error occurs during model building.
+         */
+        @Override
+        public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
+            // Create or derive a session based on the request
+            ModelBuilderSessionState session;
+            if (mainSession == null) {
+                mainSession = new ModelBuilderSessionState(request);
+                session = mainSession;
+            } else {
+                session = mainSession.derive(request, new DefaultModelBuilderResult());
+            }
+            // Build the request
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                // build the build poms
+                session.buildBuildPom();
+            } else {
+                // simply build the effective model
+                session.buildEffectiveModel(new LinkedHashSet<>());
+            }
+            return session.result;
+        }
+    }
+
+    protected class ModelBuilderSessionState implements ModelProblemCollector {
         private static final Pattern REGEX = Pattern.compile("\\$\\{([^}]+)}");
 
         final Session session;
@@ -251,7 +253,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> externalRepositories;
         List<RemoteRepository> repositories;
 
-        DefaultModelBuilderSession(ModelBuilderRequest request) {
+        ModelBuilderSessionState(ModelBuilderRequest request) {
             this(
                     request.getSession(),
                     request,
@@ -274,7 +276,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         @SuppressWarnings("checkstyle:ParameterNumber")
-        private DefaultModelBuilderSession(
+        private ModelBuilderSessionState(
                 Session session,
                 ModelBuilderRequest request,
                 DefaultModelBuilderResult result,
@@ -296,26 +298,26 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.result.setSource(this.request.getSource());
         }
 
-        DefaultModelBuilderSession derive(ModelSource source) {
+        ModelBuilderSessionState derive(ModelSource source) {
             return derive(source, new DefaultModelBuilderResult(result));
         }
 
-        DefaultModelBuilderSession derive(ModelSource source, DefaultModelBuilderResult result) {
+        ModelBuilderSessionState derive(ModelSource source, DefaultModelBuilderResult result) {
             return derive(ModelBuilderRequest.build(request, source), result);
         }
 
         /**
          * Creates a new session, sharing cached datas and propagating errors.
          */
-        DefaultModelBuilderSession derive(ModelBuilderRequest request) {
+        ModelBuilderSessionState derive(ModelBuilderRequest request) {
             return derive(request, new DefaultModelBuilderResult(result));
         }
 
-        DefaultModelBuilderSession derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
+        ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
             if (session != request.getSession()) {
                 throw new IllegalArgumentException("Session mismatch");
             }
-            return new DefaultModelBuilderSession(
+            return new ModelBuilderSessionState(
                     session,
                     request,
                     result,
@@ -669,7 +671,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             try (PhasingExecutor executor = createExecutor()) {
                 for (DefaultModelBuilderResult r : allResults) {
                     executor.execute(() -> {
-                        DefaultModelBuilderSession mbs = derive(r.getSource(), r);
+                        ModelBuilderSessionState mbs = derive(r.getSource(), r);
                         try {
                             mbs.buildEffectiveModel(new LinkedHashSet<>());
                         } catch (ModelBuilderException e) {
@@ -815,7 +817,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
 
             // lifecycle bindings injection
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
+            if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
                 org.apache.maven.api.services.ModelTransformer lifecycleBindingsInjector =
                         request.getLifecycleBindingsInjector();
                 if (lifecycleBindingsInjector != null) {
@@ -831,7 +833,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             resultModel = modelNormalizer.injectDefaultValues(resultModel, request, this);
 
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.DEPENDENCY) {
+            if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
                 // plugins configuration
                 resultModel = pluginConfigurationExpander.expandPluginConfiguration(resultModel, request, this);
             }
@@ -853,9 +855,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // effective model validation
             modelValidator.validateEffectiveModel(
                     resultModel,
-                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                            ? ModelValidator.VALIDATION_LEVEL_STRICT
-                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     request,
                     this);
 
@@ -896,8 +896,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private Model resolveParent(Model childModel) {
             Model parentModel = null;
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                    || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM) {
+            if (isBuildRequest()) {
                 parentModel = readParentLocally(childModel);
             }
             if (parentModel == null) {
@@ -911,18 +910,30 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             Parent parent = childModel.getParent();
             String parentPath = parent.getRelativePath();
-            if (parentPath != null && !parentPath.isEmpty()) {
-                candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
-                if (candidateSource == null) {
-                    wrongParentRelativePath(childModel);
-                    return null;
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                if (parentPath != null && !parentPath.isEmpty()) {
+                    candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
+                    if (candidateSource == null) {
+                        wrongParentRelativePath(childModel);
+                        return null;
+                    }
+                } else {
+                    candidateSource =
+                            resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
+                    if (candidateSource == null && parentPath == null) {
+                        candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, "..");
+                    }
                 }
-            }
-            if (candidateSource == null) {
+            } else {
                 candidateSource = resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
-            }
-            if (candidateSource == null && parentPath == null) {
-                candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, "..");
+                if (candidateSource == null) {
+                    if (parentPath == null) {
+                        parentPath = "..";
+                    }
+                    if (!parentPath.isEmpty()) {
+                        candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
+                    }
+                }
             }
 
             if (candidateSource == null) {
@@ -1056,7 +1067,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     buffer.append(" for ").append(ModelProblemUtils.toId(childModel));
                 }
                 buffer.append(": ").append(e.getMessage());
-                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
                     buffer.append(" and parent could not be found in reactor");
                 }
 
@@ -1065,7 +1076,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             ModelBuilderRequest lenientRequest = ModelBuilderRequest.builder(request)
-                    .requestType(ModelBuilderRequest.RequestType.PARENT_POM)
+                    .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
                     .source(modelSource)
                     .build();
 
@@ -1163,13 +1174,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             // path correctly if it was not set in the input model
             if (inputModel.getParent() != null && inputModel.getParent().getRelativePath() == null) {
                 String relPath;
-                if (parentModel.getPomFile() != null
-                        && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                                || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM)) {
+                if (parentModel.getPomFile() != null && isBuildRequest()) {
                     relPath = inputModel
                             .getPomFile()
                             .getParent()
-                            .relativize(parentModel.getPomFile().getParent())
+                            .toAbsolutePath()
+                            .relativize(
+                                    parentModel.getPomFile().toAbsolutePath().getParent())
                             .toString();
                 } else {
                     relPath = "..";
@@ -1232,7 +1243,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private List<Profile> getActiveProfiles(
                 Collection<Profile> interpolatedProfiles, DefaultProfileActivationContext profileActivationContext) {
-            if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_POM) {
+            if (isBuildRequestWithActivation()) {
                 return profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
             } else {
                 return List.of();
@@ -1254,7 +1265,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             try {
-                boolean strict = request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM;
+                boolean strict = isBuildRequest();
                 try {
                     rootDirectory = request.getSession().getRootDirectory();
                 } catch (IllegalStateException ignore) {
@@ -1335,8 +1346,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
 
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                    || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM) {
+            if (isBuildRequest()) {
                 model = model.withPomFile(modelSource.getPath());
 
                 Parent parent = model.getParent();
@@ -1437,9 +1447,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(model);
             modelValidator.validateFileModel(
                     model,
-                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                            ? ModelValidator.VALIDATION_LEVEL_STRICT
-                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     request,
                     this);
             if (hasFatalErrors()) {
@@ -1459,12 +1467,9 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private Model doReadRawModel() throws ModelBuilderException {
-            ModelBuilderRequest request = this.request;
             Model rawModel = readFileModel();
 
-            if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion())
-                    && (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                            || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_POM)) {
+            if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion()) && isBuildRequest()) {
                 rawModel = transformFileToRaw(rawModel);
             }
 
@@ -1474,9 +1479,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             modelValidator.validateRawModel(
                     rawModel,
-                    request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
-                            ? ModelValidator.VALIDATION_LEVEL_STRICT
-                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     request,
                     this);
 
@@ -1679,7 +1682,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             } catch (IllegalStateException e) {
                 rootDirectory = null;
             }
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM && rootDirectory != null) {
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT && rootDirectory != null) {
                 Path sourcePath = importSource.getPath();
                 if (sourcePath != null && sourcePath.startsWith(rootDirectory)) {
                     add(
@@ -1694,13 +1697,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             try {
                 ModelBuilderRequest importRequest = ModelBuilderRequest.builder()
                         .session(request.getSession())
-                        .requestType(ModelBuilderRequest.RequestType.DEPENDENCY)
+                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
                         .systemProperties(request.getSystemProperties())
                         .userProperties(request.getUserProperties())
                         .source(importSource)
                         .repositories(repositories)
                         .build();
-                DefaultModelBuilderSession modelBuilderSession = derive(importRequest);
+                ModelBuilderSessionState modelBuilderSession = derive(importRequest);
                 // build the effective model
                 modelBuilderSession.buildEffectiveModel(importIds);
                 importResult = modelBuilderSession.result;
@@ -1736,6 +1739,16 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private <T> T cache(Source source, String tag, Supplier<T> supplier) {
             return cache.computeIfAbsent(source, tag, supplier);
+        }
+
+        boolean isBuildRequest() {
+            return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER;
+        }
+
+        boolean isBuildRequestWithActivation() {
+            return request.getRequestType() != ModelBuilderRequest.RequestType.BUILD_CONSUMER;
         }
 
         private List<Profile> interpolateActivations(
@@ -1816,7 +1829,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
-        DefaultModelBuilderSession build = new DefaultModelBuilderSession(request);
+        ModelBuilderSessionState build = new ModelBuilderSessionState(request);
         Model model = build.readRawModel();
         if (((ModelProblemCollector) build).hasErrors()) {
             throw build.newModelBuilderException();

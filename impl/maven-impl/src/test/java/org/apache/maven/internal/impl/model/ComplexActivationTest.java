@@ -56,7 +56,7 @@ class ComplexActivationTest {
     void testAndConditionInActivation() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
-                .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                 .source(ModelSource.fromPath(getPom("complex")))
                 .systemProperties(Map.of("myproperty", "test"))
                 .build();
@@ -71,7 +71,7 @@ class ComplexActivationTest {
     public void testConditionExistingAndMissingInActivation() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
-                .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                 .source(ModelSource.fromPath(getPom("complexExistsAndMissing")))
                 .build();
         ModelBuilderResult result = builder.newSession().build(request);

@@ -351,8 +351,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     ModelBuilderRequest.RequestType type = pomFile != null
                                     && this.request.isProcessPlugins()
                                     && this.request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_STRICT
-                            ? ModelBuilderRequest.RequestType.BUILD_POM
-                            : ModelBuilderRequest.RequestType.PARENT_POM;
+                            ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
+                            : ModelBuilderRequest.RequestType.CONSUMER_PARENT;
                     MavenProject theProject = project;
                     ModelBuilderRequest request = builder.source(modelSource)
                             .requestType(type)
@@ -489,7 +489,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 };
                 ModelBuilderRequest modelBuildingRequest = getModelBuildingRequest()
                         .source(ModelSource.fromPath(pomFile.toPath()))
-                        .requestType(ModelBuilderRequest.RequestType.BUILD_POM)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .locationTracking(true)
                         .recursive(recursive)
                         .lifecycleBindingsInjector(injector)
@@ -780,7 +780,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             InternalSession internalSession = InternalSession.from(session);
             modelBuildingRequest.session(internalSession);
-            modelBuildingRequest.requestType(ModelBuilderRequest.RequestType.BUILD_POM);
+            modelBuildingRequest.requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT);
             modelBuildingRequest.profiles(
                     request.getProfiles() != null
                             ? request.getProfiles().stream()
@@ -913,7 +913,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
         project.setPluginArtifactRepositories(pluginRepositories);
 
-        if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM) {
+        if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
             try {
                 ProjectRealmCache.CacheRecord record =
                         projectBuildingHelper.createProjectRealm(project, model3, projectBuildingRequest);

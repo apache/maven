@@ -21,14 +21,9 @@ package org.apache.maven.internal.transformation.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.SessionData;
@@ -44,7 +39,6 @@ import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
@@ -95,10 +89,9 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
-        request.requestType(ModelBuilderRequest.RequestType.CONSUMER_POM);
+        request.requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER);
         request.session(iSession);
-        // in order to resolve parents, we need to fake being at the correct location
-        request.source(new PomConsumerModelSource(project.getModel().getPomPath(), src));
+        request.source(ModelSource.fromPath(src));
         request.locationTracking(false);
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
@@ -207,64 +200,5 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         return repositories.stream()
                 .filter(r -> !org.apache.maven.api.Repository.CENTRAL_ID.equals(r.getId()))
                 .collect(Collectors.toList());
-    }
-
-    static class PomConsumerModelSource implements ModelSource {
-        final Path path;
-        final Path src;
-
-        PomConsumerModelSource(Path path, Path src) {
-            this.path = path;
-            this.src = src;
-        }
-
-        @Override
-        public Path getPath() {
-            return path;
-        }
-
-        @Override
-        public InputStream openStream() throws IOException {
-            return Files.newInputStream(src);
-        }
-
-        @Override
-        public String getLocation() {
-            return src.toString();
-        }
-
-        @Override
-        public Source resolve(String relative) {
-            return ModelSource.fromPath(path.resolve(relative));
-        }
-
-        @Override
-        public ModelSource resolve(ModelLocator locator, String relative) {
-            String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
-            Path path = getPath().getParent().resolve(norm);
-            Path relatedPom = locator.locateExistingPom(path);
-            if (relatedPom != null) {
-                return ModelSource.fromPath(relatedPom);
-            }
-            return null;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return this == o
-                    || o.getClass() == getClass()
-                            && Objects.equals(path, ((PomConsumerModelSource) o).path)
-                            && Objects.equals(src, ((PomConsumerModelSource) o).src);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(path, src);
-        }
-
-        @Override
-        public String toString() {
-            return "PomConsumerModelSource[" + "path=" + path + ']';
-        }
     }
 }
