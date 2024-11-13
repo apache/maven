@@ -1746,8 +1746,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         boolean isBuildRequestWithActivation() {
-            return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
-                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE;
+            return request.getRequestType() != ModelBuilderRequest.RequestType.BUILD_CONSUMER;
         }
 
         private List<Profile> interpolateActivations(
