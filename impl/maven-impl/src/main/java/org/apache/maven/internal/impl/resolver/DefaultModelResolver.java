@@ -44,6 +44,7 @@ import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.VersionRangeResolverException;
+import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.services.model.ModelResolver;
 import org.apache.maven.api.services.model.ModelResolverException;
 
@@ -135,22 +136,26 @@ public class DefaultModelResolver implements ModelResolver {
                         artifactId,
                         version);
             }
-            List<Version> versions = session.resolveVersionRange(coords, repositories);
-            if (versions.isEmpty()) {
-                throw new ModelResolverException(
-                        "No versions matched the requested " + (type != null ? type + " " : "") + "version range '"
-                                + version + "'",
-                        groupId,
-                        artifactId,
-                        version);
-            }
-            String newVersion = versions.get(versions.size() - 1).asString();
-            if (!version.equals(newVersion)) {
-                resolvedVersion.accept(newVersion);
-            }
+            try {
+                List<Version> versions = session.resolveVersionRange(coords, repositories);
+                if (versions.isEmpty()) {
+                    throw new ModelResolverException(
+                            "No versions matched the requested " + (type != null ? type + " " : "") + "version range '"
+                                    + version + "'",
+                            groupId,
+                            artifactId,
+                            version);
+                }
+                String newVersion = versions.get(versions.size() - 1).asString();
+                if (!version.equals(newVersion)) {
+                    resolvedVersion.accept(newVersion);
+                }
 
-            Path path = getPath(session, repositories, groupId, artifactId, newVersion, classifier);
-            return new ResolverModelSource(path, groupId + ":" + artifactId + ":" + newVersion);
+                Path path = getPath(session, repositories, groupId, artifactId, newVersion, classifier);
+                return new ResolverModelSource(path, groupId + ":" + artifactId + ":" + newVersion);
+            } catch (VersionResolverException e) {
+                throw new ModelResolverException(e, groupId, artifactId, version);
+            }
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
                     e.getMessage() + " (remote repositories: "
