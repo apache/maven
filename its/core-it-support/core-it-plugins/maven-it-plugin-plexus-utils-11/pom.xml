@@ -35,7 +35,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.0.24</version>
+      <version>4.0.2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>

@@ -96,7 +96,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.3.0</version>
+      <version>4.0.2</version>
       <!-- NOTE: Use compile scope for transitivity. -->
     </dependency>
     <dependency>
