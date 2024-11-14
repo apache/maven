@@ -1760,7 +1760,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 try {
                     return consumer.apply(new ThrowingSupplierWrapper<>(throwingSupplier));
                 } catch (RuntimeException e) {
-                    if (e.getClass().equals(RuntimeException.class)) {
+                    if (e.getClass().equals(RuntimeException.class) && e.getCause() != null) {
                         throw (E) e.getCause();
                     } else {
                         throw e;
