@@ -1735,14 +1735,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         @FunctionalInterface
-        private interface ThrowingSupplier<T, E extends Exception> {
-            T get() throws E;
+        private interface ModelBuilderExceptionThrowingSupplier<T> {
+            T get() throws ModelBuilderException;
         }
 
-        private static class ThrowingSupplierWrapper<T, E extends Exception> implements Supplier<T> {
-            private final ThrowingSupplier<T, E> throwingSupplier;
+        private static class ThrowingSupplierWrapper<T> implements Supplier<T> {
+            private final ModelBuilderExceptionThrowingSupplier<T> throwingSupplier;
 
-            private ThrowingSupplierWrapper(ThrowingSupplier<T, E> throwingSupplier) {
+            private ThrowingSupplierWrapper(ModelBuilderExceptionThrowingSupplier<T> throwingSupplier) {
                 this.throwingSupplier = throwingSupplier;
             }
 
@@ -1750,18 +1750,19 @@ public class DefaultModelBuilder implements ModelBuilder {
             public T get() {
                 try {
                     return throwingSupplier.get();
-                } catch (Exception e) {
+                } catch (ModelBuilderException e) {
                     throw new RuntimeException(e);
                 }
             }
 
-            private static <T, E extends Exception> T process(
-                    ThrowingSupplier<T, E> throwingSupplier, Function<Supplier<T>, T> consumer) throws E {
+            private static <T> T process(
+                    ModelBuilderExceptionThrowingSupplier<T> throwingSupplier, Function<Supplier<T>, T> consumer)
+                    throws ModelBuilderException {
                 try {
                     return consumer.apply(new ThrowingSupplierWrapper<>(throwingSupplier));
                 } catch (RuntimeException e) {
-                    if (e.getClass().equals(RuntimeException.class) && e.getCause() != null) {
-                        throw (E) e.getCause();
+                    if (e.getCause() instanceof ModelBuilderException) {
+                        throw (ModelBuilderException) e.getCause();
                     } else {
                         throw e;
                     }
@@ -1769,14 +1770,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        private <T, E extends Exception> T cache(
-                String groupId, String artifactId, String version, String tag, ThrowingSupplier<T, E> supplier)
-                throws E {
-            return ThrowingSupplierWrapper.process(
-                    supplier, s -> cache.computeIfAbsent(groupId, artifactId, version, tag, s));
+        private <T> T cache(String groupId, String artifactId, String version, String tag, Supplier<T> supplier) {
+            return cache.computeIfAbsent(groupId, artifactId, version, tag, supplier);
         }
 
-        private <T, E extends Exception> T cache(Source source, String tag, ThrowingSupplier<T, E> supplier) throws E {
+        private <T> T cache(Source source, String tag, ModelBuilderExceptionThrowingSupplier<T> supplier)
+                throws ModelBuilderException {
             return ThrowingSupplierWrapper.process(supplier, s -> cache.computeIfAbsent(source, tag, s));
         }
 
