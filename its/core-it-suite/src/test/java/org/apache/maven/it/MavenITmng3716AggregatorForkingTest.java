@@ -45,7 +45,7 @@ public class MavenITmng3716AggregatorForkingTest extends AbstractMavenIntegratio
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
 

@@ -45,7 +45,7 @@ public class MavenITmng3693PomFileBasedirChangeTest extends AbstractMavenIntegra
         File pluginDir = new File(testDir, "maven-mng3693-plugin");
         File projectsDir = new File(testDir, "projects");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
 
         verifier.addCliArgument("install");
         verifier.execute();

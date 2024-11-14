@@ -48,7 +48,7 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
 
@@ -78,7 +78,7 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginsDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginsDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
 

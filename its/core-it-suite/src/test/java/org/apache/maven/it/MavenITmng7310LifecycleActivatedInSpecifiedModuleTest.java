@@ -41,7 +41,7 @@ public class MavenITmng7310LifecycleActivatedInSpecifiedModuleTest extends Abstr
         File extensionTestDir = ResourceExtractor.simpleExtractResources(getClass(), BASE_TEST_DIR + "/extension");
         File projectTestDir = ResourceExtractor.simpleExtractResources(getClass(), BASE_TEST_DIR + "/project");
 
-        Verifier verifier = newVerifier(extensionTestDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(extensionTestDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
 

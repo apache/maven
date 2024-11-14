@@ -51,7 +51,7 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends A
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

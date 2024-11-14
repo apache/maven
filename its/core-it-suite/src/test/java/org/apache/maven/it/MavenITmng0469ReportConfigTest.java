@@ -67,7 +67,7 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
     public void testitBuildConfigIrrelevantForReports() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0469/test2");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         if (matchesVersionRange("(,3.0-alpha-1)")) {

@@ -47,7 +47,7 @@ public class MavenITmng3740SelfReferentialReactorProjectsTest extends AbstractMa
 
         Verifier verifier;
 
-        verifier = newVerifier(v1.getAbsolutePath(), "remote");
+        verifier = newVerifier(v1.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

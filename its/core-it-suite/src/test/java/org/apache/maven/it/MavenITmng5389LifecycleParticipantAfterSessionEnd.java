@@ -38,13 +38,13 @@ public class MavenITmng5389LifecycleParticipantAfterSessionEnd extends AbstractM
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(extensionDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -47,7 +47,7 @@ public class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase
         //
         // Build a plugin that uses a JSR330 plugin
         //
-        Verifier v0 = newVerifier(testDir.getAbsolutePath(), "remote");
+        Verifier v0 = newVerifier(testDir.getAbsolutePath());
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng5382");
@@ -58,7 +58,7 @@ public class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase
         //
         // Execute the JSR330 plugin
         //
-        Verifier v1 = newVerifier(testDir.getAbsolutePath(), "remote");
+        Verifier v1 = newVerifier(testDir.getAbsolutePath());
         v1.setAutoclean(false);
         v1.addCliArgument("org.apache.maven.its.mng5382:jsr330-maven-plugin:0.0.1-SNAPSHOT:hello");
         v1.execute();

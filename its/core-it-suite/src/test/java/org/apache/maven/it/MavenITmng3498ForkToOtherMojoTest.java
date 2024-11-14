@@ -46,7 +46,7 @@ public class MavenITmng3498ForkToOtherMojoTest extends AbstractMavenIntegrationT
         File pluginDir = new File(testDir, "maven-mng3498-plugin");
         File projectDir = new File(testDir, "mng-3498-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.deleteArtifact("org.apache.maven.its.mng3498", "mavenit-mng3498-plugin", "1", "pom");
 
         verifier.addCliArgument("install");

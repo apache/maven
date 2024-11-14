@@ -37,12 +37,12 @@ public class MavenITmng6506PackageAnnotationTest extends AbstractMavenIntegratio
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

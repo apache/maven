@@ -248,7 +248,7 @@ public abstract class AbstractMavenIntegrationTestCase {
     }
 
     protected Verifier newVerifier(String basedir, boolean debug) throws VerificationException {
-        return newVerifier(basedir, "", debug);
+        return newVerifier(basedir, "remote", debug);
     }
 
     protected Verifier newVerifier(String basedir, String settings, boolean debug) throws VerificationException {

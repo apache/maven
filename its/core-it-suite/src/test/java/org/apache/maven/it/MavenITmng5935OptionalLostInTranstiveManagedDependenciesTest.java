@@ -41,7 +41,7 @@ public class MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest extend
         File testDir = ResourceExtractor.simpleExtractResources(
                 getClass(), "/mng-5935-optional-lost-in-transtive-managed-dependencies");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

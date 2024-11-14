@@ -45,7 +45,7 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -58,7 +58,7 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends 
         modCconfigurationFile.delete();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("verify");
         verifier.addCliArgument("-X");
         verifier.execute();

@@ -42,7 +42,7 @@ public class MavenITmng3694ReactorProjectsDynamismTest extends AbstractMavenInte
         File pluginDir = new File(testDir, "maven-mng3694-plugin");
         File projectDir = new File(testDir, "projects");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
 
         verifier.addCliArgument("install");
         verifier.execute();

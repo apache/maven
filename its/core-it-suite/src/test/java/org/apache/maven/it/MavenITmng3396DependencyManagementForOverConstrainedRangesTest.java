@@ -40,7 +40,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
         String baseDir = "/mng-3396";
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), baseDir + "/dependencies");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "pom");
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "jar");
         verifier.deleteArtifact(GROUP_ID, "B", "1.0", "pom");
@@ -51,7 +51,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
 
         testDir = ResourceExtractor.simpleExtractResources(getClass(), baseDir + "/plugin");
 
-        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "pom");
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "jar");
         verifier.deleteArtifact(GROUP_ID, "A", "3.0", "pom");
@@ -64,7 +64,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
 
         testDir = ResourceExtractor.simpleExtractResources(getClass(), baseDir + "/pluginuser");
 
-        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteArtifact(GROUP_ID, "pluginuser", "1.0", "pom");
         verifier.deleteArtifact(GROUP_ID, "pluginuser", "1.0", "jar");
         verifier.addCliArgument("install");
