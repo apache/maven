@@ -115,8 +115,6 @@ import org.apache.maven.model.v4.MavenTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * The model builder is responsible for building the {@link Model} from the POM file.
  * There are two ways to main use cases: the first one is to build the model from a POM file
@@ -908,7 +906,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private Model readParentLocally(Model childModel) throws ModelBuilderException {
-            ModelSource candidateSource = null;
+            ModelSource candidateSource;
 
             Parent parent = childModel.getParent();
             String parentPath = parent.getRelativePath();
@@ -1745,7 +1743,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             private final ThrowingSupplier<T, E> throwingSupplier;
 
             private ThrowingSupplierWrapper(ThrowingSupplier<T, E> throwingSupplier) {
-                this.throwingSupplier = requireNonNull(throwingSupplier);
+                this.throwingSupplier = throwingSupplier;
             }
 
             @Override
@@ -1872,7 +1870,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
         ModelBuilderSessionState build = new ModelBuilderSessionState(request);
         Model model = build.readRawModel();
-        if (((ModelProblemCollector) build).hasErrors()) {
+        if (build.hasErrors()) {
             throw build.newModelBuilderException();
         }
         return model;
