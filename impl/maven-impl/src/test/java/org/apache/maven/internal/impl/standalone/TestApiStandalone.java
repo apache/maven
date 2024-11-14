@@ -27,6 +27,7 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelSource;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestApiStandalone {
 
     @Test
-    void testStandalone() throws Exception {
+    void testStandalone() throws ModelBuilderException {
         Session session = ApiRunner.createSession();
 
         ModelBuilder builder = session.getService(ModelBuilder.class);
