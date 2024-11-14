@@ -115,6 +115,8 @@ import org.apache.maven.model.v4.MavenTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * The model builder is responsible for building the {@link Model} from the POM file.
  * There are two ways to main use cases: the first one is to build the model from a POM file
@@ -894,7 +896,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return parentModel;
         }
 
-        private Model resolveParent(Model childModel) {
+        private Model resolveParent(Model childModel) throws ModelBuilderException {
             Model parentModel = null;
             if (isBuildRequest()) {
                 parentModel = readParentLocally(childModel);
@@ -1493,7 +1495,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         /**
          * Reads the request source's parent.
          */
-        Model readAsParentModel() {
+        Model readAsParentModel() throws ModelBuilderException {
             return cache(request.getSource(), PARENT, this::doReadAsParentModel);
         }
 
@@ -1664,7 +1666,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     importSource = modelResolver.resolveModel(
                             request.getSession(), repositories, dependency, new AtomicReference<>());
                 }
-            } catch (ModelBuilderException e) {
+            } catch (ModelBuilderException | ModelResolverException e) {
                 StringBuilder buffer = new StringBuilder(256);
                 buffer.append("Non-resolvable import POM");
                 if (!containsCoordinates(e.getMessage(), groupId, artifactId, version)) {
@@ -1719,7 +1721,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             return importModel;
         }
 
-        ModelSource resolveReactorModel(String groupId, String artifactId, String version) {
+        ModelSource resolveReactorModel(String groupId, String artifactId, String version)
+                throws ModelBuilderException {
             Set<ModelSource> sources = mappedSources.get(new GAKey(groupId, artifactId));
             if (sources != null) {
                 for (ModelSource source : sources) {
@@ -1733,12 +1736,50 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
-        private <T> T cache(String groupId, String artifactId, String version, String tag, Supplier<T> supplier) {
-            return cache.computeIfAbsent(groupId, artifactId, version, tag, supplier);
+        @FunctionalInterface
+        private interface ThrowingSupplier<T, E extends Exception> {
+            T get() throws E;
         }
 
-        private <T> T cache(Source source, String tag, Supplier<T> supplier) {
-            return cache.computeIfAbsent(source, tag, supplier);
+        private static class ThrowingSupplierWrapper<T, E extends Exception> implements Supplier<T> {
+            private final ThrowingSupplier<T, E> throwingSupplier;
+
+            private ThrowingSupplierWrapper(ThrowingSupplier<T, E> throwingSupplier) {
+                this.throwingSupplier = requireNonNull(throwingSupplier);
+            }
+
+            @Override
+            public T get() {
+                try {
+                    return throwingSupplier.get();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            private static <T, E extends Exception> T process(
+                    ThrowingSupplier<T, E> throwingSupplier, Function<Supplier<T>, T> consumer) throws E {
+                try {
+                    return consumer.apply(new ThrowingSupplierWrapper<>(throwingSupplier));
+                } catch (RuntimeException e) {
+                    if (e.getClass().equals(RuntimeException.class)) {
+                        throw (E) e.getCause();
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+        }
+
+        private <T, E extends Exception> T cache(
+                String groupId, String artifactId, String version, String tag, ThrowingSupplier<T, E> supplier)
+                throws E {
+            return ThrowingSupplierWrapper.process(
+                    supplier, s -> cache.computeIfAbsent(groupId, artifactId, version, tag, s));
+        }
+
+        private <T, E extends Exception> T cache(Source source, String tag, ThrowingSupplier<T, E> supplier) throws E {
+            return ThrowingSupplierWrapper.process(supplier, s -> cache.computeIfAbsent(source, tag, s));
         }
 
         boolean isBuildRequest() {

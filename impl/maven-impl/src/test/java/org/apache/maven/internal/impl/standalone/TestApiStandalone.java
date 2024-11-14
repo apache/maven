@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestApiStandalone {
 
     @Test
-    void testStandalone() {
+    void testStandalone() throws Exception {
         Session session = ApiRunner.createSession();
 
         ModelBuilder builder = session.getService(ModelBuilder.class);

@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0.0
  */
 @Experimental
-public class ModelBuilderException extends MavenException {
+public class ModelBuilderException extends MavenCheckedException {
 
     @Serial
     private static final long serialVersionUID = -1865447022070650896L;

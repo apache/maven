@@ -38,5 +38,5 @@ public interface ModelBuilder extends Service {
         ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException;
     }
 
-    Model buildRawModel(ModelBuilderRequest request);
+    Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException;
 }

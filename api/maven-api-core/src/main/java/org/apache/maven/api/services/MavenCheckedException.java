@@ -16,24 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.transformation.impl;
+package org.apache.maven.api.services;
 
-import javax.xml.stream.XMLStreamException;
+import java.io.Serial;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.ModelBuilderException;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.RepositorySystemSession;
+import org.apache.maven.api.annotations.Experimental;
 
 /**
- * This interface is not public and the purpose is to allow easy unit testing
- * of {@link DefaultConsumerPomArtifactTransformer}.
+ * Base class for all maven exceptions you want to deal with.
+ *
+ * @since 4.0.0
  */
-interface ConsumerPomBuilder {
+@Experimental
+public class MavenCheckedException extends Exception {
 
-    Model build(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuilderException, IOException, XMLStreamException;
+    @Serial
+    private static final long serialVersionUID = 5687063382274793735L;
+
+    public MavenCheckedException() {}
+
+    public MavenCheckedException(String message) {
+        super(message);
+    }
+
+    public MavenCheckedException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public MavenCheckedException(Throwable cause) {
+        super(cause);
+    }
 }
