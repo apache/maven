@@ -20,23 +20,12 @@ under the License.
 -->
 
 <!--
-These settings are meant for ITs that download artifacts from remote servers. In general, ITs should use stub
-plugins/artifacts from test repos so use of these settings should be the exceptional case, not the default.
+These settings are meant for ITs that don't download artifacts from remote servers, i.e. ITs that either use their
+own test repos or can employ the local repository (after bootstrapping). This configuration uses a file: URL to
+"central" to avoid needless network access for files knowingly not present externally.
 -->
 
 <settings>
-  <proxies>
-    <proxy>
-      <id>it-proxy</id>
-      <active>${proxy.active}</active>
-      <protocol>${proxy.type}</protocol>
-      <host>${proxy.host}</host>
-      <port>${proxy.port}</port>
-      <username>${proxy.user}</username>
-      <password>${proxy.pass}</password>
-      <nonProxyHosts>${proxy.nonProxyHosts}</nonProxyHosts>
-    </proxy>
-  </proxies>
   <profiles>
     <profile>
       <id>it-defaults</id>
@@ -44,12 +33,12 @@ plugins/artifacts from test repos so use of these settings should be the excepti
         <repository>
           <id>central</id>
           <name>Apache Maven Integration Testing Repository</name>
-          <url>${maven.it.central}</url>
+          <url>file:target/null</url>
           <releases>
             <enabled>true</enabled>
           </releases>
           <snapshots>
-            <enabled>true</enabled>
+            <enabled>false</enabled>
           </snapshots>
         </repository>
       </repositories>
@@ -57,7 +46,7 @@ plugins/artifacts from test repos so use of these settings should be the excepti
         <pluginRepository>
           <id>central</id>
           <name>Apache Maven Integration Testing Repository</name>
-          <url>${maven.it.central}</url>
+          <url>file:target/null</url>
           <releases>
             <enabled>true</enabled>
           </releases>
