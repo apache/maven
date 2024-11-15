@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -35,6 +34,8 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4555">MNG-4555</a>.
@@ -89,7 +90,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
             System.out.println("Bound server socket to the port " + port);
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@port@", Integer.toString(port));
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("--offline");
             verifier.addCliArgument("--settings");
             verifier.addCliArgument("settings.xml");
@@ -102,6 +103,6 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
             server.join();
         }
 
-        assertTrue(uris.toString(), uris.isEmpty());
+        assertTrue(uris.isEmpty(), uris.toString());
     }
 }

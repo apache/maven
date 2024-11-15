@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4919">MNG-4919</a>.
@@ -53,7 +54,7 @@ public class MavenITmng4919LifecycleMappingWithSameGoalTwiceTest extends Abstrac
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("target/log.txt", "UTF-8");
+        List<String> lines = verifier.loadLines("target/log.txt");
         assertEquals(Arrays.asList(new String[] {"check", "check"}), lines);
     }
 }

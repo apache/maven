@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * [MNG-5600] Dependency management import should support exclusions.
@@ -42,7 +43,7 @@ class MavenITmng5600DependencyManagementImportExclusionsTest extends AbstractMav
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterMap());
+        verifier.filterFile("../settings-template.xml", "settings.xml", verifier.newDefaultFilterMap());
 
         verifier.addCliArguments("-s", "settings.xml");
         verifier.addCliArguments("clean", "verify");

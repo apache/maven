@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4320">MNG-4320</a>.
@@ -52,21 +54,21 @@ public class MavenITmng4320AggregatorAndDependenciesTest extends AbstractMavenIn
         verifier.deleteArtifacts("org.apache.maven.its.mng4320");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:aggregate-test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath;
 
-        classpath = verifier.loadLines("target/sub-1.txt", "UTF-8");
-        assertTrue(classpath.toString(), classpath.contains("a-0.1.jar"));
+        classpath = verifier.loadLines("target/sub-1.txt");
+        assertTrue(classpath.contains("a-0.1.jar"), classpath.toString());
 
-        classpath = verifier.loadLines("target/sub-2.txt", "UTF-8");
-        assertTrue(classpath.toString(), classpath.contains("b-0.2.jar"));
+        classpath = verifier.loadLines("target/sub-2.txt");
+        assertTrue(classpath.contains("b-0.2.jar"), classpath.toString());
 
-        classpath = verifier.loadLines("target/aggregator.txt", "UTF-8");
-        assertFalse(classpath.toString(), classpath.contains("a-0.1.jar"));
-        assertFalse(classpath.toString(), classpath.contains("b-0.2.jar"));
+        classpath = verifier.loadLines("target/aggregator.txt");
+        assertFalse(classpath.contains("a-0.1.jar"), classpath.toString());
+        assertFalse(classpath.contains("b-0.2.jar"), classpath.toString());
     }
 }

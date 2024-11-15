@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +39,7 @@ public class MavenITmng6210CoreExtensionsCustomScopesTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6210-core-extensions-scopes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
 
         verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
         verifier.deleteDirectory("target");

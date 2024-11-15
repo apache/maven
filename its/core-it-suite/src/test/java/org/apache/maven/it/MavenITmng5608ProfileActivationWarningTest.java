@@ -22,9 +22,11 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5608">MNG-5608</a>:
@@ -53,14 +55,14 @@ public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenInt
         assertFileExists(testDir, "target/mng-5608-missing-project.basedir");
 
         // check that the 2 profiles using ${project.basedir} caused warnings
-        List<String> logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logFile = verifier.loadLogLines();
         assertNotNull(findWarning(logFile, "mng-5608-exists-project.basedir"));
         assertNotNull(findWarning(logFile, "mng-5608-missing-project.basedir"));
     }
 
     private void assertFileExists(File dir, String filename) {
         File file = new File(dir, filename);
-        assertTrue("expected file: " + file, file.exists());
+        assertTrue(file.exists(), "expected file: " + file);
     }
 
     private String findWarning(List<String> logLines, String profileId) {

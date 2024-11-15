@@ -20,10 +20,8 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -75,7 +73,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
             fail("Expected this invocation to fail");
         } catch (final VerificationException ve) {
             verifier.verifyTextInLog("mvn [args] -r");
-            verifyTextNotInLog(verifier, "mvn [args] -rf :module-b");
+            verifier.verifyTextNotInLog("mvn [args] -rf :module-b");
         }
 
         // New build with -r should resume the build from module-b, skipping module-a since it has succeeded already.
@@ -83,7 +81,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifier.addCliArgument("-r");
         verifier.addCliArgument("test");
         verifier.execute();
-        verifyTextNotInLog(verifier, "Building module-a 1.0");
+        verifier.verifyTextNotInLog("Building module-a 1.0");
         verifier.verifyTextInLog("Building module-b 1.0");
         verifier.verifyTextInLog("Building module-c 1.0");
     }
@@ -135,7 +133,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyTextInLog("Building module-a 1.0");
-        verifyTextNotInLog(verifier, "Building module-b 1.0");
+        verifier.verifyTextNotInLog("Building module-b 1.0");
     }
 
     @Test
@@ -232,22 +230,5 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         //   d : success
         verifier.addCliArgument("verify");
         verifier.execute();
-    }
-
-    /**
-     * Throws an exception if the text <strong>is</strong> present in the log.
-     *
-     * @param verifier the verifier to use
-     * @param text the text to assert present
-     * @throws VerificationException if text is not found in log
-     */
-    private void verifyTextNotInLog(Verifier verifier, String text) throws VerificationException {
-        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
-
-        for (String line : lines) {
-            if (Verifier.stripAnsi(line).contains(text)) {
-                throw new VerificationException("Text found in log: " + text);
-            }
-        }
     }
 }

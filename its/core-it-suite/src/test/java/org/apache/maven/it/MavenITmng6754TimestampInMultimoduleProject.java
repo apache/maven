@@ -28,10 +28,13 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIntegrationTestCase {
     private static final String RESOURCE_PATH = "/mng-6754-version-timestamp-in-multimodule-build";
@@ -365,12 +368,12 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
                 phase = "Deployed";
                 break;
         }
-        assertEquals(
+        Assertions.assertEquals(
+                expected,
+                actual,
                 String.format(
                         "%s %s module should have equal %s %s with the Maven build timestamp",
-                        phase, moduleName, location, field),
-                expected,
-                actual);
+                        phase, moduleName, location, field));
     }
 
     private void assertPathExists(Path repoDir, String moduleName, String location, String version, String fileName) {
@@ -385,7 +388,7 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
         }
         Path file = getRepoFile(repoDir, moduleName, version, fileName);
         assertTrue(
-                String.format("%s %s module %s file %s should exist", phase, moduleName, location, file),
-                Files.exists(file));
+                Files.exists(file),
+                String.format("%s %s module %s file %s should exist", phase, moduleName, location, file));
     }
 }

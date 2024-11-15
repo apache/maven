@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3482">MNG-3482</a>.
@@ -43,7 +44,7 @@ public class MavenITmng3482DependencyPomInterpolationTest extends AbstractMavenI
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3482");
         verifier.addCliArgument("-s");
@@ -52,7 +53,7 @@ public class MavenITmng3482DependencyPomInterpolationTest extends AbstractMavenI
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
-        assertTrue(classpath.toString(), classpath.contains("dep2-1.jar"));
+        List<String> classpath = verifier.loadLines("target/classpath.txt");
+        assertTrue(classpath.contains("dep2-1.jar"), classpath.toString());
     }
 }

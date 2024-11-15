@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -53,66 +55,66 @@ public class MavenIT0142DirectDependencyScopesTest extends AbstractMavenIntegrat
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0142");
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("pom-template.xml", "pom.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileArtifacts = verifier.loadLines("target/compile-artifacts.txt", "UTF-8");
+        List<String> compileArtifacts = verifier.loadLines("target/compile-artifacts.txt");
         assertTrue(
-                compileArtifacts.toString(), compileArtifacts.contains("org.apache.maven.its.it0142:system:jar:0.1"));
+                compileArtifacts.contains("org.apache.maven.its.it0142:system:jar:0.1"), compileArtifacts.toString());
         assertTrue(
-                compileArtifacts.toString(), compileArtifacts.contains("org.apache.maven.its.it0142:provided:jar:0.1"));
+                compileArtifacts.contains("org.apache.maven.its.it0142:provided:jar:0.1"), compileArtifacts.toString());
         assertTrue(
-                compileArtifacts.toString(), compileArtifacts.contains("org.apache.maven.its.it0142:compile:jar:0.1"));
+                compileArtifacts.contains("org.apache.maven.its.it0142:compile:jar:0.1"), compileArtifacts.toString());
         assertEquals(3, compileArtifacts.size());
 
-        List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt", "UTF-8");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("classes"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("system-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("provided-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("compile-0.1.jar"));
+        List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt");
+        assertTrue(compileClassPath.contains("classes"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("system-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("provided-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("compile-0.1.jar"), compileClassPath.toString());
         assertEquals(4, compileClassPath.size());
 
-        List<String> runtimeArtifacts = verifier.loadLines("target/runtime-artifacts.txt", "UTF-8");
+        List<String> runtimeArtifacts = verifier.loadLines("target/runtime-artifacts.txt");
         assertTrue(
-                runtimeArtifacts.toString(), runtimeArtifacts.contains("org.apache.maven.its.it0142:compile:jar:0.1"));
+                runtimeArtifacts.contains("org.apache.maven.its.it0142:compile:jar:0.1"), runtimeArtifacts.toString());
         assertTrue(
-                runtimeArtifacts.toString(), runtimeArtifacts.contains("org.apache.maven.its.it0142:runtime:jar:0.1"));
+                runtimeArtifacts.contains("org.apache.maven.its.it0142:runtime:jar:0.1"), runtimeArtifacts.toString());
         assertTrue(
-                runtimeArtifacts.toString(),
-                runtimeArtifacts.contains("org.apache.maven.its.it0142:runtime:jar:retro:0.1"));
+                runtimeArtifacts.contains("org.apache.maven.its.it0142:runtime:jar:retro:0.1"),
+                runtimeArtifacts.toString());
         assertEquals(3, runtimeArtifacts.size());
 
-        List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt", "UTF-8");
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("classes"));
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("compile-0.1.jar"));
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("runtime-0.1.jar"));
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("runtime-0.1-retro.jar"));
+        List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt");
+        assertTrue(runtimeClassPath.contains("classes"), runtimeClassPath.toString());
+        assertTrue(runtimeClassPath.contains("compile-0.1.jar"), runtimeClassPath.toString());
+        assertTrue(runtimeClassPath.contains("runtime-0.1.jar"), runtimeClassPath.toString());
+        assertTrue(runtimeClassPath.contains("runtime-0.1-retro.jar"), runtimeClassPath.toString());
         assertEquals(4, runtimeClassPath.size());
 
-        List<String> testArtifacts = verifier.loadLines("target/test-artifacts.txt", "UTF-8");
-        assertTrue(testArtifacts.toString(), testArtifacts.contains("org.apache.maven.its.it0142:system:jar:0.1"));
-        assertTrue(testArtifacts.toString(), testArtifacts.contains("org.apache.maven.its.it0142:provided:jar:0.1"));
-        assertTrue(testArtifacts.toString(), testArtifacts.contains("org.apache.maven.its.it0142:compile:jar:0.1"));
-        assertTrue(testArtifacts.toString(), testArtifacts.contains("org.apache.maven.its.it0142:runtime:jar:0.1"));
+        List<String> testArtifacts = verifier.loadLines("target/test-artifacts.txt");
+        assertTrue(testArtifacts.contains("org.apache.maven.its.it0142:system:jar:0.1"), testArtifacts.toString());
+        assertTrue(testArtifacts.contains("org.apache.maven.its.it0142:provided:jar:0.1"), testArtifacts.toString());
+        assertTrue(testArtifacts.contains("org.apache.maven.its.it0142:compile:jar:0.1"), testArtifacts.toString());
+        assertTrue(testArtifacts.contains("org.apache.maven.its.it0142:runtime:jar:0.1"), testArtifacts.toString());
         assertTrue(
-                testArtifacts.toString(), testArtifacts.contains("org.apache.maven.its.it0142:runtime:jar:retro:0.1"));
-        assertTrue(testArtifacts.toString(), testArtifacts.contains("org.apache.maven.its.it0142:test:jar:0.1"));
+                testArtifacts.contains("org.apache.maven.its.it0142:runtime:jar:retro:0.1"), testArtifacts.toString());
+        assertTrue(testArtifacts.contains("org.apache.maven.its.it0142:test:jar:0.1"), testArtifacts.toString());
         assertEquals(6, testArtifacts.size());
 
-        List<String> testClassPath = verifier.loadLines("target/test-cp.txt", "UTF-8");
-        assertTrue(testClassPath.toString(), testClassPath.contains("classes"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("test-classes"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("system-0.1.jar"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("provided-0.1.jar"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("compile-0.1.jar"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("runtime-0.1.jar"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("runtime-0.1-retro.jar"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("test-0.1.jar"));
+        List<String> testClassPath = verifier.loadLines("target/test-cp.txt");
+        assertTrue(testClassPath.contains("classes"), testClassPath.toString());
+        assertTrue(testClassPath.contains("test-classes"), testClassPath.toString());
+        assertTrue(testClassPath.contains("system-0.1.jar"), testClassPath.toString());
+        assertTrue(testClassPath.contains("provided-0.1.jar"), testClassPath.toString());
+        assertTrue(testClassPath.contains("compile-0.1.jar"), testClassPath.toString());
+        assertTrue(testClassPath.contains("runtime-0.1.jar"), testClassPath.toString());
+        assertTrue(testClassPath.contains("runtime-0.1-retro.jar"), testClassPath.toString());
+        assertTrue(testClassPath.contains("test-0.1.jar"), testClassPath.toString());
         assertEquals(8, testClassPath.size());
     }
 }

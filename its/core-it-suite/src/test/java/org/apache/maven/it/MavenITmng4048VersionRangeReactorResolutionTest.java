@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4048">MNG-4048</a>.
@@ -53,7 +54,7 @@ public class MavenITmng4048VersionRangeReactorResolutionTest extends AbstractMav
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("sub-2/target/compile.txt", "UTF-8");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4048:sub-1:jar:1.1-SNAPSHOT"));
+        List<String> artifacts = verifier.loadLines("sub-2/target/compile.txt");
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4048:sub-1:jar:1.1-SNAPSHOT"), artifacts.toString());
     }
 }

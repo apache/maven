@@ -23,9 +23,11 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4091">MNG-4091</a>:
@@ -44,16 +46,11 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
+        verifier.addCliArgument("validate");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-            fail("should throw an error during execution.");
-        } catch (VerificationException e) {
-            // expected...it'd be nice if we could get the specifics of the exception right here...
-        }
-
-        List<String> logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logFile = verifier.loadLogLines();
 
         String msg = "Plugin's descriptor contains the wrong version: 2.0-SNAPSHOT";
 
@@ -65,7 +62,7 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
             }
         }
 
-        assertTrue("User-friendly message was not found in output.", foundMessage);
+        assertTrue(foundMessage, "User-friendly message was not found in output.");
     }
 
     @Test

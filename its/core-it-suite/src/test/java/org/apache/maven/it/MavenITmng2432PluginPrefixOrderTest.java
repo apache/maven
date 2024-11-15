@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +50,7 @@ public class MavenITmng2432PluginPrefixOrderTest extends AbstractMavenIntegratio
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2432.pom");
         verifier.deleteArtifacts("org.apache.maven.its.mng2432.settings");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("it:touch");

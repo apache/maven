@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4026">MNG-4026</a>.
@@ -55,7 +56,7 @@ public class MavenITmng4026ReactorDependenciesOrderTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath1 = verifier.loadLines("consumer/target/classpath-1.txt", "UTF-8");
+        List<String> classpath1 = verifier.loadLines("consumer/target/classpath-1.txt");
         assertEquals(5, classpath1.size());
         assertEquals("consumer/classes", classpath1.get(0));
         assertEquals("dep-1/pom.xml", classpath1.get(1));
@@ -63,7 +64,7 @@ public class MavenITmng4026ReactorDependenciesOrderTest extends AbstractMavenInt
         assertEquals("dep-2/pom.xml", classpath1.get(3));
         assertEquals("dep-4/pom.xml", classpath1.get(4));
 
-        List<String> classpath2 = verifier.loadLines("consumer/target/classpath-2.txt", "UTF-8");
+        List<String> classpath2 = verifier.loadLines("consumer/target/classpath-2.txt");
         assertEquals(classpath1, classpath2);
     }
 }

@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1412">MNG-1412</a>:
@@ -46,29 +47,29 @@ public class MavenITmng1412DependenciesOrderTest extends AbstractMavenIntegratio
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng1412");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileArtifacts = verifier.loadLines("target/compile-artifacts.txt", "UTF-8");
+        List<String> compileArtifacts = verifier.loadLines("target/compile-artifacts.txt");
         assertArtifactOrder(compileArtifacts);
 
-        List<String> compileClassPath = verifier.loadLines("target/compile-classpath.txt", "UTF-8");
+        List<String> compileClassPath = verifier.loadLines("target/compile-classpath.txt");
         assertClassPathOrder(compileClassPath.subList(1, compileClassPath.size()));
 
-        List<String> runtimeArtifacts = verifier.loadLines("target/runtime-artifacts.txt", "UTF-8");
+        List<String> runtimeArtifacts = verifier.loadLines("target/runtime-artifacts.txt");
         assertArtifactOrder(runtimeArtifacts);
 
-        List<String> runtimeClassPath = verifier.loadLines("target/runtime-classpath.txt", "UTF-8");
+        List<String> runtimeClassPath = verifier.loadLines("target/runtime-classpath.txt");
         assertClassPathOrder(runtimeClassPath.subList(1, runtimeClassPath.size()));
 
-        List<String> testArtifacts = verifier.loadLines("target/test-artifacts.txt", "UTF-8");
+        List<String> testArtifacts = verifier.loadLines("target/test-artifacts.txt");
         assertArtifactOrder(testArtifacts);
 
-        List<String> testClassPath = verifier.loadLines("target/test-classpath.txt", "UTF-8");
+        List<String> testClassPath = verifier.loadLines("target/test-classpath.txt");
         assertClassPathOrder(testClassPath.subList(2, testClassPath.size()));
     }
 

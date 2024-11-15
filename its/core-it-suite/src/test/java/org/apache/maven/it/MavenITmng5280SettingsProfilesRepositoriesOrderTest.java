@@ -29,7 +29,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -38,6 +37,8 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5280">MNG-5280</a>.
@@ -90,7 +91,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
         verifier.deleteArtifacts("org.apache.maven.its.mng5280");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@httpserver.port@", Integer.toString(httpPort));
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument(
@@ -125,7 +126,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
         verifier.deleteArtifacts("org.apache.maven.its.mng5280");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@httpserver.port@", Integer.toString(httpPort));
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("org.apache.maven.its.mng5280:fake-maven-plugin:1.0:fake");

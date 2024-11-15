@@ -23,9 +23,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3719">MNG-3719</a>.
@@ -58,9 +59,9 @@ public class MavenITmng3719PomExecutionOrderingTest extends AbstractMavenIntegra
         Pattern pattern = Pattern.compile(".*step-([0-9])\\.properties.*");
 
         int[] stepLines = new int[3];
-        List<String> content = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> content = verifier.loadLogLines();
         for (int i = 0; i < content.size(); i++) {
-            String line = (String) content.get(i);
+            String line = content.get(i);
 
             Matcher m = pattern.matcher(line);
             if (m.matches()) {
@@ -70,8 +71,8 @@ public class MavenITmng3719PomExecutionOrderingTest extends AbstractMavenIntegra
         }
 
         // check order - note it is not in sequence as the plugin definitions are merged
-        assertTrue("Step 1 should be found", stepLines[0] > 0);
-        assertTrue("Step 3 should be second", stepLines[0] < stepLines[2]);
-        assertTrue("Step 2 should be third", stepLines[2] < stepLines[1]);
+        assertTrue(stepLines[0] > 0, "Step 1 should be found");
+        assertTrue(stepLines[0] < stepLines[2], "Step 3 should be second");
+        assertTrue(stepLines[2] < stepLines[1], "Step 2 should be third");
     }
 }

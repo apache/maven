@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends AbstractMavenIntegrationTestCase {
 

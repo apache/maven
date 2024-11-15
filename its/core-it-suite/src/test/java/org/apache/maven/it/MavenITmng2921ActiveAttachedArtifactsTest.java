@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Collection;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2921">MNG-2921</a>. It naturally includes the
@@ -59,38 +61,38 @@ public class MavenITmng2921ActiveAttachedArtifactsTest extends AbstractMavenInte
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Collection<String> compileArtifacts = verifier.loadLines("consumer/target/compile.txt", "UTF-8");
+        Collection<String> compileArtifacts = verifier.loadLines("consumer/target/compile.txt");
         assertTrue(
-                compileArtifacts.toString(),
-                compileArtifacts.contains("org.apache.maven.its.mng2921:ejbs:ejb-client:client:1.0-SNAPSHOT"));
+                compileArtifacts.contains("org.apache.maven.its.mng2921:ejbs:ejb-client:client:1.0-SNAPSHOT"),
+                compileArtifacts.toString());
         assertTrue(
-                compileArtifacts.toString(),
-                compileArtifacts.contains("org.apache.maven.its.mng2921:producer:ejb-client:client:1.0-SNAPSHOT"));
+                compileArtifacts.contains("org.apache.maven.its.mng2921:producer:ejb-client:client:1.0-SNAPSHOT"),
+                compileArtifacts.toString());
         assertFalse(
-                compileArtifacts.toString(),
-                compileArtifacts.contains("org.apache.maven.its.mng2921:tests:test-jar:tests:1.0-SNAPSHOT"));
+                compileArtifacts.contains("org.apache.maven.its.mng2921:tests:test-jar:tests:1.0-SNAPSHOT"),
+                compileArtifacts.toString());
         assertFalse(
-                compileArtifacts.toString(),
-                compileArtifacts.contains("org.apache.maven.its.mng2921:producer:test-jar:tests:1.0-SNAPSHOT"));
+                compileArtifacts.contains("org.apache.maven.its.mng2921:producer:test-jar:tests:1.0-SNAPSHOT"),
+                compileArtifacts.toString());
 
-        Collection<String> testArtifacts = verifier.loadLines("consumer/target/test.txt", "UTF-8");
+        Collection<String> testArtifacts = verifier.loadLines("consumer/target/test.txt");
         assertTrue(
-                testArtifacts.toString(),
-                testArtifacts.contains("org.apache.maven.its.mng2921:ejbs:ejb-client:client:1.0-SNAPSHOT"));
+                testArtifacts.contains("org.apache.maven.its.mng2921:ejbs:ejb-client:client:1.0-SNAPSHOT"),
+                testArtifacts.toString());
         assertTrue(
-                testArtifacts.toString(),
-                testArtifacts.contains("org.apache.maven.its.mng2921:producer:ejb-client:client:1.0-SNAPSHOT"));
+                testArtifacts.contains("org.apache.maven.its.mng2921:producer:ejb-client:client:1.0-SNAPSHOT"),
+                testArtifacts.toString());
         assertTrue(
-                testArtifacts.toString(),
-                testArtifacts.contains("org.apache.maven.its.mng2921:tests:test-jar:tests:1.0-SNAPSHOT"));
+                testArtifacts.contains("org.apache.maven.its.mng2921:tests:test-jar:tests:1.0-SNAPSHOT"),
+                testArtifacts.toString());
         assertTrue(
-                testArtifacts.toString(),
-                testArtifacts.contains("org.apache.maven.its.mng2921:producer:test-jar:tests:1.0-SNAPSHOT"));
+                testArtifacts.contains("org.apache.maven.its.mng2921:producer:test-jar:tests:1.0-SNAPSHOT"),
+                testArtifacts.toString());
 
-        Collection<String> testClassPath = verifier.loadLines("consumer/target/test-classpath.txt", "UTF-8");
-        assertTrue(testClassPath.toString(), testClassPath.contains("ejbs/attached.jar"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("tests/attached.jar"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("producer/client.jar"));
-        assertTrue(testClassPath.toString(), testClassPath.contains("producer/tests.jar"));
+        Collection<String> testClassPath = verifier.loadLines("consumer/target/test-classpath.txt");
+        assertTrue(testClassPath.contains("ejbs/attached.jar"), testClassPath.toString());
+        assertTrue(testClassPath.contains("tests/attached.jar"), testClassPath.toString());
+        assertTrue(testClassPath.contains("producer/client.jar"), testClassPath.toString());
+        assertTrue(testClassPath.contains("producer/tests.jar"), testClassPath.toString());
     }
 }

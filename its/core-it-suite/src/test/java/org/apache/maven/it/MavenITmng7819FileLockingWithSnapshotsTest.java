@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -87,7 +86,7 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
         Map<String, String> properties = new HashMap<>();
         properties.put("@port@", Integer.toString(port));
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", properties);
+        verifier.filterFile("settings-template.xml", "settings.xml", properties);
 
         verifier.addCliArgument("-e");
         verifier.addCliArgument("-s");

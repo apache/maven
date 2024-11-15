@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3906">MNG-3906</a>.
@@ -50,7 +52,7 @@ public class MavenITmng3906MergedPluginClassPathOrderingTest extends AbstractMav
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3906");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -65,19 +67,19 @@ public class MavenITmng3906MergedPluginClassPathOrderingTest extends AbstractMav
         assertEquals("5", pclProps.getProperty(resName + ".count"));
 
         assertTrue(
-                pclProps.getProperty(resName + ".0"),
-                pclProps.getProperty(resName + ".0").endsWith("/c-0.1.jar!/" + resName));
+                pclProps.getProperty(resName + ".0").endsWith("/c-0.1.jar!/" + resName),
+                pclProps.getProperty(resName + ".0"));
         assertTrue(
-                pclProps.getProperty(resName + ".1"),
-                pclProps.getProperty(resName + ".1").endsWith("/a-0.2.jar!/" + resName));
+                pclProps.getProperty(resName + ".1").endsWith("/a-0.2.jar!/" + resName),
+                pclProps.getProperty(resName + ".1"));
         assertTrue(
-                pclProps.getProperty(resName + ".2"),
-                pclProps.getProperty(resName + ".2").endsWith("/b-0.1.jar!/" + resName));
+                pclProps.getProperty(resName + ".2").endsWith("/b-0.1.jar!/" + resName),
+                pclProps.getProperty(resName + ".2"));
         assertTrue(
-                pclProps.getProperty(resName + ".3"),
-                pclProps.getProperty(resName + ".3").endsWith("/e-0.1.jar!/" + resName));
+                pclProps.getProperty(resName + ".3").endsWith("/e-0.1.jar!/" + resName),
+                pclProps.getProperty(resName + ".3"));
         assertTrue(
-                pclProps.getProperty(resName + ".4"),
-                pclProps.getProperty(resName + ".4").endsWith("/d-0.1.jar!/" + resName));
+                pclProps.getProperty(resName + ".4").endsWith("/d-0.1.jar!/" + resName),
+                pclProps.getProperty(resName + ".4"));
     }
 }

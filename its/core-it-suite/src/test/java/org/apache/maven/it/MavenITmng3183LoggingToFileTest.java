@@ -23,9 +23,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3183">MNG-3183</a>.
@@ -58,7 +60,7 @@ public class MavenITmng3183LoggingToFileTest extends AbstractMavenIntegrationTes
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> stdout = verifier.loadLines("stdout.txt", "UTF-8");
+        List<String> stdout = verifier.loadLines("stdout.txt");
 
         for (Iterator<String> it = stdout.iterator(); it.hasNext(); ) {
             String line = it.next();
@@ -69,7 +71,7 @@ public class MavenITmng3183LoggingToFileTest extends AbstractMavenIntegrationTes
 
         assertEquals(Collections.EMPTY_LIST, stdout);
 
-        List<String> log = verifier.loadLines("maven.log", "UTF-8");
+        List<String> log = verifier.loadLines("maven.log");
 
         assertFalse(log.isEmpty());
     }

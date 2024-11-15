@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1701">MNG-1701</a>.
@@ -62,7 +63,7 @@ public class MavenITmng1701DuplicatePluginTest extends AbstractMavenIntegrationT
             logLevel = "ERROR";
         }
 
-        List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+        List<String> lines = verifier.loadLogLines();
         boolean foundMessage = false;
         for (String line : lines) {
             if (line.startsWith("[" + logLevel + "]")
@@ -73,6 +74,6 @@ public class MavenITmng1701DuplicatePluginTest extends AbstractMavenIntegrationT
             }
         }
 
-        assertTrue("Duplicate plugin message wasn't generated.", foundMessage);
+        assertTrue(foundMessage, "Duplicate plugin message wasn't generated.");
     }
 }

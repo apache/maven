@@ -19,13 +19,13 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.util.List;
+import java.io.IOException;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends AbstractMavenIntegrationTestCase {
     private static final String RESOURCE_PATH = "/mng-6566-execute-annotation-should-not-re-execute-goals";
@@ -81,14 +81,8 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
         verifier.verifyTextInLog("MNG-6566 plugin require-compile-phase goal executed");
     }
 
-    private void assertCompiledOnce(Verifier verifier) throws VerificationException {
-        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
-        int counter = 0;
-        for (String line : lines) {
-            if (line.contains("compiler:0.1-stub-SNAPSHOT:compile")) {
-                counter++;
-            }
-        }
-        assertEquals("Compile goal was expected to run once", counter, 1);
+    private void assertCompiledOnce(Verifier verifier) throws IOException {
+        long count = verifier.textOccurrencesInLog("compiler:0.1-stub-SNAPSHOT:compile");
+        assertEquals(count, 1L, "Compile goal was expected to run once");
     }
 }

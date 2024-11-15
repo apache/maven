@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4842">MNG-4842</a>.
@@ -53,14 +54,14 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
         verifier.deleteArtifacts("org.apache.maven.its.mng4842");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        List<String> compile = verifier.loadLines("target/compile.txt");
 
-        assertTrue(compile.toString(), compile.contains("dep-0.1.jar"));
+        assertTrue(compile.contains("dep-0.1.jar"), compile.toString());
         verifier.verifyArtifactPresent("org.apache.maven.its.mng4842", "parent", "0.1", "pom");
     }
 
@@ -81,7 +82,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
         verifier.deleteArtifacts("org.apache.maven.its.mng4842");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.apache.maven.it.Verifier.verifyTextInLog;
+import static org.apache.maven.it.Verifier.verifyTextNotInLog;
 
 /**
  * This is a test set for
@@ -49,7 +51,7 @@ class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrati
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logs = verifier.loadLines(verifier.getLogFileName(), null);
+        List<String> logs = verifier.loadLogLines();
 
         verifyTextInLog(logs, "[INFO] [MAVEN-CORE-IT-LOG] localRepository");
         verifyTextInLog(logs, "[WARNING]  * org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT");
@@ -77,7 +79,7 @@ class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrati
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logs = verifier.loadLines(verifier.getLogFileName(), null);
+        List<String> logs = verifier.loadLogLines();
 
         verifyTextInLog(logs, "[INFO] [MAVEN-CORE-IT-LOG] localRepository");
         verifyTextNotInLog(
@@ -89,13 +91,5 @@ class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrati
         verifyTextNotInLog(
                 logs,
                 "[WARNING]      - Parameter 'localRepository' uses deprecated parameter expression '${localRepository}'");
-    }
-
-    private void verifyTextInLog(List<String> logs, String text) {
-        assertTrue("Log file not contains: " + text, logs.stream().anyMatch(l -> l.contains(text)));
-    }
-
-    private void verifyTextNotInLog(List<String> logs, String text) {
-        assertFalse("Log file contains: " + text, logs.stream().anyMatch(l -> l.contains(text)));
     }
 }

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -39,6 +38,9 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4554">MNG-4554</a>.
@@ -104,7 +106,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
             filterProps.put("@port@", Integer.toString(connector.getLocalPort()));
             filterProps.put("@repo@", "repo-1");
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
 
@@ -114,7 +116,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.verifyErrorFreeLog();
 
             verifier.verifyFilePresent("target/touch.txt");
-            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
+            assertTrue(requestedUris.contains(metadataUri), requestedUris.toString());
 
             requestedUris.clear();
 
@@ -123,7 +125,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            assertFalse(requestedUris.toString(), requestedUris.contains(metadataUri));
+            assertFalse(requestedUris.contains(metadataUri), requestedUris.toString());
         } finally {
             server.stop();
             server.join();
@@ -183,7 +185,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
             filterProps.put("@port@", Integer.toString(connector.getLocalPort()));
             filterProps.put("@repo@", "repo-1");
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-U");
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
@@ -194,7 +196,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.verifyErrorFreeLog();
 
             verifier.verifyFilePresent("target/touch.txt");
-            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
+            assertTrue(requestedUris.contains(metadataUri), requestedUris.toString());
 
             requestedUris.clear();
 
@@ -203,7 +205,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
+            assertTrue(requestedUris.contains(metadataUri), requestedUris.toString());
         } finally {
             server.stop();
             server.join();
@@ -265,7 +267,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
             filterProps.put("@port@", Integer.toString(connector.getLocalPort()));
             filterProps.put("@repo@", "repo-it");
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
 
@@ -277,7 +279,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.verifyErrorFreeLog();
 
             verifier.verifyFilePresent("target/touch.txt");
-            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
+            assertTrue(requestedUris.contains(metadataUri), requestedUris.toString());
 
             requestedUris.clear();
 
@@ -289,7 +291,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
+            assertTrue(requestedUris.contains(metadataUri), requestedUris.toString());
         } finally {
             server.stop();
             server.join();

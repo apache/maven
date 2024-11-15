@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4385">MNG-4385</a>.
@@ -57,10 +58,10 @@ public class MavenITmng4385LifecycleMappingFromExtensionInReactorTest extends Ab
             // expected, should fail
             String msg = e.getMessage();
 
-            assertTrue("Failure should be due to unknown packaging", msg.contains("Unknown packaging: it-packaging"));
+            assertTrue(msg.contains("Unknown packaging: it-packaging"), "Failure should be due to unknown packaging");
             assertTrue(
-                    "Failure should be due to sub-b project",
-                    msg.contains("The project org.apache.maven.its.mng4385:sub-b:0.1"));
+                    msg.contains("The project org.apache.maven.its.mng4385:sub-b:0.1"),
+                    "Failure should be due to sub-b project");
         }
     }
 }

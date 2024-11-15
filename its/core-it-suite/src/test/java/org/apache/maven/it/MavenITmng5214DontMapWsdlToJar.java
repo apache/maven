@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTestCase {
     public MavenITmng5214DontMapWsdlToJar() {
@@ -60,7 +62,7 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> lines = verifier.loadLogLines();
         // RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT $ /tmp/it
         // .repo/org/apache/maven/its/mng5214/dependency/1.0-SNAPSHOT/dependency-1.0-SNAPSHOT.wsdl
         for (String line : lines) {

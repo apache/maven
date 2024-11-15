@@ -29,11 +29,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test case for a new check introduced with <a href="https://issues.apache.org/jira/browse/MNG-4660">MNG-4660</a>.

@@ -21,9 +21,12 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Collection;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-820">MNG-820</a>.
@@ -49,18 +52,18 @@ public class MavenITmng0820ConflictResolutionTest extends AbstractMavenIntegrati
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0820");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Collection<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        Collection<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertEquals(3, artifacts.size());
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng0820:d:jar:2.0"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng0820:c:jar:1.4"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng0820:a:jar:1.0"));
-        assertFalse(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng0505:b:jar:1.0"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng0820:d:jar:2.0"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng0820:c:jar:1.4"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng0820:a:jar:1.0"), artifacts.toString());
+        assertFalse(artifacts.contains("org.apache.maven.its.mng0505:b:jar:1.0"), artifacts.toString());
     }
 }

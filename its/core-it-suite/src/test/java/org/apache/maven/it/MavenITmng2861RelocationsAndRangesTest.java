@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2861">MNG-2861</a>.
@@ -44,16 +45,16 @@ public class MavenITmng2861RelocationsAndRangesTest extends AbstractMavenIntegra
         verifier.setAutoclean(false);
         verifier.deleteDirectory("A/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2861");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("A/target/artifacts.txt", "UTF-8");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2861:B:jar:1.0-SNAPSHOT"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2861.new:project:jar:2.0"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2861:C:jar:1.0-SNAPSHOT"));
+        List<String> artifacts = verifier.loadLines("A/target/artifacts.txt");
+        assertTrue(artifacts.contains("org.apache.maven.its.mng2861:B:jar:1.0-SNAPSHOT"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng2861.new:project:jar:2.0"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng2861:C:jar:1.0-SNAPSHOT"), artifacts.toString());
     }
 }

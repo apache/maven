@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4327">MNG-4327</a>.
@@ -53,8 +55,8 @@ public class MavenITmng4327ExcludeForkingMojoFromForkedLifecycleTest extends Abs
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> log = verifier.loadLines("target/fork-lifecycle.txt", "UTF-8");
+        List<String> log = verifier.loadLines("target/fork-lifecycle.txt");
         assertEquals(1, log.size());
-        assertTrue(log.toString(), log.contains("fork-lifecycle.txt"));
+        assertTrue(log.contains("fork-lifecycle.txt"), log.toString());
     }
 }

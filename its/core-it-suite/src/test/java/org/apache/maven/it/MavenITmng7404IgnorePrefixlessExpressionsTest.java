@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +45,7 @@ public class MavenITmng7404IgnorePrefixlessExpressionsTest extends AbstractMaven
     }
 
     private void verifyLogDoesNotContainUnexpectedWarning(Verifier verifier) throws IOException {
-        List<String> loadedLines = verifier.loadLines("log.txt", "UTF-8");
+        List<String> loadedLines = verifier.loadLines("log.txt");
         for (String line : loadedLines) {
             if (line.startsWith("[WARNING]") && line.contains("The expression ${version} is deprecated.")) {
                 fail("Log contained unexpected deprecation warning");

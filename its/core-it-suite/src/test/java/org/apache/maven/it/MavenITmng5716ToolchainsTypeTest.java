@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5716">MNG-5716</a>.
@@ -54,7 +55,7 @@ public class MavenITmng5716ToolchainsTypeTest extends AbstractMavenIntegrationTe
         Map<String, String> properties = verifier.newDefaultFilterMap();
         properties.put("@javaHome@", javaHome.getAbsolutePath());
 
-        verifier.filterFile("toolchains.xml", "toolchains.xml", "UTF-8", properties);
+        verifier.filterFile("toolchains.xml", "toolchains.xml", properties);
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -66,6 +67,6 @@ public class MavenITmng5716ToolchainsTypeTest extends AbstractMavenIntegrationTe
 
         verifier.verifyFilePresent("target/toolchains.properties");
         Properties results = verifier.loadProperties("target/toolchains.properties");
-        assertNull("javac tool should not be found for requested 'fake' toolchain", results.getProperty("tool.1"));
+        assertNull(results.getProperty("tool.1"), "javac tool should not be found for requested 'fake' toolchain");
     }
 }

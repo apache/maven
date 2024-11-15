@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-507">MNG-507</a>.
@@ -61,7 +62,7 @@ public class MavenITmng0507ArtifactRelocationTest extends AbstractMavenIntegrati
         verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom");
         verifier.verifyArtifactNotPresent("org.apache.maven", "maven-core-it-support-old-location", "1.1", "jar");
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven:maven-core-it-support:jar:1.1"));
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
+        assertTrue(artifacts.contains("org.apache.maven:maven-core-it-support:jar:1.1"), artifacts.toString());
     }
 }

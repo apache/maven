@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4452">MNG-4452</a>.
@@ -77,18 +78,18 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
         verifier.deleteArtifacts("org.apache.maven.its.mng4452");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertTrue(
-                artifacts.toString(),
-                artifacts.contains("org.apache.maven.its.mng4452:producer:jar:unix:0.1-SNAPSHOT"));
+                artifacts.contains("org.apache.maven.its.mng4452:producer:jar:unix:0.1-SNAPSHOT"),
+                artifacts.toString());
         assertTrue(
-                artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4452:producer:jar:win:0.1-SNAPSHOT"));
+                artifacts.contains("org.apache.maven.its.mng4452:producer:jar:win:0.1-SNAPSHOT"), artifacts.toString());
         assertTrue(
-                artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4452:producer:war:win:0.1-SNAPSHOT"));
+                artifacts.contains("org.apache.maven.its.mng4452:producer:war:win:0.1-SNAPSHOT"), artifacts.toString());
     }
 }

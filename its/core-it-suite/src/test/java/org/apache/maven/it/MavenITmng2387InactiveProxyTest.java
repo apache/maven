@@ -22,7 +22,6 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -115,7 +114,7 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
         properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());
         properties.put("@port@", Integer.toString(port));
         properties.put("@proxyPort@", Integer.toString(proxyPort));
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", properties);
+        verifier.filterFile("settings-template.xml", "settings.xml", properties);
 
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2387");

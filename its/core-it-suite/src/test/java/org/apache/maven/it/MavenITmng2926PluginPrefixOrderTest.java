@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +66,7 @@ public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegratio
         verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-default.txt");
-        verifier.filterFile("settings-default-template.xml", "settings-default.xml", "UTF-8");
+        verifier.filterFile("settings-default-template.xml", "settings-default.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings-default.xml");
         verifier.addCliArgument("mng-2926:apache");
@@ -77,7 +76,7 @@ public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegratio
         verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-custom.txt");
-        verifier.filterFile("settings-custom-template.xml", "settings-custom.xml", "UTF-8");
+        verifier.filterFile("settings-custom-template.xml", "settings-custom.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings-custom.xml");
         verifier.addCliArgument("mng-2926:custom");

@@ -22,9 +22,11 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4361">MNG-4361</a>.
@@ -56,7 +58,7 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest extends AbstractMav
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
 
         filterProps.put("@repo@", "repo-1");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setLogFileName("log-force-1.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -65,7 +67,7 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest extends AbstractMav
         assertNull(verifier.loadProperties("target/checksum.properties").getProperty("b-0.1-SNAPSHOT.jar"));
 
         filterProps.put("@repo@", "repo-2");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setLogFileName("log-force-2.txt");
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-U");

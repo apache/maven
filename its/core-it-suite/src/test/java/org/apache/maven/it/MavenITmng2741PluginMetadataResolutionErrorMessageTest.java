@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2741">MNG-2741</a>.
@@ -72,7 +73,7 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
         } catch (VerificationException e) {
             boolean foundCause = false;
             StringBuilder sb = new StringBuilder();
-            List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+            List<String> lines = verifier.loadLogLines();
             for (String line : lines) {
                 sb.append(line).append(System.lineSeparator());
                 if (line.matches(".*Connection refused.*")) {
@@ -89,7 +90,7 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
                     break;
                 }
             }
-            assertTrue("Transfer error cause was not found: " + sb, foundCause);
+            assertTrue(foundCause, "Transfer error cause was not found: " + sb);
         }
     }
 }

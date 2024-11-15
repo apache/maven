@@ -22,9 +22,11 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Using a <code>${revision}</code> in the version will change the reactor order before fixing
@@ -59,7 +61,7 @@ public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegratio
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> loadedLines = verifier.loadLines("log-only.txt", "UTF-8");
+        List<String> loadedLines = verifier.loadLines("log-only.txt");
         List<String> resultingLines = extractReactorBuildOrder(loadedLines);
 
         // We're expecting exactly three lines as result.

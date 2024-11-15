@@ -23,9 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4403">MNG-4403</a>.
@@ -53,14 +54,14 @@ public class MavenITmng4403LenientDependencyPomParsingTest extends AbstractMaven
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4403");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         Collections.sort(artifacts);
 
         List<String> expected = new ArrayList<>();

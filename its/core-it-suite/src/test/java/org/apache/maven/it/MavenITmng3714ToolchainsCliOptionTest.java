@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3714">MNG-3714</a>.
@@ -56,7 +57,7 @@ public class MavenITmng3714ToolchainsCliOptionTest extends AbstractMavenIntegrat
         Map<String, String> properties = verifier.newDefaultFilterMap();
         properties.put("@javaHome@", javaHome.getAbsolutePath());
 
-        verifier.filterFile("toolchains.xml", "toolchains.xml", "UTF-8", properties);
+        verifier.filterFile("toolchains.xml", "toolchains.xml", properties);
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2362">MNG-2362</a>.
@@ -86,7 +87,7 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
         String prefix = "TEST-CHARS: ";
         int pos = pom.indexOf(prefix);
         assertTrue(
-                "Corrupt data " + pom.substring(pos, pos + prefix.length() + chars.length()) + " in " + pomFile,
-                pom.contains(prefix + chars));
+                pom.contains(prefix + chars),
+                "Corrupt data " + pom.substring(pos, pos + prefix.length() + chars.length()) + " in " + pomFile);
     }
 }

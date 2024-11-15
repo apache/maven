@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4975">MNG-4975</a>.
@@ -54,7 +55,7 @@ public class MavenITmng4975ProfileInjectedPluginExecutionOrderTest extends Abstr
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("target/exec.log", "UTF-8");
+        List<String> lines = verifier.loadLines("target/exec.log");
         List<String> expected = Arrays.asList(new String[] {"1", "2", "3", "4", "5"});
         assertEquals(expected, lines);
     }

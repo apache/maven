@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -120,7 +119,7 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
         filterProps.put("@mirrorPort@", Integer.toString(port));
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4068");
         verifier.addCliArgument("--settings");

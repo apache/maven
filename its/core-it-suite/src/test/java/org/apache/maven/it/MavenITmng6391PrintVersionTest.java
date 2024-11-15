@@ -22,9 +22,11 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * An integration test to check the enhancements to print out version
@@ -61,7 +63,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> loadedLines = verifier.loadLines("version-log.txt", "UTF-8");
+        List<String> loadedLines = verifier.loadLines("version-log.txt");
         List<String> resultingLines = extractReactorBuildOrder(loadedLines);
 
         // We're expecting exactly four lines as result.
@@ -102,7 +104,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> loadedLines = verifier.loadLines("version-log.txt", "UTF-8");
+        List<String> loadedLines = verifier.loadLines("version-log.txt");
         List<String> resultingLines = extractReactorBuildOrder(loadedLines);
 
         // We're expecting exactly four lines as result.

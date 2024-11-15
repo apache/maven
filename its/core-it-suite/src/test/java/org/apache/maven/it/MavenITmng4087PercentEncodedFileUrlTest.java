@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +47,7 @@ public class MavenITmng4087PercentEncodedFileUrlTest extends AbstractMavenIntegr
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4087");
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
+        verifier.filterFile("pom-template.xml", "pom.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

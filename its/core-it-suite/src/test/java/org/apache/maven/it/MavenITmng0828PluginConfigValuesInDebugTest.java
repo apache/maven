@@ -23,10 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-828">MNG-828</a>.
@@ -58,7 +58,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String log = FileUtils.fileRead(new File(verifier.getBasedir(), verifier.getLogFileName()));
+        String log = verifier.loadLogContent();
 
         checkLog(log, "[DEBUG]   (f) aliasDefaultExpressionParam = test");
         checkLog(log, "[DEBUG]   (f) basedir = " + testDir.getCanonicalPath());
@@ -110,7 +110,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
 
     private void checkLog(String log, String expected) {
         assertTrue(
-                NL + ">>>" + NL + log + "<<<" + NL + NL + "does not contains: " + NL + expected + NL,
-                log.contains(expected));
+                log.contains(expected),
+                NL + ">>>" + NL + log + "<<<" + NL + NL + "does not contains: " + NL + expected + NL);
     }
 }

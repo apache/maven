@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -39,6 +38,8 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4343">MNG-4343</a>.
@@ -136,7 +137,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@updates@", "always");
         filterProps.put("@port@", Integer.toString(port));
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
 
         blockAccess = true;
 
@@ -151,8 +152,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         }
 
         assertTrue(
-                requestedUris.toString(),
-                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"));
+                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"),
+                requestedUris.toString());
         requestedUris.clear();
 
         blockAccess = false;
@@ -162,8 +163,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertTrue(requestedUris.toString(), requestedUris.contains("/dep/0.1/dep-0.1.jar"));
-        assertTrue(requestedUris.toString(), requestedUris.contains("/dep/0.1/dep-0.1.pom"));
+        assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.jar"), requestedUris.toString());
+        assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.pom"), requestedUris.toString());
         verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar");
         verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom");
     }
@@ -187,7 +188,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@updates@", "never");
         filterProps.put("@port@", Integer.toString(port));
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
 
         blockAccess = true;
 
@@ -202,8 +203,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         }
 
         assertTrue(
-                requestedUris.toString(),
-                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"));
+                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"),
+                requestedUris.toString());
         requestedUris.clear();
 
         blockAccess = false;

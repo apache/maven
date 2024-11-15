@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4955">MNG-4955</a>.
@@ -59,12 +60,12 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest extends AbstractM
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
+        List<String> classpath = verifier.loadLines("target/classpath.txt");
 
         File jarFile = new File(classpath.get(1).toString());
         assertEquals("eeff09b1b80e823eeb2a615b1d4b09e003e86fd3", ItUtils.calcHash(jarFile, "SHA-1"));

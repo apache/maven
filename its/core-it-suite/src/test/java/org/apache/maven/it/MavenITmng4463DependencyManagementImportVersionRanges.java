@@ -23,9 +23,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration tests for <a href="https://issues.apache.org/jira/browse/MNG-4463">MNG-4463</a>.
@@ -48,8 +49,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        final List<String> artifacts = verifier.loadLines("target/compile.txt", "UTF-8");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"));
+        final List<String> artifacts = verifier.loadLines("target/compile.txt");
+        assertTrue(artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"), artifacts.toString());
     }
 
     @Test
@@ -62,8 +63,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/compile.txt", "UTF-8");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"));
+        List<String> artifacts = verifier.loadLines("target/compile.txt");
+        assertTrue(artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"), artifacts.toString());
     }
 
     @Test
@@ -80,8 +81,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
         } catch (final VerificationException e) {
             final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
             assertTrue(
-                    "Expected error message not found.",
-                    indexOf(lines, ".*dependency version range.*does not specify an upper bound.*") >= 0);
+                    indexOf(lines, ".*dependency version range.*does not specify an upper bound.*") >= 0,
+                    "Expected error message not found.");
         }
     }
 

@@ -31,7 +31,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
@@ -117,7 +116,7 @@ public abstract class AbstractMavenIntegrationTestCase {
         if (mavenVersion == null) {
             String version = System.getProperty("maven.version", "");
 
-            if (version.length() <= 0 || version.startsWith("${")) {
+            if (version.isEmpty() || version.startsWith("${")) {
                 try {
                     Verifier verifier = new Verifier("");
                     version = verifier.getMavenVersion();
@@ -298,70 +297,6 @@ public abstract class AbstractMavenIntegrationTestCase {
         verifier.getSystemProperties().put("maven.compiler.release", "8");
 
         return verifier;
-    }
-
-    public static void assertCanonicalFileEquals(String message, File expected, File actual) throws IOException {
-        assertEquals(message, expected.getCanonicalFile(), actual.getCanonicalFile());
-    }
-
-    public static void assertCanonicalFileEquals(File expected, File actual) throws IOException {
-        assertCanonicalFileEquals(null, expected, actual);
-    }
-
-    public static void assertCanonicalFileEquals(String message, String expected, String actual) throws IOException {
-        assertCanonicalFileEquals(message, new File(expected), new File(actual));
-    }
-
-    public static void assertCanonicalFileEquals(String expected, String actual) throws IOException {
-        assertCanonicalFileEquals(null, new File(expected), new File(actual));
-    }
-
-    public static void assertEquals(Object o1, Object o2) {
-        assertEquals(null, o1, o2);
-    }
-
-    public static void assertEquals(String message, Object o1, Object o2) {
-        org.junit.jupiter.api.Assertions.assertEquals(o1, o2, message);
-    }
-
-    public static void assertNotEquals(Object o1, Object o2) {
-        assertNotEquals(null, o1, o2);
-    }
-
-    public static void assertNotEquals(String message, Object o1, Object o2) {
-        org.junit.jupiter.api.Assertions.assertNotEquals(o1, o2, message);
-    }
-
-    public static void assertTrue(boolean test) {
-        assertTrue(null, test);
-    }
-
-    public static void assertTrue(String message, boolean test) {
-        org.junit.jupiter.api.Assertions.assertTrue(test, message);
-    }
-
-    public static void assertFalse(boolean test) {
-        assertFalse(null, test);
-    }
-
-    public static void assertFalse(String message, boolean test) {
-        org.junit.jupiter.api.Assertions.assertFalse(test, message);
-    }
-
-    public static void assertNotNull(Object o) {
-        assertNotNull(null, o);
-    }
-
-    public static void assertNotNull(String message, Object o) {
-        org.junit.jupiter.api.Assertions.assertNotNull(o, message);
-    }
-
-    public static void assertNull(Object o) {
-        assertNull(null, o);
-    }
-
-    public static void assertNull(String message, Object o) {
-        org.junit.jupiter.api.Assertions.assertNull(o, message);
     }
 
     public static void fail(String message) {

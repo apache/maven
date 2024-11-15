@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2690">MNG-2690</a>.
@@ -50,22 +52,17 @@ public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegratio
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-
-            fail("should throw an error during execution.");
-        } catch (VerificationException e) {
-            // expected...it'd be nice if we could get the specifics of the exception right here...
-        }
+        verifier.addCliArgument("validate");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
         List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
         int msg = indexOf(lines, "(?i).*required class is missing.*");
-        assertTrue("User-friendly message was not found in output.", msg >= 0);
+        assertTrue(msg >= 0, "User-friendly message was not found in output.");
 
         int cls = lines.get(msg).toString().replace('/', '.').indexOf("junit.framework.TestCase");
-        assertTrue("Missing class name was not found in output.", cls >= 0);
+        assertTrue(cls >= 0, "Missing class name was not found in output.");
     }
 
     @Test
@@ -75,22 +72,17 @@ public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegratio
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-
-            fail("should throw an error during execution.");
-        } catch (VerificationException e) {
-            // expected...it'd be nice if we could get the specifics of the exception right here...
-        }
+        verifier.addCliArgument("validate");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
         List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
         int msg = indexOf(lines, "(?i).*required class (i|wa)s missing( during (mojo )?configuration)?.*");
-        assertTrue("User-friendly message was not found in output.", msg >= 0);
+        assertTrue(msg >= 0, "User-friendly message was not found in output.");
 
         int cls = lines.get(msg).toString().replace('/', '.').indexOf("junit.framework.TestCase");
-        assertTrue("Missing class name was not found in output.", cls >= 0);
+        assertTrue(cls >= 0, "Missing class name was not found in output.");
     }
 
     @Test
@@ -100,21 +92,16 @@ public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegratio
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-
-            fail("should throw an error during execution.");
-        } catch (VerificationException e) {
-            // expected...it'd be nice if we could get the specifics of the exception right here...
-        }
+        verifier.addCliArgument("validate");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
         List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
         String compLookupMsg = "(?i).*unable to .* mojo 'mojo-component-lookup-exception' .* plugin "
                 + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";
 
-        assertTrue("User-friendly message was not found in output.", indexOf(lines, compLookupMsg) > 0);
+        assertTrue(indexOf(lines, compLookupMsg) > 0, "User-friendly message was not found in output.");
     }
 
     @Test
@@ -124,21 +111,16 @@ public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegratio
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-
-            fail("should throw an error during execution.");
-        } catch (VerificationException e) {
-            // expected...it'd be nice if we could get the specifics of the exception right here...
-        }
+        verifier.addCliArgument("validate");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
         List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
         String compLookupMsg = "(?i).*unable to .* mojo 'requirement-component-lookup-exception' .* plugin "
                 + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";
 
-        assertTrue("User-friendly message was not found in output.", indexOf(lines, compLookupMsg) > 0);
+        assertTrue(indexOf(lines, compLookupMsg) > 0, "User-friendly message was not found in output.");
     }
 
     private int indexOf(List<String> logLines, String regex) {

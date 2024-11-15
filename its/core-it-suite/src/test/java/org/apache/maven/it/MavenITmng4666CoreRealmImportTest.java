@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4666">MNG-4666</a>.
@@ -70,7 +72,7 @@ public class MavenITmng4666CoreRealmImportTest extends AbstractMavenIntegrationT
         verifier.deleteArtifacts("org.sonatype.sisu", "sisu-inject-plexus", "0.1-stub");
         verifier.deleteArtifacts("org.sonatype.spice", "spice-inject-plexus", "0.1-stub");
         verifier.deleteArtifacts("classworlds", "classworlds", "0.1-stub");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -86,7 +88,7 @@ public class MavenITmng4666CoreRealmImportTest extends AbstractMavenIntegrationT
         }
         assertFalse(types.isEmpty());
         for (String type : types) {
-            assertEquals(type, props.get("plugin." + type), props.get("core." + type));
+            assertEquals(props.get("plugin." + type), props.get("core." + type), type);
         }
     }
 

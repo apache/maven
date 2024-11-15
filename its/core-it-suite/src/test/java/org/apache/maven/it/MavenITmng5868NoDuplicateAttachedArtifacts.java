@@ -25,7 +25,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -36,6 +35,8 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5868">MNG-5868</a>.
@@ -117,6 +118,6 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
         verifier.addCliArguments("org.apache.maven.its.plugins:maven-it-plugin-artifact:2.1-SNAPSHOT:attach", "deploy");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        assertEquals("deployedJarArtifactNumber: " + deployedJarArtifactNumber, 1, deployedJarArtifactNumber);
+        assertEquals(1, deployedJarArtifactNumber, "deployedJarArtifactNumber: " + deployedJarArtifactNumber);
     }
 }

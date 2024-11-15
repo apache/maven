@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +51,7 @@ public class MavenITmng3314OfflineSnapshotsTest extends AbstractMavenIntegration
             Verifier verifier = newVerifier(testDir.getAbsolutePath());
             verifier.deleteArtifacts("org.apache.maven.its.mng3314");
             verifier.setLogFileName("log1.txt");
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+            verifier.filterFile("settings-template.xml", "settings.xml");
             verifier.addCliArgument("--settings");
             verifier.addCliArgument("settings.xml");
             verifier.addCliArgument("validate");
