@@ -19,9 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +45,6 @@ class MavenITmng8336UnknownPackagingTest extends AbstractMavenIntegrationTestCas
         verifier.execute();
 
         // verify log
-        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
-        assertTrue(lines.stream().noneMatch(s -> s.contains("Unable to obtain POM for artifact")));
+        verifier.verifyTextNotInLog("Unable to obtain POM for artifact");
     }
 }
