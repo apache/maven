@@ -46,8 +46,6 @@ class MavenITmng8340GeneratedPomInTargetTest extends AbstractMavenIntegrationTes
         verifier.verifyErrorFreeLog();
 
         List<String> l = verifier.loadLogLines();
-        assertFalse(l.stream()
-                .anyMatch(i -> i.contains(
-                        "[FATAL] 'parent.relativePath' points at '../../pom.xml' but no POM could be found")));
+        verifier.verifyTextNotInLog("[FATAL] 'parent.relativePath' points at '../../pom.xml' but no POM could be found");
     }
 }
