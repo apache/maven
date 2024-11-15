@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.BuilderProblem;
@@ -50,9 +49,9 @@ import org.apache.maven.api.settings.RepositoryPolicy;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
-import org.apache.maven.internal.impl.secdispatcher.MavenSecDispatcher;
 import org.apache.maven.settings.v4.SettingsMerger;
 import org.apache.maven.settings.v4.SettingsTransformer;
+import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
@@ -67,11 +66,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final Interpolator interpolator;
 
-    @Nullable
-    private final MavenSecDispatcher secDispatcher;
+    private final SecDispatcher secDispatcher;
 
     /**
-     * This ctor is used in legacy components, and when in legacy, {@link MavenSecDispatcher} is {@code null} and
+     * This ctor is used in legacy components, and when in legacy, {@link SecDispatcher} is {@code null} and
      * Maven3 exposes decryption with other means.
      */
     public DefaultSettingsBuilder() {
@@ -79,10 +77,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     /**
-     * In Maven4 the {@link MavenSecDispatcher} is injected and build settings are fully decrypted as well.
+     * In Maven4 the {@link SecDispatcher} is injected and build settings are fully decrypted as well.
      */
     @Inject
-    public DefaultSettingsBuilder(Interpolator interpolator, MavenSecDispatcher secDispatcher) {
+    public DefaultSettingsBuilder(Interpolator interpolator, SecDispatcher secDispatcher) {
         this.interpolator = interpolator;
         this.secDispatcher = secDispatcher;
     }

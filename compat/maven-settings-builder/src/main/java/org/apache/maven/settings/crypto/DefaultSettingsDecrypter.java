@@ -46,7 +46,7 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
     private final SecDispatcher securityDispatcher;
 
     @Inject
-    public DefaultSettingsDecrypter(SecDispatcher securityDispatcher) {
+    public DefaultSettingsDecrypter(MavenSecDispatcher securityDispatcher) {
         this.securityDispatcher = securityDispatcher;
     }
 
