@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4690">MNG-4690</a>.
  *
@@ -89,12 +91,12 @@ public class MavenITmng4690InterdependentConflictResolutionTest extends Abstract
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
 
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("a-1.jar"));
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("b-1.jar"));
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("c-1.jar"));
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("d-1.jar"));
+        assertTrue(classpath.contains("a-1.jar"), test + " > " + classpath.toString());
+        assertTrue(classpath.contains("b-1.jar"), test + " > " + classpath.toString());
+        assertTrue(classpath.contains("c-1.jar"), test + " > " + classpath.toString());
+        assertTrue(classpath.contains("d-1.jar"), test + " > " + classpath.toString());
 
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("x-1.jar"));
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("y-2.jar"));
+        assertTrue(classpath.contains("x-1.jar"), test + " > " + classpath.toString());
+        assertTrue(classpath.contains("y-2.jar"), test + " > " + classpath.toString());
     }
 }

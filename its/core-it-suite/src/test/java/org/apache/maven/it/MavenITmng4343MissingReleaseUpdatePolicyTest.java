@@ -39,6 +39,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4343">MNG-4343</a>.
  *
@@ -150,8 +152,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         }
 
         assertTrue(
-                requestedUris.toString(),
-                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"));
+                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"),
+                requestedUris.toString());
         requestedUris.clear();
 
         blockAccess = false;
@@ -161,8 +163,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertTrue(requestedUris.toString(), requestedUris.contains("/dep/0.1/dep-0.1.jar"));
-        assertTrue(requestedUris.toString(), requestedUris.contains("/dep/0.1/dep-0.1.pom"));
+        assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.jar"), requestedUris.toString());
+        assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.pom"), requestedUris.toString());
         verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar");
         verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom");
     }
@@ -201,8 +203,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         }
 
         assertTrue(
-                requestedUris.toString(),
-                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"));
+                requestedUris.contains("/dep/0.1/dep-0.1.jar") || requestedUris.contains("/dep/0.1/dep-0.1.pom"),
+                requestedUris.toString());
         requestedUris.clear();
 
         blockAccess = false;

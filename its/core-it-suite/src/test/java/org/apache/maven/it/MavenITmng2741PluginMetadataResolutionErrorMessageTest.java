@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2741">MNG-2741</a>.
  *
@@ -88,7 +90,7 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
                     break;
                 }
             }
-            assertTrue("Transfer error cause was not found: " + sb, foundCause);
+            assertTrue(foundCause, "Transfer error cause was not found: " + sb);
         }
     }
 }

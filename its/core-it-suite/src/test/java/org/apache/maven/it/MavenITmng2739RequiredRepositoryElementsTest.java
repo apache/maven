@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2739">MNG-2739</a>.
  * todo Fill in a better description of what this test verifies!
@@ -64,7 +66,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
             }
         }
 
-        assertFalse("Missing repository-id should not result in a NullPointerException.", foundNpe);
+        assertFalse(foundNpe, "Missing repository-id should not result in a NullPointerException.");
     }
 
     @Test
@@ -96,6 +98,6 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
             }
         }
 
-        assertFalse("Missing repository-url should not result in a NullPointerException.", foundNpe);
+        assertFalse(foundNpe, "Missing repository-url should not result in a NullPointerException.");
     }
 }

@@ -36,6 +36,10 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3415">MNG-3415</a>.
  */
@@ -203,8 +207,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
             verifier.verifyErrorFreeLog();
 
             assertTrue(
-                    requestUris.toString(),
-                    requestUris.contains("/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml"));
+                    requestUris.contains("/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml"),
+                    requestUris.toString());
 
             requestUris.clear();
 
@@ -220,14 +224,14 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
             verifier.verifyErrorFreeLog();
 
             assertFalse(
-                    requestUris.toString(),
-                    requestUris.contains("/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml"));
+                    requestUris.contains("/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml"),
+                    requestUris.toString());
 
             assertEquals(
-                    "Last-modified time should be unchanged from first build through second build for the file we use for"
-                            + " updateInterval checks.",
                     firstLastMod,
-                    updateCheckFile.lastModified());
+                    updateCheckFile.lastModified(),
+                    "Last-modified time should be unchanged from first build through second build for the file we use for"
+                            + " updateInterval checks.");
         } finally {
             server.stop();
             server.join();
@@ -238,8 +242,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         File metadata = getMetadataFile(verifier);
 
         assertFalse(
-                "Metadata file should NOT be present in local repository: " + metadata.getAbsolutePath(),
-                metadata.exists());
+                metadata.exists(),
+                "Metadata file should NOT be present in local repository: " + metadata.getAbsolutePath());
     }
 
     private void setupDummyDependency(Verifier verifier, File testDir, boolean resetUpdateInterval) throws IOException {

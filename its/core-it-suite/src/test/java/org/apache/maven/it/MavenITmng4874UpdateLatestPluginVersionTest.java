@@ -24,6 +24,8 @@ import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4874">MNG-4874</a>.
  *
@@ -54,6 +56,6 @@ public class MavenITmng4874UpdateLatestPluginVersionTest extends AbstractMavenIn
 
         File metadataFile = new File(testDir, "target/repo/org/apache/maven/its/mng4874/test/maven-metadata.xml");
         String xml = FileUtils.fileRead(metadataFile, "UTF-8");
-        assertTrue(xml, xml.matches("(?s).*<latest>0\\.1-SNAPSHOT</latest>.*"));
+        assertTrue(xml.matches("(?s).*<latest>0\\.1-SNAPSHOT</latest>.*"), xml);
     }
 }

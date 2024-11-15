@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4359">MNG-4359</a>.
  *
@@ -55,7 +57,7 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest extends Ab
         verifier.verifyErrorFreeLog();
 
         List<String> cp = verifier.loadLines("mod-c/target/classpath.txt");
-        assertTrue(cp.toString(), cp.contains("mod-b/pom.xml"));
-        assertTrue(cp.toString(), cp.contains("mod-a/pom.xml"));
+        assertTrue(cp.contains("mod-b/pom.xml"), cp.toString());
+        assertTrue(cp.contains("mod-a/pom.xml"), cp.toString());
     }
 }

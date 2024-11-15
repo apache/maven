@@ -35,6 +35,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4555">MNG-4555</a>.
  *
@@ -101,6 +103,6 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
             server.join();
         }
 
-        assertTrue(uris.toString(), uris.isEmpty());
+        assertTrue(uris.isEmpty(), uris.toString());
     }
 }

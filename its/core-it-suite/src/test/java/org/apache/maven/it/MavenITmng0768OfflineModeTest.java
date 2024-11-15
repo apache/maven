@@ -38,6 +38,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-768">MNG-768</a>.
  *
@@ -138,7 +140,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
                 verifier.verifyErrorFreeLog();
             }
 
-            assertTrue(requestedUris.toString(), requestedUris.isEmpty());
+            assertTrue(requestedUris.isEmpty(), requestedUris.toString());
 
             {
                 // phase 3: delete test artifact and run build in offline mode to check it fails now
@@ -164,7 +166,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
 
             System.out.println("Bound server socket to the port " + port);
 
-            assertTrue(requestedUris.toString(), requestedUris.isEmpty());
+            assertTrue(requestedUris.isEmpty(), requestedUris.toString());
         } finally {
             server.stop();
             server.join();

@@ -35,6 +35,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4348">MNG-4348</a>.
  *

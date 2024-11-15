@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * MNG-6030 reintroduced ReactorModelCache, but this ignores invalid relativePaths of parents
  *

@@ -36,6 +36,8 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4771">MNG-4771</a>.
  *
@@ -101,6 +103,6 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest ext
             server.join();
         }
 
-        assertTrue(requestedUris.toString(), requestedUris.isEmpty());
+        assertTrue(requestedUris.isEmpty(), requestedUris.toString());
     }
 }

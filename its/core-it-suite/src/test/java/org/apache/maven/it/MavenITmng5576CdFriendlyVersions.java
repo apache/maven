@@ -25,6 +25,9 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5576">MNG-5576</a>.
  *
@@ -62,7 +65,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
         for (String line : lines) {
             seenScanning |= line.contains("Scanning for projects");
             if (seenScanning) {
-                assertFalse(String.join("\n", lines), line.contains("WARNING"));
+                assertFalse(line.contains("WARNING"), String.join("\n", lines));
             }
         }
     }
@@ -95,7 +98,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
         for (String line : lines) {
             seenScanning |= line.contains("Scanning for projects");
             if (seenScanning) {
-                assertFalse(String.join("\n", lines), line.contains("WARNING"));
+                assertFalse(line.contains("WARNING"), String.join("\n", lines));
             }
         }
     }

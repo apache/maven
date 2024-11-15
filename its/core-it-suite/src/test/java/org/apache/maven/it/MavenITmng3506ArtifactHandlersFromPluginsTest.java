@@ -25,6 +25,9 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3506">MNG-3506</a>.
  *
@@ -64,32 +67,32 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest extends AbstractMaven
 
         // Parent POM
         String path = verifier.getArtifactPath(GID, AID, VERSION, "pom");
-        assertTrue(path + " should have been installed.", new File(path).exists());
+        assertTrue(new File(path).exists(), path + " should have been installed.");
 
         // Child 1
         path = verifier.getArtifactPath(GID, AID + ".1", VERSION, TYPE);
-        assertTrue(path + " should have been installed.", new File(path).exists());
+        assertTrue(new File(path).exists(), path + " should have been installed.");
 
         path = verifier.getArtifactPath(GID, AID + ".1", VERSION, "pom");
-        assertTrue(path + " should have been installed.", new File(path).exists());
+        assertTrue(new File(path).exists(), path + " should have been installed.");
 
         path = verifier.getArtifactPath(GID, AID + ".1", VERSION, BAD_TYPE1);
-        assertFalse(path + " should NOT have been installed.", new File(path).exists());
+        assertFalse(new File(path).exists(), path + " should NOT have been installed.");
 
         path = verifier.getArtifactPath(GID, AID + ".1", VERSION, BAD_TYPE2);
-        assertFalse(path + " should _NEVER_ be installed!!!", new File(path).exists());
+        assertFalse(new File(path).exists(), path + " should _NEVER_ be installed!!!");
 
         // Child 2
         path = verifier.getArtifactPath(GID, AID + ".2", VERSION, TYPE);
-        assertTrue(path + " should have been installed.", new File(path).exists());
+        assertTrue(new File(path).exists(), path + " should have been installed.");
 
         path = verifier.getArtifactPath(GID, AID + ".2", VERSION, "pom");
-        assertTrue(path + " should have been installed.", new File(path).exists());
+        assertTrue(new File(path).exists(), path + " should have been installed.");
 
         path = verifier.getArtifactPath(GID, AID + ".2", VERSION, BAD_TYPE1);
-        assertFalse(path + " should _NEVER_ be installed!!!", new File(path).exists());
+        assertFalse(new File(path).exists(), path + " should _NEVER_ be installed!!!");
 
         path = verifier.getArtifactPath(GID, AID + ".2", VERSION, BAD_TYPE2);
-        assertFalse(path + " should NOT have been installed.", new File(path).exists());
+        assertFalse(new File(path).exists(), path + " should NOT have been installed.");
     }
 }

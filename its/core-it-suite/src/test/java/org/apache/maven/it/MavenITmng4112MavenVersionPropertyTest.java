@@ -24,6 +24,9 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MavenITmng4112MavenVersionPropertyTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng4112MavenVersionPropertyTest() {
@@ -48,11 +51,11 @@ public class MavenITmng4112MavenVersionPropertyTest extends AbstractMavenIntegra
         Properties props = verifier.loadProperties("target/pom.properties");
 
         String testMavenVersion = props.getProperty("project.properties.simpleVersion", "");
-        assertFalse(testMavenVersion, testMavenVersion.contains("$"));
-        assertTrue(testMavenVersion, testMavenVersion.matches("[0-9]+\\.[0-9]+.*"));
+        assertFalse(testMavenVersion.contains("$"), testMavenVersion);
+        assertTrue(testMavenVersion.matches("[0-9]+\\.[0-9]+.*"), testMavenVersion);
 
         String testMavenBuildVersion = props.getProperty("project.properties.fullVersion", "");
-        assertTrue(testMavenBuildVersion, testMavenBuildVersion.contains(testMavenVersion));
+        assertTrue(testMavenBuildVersion.contains(testMavenVersion), testMavenBuildVersion);
 
         verifier.verifyErrorFreeLog();
     }

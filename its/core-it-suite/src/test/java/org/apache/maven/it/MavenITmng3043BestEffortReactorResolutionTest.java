@@ -25,6 +25,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3043">MNG-3043</a>.
  *
@@ -225,7 +228,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     }
 
     private void assertContains(List<String> collection, String item) {
-        assertTrue(item + " missing in " + collection, collection.contains(item));
+        assertTrue(collection.contains(item), item + " missing in " + collection);
     }
 
     private void assertNotContains(List<String> collection, String[] items) {
@@ -235,6 +238,6 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     }
 
     private void assertNotContains(List<String> collection, String item) {
-        assertFalse(item + " present in " + collection, collection.contains(item));
+        assertFalse(collection.contains(item), item + " present in " + collection);
     }
 }

@@ -23,6 +23,8 @@ import java.io.File;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2339">MNG-2339</a>.
  */
@@ -64,8 +66,8 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
         verifier.execute();
 
         assertTrue(
-                "Touchfile using ${project.version} for ${version} does not exist.",
-                new File(testDir, "target/touch-1.txt").exists());
+                new File(testDir, "target/touch-1.txt").exists(),
+                "Touchfile using ${project.version} for ${version} does not exist.");
 
         verifier.verifyErrorFreeLog();
 
@@ -81,7 +83,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
         verifier.verifyErrorFreeLog();
 
         assertTrue(
-                "Touchfile using CLI-specified ${version} does not exist.",
-                new File(testDir, "target/touch-2.txt").exists());
+                new File(testDir, "target/touch-2.txt").exists(),
+                "Touchfile using CLI-specified ${version} does not exist.");
     }
 }

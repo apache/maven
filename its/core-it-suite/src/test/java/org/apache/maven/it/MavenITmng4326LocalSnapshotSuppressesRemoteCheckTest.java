@@ -38,6 +38,9 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4326">MNG-4326</a>.
  *
@@ -147,10 +150,10 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
             verifier.verifyErrorFreeLog();
 
             List<String> cp = verifier.loadLines("target/classpath.txt");
-            assertTrue(cp.toString(), cp.contains("dep-0.1-SNAPSHOT.jar"));
+            assertTrue(cp.contains("dep-0.1-SNAPSHOT.jar"), cp.toString());
 
-            assertFalse(uris.toString(), uris.contains("/dep/0.1-SNAPSHOT/maven-metadata.xml"));
-            assertFalse(uris.toString(), uris.contains("/dep/0.1-SNAPSHOT/dep-0.1-20100329.235556-1.jar"));
+            assertFalse(uris.contains("/dep/0.1-SNAPSHOT/maven-metadata.xml"), uris.toString());
+            assertFalse(uris.contains("/dep/0.1-SNAPSHOT/dep-0.1-20100329.235556-1.jar"), uris.toString());
 
             uris.clear();
 
@@ -163,10 +166,10 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
             verifier.verifyErrorFreeLog();
 
             cp = verifier.loadLines("target/classpath.txt");
-            assertTrue(cp.toString(), cp.contains("dep-0.1-SNAPSHOT.jar"));
+            assertTrue(cp.contains("dep-0.1-SNAPSHOT.jar"), cp.toString());
 
-            assertTrue(uris.toString(), uris.contains("/dep/0.1-SNAPSHOT/maven-metadata.xml"));
-            assertTrue(uris.toString(), uris.contains("/dep/0.1-SNAPSHOT/dep-0.1-20100329.235556-1.jar"));
+            assertTrue(uris.contains("/dep/0.1-SNAPSHOT/maven-metadata.xml"), uris.toString());
+            assertTrue(uris.contains("/dep/0.1-SNAPSHOT/dep-0.1-20100329.235556-1.jar"), uris.toString());
         } finally {
             server.stop();
         }

@@ -24,6 +24,8 @@ import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3503">MNG-3503</a>. The first test verifies that
  * a plugin using plexus-utils-1.1 does not cause linkage errors. The second test verifies that a plugin with a

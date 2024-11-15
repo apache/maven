@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-249">MNG-249</a>.
  *
@@ -51,18 +53,18 @@ public class MavenITmng0249ResolveDepsFromReactorTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         List<String> ccp = verifier.loadLines("test-component-c/target/compile.txt");
-        assertTrue(ccp.toString(), ccp.contains("test-component-c/classes"));
-        assertTrue(ccp.toString(), ccp.contains("test-component-b/classes"));
-        assertTrue(ccp.toString(), ccp.contains("test-component-a/classes"));
+        assertTrue(ccp.contains("test-component-c/classes"), ccp.toString());
+        assertTrue(ccp.contains("test-component-b/classes"), ccp.toString());
+        assertTrue(ccp.contains("test-component-a/classes"), ccp.toString());
 
         List<String> rcp = verifier.loadLines("test-component-c/target/runtime.txt");
-        assertTrue(rcp.toString(), rcp.contains("test-component-c/classes"));
-        assertTrue(rcp.toString(), rcp.contains("test-component-b/classes"));
-        assertTrue(rcp.toString(), rcp.contains("test-component-a/classes"));
+        assertTrue(rcp.contains("test-component-c/classes"), rcp.toString());
+        assertTrue(rcp.contains("test-component-b/classes"), rcp.toString());
+        assertTrue(rcp.contains("test-component-a/classes"), rcp.toString());
 
         List<String> tcp = verifier.loadLines("test-component-c/target/test.txt");
-        assertTrue(tcp.toString(), tcp.contains("test-component-c/classes"));
-        assertTrue(tcp.toString(), tcp.contains("test-component-b/classes"));
-        assertTrue(tcp.toString(), tcp.contains("test-component-a/classes"));
+        assertTrue(tcp.contains("test-component-c/classes"), tcp.toString());
+        assertTrue(tcp.contains("test-component-b/classes"), tcp.toString());
+        assertTrue(tcp.contains("test-component-a/classes"), tcp.toString());
     }
 }

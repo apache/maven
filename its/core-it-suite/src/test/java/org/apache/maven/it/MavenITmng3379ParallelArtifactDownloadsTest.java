@@ -23,6 +23,9 @@ import java.io.File;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3379">MNG-3379</a>.
  *
@@ -108,21 +111,21 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
             Verifier verifier, String gid, String aid, String ver, String cls, String ext, String sha1)
             throws Exception {
         File file = new File(verifier.getArtifactPath(gid, aid, ver, ext, cls));
-        assertTrue(file.getAbsolutePath(), file.isFile());
+        assertTrue(file.isFile(), file.getAbsolutePath());
         assertEquals(sha1, ItUtils.calcHash(file, "SHA-1"));
     }
 
     private void assertMetadata(Verifier verifier, String gid, String aid, String ver, String sha1) throws Exception {
         String name = "maven-metadata-maven-core-it.xml";
         File file = new File(verifier.getArtifactMetadataPath(gid, aid, ver, name));
-        assertTrue(file.getAbsolutePath(), file.isFile());
+        assertTrue(file.isFile(), file.getAbsolutePath());
         assertEquals(sha1, ItUtils.calcHash(file, "SHA-1"));
     }
 
     private void assertMetadata(Verifier verifier, String gid, String aid, String sha1) throws Exception {
         String name = "maven-metadata-maven-core-it.xml";
         File file = new File(verifier.getArtifactMetadataPath(gid, aid, null, name));
-        assertTrue(file.getAbsolutePath(), file.isFile());
+        assertTrue(file.isFile(), file.getAbsolutePath());
         assertEquals(sha1, ItUtils.calcHash(file, "SHA-1"));
     }
 }

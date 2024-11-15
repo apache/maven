@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4293">MNG-4293</a>.
  *
@@ -61,14 +64,14 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest extends AbstractM
         verifier.verifyErrorFreeLog();
 
         List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("system-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("provided-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("compile-0.1.jar"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("test-0.1.jar"));
+        assertTrue(compileClassPath.contains("system-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("provided-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("compile-0.1.jar"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("test-0.1.jar"), compileClassPath.toString());
 
         List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt");
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("compile-0.1.jar"));
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("runtime-0.1.jar"));
-        assertFalse(runtimeClassPath.toString(), runtimeClassPath.contains("test-0.1.jar"));
+        assertTrue(runtimeClassPath.contains("compile-0.1.jar"), runtimeClassPath.toString());
+        assertTrue(runtimeClassPath.contains("runtime-0.1.jar"), runtimeClassPath.toString());
+        assertFalse(runtimeClassPath.contains("test-0.1.jar"), runtimeClassPath.toString());
     }
 }

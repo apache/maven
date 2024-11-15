@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2486">MNG-2486</a>.
  *
@@ -83,6 +85,6 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends
         verifier.verifyErrorFreeLog();
 
         List<String> files = verifier.loadLines("target/classpath.txt");
-        assertTrue(files.toString(), files.contains("dep-a-0.1-SNAPSHOT.jar"));
+        assertTrue(files.contains("dep-a-0.1-SNAPSHOT.jar"), files.toString());
     }
 }

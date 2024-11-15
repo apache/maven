@@ -24,6 +24,9 @@ import java.util.Collection;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1233">MNG-1233</a>.
  *
@@ -57,18 +60,18 @@ public class MavenITmng1233WarDepWithProvidedScopeTest extends AbstractMavenInte
 
         Collection<String> compileArtifacts = verifier.loadLines("target/compile.txt");
         assertTrue(
-                compileArtifacts.toString(),
-                compileArtifacts.contains("org.apache.maven.its.it0083:direct-dep:jar:0.1"));
+                compileArtifacts.contains("org.apache.maven.its.it0083:direct-dep:jar:0.1"),
+                compileArtifacts.toString());
         assertTrue(
-                compileArtifacts.toString(),
-                compileArtifacts.contains("org.apache.maven.its.it0083:trans-dep:jar:0.1"));
+                compileArtifacts.contains("org.apache.maven.its.it0083:trans-dep:jar:0.1"),
+                compileArtifacts.toString());
 
         Collection<String> runtimeArtifacts = verifier.loadLines("target/runtime.txt");
         assertTrue(
-                runtimeArtifacts.toString(),
-                runtimeArtifacts.contains("org.apache.maven.its.it0083:direct-dep:jar:0.1"));
+                runtimeArtifacts.contains("org.apache.maven.its.it0083:direct-dep:jar:0.1"),
+                runtimeArtifacts.toString());
         assertFalse(
-                runtimeArtifacts.toString(),
-                runtimeArtifacts.contains("org.apache.maven.its.it0083:trans-dep:jar:0.1"));
+                runtimeArtifacts.contains("org.apache.maven.its.it0083:trans-dep:jar:0.1"),
+                runtimeArtifacts.toString());
     }
 }

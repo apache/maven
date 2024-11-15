@@ -23,6 +23,9 @@ import java.io.File;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3710">MNG-3710</a>.
  *
@@ -58,13 +61,13 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
         verifier.verifyErrorFreeLog();
 
         File topLevelTouchFile = new File(projectsDir, "target/touch.txt");
-        assertFalse("Top-level touch file should NOT be created in projects tree.", topLevelTouchFile.exists());
+        assertFalse(topLevelTouchFile.exists(), "Top-level touch file should NOT be created in projects tree.");
 
         File midLevelTouchFile = new File(projectsDir, "middle/target/touch.txt");
-        assertTrue("Mid-level touch file should have been created in projects tree.", midLevelTouchFile.exists());
+        assertTrue(midLevelTouchFile.exists(), "Mid-level touch file should have been created in projects tree.");
 
         File childLevelTouchFile = new File(projectsDir, "middle/child/target/touch.txt");
-        assertTrue("Child-level touch file should have been created in projects tree.", childLevelTouchFile.exists());
+        assertTrue(childLevelTouchFile.exists(), "Child-level touch file should have been created in projects tree.");
     }
 
     @Test

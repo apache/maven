@@ -27,6 +27,7 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4091">MNG-4091</a>:
@@ -61,7 +62,7 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
             }
         }
 
-        assertTrue("User-friendly message was not found in output.", foundMessage);
+        assertTrue(foundMessage, "User-friendly message was not found in output.");
     }
 
     @Test

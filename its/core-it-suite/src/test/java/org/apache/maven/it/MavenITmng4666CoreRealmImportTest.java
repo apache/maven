@@ -26,6 +26,9 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4666">MNG-4666</a>.
  *
@@ -85,7 +88,7 @@ public class MavenITmng4666CoreRealmImportTest extends AbstractMavenIntegrationT
         }
         assertFalse(types.isEmpty());
         for (String type : types) {
-            assertEquals(type, props.get("plugin." + type), props.get("core." + type));
+            assertEquals(props.get("plugin." + type), props.get("core." + type), type);
         }
     }
 

@@ -26,6 +26,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class MavenITmng7443ConsistencyOfOptionalProjectsAndProfilesTest extends AbstractMavenIntegrationTestCase {
     public MavenITmng7443ConsistencyOfOptionalProjectsAndProfilesTest() {
         super("[4.0.0-alpha-1,)");

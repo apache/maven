@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4987">MNG-4987</a>.
  *
@@ -58,6 +60,6 @@ public class MavenITmng4987TimestampBasedSnapshotSelectionTest extends AbstractM
 
         List<String> compile = verifier.loadLines("target/compile.txt");
 
-        assertTrue(compile.toString(), compile.get(1).toString().startsWith("dep-0.1-"));
+        assertTrue(compile.get(1).toString().startsWith("dep-0.1-"), compile.toString());
     }
 }

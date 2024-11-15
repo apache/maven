@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4275">MNG-4275</a>.
  *
@@ -60,8 +62,8 @@ public class MavenITmng4275RelocationWarningTest extends AbstractMavenIntegratio
         for (String line : lines) {
             if (foundWarning) {
                 assertTrue(
-                        "Relocation target should have been logged right after warning.",
-                        line.contains("This artifact has been relocated to org.apache.maven.its.mng4275:relocated:1"));
+                        line.contains("This artifact has been relocated to org.apache.maven.its.mng4275:relocated:1"),
+                        "Relocation target should have been logged right after warning.");
                 break;
             } else if (line.startsWith("[WARNING] While downloading org.apache.maven.its.mng4275:relocation:1")) {
                 foundWarning = true;
@@ -73,6 +75,6 @@ public class MavenITmng4275RelocationWarningTest extends AbstractMavenIntegratio
             }
         }
 
-        assertTrue("Relocation warning should haven been logged.", foundWarning);
+        assertTrue(foundWarning, "Relocation warning should haven been logged.");
     }
 }

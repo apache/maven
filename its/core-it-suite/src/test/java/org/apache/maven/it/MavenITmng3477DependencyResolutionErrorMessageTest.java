@@ -29,6 +29,8 @@ import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3477">MNG-3477</a>.
  * and extends for <a href="https://issues.apache.org/jira/browse/MNG-7758">MNG-7758</a>
@@ -73,7 +75,7 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
                         break;
                     }
                 }
-                assertTrue("Transfer error cause was not found - " + pattern, foundCause);
+                assertTrue(foundCause, "Transfer error cause was not found - " + pattern);
             }
         }
     }

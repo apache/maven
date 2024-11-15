@@ -32,6 +32,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * Downloads a snapshot dependency that was deployed with uniqueVersion = false, and checks it can be
  * updated. See <a href="https://issues.apache.org/jira/browse/MNG-1908">MNG-1908</a>.

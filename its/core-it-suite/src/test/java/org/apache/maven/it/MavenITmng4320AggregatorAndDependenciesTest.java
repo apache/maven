@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4320">MNG-4320</a>.
  *
@@ -59,13 +62,13 @@ public class MavenITmng4320AggregatorAndDependenciesTest extends AbstractMavenIn
         List<String> classpath;
 
         classpath = verifier.loadLines("target/sub-1.txt");
-        assertTrue(classpath.toString(), classpath.contains("a-0.1.jar"));
+        assertTrue(classpath.contains("a-0.1.jar"), classpath.toString());
 
         classpath = verifier.loadLines("target/sub-2.txt");
-        assertTrue(classpath.toString(), classpath.contains("b-0.2.jar"));
+        assertTrue(classpath.contains("b-0.2.jar"), classpath.toString());
 
         classpath = verifier.loadLines("target/aggregator.txt");
-        assertFalse(classpath.toString(), classpath.contains("a-0.1.jar"));
-        assertFalse(classpath.toString(), classpath.contains("b-0.2.jar"));
+        assertFalse(classpath.contains("a-0.1.jar"), classpath.toString());
+        assertFalse(classpath.contains("b-0.2.jar"), classpath.toString());
     }
 }

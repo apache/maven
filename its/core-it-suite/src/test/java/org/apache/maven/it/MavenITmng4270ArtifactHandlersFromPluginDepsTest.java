@@ -25,6 +25,9 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4270">MNG-4270</a>.
  *
@@ -62,12 +65,12 @@ public class MavenITmng4270ArtifactHandlersFromPluginDepsTest extends AbstractMa
         // IF IT DIDN'T, we have a .pom and a .coreit in the local repo...
 
         String path = verifier.getArtifactPath(GID, AID, VERSION, TYPE);
-        assertTrue(path + " should have been installed.", new File(path).exists());
+        assertTrue(new File(path).exists(), path + " should have been installed.");
 
         path = verifier.getArtifactPath(GID, AID, VERSION, "pom");
-        assertTrue(path + " should have been installed.", new File(path).exists());
+        assertTrue(new File(path).exists(), path + " should have been installed.");
 
         path = verifier.getArtifactPath(GID, AID, VERSION, BAD_TYPE);
-        assertFalse(path + " should NOT have been installed.", new File(path).exists());
+        assertFalse(new File(path).exists(), path + " should NOT have been installed.");
     }
 }

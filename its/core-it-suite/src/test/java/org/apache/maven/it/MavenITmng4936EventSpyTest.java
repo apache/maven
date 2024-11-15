@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4936">MNG-4936</a>.
  *
@@ -55,23 +57,23 @@ public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase
         verifier.verifyErrorFreeLog();
 
         List<String> lines = verifier.loadLines("target/spy.log");
-        assertTrue(lines.toString(), lines.get(0).toString().startsWith("init"));
-        assertTrue(lines.toString(), lines.get(lines.size() - 1).toString().startsWith("close"));
+        assertTrue(lines.get(0).toString().startsWith("init"), lines.toString());
+        assertTrue(lines.get(lines.size() - 1).toString().startsWith("close"), lines.toString());
         assertTrue(
-                lines.toString(),
                 lines.contains(
                         matchesVersionRange("[4.0.0-beta-5,)")
                                 ? "event: org.apache.maven.api.services.SettingsBuilderRequest$SettingsBuilderRequestBuilder$DefaultSettingsBuilderRequest"
-                                : "event: org.apache.maven.settings.building.DefaultSettingsBuildingRequest"));
+                                : "event: org.apache.maven.settings.building.DefaultSettingsBuildingRequest"),
+                lines.toString());
         assertTrue(
-                lines.toString(),
                 lines.contains(
                         matchesVersionRange("[4.0.0-beta-5,)")
                                 ? "event: org.apache.maven.internal.impl.DefaultSettingsBuilder$DefaultSettingsBuilderResult"
-                                : "event: org.apache.maven.settings.building.DefaultSettingsBuildingResult"));
-        assertTrue(lines.toString(), lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionRequest"));
-        assertTrue(lines.toString(), lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionResult"));
+                                : "event: org.apache.maven.settings.building.DefaultSettingsBuildingResult"),
+                lines.toString());
+        assertTrue(lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionRequest"), lines.toString());
+        assertTrue(lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionResult"), lines.toString());
         assertTrue(
-                lines.toString(), lines.contains("event: org.apache.maven.lifecycle.internal.DefaultExecutionEvent"));
+                lines.contains("event: org.apache.maven.lifecycle.internal.DefaultExecutionEvent"), lines.toString());
     }
 }

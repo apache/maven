@@ -25,7 +25,9 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3023">MNG-3023</a>
@@ -96,8 +98,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
+        assertTrue(compileClassPath.contains("dependency-classes"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("dependency-1.jar"), compileClassPath.toString());
     }
 
     /**
@@ -130,8 +132,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
+        assertTrue(compileClassPath.contains("dependency-1.jar"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("dependency-classes"), compileClassPath.toString());
 
         verifier.deleteDirectory("dependency/dependency-classes");
         verifier.deleteDirectory("consumer/target");
@@ -141,7 +143,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         compileClassPath = verifier.loadLines("consumer/target/compile.classpath");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
+        assertTrue(compileClassPath.contains("dependency-1.jar"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("dependency-classes"), compileClassPath.toString());
     }
 }

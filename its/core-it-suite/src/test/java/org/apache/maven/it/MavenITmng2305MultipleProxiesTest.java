@@ -41,6 +41,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.jetty.http.HttpVersion.HTTP_1_1;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2305">MNG-2305</a>.
@@ -117,8 +118,8 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
         }
 
         List<String> cp = verifier.loadLines("target/classpath.txt");
-        assertTrue(cp.toString(), cp.contains("http-0.1.jar"));
-        assertTrue(cp.toString(), cp.contains("https-0.1.jar"));
+        assertTrue(cp.contains("http-0.1.jar"), cp.toString());
+        assertTrue(cp.contains("https-0.1.jar"), cp.toString());
     }
 
     private void addHttpsConnector(Server server, String keyStorePath, String keyStorePassword, String keyPassword) {

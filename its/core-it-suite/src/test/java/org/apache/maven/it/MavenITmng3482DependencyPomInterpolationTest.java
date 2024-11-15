@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3482">MNG-3482</a>.
  *
@@ -52,6 +54,6 @@ public class MavenITmng3482DependencyPomInterpolationTest extends AbstractMavenI
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
-        assertTrue(classpath.toString(), classpath.contains("dep2-1.jar"));
+        assertTrue(classpath.contains("dep2-1.jar"), classpath.toString());
     }
 }

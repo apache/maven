@@ -25,6 +25,8 @@ import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * With the build-consumer the pom.xml will be adjusted during the process.
  * <ul>
@@ -109,8 +111,8 @@ public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCas
 
     static void assertTextEquals(File file1, File file2) throws IOException {
         assertEquals(
-                "pom files differ " + file1 + " " + file2,
                 String.join("\n", FileUtils.loadFile(file1)),
-                String.join("\n", FileUtils.loadFile(file2)));
+                String.join("\n", FileUtils.loadFile(file2)),
+                "pom files differ " + file1 + " " + file2);
     }
 }

@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTestCase {
     public MavenITmng5214DontMapWsdlToJar() {
         super("[3.1,)");

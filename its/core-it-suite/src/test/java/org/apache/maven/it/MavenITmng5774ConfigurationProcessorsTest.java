@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenIntegrationTestCase {
     public MavenITmng5774ConfigurationProcessorsTest() {
         super("(3.2.5,4.0.0-beta-4]");

@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends AbstractMavenIntegrationTestCase {
     private static final String RESOURCE_PATH = "/mng-6566-execute-annotation-should-not-re-execute-goals";
     private static final String PLUGIN_KEY = "org.apache.maven.its.mng6566:plugin:1.0-SNAPSHOT";
@@ -81,6 +83,6 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
 
     private void assertCompiledOnce(Verifier verifier) throws IOException {
         long count = verifier.textOccurrencesInLog("compiler:0.1-stub-SNAPSHOT:compile");
-        assertEquals("Compile goal was expected to run once", count, 1L);
+        assertEquals(count, 1L, "Compile goal was expected to run once");
     }
 }

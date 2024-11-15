@@ -24,6 +24,10 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3807">MNG-3807</a>.
  *
@@ -69,6 +73,6 @@ public class MavenITmng3807PluginConfigExpressionEvaluationTest extends Abstract
     private void assertEvaluated(String value) {
         assertNotNull(value);
         assertTrue(value.length() > 0);
-        assertFalse(value, value.contains("${"));
+        assertFalse(value.contains("${"), value);
     }
 }

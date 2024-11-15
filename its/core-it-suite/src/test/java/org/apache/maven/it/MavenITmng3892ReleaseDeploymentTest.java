@@ -25,6 +25,8 @@ import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3892">MNG-3892</a>.
  *
@@ -79,7 +81,7 @@ public class MavenITmng3892ReleaseDeploymentTest extends AbstractMavenIntegratio
     }
 
     private void verify(File testDir, String file, String checksum) throws Exception {
-        assertEquals(file, checksum, readChecksum(new File(testDir, file)));
+        assertEquals(checksum, readChecksum(new File(testDir, file)), file);
     }
 
     private String readChecksum(File checksumFile) throws Exception {

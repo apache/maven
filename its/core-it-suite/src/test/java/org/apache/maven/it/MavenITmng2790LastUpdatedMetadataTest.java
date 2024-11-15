@@ -27,6 +27,8 @@ import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2790">MNG-2790</a>.
  *
@@ -70,11 +72,11 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
 
         // sanity check: timestamps shouldn't differ by more than 10 min from now (i.e. timezone is UTC)
         assertTrue(
-                artifactVersionLastUpdated1 + " ~ " + now,
-                Math.abs(artifactVersionLastUpdated1.getTime() - now.getTime()) < 10 * 60 * 1000);
+                Math.abs(artifactVersionLastUpdated1.getTime() - now.getTime()) < 10 * 60 * 1000,
+                artifactVersionLastUpdated1 + " ~ " + now);
         assertTrue(
-                artifactLastUpdated1 + " ~ " + now,
-                Math.abs(artifactLastUpdated1.getTime() - now.getTime()) < 10 * 60 * 1000);
+                Math.abs(artifactLastUpdated1.getTime() - now.getTime()) < 10 * 60 * 1000,
+                artifactLastUpdated1 + " ~ " + now);
 
         // enforce some advance of time
         Thread.sleep(1000);
@@ -93,10 +95,10 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
 
         // check that new timestamps are strictly later than from original install
         assertTrue(
-                artifactVersionLastUpdated1 + " < " + artifactVersionLastUpdated2,
-                artifactVersionLastUpdated2.after(artifactVersionLastUpdated1));
+                artifactVersionLastUpdated2.after(artifactVersionLastUpdated1),
+                artifactVersionLastUpdated1 + " < " + artifactVersionLastUpdated2);
         assertTrue(
-                artifactLastUpdated1 + " < " + artifactLastUpdated2, artifactLastUpdated2.after(artifactLastUpdated1));
+                artifactLastUpdated2.after(artifactLastUpdated1), artifactLastUpdated1 + " < " + artifactLastUpdated2);
     }
 
     private Date getLastUpdated(File metadataFile) throws Exception {

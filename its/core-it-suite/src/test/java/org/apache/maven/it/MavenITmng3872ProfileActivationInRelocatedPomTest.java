@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3872">MNG-3872</a>.
  *
@@ -56,8 +59,8 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest extends AbstractM
         verifier.verifyErrorFreeLog();
 
         List<String> compileClassPath = verifier.loadLines("target/compile.txt");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("a-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("b-0.1.jar"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("c-0.1.jar"));
+        assertTrue(compileClassPath.contains("a-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("b-0.1.jar"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("c-0.1.jar"), compileClassPath.toString());
     }
 }

@@ -26,6 +26,11 @@ import java.util.TreeSet;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3843">MNG-3843</a>.
  *
@@ -294,13 +299,13 @@ public class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTe
 
     private void assertUrlCommon(String expected, String actual) {
         // NOTE: URL adjustment is a slightly different issue, so don't test here and merely check for common prefix
-        assertTrue("expected " + expected + " but was " + actual, actual.startsWith(expected));
+        assertTrue(actual.startsWith(expected), "expected " + expected + " but was " + actual);
     }
 
     private void assertMissing(Properties props, String prefix) {
         for (Object o : props.keySet()) {
             String key = o.toString();
-            assertFalse("Found unexpected key: " + key, key.startsWith(prefix));
+            assertFalse(key.startsWith(prefix), "Found unexpected key: " + key);
         }
     }
 }

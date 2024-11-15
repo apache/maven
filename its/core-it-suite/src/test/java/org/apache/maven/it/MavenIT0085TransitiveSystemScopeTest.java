@@ -24,6 +24,8 @@ import java.util.Collection;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MavenIT0085TransitiveSystemScopeTest extends AbstractMavenIntegrationTestCase {
     public MavenIT0085TransitiveSystemScopeTest() {
         super(ALL_MAVEN_VERSIONS);
@@ -54,6 +56,6 @@ public class MavenIT0085TransitiveSystemScopeTest extends AbstractMavenIntegrati
         verifier.verifyErrorFreeLog();
 
         Collection<String> lines = verifier.loadLines("target/test.txt");
-        assertTrue(lines.toString(), lines.contains("system.jar"));
+        assertTrue(lines.contains("system.jar"), lines.toString());
     }
 }

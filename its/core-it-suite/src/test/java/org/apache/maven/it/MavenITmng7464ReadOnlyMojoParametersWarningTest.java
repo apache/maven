@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Test for
  * <a href="https://issues.apache.org/jira/browse/MNG-7464">MNG-7464</a>
@@ -56,7 +58,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findReadOnlyWarning(logLines);
 
-        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
+        assertTrue(warnLines.isEmpty(), "Unwanted warnings: " + warnLines);
     }
 
     /**

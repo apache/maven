@@ -24,6 +24,8 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3827">MNG-3827</a>.
  *
@@ -54,7 +56,7 @@ public class MavenITmng3827PluginConfigTest extends AbstractMavenIntegrationTest
 
         Properties props = verifier.loadProperties("target/plugin-config.properties");
 
-        assertCanonicalFileEquals(new File(testDir, "pom.xml"), new File(props.getProperty("fileParam")));
+        ItUtils.assertCanonicalFileEquals(new File(testDir, "pom.xml"), new File(props.getProperty("fileParam")));
         assertEquals("true", props.getProperty("booleanParam"));
         assertEquals("42", props.getProperty("byteParam"));
         assertEquals("-12345", props.getProperty("shortParam"));

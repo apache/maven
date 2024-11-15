@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2123">MNG-2123</a>.
  */
@@ -49,8 +51,8 @@ public class MavenITmng2123VersionRangeDependencyTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("target/artifacts.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2123:fixed:jar:0.1"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2123:common:jar:3.1"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2123:range:jar:0.1"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng2123:fixed:jar:0.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng2123:common:jar:3.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng2123:range:jar:0.1"), artifacts.toString());
     }
 }

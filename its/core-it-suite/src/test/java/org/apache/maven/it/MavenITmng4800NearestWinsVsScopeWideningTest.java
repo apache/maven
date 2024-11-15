@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4800">MNG-4800</a>.
  *
@@ -66,22 +69,22 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest extends AbstractMavenI
 
         List<String> compile = verifier.loadLines("target/compile.txt");
 
-        assertTrue(test + " > " + compile.toString(), compile.contains("b-0.1.jar"));
-        assertTrue(test + " > " + compile.toString(), compile.contains("c-0.1.jar"));
-        assertTrue(test + " > " + compile.toString(), compile.contains("s-0.1.jar"));
-        assertTrue(test + " > " + compile.toString(), compile.contains("x-0.1.jar"));
-        assertFalse(test + " > " + compile.toString(), compile.contains("a-0.1.jar"));
-        assertFalse(test + " > " + compile.toString(), compile.contains("s-0.2.jar"));
-        assertFalse(test + " > " + compile.toString(), compile.contains("y-0.1.jar"));
+        assertTrue(compile.contains("b-0.1.jar"), test + " > " + compile.toString());
+        assertTrue(compile.contains("c-0.1.jar"), test + " > " + compile.toString());
+        assertTrue(compile.contains("s-0.1.jar"), test + " > " + compile.toString());
+        assertTrue(compile.contains("x-0.1.jar"), test + " > " + compile.toString());
+        assertFalse(compile.contains("a-0.1.jar"), test + " > " + compile.toString());
+        assertFalse(compile.contains("s-0.2.jar"), test + " > " + compile.toString());
+        assertFalse(compile.contains("y-0.1.jar"), test + " > " + compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
 
-        assertTrue(test + " > " + runtime.toString(), runtime.contains("b-0.1.jar"));
-        assertTrue(test + " > " + runtime.toString(), runtime.contains("c-0.1.jar"));
-        assertTrue(test + " > " + runtime.toString(), runtime.contains("s-0.1.jar"));
-        assertTrue(test + " > " + runtime.toString(), runtime.contains("x-0.1.jar"));
-        assertTrue(test + " > " + runtime.toString(), runtime.contains("a-0.1.jar"));
-        assertFalse(test + " > " + runtime.toString(), runtime.contains("s-0.2.jar"));
-        assertFalse(test + " > " + runtime.toString(), runtime.contains("y-0.1.jar"));
+        assertTrue(runtime.contains("b-0.1.jar"), test + " > " + runtime.toString());
+        assertTrue(runtime.contains("c-0.1.jar"), test + " > " + runtime.toString());
+        assertTrue(runtime.contains("s-0.1.jar"), test + " > " + runtime.toString());
+        assertTrue(runtime.contains("x-0.1.jar"), test + " > " + runtime.toString());
+        assertTrue(runtime.contains("a-0.1.jar"), test + " > " + runtime.toString());
+        assertFalse(runtime.contains("s-0.2.jar"), test + " > " + runtime.toString());
+        assertFalse(runtime.contains("y-0.1.jar"), test + " > " + runtime.toString());
     }
 }

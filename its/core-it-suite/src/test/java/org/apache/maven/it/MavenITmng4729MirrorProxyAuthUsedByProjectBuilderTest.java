@@ -37,6 +37,7 @@ import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4729">MNG-4729</a>.

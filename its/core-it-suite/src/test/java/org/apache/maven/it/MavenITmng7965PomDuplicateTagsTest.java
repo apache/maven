@@ -26,6 +26,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for
  * <a href="https://issues.apache.org/jira/browse/MNG-7965">MNG-7965</a>.
@@ -58,11 +60,11 @@ class MavenITmng7965PomDuplicateTagsTest extends AbstractMavenIntegrationTestCas
         // the POM is not parseable
         verifyRegexInLog(logs, "\\[ERROR\\]\\s+Non-parseable POM");
 
-        assertTrue("The Maven invocation should have failed: the POM is non-parseable", invocationFailed);
+        assertTrue(invocationFailed, "The Maven invocation should have failed: the POM is non-parseable");
     }
 
     private void verifyRegexInLog(List<String> logs, String text) {
         Pattern p = Pattern.compile(text);
-        assertTrue("Log file not contains: " + text, logs.stream().anyMatch(p.asPredicate()));
+        assertTrue(logs.stream().anyMatch(p.asPredicate()), "Log file not contains: " + text);
     }
 }

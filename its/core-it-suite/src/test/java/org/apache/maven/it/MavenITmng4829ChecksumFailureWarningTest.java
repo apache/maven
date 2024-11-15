@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4829">MNG-4829</a>.
  *
@@ -69,7 +71,7 @@ public class MavenITmng4829ChecksumFailureWarningTest extends AbstractMavenInteg
             }
         }
 
-        assertTrue("Checksum warning for corrupt.pom has not been logged.", foundWarningPom);
-        assertTrue("Checksum warning for corrupt.jar has not been logged.", foundWarningJar);
+        assertTrue(foundWarningPom, "Checksum warning for corrupt.pom has not been logged.");
+        assertTrue(foundWarningJar, "Checksum warning for corrupt.jar has not been logged.");
     }
 }

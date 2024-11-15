@@ -25,6 +25,9 @@ import java.util.regex.Pattern;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5608">MNG-5608</a>:
  * Profile activation warning test when file specification contains <code>${project.basedir}</code>
@@ -59,7 +62,7 @@ public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenInt
 
     private void assertFileExists(File dir, String filename) {
         File file = new File(dir, filename);
-        assertTrue("expected file: " + file, file.exists());
+        assertTrue(file.exists(), "expected file: " + file);
     }
 
     private String findWarning(List<String> logLines, String profileId) {

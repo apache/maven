@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4005">MNG-4005</a>.
  *
@@ -104,6 +106,6 @@ public class MavenITmng4005UniqueDependencyKeyTest extends AbstractMavenIntegrat
             }
         }
 
-        assertTrue("Duplicate dependency message wasn't generated.", foundMessage);
+        assertTrue(foundMessage, "Duplicate dependency message wasn't generated.");
     }
 }

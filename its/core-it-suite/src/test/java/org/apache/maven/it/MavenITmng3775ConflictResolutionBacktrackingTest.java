@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3775">MNG-3775</a>.
  *
@@ -86,9 +88,9 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest extends AbstractMa
 
         List<String> test = verifier.loadLines("target/test.txt");
 
-        assertTrue(project + " > " + test.toString(), test.contains("a-0.1.jar"));
-        assertTrue(project + " > " + test.toString(), test.contains("b-0.1.jar"));
-        assertTrue(project + " > " + test.toString(), test.contains("x-0.1.jar"));
-        assertTrue(project + " > " + test.toString(), test.contains("c-0.1.jar"));
+        assertTrue(test.contains("a-0.1.jar"), project + " > " + test.toString());
+        assertTrue(test.contains("b-0.1.jar"), project + " > " + test.toString());
+        assertTrue(test.contains("x-0.1.jar"), project + " > " + test.toString());
+        assertTrue(test.contains("c-0.1.jar"), project + " > " + test.toString());
     }
 }

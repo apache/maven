@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5006">MNG-5006</a>.
  *
@@ -60,7 +62,7 @@ public class MavenITmng5006VersionRangeDependencyParentResolutionTest extends Ab
 
         List<String> compile = verifier.loadLines("target/compile.txt");
 
-        assertTrue(compile.toString(), compile.contains("a-0.1.jar"));
-        assertTrue(compile.toString(), compile.contains("b-0.1.jar"));
+        assertTrue(compile.contains("a-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("b-0.1.jar"), compile.toString());
     }
 }

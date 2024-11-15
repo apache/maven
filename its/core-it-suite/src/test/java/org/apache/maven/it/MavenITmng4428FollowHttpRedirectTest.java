@@ -42,6 +42,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.jetty.http.HttpVersion.HTTP_1_1;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4428">MNG-4428</a>.
@@ -139,7 +140,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
         }
 
         List<String> cp = verifier.loadLines("target/classpath.txt");
-        assertTrue(cp.toString(), cp.contains("dep-0.1.jar"));
+        assertTrue(cp.contains("dep-0.1.jar"), cp.toString());
     }
 
     private void addHttpsConnector(Server server, String keyStorePath, String keyStorePassword, String keyPassword) {

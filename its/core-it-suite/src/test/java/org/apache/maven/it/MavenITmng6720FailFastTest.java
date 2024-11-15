@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * An integration test to check that concurrently running projects are finished
  * in --fail-fast mode, while downstream projects are skipped.
@@ -56,12 +58,12 @@ class MavenITmng6720FailFastTest extends AbstractMavenIntegrationTestCase {
 
         List<String> module1Lines = verifier.loadFile(
                 new File(testDir, "module-1/target/surefire-reports/mng6720.Module1Test-output.txt"), false);
-        assertTrue("module-1 should be executed", module1Lines.contains("Module1"));
+        assertTrue(module1Lines.contains("Module1"), "module-1 should be executed");
         List<String> module2Lines = verifier.loadFile(
                 new File(testDir, "module-2/target/surefire-reports/mng6720.Module2Test-output.txt"), false);
-        assertTrue("module-2 should be executed", module2Lines.contains("Module2"));
+        assertTrue(module2Lines.contains("Module2"), "module-2 should be executed");
         List<String> module3Lines = verifier.loadFile(
                 new File(testDir, "module-3/target/surefire-reports/mng6720.Module3Test-output.txt"), false);
-        assertTrue("module-3 should be skipped", module3Lines.isEmpty());
+        assertTrue(module3Lines.isEmpty(), "module-3 should be skipped");
     }
 }

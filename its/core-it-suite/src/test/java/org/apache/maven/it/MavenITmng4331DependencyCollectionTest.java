@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4331">MNG-4331</a>.
  *
@@ -56,7 +59,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("sub-2/target/compile.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4331:sub-1:jar:0.1"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4331:sub-1:jar:0.1"), artifacts.toString());
         assertEquals(1, artifacts.size());
     }
 
@@ -82,7 +85,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("target/sub-2.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4331:sub-1:jar:0.1"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4331:sub-1:jar:0.1"), artifacts.toString());
         assertEquals(1, artifacts.size());
 
         artifacts = verifier.loadLines("target/sub-1.txt");

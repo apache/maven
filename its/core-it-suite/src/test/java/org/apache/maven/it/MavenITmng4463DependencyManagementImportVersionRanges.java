@@ -26,6 +26,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Integration tests for <a href="https://issues.apache.org/jira/browse/MNG-4463">MNG-4463</a>.
  *
@@ -48,7 +50,7 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
         verifier.verifyErrorFreeLog();
 
         final List<String> artifacts = verifier.loadLines("target/compile.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"));
+        assertTrue(artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"), artifacts.toString());
     }
 
     @Test
@@ -62,7 +64,7 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("target/compile.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"));
+        assertTrue(artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"), artifacts.toString());
     }
 
     @Test
@@ -79,8 +81,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
         } catch (final VerificationException e) {
             final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
             assertTrue(
-                    "Expected error message not found.",
-                    indexOf(lines, ".*dependency version range.*does not specify an upper bound.*") >= 0);
+                    indexOf(lines, ".*dependency version range.*does not specify an upper bound.*") >= 0,
+                    "Expected error message not found.");
         }
     }
 

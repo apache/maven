@@ -25,6 +25,8 @@ import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4952">MNG-4952</a>.
  *
@@ -68,6 +70,6 @@ public class MavenITmng4952MetadataReleaseInfoUpdateTest extends AbstractMavenIn
 
         File metadataFile = new File(testDir, "target/repo/org/apache/maven/its/mng4952/test/maven-metadata.xml");
         String xml = FileUtils.fileRead(metadataFile, "UTF-8");
-        assertTrue(xml, xml.matches("(?s).*<release>2\\.0</release>.*"));
+        assertTrue(xml.matches("(?s).*<release>2\\.0</release>.*"), xml);
     }
 }

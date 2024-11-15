@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MRESOLVER-614">MRESOLVER-614</a> that is
  * fixed in Resolver release 2.0.3.
@@ -138,6 +140,6 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
      * Assert true, log lines contains string...
      */
     protected void a(List<String> logLines, String string) {
-        assertTrue("missing " + string, logLines.contains(string));
+        assertTrue(logLines.contains(string), "missing " + string);
     }
 }

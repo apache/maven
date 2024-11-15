@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrationTestCase {
 
     protected MavenITmng7891ConfigurationForExtensionsTest() {

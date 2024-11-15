@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4789">MNG-4789</a>.
  *
@@ -57,18 +60,18 @@ public class MavenITmng4789ScopeInheritanceMeetsConflictTest extends AbstractMav
         verifier.verifyErrorFreeLog();
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
-        assertTrue(compile.toString(), compile.contains("b-0.1.jar"));
-        assertFalse(compile.toString(), compile.contains("x-0.1.jar"));
+        assertFalse(compile.contains("a-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("b-0.1.jar"), compile.toString());
+        assertFalse(compile.contains("x-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
-        assertTrue(runtime.toString(), runtime.contains("b-0.1.jar"));
-        assertFalse(runtime.toString(), runtime.contains("x-0.1.jar"));
+        assertFalse(runtime.contains("a-0.1.jar"), runtime.toString());
+        assertTrue(runtime.contains("b-0.1.jar"), runtime.toString());
+        assertFalse(runtime.contains("x-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
-        assertTrue(test.toString(), test.contains("a-0.1.jar"));
-        assertTrue(test.toString(), test.contains("b-0.1.jar"));
-        assertTrue(test.toString(), test.contains("x-0.1.jar"));
+        assertTrue(test.contains("a-0.1.jar"), test.toString());
+        assertTrue(test.contains("b-0.1.jar"), test.toString());
+        assertTrue(test.contains("x-0.1.jar"), test.toString());
     }
 }

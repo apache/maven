@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3220">MNG-3220</a>.
  *
@@ -87,6 +89,6 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
             }
         }
 
-        assertTrue("Should have found validation error line in output.", found);
+        assertTrue(found, "Should have found validation error line in output.");
     }
 }

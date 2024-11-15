@@ -23,6 +23,8 @@ import java.io.File;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1021">MNG-1021</a>.
  *
@@ -57,7 +59,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
 
         String dir = "repo/org/apache/maven/its/mng1021/test/";
         String snapshot = getSnapshotVersion(new File(testDir, dir + "1-SNAPSHOT"));
-        assertTrue(snapshot, snapshot.endsWith("-1"));
+        assertTrue(snapshot.endsWith("-1"), snapshot);
 
         verifier.verifyFilePresent(dir + "maven-metadata.xml");
         verifier.verifyFilePresent(dir + "maven-metadata.xml.md5");

@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * An integration test to verify that builds fail when logs occur
  * above or equal to the --fail-on-severity cli property.
@@ -57,7 +59,7 @@ public class MavenITmng6065FailOnSeverityTest extends AbstractMavenIntegrationTe
             verifier.verifyTextInLog("Build failed due to log statements with a higher severity than allowed.");
         }
 
-        assertTrue("Build should have failed", failed);
+        assertTrue(failed, "Build should have failed");
     }
 
     @Test

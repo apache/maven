@@ -32,6 +32,8 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4991">MNG-4991</a>.
  *
@@ -104,6 +106,6 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
 
         List<String> compile = verifier.loadLines("target/compile.txt");
 
-        assertTrue(compile.toString(), compile.contains("dep-0.1.jar"));
+        assertTrue(compile.contains("dep-0.1.jar"), compile.toString());
     }
 }

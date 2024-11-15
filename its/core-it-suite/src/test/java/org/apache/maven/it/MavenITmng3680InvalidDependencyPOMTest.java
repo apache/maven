@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3680">MNG-3680</a>.
  *
@@ -56,7 +58,7 @@ public class MavenITmng3680InvalidDependencyPOMTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("target/artifacts.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3680:direct:jar:0.1"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3680:transitive:jar:0.1"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng3680:direct:jar:0.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng3680:transitive:jar:0.1"), artifacts.toString());
     }
 }

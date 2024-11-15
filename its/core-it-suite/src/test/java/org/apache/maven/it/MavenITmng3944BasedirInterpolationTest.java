@@ -56,7 +56,7 @@ public class MavenITmng3944BasedirInterpolationTest extends AbstractMavenIntegra
 
         verifier.verifyFilePresent("target/basedir.properties");
         Properties props = verifier.loadProperties("target/basedir.properties");
-        assertCanonicalFileEquals(testDir, new File(props.getProperty("project.properties.prop0")));
-        assertCanonicalFileEquals(testDir, new File(props.getProperty("project.properties.prop1")));
+        ItUtils.assertCanonicalFileEquals(testDir, new File(props.getProperty("project.properties.prop0")));
+        ItUtils.assertCanonicalFileEquals(testDir, new File(props.getProperty("project.properties.prop1")));
     }
 }

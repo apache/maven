@@ -24,6 +24,10 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4750">MNG-4750</a> and
  * <a href="https://issues.apache.org/jira/browse/MNG-4845">MNG-4845</a>.
@@ -61,7 +65,7 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends A
 
         String path = props.getProperty("project.dependencyArtifacts.0.file");
         assertNotNull(path);
-        assertTrue(path, new File(path).isFile());
+        assertTrue(new File(path).isFile(), path);
 
         String version = props.getProperty("project.dependencyArtifacts.0.version");
         assertEquals("0.1", version);

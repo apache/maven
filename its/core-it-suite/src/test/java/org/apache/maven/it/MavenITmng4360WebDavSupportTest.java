@@ -35,6 +35,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4360">MNG-4360</a>.
  *
@@ -132,6 +134,6 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
         }
 
         List<String> cp = verifier.loadLines("target/classpath.txt");
-        assertTrue(cp.toString(), cp.contains("dep-0.1.jar"));
+        assertTrue(cp.contains("dep-0.1.jar"), cp.toString());
     }
 }

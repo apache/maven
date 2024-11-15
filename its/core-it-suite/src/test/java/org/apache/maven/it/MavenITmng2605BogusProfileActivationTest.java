@@ -24,6 +24,8 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2605">MNG-2605</a>.
  *

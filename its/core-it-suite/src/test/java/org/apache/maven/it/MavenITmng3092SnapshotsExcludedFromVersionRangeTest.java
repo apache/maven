@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3092">MNG-3092</a>.
  *
@@ -59,8 +61,8 @@ public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest extends Abstrac
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
-        assertTrue(classpath.toString(), classpath.contains("a-1.1.jar"));
-        assertTrue(classpath.toString(), classpath.contains("b-1.0-SNAPSHOT.jar"));
-        assertTrue(classpath.toString(), classpath.contains("c-1.1-SNAPSHOT.jar"));
+        assertTrue(classpath.contains("a-1.1.jar"), classpath.toString());
+        assertTrue(classpath.contains("b-1.0-SNAPSHOT.jar"), classpath.toString());
+        assertTrue(classpath.contains("c-1.1-SNAPSHOT.jar"), classpath.toString());
     }
 }

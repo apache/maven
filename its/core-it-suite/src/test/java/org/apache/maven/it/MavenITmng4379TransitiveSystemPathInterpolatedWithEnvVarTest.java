@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4379">MNG-4379</a>.
  *
@@ -58,6 +60,6 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest extend
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
-        assertTrue(classpath.toString(), classpath.contains("pom.xml"));
+        assertTrue(classpath.contains("pom.xml"), classpath.toString());
     }
 }

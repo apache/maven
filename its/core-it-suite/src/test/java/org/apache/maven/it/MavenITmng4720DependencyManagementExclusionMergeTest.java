@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4720">MNG-4720</a>.
  *
@@ -60,16 +63,16 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
 
-        assertTrue(classpath.toString(), classpath.contains("a-0.1.jar"));
-        assertTrue(classpath.toString(), classpath.contains("c-0.1.jar"));
+        assertTrue(classpath.contains("a-0.1.jar"), classpath.toString());
+        assertTrue(classpath.contains("c-0.1.jar"), classpath.toString());
 
-        assertFalse(classpath.toString(), classpath.contains("b-0.1.jar"));
+        assertFalse(classpath.contains("b-0.1.jar"), classpath.toString());
 
         // dependency management in a excludes d
         if (matchesVersionRange("[4.0.0-beta-5,)")) {
-            assertFalse(classpath.toString(), classpath.contains("d-0.1.jar"));
+            assertFalse(classpath.contains("d-0.1.jar"), classpath.toString());
         } else {
-            assertTrue(classpath.toString(), classpath.contains("d-0.1.jar"));
+            assertTrue(classpath.contains("d-0.1.jar"), classpath.toString());
         }
     }
 
@@ -98,12 +101,12 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
 
-        assertTrue(classpath.toString(), classpath.contains("a-0.1.jar"));
-        assertTrue(classpath.toString(), classpath.contains("c-0.1.jar"));
+        assertTrue(classpath.contains("a-0.1.jar"), classpath.toString());
+        assertTrue(classpath.contains("c-0.1.jar"), classpath.toString());
 
-        assertFalse(classpath.toString(), classpath.contains("b-0.1.jar"));
+        assertFalse(classpath.contains("b-0.1.jar"), classpath.toString());
 
         // backward-compat: dependency management is ignored except in root pom
-        assertTrue(classpath.toString(), classpath.contains("d-0.1.jar"));
+        assertTrue(classpath.contains("d-0.1.jar"), classpath.toString());
     }
 }

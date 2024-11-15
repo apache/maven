@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4386">MNG-4386</a>.
  *
@@ -63,6 +65,6 @@ public class MavenITmng4386DebugLoggingTest extends AbstractMavenIntegrationTest
             }
         }
 
-        assertTrue(lines.toString(), debug);
+        assertTrue(debug, lines.toString());
     }
 }

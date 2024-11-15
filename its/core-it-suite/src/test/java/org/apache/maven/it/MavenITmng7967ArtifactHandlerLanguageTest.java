@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.apache.maven.it.Verifier.verifyTextInLog;
 import static org.apache.maven.it.Verifier.verifyTextNotInLog;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for
@@ -66,6 +67,6 @@ class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegration
         // javadoc invocation should actually fail the build
         verifyTextInLog(logs, "[ERROR] Failed to execute goal org.apache.maven.plugins:maven-javadoc-plugin");
 
-        assertTrue("The Maven invocation should have failed: the javadoc should error out", invocationFailed);
+        assertTrue(invocationFailed, "The Maven invocation should have failed: the javadoc should error out");
     }
 }

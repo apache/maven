@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-947">MNG-947</a>.
  *
@@ -59,20 +62,20 @@ public class MavenITmng0947OptionalDependencyTest extends AbstractMavenIntegrati
         verifier.verifyErrorFreeLog();
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertTrue(compile.toString(), compile.contains("org.apache.maven.its.mng0947:d:jar:0.1 (optional)"));
-        assertTrue(compile.toString(), compile.contains("org.apache.maven.its.mng0947:e:jar:0.1 (optional)"));
+        assertTrue(compile.contains("org.apache.maven.its.mng0947:d:jar:0.1 (optional)"), compile.toString());
+        assertTrue(compile.contains("org.apache.maven.its.mng0947:e:jar:0.1 (optional)"), compile.toString());
         assertEquals(2, compile.size());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertTrue(runtime.toString(), runtime.contains("org.apache.maven.its.mng0947:c:jar:0.1"));
-        assertTrue(runtime.toString(), runtime.contains("org.apache.maven.its.mng0947:d:jar:0.1 (optional)"));
-        assertTrue(runtime.toString(), runtime.contains("org.apache.maven.its.mng0947:e:jar:0.1 (optional)"));
+        assertTrue(runtime.contains("org.apache.maven.its.mng0947:c:jar:0.1"), runtime.toString());
+        assertTrue(runtime.contains("org.apache.maven.its.mng0947:d:jar:0.1 (optional)"), runtime.toString());
+        assertTrue(runtime.contains("org.apache.maven.its.mng0947:e:jar:0.1 (optional)"), runtime.toString());
         assertEquals(3, runtime.size());
 
         List<String> test = verifier.loadLines("target/test.txt");
-        assertTrue(test.toString(), test.contains("org.apache.maven.its.mng0947:c:jar:0.1"));
-        assertTrue(test.toString(), test.contains("org.apache.maven.its.mng0947:d:jar:0.1 (optional)"));
-        assertTrue(test.toString(), test.contains("org.apache.maven.its.mng0947:e:jar:0.1 (optional)"));
+        assertTrue(test.contains("org.apache.maven.its.mng0947:c:jar:0.1"), test.toString());
+        assertTrue(test.contains("org.apache.maven.its.mng0947:d:jar:0.1 (optional)"), test.toString());
+        assertTrue(test.contains("org.apache.maven.its.mng0947:e:jar:0.1 (optional)"), test.toString());
         assertEquals(3, test.size());
     }
 }

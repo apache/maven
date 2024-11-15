@@ -25,6 +25,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Using a <code>${revision}</code> in the version will change the reactor order before fixing
  * <a href="https://issues.apache.org/jira/browse/MNG-6057">MNG-6057</a>. Without the fix for this issue the order of

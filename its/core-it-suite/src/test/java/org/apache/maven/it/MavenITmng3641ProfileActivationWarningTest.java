@@ -25,6 +25,9 @@ import java.util.regex.Pattern;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3641">MNG-3641</a>:
  * Profile activation warning test

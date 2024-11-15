@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4814">MNG-4814</a>.
  *
@@ -62,7 +65,7 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest extends A
 
         List<String> compile = verifier.loadLines("consumer/target/compile.txt");
 
-        assertFalse(compile.toString(), compile.contains("0.1-SNAPSHOT/producer-0.1-SNAPSHOT.jar"));
-        assertTrue(compile.toString(), compile.contains("producer/pom.xml"));
+        assertFalse(compile.contains("0.1-SNAPSHOT/producer-0.1-SNAPSHOT.jar"), compile.toString());
+        assertTrue(compile.contains("producer/pom.xml"), compile.toString());
     }
 }

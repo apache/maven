@@ -37,6 +37,9 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4500">MNG-4500</a>.
  *
@@ -105,9 +108,9 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
             verifier.verifyErrorFreeLog();
 
             List<String> classpath = verifier.loadLines("target/classpath.txt");
-            assertTrue(classpath.toString(), classpath.contains("dep-0.1-SNAPSHOT.jar"));
-            assertTrue(requestedUris.toString(), requestedUris.contains(pomUri));
-            assertTrue(requestedUris.toString(), requestedUris.contains(jarUri));
+            assertTrue(classpath.contains("dep-0.1-SNAPSHOT.jar"), classpath.toString());
+            assertTrue(requestedUris.contains(pomUri), requestedUris.toString());
+            assertTrue(requestedUris.contains(jarUri), requestedUris.toString());
 
             requestedUris.clear();
 
@@ -117,9 +120,9 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
             verifier.verifyErrorFreeLog();
 
             classpath = verifier.loadLines("target/classpath.txt");
-            assertTrue(classpath.toString(), classpath.contains("dep-0.1-SNAPSHOT.jar"));
-            assertFalse(requestedUris.toString(), requestedUris.contains(pomUri));
-            assertFalse(requestedUris.toString(), requestedUris.contains(jarUri));
+            assertTrue(classpath.contains("dep-0.1-SNAPSHOT.jar"), classpath.toString());
+            assertFalse(requestedUris.contains(pomUri), requestedUris.toString());
+            assertFalse(requestedUris.contains(jarUri), requestedUris.toString());
         } finally {
             server.stop();
             server.join();

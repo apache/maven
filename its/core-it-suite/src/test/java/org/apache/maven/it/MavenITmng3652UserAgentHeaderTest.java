@@ -35,6 +35,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3652">MNG-3652</a>.
  */
@@ -136,9 +140,9 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
         String artifactVersion = lines.get(4);
 
         assertEquals(
-                "Comparing User-Agent '" + userAgent + "'",
                 "Apache-Maven/" + mavenVersion + " (Java " + javaVersion + "; " + os + ")",
-                userAgent);
+                userAgent,
+                "Comparing User-Agent '" + userAgent + "'");
     }
 
     @Test
@@ -181,9 +185,9 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
         assertNotNull(userAgent);
 
         assertEquals(
-                "Comparing User-Agent '" + userAgent + "'",
                 "Apache-Maven/" + mavenVersion + " (Java " + javaVersion + "; " + os + ")",
-                userAgent);
+                userAgent,
+                "Comparing User-Agent '" + userAgent + "'");
     }
 
     @Test
@@ -228,9 +232,9 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
         assertNotNull(userAgent);
 
         assertEquals(
-                "Comparing User-Agent '" + userAgent + "'",
                 "Apache-Maven/" + mavenVersion + " (Java " + javaVersion + "; " + os + ")",
-                userAgent);
+                userAgent,
+                "Comparing User-Agent '" + userAgent + "'");
     }
 
     @Test

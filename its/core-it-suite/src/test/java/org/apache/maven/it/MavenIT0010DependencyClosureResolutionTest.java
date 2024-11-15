@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MavenIT0010DependencyClosureResolutionTest extends AbstractMavenIntegrationTestCase {
     public MavenIT0010DependencyClosureResolutionTest() {
         super(ALL_MAVEN_VERSIONS);
@@ -56,7 +58,7 @@ public class MavenIT0010DependencyClosureResolutionTest extends AbstractMavenInt
         verifier.verifyArtifactPresent("org.apache.maven.its.it0010", "parent", "1.0", "pom");
 
         List<String> artifacts = verifier.loadLines("target/compile.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.it0010:a:jar:0.1"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.it0010:b:jar:0.2"));
+        assertTrue(artifacts.contains("org.apache.maven.its.it0010:a:jar:0.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.it0010:b:jar:0.2"), artifacts.toString());
     }
 }

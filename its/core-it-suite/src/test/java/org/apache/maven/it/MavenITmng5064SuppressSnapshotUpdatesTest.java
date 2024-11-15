@@ -37,6 +37,9 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5064">MNG-5064</a>.
  *
@@ -107,8 +110,8 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
             verifier.verifyErrorFreeLog();
 
             List<String> classpath = verifier.loadLines("target/classpath.txt");
-            assertTrue(classpath.toString(), classpath.contains("dep-0.1-SNAPSHOT.jar"));
-            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
+            assertTrue(classpath.contains("dep-0.1-SNAPSHOT.jar"), classpath.toString());
+            assertTrue(requestedUris.contains(metadataUri), requestedUris.toString());
 
             requestedUris.clear();
 
@@ -118,8 +121,8 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
             verifier.verifyErrorFreeLog();
 
             classpath = verifier.loadLines("target/classpath.txt");
-            assertTrue(classpath.toString(), classpath.contains("dep-0.1-SNAPSHOT.jar"));
-            assertFalse(requestedUris.toString(), requestedUris.contains(metadataUri));
+            assertTrue(classpath.contains("dep-0.1-SNAPSHOT.jar"), classpath.toString());
+            assertFalse(requestedUris.contains(metadataUri), requestedUris.toString());
         } finally {
             server.stop();
             server.join();

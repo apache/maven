@@ -52,6 +52,7 @@ import org.junit.jupiter.api.Test;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4235">MNG-4235</a>.
@@ -166,7 +167,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
 
         String expectedHash = verifier.loadLines(dataFile + hashExt).get(0).trim();
 
-        assertTrue("expected=" + expectedHash + ", actual=" + actualHash, expectedHash.equalsIgnoreCase(actualHash));
+        assertTrue(expectedHash.equalsIgnoreCase(actualHash), "expected=" + expectedHash + ", actual=" + actualHash);
     }
 
     private static class RepoHandler extends ResourceHandler {

@@ -25,6 +25,9 @@ import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1751">MNG-1751</a>.
  *
@@ -74,7 +77,7 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
 
         Properties checksums = verifier.loadProperties("target/checksum.properties");
         String sha1 = checksums.getProperty("dep-0.1-SNAPSHOT.jar", "").toLowerCase(java.util.Locale.ENGLISH);
-        assertEquals(sha1, 40, sha1.length());
+        assertEquals(40, sha1.length(), sha1);
         assertNotEquals("fc081cd365b837dcb01eb9991f21c409b155ea5c", sha1);
     }
 }

@@ -23,6 +23,8 @@ import java.io.File;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3642">MNG-3642</a>.
  *
@@ -77,9 +79,9 @@ public class MavenITmng3642DynamicResourcesTest extends AbstractMavenIntegration
         verifier.verifyErrorFreeLog();
 
         File first = new File(testDir, "target/test-classes/one.txt");
-        assertTrue("First resource file was not present: " + first, first.exists());
+        assertTrue(first.exists(), "First resource file was not present: " + first);
 
         File second = new File(testDir, "target/test-classes/two.txt");
-        assertTrue("Second resource file was not present: " + second, second.exists());
+        assertTrue(second.exists(), "Second resource file was not present: " + second);
     }
 }

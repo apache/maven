@@ -25,6 +25,9 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4600">MNG-4600</a>.
  *
@@ -80,7 +83,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest extends Abstract
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
-        assertTrue(classpath.toString(), classpath.contains("direct-0.2.jar"));
-        assertTrue(classpath.toString(), classpath.contains("transitive-0.1.jar"));
+        assertTrue(classpath.contains("direct-0.2.jar"), classpath.toString());
+        assertTrue(classpath.contains("transitive-0.1.jar"), classpath.toString());
     }
 }

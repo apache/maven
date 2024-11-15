@@ -28,6 +28,7 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5482">MNG-5482</a>.
@@ -72,10 +73,10 @@ public class MavenITmng5482AetherNotFoundTest extends AbstractMavenIntegrationTe
         List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
         int msg = indexOf(lines, "Caused by: java.lang.ClassNotFoundException: org.sonatype.aether.+");
-        assertTrue("ClassNotFoundException message was not found in output.", msg >= 0);
+        assertTrue(msg >= 0, "ClassNotFoundException message was not found in output.");
 
         int url = indexOf(lines, ".*http://cwiki.apache.org/confluence/display/MAVEN/AetherClassNotFound.*");
-        assertTrue("Url to ClassNotFoundAether was not found in output.", url >= 0);
+        assertTrue(url >= 0, "Url to ClassNotFoundAether was not found in output.");
     }
 
     private int indexOf(List<String> logLines, String regex) {

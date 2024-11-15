@@ -26,6 +26,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3183">MNG-3183</a>.
  *

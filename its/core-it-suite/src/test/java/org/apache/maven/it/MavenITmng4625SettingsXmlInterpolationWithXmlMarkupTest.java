@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4625">MNG-4625</a>.
  *

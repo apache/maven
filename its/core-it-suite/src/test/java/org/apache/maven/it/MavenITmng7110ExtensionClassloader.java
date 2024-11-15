@@ -28,6 +28,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class MavenITmng7110ExtensionClassloader extends AbstractMavenIntegrationTestCase {
     public MavenITmng7110ExtensionClassloader() {
         super(ALL_MAVEN_VERSIONS);

@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5096">MNG-5096</a>.
  *
@@ -59,7 +62,7 @@ public class MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest extend
 
         List<String> compile = verifier.loadLines("target/compile.txt");
 
-        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
-        assertTrue(compile.toString(), compile.contains("b-0.1.jar"));
+        assertFalse(compile.contains("a-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("b-0.1.jar"), compile.toString());
     }
 }

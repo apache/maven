@@ -25,6 +25,8 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1803">MNG-1803</a>.
  *
@@ -65,12 +67,12 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest extends Abst
                 } else {
                     location = "line 34, column 19";
                 }
-                assertTrue("Position not found in: " + line, line.indexOf(location) > 0);
+                assertTrue(line.indexOf(location) > 0, "Position not found in: " + line);
                 foundError = true;
                 break;
             }
         }
 
-        assertTrue("Build output did not mention validation error!", foundError);
+        assertTrue(foundError, "Build output did not mention validation error!");
     }
 }

@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4779">MNG-4779</a>.
  *
@@ -55,6 +57,6 @@ public class MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest extends
 
         List<String> classpath = verifier.loadLines("test/target/classpath.txt");
 
-        assertEquals(classpath.toString(), 4, classpath.size());
+        assertEquals(4, classpath.size(), classpath.toString());
     }
 }

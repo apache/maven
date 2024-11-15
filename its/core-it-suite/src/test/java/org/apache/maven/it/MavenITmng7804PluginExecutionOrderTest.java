@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7804">MNG-7804</a>.
  * Verifies that plugin execution can be ordered across different plugins.

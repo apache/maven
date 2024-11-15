@@ -24,6 +24,9 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3822">MNG-3822</a>.
  *
@@ -67,6 +70,6 @@ public class MavenITmng3822BasedirAlignedInterpolationTest extends AbstractMaven
         File expected = new File(testDir, buildDir);
 
         assertTrue(actual.isAbsolute());
-        assertEquals(expected.getCanonicalFile(), actual.getCanonicalFile());
+        ItUtils.assertCanonicalFileEquals(expected, actual);
     }
 }

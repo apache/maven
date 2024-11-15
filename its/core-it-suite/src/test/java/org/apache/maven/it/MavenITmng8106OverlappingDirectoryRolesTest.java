@@ -26,6 +26,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIntegrationTestCase {
     public MavenITmng8106OverlappingDirectoryRolesTest() {
         // Broken in: 3.9.0..3.9.6 && 4.0.0-alpha-1..4.0.0-alpha-13
@@ -59,7 +61,7 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
         try (FileReader reader = new FileReader(metadataFile)) {
             dom = Xpp3DomBuilder.build(reader);
         }
-        assertTrue("metadata missing A level data", dom.getChild("versioning") != null);
-        assertTrue("metadata missing G level data", dom.getChild("plugins") != null);
+        assertTrue(dom.getChild("versioning") != null, "metadata missing A level data");
+        assertTrue(dom.getChild("plugins") != null, "metadata missing G level data");
     }
 }

@@ -25,6 +25,9 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8230">MNG-8230</a>.
  */
@@ -121,10 +124,10 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
             fail("Expected failure");
         } catch (VerificationException e) {
             assertTrue(
-                    e.getMessage(),
                     e.getMessage()
                             .contains(
-                                    "'version' contains an expression but should be a constant. @ myGroup:parent:${ci-version}"));
+                                    "'version' contains an expression but should be a constant. @ myGroup:parent:${ci-version}"),
+                    e.getMessage());
         }
     }
 
@@ -142,10 +145,10 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
             fail("Expected failure");
         } catch (VerificationException e) {
             assertTrue(
-                    e.getMessage(),
                     e.getMessage()
                             .contains(
-                                    "'groupId' contains an expression but should be a constant. @ ${foo}:myArtifact:1.0-SNAPSHOT"));
+                                    "'groupId' contains an expression but should be a constant. @ ${foo}:myArtifact:1.0-SNAPSHOT"),
+                    e.getMessage());
         }
     }
 
@@ -163,10 +166,10 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
             fail("Expected failure");
         } catch (VerificationException e) {
             assertTrue(
-                    e.getMessage(),
                     e.getMessage()
                             .contains(
-                                    "'artifactId' contains an expression but should be a constant. @ myGroup:${foo}:1.0-SNAPSHOT"));
+                                    "'artifactId' contains an expression but should be a constant. @ myGroup:${foo}:1.0-SNAPSHOT"),
+                    e.getMessage());
         }
     }
 }

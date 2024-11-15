@@ -24,6 +24,10 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4199">MNG-4199</a>.
  *
@@ -65,40 +69,40 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest extends AbstractMavenInt
 
         List<String> compileArtifacts = verifier.loadLines("target/compile-artifacts.txt");
         assertTrue(
-                compileArtifacts.toString(), compileArtifacts.contains("org.apache.maven.its.mng4199:system:jar:0.1"));
+                compileArtifacts.contains("org.apache.maven.its.mng4199:system:jar:0.1"), compileArtifacts.toString());
         assertTrue(
-                compileArtifacts.toString(),
-                compileArtifacts.contains("org.apache.maven.its.mng4199:provided:jar:0.1"));
+                compileArtifacts.contains("org.apache.maven.its.mng4199:provided:jar:0.1"),
+                compileArtifacts.toString());
         assertTrue(
-                compileArtifacts.toString(), compileArtifacts.contains("org.apache.maven.its.mng4199:compile:jar:0.1"));
+                compileArtifacts.contains("org.apache.maven.its.mng4199:compile:jar:0.1"), compileArtifacts.toString());
         assertFalse(
-                compileArtifacts.toString(), compileArtifacts.contains("org.apache.maven.its.mng4199:runtime:jar:0.1"));
+                compileArtifacts.contains("org.apache.maven.its.mng4199:runtime:jar:0.1"), compileArtifacts.toString());
         assertEquals(3, compileArtifacts.size());
 
         List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("system-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("provided-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("compile-0.1.jar"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("runtime-0.1.jar"));
+        assertTrue(compileClassPath.contains("system-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("provided-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("compile-0.1.jar"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("runtime-0.1.jar"), compileClassPath.toString());
         assertEquals(4, compileClassPath.size());
 
         List<String> runtimeArtifacts = verifier.loadLines("target/runtime-artifacts.txt");
         assertFalse(
-                runtimeArtifacts.toString(), runtimeArtifacts.contains("org.apache.maven.its.mng4199:system:jar:0.1"));
+                runtimeArtifacts.contains("org.apache.maven.its.mng4199:system:jar:0.1"), runtimeArtifacts.toString());
         assertFalse(
-                runtimeArtifacts.toString(),
-                runtimeArtifacts.contains("org.apache.maven.its.mng4199:provided:jar:0.1"));
+                runtimeArtifacts.contains("org.apache.maven.its.mng4199:provided:jar:0.1"),
+                runtimeArtifacts.toString());
         assertTrue(
-                runtimeArtifacts.toString(), runtimeArtifacts.contains("org.apache.maven.its.mng4199:compile:jar:0.1"));
+                runtimeArtifacts.contains("org.apache.maven.its.mng4199:compile:jar:0.1"), runtimeArtifacts.toString());
         assertTrue(
-                runtimeArtifacts.toString(), runtimeArtifacts.contains("org.apache.maven.its.mng4199:runtime:jar:0.1"));
+                runtimeArtifacts.contains("org.apache.maven.its.mng4199:runtime:jar:0.1"), runtimeArtifacts.toString());
         assertEquals(2, runtimeArtifacts.size());
 
         List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt");
-        assertFalse(runtimeClassPath.toString(), runtimeClassPath.contains("system-0.1.jar"));
-        assertFalse(runtimeClassPath.toString(), runtimeClassPath.contains("provided-0.1.jar"));
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("compile-0.1.jar"));
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("runtime-0.1.jar"));
+        assertFalse(runtimeClassPath.contains("system-0.1.jar"), runtimeClassPath.toString());
+        assertFalse(runtimeClassPath.contains("provided-0.1.jar"), runtimeClassPath.toString());
+        assertTrue(runtimeClassPath.contains("compile-0.1.jar"), runtimeClassPath.toString());
+        assertTrue(runtimeClassPath.contains("runtime-0.1.jar"), runtimeClassPath.toString());
         assertEquals(3, runtimeClassPath.size());
     }
 }

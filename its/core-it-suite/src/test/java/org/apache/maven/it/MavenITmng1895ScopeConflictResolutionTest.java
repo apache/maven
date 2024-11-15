@@ -25,6 +25,9 @@ import java.util.Map;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1895">MNG-1895</a>.
  *
@@ -58,22 +61,22 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
         verifier.verifyErrorFreeLog();
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertTrue(compile.toString(), compile.contains("a-0.1.jar"));
-        assertFalse(compile.toString(), compile.contains("b-0.1.jar"));
-        assertFalse(compile.toString(), compile.contains("c-0.1.jar"));
-        assertTrue(compile.toString(), compile.contains("d-0.1.jar"));
+        assertTrue(compile.contains("a-0.1.jar"), compile.toString());
+        assertFalse(compile.contains("b-0.1.jar"), compile.toString());
+        assertFalse(compile.contains("c-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("d-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
-        assertTrue(runtime.toString(), runtime.contains("b-0.1.jar"));
-        assertFalse(runtime.toString(), runtime.contains("c-0.1.jar"));
-        assertTrue(runtime.toString(), runtime.contains("d-0.1.jar"));
+        assertFalse(runtime.contains("a-0.1.jar"), runtime.toString());
+        assertTrue(runtime.contains("b-0.1.jar"), runtime.toString());
+        assertFalse(runtime.contains("c-0.1.jar"), runtime.toString());
+        assertTrue(runtime.contains("d-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
-        assertTrue(test.toString(), test.contains("a-0.1.jar"));
-        assertTrue(test.toString(), test.contains("b-0.1.jar"));
-        assertTrue(test.toString(), test.contains("c-0.1.jar"));
-        assertTrue(test.toString(), test.contains("d-0.1.jar"));
+        assertTrue(test.contains("a-0.1.jar"), test.toString());
+        assertTrue(test.contains("b-0.1.jar"), test.toString());
+        assertTrue(test.contains("c-0.1.jar"), test.toString());
+        assertTrue(test.contains("d-0.1.jar"), test.toString());
     }
 
     /**
@@ -86,16 +89,16 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
         Verifier verifier = run("compile", "runtime");
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertTrue(compile.toString(), compile.contains("x-0.1.jar"));
-        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
+        assertTrue(compile.contains("x-0.1.jar"), compile.toString());
+        assertFalse(compile.contains("a-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
-        assertTrue(runtime.toString(), runtime.contains("a-0.1.jar"));
+        assertTrue(runtime.contains("x-0.1.jar"), runtime.toString());
+        assertTrue(runtime.contains("a-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
-        assertTrue(test.toString(), test.contains("x-0.1.jar"));
-        assertTrue(test.toString(), test.contains("a-0.1.jar"));
+        assertTrue(test.contains("x-0.1.jar"), test.toString());
+        assertTrue(test.contains("a-0.1.jar"), test.toString());
     }
 
     /**
@@ -108,16 +111,16 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
         Verifier verifier = run("compile", "test");
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertTrue(compile.toString(), compile.contains("x-0.1.jar"));
-        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
+        assertTrue(compile.contains("x-0.1.jar"), compile.toString());
+        assertFalse(compile.contains("a-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
-        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
+        assertTrue(runtime.contains("x-0.1.jar"), runtime.toString());
+        assertFalse(runtime.contains("a-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
-        assertTrue(test.toString(), test.contains("x-0.1.jar"));
-        assertTrue(test.toString(), test.contains("a-0.1.jar"));
+        assertTrue(test.contains("x-0.1.jar"), test.toString());
+        assertTrue(test.contains("a-0.1.jar"), test.toString());
     }
 
     /**
@@ -130,16 +133,16 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
         Verifier verifier = run("compile", "provided");
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertTrue(compile.toString(), compile.contains("x-0.1.jar"));
-        assertTrue(compile.toString(), compile.contains("a-0.1.jar"));
+        assertTrue(compile.contains("x-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("a-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
-        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
+        assertTrue(runtime.contains("x-0.1.jar"), runtime.toString());
+        assertFalse(runtime.contains("a-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
-        assertTrue(test.toString(), test.contains("x-0.1.jar"));
-        assertTrue(test.toString(), test.contains("a-0.1.jar"));
+        assertTrue(test.contains("x-0.1.jar"), test.toString());
+        assertTrue(test.contains("a-0.1.jar"), test.toString());
     }
 
     /**
@@ -152,16 +155,16 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
         Verifier verifier = run("runtime", "test");
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertFalse(compile.toString(), compile.contains("x-0.1.jar"));
-        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
+        assertFalse(compile.contains("x-0.1.jar"), compile.toString());
+        assertFalse(compile.contains("a-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
-        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
+        assertTrue(runtime.contains("x-0.1.jar"), runtime.toString());
+        assertFalse(runtime.contains("a-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
-        assertTrue(test.toString(), test.contains("x-0.1.jar"));
-        assertTrue(test.toString(), test.contains("a-0.1.jar"));
+        assertTrue(test.contains("x-0.1.jar"), test.toString());
+        assertTrue(test.contains("a-0.1.jar"), test.toString());
     }
 
     /**
@@ -174,16 +177,16 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
         Verifier verifier = run("runtime", "provided");
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertFalse(compile.toString(), compile.contains("x-0.1.jar"));
-        assertTrue(compile.toString(), compile.contains("a-0.1.jar"));
+        assertFalse(compile.contains("x-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("a-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertTrue(runtime.toString(), runtime.contains("x-0.1.jar"));
-        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
+        assertTrue(runtime.contains("x-0.1.jar"), runtime.toString());
+        assertFalse(runtime.contains("a-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
-        assertTrue(test.toString(), test.contains("x-0.1.jar"));
-        assertTrue(test.toString(), test.contains("a-0.1.jar"));
+        assertTrue(test.contains("x-0.1.jar"), test.toString());
+        assertTrue(test.contains("a-0.1.jar"), test.toString());
     }
 
     /**
@@ -198,16 +201,16 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
         Verifier verifier = run("provided", "test");
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertTrue(compile.toString(), compile.contains("x-0.1.jar"));
-        assertFalse(compile.toString(), compile.contains("a-0.1.jar"));
+        assertTrue(compile.contains("x-0.1.jar"), compile.toString());
+        assertFalse(compile.contains("a-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertFalse(runtime.toString(), runtime.contains("x-0.1.jar"));
-        assertFalse(runtime.toString(), runtime.contains("a-0.1.jar"));
+        assertFalse(runtime.contains("x-0.1.jar"), runtime.toString());
+        assertFalse(runtime.contains("a-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
-        assertTrue(test.toString(), test.contains("x-0.1.jar"));
-        assertTrue(test.toString(), test.contains("a-0.1.jar"));
+        assertTrue(test.contains("x-0.1.jar"), test.toString());
+        assertTrue(test.contains("a-0.1.jar"), test.toString());
     }
 
     private Verifier run(String scopeB, String scopeA) throws Exception {

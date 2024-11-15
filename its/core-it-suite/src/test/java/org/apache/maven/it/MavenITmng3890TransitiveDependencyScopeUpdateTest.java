@@ -25,6 +25,10 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3890">MNG-3890</a>.
  *
@@ -58,9 +62,9 @@ public class MavenITmng3890TransitiveDependencyScopeUpdateTest extends AbstractM
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("target/artifacts.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3890:c:jar:0.1"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3890:b:jar:0.1"));
-        assertFalse(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3890:a:jar:0.1"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng3890:c:jar:0.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng3890:b:jar:0.1"), artifacts.toString());
+        assertFalse(artifacts.contains("org.apache.maven.its.mng3890:a:jar:0.1"), artifacts.toString());
         assertEquals(2, artifacts.size());
     }
 }

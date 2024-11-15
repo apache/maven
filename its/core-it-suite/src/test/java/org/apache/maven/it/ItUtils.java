@@ -20,9 +20,12 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Benjamin Bentmann
@@ -77,5 +80,17 @@ class ItUtils {
         } else {
             verifier.setEnvironmentVariable("MAVEN_OPTS", "\"-Duser.home=" + path + "\"");
         }
+    }
+
+    public static void assertCanonicalFileEquals(File expected, File actual) throws IOException {
+        assertEquals(expected.getCanonicalFile(), actual.getCanonicalFile());
+    }
+
+    public static void assertCanonicalFileEquals(String expected, String actual, String message) throws IOException {
+        assertEquals(new File(expected).getCanonicalFile(), new File(actual).getCanonicalFile(), message);
+    }
+
+    public static void assertCanonicalFileEquals(String expected, String actual) throws IOException {
+        assertEquals(new File(expected).getCanonicalFile(), new File(actual).getCanonicalFile());
     }
 }

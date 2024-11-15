@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5135">MNG-5135</a>.
  *
@@ -57,6 +59,6 @@ public class MavenITmng5135AggregatorDepResolutionModuleExtensionTest extends Ab
 
         List<String> compile = verifier.loadLines("target/module.txt");
 
-        assertTrue(compile.toString(), compile.contains("dep-0.1-it.jar"));
+        assertTrue(compile.contains("dep-0.1-it.jar"), compile.toString());
     }
 }

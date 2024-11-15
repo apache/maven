@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegrationTestCase {
 
     private File testDir;

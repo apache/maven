@@ -25,6 +25,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MavenITmng7349RelocationWarningTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng7349RelocationWarningTest() {
@@ -55,12 +58,12 @@ public class MavenITmng7349RelocationWarningTest extends AbstractMavenIntegratio
                 relocated.add(line);
             }
         }
-        assertEquals("Expected 2 relocations, but found multiple", 2, relocated.size());
+        assertEquals(2, relocated.size(), "Expected 2 relocations, but found multiple");
         assertTrue(
-                "Expected the relocation messages to be logged",
-                relocated.get(0).contains("Test relocation reason for old-plugin"));
+                relocated.get(0).contains("Test relocation reason for old-plugin"),
+                "Expected the relocation messages to be logged");
         assertTrue(
-                "Expected the relocation messages to be logged",
-                relocated.get(1).contains("Test relocation reason for old-dep"));
+                relocated.get(1).contains("Test relocation reason for old-dep"),
+                "Expected the relocation messages to be logged");
     }
 }

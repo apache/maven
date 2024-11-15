@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4842">MNG-4842</a>.
  *
@@ -59,7 +61,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
 
         List<String> compile = verifier.loadLines("target/compile.txt");
 
-        assertTrue(compile.toString(), compile.contains("dep-0.1.jar"));
+        assertTrue(compile.contains("dep-0.1.jar"), compile.toString());
         verifier.verifyArtifactPresent("org.apache.maven.its.mng4842", "parent", "0.1", "pom");
     }
 

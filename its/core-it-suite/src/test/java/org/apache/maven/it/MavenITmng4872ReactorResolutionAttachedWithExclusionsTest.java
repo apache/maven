@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4872">MNG-4872</a>.
  *
@@ -54,8 +57,8 @@ public class MavenITmng4872ReactorResolutionAttachedWithExclusionsTest extends A
 
         List<String> artifacts = verifier.loadLines("consumer/target/artifacts.txt");
 
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4872:producer:jar:0.1"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4872:producer:jar:shaded:0.1"));
-        assertFalse(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4872:excluded:jar:0.1"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4872:producer:jar:0.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4872:producer:jar:shaded:0.1"), artifacts.toString());
+        assertFalse(artifacts.contains("org.apache.maven.its.mng4872:excluded:jar:0.1"), artifacts.toString());
     }
 }

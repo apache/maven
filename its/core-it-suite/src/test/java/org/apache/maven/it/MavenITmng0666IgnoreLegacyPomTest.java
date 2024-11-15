@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-666">MNG-666</a>.
  *
@@ -59,6 +61,6 @@ public class MavenITmng0666IgnoreLegacyPomTest extends AbstractMavenIntegrationT
         verifier.verifyArtifactPresent("org.apache.maven.its.it0059", "test", "3.8.1", "jar");
 
         List<String> artifacts = verifier.loadLines("target/artifacts.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.it0059:test:jar:3.8.1"));
+        assertTrue(artifacts.contains("org.apache.maven.its.it0059:test:jar:3.8.1"), artifacts.toString());
     }
 }

@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2861">MNG-2861</a>.
  *
@@ -51,8 +53,8 @@ public class MavenITmng2861RelocationsAndRangesTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("A/target/artifacts.txt");
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2861:B:jar:1.0-SNAPSHOT"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2861.new:project:jar:2.0"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2861:C:jar:1.0-SNAPSHOT"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng2861:B:jar:1.0-SNAPSHOT"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng2861.new:project:jar:2.0"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng2861:C:jar:1.0-SNAPSHOT"), artifacts.toString());
     }
 }

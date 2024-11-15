@@ -28,6 +28,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTestCase {
 
     protected MavenITmng7836AlternativePomSyntaxTest() {

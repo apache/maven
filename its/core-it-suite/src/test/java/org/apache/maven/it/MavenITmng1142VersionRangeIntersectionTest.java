@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1142">MNG-1142</a>.
  *
@@ -73,8 +76,8 @@ public class MavenITmng1142VersionRangeIntersectionTest extends AbstractMavenInt
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
 
-        assertFalse(classpath.toString(), classpath.contains("a-1.1.2.jar"));
-        assertTrue(classpath.toString(), classpath.contains("a-1.1.1.jar"));
-        assertTrue(classpath.toString(), classpath.contains("b-0.1.jar"));
+        assertFalse(classpath.contains("a-1.1.2.jar"), classpath.toString());
+        assertTrue(classpath.contains("a-1.1.1.jar"), classpath.toString());
+        assertTrue(classpath.contains("b-0.1.jar"), classpath.toString());
     }
 }

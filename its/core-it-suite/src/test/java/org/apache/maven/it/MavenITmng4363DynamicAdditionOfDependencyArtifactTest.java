@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4363">MNG-4363</a>.
  *
@@ -57,8 +59,8 @@ public class MavenITmng4363DynamicAdditionOfDependencyArtifactTest extends Abstr
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
-        assertTrue(classpath.toString(), classpath.contains("a-0.1.jar"));
-        assertTrue(classpath.toString(), classpath.contains("b-0.1.jar"));
-        assertTrue(classpath.toString(), classpath.contains("c-0.1.jar"));
+        assertTrue(classpath.contains("a-0.1.jar"), classpath.toString());
+        assertTrue(classpath.contains("b-0.1.jar"), classpath.toString());
+        assertTrue(classpath.contains("c-0.1.jar"), classpath.toString());
     }
 }

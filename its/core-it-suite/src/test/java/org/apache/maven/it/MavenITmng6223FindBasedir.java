@@ -24,6 +24,8 @@ import java.util.Properties;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6223">MNG-6223</a>:
  * check that extensions in <code>.mvn/</code> are found when Maven is run with <code>-f path/to/dir</code>.

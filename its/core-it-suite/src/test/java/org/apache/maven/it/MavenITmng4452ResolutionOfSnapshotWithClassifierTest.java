@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4452">MNG-4452</a>.
  *
@@ -83,11 +85,11 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
 
         List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertTrue(
-                artifacts.toString(),
-                artifacts.contains("org.apache.maven.its.mng4452:producer:jar:unix:0.1-SNAPSHOT"));
+                artifacts.contains("org.apache.maven.its.mng4452:producer:jar:unix:0.1-SNAPSHOT"),
+                artifacts.toString());
         assertTrue(
-                artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4452:producer:jar:win:0.1-SNAPSHOT"));
+                artifacts.contains("org.apache.maven.its.mng4452:producer:jar:win:0.1-SNAPSHOT"), artifacts.toString());
         assertTrue(
-                artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4452:producer:war:win:0.1-SNAPSHOT"));
+                artifacts.contains("org.apache.maven.its.mng4452:producer:war:win:0.1-SNAPSHOT"), artifacts.toString());
     }
 }

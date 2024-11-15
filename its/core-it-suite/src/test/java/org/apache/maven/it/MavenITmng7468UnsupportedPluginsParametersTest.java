@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Test for
  * <a href="https://issues.apache.org/jira/browse/MNG-7468">MNG-7468</a>
@@ -43,7 +45,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     @Test
     public void testNoConfiguration() throws Exception {
         List<String> warnLines = performTest("no-config");
-        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
+        assertTrue(warnLines.isEmpty(), "Unwanted warnings: " + warnLines);
     }
 
     /**
@@ -52,7 +54,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     @Test
     public void testValidParameter() throws Exception {
         List<String> warnLines = performTest("valid-parameter");
-        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
+        assertTrue(warnLines.isEmpty(), "Unwanted warnings: " + warnLines);
     }
 
     /**
@@ -61,7 +63,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     @Test
     public void testValidParameterAlias() throws Exception {
         List<String> warnLines = performTest("valid-parameter-alias");
-        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
+        assertTrue(warnLines.isEmpty(), "Unwanted warnings: " + warnLines);
     }
 
     /**
@@ -70,7 +72,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     @Test
     public void testValidParameterForOtherGoal() throws Exception {
         List<String> warnLines = performTest("valid-parameter-other-goal");
-        assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
+        assertTrue(warnLines.isEmpty(), "Unwanted warnings: " + warnLines);
     }
 
     /**
@@ -141,7 +143,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
                 warnLines.remove(
                         "[WARNING] Parameter 'invalidParam' is unknown for plugin 'maven-it-plugin-fork:2.1-SNAPSHOT:touch (touch)'"));
 
-        assertTrue("Not verified line: " + warnLines, warnLines.isEmpty());
+        assertTrue(warnLines.isEmpty(), "Not verified line: " + warnLines);
     }
 
     private List<String> performTest(String project) throws Exception {
@@ -165,7 +167,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
                 warnLines.remove(
                         "[WARNING] Parameter 'invalidXml' is unknown for plugin 'maven-it-plugin-configuration:2.1-SNAPSHOT:touch (default)'"));
 
-        assertTrue("Not verified line: " + warnLines, warnLines.isEmpty());
+        assertTrue(warnLines.isEmpty(), "Not verified line: " + warnLines);
     }
 
     private List<String> findUnknownWarning(List<String> logLines) {

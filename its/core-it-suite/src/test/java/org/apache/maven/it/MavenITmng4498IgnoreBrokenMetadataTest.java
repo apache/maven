@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4498">MNG-4498</a>.
  *
@@ -56,6 +58,6 @@ public class MavenITmng4498IgnoreBrokenMetadataTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
-        assertTrue(classpath.toString(), classpath.contains("dep-0.1-SNAPSHOT.jar"));
+        assertTrue(classpath.contains("dep-0.1-SNAPSHOT.jar"), classpath.toString());
     }
 }
