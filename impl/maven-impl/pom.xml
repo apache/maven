@@ -109,6 +109,10 @@ under the License.
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-impl</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-sec-dispatcher</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>

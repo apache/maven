@@ -47,10 +47,6 @@ import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
-import org.apache.maven.settings.crypto.SettingsDecrypter;
-import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.RepositoryListener;
@@ -123,8 +119,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
     private final RepositorySystem repoSystem;
 
-    private final SettingsDecrypter settingsDecrypter;
-
     private final EventSpyDispatcher eventSpyDispatcher;
 
     private final RuntimeInformation runtimeInformation;
@@ -141,7 +135,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
     @Inject
     DefaultRepositorySystemSessionFactory(
             RepositorySystem repoSystem,
-            SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
             RuntimeInformation runtimeInformation,
             TypeRegistry typeRegistry,
@@ -149,7 +142,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             Map<String, MavenExecutionRequestExtender> requestExtenders,
             Map<String, RepositorySystemSessionExtender> sessionExtenders) {
         this.repoSystem = repoSystem;
-        this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.runtimeInformation = runtimeInformation;
         this.typeRegistry = typeRegistry;
@@ -211,22 +203,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             sessionBuilder.setVersionFilter(versionFilter);
         }
 
-        DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
-        decrypt.setProxies(request.getProxies());
-        decrypt.setServers(request.getServers());
-        SettingsDecryptionResult decrypted = settingsDecrypter.decrypt(decrypt);
-        for (SettingsProblem problem : decrypted.getProblems()) {
-            if (problem.getSeverity() == SettingsProblem.Severity.WARNING) {
-                logger.warn(problem.getMessage());
-            } else if (problem.getSeverity() == SettingsProblem.Severity.ERROR) {
-                logger.error(
-                        problem.getMessage(),
-                        request.isShowErrors()
-                                ? problem.getException()
-                                : problem.getException().getMessage());
-            }
-        }
-
         DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
         for (Mirror mirror : request.getMirrors()) {
             mirrorSelector.add(
@@ -241,7 +217,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setMirrorSelector(mirrorSelector);
 
         DefaultProxySelector proxySelector = new DefaultProxySelector();
-        for (Proxy proxy : decrypted.getProxies()) {
+        for (Proxy proxy : request.getProxies()) {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
             authBuilder.addUsername(proxy.getUsername()).addPassword(proxy.getPassword());
             proxySelector.add(
@@ -254,7 +230,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         // Note: we do NOT use WagonTransportConfigurationKeys here as Maven Core does NOT depend on Wagon Transport
         // and this is okay and "good thing".
         DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
-        for (Server server : decrypted.getServers()) {
+        for (Server server : request.getServers()) {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
             authBuilder.addUsername(server.getUsername()).addPassword(server.getPassword());
             authBuilder.addPrivateKey(server.getPrivateKey(), server.getPassphrase());

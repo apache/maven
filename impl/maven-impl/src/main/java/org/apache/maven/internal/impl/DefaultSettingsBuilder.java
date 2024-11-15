@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.BuilderProblem;
@@ -49,6 +50,7 @@ import org.apache.maven.api.settings.RepositoryPolicy;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.internal.impl.secdispatcher.MavenSecDispatcher;
 import org.apache.maven.settings.v4.SettingsMerger;
 import org.apache.maven.settings.v4.SettingsTransformer;
 
@@ -65,13 +67,24 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final Interpolator interpolator;
 
+    @Nullable
+    private final MavenSecDispatcher secDispatcher;
+
+    /**
+     * This ctor is used in legacy components, and when in legacy, {@link MavenSecDispatcher} is {@code null} and
+     * Maven3 exposes decryption with other means.
+     */
     public DefaultSettingsBuilder() {
-        this(new DefaultInterpolator());
+        this(new DefaultInterpolator(), null);
     }
 
+    /**
+     * In Maven4 the {@link MavenSecDispatcher} is injected and build settings are fully decrypted as well.
+     */
     @Inject
-    public DefaultSettingsBuilder(Interpolator interpolator) {
+    public DefaultSettingsBuilder(Interpolator interpolator, MavenSecDispatcher secDispatcher) {
         this.interpolator = interpolator;
+        this.secDispatcher = secDispatcher;
     }
 
     @Override
@@ -198,6 +211,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         settings = interpolate(settings, request, problems);
+        settings = decrypt(settingsSource, settings, request, problems);
 
         settingsValidator.validate(settings, isProjectSettings, problems);
 
@@ -235,6 +249,35 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
         return new SettingsTransformer(value -> value != null ? interpolator.interpolate(value, src) : null)
                 .visit(settings);
+    }
+
+    private Settings decrypt(
+            Source settingsSource, Settings settings, SettingsBuilderRequest request, List<BuilderProblem> problems) {
+        if (secDispatcher == null) {
+            return settings;
+        }
+        Function<String, String> decryptFunction = str -> {
+            if (secDispatcher.isAnyEncryptedString(str)) {
+                if (secDispatcher.isLegacyEncryptedString(str)) {
+                    // add a problem
+                    problems.add(new DefaultBuilderProblem(
+                            settingsSource.getLocation(),
+                            -1,
+                            -1,
+                            null,
+                            "Legacy encrypted string",
+                            BuilderProblem.Severity.WARNING));
+                }
+                try {
+                    return secDispatcher.decrypt(str);
+                } catch (Exception e) {
+                    problems.add(new DefaultBuilderProblem(
+                            settingsSource.getLocation(), -1, -1, e, e.getMessage(), BuilderProblem.Severity.ERROR));
+                }
+            }
+            return str;
+        };
+        return new SettingsTransformer(decryptFunction).visit(settings);
     }
 
     @Override

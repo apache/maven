@@ -36,7 +36,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.DefaultTypeRegistry;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Server;
-import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -70,9 +69,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     protected EventSpyDispatcher eventSpyDispatcher;
 
     @Inject
-    protected SettingsDecrypter settingsDecrypter;
-
-    @Inject
     protected org.eclipse.aether.RepositorySystem aetherRepositorySystem;
 
     @Inject
@@ -88,7 +84,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     void isNoSnapshotUpdatesTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
@@ -112,7 +107,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     void isSnapshotUpdatesTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
@@ -148,7 +142,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
@@ -192,7 +185,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
@@ -230,7 +222,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
@@ -272,7 +263,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
@@ -308,7 +298,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
@@ -350,7 +339,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
@@ -369,7 +357,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     void transportConfigurationTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
@@ -416,7 +403,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
     void versionFilteringTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
-                settingsDecrypter,
                 eventSpyDispatcher,
                 information,
                 defaultTypeRegistry,
