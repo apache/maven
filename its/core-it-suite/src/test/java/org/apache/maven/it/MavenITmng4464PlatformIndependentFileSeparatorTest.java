@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4464">MNG-4464</a>.
@@ -67,6 +68,6 @@ public class MavenITmng4464PlatformIndependentFileSeparatorTest extends Abstract
 
     private void assertPath(Properties props, String key, String path) {
         String actual = props.getProperty(key, "");
-        assertTrue(actual, actual.endsWith(path.replace('/', File.separatorChar)));
+        assertTrue(actual.endsWith(path.replace('/', File.separatorChar)), actual);
     }
 }

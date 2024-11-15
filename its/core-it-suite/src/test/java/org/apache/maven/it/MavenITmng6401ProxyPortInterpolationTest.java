@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.Properties;
 
 import org.apache.maven.settings.Proxy;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MavenITmng6401ProxyPortInterpolationTest extends AbstractMavenIntegrationTestCase {
 

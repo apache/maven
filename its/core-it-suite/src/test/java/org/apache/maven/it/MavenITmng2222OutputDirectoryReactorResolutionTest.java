@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2222">MNG-2222</a>.
@@ -56,7 +57,7 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest extends Abstract
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines("mod-b/target/compile.txt", "UTF-8");
-        assertTrue(classpath.toString(), classpath.contains("mod-a/target/classes"));
+        List<String> classpath = verifier.loadLines("mod-b/target/compile.txt");
+        assertTrue(classpath.contains("mod-a/target/classes"), classpath.toString());
     }
 }

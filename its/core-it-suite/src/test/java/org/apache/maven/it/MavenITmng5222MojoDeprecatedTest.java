@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test for
@@ -56,7 +58,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findDeprecationWarning(logLines);
 
         assertTrue(warnLines.stream()
@@ -81,7 +83,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
         assertEquals("testValue", configProps.remove("deprecatedParamWithDefaultConstant"));
         assertEquals("https://www.test.org", configProps.remove("deprecatedParamWithDefaultEvaluate"));
 
-        assertTrue("not checked config properties: " + configProps, configProps.isEmpty());
+        assertTrue(configProps.isEmpty(), "not checked config properties: " + configProps);
     }
 
     /**
@@ -105,7 +107,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findDeprecationWarning(logLines);
 
         assertTrue(warnLines.stream()
@@ -154,7 +156,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
         assertEquals("testValue", configProps.remove("deprecatedParamWithDefaultConstant"));
         assertEquals("https://www.test.org", configProps.remove("deprecatedParamWithDefaultEvaluate"));
 
-        assertTrue("not checked config properties: " + configProps, configProps.isEmpty());
+        assertTrue(configProps.isEmpty(), "not checked config properties: " + configProps);
     }
 
     /**
@@ -176,7 +178,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findDeprecationWarning(logLines);
 
         assertTrue(warnLines.stream()
@@ -248,7 +250,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
         assertEquals("value1", configProps.remove("deprecatedMap.key1"));
         assertEquals("value2", configProps.remove("deprecatedMap.key2"));
 
-        assertTrue("not checked config properties: " + configProps, configProps.isEmpty());
+        assertTrue(configProps.isEmpty(), "not checked config properties: " + configProps);
     }
 
     private List<String> findDeprecationWarning(List<String> logLines) {

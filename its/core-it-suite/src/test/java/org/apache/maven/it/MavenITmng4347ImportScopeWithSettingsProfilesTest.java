@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +55,7 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest extends AbstractM
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
 
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
 
         verifier.addCliArgument("validate");
         verifier.execute();

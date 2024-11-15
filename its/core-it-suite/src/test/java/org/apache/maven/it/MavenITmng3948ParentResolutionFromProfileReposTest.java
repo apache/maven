@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +49,7 @@ public class MavenITmng3948ParentResolutionFromProfileReposTest extends Abstract
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3948");
-        verifier.filterFile("pom.xml", "pom.xml", "UTF-8");
+        verifier.filterFile("pom.xml", "pom.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

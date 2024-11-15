@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5137">MNG-5137</a>.
@@ -58,8 +59,8 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest extends AbstractMa
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines("consumer/target/compile.txt", "UTF-8");
+        List<String> compile = verifier.loadLines("consumer/target/compile.txt");
 
-        assertTrue(compile.toString(), compile.contains("producer/pom.xml"));
+        assertTrue(compile.contains("producer/pom.xml"), compile.toString());
     }
 }

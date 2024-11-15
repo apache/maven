@@ -20,9 +20,10 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4536">MNG-4536</a>.
@@ -53,7 +54,7 @@ public class MavenITmng4536RequiresNoProjectForkingMojoTest extends AbstractMave
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertEquals(2, verifier.loadLines("mod-a/target/touch.log", "UTF-8").size());
-        assertEquals(2, verifier.loadLines("mod-b/target/touch.log", "UTF-8").size());
+        assertEquals(2, verifier.loadLines("mod-a/target/touch.log").size());
+        assertEquals(2, verifier.loadLines("mod-b/target/touch.log").size());
     }
 }

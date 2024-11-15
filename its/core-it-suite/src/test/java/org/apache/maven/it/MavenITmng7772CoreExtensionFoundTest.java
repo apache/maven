@@ -23,9 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrationTestCase {
     public MavenITmng7772CoreExtensionFoundTest() {
@@ -63,7 +64,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
         Path jarPath = Paths.get(verifier.getArtifactPath(
                 "org.apache.maven.its.7772-core-extensions-scopes", "maven-it-core-extensions", "0.1", "jar", ""));
 
-        assertNotNull("Jar output path was not found in the log", jarPath);
+        assertNotNull(jarPath, "Jar output path was not found in the log");
 
         Path jarToPath = Paths.get(testDir.toString(), "home-lib-ext", ".m2", "ext", "extension.jar");
         try {

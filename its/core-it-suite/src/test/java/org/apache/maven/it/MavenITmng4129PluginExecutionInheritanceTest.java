@@ -23,9 +23,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4129">MNG-4129</a>.
@@ -57,14 +58,14 @@ public class MavenITmng4129PluginExecutionInheritanceTest extends AbstractMavenI
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> executions = verifier.loadLines("target/executions.txt", "UTF-8");
+        List<String> executions = verifier.loadLines("target/executions.txt");
         Collections.sort(executions);
         assertEquals(Arrays.asList(new String[] {"inherited-execution", "non-inherited-execution"}), executions);
 
-        List<String> executions1 = verifier.loadLines("child-1/target/executions.txt", "UTF-8");
+        List<String> executions1 = verifier.loadLines("child-1/target/executions.txt");
         assertEquals(Collections.singletonList("inherited-execution"), executions1);
 
-        List<String> executions2 = verifier.loadLines("child-2/target/executions.txt", "UTF-8");
+        List<String> executions2 = verifier.loadLines("child-2/target/executions.txt");
         assertEquals(Collections.singletonList("inherited-execution"), executions2);
     }
 }

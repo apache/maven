@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4293">MNG-4293</a>.
@@ -53,23 +55,23 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest extends AbstractM
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4293");
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("pom-template.xml", "pom.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt", "UTF-8");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("system-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("provided-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("compile-0.1.jar"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("test-0.1.jar"));
+        List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt");
+        assertTrue(compileClassPath.contains("system-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("provided-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("compile-0.1.jar"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("test-0.1.jar"), compileClassPath.toString());
 
-        List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt", "UTF-8");
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("compile-0.1.jar"));
-        assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("runtime-0.1.jar"));
-        assertFalse(runtimeClassPath.toString(), runtimeClassPath.contains("test-0.1.jar"));
+        List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt");
+        assertTrue(runtimeClassPath.contains("compile-0.1.jar"), runtimeClassPath.toString());
+        assertTrue(runtimeClassPath.contains("runtime-0.1.jar"), runtimeClassPath.toString());
+        assertFalse(runtimeClassPath.contains("test-0.1.jar"), runtimeClassPath.toString());
     }
 }

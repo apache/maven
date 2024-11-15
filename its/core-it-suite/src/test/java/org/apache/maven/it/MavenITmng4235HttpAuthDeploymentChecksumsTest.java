@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.it.utils.DeployedResource;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -53,6 +52,7 @@ import org.junit.jupiter.api.Test;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4235">MNG-4235</a>.
@@ -135,7 +135,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
         filterProps.put("@port@", Integer.toString(port));
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8", filterProps);
+        verifier.filterFile("pom-template.xml", "pom.xml", filterProps);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4235");
         verifier.deleteDirectory("repo");
@@ -165,10 +165,9 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
     private void assertHash(Verifier verifier, String dataFile, String hashExt, String algo) throws Exception {
         String actualHash = ItUtils.calcHash(new File(verifier.getBasedir(), dataFile), algo);
 
-        String expectedHash =
-                verifier.loadLines(dataFile + hashExt, "UTF-8").get(0).trim();
+        String expectedHash = verifier.loadLines(dataFile + hashExt).get(0).trim();
 
-        assertTrue("expected=" + expectedHash + ", actual=" + actualHash, expectedHash.equalsIgnoreCase(actualHash));
+        assertTrue(expectedHash.equalsIgnoreCase(actualHash), "expected=" + expectedHash + ", actual=" + actualHash);
     }
 
     private static class RepoHandler extends ResourceHandler {

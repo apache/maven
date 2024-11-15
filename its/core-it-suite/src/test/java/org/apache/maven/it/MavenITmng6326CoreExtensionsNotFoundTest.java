@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +48,7 @@ public class MavenITmng6326CoreExtensionsNotFoundTest extends AbstractMavenInteg
                 verifier.verifyTextInLog(
                         "Extension org.apache.maven.its.it-core-extensions:maven-it-unknown-extensions:0.1 or one of its dependencies could not be resolved");
             } catch (VerificationException e2) {
-                throw new VerificationException(e2.getMessage() + "\nLog:" + ItUtils.getLogContent(verifier));
+                throw new VerificationException(e2.getMessage() + "\nLog:" + verifier.loadLogContent());
             }
         }
     }

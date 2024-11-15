@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1142">MNG-1142</a>.
@@ -67,15 +69,15 @@ public class MavenITmng1142VersionRangeIntersectionTest extends AbstractMavenInt
         verifier.deleteArtifacts("org.apache.maven.its.mng1142");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
+        List<String> classpath = verifier.loadLines("target/classpath.txt");
 
-        assertFalse(classpath.toString(), classpath.contains("a-1.1.2.jar"));
-        assertTrue(classpath.toString(), classpath.contains("a-1.1.1.jar"));
-        assertTrue(classpath.toString(), classpath.contains("b-0.1.jar"));
+        assertFalse(classpath.contains("a-1.1.2.jar"), classpath.toString());
+        assertTrue(classpath.contains("a-1.1.1.jar"), classpath.toString());
+        assertTrue(classpath.contains("b-0.1.jar"), classpath.toString());
     }
 }

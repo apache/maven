@@ -23,9 +23,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for
@@ -54,16 +55,16 @@ class MavenITmng7965PomDuplicateTagsTest extends AbstractMavenIntegrationTestCas
             invocationFailed = true;
         }
 
-        List<String> logs = verifier.loadLines(verifier.getLogFileName(), null);
+        List<String> logs = verifier.loadLogLines();
 
         // the POM is not parseable
         verifyRegexInLog(logs, "\\[ERROR\\]\\s+Non-parseable POM");
 
-        assertTrue("The Maven invocation should have failed: the POM is non-parseable", invocationFailed);
+        assertTrue(invocationFailed, "The Maven invocation should have failed: the POM is non-parseable");
     }
 
     private void verifyRegexInLog(List<String> logs, String text) {
         Pattern p = Pattern.compile(text);
-        assertTrue("Log file not contains: " + text, logs.stream().anyMatch(p.asPredicate()));
+        assertTrue(logs.stream().anyMatch(p.asPredicate()), "Log file not contains: " + text);
     }
 }

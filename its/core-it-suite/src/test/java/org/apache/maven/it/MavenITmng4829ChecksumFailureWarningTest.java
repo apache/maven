@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4829">MNG-4829</a>.
@@ -52,12 +53,12 @@ public class MavenITmng4829ChecksumFailureWarningTest extends AbstractMavenInteg
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.setEnvironmentVariable("CI", "false");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadFile(new File(testDir, verifier.getLogFileName()), false);
+        List<String> lines = verifier.loadLogLines();
 
         boolean foundWarningJar = false, foundWarningPom = false;
 
@@ -70,7 +71,7 @@ public class MavenITmng4829ChecksumFailureWarningTest extends AbstractMavenInteg
             }
         }
 
-        assertTrue("Checksum warning for corrupt.pom has not been logged.", foundWarningPom);
-        assertTrue("Checksum warning for corrupt.jar has not been logged.", foundWarningJar);
+        assertTrue(foundWarningPom, "Checksum warning for corrupt.pom has not been logged.");
+        assertTrue(foundWarningJar, "Checksum warning for corrupt.jar has not been logged.");
     }
 }

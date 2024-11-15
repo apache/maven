@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -59,7 +58,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3461");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -123,7 +122,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
             verifier.deleteArtifacts("org.apache.maven.its.mng3461");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@test.port@", Integer.toString(port));
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("--settings");
             verifier.addCliArgument("settings.xml");
             verifier.addCliArgument("validate");
@@ -152,7 +151,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3461");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -35,6 +34,8 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4348">MNG-4348</a>.
@@ -94,7 +95,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMav
             verifier.deleteDirectory("target");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@port@", Integer.toString(port));
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("--settings");
             verifier.addCliArgument("settings.xml");
             verifier.addCliArgument("validate");

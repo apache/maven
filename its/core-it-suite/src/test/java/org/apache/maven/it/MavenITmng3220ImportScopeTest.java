@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3220">MNG-3220</a>.
@@ -46,7 +47,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3220");
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -64,7 +65,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3220");
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
 
@@ -88,6 +89,6 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
             }
         }
 
-        assertTrue("Should have found validation error line in output.", found);
+        assertTrue(found, "Should have found validation error line in output.");
     }
 }

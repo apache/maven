@@ -22,9 +22,11 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4421">MNG-4421</a>.
@@ -61,7 +63,7 @@ public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest extends Abs
         assertEquals("0.1", props.getProperty("project.properties.property1"));
         assertEquals("0.1", props.getProperty("project.properties.property2"));
 
-        List<String> lines = verifier.loadLines("log.txt", null);
+        List<String> lines = verifier.loadLines("log.txt");
 
         boolean warnedPomPrefix = false;
         boolean warnedEmptyPrefix = false;

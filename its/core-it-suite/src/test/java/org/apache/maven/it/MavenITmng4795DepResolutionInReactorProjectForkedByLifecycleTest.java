@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4795">MNG-4795</a>.
@@ -54,10 +55,10 @@ public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest ex
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile0 = verifier.loadLines("sub/target/compile-0.txt", "UTF-8");
-        assertTrue(compile0.toString(), compile0.contains("maven-core-it-support-1.0.jar"));
+        List<String> compile0 = verifier.loadLines("sub/target/compile-0.txt");
+        assertTrue(compile0.contains("maven-core-it-support-1.0.jar"), compile0.toString());
 
-        List<String> compile1 = verifier.loadLines("sub/target/compile-1.txt", "UTF-8");
-        assertTrue(compile1.toString(), compile1.contains("maven-core-it-support-1.0.jar"));
+        List<String> compile1 = verifier.loadLines("sub/target/compile-1.txt");
+        assertTrue(compile1.contains("maven-core-it-support-1.0.jar"), compile1.toString());
     }
 }

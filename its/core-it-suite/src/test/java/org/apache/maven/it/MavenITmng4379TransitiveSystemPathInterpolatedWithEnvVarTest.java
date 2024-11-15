@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4379">MNG-4379</a>.
@@ -50,7 +51,7 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest extend
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4379");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.setEnvironmentVariable("MNG_4379_HOME", testDir.getAbsolutePath());
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
@@ -58,7 +59,7 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest extend
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
-        assertTrue(classpath.toString(), classpath.contains("pom.xml"));
+        List<String> classpath = verifier.loadLines("target/classpath.txt");
+        assertTrue(classpath.contains("pom.xml"), classpath.toString());
     }
 }

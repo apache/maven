@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3769">MNG-3769</a>.
@@ -51,17 +52,17 @@ public class MavenITmng3769ExclusionRelocatedTransdepsTest extends AbstractMaven
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3769");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertEquals(Collections.singletonList("org.apache.maven.its.mng3769:dependency:jar:1.0"), artifacts);
 
-        List<String> paths = verifier.loadLines("target/test.txt", "UTF-8");
+        List<String> paths = verifier.loadLines("target/test.txt");
         assertEquals(3, paths.size());
         assertEquals("dependency-1.0.jar", paths.get(2));
     }

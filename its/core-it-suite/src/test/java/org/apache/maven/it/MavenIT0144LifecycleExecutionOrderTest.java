@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Benjamin Bentmann
@@ -97,7 +98,7 @@ public class MavenIT0144LifecycleExecutionOrderTest extends AbstractMavenIntegra
         expected.add("post-site");
         expected.add("site-deploy");
 
-        List<String> phases = verifier.loadLines("target/phases.log", "UTF-8");
+        List<String> phases = verifier.loadLines("target/phases.log");
         assertEquals(expected, phases);
     }
 }

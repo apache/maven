@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
@@ -79,7 +78,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
         Map<String, String> properties = new HashMap<>();
         properties.put("@port@", Integer.toString(port));
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", properties);
+        verifier.filterFile("settings-template.xml", "settings.xml", properties);
         if (transport == null) {
             verifier.setLogFileName("default-transport.log");
         } else {

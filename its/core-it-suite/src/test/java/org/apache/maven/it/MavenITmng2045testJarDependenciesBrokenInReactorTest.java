@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2045">MNG-2045</a>:
@@ -52,15 +54,15 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest extends Abstra
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines("test-user/target/compile.txt", "UTF-8");
+        List<String> compile = verifier.loadLines("test-user/target/compile.txt");
         assertTestClasses(compile);
         assertNotMainClasses(compile);
 
-        List<String> runtime = verifier.loadLines("test-user/target/runtime.txt", "UTF-8");
+        List<String> runtime = verifier.loadLines("test-user/target/runtime.txt");
         assertTestClasses(runtime);
         assertNotMainClasses(runtime);
 
-        List<String> test = verifier.loadLines("test-user/target/test.txt", "UTF-8");
+        List<String> test = verifier.loadLines("test-user/target/test.txt");
         assertTestClasses(test);
         assertNotMainClasses(test);
     }
@@ -71,14 +73,14 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest extends Abstra
          * is merely that we have the test classes on the classpath.
          */
         assertTrue(
-                "test classes missing in " + classpath,
                 classpath.contains("test")
                         || classpath.contains("test.jar")
-                        || classpath.contains("test-jar-0.1-SNAPSHOT-tests.jar"));
+                        || classpath.contains("test-jar-0.1-SNAPSHOT-tests.jar"),
+                "test classes missing in " + classpath);
     }
 
     private void assertNotMainClasses(List<String> classpath) {
         // When depending on the test JAR of some module, we shouldn't get its main classes
-        assertFalse("main classes present in " + classpath, classpath.contains("main"));
+        assertFalse(classpath.contains("main"), "main classes present in " + classpath);
     }
 }

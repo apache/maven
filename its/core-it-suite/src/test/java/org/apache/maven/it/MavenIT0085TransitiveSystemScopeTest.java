@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Collection;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenIT0085TransitiveSystemScopeTest extends AbstractMavenIntegrationTestCase {
     public MavenIT0085TransitiveSystemScopeTest() {
@@ -47,14 +48,14 @@ public class MavenIT0085TransitiveSystemScopeTest extends AbstractMavenIntegrati
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0085");
         verifier.getSystemProperties().setProperty("test.home", testDir.getAbsolutePath());
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Collection<String> lines = verifier.loadLines("target/test.txt", "UTF-8");
-        assertTrue(lines.toString(), lines.contains("system.jar"));
+        Collection<String> lines = verifier.loadLines("target/test.txt");
+        assertTrue(lines.contains("system.jar"), lines.toString());
     }
 }

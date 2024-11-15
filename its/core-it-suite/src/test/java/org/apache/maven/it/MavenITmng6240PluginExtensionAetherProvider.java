@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6240">MNG-6240</a>.
@@ -66,13 +67,11 @@ public class MavenITmng6240PluginExtensionAetherProvider extends AbstractMavenIn
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
-        int count = 0;
-        for (String line : lines) {
-            if (line.endsWith("/repo/org/apache/maven/its/mng6240/project/1.0-SNAPSHOT/maven-metadata.xml")) {
-                count++;
-            }
-        }
-        assertEquals(2, count); // 1 from download, 1 from upload
+        List<String> lines = verifier.loadLogLines();
+        long count = lines.stream()
+                .filter(line ->
+                        line.endsWith("/repo/org/apache/maven/its/mng6240/project/1.0-SNAPSHOT/maven-metadata.xml"))
+                .count();
+        assertEquals(2L, count); // 1 from download, 1 from upload
     }
 }

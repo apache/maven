@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrationTestCase {
 
@@ -46,7 +48,7 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logFile = verifier.loadLogLines();
         String projects = logFile.stream()
                 .filter(s -> s.contains("All projects are read now"))
                 .findFirst()
@@ -70,7 +72,7 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logFile = verifier.loadLogLines();
         String projects = logFile.stream()
                 .filter(s -> s.contains("All projects are read now"))
                 .findFirst()

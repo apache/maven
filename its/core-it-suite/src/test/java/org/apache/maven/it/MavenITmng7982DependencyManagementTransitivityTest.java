@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7982">MNG-7982</a>.
@@ -52,32 +54,32 @@ public class MavenITmng7982DependencyManagementTransitivityTest extends Abstract
         verifier.deleteArtifacts("org.apache.maven.its.mng7982");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> bClasspath = verifier.loadLines("b/target/classpath.txt", "UTF-8");
-        assertTrue(bClasspath.toString(), bClasspath.contains("a-1.jar"));
-        assertFalse(bClasspath.toString(), bClasspath.contains("a-2.jar"));
+        List<String> bClasspath = verifier.loadLines("b/target/classpath.txt");
+        assertTrue(bClasspath.contains("a-1.jar"), bClasspath.toString());
+        assertFalse(bClasspath.contains("a-2.jar"), bClasspath.toString());
 
-        List<String> cClasspath = verifier.loadLines("c/target/classpath.txt", "UTF-8");
-        assertTrue(cClasspath.toString(), cClasspath.contains("b-1.jar"));
-        assertFalse(cClasspath.toString(), cClasspath.contains("a-1.jar"));
-        assertTrue(cClasspath.toString(), cClasspath.contains("a-2.jar"));
+        List<String> cClasspath = verifier.loadLines("c/target/classpath.txt");
+        assertTrue(cClasspath.contains("b-1.jar"), cClasspath.toString());
+        assertFalse(cClasspath.contains("a-1.jar"), cClasspath.toString());
+        assertTrue(cClasspath.contains("a-2.jar"), cClasspath.toString());
 
-        List<String> dClasspath = verifier.loadLines("d/target/classpath.txt", "UTF-8");
-        assertTrue(dClasspath.toString(), dClasspath.contains("c-1.jar"));
-        assertTrue(dClasspath.toString(), dClasspath.contains("b-1.jar"));
-        assertFalse(dClasspath.toString(), dClasspath.contains("a-1.jar"));
-        assertTrue(dClasspath.toString(), dClasspath.contains("a-2.jar"));
+        List<String> dClasspath = verifier.loadLines("d/target/classpath.txt");
+        assertTrue(dClasspath.contains("c-1.jar"), dClasspath.toString());
+        assertTrue(dClasspath.contains("b-1.jar"), dClasspath.toString());
+        assertFalse(dClasspath.contains("a-1.jar"), dClasspath.toString());
+        assertTrue(dClasspath.contains("a-2.jar"), dClasspath.toString());
 
-        List<String> eClasspath = verifier.loadLines("e/target/classpath.txt", "UTF-8");
-        assertTrue(eClasspath.toString(), eClasspath.contains("d-1.jar"));
-        assertTrue(eClasspath.toString(), eClasspath.contains("c-1.jar"));
-        assertTrue(eClasspath.toString(), eClasspath.contains("b-1.jar"));
-        assertFalse(eClasspath.toString(), eClasspath.contains("a-1.jar"));
-        assertTrue(eClasspath.toString(), eClasspath.contains("a-2.jar"));
+        List<String> eClasspath = verifier.loadLines("e/target/classpath.txt");
+        assertTrue(eClasspath.contains("d-1.jar"), eClasspath.toString());
+        assertTrue(eClasspath.contains("c-1.jar"), eClasspath.toString());
+        assertTrue(eClasspath.contains("b-1.jar"), eClasspath.toString());
+        assertFalse(eClasspath.contains("a-1.jar"), eClasspath.toString());
+        assertTrue(eClasspath.contains("a-2.jar"), eClasspath.toString());
     }
 
     /**
@@ -96,34 +98,34 @@ public class MavenITmng7982DependencyManagementTransitivityTest extends Abstract
         verifier.deleteArtifacts("org.apache.maven.its.mng7982");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("verify");
         verifier.addCliArgument("-Dmaven.resolver.dependencyManagerTransitivity=false");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> bClasspath = verifier.loadLines("b/target/classpath.txt", "UTF-8");
-        assertTrue(bClasspath.toString(), bClasspath.contains("a-1.jar"));
-        assertFalse(bClasspath.toString(), bClasspath.contains("a-2.jar"));
+        List<String> bClasspath = verifier.loadLines("b/target/classpath.txt");
+        assertTrue(bClasspath.contains("a-1.jar"), bClasspath.toString());
+        assertFalse(bClasspath.contains("a-2.jar"), bClasspath.toString());
 
-        List<String> cClasspath = verifier.loadLines("c/target/classpath.txt", "UTF-8");
-        assertTrue(cClasspath.toString(), cClasspath.contains("b-1.jar"));
-        assertFalse(cClasspath.toString(), cClasspath.contains("a-1.jar"));
-        assertTrue(cClasspath.toString(), cClasspath.contains("a-2.jar"));
+        List<String> cClasspath = verifier.loadLines("c/target/classpath.txt");
+        assertTrue(cClasspath.contains("b-1.jar"), cClasspath.toString());
+        assertFalse(cClasspath.contains("a-1.jar"), cClasspath.toString());
+        assertTrue(cClasspath.contains("a-2.jar"), cClasspath.toString());
 
-        List<String> dClasspath = verifier.loadLines("d/target/classpath.txt", "UTF-8");
-        assertTrue(dClasspath.toString(), dClasspath.contains("c-1.jar"));
-        assertTrue(dClasspath.toString(), dClasspath.contains("b-1.jar"));
+        List<String> dClasspath = verifier.loadLines("d/target/classpath.txt");
+        assertTrue(dClasspath.contains("c-1.jar"), dClasspath.toString());
+        assertTrue(dClasspath.contains("b-1.jar"), dClasspath.toString());
         // dependency management of c is ignored
-        assertTrue(dClasspath.toString(), dClasspath.contains("a-1.jar"));
-        assertFalse(dClasspath.toString(), dClasspath.contains("a-2.jar"));
+        assertTrue(dClasspath.contains("a-1.jar"), dClasspath.toString());
+        assertFalse(dClasspath.contains("a-2.jar"), dClasspath.toString());
 
-        List<String> eClasspath = verifier.loadLines("e/target/classpath.txt", "UTF-8");
-        assertTrue(eClasspath.toString(), eClasspath.contains("d-1.jar"));
-        assertTrue(eClasspath.toString(), eClasspath.contains("c-1.jar"));
-        assertTrue(eClasspath.toString(), eClasspath.contains("b-1.jar"));
+        List<String> eClasspath = verifier.loadLines("e/target/classpath.txt");
+        assertTrue(eClasspath.contains("d-1.jar"), eClasspath.toString());
+        assertTrue(eClasspath.contains("c-1.jar"), eClasspath.toString());
+        assertTrue(eClasspath.contains("b-1.jar"), eClasspath.toString());
         // dependency management of c is ignored
-        assertTrue(dClasspath.toString(), dClasspath.contains("a-1.jar"));
-        assertFalse(dClasspath.toString(), dClasspath.contains("a-2.jar"));
+        assertTrue(dClasspath.contains("a-1.jar"), dClasspath.toString());
+        assertFalse(dClasspath.contains("a-2.jar"), dClasspath.toString());
     }
 }

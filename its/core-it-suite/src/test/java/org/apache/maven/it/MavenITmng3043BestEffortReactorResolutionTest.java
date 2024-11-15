@@ -22,9 +22,11 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3043">MNG-3043</a>.
@@ -63,33 +65,33 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
 
         List<String> classpath;
 
-        classpath = verifier.loadLines("consumer-a/target/compile.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-a/target/compile.txt");
         assertContains(classpath, new String[] {"classes-test"});
         assertNotContains(classpath, new String[] {"classes-main"});
-        classpath = verifier.loadLines("consumer-a/target/runtime.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-a/target/runtime.txt");
         assertContains(classpath, new String[] {"classes-test"});
         assertNotContains(classpath, new String[] {"classes-main"});
-        classpath = verifier.loadLines("consumer-a/target/test.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-a/target/test.txt");
         assertContains(classpath, new String[] {"classes-test"});
         assertNotContains(classpath, new String[] {"classes-main"});
 
-        classpath = verifier.loadLines("consumer-b/target/compile.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-b/target/compile.txt");
         assertContains(classpath, new String[] {"classes-main"});
         assertNotContains(classpath, new String[] {"classes-test"});
-        classpath = verifier.loadLines("consumer-b/target/runtime.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-b/target/runtime.txt");
         assertContains(classpath, new String[] {"classes-main"});
         assertNotContains(classpath, new String[] {"classes-test"});
-        classpath = verifier.loadLines("consumer-b/target/test.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-b/target/test.txt");
         assertContains(classpath, new String[] {"classes-main"});
         assertNotContains(classpath, new String[] {"classes-test"});
 
-        classpath = verifier.loadLines("consumer-c/target/compile.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-c/target/compile.txt");
         assertContains(classpath, new String[] {"classes-main"});
         assertContains(classpath, new String[] {"classes-test"});
-        classpath = verifier.loadLines("consumer-c/target/runtime.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-c/target/runtime.txt");
         assertContains(classpath, new String[] {"classes-main"});
         assertContains(classpath, new String[] {"classes-test"});
-        classpath = verifier.loadLines("consumer-c/target/test.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-c/target/test.txt");
         assertContains(classpath, new String[] {"classes-main"});
         assertContains(classpath, new String[] {"classes-test"});
     }
@@ -121,33 +123,33 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
 
         List<String> classpath;
 
-        classpath = verifier.loadLines("consumer-a/target/compile.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-a/target/compile.txt");
         assertContains(classpath, new String[] {prefix + "tests.jar"});
         assertNotContains(classpath, new String[] {prefix + "client.jar"});
-        classpath = verifier.loadLines("consumer-a/target/runtime.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-a/target/runtime.txt");
         assertContains(classpath, new String[] {prefix + "tests.jar"});
         assertNotContains(classpath, new String[] {prefix + "client.jar"});
-        classpath = verifier.loadLines("consumer-a/target/test.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-a/target/test.txt");
         assertContains(classpath, new String[] {prefix + "tests.jar"});
         assertNotContains(classpath, new String[] {prefix + "client.jar"});
 
-        classpath = verifier.loadLines("consumer-b/target/compile.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-b/target/compile.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertNotContains(classpath, new String[] {prefix + "tests.jar"});
-        classpath = verifier.loadLines("consumer-b/target/runtime.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-b/target/runtime.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertNotContains(classpath, new String[] {prefix + "tests.jar"});
-        classpath = verifier.loadLines("consumer-b/target/test.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-b/target/test.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertNotContains(classpath, new String[] {prefix + "tests.jar"});
 
-        classpath = verifier.loadLines("consumer-c/target/compile.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-c/target/compile.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertContains(classpath, new String[] {prefix + "tests.jar"});
-        classpath = verifier.loadLines("consumer-c/target/runtime.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-c/target/runtime.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertContains(classpath, new String[] {prefix + "tests.jar"});
-        classpath = verifier.loadLines("consumer-c/target/test.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-c/target/test.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertContains(classpath, new String[] {prefix + "tests.jar"});
     }
@@ -188,33 +190,33 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
 
         List<String> classpath;
 
-        classpath = verifier.loadLines("consumer-a/target/compile.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-a/target/compile.txt");
         assertContains(classpath, new String[] {prefix + "tests.jar"});
         assertNotContains(classpath, new String[] {prefix + "client.jar"});
-        classpath = verifier.loadLines("consumer-a/target/runtime.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-a/target/runtime.txt");
         assertContains(classpath, new String[] {prefix + "tests.jar"});
         assertNotContains(classpath, new String[] {prefix + "client.jar"});
-        classpath = verifier.loadLines("consumer-a/target/test.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-a/target/test.txt");
         assertContains(classpath, new String[] {prefix + "tests.jar"});
         assertNotContains(classpath, new String[] {prefix + "client.jar"});
 
-        classpath = verifier.loadLines("consumer-b/target/compile.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-b/target/compile.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertNotContains(classpath, new String[] {prefix + "tests.jar"});
-        classpath = verifier.loadLines("consumer-b/target/runtime.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-b/target/runtime.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertNotContains(classpath, new String[] {prefix + "tests.jar"});
-        classpath = verifier.loadLines("consumer-b/target/test.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-b/target/test.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertNotContains(classpath, new String[] {prefix + "tests.jar"});
 
-        classpath = verifier.loadLines("consumer-c/target/compile.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-c/target/compile.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertContains(classpath, new String[] {prefix + "tests.jar"});
-        classpath = verifier.loadLines("consumer-c/target/runtime.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-c/target/runtime.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertContains(classpath, new String[] {prefix + "tests.jar"});
-        classpath = verifier.loadLines("consumer-c/target/test.txt", "UTF-8");
+        classpath = verifier.loadLines("consumer-c/target/test.txt");
         assertContains(classpath, new String[] {prefix + "client.jar"});
         assertContains(classpath, new String[] {prefix + "tests.jar"});
     }
@@ -226,7 +228,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     }
 
     private void assertContains(List<String> collection, String item) {
-        assertTrue(item + " missing in " + collection, collection.contains(item));
+        assertTrue(collection.contains(item), item + " missing in " + collection);
     }
 
     private void assertNotContains(List<String> collection, String[] items) {
@@ -236,6 +238,6 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     }
 
     private void assertNotContains(List<String> collection, String item) {
-        assertFalse(item + " present in " + collection, collection.contains(item));
+        assertFalse(collection.contains(item), item + " present in " + collection);
     }
 }

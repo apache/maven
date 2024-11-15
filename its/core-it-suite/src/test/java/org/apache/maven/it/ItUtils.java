@@ -18,17 +18,14 @@
  */
 package org.apache.maven.it;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
-import org.apache.maven.shared.verifier.Verifier;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Benjamin Bentmann
@@ -64,12 +61,6 @@ class ItUtils {
         return hash.toString();
     }
 
-    public static String getLogContent(Verifier verifier) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Files.copy(Paths.get(verifier.getBasedir(), verifier.getLogFileName()), baos);
-        return baos.toString();
-    }
-
     /**
      * @see ItUtils#setUserHome(Verifier, Path)
      */
@@ -89,5 +80,17 @@ class ItUtils {
         } else {
             verifier.setEnvironmentVariable("MAVEN_OPTS", "\"-Duser.home=" + path + "\"");
         }
+    }
+
+    public static void assertCanonicalFileEquals(File expected, File actual) throws IOException {
+        assertEquals(expected.getCanonicalFile(), actual.getCanonicalFile());
+    }
+
+    public static void assertCanonicalFileEquals(String expected, String actual, String message) throws IOException {
+        assertEquals(new File(expected).getCanonicalFile(), new File(actual).getCanonicalFile(), message);
+    }
+
+    public static void assertCanonicalFileEquals(String expected, String actual) throws IOException {
+        assertEquals(new File(expected).getCanonicalFile(), new File(actual).getCanonicalFile());
     }
 }

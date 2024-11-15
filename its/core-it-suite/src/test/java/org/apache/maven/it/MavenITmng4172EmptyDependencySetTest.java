@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4172">MNG-4172</a>.
@@ -53,7 +54,7 @@ public class MavenITmng4172EmptyDependencySetTest extends AbstractMavenIntegrati
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertEquals(new ArrayList<String>(), artifacts);
     }
 }

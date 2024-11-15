@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5135">MNG-5135</a>.
@@ -51,13 +52,13 @@ public class MavenITmng5135AggregatorDepResolutionModuleExtensionTest extends Ab
         verifier.deleteArtifacts("org.apache.maven.its.mng5135");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:aggregate-test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines("target/module.txt", "UTF-8");
+        List<String> compile = verifier.loadLines("target/module.txt");
 
-        assertTrue(compile.toString(), compile.contains("dep-0.1-it.jar"));
+        assertTrue(compile.contains("dep-0.1-it.jar"), compile.toString());
     }
 }

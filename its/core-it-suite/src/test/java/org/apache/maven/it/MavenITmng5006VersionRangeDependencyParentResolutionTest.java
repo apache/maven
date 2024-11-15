@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5006">MNG-5006</a>.
@@ -54,14 +55,14 @@ public class MavenITmng5006VersionRangeDependencyParentResolutionTest extends Ab
         verifier.deleteArtifacts("org.apache.maven.its.mng5006");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        List<String> compile = verifier.loadLines("target/compile.txt");
 
-        assertTrue(compile.toString(), compile.contains("a-0.1.jar"));
-        assertTrue(compile.toString(), compile.contains("b-0.1.jar"));
+        assertTrue(compile.contains("a-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("b-0.1.jar"), compile.toString());
     }
 }

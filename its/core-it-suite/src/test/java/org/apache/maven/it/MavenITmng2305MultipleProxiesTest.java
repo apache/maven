@@ -27,7 +27,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -42,6 +41,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.jetty.http.HttpVersion.HTTP_1_1;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2305">MNG-2305</a>.
@@ -99,7 +99,7 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@proxy.http@", Integer.toString(httpPort));
             filterProps.put("@proxy.https@", Integer.toString(proxyPort));
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("--settings");
             verifier.addCliArgument("settings.xml");
             verifier.setEnvironmentVariable(
@@ -117,9 +117,9 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
             server.join();
         }
 
-        List<String> cp = verifier.loadLines("target/classpath.txt", "UTF-8");
-        assertTrue(cp.toString(), cp.contains("http-0.1.jar"));
-        assertTrue(cp.toString(), cp.contains("https-0.1.jar"));
+        List<String> cp = verifier.loadLines("target/classpath.txt");
+        assertTrue(cp.contains("http-0.1.jar"), cp.toString());
+        assertTrue(cp.contains("https-0.1.jar"), cp.toString());
     }
 
     private void addHttpsConnector(Server server, String keyStorePath, String keyStorePassword, String keyPassword) {

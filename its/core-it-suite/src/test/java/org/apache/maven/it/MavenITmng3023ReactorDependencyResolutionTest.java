@@ -22,9 +22,12 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3023">MNG-3023</a>
@@ -61,13 +64,11 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.deleteDirectory("dependency/dependency-classes");
         verifier.deleteArtifacts("org.apache.maven.its.mng3023");
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-            fail("Expected failure to resolve dependency artifact without at least calling 'compile' phase.");
-        } catch (VerificationException e) {
-            // expected.
-        }
+        verifier.addCliArgument("validate");
+        VerificationException exception = assertThrows(
+                VerificationException.class,
+                verifier::execute,
+                "Expected failure to resolve dependency artifact without at least calling 'compile' phase.");
     }
 
     /**
@@ -96,9 +97,9 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath", "UTF-8");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
+        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath");
+        assertTrue(compileClassPath.contains("dependency-classes"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("dependency-1.jar"), compileClassPath.toString());
     }
 
     /**
@@ -130,9 +131,9 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath", "UTF-8");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
+        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath");
+        assertTrue(compileClassPath.contains("dependency-1.jar"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("dependency-classes"), compileClassPath.toString());
 
         verifier.deleteDirectory("dependency/dependency-classes");
         verifier.deleteDirectory("consumer/target");
@@ -141,8 +142,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        compileClassPath = verifier.loadLines("consumer/target/compile.classpath", "UTF-8");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
+        compileClassPath = verifier.loadLines("consumer/target/compile.classpath");
+        assertTrue(compileClassPath.contains("dependency-1.jar"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("dependency-classes"), compileClassPath.toString());
     }
 }

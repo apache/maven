@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2720">MNG-2720</a>.
@@ -59,36 +61,36 @@ public class MavenITmng2720SiblingClasspathArtifactsTest extends AbstractMavenIn
 
         List<String> classPath;
 
-        classPath = verifier.loadLines("child2/target/compile.txt", "UTF-8");
+        classPath = verifier.loadLines("child2/target/compile.txt");
         assertMainJar(classPath);
 
-        classPath = verifier.loadLines("child2/target/runtime.txt", "UTF-8");
+        classPath = verifier.loadLines("child2/target/runtime.txt");
         assertMainJar(classPath);
 
-        classPath = verifier.loadLines("child2/target/test.txt", "UTF-8");
+        classPath = verifier.loadLines("child2/target/test.txt");
         assertMainJar(classPath);
 
-        classPath = verifier.loadLines("child3/target/compile.txt", "UTF-8");
+        classPath = verifier.loadLines("child3/target/compile.txt");
         assertTestJar(classPath);
 
-        classPath = verifier.loadLines("child3/target/runtime.txt", "UTF-8");
+        classPath = verifier.loadLines("child3/target/runtime.txt");
         assertTestJar(classPath);
 
-        classPath = verifier.loadLines("child3/target/test.txt", "UTF-8");
+        classPath = verifier.loadLines("child3/target/test.txt");
         assertTestJar(classPath);
     }
 
     private void assertMainJar(List<String> classPath) {
-        assertTrue(classPath.toString(), classPath.contains("main.jar"));
-        assertFalse(classPath.toString(), classPath.contains("main"));
-        assertFalse(classPath.toString(), classPath.contains("test.jar"));
-        assertFalse(classPath.toString(), classPath.contains("test"));
+        assertTrue(classPath.contains("main.jar"), classPath.toString());
+        assertFalse(classPath.contains("main"), classPath.toString());
+        assertFalse(classPath.contains("test.jar"), classPath.toString());
+        assertFalse(classPath.contains("test"), classPath.toString());
     }
 
     private void assertTestJar(List<String> classPath) {
-        assertFalse(classPath.toString(), classPath.contains("main.jar"));
-        assertFalse(classPath.toString(), classPath.contains("main"));
-        assertTrue(classPath.toString(), classPath.contains("test.jar"));
-        assertFalse(classPath.toString(), classPath.contains("test"));
+        assertFalse(classPath.contains("main.jar"), classPath.toString());
+        assertFalse(classPath.contains("main"), classPath.toString());
+        assertTrue(classPath.contains("test.jar"), classPath.toString());
+        assertFalse(classPath.contains("test"), classPath.toString());
     }
 }

@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MRESOLVER-614">MRESOLVER-614</a> that is
@@ -54,7 +55,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> l = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+        List<String> l = verifier.loadLogLines();
         if (matchesVersionRange("[3.9.0,4.0.0-alpha-12)")) {
             // Maven3 is not transitive
             a(l, "[INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0");
@@ -100,7 +101,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> l = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+        List<String> l = verifier.loadLogLines();
         if (matchesVersionRange("[4.0.0-beta-5]")) {
             a(l, "[INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0");
             a(l, "[INFO] \\- org.sonatype.plexus:plexus-build-api:jar:0.0.7:compile");
@@ -127,7 +128,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         // this really boils down to "transitive" vs "non-transitive"
-        List<String> l = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+        List<String> l = verifier.loadLogLines();
         if (matchesVersionRange("[,4.0.0-alpha-11)")) {
             a(l, "[INFO]    |  |  |  \\- com.fasterxml.jackson.core:jackson-core:jar:2.16.1:compile");
         } else {
@@ -139,6 +140,6 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
      * Assert true, log lines contains string...
      */
     protected void a(List<String> logLines, String string) {
-        assertTrue("missing " + string, logLines.contains(string));
+        assertTrue(logLines.contains(string), "missing " + string);
     }
 }

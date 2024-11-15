@@ -26,9 +26,10 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * An integration test to ensure any pomfile is only read once.
@@ -61,7 +62,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
         verifier.addCliArgument("verify");
         verifier.execute();
 
-        List<String> logTxt = verifier.loadLines("log.txt", "utf-8");
+        List<String> logTxt = verifier.loadLines("log.txt");
 
         // count source items
         Map<String, Long> sourceMap = logTxt.stream()
@@ -75,7 +76,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        assertTrue("Duplicate items: " + String.join(System.lineSeparator(), duplicates), duplicates.isEmpty());
+        assertTrue(duplicates.isEmpty(), "Duplicate items: " + String.join(System.lineSeparator(), duplicates));
     }
 
     @Test
@@ -97,7 +98,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
         verifier.addCliArgument("verify");
         verifier.execute();
 
-        List<String> logTxt = verifier.loadLines("log-bc.txt", "utf-8");
+        List<String> logTxt = verifier.loadLines("log-bc.txt");
 
         // count source items
         Map<String, Long> sourceMap = logTxt.stream()
@@ -111,7 +112,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        assertTrue("Duplicate items: " + String.join(System.lineSeparator(), duplicates), duplicates.isEmpty());
+        assertTrue(duplicates.isEmpty(), "Duplicate items: " + String.join(System.lineSeparator(), duplicates));
     }
 
     private String getSourceFromLogLine(String line) {

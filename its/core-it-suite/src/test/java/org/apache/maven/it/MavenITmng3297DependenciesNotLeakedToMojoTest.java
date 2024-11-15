@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3297">MNG-3297</a>.
@@ -54,8 +55,8 @@ public class MavenITmng3297DependenciesNotLeakedToMojoTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
-        assertEquals(artifacts.toString(), 1, artifacts.size());
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
+        assertEquals(1, artifacts.size(), artifacts.toString());
 
         Properties props = verifier.loadProperties("target/artifact.properties");
         assertEquals("0", props.getProperty("project.artifacts"));

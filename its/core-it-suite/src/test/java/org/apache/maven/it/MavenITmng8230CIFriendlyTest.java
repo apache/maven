@@ -19,14 +19,14 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8230">MNG-8230</a>.
@@ -124,10 +124,10 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
             fail("Expected failure");
         } catch (VerificationException e) {
             assertTrue(
-                    e.getMessage(),
                     e.getMessage()
                             .contains(
-                                    "'version' contains an expression but should be a constant. @ myGroup:parent:${ci-version}"));
+                                    "'version' contains an expression but should be a constant. @ myGroup:parent:${ci-version}"),
+                    e.getMessage());
         }
     }
 
@@ -145,10 +145,10 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
             fail("Expected failure");
         } catch (VerificationException e) {
             assertTrue(
-                    e.getMessage(),
                     e.getMessage()
                             .contains(
-                                    "'groupId' contains an expression but should be a constant. @ ${foo}:myArtifact:1.0-SNAPSHOT"));
+                                    "'groupId' contains an expression but should be a constant. @ ${foo}:myArtifact:1.0-SNAPSHOT"),
+                    e.getMessage());
         }
     }
 
@@ -166,18 +166,10 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
             fail("Expected failure");
         } catch (VerificationException e) {
             assertTrue(
-                    e.getMessage(),
                     e.getMessage()
                             .contains(
-                                    "'artifactId' contains an expression but should be a constant. @ myGroup:${foo}:1.0-SNAPSHOT"));
-        }
-    }
-
-    void verifyExactLine(Verifier verifier, String line) throws Exception {
-        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
-        if (lines.stream().noneMatch(s -> Objects.equals(s, line))) {
-            throw new VerificationException(
-                    "Could not find line: '" + line + "' in output log:\n" + String.join("\n", lines));
+                                    "'artifactId' contains an expression but should be a constant. @ myGroup:${foo}:1.0-SNAPSHOT"),
+                    e.getMessage());
         }
     }
 }

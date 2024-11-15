@@ -23,9 +23,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrationTestCase {
 
@@ -51,7 +54,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         // building a parent fails. The build succeeds without any parent. If that warning message appears in the
         // log, parent resolution failed.
         final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
-        assertFalse("Unexpected error message found.", indexOf(lines, ".*Failed to build parent project.*") >= 0);
+        assertFalse(indexOf(lines, ".*Failed to build parent project.*") >= 0, "Unexpected error message found.");
     }
 
     @Test
@@ -72,7 +75,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         // building a parent fails. The build succeeds without any parent. If that warning message appears in the
         // log, parent resolution failed.
         final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
-        assertFalse("Unexpected error message found.", indexOf(lines, ".*Failed to build parent project.*") >= 0);
+        assertFalse(indexOf(lines, ".*Failed to build parent project.*") >= 0, "Unexpected error message found.");
     }
 
     @Test
@@ -91,8 +94,8 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
             assertNotNull(verifier);
             final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
             assertTrue(
-                    "Expected error message not found.",
-                    indexOf(lines, ".*(parent)? version range.*does not specify an upper bound.*") >= 0);
+                    indexOf(lines, ".*(parent)? version range.*does not specify an upper bound.*") >= 0,
+                    "Expected error message not found.");
         }
     }
 
@@ -113,7 +116,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
             assertNotNull(verifier);
             final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
             int msg = indexOf(lines, ".*Version must be a constant.*org.apache.maven.its.mng2199:expression.*");
-            assertTrue("Expected error message not found.", msg >= 0);
+            assertTrue(msg >= 0, "Expected error message not found.");
         }
     }
 
@@ -133,7 +136,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
             assertNotNull(verifier);
             final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
             int msg = indexOf(lines, ".*Version must be a constant.*org.apache.maven.its.mng2199:inherited.*");
-            assertTrue("Expected error message not found.", msg >= 0);
+            assertTrue(msg >= 0, "Expected error message not found.");
         }
     }
 
@@ -155,7 +158,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         // is not corrupt. It's expected to find the local parent and not fall back to remote resolution. If it
         // falls back to remote resolution, this just catches the test project to be broken.
         final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
-        assertFalse("Unexpected error message found.", indexOf(lines, ".*Failed to build parent project.*") >= 0);
+        assertFalse(indexOf(lines, ".*Failed to build parent project.*") >= 0, "Unexpected error message found.");
     }
 
     @Test
@@ -176,7 +179,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
             final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
             int msg =
                     indexOf(lines, ".*Non-resolvable parent POM org.apache.maven.its.mng2199:local-parent:\\[2,3\\].*");
-            assertTrue("Expected error message not found.", msg >= 0);
+            assertTrue(msg >= 0, "Expected error message not found.");
         }
     }
 
@@ -198,7 +201,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         // resolution with a version range in use. If the warning message is in the logs, that remote parent
         // resolution failed unexpectedly.
         final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
-        assertFalse("Unexpected error message found.", indexOf(lines, ".*Failed to build parent project.*") >= 0);
+        assertFalse(indexOf(lines, ".*Failed to build parent project.*") >= 0, "Unexpected error message found.");
     }
 
     @Test
@@ -217,7 +220,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
             assertNotNull(verifier);
             final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
             int msg = indexOf(lines, ".*Version must be a constant.*org.apache.maven.its.mng2199:expression.*");
-            assertTrue("Expected error message not found.", msg >= 0);
+            assertTrue(msg >= 0, "Expected error message not found.");
         }
     }
 
@@ -237,7 +240,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
             assertNotNull(verifier);
             final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
             int msg = indexOf(lines, ".*Version must be a constant.*org.apache.maven.its.mng2199:inherited.*");
-            assertTrue("Expected error message not found.", msg >= 0);
+            assertTrue(msg >= 0, "Expected error message not found.");
         }
     }
 

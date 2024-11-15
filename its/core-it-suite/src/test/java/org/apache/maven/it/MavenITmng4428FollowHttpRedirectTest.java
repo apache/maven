@@ -27,7 +27,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -43,6 +42,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.jetty.http.HttpVersion.HTTP_1_1;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4428">MNG-4428</a>.
@@ -123,7 +123,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@protocol@", fromHttp ? "http" : "https");
             filterProps.put("@port@", Integer.toString(((NetworkConnector) from).getLocalPort()));
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-X");
             verifier.addCliArgument("--settings");
             verifier.addCliArgument("settings.xml");
@@ -139,8 +139,8 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
             server.join();
         }
 
-        List<String> cp = verifier.loadLines("target/classpath.txt", "UTF-8");
-        assertTrue(cp.toString(), cp.contains("dep-0.1.jar"));
+        List<String> cp = verifier.loadLines("target/classpath.txt");
+        assertTrue(cp.contains("dep-0.1.jar"), cp.toString());
     }
 
     private void addHttpsConnector(Server server, String keyStorePath, String keyStorePassword, String keyPassword) {

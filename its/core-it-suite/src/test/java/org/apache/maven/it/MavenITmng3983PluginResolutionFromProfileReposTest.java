@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +51,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3983");
-        verifier.filterFile("pom.xml", "pom.xml", "UTF-8");
+        verifier.filterFile("pom.xml", "pom.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -74,7 +73,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3983");
-        verifier.filterFile("settings.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

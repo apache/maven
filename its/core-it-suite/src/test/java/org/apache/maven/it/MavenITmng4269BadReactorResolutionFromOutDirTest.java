@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +52,7 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest extends AbstractMa
         // NOTE: It's a crucial prerequisite to create the output directory, i.e. the bad choice
         new File(testDir, "target/classes").mkdirs();
         verifier.deleteArtifacts("org.apache.maven.its.mng4269");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         // This should use the previous installation/deployment from the repo, not the invalid output directory

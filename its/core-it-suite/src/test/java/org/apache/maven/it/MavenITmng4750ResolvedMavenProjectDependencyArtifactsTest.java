@@ -21,9 +21,12 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4750">MNG-4750</a> and
@@ -52,7 +55,7 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends A
         verifier.deleteArtifacts("org.apache.maven.its.mng4750");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -62,7 +65,7 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends A
 
         String path = props.getProperty("project.dependencyArtifacts.0.file");
         assertNotNull(path);
-        assertTrue(path, new File(path).isFile());
+        assertTrue(new File(path).isFile(), path);
 
         String version = props.getProperty("project.dependencyArtifacts.0.version");
         assertEquals("0.1", version);

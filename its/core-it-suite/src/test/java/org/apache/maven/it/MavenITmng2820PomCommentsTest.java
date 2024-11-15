@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2820">MNG-2820</a>.
@@ -73,6 +74,6 @@ public class MavenITmng2820PomCommentsTest extends AbstractMavenIntegrationTestC
     }
 
     private void assertPomComment(String pom, String comment) throws Exception {
-        assertTrue("Missing comment: " + comment, pom.contains(comment));
+        assertTrue(pom.contains(comment), "Missing comment: " + comment);
     }
 }

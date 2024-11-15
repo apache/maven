@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2140">MNG-2140</a>.
@@ -52,7 +53,7 @@ public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest extends Abstrac
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("project/target/test.txt", "UTF-8");
-        assertTrue(artifacts.toString(), artifacts.contains("dependency/pom.xml"));
+        List<String> artifacts = verifier.loadLines("project/target/test.txt");
+        assertTrue(artifacts.contains("dependency/pom.xml"), artifacts.toString());
     }
 }

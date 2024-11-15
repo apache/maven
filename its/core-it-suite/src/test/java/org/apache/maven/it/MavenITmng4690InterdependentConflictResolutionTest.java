@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4690">MNG-4690</a>.
@@ -83,19 +84,19 @@ public class MavenITmng4690InterdependentConflictResolutionTest extends Abstract
         verifier.deleteArtifacts("org.apache.maven.its.mng4690");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
+        List<String> classpath = verifier.loadLines("target/classpath.txt");
 
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("a-1.jar"));
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("b-1.jar"));
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("c-1.jar"));
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("d-1.jar"));
+        assertTrue(classpath.contains("a-1.jar"), test + " > " + classpath.toString());
+        assertTrue(classpath.contains("b-1.jar"), test + " > " + classpath.toString());
+        assertTrue(classpath.contains("c-1.jar"), test + " > " + classpath.toString());
+        assertTrue(classpath.contains("d-1.jar"), test + " > " + classpath.toString());
 
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("x-1.jar"));
-        assertTrue(test + " > " + classpath.toString(), classpath.contains("y-2.jar"));
+        assertTrue(classpath.contains("x-1.jar"), test + " > " + classpath.toString());
+        assertTrue(classpath.contains("y-2.jar"), test + " > " + classpath.toString());
     }
 }

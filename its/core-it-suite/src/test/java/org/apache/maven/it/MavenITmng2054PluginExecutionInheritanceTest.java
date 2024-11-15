@@ -22,9 +22,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2054">MNG-2054</a>.
@@ -53,7 +54,7 @@ public class MavenITmng2054PluginExecutionInheritanceTest extends AbstractMavenI
         verifier.verifyErrorFreeLog();
 
         List<String> executions =
-                verifier.loadLines("project/project-level2/project-level3/project-jar/target/exec.log", "UTF-8");
+                verifier.loadLines("project/project-level2/project-level3/project-jar/target/exec.log");
         List<String> expected = Arrays.asList(new String[] {"once"});
         assertEquals(expected, executions);
     }

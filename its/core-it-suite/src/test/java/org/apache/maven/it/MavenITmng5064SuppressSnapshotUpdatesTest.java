@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -37,6 +36,9 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5064">MNG-5064</a>.
@@ -97,7 +99,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
             verifier.deleteArtifacts("org.apache.maven.its.mng5064");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@port@", Integer.toString(port));
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-nsu");
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
@@ -107,9 +109,9 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
-            assertTrue(classpath.toString(), classpath.contains("dep-0.1-SNAPSHOT.jar"));
-            assertTrue(requestedUris.toString(), requestedUris.contains(metadataUri));
+            List<String> classpath = verifier.loadLines("target/classpath.txt");
+            assertTrue(classpath.contains("dep-0.1-SNAPSHOT.jar"), classpath.toString());
+            assertTrue(requestedUris.contains(metadataUri), requestedUris.toString());
 
             requestedUris.clear();
 
@@ -118,9 +120,9 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
-            assertTrue(classpath.toString(), classpath.contains("dep-0.1-SNAPSHOT.jar"));
-            assertFalse(requestedUris.toString(), requestedUris.contains(metadataUri));
+            classpath = verifier.loadLines("target/classpath.txt");
+            assertTrue(classpath.contains("dep-0.1-SNAPSHOT.jar"), classpath.toString());
+            assertFalse(requestedUris.contains(metadataUri), requestedUris.toString());
         } finally {
             server.stop();
             server.join();

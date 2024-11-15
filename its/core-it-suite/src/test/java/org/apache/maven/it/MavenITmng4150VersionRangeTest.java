@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Collection;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-505">MNG-505</a>.
@@ -49,18 +51,18 @@ public class MavenITmng4150VersionRangeTest extends AbstractMavenIntegrationTest
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4150");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Collection<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        Collection<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertEquals(4, artifacts.size());
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4150:a:jar:1.1"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4150:b:jar:1.0"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4150:c:jar:3.8"));
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4150:d:jar:2.1.1"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4150:a:jar:1.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4150:b:jar:1.0"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4150:c:jar:3.8"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4150:d:jar:2.1.1"), artifacts.toString());
     }
 }

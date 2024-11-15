@@ -22,9 +22,11 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4696">MNG-4696</a>.
@@ -53,7 +55,7 @@ public class MavenITmng4696MavenProjectDependencyArtifactsTest extends AbstractM
         verifier.deleteArtifacts("org.apache.maven.its.mng4696");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -65,8 +67,8 @@ public class MavenITmng4696MavenProjectDependencyArtifactsTest extends AbstractM
         ids.add(props.getProperty("project.dependencyArtifacts.0.artifactId"));
         ids.add(props.getProperty("project.dependencyArtifacts.1.artifactId"));
         ids.add(props.getProperty("project.dependencyArtifacts.2.artifactId"));
-        assertTrue(ids.toString(), ids.contains("b"));
-        assertTrue(ids.toString(), ids.contains("c"));
-        assertTrue(ids.toString(), ids.contains("d"));
+        assertTrue(ids.contains("b"), ids.toString());
+        assertTrue(ids.contains("c"), ids.toString());
+        assertTrue(ids.contains("d"), ids.toString());
     }
 }

@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -80,7 +79,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
         properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());
         properties.put("@port@", Integer.toString(port));
 
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", properties);
+        verifier.filterFile("settings-template.xml", "settings.xml", properties);
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -117,7 +116,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
         properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());
         properties.put("@port@", Integer.toString(port));
 
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", properties);
+        verifier.filterFile("settings-template.xml", "settings.xml", properties);
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

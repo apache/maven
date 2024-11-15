@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +49,7 @@ class MavenITmng7566JavaPrerequisiteTest extends AbstractMavenIntegrationTestCas
         verifier.deleteArtifacts("org.apache.maven.its.mng7566");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("../settings-template.xml", "settings.xml");
         try {
             verifier.addCliArgument("validate");
             verifier.execute();
@@ -77,7 +76,7 @@ class MavenITmng7566JavaPrerequisiteTest extends AbstractMavenIntegrationTestCas
         verifier.deleteArtifacts("org.apache.maven.its.mng7566");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("org.apache.maven.its.mng7566:maven-mng7566-plugin:touch");
         verifier.execute();
         verifier.verifyErrorFreeLog();

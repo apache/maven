@@ -23,9 +23,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2562">MNG-2562</a>.
@@ -52,9 +54,9 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
         Properties props = verifier.loadProperties("target/pom.properties");
 
         String timestamp1 = props.getProperty("project.properties.timestamp1", "");
-        assertTrue(timestamp1, timestamp1.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"));
+        assertTrue(timestamp1.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"), timestamp1);
         Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(timestamp1);
-        assertTrue(now + " vs " + date, Math.abs(now.getTime() - date.getTime()) < 24 * 60 * 60 * 1000);
+        assertTrue(Math.abs(now.getTime() - date.getTime()) < 24 * 60 * 60 * 1000, now + " vs " + date);
 
         String timestamp2 = props.getProperty("project.properties.timestamp2", "");
         assertEquals(timestamp1, timestamp2);
@@ -77,7 +79,7 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
 
         String timestamp1 = props.getProperty("project.properties.timestamp", "");
         Date date = new SimpleDateFormat("mm:HH dd-MM-yyyy").parse(timestamp1);
-        assertTrue(now + " vs " + date, Math.abs(now.getTime() - date.getTime()) < 24 * 60 * 60 * 1000);
+        assertTrue(Math.abs(now.getTime() - date.getTime()) < 24 * 60 * 60 * 1000, now + " vs " + date);
     }
 
     @Test

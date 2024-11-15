@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3872">MNG-3872</a>.
@@ -49,16 +51,16 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest extends AbstractM
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3872");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines("target/compile.txt", "UTF-8");
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("a-0.1.jar"));
-        assertTrue(compileClassPath.toString(), compileClassPath.contains("b-0.1.jar"));
-        assertFalse(compileClassPath.toString(), compileClassPath.contains("c-0.1.jar"));
+        List<String> compileClassPath = verifier.loadLines("target/compile.txt");
+        assertTrue(compileClassPath.contains("a-0.1.jar"), compileClassPath.toString());
+        assertTrue(compileClassPath.contains("b-0.1.jar"), compileClassPath.toString());
+        assertFalse(compileClassPath.contains("c-0.1.jar"), compileClassPath.toString());
     }
 }

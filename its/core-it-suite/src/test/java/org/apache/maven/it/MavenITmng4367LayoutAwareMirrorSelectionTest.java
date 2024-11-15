@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +56,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenI
 
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings-a.xml");
-        verifier.filterFile("settings-template.xml", "settings-a.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings-a.xml", filterProps);
         verifier.setLogFileName("log-a.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -86,7 +85,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenI
 
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings-b.xml");
-        verifier.filterFile("settings-template.xml", "settings-b.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings-b.xml", filterProps);
         verifier.setLogFileName("log-b.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -115,7 +114,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenI
 
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings-c.xml");
-        verifier.filterFile("settings-template.xml", "settings-c.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings-c.xml", filterProps);
         verifier.setLogFileName("log-c.txt");
         verifier.addCliArgument("validate");
         verifier.execute();

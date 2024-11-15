@@ -27,10 +27,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -38,6 +37,8 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-768">MNG-768</a>.
@@ -110,9 +111,8 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
                 verifier.deleteDirectory("target");
                 verifier.deleteArtifacts("org.apache.maven.its.mng0768");
                 verifier.setLogFileName("log1.txt");
-                Properties props = new Properties();
-                props.put("@port@", Integer.toString(port));
-                verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", props);
+                Map<String, String> props = Map.of("@port@", Integer.toString(port));
+                verifier.filterFile("settings-template.xml", "settings.xml", props);
                 verifier.addCliArgument("--settings");
                 verifier.addCliArgument("settings.xml");
                 verifier.addCliArgument(
@@ -140,7 +140,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
                 verifier.verifyErrorFreeLog();
             }
 
-            assertTrue(requestedUris.toString(), requestedUris.isEmpty());
+            assertTrue(requestedUris.isEmpty(), requestedUris.toString());
 
             {
                 // phase 3: delete test artifact and run build in offline mode to check it fails now
@@ -166,7 +166,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
 
             System.out.println("Bound server socket to the port " + port);
 
-            assertTrue(requestedUris.toString(), requestedUris.isEmpty());
+            assertTrue(requestedUris.isEmpty(), requestedUris.toString());
         } finally {
             server.stop();
             server.join();

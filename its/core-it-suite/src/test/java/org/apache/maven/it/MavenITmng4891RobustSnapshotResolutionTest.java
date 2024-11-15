@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4891">MNG-4891</a>.
@@ -61,8 +62,8 @@ public class MavenITmng4891RobustSnapshotResolutionTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
 
-        assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4891:producer:jar:0.1-SNAPSHOT"));
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4891:producer:jar:0.1-SNAPSHOT"), artifacts.toString());
     }
 }

@@ -21,9 +21,11 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4791">MNG-4791</a>.
@@ -52,7 +54,7 @@ public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest extends A
         verifier.deleteArtifacts("org.apache.maven.its.mng4791");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -62,6 +64,6 @@ public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest extends A
         assertEquals(
                 "0.1-20100902.190819-1", props.getProperty("org.apache.maven.its.mng4791:a:pom:0.1-SNAPSHOT.version"));
         String path = props.getProperty("org.apache.maven.its.mng4791:a:pom:0.1-SNAPSHOT.file");
-        assertTrue(path, path.endsWith(".pom"));
+        assertTrue(path.endsWith(".pom"), path);
     }
 }

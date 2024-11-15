@@ -23,9 +23,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3998">MNG-3998</a>.
@@ -55,7 +56,7 @@ public class MavenITmng3998PluginExecutionConfigTest extends AbstractMavenIntegr
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> executions = verifier.loadLines("target/exec.log", "UTF-8");
+        List<String> executions = verifier.loadLines("target/exec.log");
         // NOTE: Ordering of executions is another issue (MNG-3887), so ignore/normalize order
         Collections.sort(executions);
         List<String> expected = Arrays.asList(new String[] {"exec-1", "exec-2"});
