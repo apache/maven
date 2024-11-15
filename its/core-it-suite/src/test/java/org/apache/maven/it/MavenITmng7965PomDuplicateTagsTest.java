@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +53,7 @@ class MavenITmng7965PomDuplicateTagsTest extends AbstractMavenIntegrationTestCas
             invocationFailed = true;
         }
 
-        List<String> logs = verifier.loadLines(verifier.getLogFileName(), null);
+        List<String> logs = verifier.loadLogLines();
 
         // the POM is not parseable
         verifyRegexInLog(logs, "\\[ERROR\\]\\s+Non-parseable POM");

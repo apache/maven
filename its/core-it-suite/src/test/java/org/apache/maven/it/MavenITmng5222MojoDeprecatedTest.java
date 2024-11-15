@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +55,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findDeprecationWarning(logLines);
 
         assertTrue(warnLines.stream()
@@ -105,7 +104,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findDeprecationWarning(logLines);
 
         assertTrue(warnLines.stream()
@@ -176,7 +175,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findDeprecationWarning(logLines);
 
         assertTrue(warnLines.stream()

@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Map;
 
 import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -54,14 +53,14 @@ public class MavenITmng4952MetadataReleaseInfoUpdateTest extends AbstractMavenIn
         Map<String, String> props = verifier.newDefaultFilterMap();
 
         props.put("@version@", "1.0");
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8", props);
+        verifier.filterFile("pom-template.xml", "pom.xml", props);
         verifier.setLogFileName("log-1.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         props.put("@version@", "2.0");
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8", props);
+        verifier.filterFile("pom-template.xml", "pom.xml", props);
         verifier.setLogFileName("log-2.txt");
         verifier.addCliArgument("validate");
         verifier.execute();

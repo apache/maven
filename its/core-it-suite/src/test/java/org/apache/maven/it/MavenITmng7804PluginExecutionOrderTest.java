@@ -19,12 +19,9 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +50,7 @@ class MavenITmng7804PluginExecutionOrderTest extends AbstractMavenIntegrationTes
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> executions = Files.lines(Paths.get(verifier.getBasedir(), verifier.getLogFileName()))
+        List<String> executions = verifier.loadLogLines().stream()
                 .filter(l -> l.contains(" This should be "))
                 .collect(Collectors.toList());
         assertEquals(4, executions.size());

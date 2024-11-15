@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +51,7 @@ public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractM
         verifier.addCliArgument("site");
         verifier.execute();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
 
         for (String line : logLines) {
             assertFalse(

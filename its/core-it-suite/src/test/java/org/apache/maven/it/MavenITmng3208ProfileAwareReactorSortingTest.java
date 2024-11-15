@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +53,7 @@ public class MavenITmng3208ProfileAwareReactorSortingTest extends AbstractMavenI
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> order = verifier.loadLines("target/order.txt", "UTF-8");
+        List<String> order = verifier.loadLines("target/order.txt");
         assertEquals(Arrays.asList(new String[] {"mod-b", "mod-a"}), order);
     }
 }

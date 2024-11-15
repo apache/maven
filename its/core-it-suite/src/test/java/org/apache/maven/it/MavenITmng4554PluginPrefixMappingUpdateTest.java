@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -104,7 +103,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
             filterProps.put("@port@", Integer.toString(connector.getLocalPort()));
             filterProps.put("@repo@", "repo-1");
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
 
@@ -183,7 +182,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
             filterProps.put("@port@", Integer.toString(connector.getLocalPort()));
             filterProps.put("@repo@", "repo-1");
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-U");
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
@@ -265,7 +264,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
             filterProps.put("@port@", Integer.toString(connector.getLocalPort()));
             filterProps.put("@repo@", "repo-it");
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
 

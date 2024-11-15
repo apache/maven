@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Properties;
 
 import org.apache.maven.shared.utils.Os;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 

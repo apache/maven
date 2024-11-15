@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,21 +52,21 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest extends AbstractM
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4293");
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("pom-template.xml", "pom.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt", "UTF-8");
+        List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt");
         assertTrue(compileClassPath.toString(), compileClassPath.contains("system-0.1.jar"));
         assertTrue(compileClassPath.toString(), compileClassPath.contains("provided-0.1.jar"));
         assertTrue(compileClassPath.toString(), compileClassPath.contains("compile-0.1.jar"));
         assertFalse(compileClassPath.toString(), compileClassPath.contains("test-0.1.jar"));
 
-        List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt", "UTF-8");
+        List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt");
         assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("compile-0.1.jar"));
         assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("runtime-0.1.jar"));
         assertFalse(runtimeClassPath.toString(), runtimeClassPath.contains("test-0.1.jar"));

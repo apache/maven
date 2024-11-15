@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +69,7 @@ public class MavenITmng4666CoreRealmImportTest extends AbstractMavenIntegrationT
         verifier.deleteArtifacts("org.sonatype.sisu", "sisu-inject-plexus", "0.1-stub");
         verifier.deleteArtifacts("org.sonatype.spice", "spice-inject-plexus", "0.1-stub");
         verifier.deleteArtifacts("classworlds", "classworlds", "0.1-stub");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

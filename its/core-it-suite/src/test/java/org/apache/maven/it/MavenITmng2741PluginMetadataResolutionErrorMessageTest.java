@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +71,7 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
         } catch (VerificationException e) {
             boolean foundCause = false;
             StringBuilder sb = new StringBuilder();
-            List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+            List<String> lines = verifier.loadLogLines();
             for (String line : lines) {
                 sb.append(line).append(System.lineSeparator());
                 if (line.matches(".*Connection refused.*")) {

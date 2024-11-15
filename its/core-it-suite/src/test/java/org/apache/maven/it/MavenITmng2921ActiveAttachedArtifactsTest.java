@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Collection;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +58,7 @@ public class MavenITmng2921ActiveAttachedArtifactsTest extends AbstractMavenInte
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Collection<String> compileArtifacts = verifier.loadLines("consumer/target/compile.txt", "UTF-8");
+        Collection<String> compileArtifacts = verifier.loadLines("consumer/target/compile.txt");
         assertTrue(
                 compileArtifacts.toString(),
                 compileArtifacts.contains("org.apache.maven.its.mng2921:ejbs:ejb-client:client:1.0-SNAPSHOT"));
@@ -73,7 +72,7 @@ public class MavenITmng2921ActiveAttachedArtifactsTest extends AbstractMavenInte
                 compileArtifacts.toString(),
                 compileArtifacts.contains("org.apache.maven.its.mng2921:producer:test-jar:tests:1.0-SNAPSHOT"));
 
-        Collection<String> testArtifacts = verifier.loadLines("consumer/target/test.txt", "UTF-8");
+        Collection<String> testArtifacts = verifier.loadLines("consumer/target/test.txt");
         assertTrue(
                 testArtifacts.toString(),
                 testArtifacts.contains("org.apache.maven.its.mng2921:ejbs:ejb-client:client:1.0-SNAPSHOT"));
@@ -87,7 +86,7 @@ public class MavenITmng2921ActiveAttachedArtifactsTest extends AbstractMavenInte
                 testArtifacts.toString(),
                 testArtifacts.contains("org.apache.maven.its.mng2921:producer:test-jar:tests:1.0-SNAPSHOT"));
 
-        Collection<String> testClassPath = verifier.loadLines("consumer/target/test-classpath.txt", "UTF-8");
+        Collection<String> testClassPath = verifier.loadLines("consumer/target/test-classpath.txt");
         assertTrue(testClassPath.toString(), testClassPath.contains("ejbs/attached.jar"));
         assertTrue(testClassPath.toString(), testClassPath.contains("tests/attached.jar"));
         assertTrue(testClassPath.toString(), testClassPath.contains("producer/client.jar"));

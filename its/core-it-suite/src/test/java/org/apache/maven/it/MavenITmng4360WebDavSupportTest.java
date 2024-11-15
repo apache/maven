@@ -27,7 +27,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -121,7 +120,7 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
             verifier.deleteDirectory("target");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@port@", Integer.toString(port));
-            verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("../settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("--settings");
             verifier.addCliArgument("settings.xml");
             verifier.addCliArgument("validate");
@@ -132,7 +131,7 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
             server.join();
         }
 
-        List<String> cp = verifier.loadLines("target/classpath.txt", "UTF-8");
+        List<String> cp = verifier.loadLines("target/classpath.txt");
         assertTrue(cp.toString(), cp.contains("dep-0.1.jar"));
     }
 }

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -44,14 +43,14 @@ public class MavenITmng2861RelocationsAndRangesTest extends AbstractMavenIntegra
         verifier.setAutoclean(false);
         verifier.deleteDirectory("A/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2861");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("A/target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("A/target/artifacts.txt");
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2861:B:jar:1.0-SNAPSHOT"));
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2861.new:project:jar:2.0"));
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng2861:C:jar:1.0-SNAPSHOT"));

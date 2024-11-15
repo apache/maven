@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -96,7 +95,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
             verifier.deleteArtifacts("org.apache.maven.its.mng4500");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@port@", Integer.toString(port));
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
 
@@ -105,7 +104,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
+            List<String> classpath = verifier.loadLines("target/classpath.txt");
             assertTrue(classpath.toString(), classpath.contains("dep-0.1-SNAPSHOT.jar"));
             assertTrue(requestedUris.toString(), requestedUris.contains(pomUri));
             assertTrue(requestedUris.toString(), requestedUris.contains(jarUri));
@@ -117,7 +116,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
+            classpath = verifier.loadLines("target/classpath.txt");
             assertTrue(classpath.toString(), classpath.contains("dep-0.1-SNAPSHOT.jar"));
             assertFalse(requestedUris.toString(), requestedUris.contains(pomUri));
             assertFalse(requestedUris.toString(), requestedUris.contains(jarUri));

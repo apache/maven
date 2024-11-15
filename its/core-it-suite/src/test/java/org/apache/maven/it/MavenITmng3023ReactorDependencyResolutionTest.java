@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -96,7 +95,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath", "UTF-8");
+        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath");
         assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
         assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
     }
@@ -130,7 +129,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath", "UTF-8");
+        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.classpath");
         assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
         assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
 
@@ -141,7 +140,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        compileClassPath = verifier.loadLines("consumer/target/compile.classpath", "UTF-8");
+        compileClassPath = verifier.loadLines("consumer/target/compile.classpath");
         assertTrue(compileClassPath.toString(), compileClassPath.contains("dependency-1.jar"));
         assertFalse(compileClassPath.toString(), compileClassPath.contains("dependency-classes"));
     }

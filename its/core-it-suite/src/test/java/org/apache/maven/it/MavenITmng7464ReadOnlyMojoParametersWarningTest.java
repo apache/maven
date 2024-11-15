@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +53,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findReadOnlyWarning(logLines);
 
         assertTrue("Unwanted warnings: " + warnLines, warnLines.isEmpty());
@@ -77,7 +76,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findReadOnlyWarning(logLines);
 
         assertTrue(
@@ -104,7 +103,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logLines = verifier.loadLogLines();
         List<String> warnLines = findReadOnlyWarning(logLines);
 
         assertTrue(warnLines.stream()

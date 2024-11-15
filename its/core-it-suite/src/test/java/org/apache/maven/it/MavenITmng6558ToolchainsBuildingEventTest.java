@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +52,7 @@ public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenInte
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("target/spy.log", "UTF-8");
+        List<String> lines = verifier.loadLines("target/spy.log");
         assertTrue(lines.toString(), lines.get(0).startsWith("init"));
         assertTrue(lines.toString(), lines.get(lines.size() - 1).startsWith("close"));
         assertTrue(

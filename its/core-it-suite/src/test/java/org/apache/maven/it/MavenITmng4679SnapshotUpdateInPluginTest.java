@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenInteg
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
 
         filterProps.put("@repo@", "repo-1");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setLogFileName("log-force-1.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -65,7 +64,7 @@ public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenInteg
         assertChecksum(verifier, "pom", "0b58dbbc61f81b85a70692ffdce88cf1892a8da4");
 
         filterProps.put("@repo@", "repo-2");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setLogFileName("log-force-2.txt");
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-U");

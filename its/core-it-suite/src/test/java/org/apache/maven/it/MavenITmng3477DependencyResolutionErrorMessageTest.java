@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
@@ -52,7 +51,7 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
 
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@port@", Integer.toString(port));
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
 
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3477");
@@ -65,7 +64,7 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
             verifier.execute();
             fail("Build should have failed to resolve dependency");
         } catch (VerificationException e) {
-            List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+            List<String> lines = verifier.loadLogLines();
             for (String pattern : logExpectPatterns) {
                 boolean foundCause = false;
                 for (String line : lines) {

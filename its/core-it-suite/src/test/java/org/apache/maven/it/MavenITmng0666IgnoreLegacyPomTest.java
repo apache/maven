@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +49,7 @@ public class MavenITmng0666IgnoreLegacyPomTest extends AbstractMavenIntegrationT
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0059");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -59,7 +58,7 @@ public class MavenITmng0666IgnoreLegacyPomTest extends AbstractMavenIntegrationT
 
         verifier.verifyArtifactPresent("org.apache.maven.its.it0059", "test", "3.8.1", "jar");
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.it0059:test:jar:3.8.1"));
     }
 }

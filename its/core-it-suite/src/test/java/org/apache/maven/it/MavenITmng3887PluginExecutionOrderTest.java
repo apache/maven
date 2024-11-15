@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +69,7 @@ public class MavenITmng3887PluginExecutionOrderTest extends AbstractMavenIntegra
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("target/it.log", "UTF-8");
+        List<String> lines = verifier.loadLines("target/it.log");
         assertEquals(Arrays.asList(new String[] {"test", "----"}), lines);
     }
 }

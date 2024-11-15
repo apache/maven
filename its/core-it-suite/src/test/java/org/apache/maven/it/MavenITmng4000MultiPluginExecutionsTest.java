@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ public class MavenITmng4000MultiPluginExecutionsTest extends AbstractMavenIntegr
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> executions = verifier.loadLines("target/exec.log", "UTF-8");
+        List<String> executions = verifier.loadLines("target/exec.log");
         List<String> expected = Arrays.asList(new String[] {"exec", "exec"});
         assertEquals(expected, executions);
     }
@@ -77,7 +76,7 @@ public class MavenITmng4000MultiPluginExecutionsTest extends AbstractMavenIntegr
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> executions = verifier.loadLines("target/exec.log", "UTF-8");
+        List<String> executions = verifier.loadLines("target/exec.log");
         List<String> expected = Arrays.asList(new String[] {"exec", "exec"});
         assertEquals(expected, executions);
     }

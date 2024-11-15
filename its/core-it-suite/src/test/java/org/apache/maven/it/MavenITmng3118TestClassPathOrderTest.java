@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +52,7 @@ public class MavenITmng3118TestClassPathOrderTest extends AbstractMavenIntegrati
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> testClassPath = verifier.loadLines("target/test-classpath.txt", "UTF-8");
+        List<String> testClassPath = verifier.loadLines("target/test-classpath.txt");
         assertEquals(Arrays.asList(new String[] {"test-classes", "classes"}), testClassPath);
     }
 }

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +45,7 @@ class MavenITmng8340GeneratedPomInTargetTest extends AbstractMavenIntegrationTes
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> l = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+        List<String> l = verifier.loadLogLines();
         assertFalse(l.stream()
                 .anyMatch(i -> i.contains(
                         "[FATAL] 'parent.relativePath' points at '../../pom.xml' but no POM could be found")));

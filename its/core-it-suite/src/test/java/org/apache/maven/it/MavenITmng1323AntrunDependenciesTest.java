@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +53,7 @@ public class MavenITmng1323AntrunDependenciesTest extends AbstractMavenIntegrati
         verifier.deleteDirectory("b/target");
         verifier.deleteDirectory("c/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng1323");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

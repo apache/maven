@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +52,7 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
             // expected...it'd be nice if we could get the specifics of the exception right here...
         }
 
-        List<String> logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logFile = verifier.loadLogLines();
 
         String msg = "Plugin's descriptor contains the wrong version: 2.0-SNAPSHOT";
 

@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +69,7 @@ public class MavenITmng3925MergedPluginExecutionOrderTest extends AbstractMavenI
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("target/exec.log", "UTF-8");
+        List<String> lines = verifier.loadLines("target/exec.log");
         // Order is parent first and child appended, unless child overrides parent execution via equal id
         List<String> expected =
                 Arrays.asList(new String[] {"parent-1", "parent-2", "child-default", "child-1", "child-2"});

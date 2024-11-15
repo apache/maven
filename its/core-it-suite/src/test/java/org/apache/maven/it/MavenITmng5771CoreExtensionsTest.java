@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +39,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
 
         verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
         verifier.deleteDirectory("target");
@@ -57,7 +56,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
 
         verifier = newVerifier(new File(testDir, "client-no-descriptor").getAbsolutePath());
         verifier.deleteDirectory("target");
@@ -97,7 +96,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
             mirrorOf = "external:*";
         }
         properties.put("@mirrorOf@", mirrorOf);
-        verifier.filterFile("settings-template-mirror-auth.xml", "settings.xml", "UTF-8", properties);
+        verifier.filterFile("settings-template-mirror-auth.xml", "settings.xml", properties);
 
         verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
         verifier.deleteDirectory("target");
@@ -121,7 +120,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
 
         verifier = newVerifier(new File(testDir, "client-properties").getAbsolutePath());
         verifier.deleteDirectory("target");
@@ -144,7 +143,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
 
         verifier = newVerifier(new File(testDir, "client-config").getAbsolutePath());
         verifier.deleteDirectory("target");

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +44,7 @@ public class MavenIT0010DependencyClosureResolutionTest extends AbstractMavenInt
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0010");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -56,7 +55,7 @@ public class MavenIT0010DependencyClosureResolutionTest extends AbstractMavenInt
         verifier.verifyArtifactPresent("org.apache.maven.its.it0010", "b", "0.2", "jar");
         verifier.verifyArtifactPresent("org.apache.maven.its.it0010", "parent", "1.0", "pom");
 
-        List<String> artifacts = verifier.loadLines("target/compile.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/compile.txt");
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.it0010:a:jar:0.1"));
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.it0010:b:jar:0.2"));
     }

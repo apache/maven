@@ -19,10 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.util.List;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -70,21 +67,6 @@ public class MavenITmng5581LifecycleMappingDelegate extends AbstractMavenIntegra
         verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog("maven-surefire-plugin");
-        verifyTextNotInLog(verifier, "maven-compiler-plugin");
-    }
-
-    private void verifyTextNotInLog(Verifier verifier, String text) throws VerificationException {
-        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
-
-        boolean textFound = false;
-        for (String line : lines) {
-            if (line.contains(text)) {
-                textFound = true;
-                break;
-            }
-        }
-        if (textFound) {
-            throw new VerificationException("Text found in log: " + text);
-        }
+        verifier.verifyTextNotInLog("maven-compiler-plugin");
     }
 }

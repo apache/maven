@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +45,7 @@ public class MavenITmng7443ConsistencyOfOptionalProjectsAndProfilesTest extends 
         verifier.addCliArguments("clean", "verify");
         verifier.execute();
 
-        final List<String> logLines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        final List<String> logLines = verifier.loadLogLines();
 
         int projectSelectorMissingCounter = 0;
         int profileSelectorMissingCounter = 0;

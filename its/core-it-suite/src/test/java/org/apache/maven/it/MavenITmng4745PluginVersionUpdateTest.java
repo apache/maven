@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
         verifier.addCliArgument("settings.xml");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@updates@", "always");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
 
         writeMetadata(testDir, "1.0", "20100729123455");
         verifier.setLogFileName("log-1a.txt");
@@ -90,7 +89,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
         verifier.addCliArgument("settings.xml");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@updates@", "never");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
 
         writeMetadata(testDir, "1.0", "20100729123455");
         verifier.setLogFileName("log-2a.txt");
@@ -126,7 +125,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
         verifier.addCliArgument("settings.xml");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@updates@", "never");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
 
         writeMetadata(testDir, "1.0", "20100729123455");
         verifier.setLogFileName("log-3a.txt");

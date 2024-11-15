@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Collections;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +51,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest extends Abstra
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3139");
 
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.setLogFileName("log1.txt");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ public class MavenITmng4387QuietLoggingTest extends AbstractMavenIntegrationTest
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("log.txt", "UTF-8");
+        List<String> lines = verifier.loadLines("log.txt");
 
         for (Iterator<String> it = lines.iterator(); it.hasNext(); ) {
             String line = it.next();

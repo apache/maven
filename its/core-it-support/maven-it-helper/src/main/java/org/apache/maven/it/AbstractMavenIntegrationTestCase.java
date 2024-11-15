@@ -31,7 +31,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
@@ -117,7 +116,7 @@ public abstract class AbstractMavenIntegrationTestCase {
         if (mavenVersion == null) {
             String version = System.getProperty("maven.version", "");
 
-            if (version.length() <= 0 || version.startsWith("${")) {
+            if (version.isEmpty() || version.startsWith("${")) {
                 try {
                     Verifier verifier = new Verifier("");
                     version = verifier.getMavenVersion();

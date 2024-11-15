@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +53,7 @@ public class MavenITmng4386DebugLoggingTest extends AbstractMavenIntegrationTest
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("log.txt", "UTF-8");
+        List<String> lines = verifier.loadLines("log.txt");
 
         boolean debug = false;
         for (String line : lines) {

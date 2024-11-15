@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -56,14 +55,14 @@ public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegra
         filterProps.put("@updates@", "always");
 
         filterProps.put("@repo@", "repo-1");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setLogFileName("log-always-1.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         filterProps.put("@repo@", "repo-2");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setLogFileName("log-always-2.txt");
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -94,14 +93,14 @@ public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegra
         filterProps.put("@updates@", "never");
 
         filterProps.put("@repo@", "repo-1");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setLogFileName("log-never-1.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         filterProps.put("@repo@", "repo-2");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setLogFileName("log-never-2.txt");
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

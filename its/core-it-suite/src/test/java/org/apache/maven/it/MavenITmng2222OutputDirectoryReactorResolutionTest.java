@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +55,7 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest extends Abstract
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines("mod-b/target/compile.txt", "UTF-8");
+        List<String> classpath = verifier.loadLines("mod-b/target/compile.txt");
         assertTrue(classpath.toString(), classpath.contains("mod-a/target/classes"));
     }
 }

@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +48,7 @@ public class MavenITmng7349RelocationWarningTest extends AbstractMavenIntegratio
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+        List<String> lines = verifier.loadLogLines();
         List<String> relocated = new ArrayList<>();
         for (String line : lines) {
             if (line.contains("has been relocated")) {

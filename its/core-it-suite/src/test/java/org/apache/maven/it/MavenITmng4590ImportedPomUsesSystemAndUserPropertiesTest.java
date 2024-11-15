@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +48,7 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends Ab
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4590");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dtest.file=pom.xml");
         verifier.addCliArgument("-Dtest.dir=" + testDir.getAbsolutePath());
         verifier.addCliArgument("--settings");

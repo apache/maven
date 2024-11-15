@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -51,7 +50,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
         overrideGlobalSettings(testDir, verifier);
         verifier.deleteArtifacts("org.apache.maven.its.mng6772");
 
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
+        verifier.filterFile("pom-template.xml", "pom.xml");
 
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -67,7 +66,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
         overrideGlobalSettings(testDir, verifier);
         verifier.deleteArtifacts("org.apache.maven.its.mng6772");
 
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
+        verifier.filterFile("pom-template.xml", "pom.xml");
 
         verifier.addCliArgument("compile");
         verifier.execute();

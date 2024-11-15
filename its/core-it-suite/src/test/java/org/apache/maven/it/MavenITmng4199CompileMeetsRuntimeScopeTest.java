@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -56,15 +55,15 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest extends AbstractMavenInt
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4199");
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("pom-template.xml", "pom.xml");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileArtifacts = verifier.loadLines("target/compile-artifacts.txt", "UTF-8");
+        List<String> compileArtifacts = verifier.loadLines("target/compile-artifacts.txt");
         assertTrue(
                 compileArtifacts.toString(), compileArtifacts.contains("org.apache.maven.its.mng4199:system:jar:0.1"));
         assertTrue(
@@ -76,14 +75,14 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest extends AbstractMavenInt
                 compileArtifacts.toString(), compileArtifacts.contains("org.apache.maven.its.mng4199:runtime:jar:0.1"));
         assertEquals(3, compileArtifacts.size());
 
-        List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt", "UTF-8");
+        List<String> compileClassPath = verifier.loadLines("target/compile-cp.txt");
         assertTrue(compileClassPath.toString(), compileClassPath.contains("system-0.1.jar"));
         assertTrue(compileClassPath.toString(), compileClassPath.contains("provided-0.1.jar"));
         assertTrue(compileClassPath.toString(), compileClassPath.contains("compile-0.1.jar"));
         assertFalse(compileClassPath.toString(), compileClassPath.contains("runtime-0.1.jar"));
         assertEquals(4, compileClassPath.size());
 
-        List<String> runtimeArtifacts = verifier.loadLines("target/runtime-artifacts.txt", "UTF-8");
+        List<String> runtimeArtifacts = verifier.loadLines("target/runtime-artifacts.txt");
         assertFalse(
                 runtimeArtifacts.toString(), runtimeArtifacts.contains("org.apache.maven.its.mng4199:system:jar:0.1"));
         assertFalse(
@@ -95,7 +94,7 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest extends AbstractMavenInt
                 runtimeArtifacts.toString(), runtimeArtifacts.contains("org.apache.maven.its.mng4199:runtime:jar:0.1"));
         assertEquals(2, runtimeArtifacts.size());
 
-        List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt", "UTF-8");
+        List<String> runtimeClassPath = verifier.loadLines("target/runtime-cp.txt");
         assertFalse(runtimeClassPath.toString(), runtimeClassPath.contains("system-0.1.jar"));
         assertFalse(runtimeClassPath.toString(), runtimeClassPath.contains("provided-0.1.jar"));
         assertTrue(runtimeClassPath.toString(), runtimeClassPath.contains("compile-0.1.jar"));

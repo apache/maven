@@ -22,9 +22,11 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
+
+import static org.apache.maven.it.Verifier.verifyTextInLog;
+import static org.apache.maven.it.Verifier.verifyTextNotInLog;
 
 /**
  * This is a test set for
@@ -53,7 +55,7 @@ class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegration
             invocationFailed = true;
         }
 
-        List<String> logs = verifier.loadLines(verifier.getLogFileName(), null);
+        List<String> logs = verifier.loadLogLines();
 
         // javadoc:jar uses language to detect is this "Java classpath-capable package"
         verifyTextNotInLog(logs, "[INFO] Not executing Javadoc as the project is not a Java classpath-capable package");
@@ -65,13 +67,5 @@ class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegration
         verifyTextInLog(logs, "[ERROR] Failed to execute goal org.apache.maven.plugins:maven-javadoc-plugin");
 
         assertTrue("The Maven invocation should have failed: the javadoc should error out", invocationFailed);
-    }
-
-    private void verifyTextInLog(List<String> logs, String text) {
-        assertTrue("Log file not contains: " + text, logs.stream().anyMatch(l -> l.contains(text)));
-    }
-
-    private void verifyTextNotInLog(List<String> logs, String text) {
-        assertFalse("Log file contains: " + text, logs.stream().anyMatch(l -> l.contains(text)));
     }
 }

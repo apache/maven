@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -52,15 +51,15 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest extends Abstra
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines("test-user/target/compile.txt", "UTF-8");
+        List<String> compile = verifier.loadLines("test-user/target/compile.txt");
         assertTestClasses(compile);
         assertNotMainClasses(compile);
 
-        List<String> runtime = verifier.loadLines("test-user/target/runtime.txt", "UTF-8");
+        List<String> runtime = verifier.loadLines("test-user/target/runtime.txt");
         assertTestClasses(runtime);
         assertNotMainClasses(runtime);
 
-        List<String> test = verifier.loadLines("test-user/target/test.txt", "UTF-8");
+        List<String> test = verifier.loadLines("test-user/target/test.txt");
         assertTestClasses(test);
         assertNotMainClasses(test);
     }

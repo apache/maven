@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Properties;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -62,7 +61,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval");
@@ -121,7 +120,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0479");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -139,7 +138,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
         verifier = newVerifier(new File(testDir, "test-2").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         try {
@@ -156,7 +155,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
         verifier = newVerifier(new File(testDir, "test-3").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         try {
@@ -174,7 +173,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
         verifier = newVerifier(new File(testDir, "test-4").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         try {

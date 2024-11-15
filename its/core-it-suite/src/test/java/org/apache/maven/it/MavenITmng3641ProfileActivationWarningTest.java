@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logFile = verifier.loadLogLines();
         assertNull(findWarning(logFile, "mng-3641-it-provided-profile"));
 
         // (2) make sure the profile was not found and a warning was printed.
@@ -67,7 +66,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        logFile = verifier.loadLogLines();
         assertNotNull(findWarning(logFile, "mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p"));
 
         // (3) make sure the first profile is found while the other is not and a warning was printed
@@ -80,7 +79,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        logFile = verifier.loadLogLines();
         assertNull(findWarning(logFile, "mng-3641-it-provided-profile"));
         assertNotNull(findWarning(logFile, "mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p"));
 
@@ -93,7 +92,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        logFile = verifier.loadLogLines();
         assertNull(findWarning(logFile, "mng-3641-it-provided-profile-child"));
 
         // (5) make sure the profile is found in subproject. Must not contain a warning.
@@ -105,7 +104,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        logFile = verifier.loadLogLines();
         assertNull(findWarning(logFile, "mng-3641-it-provided-profile-child"));
 
         // (6) make sure the profile is found from parent in subproject. Must not contain a warning.
@@ -117,7 +116,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        logFile = verifier.loadLogLines();
         assertNull(findWarning(logFile, "mng-3641-it-provided-profile"));
     }
 

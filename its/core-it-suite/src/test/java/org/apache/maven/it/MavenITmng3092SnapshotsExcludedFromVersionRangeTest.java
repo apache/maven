@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -52,14 +51,14 @@ public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest extends Abstrac
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3092");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
+        List<String> classpath = verifier.loadLines("target/classpath.txt");
         assertTrue(classpath.toString(), classpath.contains("a-1.1.jar"));
         assertTrue(classpath.toString(), classpath.contains("b-1.0-SNAPSHOT.jar"));
         assertTrue(classpath.toString(), classpath.contains("c-1.1-SNAPSHOT.jar"));

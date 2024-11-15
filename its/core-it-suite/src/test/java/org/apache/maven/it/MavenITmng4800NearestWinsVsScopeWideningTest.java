@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -60,12 +59,12 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest extends AbstractMavenI
         verifier.deleteArtifacts("org.apache.maven.its.mng4800");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.filterFile("../settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        List<String> compile = verifier.loadLines("target/compile.txt");
 
         assertTrue(test + " > " + compile.toString(), compile.contains("b-0.1.jar"));
         assertTrue(test + " > " + compile.toString(), compile.contains("c-0.1.jar"));
@@ -75,7 +74,7 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest extends AbstractMavenI
         assertFalse(test + " > " + compile.toString(), compile.contains("s-0.2.jar"));
         assertFalse(test + " > " + compile.toString(), compile.contains("y-0.1.jar"));
 
-        List<String> runtime = verifier.loadLines("target/runtime.txt", "UTF-8");
+        List<String> runtime = verifier.loadLines("target/runtime.txt");
 
         assertTrue(test + " > " + runtime.toString(), runtime.contains("b-0.1.jar"));
         assertTrue(test + " > " + runtime.toString(), runtime.contains("c-0.1.jar"));

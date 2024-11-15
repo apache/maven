@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +51,7 @@ public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest extends Abstrac
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("project/target/test.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("project/target/test.txt");
         assertTrue(artifacts.toString(), artifacts.contains("dependency/pom.xml"));
     }
 }

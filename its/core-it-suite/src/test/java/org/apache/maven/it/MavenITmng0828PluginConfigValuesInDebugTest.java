@@ -23,8 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +56,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String log = FileUtils.fileRead(new File(verifier.getBasedir(), verifier.getLogFileName()));
+        String log = verifier.loadLogContent();
 
         checkLog(log, "[DEBUG]   (f) aliasDefaultExpressionParam = test");
         checkLog(log, "[DEBUG]   (f) basedir = " + testDir.getCanonicalPath());

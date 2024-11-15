@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +49,7 @@ public class MavenITmng4526MavenProjectArtifactsScopeTest extends AbstractMavenI
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4526");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("generate-sources");
@@ -59,17 +58,17 @@ public class MavenITmng4526MavenProjectArtifactsScopeTest extends AbstractMavenI
 
         List<String> artifacts;
 
-        artifacts = verifier.loadLines("target/compile.txt", "UTF-8");
+        artifacts = verifier.loadLines("target/compile.txt");
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4526:a:jar:0.1"));
         assertFalse(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4526:b:jar:0.1"));
         assertFalse(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4526:c:jar:0.1"));
 
-        artifacts = verifier.loadLines("target/runtime.txt", "UTF-8");
+        artifacts = verifier.loadLines("target/runtime.txt");
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4526:a:jar:0.1"));
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4526:b:jar:0.1"));
         assertFalse(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4526:c:jar:0.1"));
 
-        artifacts = verifier.loadLines("target/test.txt", "UTF-8");
+        artifacts = verifier.loadLines("target/test.txt");
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4526:a:jar:0.1"));
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4526:b:jar:0.1"));
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng4526:c:jar:0.1"));

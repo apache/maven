@@ -18,17 +18,11 @@
  */
 package org.apache.maven.it;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-
-import org.apache.maven.shared.verifier.Verifier;
 
 /**
  * @author Benjamin Bentmann
@@ -62,12 +56,6 @@ class ItUtils {
         }
 
         return hash.toString();
-    }
-
-    public static String getLogContent(Verifier verifier) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Files.copy(Paths.get(verifier.getBasedir(), verifier.getLogFileName()), baos);
-        return baos.toString();
     }
 
     /**

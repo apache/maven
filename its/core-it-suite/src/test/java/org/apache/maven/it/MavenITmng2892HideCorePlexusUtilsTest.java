@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +50,7 @@ public class MavenITmng2892HideCorePlexusUtilsTest extends AbstractMavenIntegrat
         verifier.deleteDirectory("target");
         verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "jar");
         verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "pom");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

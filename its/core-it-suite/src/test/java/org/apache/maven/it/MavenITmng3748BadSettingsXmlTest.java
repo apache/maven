@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -66,7 +65,7 @@ public class MavenITmng3748BadSettingsXmlTest extends AbstractMavenIntegrationTe
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            List<String> lines = verifier.loadLines(verifier.getLogFileName(), null);
+            List<String> lines = verifier.loadLogLines();
             boolean foundWarning = false;
             boolean isWarning = false;
             for (String line : lines) {

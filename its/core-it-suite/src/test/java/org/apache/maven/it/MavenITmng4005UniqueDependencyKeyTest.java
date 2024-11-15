@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -97,7 +96,7 @@ public class MavenITmng4005UniqueDependencyKeyTest extends AbstractMavenIntegrat
             logLevel = "ERROR";
         }
 
-        List<String> lines = verifier.loadLines(verifier.getLogFileName(), "UTF-8");
+        List<String> lines = verifier.loadLogLines();
         boolean foundMessage = false;
         for (String line : lines) {
             if (line.startsWith("[" + logLevel + "]") && line.indexOf("must be unique: junit:junit:jar") > 0) {

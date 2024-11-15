@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +53,7 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest extends A
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("consumer/target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("consumer/target/artifacts.txt");
         if (matchesVersionRange("[3.0-alpha-3,)")) {
             // artifact type unchanged to match type as declared in dependency
 
@@ -82,7 +81,7 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest extends A
                     artifacts.contains("org.apache.maven.its.mng4056:producer:ejb-client:client:0.1"));
         }
 
-        List<String> classpath = verifier.loadLines("consumer/target/compile.txt", "UTF-8");
+        List<String> classpath = verifier.loadLines("consumer/target/compile.txt");
         assertTrue(classpath.toString(), classpath.contains("producer/test.jar"));
         assertTrue(classpath.toString(), classpath.contains("producer/client.jar"));
     }

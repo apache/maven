@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -51,17 +50,17 @@ public class MavenITmng0249ResolveDepsFromReactorTest extends AbstractMavenInteg
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> ccp = verifier.loadLines("test-component-c/target/compile.txt", "UTF-8");
+        List<String> ccp = verifier.loadLines("test-component-c/target/compile.txt");
         assertTrue(ccp.toString(), ccp.contains("test-component-c/classes"));
         assertTrue(ccp.toString(), ccp.contains("test-component-b/classes"));
         assertTrue(ccp.toString(), ccp.contains("test-component-a/classes"));
 
-        List<String> rcp = verifier.loadLines("test-component-c/target/runtime.txt", "UTF-8");
+        List<String> rcp = verifier.loadLines("test-component-c/target/runtime.txt");
         assertTrue(rcp.toString(), rcp.contains("test-component-c/classes"));
         assertTrue(rcp.toString(), rcp.contains("test-component-b/classes"));
         assertTrue(rcp.toString(), rcp.contains("test-component-a/classes"));
 
-        List<String> tcp = verifier.loadLines("test-component-c/target/test.txt", "UTF-8");
+        List<String> tcp = verifier.loadLines("test-component-c/target/test.txt");
         assertTrue(tcp.toString(), tcp.contains("test-component-c/classes"));
         assertTrue(tcp.toString(), tcp.contains("test-component-b/classes"));
         assertTrue(tcp.toString(), tcp.contains("test-component-a/classes"));

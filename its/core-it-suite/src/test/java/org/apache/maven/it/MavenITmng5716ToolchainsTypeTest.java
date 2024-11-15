@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +53,7 @@ public class MavenITmng5716ToolchainsTypeTest extends AbstractMavenIntegrationTe
         Map<String, String> properties = verifier.newDefaultFilterMap();
         properties.put("@javaHome@", javaHome.getAbsolutePath());
 
-        verifier.filterFile("toolchains.xml", "toolchains.xml", "UTF-8", properties);
+        verifier.filterFile("toolchains.xml", "toolchains.xml", properties);
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

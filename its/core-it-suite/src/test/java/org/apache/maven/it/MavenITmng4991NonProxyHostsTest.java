@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -90,7 +89,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
             int proxyPort = ((NetworkConnector) proxy.getConnectors()[0]).getLocalPort();
             filterProps.put("@proxyPort@", Integer.toString(proxyPort));
             filterProps.put("@localhost@", InetAddress.getLoopbackAddress().getCanonicalHostName());
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
             verifier.addCliArgument("validate");
@@ -103,7 +102,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
             proxy.join();
         }
 
-        List<String> compile = verifier.loadLines("target/compile.txt", "UTF-8");
+        List<String> compile = verifier.loadLines("target/compile.txt");
 
         assertTrue(compile.toString(), compile.contains("dep-0.1.jar"));
     }

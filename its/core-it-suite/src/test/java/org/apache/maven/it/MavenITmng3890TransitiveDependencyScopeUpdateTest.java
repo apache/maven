@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -51,14 +50,14 @@ public class MavenITmng3890TransitiveDependencyScopeUpdateTest extends AbstractM
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3890");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3890:c:jar:0.1"));
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3890:b:jar:0.1"));
         assertFalse(artifacts.toString(), artifacts.contains("org.apache.maven.its.mng3890:a:jar:0.1"));

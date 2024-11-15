@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +46,7 @@ public class MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest extend
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> dependencies = verifier.loadLines("target/dependencies.txt", "UTF-8");
+        List<String> dependencies = verifier.loadLines("target/dependencies.txt");
         assertEquals(5, dependencies.size());
         assertEquals("com.mysema.querydsl:querydsl-core:jar:3.4.3 (optional)", dependencies.get(0));
         assertEquals("com.google.guava:guava:jar:17.0 (optional)", dependencies.get(1));

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +52,7 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.txt", "UTF-8");
+        List<String> compileClassPath = verifier.loadLines("consumer/target/compile.txt");
         assertEquals(2, compileClassPath.size());
         assertEquals(
                 new File(testDir, "ejbs/target/classes").getCanonicalFile(),

@@ -27,10 +27,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -110,9 +109,8 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
                 verifier.deleteDirectory("target");
                 verifier.deleteArtifacts("org.apache.maven.its.mng0768");
                 verifier.setLogFileName("log1.txt");
-                Properties props = new Properties();
-                props.put("@port@", Integer.toString(port));
-                verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", props);
+                Map<String, String> props = Map.of("@port@", Integer.toString(port));
+                verifier.filterFile("settings-template.xml", "settings.xml", props);
                 verifier.addCliArgument("--settings");
                 verifier.addCliArgument("settings.xml");
                 verifier.addCliArgument(

@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +51,7 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest extends Abs
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4353");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.filterFile(
                 "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/template.pom",
                 "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/maven-mng4353-plugin-0.1" + ".pom",

@@ -19,12 +19,9 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -170,14 +167,6 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
                     e.getMessage()
                             .contains(
                                     "'artifactId' contains an expression but should be a constant. @ myGroup:${foo}:1.0-SNAPSHOT"));
-        }
-    }
-
-    void verifyExactLine(Verifier verifier, String line) throws Exception {
-        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
-        if (lines.stream().noneMatch(s -> Objects.equals(s, line))) {
-            throw new VerificationException(
-                    "Could not find line: '" + line + "' in output log:\n" + String.join("\n", lines));
         }
     }
 }

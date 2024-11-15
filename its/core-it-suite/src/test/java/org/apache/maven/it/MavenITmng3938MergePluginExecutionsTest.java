@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -72,10 +71,10 @@ public class MavenITmng3938MergePluginExecutionsTest extends AbstractMavenIntegr
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("target/default.log", "UTF-8");
+        List<String> lines = verifier.loadLines("target/default.log");
         assertEquals(Arrays.asList(new String[] {"child"}), lines);
 
-        lines = verifier.loadLines("target/non-default.log", "UTF-8");
+        lines = verifier.loadLines("target/non-default.log");
         assertEquals(Arrays.asList(new String[] {"child"}), lines);
 
         verifier.verifyFileNotPresent("target/parent.log");

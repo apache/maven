@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -56,21 +55,21 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest extends AbstractMavenIn
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3380");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/artifacts.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertEquals(4, artifacts.size());
         assertEquals("org.apache.maven.its.mng3380:direct:jar:1", artifacts.get(0));
         assertEquals("org.apache.maven.its.mng3380.new:transitive:jar:2", artifacts.get(1));
         assertEquals("org.apache.maven.its.mng3380.other:a:jar:1", artifacts.get(2));
         assertEquals("org.apache.maven.its.mng3380.other:b:jar:1", artifacts.get(3));
 
-        List<String> paths = verifier.loadLines("target/test.txt", "UTF-8");
+        List<String> paths = verifier.loadLines("target/test.txt");
         assertEquals(6, paths.size());
         assertEquals("direct-1.jar", paths.get(2));
         assertEquals("transitive-2.jar", paths.get(3));

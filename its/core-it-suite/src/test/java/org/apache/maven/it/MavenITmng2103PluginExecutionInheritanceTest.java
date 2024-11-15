@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -54,10 +53,10 @@ public class MavenITmng2103PluginExecutionInheritanceTest extends AbstractMavenI
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> execs = verifier.loadLines("child-1/target/log.txt", "UTF-8");
+        List<String> execs = verifier.loadLines("child-1/target/log.txt");
         assertEquals(Arrays.asList(new String[] {"inherited"}), execs);
 
-        execs = verifier.loadLines("child-2/target/log.txt", "UTF-8");
+        execs = verifier.loadLines("child-2/target/log.txt");
         assertEquals(Arrays.asList(new String[] {"inherited"}), execs);
     }
 }

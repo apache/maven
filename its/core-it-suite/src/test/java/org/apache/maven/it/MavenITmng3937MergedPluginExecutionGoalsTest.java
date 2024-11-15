@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +69,7 @@ public class MavenITmng3937MergedPluginExecutionGoalsTest extends AbstractMavenI
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("target/exec.log", "UTF-8");
+        List<String> lines = verifier.loadLines("target/exec.log");
         // Order is child first and parent appended but without duplicate goals
         List<String> expected = Arrays.asList(new String[] {"child", "----"});
         assertEquals(expected, lines);

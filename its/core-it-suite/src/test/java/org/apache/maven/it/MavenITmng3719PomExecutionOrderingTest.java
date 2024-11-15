@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -58,9 +57,9 @@ public class MavenITmng3719PomExecutionOrderingTest extends AbstractMavenIntegra
         Pattern pattern = Pattern.compile(".*step-([0-9])\\.properties.*");
 
         int[] stepLines = new int[3];
-        List<String> content = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> content = verifier.loadLogLines();
         for (int i = 0; i < content.size(); i++) {
-            String line = (String) content.get(i);
+            String line = content.get(i);
 
             Matcher m = pattern.matcher(line);
             if (m.matches()) {

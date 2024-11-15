@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +52,7 @@ public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenInt
         assertFileExists(testDir, "target/mng-5608-missing-project.basedir");
 
         // check that the 2 profiles using ${project.basedir} caused warnings
-        List<String> logFile = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        List<String> logFile = verifier.loadLogLines();
         assertNotNull(findWarning(logFile, "mng-5608-exists-project.basedir"));
         assertNotNull(findWarning(logFile, "mng-5608-missing-project.basedir"));
     }

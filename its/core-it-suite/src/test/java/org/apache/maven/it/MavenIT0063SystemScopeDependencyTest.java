@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +47,7 @@ public class MavenIT0063SystemScopeDependencyTest extends AbstractMavenIntegrati
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> lines = verifier.loadLines("target/compile.txt", "UTF-8");
+        List<String> lines = verifier.loadLines("target/compile.txt");
         assertEquals(2, lines.size());
         assertEquals(
                 new File(testDir, "jdk/lib/tools.jar").getCanonicalFile(),

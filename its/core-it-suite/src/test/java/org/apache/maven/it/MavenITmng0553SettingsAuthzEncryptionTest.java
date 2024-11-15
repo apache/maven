@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -122,7 +121,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng0553");
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         ItUtils.setUserHome(verifier, new File(testDir, "userhome"));
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -156,8 +155,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
 
         // NOTE: The tilde ~ in the file name is essential part of the test
-        verifier.filterFile("security-template.xml", "settings~security.xml", "UTF-8", filterProps);
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+        verifier.filterFile("security-template.xml", "settings~security.xml", filterProps);
+        verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -194,7 +193,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> log = verifier.loadLines(verifier.getLogFileName(), null);
+        List<String> log = verifier.loadLogLines();
         assertNotNull(findPassword(log));
 
         verifier = newVerifier(testDir.getAbsolutePath());
@@ -207,7 +206,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        log = verifier.loadLines(verifier.getLogFileName(), null);
+        log = verifier.loadLogLines();
         assertNotNull(findPassword(log));
     }
 

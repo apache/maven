@@ -27,7 +27,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -123,7 +122,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@protocol@", fromHttp ? "http" : "https");
             filterProps.put("@port@", Integer.toString(((NetworkConnector) from).getLocalPort()));
-            verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", filterProps);
+            verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
             verifier.addCliArgument("-X");
             verifier.addCliArgument("--settings");
             verifier.addCliArgument("settings.xml");
@@ -139,7 +138,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
             server.join();
         }
 
-        List<String> cp = verifier.loadLines("target/classpath.txt", "UTF-8");
+        List<String> cp = verifier.loadLines("target/classpath.txt");
         assertTrue(cp.toString(), cp.contains("dep-0.1.jar"));
     }
 

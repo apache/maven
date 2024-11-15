@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -51,14 +50,14 @@ public class MavenITmng4349RelocatedArtifactWithInvalidPomTest extends AbstractM
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4349");
         verifier.deleteDirectory("target");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> classpath = verifier.loadLines("target/classpath.txt", "UTF-8");
+        List<String> classpath = verifier.loadLines("target/classpath.txt");
         assertTrue(classpath.toString(), classpath.contains("new-0.1.jar"));
     }
 }

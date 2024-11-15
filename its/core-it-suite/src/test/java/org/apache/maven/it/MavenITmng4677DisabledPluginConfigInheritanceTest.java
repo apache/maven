@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -55,13 +54,13 @@ public class MavenITmng4677DisabledPluginConfigInheritanceTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> log = verifier.loadLines("target/log.txt", "UTF-8");
+        List<String> log = verifier.loadLines("target/log.txt");
         assertEquals(Arrays.asList(new String[] {"parent-only"}), log);
 
-        log = verifier.loadLines("child-1/target/log.txt", "UTF-8");
+        log = verifier.loadLines("child-1/target/log.txt");
         assertEquals(Arrays.asList(new String[] {"managed"}), log);
 
-        log = verifier.loadLines("child-2/target/log.txt", "UTF-8");
+        log = verifier.loadLines("child-2/target/log.txt");
         assertEquals(Arrays.asList(new String[] {"managed"}), log);
     }
 }

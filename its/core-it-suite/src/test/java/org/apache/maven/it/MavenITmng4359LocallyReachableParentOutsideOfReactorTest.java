@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest extends Ab
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> cp = verifier.loadLines("mod-c/target/classpath.txt", "UTF-8");
+        List<String> cp = verifier.loadLines("mod-c/target/classpath.txt");
         assertTrue(cp.toString(), cp.contains("mod-b/pom.xml"));
         assertTrue(cp.toString(), cp.contains("mod-a/pom.xml"));
     }

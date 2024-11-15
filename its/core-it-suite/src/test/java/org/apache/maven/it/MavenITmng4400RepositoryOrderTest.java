@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +47,7 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
         Verifier verifier = newVerifier(new File(testDir, "settings").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4400");
-        verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
+        verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -71,7 +70,7 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
         Verifier verifier = newVerifier(new File(testDir, "pom").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4400");
-        verifier.filterFile("pom-template.xml", "pom.xml", "UTF-8");
+        verifier.filterFile("pom-template.xml", "pom.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

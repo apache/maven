@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +47,7 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        final List<String> artifacts = verifier.loadLines("target/compile.txt", "UTF-8");
+        final List<String> artifacts = verifier.loadLines("target/compile.txt");
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"));
     }
 
@@ -62,7 +61,7 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> artifacts = verifier.loadLines("target/compile.txt", "UTF-8");
+        List<String> artifacts = verifier.loadLines("target/compile.txt");
         assertTrue(artifacts.toString(), artifacts.contains("org.apache.maven:maven-plugin-api:jar:3.0"));
     }
 

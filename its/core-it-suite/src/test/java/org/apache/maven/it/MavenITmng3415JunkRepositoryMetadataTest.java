@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -92,7 +91,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@protocol@", "invalid");
         filterProps.put("@port@", "0");
-        File settings = verifier.filterFile("settings-template.xml", "settings-a.xml", "UTF-8", filterProps);
+        File settings = verifier.filterFile("settings-template.xml", "settings-a.xml", filterProps);
 
         verifier.addCliArgument("-X");
         verifier.addCliArgument("-s");
@@ -189,7 +188,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@protocol@", "http");
             filterProps.put("@port@", Integer.toString(port));
-            File settings = verifier.filterFile("settings-template.xml", "settings-b.xml", "UTF-8", filterProps);
+            File settings = verifier.filterFile("settings-template.xml", "settings-b.xml", filterProps);
 
             verifier.addCliArgument("-X");
             verifier.addCliArgument("-s");

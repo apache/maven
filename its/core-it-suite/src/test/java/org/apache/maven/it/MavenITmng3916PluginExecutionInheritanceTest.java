@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +55,7 @@ public class MavenITmng3916PluginExecutionInheritanceTest extends AbstractMavenI
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        List<String> executions = verifier.loadLines("target/exec.log", "UTF-8");
+        List<String> executions = verifier.loadLines("target/exec.log");
         // NOTE: Ordering of executions is another issue (MNG-3887), so ignore/normalize order
         Collections.sort(executions);
         List<String> expected = Arrays.asList(new String[] {"child-1", "child-default", "parent-1"});

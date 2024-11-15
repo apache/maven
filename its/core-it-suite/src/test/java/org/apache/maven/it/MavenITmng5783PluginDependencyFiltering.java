@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +45,7 @@ public class MavenITmng5783PluginDependencyFiltering extends AbstractMavenIntegr
 
         // Note that plugin dependencies always include plugin itself and plexus-utils
 
-        List<String> dependencies = verifier.loadLines("target/dependencies.txt", "UTF-8");
+        List<String> dependencies = verifier.loadLines("target/dependencies.txt");
         if (matchesVersionRange("(,3.9.0)")) {
             assertEquals(3, dependencies.size());
         } else {

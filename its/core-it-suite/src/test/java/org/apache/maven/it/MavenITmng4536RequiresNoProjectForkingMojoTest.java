@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +52,7 @@ public class MavenITmng4536RequiresNoProjectForkingMojoTest extends AbstractMave
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        assertEquals(2, verifier.loadLines("mod-a/target/touch.log", "UTF-8").size());
-        assertEquals(2, verifier.loadLines("mod-b/target/touch.log", "UTF-8").size());
+        assertEquals(2, verifier.loadLines("mod-a/target/touch.log").size());
+        assertEquals(2, verifier.loadLines("mod-b/target/touch.log").size());
     }
 }
