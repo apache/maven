@@ -49,7 +49,7 @@ class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase
         verifier.verifyErrorFreeLog();
 
         // there is a warning and all fields decrypted
-        verifier.verifyTextInLog("[WARNING] Legacy encrypted string");
+        verifier.verifyTextInLog("[WARNING] Pre-Maven 4 legacy encrypted password detected");
         verifier.verifyTextInLog("<password>testtest</password>");
         verifier.verifyTextInLog("<value>testtest</value>");
     }

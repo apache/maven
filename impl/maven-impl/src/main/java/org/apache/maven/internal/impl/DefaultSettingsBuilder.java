@@ -265,14 +265,20 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                             -1,
                             -1,
                             null,
-                            "Legacy encrypted string",
+                            "Pre-Maven 4 legacy encrypted password detected "
+                                    + " - configure password encryption with the help of mvnenc to be compatible with Maven 4.",
                             BuilderProblem.Severity.WARNING));
                 }
                 try {
                     return secDispatcher.decrypt(str);
                 } catch (Exception e) {
                     problems.add(new DefaultBuilderProblem(
-                            settingsSource.getLocation(), -1, -1, e, e.getMessage(), BuilderProblem.Severity.ERROR));
+                            settingsSource.getLocation(),
+                            -1,
+                            -1,
+                            e,
+                            "Could not decrypt password (fix the corrupted password or remove it, if unused) " + str,
+                            BuilderProblem.Severity.ERROR));
                 }
             }
             return str;
