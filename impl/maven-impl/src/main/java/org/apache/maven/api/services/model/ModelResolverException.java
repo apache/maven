@@ -18,13 +18,13 @@
  */
 package org.apache.maven.api.services.model;
 
-import org.apache.maven.api.services.MavenCheckedException;
+import org.apache.maven.api.services.MavenException;
 
 /**
  * Signals an error when resolving the path to an external model.
  *
  */
-public class ModelResolverException extends MavenCheckedException {
+public class ModelResolverException extends MavenException {
 
     /**
      * The group id of the unresolvable model.

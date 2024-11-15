@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 @Consumer
-public class VersionResolverException extends MavenCheckedException {
+public class VersionResolverException extends MavenException {
 
     @Serial
     private static final long serialVersionUID = -2105433586719466573L;
