@@ -81,6 +81,6 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
 
     private void assertCompiledOnce(Verifier verifier) throws IOException {
         long count = verifier.textOccurrencesInLog("compiler:0.1-stub-SNAPSHOT:compile");
-        assertEquals("Compile goal was expected to run once", count, 1);
+        assertEquals("Compile goal was expected to run once", count, 1L);
     }
 }

@@ -70,6 +70,6 @@ public class MavenITmng6240PluginExtensionAetherProvider extends AbstractMavenIn
                 .filter(line ->
                         line.endsWith("/repo/org/apache/maven/its/mng6240/project/1.0-SNAPSHOT/maven-metadata.xml"))
                 .count();
-        assertEquals(2, count); // 1 from download, 1 from upload
+        assertEquals(2L, count); // 1 from download, 1 from upload
     }
 }
