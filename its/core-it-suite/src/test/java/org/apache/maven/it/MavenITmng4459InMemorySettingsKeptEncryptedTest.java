@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MavenITmng4459InMemorySettingsKeptEncryptedTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng4459InMemorySettingsKeptEncryptedTest() {
-        super("[2.1.0,3.0-alpha-1),[3.0-alpha-5,)");
+        super("[2.1.0,3.0-alpha-1),[3.0-alpha-5,4.0.0-beta-6)");
     }
 
     /**
