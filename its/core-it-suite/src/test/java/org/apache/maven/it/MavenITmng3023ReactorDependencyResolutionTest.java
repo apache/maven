@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3023">MNG-3023</a>
  *
@@ -60,13 +62,11 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.deleteDirectory("dependency/dependency-classes");
         verifier.deleteArtifacts("org.apache.maven.its.mng3023");
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-            fail("Expected failure to resolve dependency artifact without at least calling 'compile' phase.");
-        } catch (VerificationException e) {
-            // expected.
-        }
+        verifier.addCliArgument("validate");
+        VerificationException exception = assertThrows(
+                VerificationException.class,
+                verifier::execute,
+                "Expected failure to resolve dependency artifact without at least calling 'compile' phase.");
     }
 
     /**

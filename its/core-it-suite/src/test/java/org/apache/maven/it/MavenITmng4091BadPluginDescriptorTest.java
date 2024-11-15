@@ -26,6 +26,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4091">MNG-4091</a>:
  * Bad plugin descriptor error handling
@@ -43,14 +45,9 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-
-            fail("should throw an error during execution.");
-        } catch (VerificationException e) {
-            // expected...it'd be nice if we could get the specifics of the exception right here...
-        }
+        verifier.addCliArgument("validate");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
         List<String> logFile = verifier.loadLogLines();
 

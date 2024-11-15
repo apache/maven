@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * This is a test for <a href="https://issues.apache.org/jira/browse/MNG-3288">MNG-3288</a>.
  *
@@ -45,12 +47,10 @@ public class MavenITmng3288SystemScopeDirTest extends AbstractMavenIntegrationTe
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-            fail("Usage of directory instead of file for system-scoped dependency did not fail dependency resolution");
-        } catch (VerificationException e) {
-            // expected, <systemPath> of a system-scoped dependency should be a file, not a directory
-        }
+        verifier.addCliArgument("validate");
+        VerificationException exception = assertThrows(
+                VerificationException.class,
+                verifier::execute,
+                "Usage of directory instead of file for system-scoped dependency did not fail dependency resolution");
     }
 }

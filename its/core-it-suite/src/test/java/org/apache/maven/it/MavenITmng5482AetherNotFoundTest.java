@@ -27,6 +27,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5482">MNG-5482</a>.
  *
@@ -63,14 +65,9 @@ public class MavenITmng5482AetherNotFoundTest extends AbstractMavenIntegrationTe
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
         verifier.setAutoclean(false);
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-
-            fail("should throw an error during execution.");
-        } catch (VerificationException e) {
-            // expected...it'd be nice if we could get the specifics of the exception right here...
-        }
+        verifier.addCliArgument("validate");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
         List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 
