@@ -107,6 +107,14 @@ else
   fi
 fi
 
+java_version=$("$JAVACMD" -version 2>&1 | awk -F '"' '/version/ {print $2}' | cut -d'.' -f1)
+if [ "$java_version" -lt "17" ]; then
+  echo "Error: Apache Maven 4.x requires Java 17 or newer to run." >&2
+  echo "Your current Java version appears to be $("$JAVACMD" -version 2>&1 | head -n1)" >&2
+  echo "Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK." >&2
+  exit 1
+fi
+
 # traverses directory structure from process work directory to filesystem root
 # first directory with .mvn subdirectory is considered project base directory
 find_maven_basedir() {

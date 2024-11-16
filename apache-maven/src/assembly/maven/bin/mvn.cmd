@@ -69,6 +69,22 @@ if not exist "%JAVACMD%" (
   echo The java.exe command does not exist in PATH nor is JAVA_HOME set, so Apache Maven cannot be started. >&2
   goto error
 )
+
+@REM Check Java version
+for /f "tokens=3" %%g in ('"%JAVACMD%" -version 2^>^&1 ^| findstr /i "version"') do (
+    set JAVAVER=%%g
+)
+set JAVAVER=%JAVAVER:"=%
+for /f "delims=. tokens=1" %%v in ("%JAVAVER%") do (
+    set JAVA_MAJOR_VERSION=%%v
+)
+if %JAVA_MAJOR_VERSION% LSS 17 (
+    echo Error: Apache Maven 4.x requires Java 17 or newer to run. >&2
+    echo Your current Java version appears to be %JAVAVER% >&2
+    echo Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK. >&2
+    goto error
+)
+
 :chkMHome
 set "MAVEN_HOME=%~dp0"
 set "MAVEN_HOME=%MAVEN_HOME:~0,-5%"
