@@ -45,9 +45,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository/cached
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: maven-
-          enableCrossOsArchive: true
+          key: maven-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-initial-
+            maven-${{ runner.os }}-
 
       - name: Set up Maven
         shell: bash
@@ -55,7 +56,7 @@ jobs:
 
       - name: Build Maven distributions
         shell: bash
-        run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven
+        run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven -Dmaven.repo.local=$HOME/.m2/repository/cached
 
       - name: List contents of target directory
         shell: bash
@@ -123,9 +124,18 @@ jobs:
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
 
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/cached
+          key: maven-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-full-
+            maven-${{ runner.os }}-
+
       - name: Build site with downloaded Maven
         shell: bash
-        run: mvn verify site -e -B -V -DdistributionFileName=apache-maven -Preporting
+        run: mvn verify site -e -B -V -Preporting -Dmaven.repo.local=$HOME/.m2/repository/cached
 
   integration-tests:
     needs: initial-build
@@ -174,9 +184,18 @@ jobs:
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
 
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/cached
+          key: maven-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-its
+            maven-${{ runner.os }}-
+
       - name: Run integration tests
         shell: bash
-        run: mvn install -e -B -V -Prun-its,embedded
+        run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local=$HOME/.m2/repository/cached -Dmaven.repo.local.head=$HOME/.m2/repository/local
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
