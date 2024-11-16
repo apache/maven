@@ -33,6 +33,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactory;
+import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.settings.Settings;
 
 /**
@@ -742,7 +743,7 @@ public interface Session {
      * @see org.apache.maven.api.services.VersionResolver#resolve(Session, ArtifactCoordinates) (String)
      */
     @Nonnull
-    Version resolveVersion(@Nonnull ArtifactCoordinates artifact);
+    Version resolveVersion(@Nonnull ArtifactCoordinates artifact) throws VersionResolverException;
 
     /**
      * Expands a version range to a list of matching versions, in ascending order.
@@ -758,7 +759,7 @@ public interface Session {
      * @see org.apache.maven.api.services.VersionRangeResolver#resolve(Session, ArtifactCoordinates) (String)
      */
     @Nonnull
-    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact);
+    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact) throws VersionResolverException;
 
     /**
      * Expands a version range to a list of matching versions, in ascending order.
@@ -775,7 +776,8 @@ public interface Session {
      * @see org.apache.maven.api.services.VersionRangeResolver#resolve(Session, ArtifactCoordinates) (String)
      */
     @Nonnull
-    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact, List<RemoteRepository> repositories);
+    List<Version> resolveVersionRange(@Nonnull ArtifactCoordinates artifact, List<RemoteRepository> repositories)
+            throws VersionResolverException;
 
     /**
      * Parses the specified version string, for example "1.0".

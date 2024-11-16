@@ -87,6 +87,7 @@ import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
 import org.apache.maven.api.services.VersionResolver;
+import org.apache.maven.api.services.VersionResolverException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -839,17 +840,18 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public Version resolveVersion(ArtifactCoordinates artifact) {
+    public Version resolveVersion(ArtifactCoordinates artifact) throws VersionResolverException {
         return getService(VersionResolver.class).resolve(this, artifact).getVersion();
     }
 
     @Override
-    public List<Version> resolveVersionRange(ArtifactCoordinates artifact) {
+    public List<Version> resolveVersionRange(ArtifactCoordinates artifact) throws VersionResolverException {
         return getService(VersionRangeResolver.class).resolve(this, artifact).getVersions();
     }
 
     @Override
-    public List<Version> resolveVersionRange(ArtifactCoordinates artifact, List<RemoteRepository> repositories) {
+    public List<Version> resolveVersionRange(ArtifactCoordinates artifact, List<RemoteRepository> repositories)
+            throws VersionResolverException {
         return getService(VersionRangeResolver.class)
                 .resolve(this, artifact, repositories)
                 .getVersions();

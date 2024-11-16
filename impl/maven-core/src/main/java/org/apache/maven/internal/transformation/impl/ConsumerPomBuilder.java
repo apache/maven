@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.apache.maven.api.model.Model;
-import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -35,5 +35,5 @@ import org.eclipse.aether.RepositorySystemSession;
 interface ConsumerPomBuilder {
 
     Model build(RepositorySystemSession session, MavenProject project, Path src)
-            throws ModelBuildingException, IOException, XMLStreamException;
+            throws ModelBuilderException, IOException, XMLStreamException;
 }

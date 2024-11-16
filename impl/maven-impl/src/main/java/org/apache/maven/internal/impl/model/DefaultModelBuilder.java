@@ -894,7 +894,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return parentModel;
         }
 
-        private Model resolveParent(Model childModel) {
+        private Model resolveParent(Model childModel) throws ModelBuilderException {
             Model parentModel = null;
             if (isBuildRequest()) {
                 parentModel = readParentLocally(childModel);
@@ -906,7 +906,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private Model readParentLocally(Model childModel) throws ModelBuilderException {
-            ModelSource candidateSource = null;
+            ModelSource candidateSource;
 
             Parent parent = childModel.getParent();
             String parentPath = parent.getRelativePath();
@@ -1493,7 +1493,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         /**
          * Reads the request source's parent.
          */
-        Model readAsParentModel() {
+        Model readAsParentModel() throws ModelBuilderException {
             return cache(request.getSource(), PARENT, this::doReadAsParentModel);
         }
 
@@ -1664,7 +1664,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     importSource = modelResolver.resolveModel(
                             request.getSession(), repositories, dependency, new AtomicReference<>());
                 }
-            } catch (ModelBuilderException e) {
+            } catch (ModelBuilderException | ModelResolverException e) {
                 StringBuilder buffer = new StringBuilder(256);
                 buffer.append("Non-resolvable import POM");
                 if (!containsCoordinates(e.getMessage(), groupId, artifactId, version)) {
@@ -1719,7 +1719,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             return importModel;
         }
 
-        ModelSource resolveReactorModel(String groupId, String artifactId, String version) {
+        ModelSource resolveReactorModel(String groupId, String artifactId, String version)
+                throws ModelBuilderException {
             Set<ModelSource> sources = mappedSources.get(new GAKey(groupId, artifactId));
             if (sources != null) {
                 for (ModelSource source : sources) {
@@ -1737,7 +1738,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return cache.computeIfAbsent(groupId, artifactId, version, tag, supplier);
         }
 
-        private <T> T cache(Source source, String tag, Supplier<T> supplier) {
+        private <T> T cache(Source source, String tag, Supplier<T> supplier) throws ModelBuilderException {
             return cache.computeIfAbsent(source, tag, supplier);
         }
 
@@ -1831,7 +1832,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
         ModelBuilderSessionState build = new ModelBuilderSessionState(request);
         Model model = build.readRawModel();
-        if (((ModelProblemCollector) build).hasErrors()) {
+        if (build.hasErrors()) {
             throw build.newModelBuilderException();
         }
         return model;
