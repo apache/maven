@@ -627,6 +627,7 @@ under the License.
                 <!-- Pass this through to the tests (if set!) to have them
                   pick the right repository -->
                 <maven.repo.local>${maven.repo.local}</maven.repo.local>
+                <maven.repo.loca.head>${maven.repo.local.head}</maven.repo.loca.head>
               </systemPropertyVariables>
             </configuration>
           </plugin>

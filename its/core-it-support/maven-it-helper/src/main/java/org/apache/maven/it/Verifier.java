@@ -33,7 +33,13 @@ public class Verifier extends org.apache.maven.shared.verifier.Verifier {
     }
 
     public Verifier(String basedir, boolean debug) throws VerificationException {
-        super(basedir, debug);
+        super(basedir, null, debug, defaultCliArguments());
+    }
+
+    static String[] defaultCliArguments() {
+        return new String[] {
+            "-e", "--batch-mode", "-Dmaven.repo.local.head=" + System.getProperty("maven.repo.local.head")
+        };
     }
 
     public String loadLogContent() throws IOException {
@@ -94,5 +100,9 @@ public class Verifier extends org.apache.maven.shared.verifier.Verifier {
 
     public static long textOccurencesInLog(List<String> lines, String text) {
         return lines.stream().filter(line -> stripAnsi(line).contains(text)).count();
+    }
+
+    public void execute() throws VerificationException {
+        super.execute();
     }
 }
