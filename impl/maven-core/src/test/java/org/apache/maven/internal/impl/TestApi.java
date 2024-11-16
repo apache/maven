@@ -45,7 +45,6 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ProjectBuilder;
-import org.apache.maven.api.services.ProjectBuilderException;
 import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -141,7 +140,7 @@ class TestApi {
         sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(this.session));
     }
 
-    private Project project(Artifact artifact) throws ProjectBuilderException {
+    private Project project(Artifact artifact) {
         return session.getService(ProjectBuilder.class)
                 .build(ProjectBuilderRequest.builder()
                         .session(session)
@@ -166,7 +165,7 @@ class TestApi {
     }
 
     @Test
-    void testBuildProject() throws ProjectBuilderException {
+    void testBuildProject() {
         Artifact artifact = session.createArtifact("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
         Project project = project(artifact);
@@ -230,7 +229,7 @@ class TestApi {
     }
 
     @Test
-    void testProjectDependencies() throws ProjectBuilderException {
+    void testProjectDependencies() {
         Artifact pom = session.createArtifact("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "pom");
 
         Project project = project(pom);

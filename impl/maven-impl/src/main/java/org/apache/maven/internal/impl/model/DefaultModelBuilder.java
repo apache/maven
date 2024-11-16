@@ -1734,49 +1734,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
-        @FunctionalInterface
-        private interface ModelBuilderExceptionThrowingSupplier<T> {
-            T get() throws ModelBuilderException;
-        }
-
-        private static class ThrowingSupplierWrapper<T> implements Supplier<T> {
-            private final ModelBuilderExceptionThrowingSupplier<T> throwingSupplier;
-
-            private ThrowingSupplierWrapper(ModelBuilderExceptionThrowingSupplier<T> throwingSupplier) {
-                this.throwingSupplier = throwingSupplier;
-            }
-
-            @Override
-            public T get() {
-                try {
-                    return throwingSupplier.get();
-                } catch (ModelBuilderException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            private static <T> T process(
-                    ModelBuilderExceptionThrowingSupplier<T> throwingSupplier, Function<Supplier<T>, T> consumer)
-                    throws ModelBuilderException {
-                try {
-                    return consumer.apply(new ThrowingSupplierWrapper<>(throwingSupplier));
-                } catch (RuntimeException e) {
-                    if (e.getCause() instanceof ModelBuilderException) {
-                        throw (ModelBuilderException) e.getCause();
-                    } else {
-                        throw e;
-                    }
-                }
-            }
-        }
-
         private <T> T cache(String groupId, String artifactId, String version, String tag, Supplier<T> supplier) {
             return cache.computeIfAbsent(groupId, artifactId, version, tag, supplier);
         }
 
-        private <T> T cache(Source source, String tag, ModelBuilderExceptionThrowingSupplier<T> supplier)
-                throws ModelBuilderException {
-            return ThrowingSupplierWrapper.process(supplier, s -> cache.computeIfAbsent(source, tag, s));
+        private <T> T cache(Source source, String tag, Supplier<T> supplier) throws ModelBuilderException {
+            return cache.computeIfAbsent(source, tag, supplier);
         }
 
         boolean isBuildRequest() {
