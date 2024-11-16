@@ -76,7 +76,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
             List<InterpolationPostProcessor> postProcessors = createPostProcessors(model, projectDir, config);
 
             InterpolateObjectAction action =
-                    new InterpolateObjectAction(obj, valueSources, postProcessors, debugEnabled, this, LOGGER);
+                    new InterpolateObjectAction(obj, valueSources, postProcessors, debugEnabled, this);
 
             ModelInterpolationException error = AccessController.doPrivileged(action);
 
@@ -117,7 +117,6 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
             interpolationTargets.add(target);
 
             this.modelInterpolator = modelInterpolator;
-            this.LOGGER = LOGGER;
         }
 
         public ModelInterpolationException run() {

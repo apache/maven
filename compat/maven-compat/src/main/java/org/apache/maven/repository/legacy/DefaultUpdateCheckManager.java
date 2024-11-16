@@ -53,10 +53,6 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
 
     public DefaultUpdateCheckManager() {}
 
-    public DefaultUpdateCheckManager() {
-        enableLogging(LOGGER);
-    }
-
     public static final String LAST_UPDATE_TAG = ".lastUpdated";
 
     private static final String TOUCHFILE_NAME = "resolver-status.properties";
