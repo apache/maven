@@ -48,6 +48,7 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
         verifier.addCliArgument("--install-settings=install-settings.xml");
         verifier.addCliArgument("--settings=settings.xml");
         verifier.addCliArgument("-Dmaven.repo.local=" + testDir.toPath().resolve("target/local-repo"));
+        verifier.addCliArgument("-Dmaven.repo.local.tail=target/null");
         verifier.addCliArgument("-Dmaven.repo.central=http://repo1.maven.org/");
         verifier.addCliArgument("validate");
         assertThrows(VerificationException.class, verifier::execute);
