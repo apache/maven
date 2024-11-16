@@ -195,7 +195,7 @@ jobs:
 
       - name: Run integration tests
         shell: bash
-        run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local=$HOME/.m2/repository/cached -Dmaven.repo.local.head=$HOME/.m2/repository/local
+        run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local=$HOME/.m2/repository/local -Dmaven.repo.local.tail=$HOME/.m2/repository/cached
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4

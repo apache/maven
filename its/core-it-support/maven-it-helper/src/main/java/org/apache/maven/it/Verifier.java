@@ -29,7 +29,7 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 public class Verifier extends org.apache.maven.shared.verifier.Verifier {
     public Verifier(String basedir) throws VerificationException {
-        super(basedir);
+        this(basedir, false);
     }
 
     public Verifier(String basedir, boolean debug) throws VerificationException {
@@ -38,7 +38,7 @@ public class Verifier extends org.apache.maven.shared.verifier.Verifier {
 
     static String[] defaultCliArguments() {
         return new String[] {
-            "-e", "--batch-mode", "-Dmaven.repo.local.head=" + System.getProperty("maven.repo.local.head")
+            "-e", "--batch-mode", "-Dmaven.repo.local.tail=" + System.getProperty("maven.repo.local.tail")
         };
     }
 
