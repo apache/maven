@@ -18,14 +18,13 @@
  */
 package org.apache.maven.cling.invoker.mvnenc;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.Prompter;
 import org.apache.maven.api.services.PrompterException;
 import org.codehaus.plexus.components.secdispatcher.MasterSource;
