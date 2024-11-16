@@ -38,6 +38,8 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
@@ -45,6 +47,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 @Singleton
 @Deprecated
 public class SnapshotTransformation extends AbstractVersionTransformation {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SnapshotTransformation.class);
     private static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
 
     private static final TimeZone DEFAULT_SNAPSHOT_TIME_ZONE = TimeZone.getTimeZone("Etc/UTC");
@@ -129,7 +132,7 @@ public class SnapshotTransformation extends AbstractVersionTransformation {
             throws RepositoryMetadataResolutionException {
         RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata(artifact);
 
-        getLogger().info("Retrieving previous build number from " + remoteRepository.getId());
+        LOGGER.info("Retrieving previous build number from " + remoteRepository.getId());
         repositoryMetadataManager.resolveAlways(metadata, localRepository, remoteRepository);
 
         int buildNumber = 0;

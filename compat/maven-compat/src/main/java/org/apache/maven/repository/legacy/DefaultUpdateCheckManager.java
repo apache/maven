@@ -37,8 +37,8 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.repository.Proxy;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DefaultUpdateCheckManager
@@ -46,14 +46,15 @@ import org.codehaus.plexus.logging.Logger;
 @Named
 @Singleton
 @Deprecated
-public class DefaultUpdateCheckManager extends AbstractLogEnabled implements UpdateCheckManager {
+public class DefaultUpdateCheckManager implements UpdateCheckManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultUpdateCheckManager.class);
 
     private static final String ERROR_KEY_SUFFIX = ".error";
 
     public DefaultUpdateCheckManager() {}
 
-    public DefaultUpdateCheckManager(Logger logger) {
-        enableLogging(logger);
+    public DefaultUpdateCheckManager() {
+        enableLogging(LOGGER);
     }
 
     public static final String LAST_UPDATE_TAG = ".lastUpdated";
@@ -67,18 +68,16 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
         ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
         if (!policy.isEnabled()) {
-            if (getLogger().isDebugEnabled()) {
-                getLogger()
-                        .debug("Skipping update check for " + artifact + " (" + file + ") from " + repository.getId()
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Skipping update check for " + artifact + " (" + file + ") from " + repository.getId()
                                 + " (" + repository.getUrl() + ")");
             }
 
             return false;
         }
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger()
-                    .debug("Determining update check for " + artifact + " (" + file + ") from " + repository.getId()
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Determining update check for " + artifact + " (" + file + ") from " + repository.getId()
                             + " (" + repository.getUrl() + ")");
         }
 
@@ -110,18 +109,16 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
         ArtifactRepositoryPolicy policy = metadata.getPolicy(repository);
 
         if (!policy.isEnabled()) {
-            if (getLogger().isDebugEnabled()) {
-                getLogger()
-                        .debug("Skipping update check for " + metadata.getKey() + " (" + file + ") from "
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Skipping update check for " + metadata.getKey() + " (" + file + ") from "
                                 + repository.getId() + " (" + repository.getUrl() + ")");
             }
 
             return false;
         }
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger()
-                    .debug("Determining update check for " + metadata.getKey() + " (" + file + ") from "
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Determining update check for " + metadata.getKey() + " (" + file + ") from "
                             + repository.getId() + " (" + repository.getUrl() + ")");
         }
 
@@ -204,8 +201,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
         synchronized (touchfile.getAbsolutePath().intern()) {
             if (!touchfile.getParentFile().exists()
                     && !touchfile.getParentFile().mkdirs()) {
-                getLogger()
-                        .debug("Failed to create directory: " + touchfile.getParent()
+                LOGGER.debug("Failed to create directory: " + touchfile.getParent()
                                 + " for tracking artifact metadata resolution.");
                 return;
             }
@@ -219,7 +215,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
                 lock = channel.lock();
 
                 if (touchfile.canRead()) {
-                    getLogger().debug("Reading resolution-state from: " + touchfile);
+                    LOGGER.debug("Reading resolution-state from: " + touchfile);
                     props.load(Channels.newInputStream(channel));
                 }
 
@@ -231,7 +227,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
                     props.remove(key + ERROR_KEY_SUFFIX);
                 }
 
-                getLogger().debug("Writing resolution-state to: " + touchfile);
+                LOGGER.debug("Writing resolution-state to: " + touchfile);
                 channel.truncate(0);
                 props.store(Channels.newOutputStream(channel), "Last modified on: " + new Date());
 
@@ -241,8 +237,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
                 channel.close();
                 channel = null;
             } catch (IOException e) {
-                getLogger()
-                        .debug(
+                LOGGER.debug(
                                 "Failed to record lastUpdated information for resolution.\nFile: "
                                         + touchfile.toString() + "; key: " + key,
                                 e);
@@ -251,8 +246,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
                     try {
                         lock.release();
                     } catch (IOException e) {
-                        getLogger()
-                                .debug("Error releasing exclusive lock for resolution tracking file: " + touchfile, e);
+                        LOGGER.debug("Error releasing exclusive lock for resolution tracking file: " + touchfile, e);
                     }
                 }
 
@@ -260,7 +254,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
                     try {
                         channel.close();
                     } catch (IOException e) {
-                        getLogger().debug("Error closing FileChannel for resolution tracking file: " + touchfile, e);
+                        LOGGER.debug("Error closing FileChannel for resolution tracking file: " + touchfile, e);
                     }
                 }
             }
@@ -268,7 +262,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
     }
 
     Date readLastUpdated(File touchfile, String key) {
-        getLogger().debug("Searching for " + key + " in resolution tracking file.");
+        LOGGER.debug("Searching for " + key + " in resolution tracking file.");
 
         Properties props = read(touchfile);
         if (props != null) {
@@ -277,7 +271,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
                 try {
                     return new Date(Long.parseLong(rawVal));
                 } catch (NumberFormatException e) {
-                    getLogger().debug("Cannot parse lastUpdated date: '" + rawVal + "'. Ignoring.", e);
+                    LOGGER.debug("Cannot parse lastUpdated date: '" + rawVal + "'. Ignoring.", e);
                 }
             }
         }
@@ -294,7 +288,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
 
     private Properties read(File touchfile) {
         if (!touchfile.canRead()) {
-            getLogger().debug("Skipped unreadable resolution tracking file: " + touchfile);
+            LOGGER.debug("Skipped unreadable resolution tracking file: " + touchfile);
             return null;
         }
 
@@ -304,7 +298,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
 
                 try (FileInputStream in = new FileInputStream(touchfile)) {
                     try (FileLock lock = in.getChannel().lock(0, Long.MAX_VALUE, true)) {
-                        getLogger().debug("Reading resolution-state from: " + touchfile);
+                        LOGGER.debug("Reading resolution-state from: " + touchfile);
                         props.load(in);
 
                         return props;
@@ -312,7 +306,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
                 }
 
             } catch (IOException e) {
-                getLogger().debug("Failed to read resolution tracking file: " + touchfile, e);
+                LOGGER.debug("Failed to read resolution tracking file: " + touchfile, e);
 
                 return null;
             }

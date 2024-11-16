@@ -36,20 +36,22 @@ import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryM
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallationException;
 import org.eclipse.aether.util.artifact.SubArtifact;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
 @Named
 @Singleton
 @Deprecated
-public class DefaultArtifactInstaller extends AbstractLogEnabled implements ArtifactInstaller {
+public class DefaultArtifactInstaller implements ArtifactInstaller {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultArtifactInstaller.class);
 
     @Inject
     private RepositorySystem repoSystem;

@@ -36,7 +36,8 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.repository.legacy.WagonManager;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Describes a version transformation during artifact resolution.
@@ -44,7 +45,8 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * TODO try and refactor to remove abstract methods - not particular happy about current design
  */
 @Deprecated
-public abstract class AbstractVersionTransformation extends AbstractLogEnabled implements ArtifactTransformation {
+public abstract class AbstractVersionTransformation implements ArtifactTransformation {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractVersionTransformation.class);
     @Inject
     protected RepositoryMetadataManager repositoryMetadataManager;
 
@@ -96,7 +98,7 @@ public abstract class AbstractVersionTransformation extends AbstractLogEnabled i
 
         // TODO also do this logging for other metadata?
         // TODO figure out way to avoid duplicated message
-        if (getLogger().isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             if (!version.equals(artifact.getBaseVersion())) {
                 String message = artifact.getArtifactId() + ": resolved to version " + version;
                 if (artifact.getRepository() != null) {
@@ -104,10 +106,10 @@ public abstract class AbstractVersionTransformation extends AbstractLogEnabled i
                 } else {
                     message += " from local repository";
                 }
-                getLogger().debug(message);
+                LOGGER.debug(message);
             } else {
                 // Locally installed file is newer, don't use the resolved version
-                getLogger().debug(artifact.getArtifactId() + ": using locally installed snapshot");
+                LOGGER.debug(artifact.getArtifactId() + ": using locally installed snapshot");
             }
         }
         return version;

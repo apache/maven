@@ -49,10 +49,10 @@ import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
 import org.codehaus.plexus.interpolation.ValueSource;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
@@ -60,8 +60,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
  * TODO Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
  */
 @Deprecated
-public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEnabled
+public abstract class AbstractStringBasedModelInterpolator
         implements ModelInterpolator, Initializable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractStringBasedModelInterpolator.class);
 
     private static final List<String> PROJECT_PREFIXES = Arrays.asList("pom.", "project.");
 
@@ -249,8 +250,6 @@ public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEn
             return src;
         }
 
-        Logger logger = getLogger();
-
         String result = src;
         synchronized (this) {
             for (ValueSource vs : valueSources) {
@@ -271,19 +270,19 @@ public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEn
                 if (debug) {
                     List<Object> feedback = interpolator.getFeedback();
                     if (feedback != null && !feedback.isEmpty()) {
-                        logger.debug("Maven encountered the following problems during initial POM interpolation:");
+                        LOGGER.debug("Maven encountered the following problems during initial POM interpolation:");
 
                         Object last = null;
                         for (Object next : feedback) {
                             if (next instanceof Throwable) {
                                 if (last == null) {
-                                    logger.debug("", ((Throwable) next));
+                                    LOGGER.debug("", ((Throwable) next));
                                 } else {
-                                    logger.debug(String.valueOf(last), ((Throwable) next));
+                                    LOGGER.debug(String.valueOf(last), ((Throwable) next));
                                 }
                             } else {
                                 if (last != null) {
-                                    logger.debug(String.valueOf(last));
+                                    LOGGER.debug(String.valueOf(last));
                                 }
 
                                 last = next;
@@ -291,7 +290,7 @@ public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEn
                         }
 
                         if (last != null) {
-                            logger.debug(String.valueOf(last));
+                            LOGGER.debug(String.valueOf(last));
                         }
                     }
                 }

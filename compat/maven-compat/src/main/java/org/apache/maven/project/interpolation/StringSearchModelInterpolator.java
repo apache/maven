@@ -40,7 +40,8 @@ import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.interpolation.ValueSource;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * StringSearchModelInterpolator
@@ -49,6 +50,7 @@ import org.codehaus.plexus.logging.Logger;
 @Named
 @Singleton
 public class StringSearchModelInterpolator extends AbstractStringBasedModelInterpolator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringSearchModelInterpolator.class);
 
     private static final Map<Class<?>, Field[]> FIELDS_BY_CLASS = new WeakHashMap<>();
     private static final Map<Class<?>, Boolean> PRIMITIVE_BY_CLASS = new WeakHashMap<>();
@@ -74,7 +76,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
             List<InterpolationPostProcessor> postProcessors = createPostProcessors(model, projectDir, config);
 
             InterpolateObjectAction action =
-                    new InterpolateObjectAction(obj, valueSources, postProcessors, debugEnabled, this, getLogger());
+                    new InterpolateObjectAction(obj, valueSources, postProcessors, debugEnabled, this, LOGGER);
 
             ModelInterpolationException error = AccessController.doPrivileged(action);
 
@@ -98,7 +100,6 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
         private final boolean debugEnabled;
         private final LinkedList<Object> interpolationTargets;
         private final StringSearchModelInterpolator modelInterpolator;
-        private final Logger logger;
         private final List<ValueSource> valueSources;
         private final List<InterpolationPostProcessor> postProcessors;
 
@@ -107,8 +108,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
                 List<ValueSource> valueSources,
                 List<InterpolationPostProcessor> postProcessors,
                 boolean debugEnabled,
-                StringSearchModelInterpolator modelInterpolator,
-                Logger logger) {
+                StringSearchModelInterpolator modelInterpolator) {
             this.valueSources = valueSources;
             this.postProcessors = postProcessors;
             this.debugEnabled = debugEnabled;
@@ -117,7 +117,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
             interpolationTargets.add(target);
 
             this.modelInterpolator = modelInterpolator;
-            this.logger = logger;
+            this.LOGGER = LOGGER;
         }
 
         public ModelInterpolationException run() {
@@ -169,8 +169,8 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
                                         try {
                                             c.clear();
                                         } catch (UnsupportedOperationException e) {
-                                            if (debugEnabled && logger != null) {
-                                                logger.debug("Skipping interpolation of field: " + field + " in: "
+                                            if (debugEnabled && LOGGER != null) {
+                                                LOGGER.debug("Skipping interpolation of field: " + field + " in: "
                                                         + cls.getName()
                                                         + "; it is an unmodifiable collection.");
                                             }
@@ -217,8 +217,8 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
                                                         try {
                                                             entry.setValue(interpolated);
                                                         } catch (UnsupportedOperationException e) {
-                                                            if (debugEnabled && logger != null) {
-                                                                logger.debug("Skipping interpolation of field: " + field
+                                                            if (debugEnabled && LOGGER != null) {
+                                                                LOGGER.debug("Skipping interpolation of field: " + field
                                                                         + " (key: " + entry.getKey() + ") in: "
                                                                         + cls.getName()
                                                                         + "; it is an unmodifiable collection.");

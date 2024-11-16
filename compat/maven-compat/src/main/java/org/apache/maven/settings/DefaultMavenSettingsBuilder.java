@@ -31,15 +31,17 @@ import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
 @Deprecated
 @Named
 @Singleton
-public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements MavenSettingsBuilder {
+public class DefaultMavenSettingsBuilder implements MavenSettingsBuilder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMavenSettingsBuilder.class);
 
     private final SettingsBuilder settingsBuilder;
 

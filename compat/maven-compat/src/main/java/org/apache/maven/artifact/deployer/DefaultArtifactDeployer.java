@@ -36,7 +36,6 @@ import org.apache.maven.artifact.repository.metadata.MetadataBridge;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -46,13 +45,16 @@ import org.eclipse.aether.deployment.DeploymentException;
 import org.eclipse.aether.metadata.MergeableMetadata;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.artifact.SubArtifact;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DefaultArtifactDeployer
  */
 @Named
 @Deprecated
-public class DefaultArtifactDeployer extends AbstractLogEnabled implements ArtifactDeployer {
+public class DefaultArtifactDeployer implements ArtifactDeployer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultArtifactDeployer.class);
 
     @Inject
     private RepositorySystem repoSystem;

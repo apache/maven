@@ -24,6 +24,8 @@ import java.util.Properties;
 import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
@@ -32,6 +34,7 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
  */
 @Deprecated
 public class RegexBasedModelInterpolator extends AbstractStringBasedModelInterpolator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegexBasedModelInterpolator.class);
 
     public RegexBasedModelInterpolator() throws IOException {}
 

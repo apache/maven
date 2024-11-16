@@ -45,14 +45,16 @@ import org.apache.maven.repository.legacy.UpdateCheckManager;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
 @Named
 @Singleton
 @Deprecated
-public class DefaultRepositoryMetadataManager extends AbstractLogEnabled implements RepositoryMetadataManager {
+public class DefaultRepositoryMetadataManager implements RepositoryMetadataManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRepositoryMetadataManager.class);
     @Inject
     private WagonManager wagonManager;
 
@@ -91,9 +93,8 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                 if (!policy.isEnabled()) {
                     update = false;
 
-                    if (getLogger().isDebugEnabled()) {
-                        getLogger()
-                                .debug("Skipping update check for " + metadata.getKey() + " (" + file
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Skipping update check for " + metadata.getKey() + " (" + file
                                         + ") from disabled repository " + repository.getId() + " ("
                                         + repository.getUrl() + ")");
                     }
@@ -102,9 +103,8 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                 } else if (localCopyLastModified != null && !policy.checkOutOfDate(localCopyLastModified)) {
                     update = false;
 
-                    if (getLogger().isDebugEnabled()) {
-                        getLogger()
-                                .debug("Skipping update check for " + metadata.getKey() + " (" + file
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Skipping update check for " + metadata.getKey() + " (" + file
                                         + ") from repository " + repository.getId() + " (" + repository.getUrl()
                                         + ") in favor of local copy");
                     }
@@ -113,11 +113,11 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                 }
 
                 if (update) {
-                    getLogger().info(metadata.getKey() + ": checking for updates from " + repository.getId());
+                    LOGGER.info(metadata.getKey() + ": checking for updates from " + repository.getId());
                     try {
                         wagonManager.getArtifactMetadata(metadata, repository, file, policy.getChecksumPolicy());
                     } catch (ResourceDoesNotExistException e) {
-                        getLogger().debug(metadata + " could not be found on repository: " + repository.getId());
+                        LOGGER.debug(metadata + " could not be found on repository: " + repository.getId());
 
                         // delete the local copy so the old details aren't used.
                         if (file.exists()) {
@@ -132,10 +132,9 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                             }
                         }
                     } catch (TransferFailedException e) {
-                        getLogger()
-                                .warn(metadata + " could not be retrieved from repository: " + repository.getId()
+                        LOGGER.warn(metadata + " could not be retrieved from repository: " + repository.getId()
                                         + " due to an error: " + e.getMessage());
-                        getLogger().debug("Exception", e);
+                        LOGGER.debug("Exception", e);
                     } finally {
                         updateCheckManager.touch(metadata, repository, file);
                     }
@@ -243,10 +242,10 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
             try {
                 metadata = readMetadata(metadataFile);
             } catch (RepositoryMetadataReadException e) {
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().warn(e.getMessage(), e);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.warn(e.getMessage(), e);
                 } else {
-                    getLogger().warn(e.getMessage());
+                    LOGGER.warn(e.getMessage());
                 }
                 return setRepository;
             }
@@ -294,8 +293,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                 String lastUpdated = versioning.getLastUpdated();
                 String now = versioningRef.getLastUpdated();
                 if (lastUpdated != null && now != null && now.compareTo(lastUpdated) < 0) {
-                    getLogger()
-                            .warn("The last updated timestamp in " + metadataFile + " refers to the future (now = "
+                    LOGGER.warn("The last updated timestamp in " + metadataFile + " refers to the future (now = "
                                     + now
                                     + ", lastUpdated = " + lastUpdated + "). Please verify that the clocks of all"
                                     + " deploying machines are reasonably synchronized.");
@@ -306,16 +304,16 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
         }
 
         if (changed) {
-            getLogger().debug("Repairing metadata in " + metadataFile);
+            LOGGER.debug("Repairing metadata in " + metadataFile);
 
             try (OutputStream out = Files.newOutputStream(metadataFile.toPath())) {
                 new MetadataStaxWriter().write(out, metadata.getDelegate());
             } catch (IOException | XMLStreamException e) {
                 String msg = "Could not write fixed metadata to " + metadataFile + ": " + e.getMessage();
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().warn(msg, e);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.warn(msg, e);
                 } else {
-                    getLogger().warn(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }
@@ -354,8 +352,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
             wagonManager.getArtifactMetadataFromDeploymentRepository(
                     metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
         } catch (ResourceDoesNotExistException e) {
-            getLogger()
-                    .info(metadata + " could not be found on repository: " + remoteRepository.getId()
+            LOGGER.info(metadata + " could not be found on repository: " + remoteRepository.getId()
                             + ", so will be created");
 
             // delete the local copy so the old details aren't used.
@@ -383,7 +380,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
             throws RepositoryMetadataDeploymentException {
         File file;
         if (metadata instanceof RepositoryMetadata) {
-            getLogger().info("Retrieving previous metadata from " + deploymentRepository.getId());
+            LOGGER.info("Retrieving previous metadata from " + deploymentRepository.getId());
             try {
                 file = getArtifactMetadataFromDeploymentRepository(metadata, localRepository, deploymentRepository);
             } catch (TransferFailedException e) {
