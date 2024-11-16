@@ -45,7 +45,7 @@ public class MavenITmng6084Jsr250PluginTest extends AbstractMavenIntegrationTest
         //
         // Build a plugin that uses JSR 250 annotations
         //
-        Verifier v0 = newVerifier(testDir.getAbsolutePath(), "remote");
+        Verifier v0 = newVerifier(testDir.getAbsolutePath());
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng6084");
@@ -56,7 +56,7 @@ public class MavenITmng6084Jsr250PluginTest extends AbstractMavenIntegrationTest
         //
         // Execute the JSR 250 plugin
         //
-        Verifier v1 = newVerifier(testDir.getAbsolutePath(), "remote");
+        Verifier v1 = newVerifier(testDir.getAbsolutePath());
         v1.setAutoclean(false);
         v1.addCliArgument("org.apache.maven.its.mng6084:jsr250-maven-plugin:0.0.1-SNAPSHOT:hello");
         v1.execute();

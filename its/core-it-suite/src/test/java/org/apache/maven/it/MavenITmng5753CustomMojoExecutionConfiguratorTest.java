@@ -42,7 +42,7 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest extends AbstractM
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -51,7 +51,7 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest extends AbstractM
         configurationFile.delete();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

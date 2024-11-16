@@ -59,7 +59,7 @@ public class MavenITmng3729MultiForkAggregatorsTest extends AbstractMavenIntegra
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
 
         verifier.addCliArgument("install");
         verifier.execute();

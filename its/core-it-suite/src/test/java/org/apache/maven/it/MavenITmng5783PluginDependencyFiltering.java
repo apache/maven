@@ -35,12 +35,12 @@ public class MavenITmng5783PluginDependencyFiltering extends AbstractMavenIntegr
     @Test
     public void testSLF4j() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5783-plugin-dependency-filtering");
-        Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "slf4j").getAbsolutePath(), "remote");
+        verifier = newVerifier(new File(testDir, "slf4j").getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

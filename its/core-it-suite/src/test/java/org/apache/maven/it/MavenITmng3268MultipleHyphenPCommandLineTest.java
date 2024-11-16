@@ -40,7 +40,7 @@ public class MavenITmng3268MultipleHyphenPCommandLineTest extends AbstractMavenI
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("-Pprofile1,profile2");
         verifier.addCliArgument("-Pprofile3");

@@ -43,7 +43,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(
                 getClass(), "/mng-2199-parent-version-range/valid-inclusive-upper-bound");
 
-        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-U");
         verifier.setAutoclean(false);
         verifier.addCliArgument("verify");
@@ -64,7 +64,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(
                 getClass(), "/mng-2199-parent-version-range/valid-exclusive-upper-bound");
 
-        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-U");
         verifier.setAutoclean(false);
         verifier.addCliArgument("verify");
@@ -84,7 +84,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2199-parent-version-range/invalid");
 
         try {
-            verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+            verifier = newVerifier(testDir.getAbsolutePath());
             verifier.setAutoclean(false);
             verifier.addCliArgument("-U");
             verifier.addCliArgument("verify");
@@ -106,7 +106,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
                 ResourceExtractor.simpleExtractResources(getClass(), "/mng-2199-parent-version-range/expression");
 
         try {
-            verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+            verifier = newVerifier(testDir.getAbsolutePath());
             verifier.setAutoclean(false);
             verifier.addCliArgument("-U");
             verifier.addCliArgument("verify");
@@ -126,7 +126,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2199-parent-version-range/inherited");
 
         try {
-            verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+            verifier = newVerifier(testDir.getAbsolutePath());
             verifier.setAutoclean(false);
             verifier.addCliArgument("-U");
             verifier.addCliArgument("verify");
@@ -190,7 +190,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(
                 getClass(), "/mng-2199-parent-version-range/local-fallback-to-remote/child");
 
-        verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

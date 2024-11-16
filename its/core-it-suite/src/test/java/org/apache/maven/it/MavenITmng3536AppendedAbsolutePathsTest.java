@@ -38,7 +38,7 @@ public class MavenITmng3536AppendedAbsolutePathsTest extends AbstractMavenIntegr
     public void testitMNG3536() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3536");
         File pluginDir = new File(testDir, "plugin");
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
 
         verifier.addCliArgument("install");
         verifier.execute();

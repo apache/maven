@@ -46,7 +46,7 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.setLogFileName("log-sys.txt");
         verifier.addCliArgument("install");
         verifier.execute();
@@ -69,7 +69,7 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.setLogFileName("log-cli.txt");
         verifier.addCliArgument("install");
         verifier.execute();

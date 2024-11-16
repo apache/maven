@@ -35,13 +35,6 @@ under the License.
         - boostrap - resolves all artifacts provided in bootstrap file
         - packaging-* - resolves build plugins provided by tested Maven default lifecycle(s)</description>
 
-  <modules>
-    <module>bootstrap</module>
-    <module>packaging-jar</module>
-    <module>packaging-maven-plugin</module>
-    <module>packaging-war</module>
-  </modules>
-
   <build>
     <plugins>
       <!-- This merely locks the plugin versions to disable auto-update -->

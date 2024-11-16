@@ -37,13 +37,13 @@ public class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrati
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -62,13 +62,13 @@ public class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrati
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("--builder");
         verifier.addCliArgument("multithreaded");
         verifier.addCliArgument("-T");
@@ -92,19 +92,19 @@ public class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrati
         Verifier verifier;
 
         // install the test extension
-        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(extensionDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("-Dmaven.ext.class.path=" + new File(extensionDir, "target/classes").getAbsolutePath());
         verifier.setForkJvm(true); // verifier does not support custom realms in embedded mode
         verifier.addCliArgument("package");

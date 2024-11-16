@@ -45,13 +45,13 @@ public class MavenITmng5591WorkspaceReader extends AbstractMavenIntegrationTestC
         Verifier verifier;
 
         // install the test extension
-        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(extensionDir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // compile the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("-Dmaven.ext.class.path="
                 + new File(extensionDir, "target/mng-5591-workspace-reader-extension-0.1.jar").getCanonicalPath());
         verifier.addCliArgument("compile");
