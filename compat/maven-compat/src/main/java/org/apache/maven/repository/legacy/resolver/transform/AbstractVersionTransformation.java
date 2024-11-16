@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 @Deprecated
 public abstract class AbstractVersionTransformation implements ArtifactTransformation {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractVersionTransformation.class);
+
     @Inject
     protected RepositoryMetadataManager repositoryMetadataManager;
 

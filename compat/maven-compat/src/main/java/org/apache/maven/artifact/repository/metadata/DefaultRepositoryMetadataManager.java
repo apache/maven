@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 @Deprecated
 public class DefaultRepositoryMetadataManager implements RepositoryMetadataManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRepositoryMetadataManager.class);
+
     @Inject
     private WagonManager wagonManager;
 
@@ -95,8 +96,8 @@ public class DefaultRepositoryMetadataManager implements RepositoryMetadataManag
 
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Skipping update check for " + metadata.getKey() + " (" + file
-                                        + ") from disabled repository " + repository.getId() + " ("
-                                        + repository.getUrl() + ")");
+                                + ") from disabled repository " + repository.getId() + " ("
+                                + repository.getUrl() + ")");
                     }
                 } else if (request.isForceUpdate()) {
                     update = true;
@@ -105,8 +106,8 @@ public class DefaultRepositoryMetadataManager implements RepositoryMetadataManag
 
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Skipping update check for " + metadata.getKey() + " (" + file
-                                        + ") from repository " + repository.getId() + " (" + repository.getUrl()
-                                        + ") in favor of local copy");
+                                + ") from repository " + repository.getId() + " (" + repository.getUrl()
+                                + ") in favor of local copy");
                     }
                 } else {
                     update = updateCheckManager.isUpdateRequired(metadata, repository, file);
@@ -133,7 +134,7 @@ public class DefaultRepositoryMetadataManager implements RepositoryMetadataManag
                         }
                     } catch (TransferFailedException e) {
                         LOGGER.warn(metadata + " could not be retrieved from repository: " + repository.getId()
-                                        + " due to an error: " + e.getMessage());
+                                + " due to an error: " + e.getMessage());
                         LOGGER.debug("Exception", e);
                     } finally {
                         updateCheckManager.touch(metadata, repository, file);
@@ -294,9 +295,9 @@ public class DefaultRepositoryMetadataManager implements RepositoryMetadataManag
                 String now = versioningRef.getLastUpdated();
                 if (lastUpdated != null && now != null && now.compareTo(lastUpdated) < 0) {
                     LOGGER.warn("The last updated timestamp in " + metadataFile + " refers to the future (now = "
-                                    + now
-                                    + ", lastUpdated = " + lastUpdated + "). Please verify that the clocks of all"
-                                    + " deploying machines are reasonably synchronized.");
+                            + now
+                            + ", lastUpdated = " + lastUpdated + "). Please verify that the clocks of all"
+                            + " deploying machines are reasonably synchronized.");
                     versioning.setLastUpdated(now);
                     changed = true;
                 }
@@ -353,7 +354,7 @@ public class DefaultRepositoryMetadataManager implements RepositoryMetadataManag
                     metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
         } catch (ResourceDoesNotExistException e) {
             LOGGER.info(metadata + " could not be found on repository: " + remoteRepository.getId()
-                            + ", so will be created");
+                    + ", so will be created");
 
             // delete the local copy so the old details aren't used.
             if (file.exists()) {

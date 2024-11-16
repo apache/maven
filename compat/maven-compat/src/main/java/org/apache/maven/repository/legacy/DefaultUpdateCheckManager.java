@@ -66,7 +66,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
         if (!policy.isEnabled()) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Skipping update check for " + artifact + " (" + file + ") from " + repository.getId()
-                                + " (" + repository.getUrl() + ")");
+                        + " (" + repository.getUrl() + ")");
             }
 
             return false;
@@ -74,7 +74,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Determining update check for " + artifact + " (" + file + ") from " + repository.getId()
-                            + " (" + repository.getUrl() + ")");
+                    + " (" + repository.getUrl() + ")");
         }
 
         if (file == null) {
@@ -107,7 +107,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
         if (!policy.isEnabled()) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Skipping update check for " + metadata.getKey() + " (" + file + ") from "
-                                + repository.getId() + " (" + repository.getUrl() + ")");
+                        + repository.getId() + " (" + repository.getUrl() + ")");
             }
 
             return false;
@@ -115,7 +115,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Determining update check for " + metadata.getKey() + " (" + file + ") from "
-                            + repository.getId() + " (" + repository.getUrl() + ")");
+                    + repository.getId() + " (" + repository.getUrl() + ")");
         }
 
         if (file == null) {
@@ -198,7 +198,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
             if (!touchfile.getParentFile().exists()
                     && !touchfile.getParentFile().mkdirs()) {
                 LOGGER.debug("Failed to create directory: " + touchfile.getParent()
-                                + " for tracking artifact metadata resolution.");
+                        + " for tracking artifact metadata resolution.");
                 return;
             }
 
@@ -234,9 +234,9 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
                 channel = null;
             } catch (IOException e) {
                 LOGGER.debug(
-                                "Failed to record lastUpdated information for resolution.\nFile: "
-                                        + touchfile.toString() + "; key: " + key,
-                                e);
+                        "Failed to record lastUpdated information for resolution.\nFile: " + touchfile.toString()
+                                + "; key: " + key,
+                        e);
             } finally {
                 if (lock != null) {
                     try {

@@ -60,8 +60,7 @@ import org.slf4j.LoggerFactory;
  * TODO Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
  */
 @Deprecated
-public abstract class AbstractStringBasedModelInterpolator
-        implements ModelInterpolator, Initializable {
+public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator, Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractStringBasedModelInterpolator.class);
 
     private static final List<String> PROJECT_PREFIXES = Arrays.asList("pom.", "project.");
