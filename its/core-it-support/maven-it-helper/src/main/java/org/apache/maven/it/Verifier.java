@@ -29,11 +29,17 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 public class Verifier extends org.apache.maven.shared.verifier.Verifier {
     public Verifier(String basedir) throws VerificationException {
-        super(basedir);
+        this(basedir, false);
     }
 
     public Verifier(String basedir, boolean debug) throws VerificationException {
-        super(basedir, debug);
+        super(basedir, null, debug, defaultCliArguments());
+    }
+
+    static String[] defaultCliArguments() {
+        return new String[] {
+            "-e", "--batch-mode", "-Dmaven.repo.local.tail=" + System.getProperty("maven.repo.local.tail")
+        };
     }
 
     public String loadLogContent() throws IOException {
@@ -94,5 +100,9 @@ public class Verifier extends org.apache.maven.shared.verifier.Verifier {
 
     public static long textOccurencesInLog(List<String> lines, String text) {
         return lines.stream().filter(line -> stripAnsi(line).contains(text)).count();
+    }
+
+    public void execute() throws VerificationException {
+        super.execute();
     }
 }

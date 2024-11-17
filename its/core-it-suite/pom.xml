@@ -634,6 +634,28 @@ under the License.
       </build>
     </profile>
     <profile>
+      <id>maven-repo-local-tail</id>
+      <activation>
+        <property>
+          <name>maven.repo.local.tail</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <!-- Pass this through to the tests (if set!) to have them
+                  pick the right repository -->
+                <maven.repo.local.tail>${maven.repo.local.tail}</maven.repo.local.tail>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>maven-repo-local-layout</id>
       <activation>
         <property>
