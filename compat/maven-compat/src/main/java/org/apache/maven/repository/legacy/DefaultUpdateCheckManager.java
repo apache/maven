@@ -37,8 +37,8 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.repository.Proxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 
 /**
  * DefaultUpdateCheckManager
@@ -46,12 +46,15 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 @Deprecated
-public class DefaultUpdateCheckManager implements UpdateCheckManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultUpdateCheckManager.class);
+public class DefaultUpdateCheckManager extends AbstractLogEnabled implements UpdateCheckManager {
 
     private static final String ERROR_KEY_SUFFIX = ".error";
 
     public DefaultUpdateCheckManager() {}
+
+    public DefaultUpdateCheckManager(Logger logger) {
+        enableLogging(logger);
+    }
 
     public static final String LAST_UPDATE_TAG = ".lastUpdated";
 
@@ -64,17 +67,19 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
         ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
         if (!policy.isEnabled()) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Skipping update check for " + artifact + " (" + file + ") from " + repository.getId()
-                        + " (" + repository.getUrl() + ")");
+            if (getLogger().isDebugEnabled()) {
+                getLogger()
+                        .debug("Skipping update check for " + artifact + " (" + file + ") from " + repository.getId()
+                                + " (" + repository.getUrl() + ")");
             }
 
             return false;
         }
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Determining update check for " + artifact + " (" + file + ") from " + repository.getId()
-                    + " (" + repository.getUrl() + ")");
+        if (getLogger().isDebugEnabled()) {
+            getLogger()
+                    .debug("Determining update check for " + artifact + " (" + file + ") from " + repository.getId()
+                            + " (" + repository.getUrl() + ")");
         }
 
         if (file == null) {
@@ -105,17 +110,19 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
         ArtifactRepositoryPolicy policy = metadata.getPolicy(repository);
 
         if (!policy.isEnabled()) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Skipping update check for " + metadata.getKey() + " (" + file + ") from "
-                        + repository.getId() + " (" + repository.getUrl() + ")");
+            if (getLogger().isDebugEnabled()) {
+                getLogger()
+                        .debug("Skipping update check for " + metadata.getKey() + " (" + file + ") from "
+                                + repository.getId() + " (" + repository.getUrl() + ")");
             }
 
             return false;
         }
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Determining update check for " + metadata.getKey() + " (" + file + ") from "
-                    + repository.getId() + " (" + repository.getUrl() + ")");
+        if (getLogger().isDebugEnabled()) {
+            getLogger()
+                    .debug("Determining update check for " + metadata.getKey() + " (" + file + ") from "
+                            + repository.getId() + " (" + repository.getUrl() + ")");
         }
 
         if (file == null) {
@@ -197,8 +204,9 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
         synchronized (touchfile.getAbsolutePath().intern()) {
             if (!touchfile.getParentFile().exists()
                     && !touchfile.getParentFile().mkdirs()) {
-                LOGGER.debug("Failed to create directory: " + touchfile.getParent()
-                        + " for tracking artifact metadata resolution.");
+                getLogger()
+                        .debug("Failed to create directory: " + touchfile.getParent()
+                                + " for tracking artifact metadata resolution.");
                 return;
             }
 
@@ -211,7 +219,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
                 lock = channel.lock();
 
                 if (touchfile.canRead()) {
-                    LOGGER.debug("Reading resolution-state from: " + touchfile);
+                    getLogger().debug("Reading resolution-state from: " + touchfile);
                     props.load(Channels.newInputStream(channel));
                 }
 
@@ -223,7 +231,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
                     props.remove(key + ERROR_KEY_SUFFIX);
                 }
 
-                LOGGER.debug("Writing resolution-state to: " + touchfile);
+                getLogger().debug("Writing resolution-state to: " + touchfile);
                 channel.truncate(0);
                 props.store(Channels.newOutputStream(channel), "Last modified on: " + new Date());
 
@@ -233,16 +241,18 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
                 channel.close();
                 channel = null;
             } catch (IOException e) {
-                LOGGER.debug(
-                        "Failed to record lastUpdated information for resolution.\nFile: " + touchfile.toString()
-                                + "; key: " + key,
-                        e);
+                getLogger()
+                        .debug(
+                                "Failed to record lastUpdated information for resolution.\nFile: "
+                                        + touchfile.toString() + "; key: " + key,
+                                e);
             } finally {
                 if (lock != null) {
                     try {
                         lock.release();
                     } catch (IOException e) {
-                        LOGGER.debug("Error releasing exclusive lock for resolution tracking file: " + touchfile, e);
+                        getLogger()
+                                .debug("Error releasing exclusive lock for resolution tracking file: " + touchfile, e);
                     }
                 }
 
@@ -250,7 +260,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
                     try {
                         channel.close();
                     } catch (IOException e) {
-                        LOGGER.debug("Error closing FileChannel for resolution tracking file: " + touchfile, e);
+                        getLogger().debug("Error closing FileChannel for resolution tracking file: " + touchfile, e);
                     }
                 }
             }
@@ -258,7 +268,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
     }
 
     Date readLastUpdated(File touchfile, String key) {
-        LOGGER.debug("Searching for " + key + " in resolution tracking file.");
+        getLogger().debug("Searching for " + key + " in resolution tracking file.");
 
         Properties props = read(touchfile);
         if (props != null) {
@@ -267,7 +277,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
                 try {
                     return new Date(Long.parseLong(rawVal));
                 } catch (NumberFormatException e) {
-                    LOGGER.debug("Cannot parse lastUpdated date: '" + rawVal + "'. Ignoring.", e);
+                    getLogger().debug("Cannot parse lastUpdated date: '" + rawVal + "'. Ignoring.", e);
                 }
             }
         }
@@ -284,7 +294,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
 
     private Properties read(File touchfile) {
         if (!touchfile.canRead()) {
-            LOGGER.debug("Skipped unreadable resolution tracking file: " + touchfile);
+            getLogger().debug("Skipped unreadable resolution tracking file: " + touchfile);
             return null;
         }
 
@@ -294,7 +304,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
 
                 try (FileInputStream in = new FileInputStream(touchfile)) {
                     try (FileLock lock = in.getChannel().lock(0, Long.MAX_VALUE, true)) {
-                        LOGGER.debug("Reading resolution-state from: " + touchfile);
+                        getLogger().debug("Reading resolution-state from: " + touchfile);
                         props.load(in);
 
                         return props;
@@ -302,7 +312,7 @@ public class DefaultUpdateCheckManager implements UpdateCheckManager {
                 }
 
             } catch (IOException e) {
-                LOGGER.debug("Failed to read resolution tracking file: " + touchfile, e);
+                getLogger().debug("Failed to read resolution tracking file: " + touchfile, e);
 
                 return null;
             }

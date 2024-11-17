@@ -30,8 +30,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.artifact.AttachedArtifact;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
  * DefaultMavenProjectHelper
@@ -39,8 +38,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("deprecation")
 @Named
 @Singleton
-public class DefaultMavenProjectHelper implements MavenProjectHelper {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMavenProjectHelper.class);
+public class DefaultMavenProjectHelper extends AbstractLogEnabled implements MavenProjectHelper {
     private final ArtifactHandlerManager artifactHandlerManager;
 
     @Inject
