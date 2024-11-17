@@ -30,8 +30,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutio
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Change the version <code>RELEASE</code> to the appropriate release version from the remote repository.
@@ -41,7 +39,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Deprecated
 public class ReleaseArtifactTransformation extends AbstractVersionTransformation {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReleaseArtifactTransformation.class);
 
     @Override
     public void transformForResolve(Artifact artifact, RepositoryRequest request)

@@ -45,8 +45,6 @@ import org.eclipse.aether.deployment.DeploymentException;
 import org.eclipse.aether.metadata.MergeableMetadata;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.artifact.SubArtifact;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * DefaultArtifactDeployer
@@ -54,7 +52,6 @@ import org.slf4j.LoggerFactory;
 @Named
 @Deprecated
 public class DefaultArtifactDeployer implements ArtifactDeployer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultArtifactDeployer.class);
 
     @Inject
     private RepositorySystem repoSystem;

@@ -28,8 +28,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutio
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Describes a version transformation during artifact resolution - "latest" type
@@ -38,7 +36,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Deprecated
 public class LatestArtifactTransformation extends AbstractVersionTransformation {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LatestArtifactTransformation.class);
 
     public void transformForResolve(Artifact artifact, RepositoryRequest request)
             throws ArtifactResolutionException, ArtifactNotFoundException {

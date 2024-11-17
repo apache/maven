@@ -42,8 +42,6 @@ import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallationException;
 import org.eclipse.aether.util.artifact.SubArtifact;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  */
@@ -51,7 +49,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Deprecated
 public class DefaultArtifactInstaller implements ArtifactInstaller {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultArtifactInstaller.class);
 
     @Inject
     private RepositorySystem repoSystem;
