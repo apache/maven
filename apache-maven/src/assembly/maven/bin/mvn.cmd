@@ -46,7 +46,7 @@ if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd" %*
 if exist "%USERPROFILE%\mavenrc.cmd" call "%USERPROFILE%\mavenrc.cmd" %*
 :skipRc
 
-@setlocal
+@setlocal EnableDelayedExpansion
 
 set ERROR_CODE=0
 
@@ -88,9 +88,11 @@ for /f "delims=. tokens=1" %%v in ("!JAVAVER!") do (
 )
 
 if !JAVA_MAJOR_VERSION! LSS 17 (
+    setlocal DisableDelayedExpansion
     echo Error: Apache Maven 4.x requires Java 17 or newer to run. >&2
-    echo Your current Java version appears to be !JAVA_VERSION_LINE! >&2
+    echo Your current Java version appears to be %JAVA_VERSION_LINE% >&2
     echo Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK. >&2
+    endlocal
     goto error
 )
 
