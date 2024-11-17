@@ -71,16 +71,25 @@ if not exist "%JAVACMD%" (
 )
 
 @REM Check Java version
-for /f "tokens=3" %%g in ('"%JAVACMD%" -version 2^>^&1 ^| findstr /i "version"') do (
+"%JAVACMD%" -version 2>&1 | "%SystemRoot%\System32\findstr.exe" /i /r "version[^0-9]*[0-9]" > "%TEMP%\mvn-java-version.txt"
+if ERRORLEVEL 1 (
+    echo Error: Unable to determine Java version. >&2
+    goto error
+)
+set /p JAVA_VERSION_LINE=<"%TEMP%\mvn-java-version.txt"
+del "%TEMP%\mvn-java-version.txt"
+
+for /f "tokens=3" %%g in ("!JAVA_VERSION_LINE!") do (
     set JAVAVER=%%g
 )
-set JAVAVER=%JAVAVER:"=%
-for /f "delims=. tokens=1" %%v in ("%JAVAVER%") do (
+set JAVAVER=!JAVAVER:"=!
+for /f "delims=. tokens=1" %%v in ("!JAVAVER!") do (
     set JAVA_MAJOR_VERSION=%%v
 )
-if %JAVA_MAJOR_VERSION% LSS 17 (
+
+if !JAVA_MAJOR_VERSION! LSS 17 (
     echo Error: Apache Maven 4.x requires Java 17 or newer to run. >&2
-    echo Your current Java version appears to be %JAVAVER% >&2
+    echo Your current Java version appears to be !JAVA_VERSION_LINE! >&2
     echo Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK. >&2
     goto error
 )
