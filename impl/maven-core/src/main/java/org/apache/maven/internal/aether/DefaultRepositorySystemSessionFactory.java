@@ -198,7 +198,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
                 request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
-        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(Constants.MAVEN_VERSION_FILTERS));
+        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(Constants.MAVEN_VERSION_FILTER));
         if (versionFilter != null) {
             sessionBuilder.setVersionFilter(versionFilter);
         }

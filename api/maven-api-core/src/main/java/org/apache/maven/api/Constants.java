@@ -291,8 +291,8 @@ public final class Constants {
     public static final String MAVEN_RELOCATIONS_ENTRIES = "maven.relocations.entries";
 
     /**
-     * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
-     * filter is applied (like in Maven 3).
+     * User property for version filter expression used in session, applied to resolving ranges: a semicolon separated
+     * list of filters to apply. By default, no version filter is applied (like in Maven 3).
      * <br/>
      * Supported filters:
      * <ul>
@@ -303,12 +303,13 @@ public final class Constants {
      * </ul>
      * Example filter expression: <code>"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for "top 5" (instead
      * full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is
-     * being processed, version 1 is omitted.
+     * being processed, version 1 is omitted. Value in this property builds
+     * <code>org.eclipse.aether.collection.VersionFilter</code> instance.
      *
      * @since 4.0.0
      */
     @Config
-    public static final String MAVEN_VERSION_FILTERS = "maven.versionFilters";
+    public static final String MAVEN_VERSION_FILTER = "maven.session.versionFilter";
 
     /**
      * User property for chained LRM: the new "head" local repository to use, and "push" the existing into tail.
