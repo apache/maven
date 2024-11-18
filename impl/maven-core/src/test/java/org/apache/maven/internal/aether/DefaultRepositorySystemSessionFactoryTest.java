@@ -416,43 +416,43 @@ public class DefaultRepositorySystemSessionFactoryTest {
         VersionFilter versionFilter;
 
         // single one
-        request.getUserProperties().put("maven.versionFilters", "s");
+        request.getUserProperties().put("maven.session.versionFilter", "s");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
         assertTrue(versionFilter instanceof ContextualSnapshotVersionFilter);
 
-        request.getUserProperties().put("maven.versionFilters", "h");
+        request.getUserProperties().put("maven.session.versionFilter", "h");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
         assertTrue(versionFilter instanceof HighestVersionFilter);
 
-        request.getUserProperties().put("maven.versionFilters", "h(5)");
+        request.getUserProperties().put("maven.session.versionFilter", "h(5)");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
         assertTrue(versionFilter instanceof HighestVersionFilter);
 
-        request.getUserProperties().put("maven.versionFilters", "l");
+        request.getUserProperties().put("maven.session.versionFilter", "l");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
         assertTrue(versionFilter instanceof LowestVersionFilter);
 
-        request.getUserProperties().put("maven.versionFilters", "l(5)");
+        request.getUserProperties().put("maven.session.versionFilter", "l(5)");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
         assertTrue(versionFilter instanceof LowestVersionFilter);
 
-        request.getUserProperties().put("maven.versionFilters", "e(g:a:v)");
+        request.getUserProperties().put("maven.session.versionFilter", "e(g:a:v)");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
         assertTrue(versionFilter instanceof PredicateVersionFilter);
 
-        request.getUserProperties().put("maven.versionFilters", "e(g:a:[1,2])");
+        request.getUserProperties().put("maven.session.versionFilter", "e(g:a:[1,2])");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
         assertTrue(versionFilter instanceof PredicateVersionFilter);
 
         // chained
-        request.getUserProperties().put("maven.versionFilters", "h(5);s;e(org.foo:bar:1)");
+        request.getUserProperties().put("maven.session.versionFilter", "h(5);s;e(org.foo:bar:1)");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
         assertTrue(versionFilter instanceof ChainedVersionFilter);
