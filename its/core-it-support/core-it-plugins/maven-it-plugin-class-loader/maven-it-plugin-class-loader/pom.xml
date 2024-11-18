@@ -53,7 +53,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>3.6.4</version>
+      <version>3.15.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
