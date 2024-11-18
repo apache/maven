@@ -18,10 +18,10 @@
  */
 package org.apache.maven.it;
 
+import java.io.File;
+
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8383">MNG-8383</a>.
