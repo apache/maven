@@ -107,6 +107,13 @@ else
   fi
 fi
 
+if ! "$JAVACMD" --enable-native-access=ALL-UNNAMED -version >/dev/null 2>&1; then
+  echo "Error: Apache Maven 4.x requires Java 17 or newer to run." >&2
+  "$JAVACMD" -version >&2
+  echo "Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK." >&2
+  exit 1
+fi
+
 # traverses directory structure from process work directory to filesystem root
 # first directory with .mvn subdirectory is considered project base directory
 find_maven_basedir() {
