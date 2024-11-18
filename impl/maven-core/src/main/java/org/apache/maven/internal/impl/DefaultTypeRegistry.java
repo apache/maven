@@ -95,8 +95,9 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
                         handler.getExtension(),
                         handler.getClassifier(),
                         handler.isIncludesDependencies(),
-                        JavaPathType.CLASSES,
-                        JavaPathType.MODULES);
+                        handler.isAddedToClasspath()
+                                ? new JavaPathType[] {JavaPathType.CLASSES, JavaPathType.MODULES}
+                                : new JavaPathType[] {});
             }
             return type;
         });
