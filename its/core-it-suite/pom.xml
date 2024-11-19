@@ -585,7 +585,7 @@ under the License.
         <dependency>
           <groupId>org.apache.maven.wagon</groupId>
           <artifactId>wagon-webdav-jackrabbit</artifactId>
-          <version>3.0.0</version>
+          <version>3.5.3</version>
           <scope>test</scope>
         </dependency>
         <dependency>
