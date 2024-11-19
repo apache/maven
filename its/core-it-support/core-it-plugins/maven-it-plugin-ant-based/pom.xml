@@ -41,7 +41,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-script-ant</artifactId>
-      <version>3.15.1</version>
+      <version>${maven-plugin-tools-version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>

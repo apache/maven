@@ -45,7 +45,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
-      <version>3.5.3</version>
+      <version>${wagonVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
