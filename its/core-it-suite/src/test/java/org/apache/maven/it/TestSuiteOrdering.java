@@ -294,7 +294,6 @@ public class TestSuiteOrdering implements ClassOrderer {
         suite.addTestSuite(MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest.class);
         suite.addTestSuite(MavenITmng4789ScopeInheritanceMeetsConflictTest.class);
         suite.addTestSuite(MavenITmng4788InstallationToCustomLocalRepoTest.class);
-        suite.addTestSuite(MavenITmng4786AntBased21xMojoSupportTest.class);
         suite.addTestSuite(MavenITmng4785TransitiveResolutionInForkedThreadTest.class);
         suite.addTestSuite(MavenITmng4781DeploymentToNexusStagingRepoTest.class);
         suite.addTestSuite(MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest.class);
@@ -375,7 +374,6 @@ public class TestSuiteOrdering implements ClassOrderer {
         suite.addTestSuite(MavenITmng4402DuplicateChildModuleTest.class);
         suite.addTestSuite(MavenITmng4401RepositoryOrderForParentPomTest.class);
         suite.addTestSuite(MavenITmng4400RepositoryOrderTest.class);
-        suite.addTestSuite(MavenITmng4396AntBased20xMojoSupportTest.class);
         suite.addTestSuite(MavenITmng4393ParseExternalParenPomLenientTest.class);
         suite.addTestSuite(MavenITmng4387QuietLoggingTest.class);
         suite.addTestSuite(MavenITmng4386DebugLoggingTest.class);

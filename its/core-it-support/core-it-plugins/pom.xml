@@ -35,7 +35,6 @@ under the License.
 
   <modules>
     <module>maven-it-plugin-active-collection</module>
-    <module>maven-it-plugin-ant-based</module>
     <module>maven-it-plugin-artifact</module>
     <module>maven-it-plugin-class-loader</module>
     <module>maven-it-plugin-configuration</module>
@@ -101,6 +100,18 @@ under the License.
     <distMgmtSnapshotsName>Apache Maven IT Snapshot Repository</distMgmtSnapshotsName>
     <distMgmtSnapshotsUrl>https://repository.apache.org/content/repositories/snapshots</distMgmtSnapshotsUrl>
   </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <configuration>
+          <goalPrefix>fluke</goalPrefix>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <reporting>
     <plugins>
