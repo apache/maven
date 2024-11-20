@@ -18,10 +18,10 @@
  */
 package org.apache.maven.it;
 
+import java.io.File;
+
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8385">MNG-8385</a>.
@@ -37,7 +37,8 @@ class MavenITmng8385PropertyContributoSPITest extends AbstractMavenIntegrationTe
      */
     @Test
     void testIt() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8385").getAbsoluteFile();
+        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8385")
+                .getAbsoluteFile();
         Verifier verifier;
 
         verifier = newVerifier(new File(testDir, "spi-extension").getAbsolutePath());

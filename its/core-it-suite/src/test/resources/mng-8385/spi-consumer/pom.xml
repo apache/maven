@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
 
-    <groupId>org.apache.maven.its.mng8385</groupId>
-    <artifactId>spi-consumer</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+  <groupId>org.apache.maven.its.mng8385</groupId>
+  <artifactId>spi-consumer</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
-    <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.its.mng8385</groupId>
-                <artifactId>spi-extension</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </extension>
-        </extensions>
-    </build>
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its.mng8385</groupId>
+        <artifactId>spi-extension</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+      </extension>
+    </extensions>
+  </build>
 </project>

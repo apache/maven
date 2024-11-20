@@ -18,11 +18,11 @@
  */
 package org.apache.maven.its.mng8385;
 
+import java.util.HashMap;
+
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.spi.PropertyContributor;
-
-import java.util.HashMap;
 
 @Named
 public class CustomPropertyContributor implements PropertyContributor {
