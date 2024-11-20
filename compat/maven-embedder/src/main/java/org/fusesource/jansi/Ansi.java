@@ -28,6 +28,7 @@ import java.util.ArrayList;
  * with maven-shared-utils, while Maven has migrated to JLine (into which Jansi has been merged
  * since JLine 3.25.0).
  */
+@Deprecated
 @SuppressWarnings("unused")
 public class Ansi implements Appendable {
 

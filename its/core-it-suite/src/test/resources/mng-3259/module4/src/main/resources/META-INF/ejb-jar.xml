@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ejb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD Enterprise JavaBeans 2.0//EN" "http://java.sun.com/dtd/ejb-jar_2_0.dtd">
+<ejb-jar>
+  <display-name>MNG XXX Module4</display-name>
+  <enterprise-beans>
+    <session >
+      <description><![CDATA[An EJB in Module4.]]></description>
+      <display-name>Module4</display-name>
+      <ejb-name>Module4</ejb-name>
+      <home>mng.Module4Home</home>
+      <remote>mng.Module4</remote>
+      <ejb-class>mng.Module4Bean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>
+  </enterprise-beans>
+  <assembly-descriptor>
+    <container-transaction >
+      <method >
+        <ejb-name>Module4</ejb-name>
+        <method-name>*</method-name>
+      </method>
+      <trans-attribute>Required</trans-attribute>
+    </container-transaction>
+  </assembly-descriptor>
+</ejb-jar>
+

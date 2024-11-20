@@ -46,6 +46,7 @@ import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
  * Logs execution events to logger, eventually user-supplied.
  *
  */
+@Deprecated
 public class ExecutionEventLogger extends AbstractExecutionListener {
     private static final int MAX_LOG_PREFIX_SIZE = 8; // "[ERROR] "
     private static final int PROJECT_STATUS_SUFFIX_SIZE = 20; // "SUCCESS [  0.000 s]"

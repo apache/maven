@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng0674</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>Maven Integration Test :: MNG-674</name>
+  <description>Test parameter alias usage.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <propertiesFile>target/config.properties</propertiesFile>
+          <!-- parameter that has no default value -->
+          <aliasParamLegacy>MNG-674-1</aliasParamLegacy>
+          <!-- parameter that has a default value -->
+          <fullyAnnotatedParam>MNG-674-2</fullyAnnotatedParam>
+          <!-- parameter that is complex (cf. MNG-4997) -->
+          <aliasStringParamsLegacy>
+            <item>MNG-4997</item>
+          </aliasStringParamsLegacy>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>config</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

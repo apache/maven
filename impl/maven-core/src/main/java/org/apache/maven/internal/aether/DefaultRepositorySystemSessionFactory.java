@@ -47,10 +47,6 @@ import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
-import org.apache.maven.settings.crypto.SettingsDecrypter;
-import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.RepositoryListener;
@@ -69,6 +65,7 @@ import org.eclipse.aether.util.graph.version.LowestVersionFilter;
 import org.eclipse.aether.util.graph.version.PredicateVersionFilter;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
+import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
@@ -122,8 +119,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
     private final RepositorySystem repoSystem;
 
-    private final SettingsDecrypter settingsDecrypter;
-
     private final EventSpyDispatcher eventSpyDispatcher;
 
     private final RuntimeInformation runtimeInformation;
@@ -140,7 +135,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
     @Inject
     DefaultRepositorySystemSessionFactory(
             RepositorySystem repoSystem,
-            SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
             RuntimeInformation runtimeInformation,
             TypeRegistry typeRegistry,
@@ -148,7 +142,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             Map<String, MavenExecutionRequestExtender> requestExtenders,
             Map<String, RepositorySystemSessionExtender> sessionExtenders) {
         this.repoSystem = repoSystem;
-        this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.runtimeInformation = runtimeInformation;
         this.typeRegistry = typeRegistry;
@@ -205,25 +198,9 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
                 request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
-        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(Constants.MAVEN_VERSION_FILTERS));
+        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(Constants.MAVEN_VERSION_FILTER));
         if (versionFilter != null) {
             sessionBuilder.setVersionFilter(versionFilter);
-        }
-
-        DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
-        decrypt.setProxies(request.getProxies());
-        decrypt.setServers(request.getServers());
-        SettingsDecryptionResult decrypted = settingsDecrypter.decrypt(decrypt);
-        for (SettingsProblem problem : decrypted.getProblems()) {
-            if (problem.getSeverity() == SettingsProblem.Severity.WARNING) {
-                logger.warn(problem.getMessage());
-            } else if (problem.getSeverity() == SettingsProblem.Severity.ERROR) {
-                logger.error(
-                        problem.getMessage(),
-                        request.isShowErrors()
-                                ? problem.getException()
-                                : problem.getException().getMessage());
-            }
         }
 
         DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
@@ -240,7 +217,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setMirrorSelector(mirrorSelector);
 
         DefaultProxySelector proxySelector = new DefaultProxySelector();
-        for (Proxy proxy : decrypted.getProxies()) {
+        for (Proxy proxy : request.getProxies()) {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
             authBuilder.addUsername(proxy.getUsername()).addPassword(proxy.getPassword());
             proxySelector.add(
@@ -253,7 +230,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         // Note: we do NOT use WagonTransportConfigurationKeys here as Maven Core does NOT depend on Wagon Transport
         // and this is okay and "good thing".
         DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
-        for (Server server : decrypted.getServers()) {
+        for (Server server : request.getServers()) {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
             authBuilder.addUsername(server.getUsername()).addPassword(server.getPassword());
             authBuilder.addPrivateKey(server.getPrivateKey(), server.getPassphrase());
@@ -392,15 +369,28 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                 supplier.getDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
         ArrayList<Path> paths = new ArrayList<>();
+        String localRepoHead = mergedProps.get(Constants.MAVEN_REPO_LOCAL_HEAD);
+        if (localRepoHead != null) {
+            Arrays.stream(localRepoHead.split(","))
+                    .filter(p -> p != null && !p.trim().isEmpty())
+                    .map(this::resolve)
+                    .forEach(paths::add);
+        }
         paths.add(Paths.get(request.getLocalRepository().getBasedir()));
         String localRepoTail = mergedProps.get(Constants.MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
                     .filter(p -> p != null && !p.trim().isEmpty())
-                    .map(Paths::get)
+                    .map(this::resolve)
                     .forEach(paths::add);
         }
         sessionBuilder.withLocalRepositoryBaseDirectories(paths);
+        // Pass over property supported by Maven 3.9.x
+        if (mergedProps.containsKey(Constants.MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY)) {
+            configProps.put(
+                    ChainedLocalRepositoryManager.CONFIG_PROP_IGNORE_TAIL_AVAILABILITY,
+                    mergedProps.get(Constants.MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
+        }
 
         for (RepositorySystemSessionExtender extender : sessionExtenders.values()) {
             extender.extend(request, configProps, mirrorSelector, proxySelector, authSelector);
@@ -417,6 +407,19 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setConfigProperties(finalConfigProperties);
 
         return sessionBuilder;
+    }
+
+    private Path resolve(String string) {
+        if (string.startsWith("~/") || string.startsWith("~\\")) {
+            // resolve based on $HOME
+            return Paths.get(System.getProperty("user.home"))
+                    .resolve(string.substring(2))
+                    .normalize()
+                    .toAbsolutePath();
+        } else {
+            // resolve based on $CWD
+            return Paths.get(string).normalize().toAbsolutePath();
+        }
     }
 
     private VersionFilter buildVersionFilter(String filterExpression) {

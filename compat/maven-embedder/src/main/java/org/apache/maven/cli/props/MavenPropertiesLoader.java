@@ -28,6 +28,7 @@ import java.util.function.Function;
 
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 
+@Deprecated
 public class MavenPropertiesLoader {
 
     public static final String INCLUDES_PROPERTY = "${includes}"; // includes

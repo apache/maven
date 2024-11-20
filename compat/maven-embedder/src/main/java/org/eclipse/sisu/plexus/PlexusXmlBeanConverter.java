@@ -53,6 +53,7 @@ import org.eclipse.sisu.inject.TypeArguments;
  */
 @Singleton
 @Priority(10)
+@Deprecated
 public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
     // ----------------------------------------------------------------------
     // Constants

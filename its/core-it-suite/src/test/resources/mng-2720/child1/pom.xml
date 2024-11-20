@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng2720</groupId>
+    <artifactId>project-hierarchy</artifactId>
+    <version>1</version>
+  </parent>
+
+  <artifactId>child1</artifactId>
+
+  <name>MNG-2720 Project Hierarchy 1 Child 1</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-artifact</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>package</id>
+            <goals>
+              <!-- emulate package phase -->
+              <goal>set</goal>
+              <goal>attach-pom</goal>
+              <goal>attach</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <mainFile>main.jar</mainFile>
+              <attachedFile>test.jar</attachedFile>
+              <artifactType>test-jar</artifactType>
+              <artifactClassifier>tests</artifactClassifier>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <outputDirectory>main</outputDirectory>
+    <testOutputDirectory>test</testOutputDirectory>
+  </build>
+</project>

@@ -1,0 +1,27 @@
+<settings>
+  <profiles>
+    <profile>
+      <id>apache</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <run-its>true</run-its>
+      </properties>
+    </profile>
+    <profile>
+      <id>release</id>
+      <properties>
+        <gpg.passphrase>verycomplicatedpassphrase</gpg.passphrase>
+      </properties>
+    </profile>
+    <profile>
+      <id>fast</id>
+      <properties>
+        <maven.test.skip>true</maven.test.skip>
+        <skipTests>true</skipTests>
+      </properties>
+    </profile>
+  </profiles>
+</settings>
+

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng3775</groupId>
+  <artifactId>abc</artifactId>
+  <version>0.1</version>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: MNG-3775</name>
+  <description>Verify that conflict resolution doesn't select nodes which are children of eventually disabled nodes.
+    In other words, when a subtree gets disabled, all previously selected winners among the children need to
+    be revised.</description>
+
+  <dependencies>
+    <!--
+    project
+    +- a:compile
+    |  \- b:compile
+    |     \- x:compile
+    +- b:compile
+    \- c:test
+       \- x:test
+    -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng3775</groupId>
+      <artifactId>a</artifactId>
+      <version>0.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.mng3775</groupId>
+      <artifactId>b</artifactId>
+      <version>0.1</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <!-- NOTE: This exclusion of a dependency shared with c is a crucial piece of this test -->
+          <groupId>org.apache.maven.its.mng3775</groupId>
+          <artifactId>x</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.mng3775</groupId>
+      <artifactId>c</artifactId>
+      <version>0.1</version>
+      <!-- NOTE: This dependency having a narrower scope than compile is a crucial piece of this test -->
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <compileClassPath>target/compile.txt</compileClassPath>
+          <testClassPath>target/test.txt</testClassPath>
+          <significantPathLevels>1</significantPathLevels>
+        </configuration>
+        <executions>
+          <execution>
+            <id>resolve</id>
+            <goals>
+              <goal>compile</goal>
+              <goal>test</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

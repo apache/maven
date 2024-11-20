@@ -23,10 +23,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker;
+import org.apache.maven.cling.invoker.mvnenc.EncryptContext;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
-import static org.apache.maven.cling.invoker.mvnenc.DefaultEncryptInvoker.ERROR;
+import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.ERROR;
 
 /**
  * The support class for goal implementations that requires valid/workable config.
@@ -37,7 +37,7 @@ public abstract class ConfiguredGoalSupport extends GoalSupport {
     }
 
     @Override
-    public int execute(DefaultEncryptInvoker.LocalContext context) throws Exception {
+    public int execute(EncryptContext context) throws Exception {
         if (!validateConfiguration(context)) {
             context.terminal
                     .writer()
@@ -50,7 +50,7 @@ public abstract class ConfiguredGoalSupport extends GoalSupport {
         return doExecute(context);
     }
 
-    protected boolean validateConfiguration(DefaultEncryptInvoker.LocalContext context) {
+    protected boolean validateConfiguration(EncryptContext context) {
         SecDispatcher.ValidationResponse response = secDispatcher.validateConfiguration();
         if (!response.isValid() || context.invokerRequest.options().verbose().orElse(false)) {
             dumpResponse(context, "", response);
@@ -58,8 +58,7 @@ public abstract class ConfiguredGoalSupport extends GoalSupport {
         return response.isValid();
     }
 
-    protected void dumpResponse(
-            DefaultEncryptInvoker.LocalContext context, String indent, SecDispatcher.ValidationResponse response) {
+    protected void dumpResponse(EncryptContext context, String indent, SecDispatcher.ValidationResponse response) {
         context.terminal
                 .writer()
                 .println(messageBuilderFactory
@@ -100,5 +99,5 @@ public abstract class ConfiguredGoalSupport extends GoalSupport {
         }
     }
 
-    protected abstract int doExecute(DefaultEncryptInvoker.LocalContext context) throws Exception;
+    protected abstract int doExecute(EncryptContext context) throws Exception;
 }

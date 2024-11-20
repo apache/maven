@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+  <parent>
+    <relativePath>../foo</relativePath>
+  </parent>
+  <groupId>org.apache.maven.its.mng8294</groupId>
+  <artifactId>parent</artifactId>
+  <version>0.1-SNAPSHOT</version>
+</project>

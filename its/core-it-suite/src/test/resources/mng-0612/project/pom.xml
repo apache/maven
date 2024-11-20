@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.it0125</groupId>
+  <artifactId>maven-it-it0125</artifactId>
+  <version>1.0</version>
+  <name>Maven Integration Test :: it0125</name>
+  <description>Test that ensures the newest-wins conflict resolver is used.</description>
+  <properties>
+    <mavenConflictResolvers>newest</mavenConflictResolvers>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.it0125</groupId>
+      <artifactId>maven-it-it0125-dependency</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>maven-core-it-support</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.it0125</groupId>
+        <artifactId>maven-it-it0125-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>dependencies</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-verifier-plugin</artifactId>
+        <configuration>
+          <verificationFile>src/test/verifier/verifications-test.xml</verificationFile>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

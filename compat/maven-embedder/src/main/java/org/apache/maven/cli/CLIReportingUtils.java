@@ -33,6 +33,7 @@ import org.slf4j.Logger;
  * Utility class used to report errors, statistics, application version info, etc.
  *
  */
+@Deprecated
 public final class CLIReportingUtils {
     // CHECKSTYLE_OFF: MagicNumber
     public static final long MB = 1024 * 1024;

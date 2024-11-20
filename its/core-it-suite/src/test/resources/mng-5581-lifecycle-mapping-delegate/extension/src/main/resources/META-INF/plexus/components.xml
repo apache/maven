@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.Lifecycle</role>
+      <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+      <role-hint>post</role-hint>
+      <configuration>
+        <id>test-only</id>
+        <phases>
+          <phase>test-only</phase>
+        </phases>
+      </configuration>
+    </component>
+  </components>
+</component-set>

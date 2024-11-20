@@ -1,0 +1,3 @@
+When plugin configuration in the POM uses project.build.directory or another _prefixed_ build-path expression (i.e. not build.directory but project.build.directory), and the build/directory (or whatever path it references) is given as a relative location in the POM, AND the plugin configuration is not a File...then, that interpolation result is coming up as a relative path. This is because the interpolator post-processor in charge of translating build paths to their absolute values as interpolation occurs is not prefix-aware. The expression build.directory will work fine, but project.build.directory does not.
+
+This test verifies that the above problem is fixed.

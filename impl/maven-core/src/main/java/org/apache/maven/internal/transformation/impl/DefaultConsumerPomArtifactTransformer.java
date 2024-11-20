@@ -36,8 +36,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
-import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.v4.MavenStaxWriter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
@@ -112,7 +112,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
     }
 
     void transform(MavenProject project, RepositorySystemSession session, Path src, Path tgt)
-            throws ModelBuildingException, XMLStreamException, IOException {
+            throws ModelBuilderException, XMLStreamException, IOException {
         Model model = builder.build(session, project, src);
         write(model, tgt);
     }

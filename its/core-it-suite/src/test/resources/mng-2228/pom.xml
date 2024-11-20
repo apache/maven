@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng2228</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0</version>
+
+  <name>Maven Integration Test :: MNG-2228</name>
+  <description>Verify that components injected into plugins are actually assignment-compatible with the corresponding mojo
+    fields in case the field type is both provided by a plugin dependency and by a build extension.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-class-loader</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <dependencies>
+          <!-- load component api and implementation into plugin realm -->
+          <dependency>
+            <groupId>org.apache.maven.its.mng2228</groupId>
+            <artifactId>api</artifactId>
+            <version>0.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven.its.mng2228</groupId>
+            <artifactId>component</artifactId>
+            <version>0.1</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>api</id>
+            <goals>
+              <goal>instanceof</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <className>org.apache.maven.its.mng2228.Component</className>
+              <instanceofPropertiesFile>target/api.properties</instanceofPropertiesFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <extensions>
+      <!-- load component api and implementation into core/extension realm -->
+      <extension>
+        <groupId>org.apache.maven.its.mng2228</groupId>
+        <artifactId>component</artifactId>
+        <version>0.1</version>
+      </extension>
+    </extensions>
+  </build>
+</project>

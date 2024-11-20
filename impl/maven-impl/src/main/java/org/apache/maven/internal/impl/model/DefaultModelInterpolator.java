@@ -123,7 +123,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
     }
 
     protected List<String> getProjectPrefixes(ModelBuilderRequest request) {
-        return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_POM
+        return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
                 ? PROJECT_PREFIXES_4_0
                 : PROJECT_PREFIXES_3_1;
     }

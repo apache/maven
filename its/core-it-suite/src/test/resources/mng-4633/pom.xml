@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4633</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: MNG-4633 : Parent pom</name>
+  <description>Interleaved access to "artifact.getFile()</description>
+
+  <modules>
+    <module>subproject1</module>
+    <module>subproject2</module>
+  </modules>
+</project>

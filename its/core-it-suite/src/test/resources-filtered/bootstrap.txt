@@ -1,0 +1,6 @@
+#0
+#1   This file contains a list of artifacts that will be downloaded (with their transitive dependencies)
+#2   during the bootstrap phase.
+#3   It should be kept sorted alphabetically using the following commands:
+#4     mv bootstrap.txt tmp.txt && cat tmp.txt | sort -u > bootstrap.txt && rm tmp.txt
+#5

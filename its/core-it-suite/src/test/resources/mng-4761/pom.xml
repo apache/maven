@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4761</groupId>
+  <artifactId>mng4761</artifactId>
+  <version>0.1</version>
+  <packaging>pom</packaging>
+  <name>Integration Test for MNG-4761</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.mng4761</groupId>
+        <artifactId>maven-mng4761-plugin</artifactId>
+        <version>0.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.its.mng4761</groupId>
+            <artifactId>override-dep</artifactId>
+            <version>0.1</version>
+          </dependency>
+        </dependencies>
+
+        <executions>
+          <execution>
+            <id>test-run</id>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -34,7 +34,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.cli.CleanArgument;
 import org.apache.maven.jline.MessageUtils;
 
 import static java.util.Objects.requireNonNull;

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>Maven Integration Test :: MNG-4357 :: Extension</name>
+      <prefix>extension</prefix>
+      <artifactId>extension</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

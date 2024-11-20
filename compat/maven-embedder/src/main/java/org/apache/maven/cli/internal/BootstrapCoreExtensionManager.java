@@ -87,6 +87,7 @@ import org.slf4j.LoggerFactory;
 /**
  * BootstrapCoreExtensionManager
  */
+@Deprecated
 @Named
 public class BootstrapCoreExtensionManager {
     public static final String STRATEGY_PARENT_FIRST = "parent-first";

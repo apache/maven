@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng0870</groupId>
+    <artifactId>test</artifactId>
+    <version>1-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.apache.maven.its.mng0870</groupId>
+  <artifactId>it-maven-plugin</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+
+  <name>Maven Integration Test :: MNG-870 :: Test Plugin</name>
+  <description>Test that the reactor can resolve plugins that have just been built by a previous module and are not yet
+    installed to the local repo.</description>
+
+  <properties>
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>3.8.6</version>
+    </dependency>
+    <dependency>
+      <!--
+      NOTE: It's an essential part of the test to have a dependency that is not part of the core to check the plugin
+      POM is resolved, too.
+      -->
+      <groupId>org.apache.maven.its.mng0870</groupId>
+      <artifactId>dep</artifactId>
+      <version>0.1</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>pom.xml</include>
+          <include>src/**</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <!-- We don't build the plugin from sources here but use the ready-made plugin artifact -->
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-artifact</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <mainFile>it-maven-plugin-0.1-SNAPSHOT.jar</mainFile>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>set</goal>
+            </goals>
+            <phase>initialize</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

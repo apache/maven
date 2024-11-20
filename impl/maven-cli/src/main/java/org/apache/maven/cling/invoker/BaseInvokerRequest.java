@@ -28,26 +28,20 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 
 import static java.util.Objects.requireNonNull;
 
-public abstract class BaseInvokerRequest<T extends Options> implements InvokerRequest<T> {
-    private final ParserRequest parserRequest;
-    private final Path cwd;
-    private final Path installationDirectory;
-    private final Path userHomeDirectory;
+public abstract class BaseInvokerRequest extends BaseExecutorRequest implements InvokerRequest {
     private final Map<String, String> userProperties;
     private final Map<String, String> systemProperties;
     private final Path topDirectory;
     private final Path rootDirectory;
-
+    private final List<CoreExtension> coreExtensions;
     private final InputStream in;
     private final OutputStream out;
     private final OutputStream err;
-    private final List<CoreExtension> coreExtensions;
 
     @SuppressWarnings("ParameterNumber")
     public BaseInvokerRequest(
@@ -62,40 +56,18 @@ public abstract class BaseInvokerRequest<T extends Options> implements InvokerRe
             @Nullable InputStream in,
             @Nullable OutputStream out,
             @Nullable OutputStream err,
-            @Nullable List<CoreExtension> coreExtensions) {
-        this.parserRequest = requireNonNull(parserRequest);
-        this.cwd = requireNonNull(cwd);
-        this.installationDirectory = requireNonNull(installationDirectory);
-        this.userHomeDirectory = requireNonNull(userHomeDirectory);
+            @Nullable List<CoreExtension> coreExtensions,
+            @Nullable List<String> jvmArguments) {
+        super(parserRequest, cwd, installationDirectory, userHomeDirectory, jvmArguments);
         this.userProperties = requireNonNull(userProperties);
         this.systemProperties = requireNonNull(systemProperties);
         this.topDirectory = requireNonNull(topDirectory);
         this.rootDirectory = rootDirectory;
+        this.coreExtensions = coreExtensions;
 
         this.in = in;
         this.out = out;
         this.err = err;
-        this.coreExtensions = coreExtensions;
-    }
-
-    @Override
-    public ParserRequest parserRequest() {
-        return parserRequest;
-    }
-
-    @Override
-    public Path cwd() {
-        return cwd;
-    }
-
-    @Override
-    public Path installationDirectory() {
-        return installationDirectory;
-    }
-
-    @Override
-    public Path userHomeDirectory() {
-        return userHomeDirectory;
     }
 
     @Override

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -104,7 +105,7 @@ public class DefaultVersionResolver implements VersionResolver {
 
         Key cacheKey = null;
         RepositoryCache cache = session.getCache();
-        if (cache != null && !ConfigUtils.getBoolean(session, false, "aether.versionResolver.noCache")) {
+        if (cache != null && !ConfigUtils.getBoolean(session, false, Constants.MAVEN_VERSION_RESOLVER_NO_CACHE)) {
             cacheKey = new Key(session, request);
 
             Object obj = cache.get(session, cacheKey);

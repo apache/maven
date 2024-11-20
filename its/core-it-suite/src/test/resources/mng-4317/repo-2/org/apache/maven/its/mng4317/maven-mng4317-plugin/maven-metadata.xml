@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.maven.its.mng4317</groupId>
+  <artifactId>maven-mng4317-plugin</artifactId>
+  <version>0.1</version>
+  <versioning>
+    <latest>0.2</latest>
+    <release>0.2</release>
+    <versions>
+      <version>0.1</version>
+      <version>0.2</version>
+    </versions>
+    <lastUpdated>20090824084140</lastUpdated>
+  </versioning>
+</metadata>

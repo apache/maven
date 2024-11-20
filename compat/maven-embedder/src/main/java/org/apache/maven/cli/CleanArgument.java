@@ -24,6 +24,7 @@ import java.util.List;
 /**
  * CleanArgument
  */
+@Deprecated
 public class CleanArgument {
     public static String[] cleanArgs(String[] args) {
         try {

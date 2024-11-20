@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ejb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD Enterprise JavaBeans 2.0//EN" "http://java.sun.com/dtd/ejb-jar_2_0.dtd">
+<ejb-jar>
+  <display-name>IssueMEJB18</display-name>
+  <enterprise-beans>
+    <session>
+      <ejb-name>MEJB18</ejb-name>
+      <home>mejb.Issue18Home</home>
+      <remote>mejb.Issue18</remote>
+      <ejb-class>mejb.Issue18Bean</ejb-class>
+      <session-type>Stateless</session-type>
+    </session>
+  </enterprise-beans>
+</ejb-jar>

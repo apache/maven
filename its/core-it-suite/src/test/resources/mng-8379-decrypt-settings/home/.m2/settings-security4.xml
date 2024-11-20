@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<settingsSecurity xmlns="http://codehaus-plexus.github.io/plexus-sec-dispatcher/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://codehaus-plexus.github.io/plexus-sec-dispatcher/4.0.0 https://codehaus-plexus.github.io/xsd/plexus-sec-dispatcher-4.0.0.xsd">
+  <modelVersion>4.0</modelVersion>
+  <defaultDispatcher>master</defaultDispatcher>
+  <configurations>
+    <configuration>
+      <name>master</name>
+      <properties>
+        <property>
+          <name>source</name>
+          <value>env:MAVEN_MASTER_PASSWORD</value>
+        </property>
+        <property>
+          <name>cipher</name>
+          <value>AES/GCM/NoPadding</value>
+        </property>
+      </properties>
+    </configuration>
+  </configurations>
+</settingsSecurity>

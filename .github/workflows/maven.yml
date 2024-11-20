@@ -17,128 +17,189 @@
 
 name: Java CI
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 # clear all permissions for GITHUB_TOKEN
 permissions: {}
 
 jobs:
-  build:
-
-    # execute on any push, workflow_dispatch  or pull request from forked repo
-    if: >
-      github.event_name == 'push' ||
-      github.event_name == 'workflow_dispatch' ||
-      ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork )
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
-
+  initial-build:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-java@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'temurin'
-          cache: 'maven'
 
-      - name: Set up Maven
-        run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.7"
-
-      - name: Build with Maven
-        run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven
-
-      - name: Upload built Maven
-        uses: actions/upload-artifact@v4
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        with:
-          name: built-maven
-          path: apache-maven/target/
-
-  integration-test:
-    needs: build
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [17, 21]
-
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: Collect environment context variables
-        shell: bash
-        env:
-          PR_HEAD_LABEL: ${{ github.event.pull_request.head.label }}
-        run: |
-          set +e
-          repo=maven-integration-testing
-          target_branch=master
-          target_user=apache
-          if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-            user=${PR_HEAD_LABEL%:*}
-            branch=${PR_HEAD_LABEL#*:}
-          else
-            user=${GITHUB_REPOSITORY%/*}
-            branch=${GITHUB_REF#refs/heads/}
-          fi
-          if [ $branch != "master" ]; then
-            git ls-remote https://github.com/$user/$repo.git | grep "refs/heads/${branch}$" > /dev/null
-            if [ $? -eq 0 ]; then
-              echo "Found a branch \"$branch\" in fork \"$user/$repo\", configuring this for the integration tests to be run against."
-              target_branch=$branch
-              target_user=$user
-            else
-              echo "Could not find fork \"$user/$repo\" or a branch \"$branch\" in this fork. Falling back to \"$target_branch\" in \"$target_user/$repo\"."
-            fi
-          else
-            echo "Integration tests will run against $target_user/$repo for master builds."
-          fi
-          echo "REPO_BRANCH=$target_branch" >> $GITHUB_ENV
-          echo "REPO_USER=$target_user" >> $GITHUB_ENV
-
-      - name: Checkout maven-integration-testing
+      - name: Checkout maven
         uses: actions/checkout@v4
         with:
-          repository: ${{ env.REPO_USER }}/maven-integration-testing
-          path: maven-integration-testing/
-          ref: ${{ env.REPO_BRANCH }}
           persist-credentials: false
 
-      - name: Set up JDK
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/cached
+          key: maven-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-initial-
+            maven-${{ runner.os }}-
+
+      - name: Set up Maven
+        shell: bash
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-beta-4"
+
+      - name: Build Maven distributions
+        shell: bash
+        run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven -Dmaven.repo.local=$HOME/.m2/repository/cached
+
+      - name: List contents of target directory
+        shell: bash
+        run: ls -la apache-maven/target
+
+      - name: Upload Maven distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-distributions
+          path: |
+            apache-maven/target/apache-maven*.zip
+            apache-maven/target/apache-maven*.tar.gz
+
+  full-build:
+    needs: initial-build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        java: ['17', '21']
+    steps:
+      - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-#          cache: 'maven' - don't use cache for integration tests
 
-      - uses: actions/checkout@v4
+      - name: Install Graphviz (MacOS)
+        if: runner.os == 'macOS'
+        run: brew install graphviz
+
+      - name: Install Graphviz (Ubuntu)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install graphviz
+
+      - name: Install Graphviz (Windows)
+        if: runner.os == 'Windows'
+        run: choco install graphviz
+
+      - name: Checkout maven
+        uses: actions/checkout@v4
         with:
-          path: maven/
           persist-credentials: false
 
-      - name: Set up Maven
-        run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.7"
-
-      - name: Build Maven
-        run: ./mvnw install -e -B -V -DdistributionFileName=apache-maven -DskipTests -f maven/pom.xml
-
-      - name: Running integration tests
-        shell: bash
-        run: ./mvnw install -e -B -V -Prun-its,embedded -DmavenDistro="$GITHUB_WORKSPACE/maven/apache-maven/target/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
-
-      - name: Upload artifact on integration testing
-        uses: actions/upload-artifact@v4
-        if: failure() && matrix.os != 'windows-latest'
+      - name: Download Maven distribution
+        uses: actions/download-artifact@v4
         with:
-          name: ${{ github.run_number }}-integration-test-artifact-${{ matrix.os }}-${{ matrix.java }}
-          path: ./maven-integration-testing/core-it-suite/target/test-classes/
+          name: maven-distributions
+          path: maven-dist
+
+      - name: List downloaded files
+        shell: bash
+        run: ls -la maven-dist
+
+      - name: Extract Maven distribution
+        shell: bash
+        run: |
+          mkdir -p maven-local
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            unzip maven-dist/apache-maven-bin.zip -d maven-local
+          else
+            tar xzf maven-dist/apache-maven-bin.tar.gz -C maven-local --strip-components 1
+          fi
+          echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
+          echo "$PWD/maven-local/bin" >> $GITHUB_PATH
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/cached
+          key: maven-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-full-
+            maven-${{ runner.os }}-
+
+      - name: Build site with downloaded Maven
+        shell: bash
+        run: mvn verify site -e -B -V -Preporting -Dmaven.repo.local=$HOME/.m2/repository/cached
+
+  integration-tests:
+    needs: initial-build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        java: ['17', '21']
+    steps:
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+
+      - name: Checkout maven
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Download Maven distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-distributions
+          path: maven-dist
+
+      - name: List downloaded files
+        shell: bash
+        run: ls -la maven-dist
+
+      - name: Extract Maven distribution
+        shell: bash
+        run: |
+          mkdir -p maven-local
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            unzip maven-dist/apache-maven-bin.zip -d maven-local
+            # Get the name of the extracted directory
+            MAVEN_DIR=$(ls maven-local)
+            # Move contents up one level
+            mv "maven-local/$MAVEN_DIR"/* maven-local/
+            rm -r "maven-local/$MAVEN_DIR"
+          else
+            tar xzf maven-dist/apache-maven-bin.tar.gz -C maven-local --strip-components 1
+          fi
+          echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
+          echo "$PWD/maven-local/bin" >> $GITHUB_PATH
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/cached
+          key: maven-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-its
+            maven-${{ runner.os }}-
+
+      - name: Run integration tests
+        shell: bash
+        run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local=$HOME/.m2/repository/local -Dmaven.repo.local.tail=$HOME/.m2/repository/cached
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
+          path: ./its/core-it-suite/target/test-classes/

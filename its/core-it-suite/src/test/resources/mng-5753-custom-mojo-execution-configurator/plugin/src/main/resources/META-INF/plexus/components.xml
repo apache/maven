@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-set>
+  <components>
+    <component>
+      <role>org.codehaus.plexus.component.configurator.ComponentConfigurator</role>
+      <role-hint>test</role-hint>
+      <implementation>org.codehaus.plexus.component.configurator.BasicComponentConfigurator</implementation>
+    </component>
+    <component>
+      <role>org.apache.maven.lifecycle.MojoExecutionConfigurator</role>
+      <role-hint>test</role-hint>
+      <implementation>org.apache.maven.its.mng5753.plugin.TestMojoExecutionConfigurator</implementation>
+    </component>
+  </components>
+</component-set>

@@ -49,4 +49,21 @@ public class InvokerException extends MavenException {
     public InvokerException(@Nullable String message, @Nullable Throwable cause) {
         super(message, cause);
     }
+
+    /**
+     * Exception for intentional exit: No message or anything will be displayed, just the
+     * carried exit code will be returned from invoker {@link Invoker#invoke(InvokerRequest)} method.
+     */
+    public static final class ExitException extends InvokerException {
+        private final int exitCode;
+
+        public ExitException(int exitCode) {
+            super("EXIT");
+            this.exitCode = exitCode;
+        }
+
+        public int getExitCode() {
+            return exitCode;
+        }
+    }
 }

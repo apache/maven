@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng5608</groupId>
+  <artifactId>profile-test</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+
+  <name>MNG-5608 - Profile activation warning test when file specification contains ${project.basedir}</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-touch</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- ${project.basedir} not supported for profile activation -->
+    <profile>
+      <id>mng-5608-exists-project.basedir</id>
+      <activation>
+        <file>
+          <exists>${project.basedir}/pom.xml</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-touch</artifactId>
+            <configuration>
+              <fail>true</fail>
+              <!-- this profile should not be activated -->
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>mng-5608-missing-project.basedir</id>
+      <activation>
+        <file>
+          <missing>${project.basedir}/pom.xml</missing>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-touch</artifactId>
+            <configuration>
+              <pluginItem>mng-5608-missing-project.basedir</pluginItem>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- for reference: ${basedir} supported for profile activation, see MNG-2363 -->
+    <profile>
+      <id>exists-basedir</id>
+      <activation>
+        <file>
+          <exists>${basedir}/pom.xml</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-touch</artifactId>
+            <configuration>
+              <goalItem>exists-basedir</goalItem>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>missing-basedir</id>
+      <activation>
+        <file>
+          <missing>${basedir}/pom.xml</missing>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-touch</artifactId>
+            <configuration>
+              <fail>true</fail>
+              <!-- this profile should not be activated -->
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

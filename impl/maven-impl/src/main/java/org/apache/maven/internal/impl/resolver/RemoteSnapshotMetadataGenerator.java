@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.maven.api.Constants;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.deployment.DeployRequest;
@@ -46,7 +47,7 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
 
     RemoteSnapshotMetadataGenerator(RepositorySystemSession session, DeployRequest request) {
         timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
-        Object bn = ConfigUtils.getObject(session, null, "maven.buildNumber");
+        Object bn = ConfigUtils.getObject(session, null, Constants.MAVEN_DEPLOY_SNAPSHOT_BUILD_NUMBER);
         if (bn instanceof Integer) {
             this.buildNumber = (Integer) bn;
         } else if (bn instanceof String) {

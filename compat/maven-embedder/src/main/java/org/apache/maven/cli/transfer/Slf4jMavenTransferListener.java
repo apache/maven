@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Slf4jMavenTransferListener
  */
+@Deprecated
 public class Slf4jMavenTransferListener extends AbstractTransferListener {
 
     protected final Logger out;

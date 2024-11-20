@@ -22,4 +22,5 @@ import org.eclipse.aether.transfer.AbstractTransferListener;
 
 /**
  */
+@Deprecated
 public class QuietMavenTransferListener extends AbstractTransferListener {}

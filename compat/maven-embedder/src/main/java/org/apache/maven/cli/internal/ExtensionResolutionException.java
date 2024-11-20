@@ -24,6 +24,7 @@ import org.apache.maven.api.cli.extensions.CoreExtension;
  * Exception occurring trying to resolve a plugin.
  *
  */
+@Deprecated
 public class ExtensionResolutionException extends Exception {
 
     private final CoreExtension extension;

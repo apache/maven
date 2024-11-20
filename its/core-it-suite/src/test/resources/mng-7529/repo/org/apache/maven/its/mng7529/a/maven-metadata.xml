@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <groupId>org.apache.maven.its.mng7529</groupId>
+  <artifactId>a</artifactId>
+  <version>1.0</version>
+  <versioning>
+    <release>1.1</release>
+    <versions>
+      <version>1.0</version>
+      <version>1.1</version>
+    </versions>
+    <lastUpdated>20220820180700</lastUpdated>
+  </versioning>
+</metadata>

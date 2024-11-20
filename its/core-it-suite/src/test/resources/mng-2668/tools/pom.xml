@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng2668</groupId>
+    <artifactId>test-project</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>tools</artifactId>
+
+  <name>Maven Integration Test :: MNG-2539 :: Plugin Dependency Provider</name>
+  <description>Verify that dependencies of plugins are considered by the project sorter for a reactor build.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-artifact</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <mainFile>pom.xml</mainFile>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>set</goal>
+              <goal>install</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

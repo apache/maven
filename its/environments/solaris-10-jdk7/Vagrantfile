@@ -1,0 +1,54 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "tnarik/solaris10-minimal"
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    v.cpus = 2
+  end
+
+  config.vm.provision "file", source:"jdk-7u80-solaris-i586.tar.Z", destination:"jdk-7u80-solaris-i586.tar.Z"
+  config.vm.provision "file", source:"jdk-7u80-solaris-x64.tar.Z", destination:"jdk-7u80-solaris-x64.tar.Z"
+  config.vm.provision "file", source:"apache-maven-3.3.9-bin.tar.gz", destination:"apache-maven-3.3.9-bin.tar.gz"
+  config.vm.provision "file", source:"apache-maven-3.3.9.patch", destination:"apache-maven-3.3.9.patch"
+  config.vm.provision "file", source:"admin", destination:"admin"
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo pkgadd -d http://get.opencsw.org/now -a/export/home/vagrant/admin CSWpkgutil &&\
+    sudo /opt/csw/bin/pkgutil -U &&\
+    sudo /opt/csw/bin/pkgutil -y -i git &&\
+    zcat jdk-7u80-solaris-i586.tar.Z | tar xf - > /dev/null 2>&1 &&\
+    sudo pkgadd -n -a/export/home/vagrant/admin -d . SUNWj7rt SUNWj7dev SUNWj7cfg SUNWj7man > /dev/null 2>&1 &&\
+    zcat jdk-7u80-solaris-x64.tar.Z | tar xf - > /dev/null 2>&1 &&\
+    sudo pkgadd -n -a/export/home/vagrant/admin -d . SUNWj7rtx SUNWj7dvx > /dev/null 2>&1 &&\
+    rm -rf jdk-7u80-solaris-i586.tar.Z jdk-7u80-solaris-x64.tar.Z SUNWj7rt SUNWj7jmp SUNWj7dev SUNWj7cfg SUNWj7man SUNWj7rtx SUNWj7dvx SUNWj7dmx COPYRIGHT LICENSE README.html THIRDPARTYLICENSEREADME.txt admin > /dev/null 2>&1 &&\
+    gunzip -c apache-maven-3.3.9-bin.tar.gz | sudo sh -c "cd /opt; tar xf - " 2>&1 &&\
+    sudo patch -i apache-maven-3.3.9.patch /opt/apache-maven-3.3.9/bin/mvn &&\
+    sudo ln -s /opt/apache-maven-3.3.9/bin/mvn /usr/bin/mvn &&\
+    rm -rf apache-maven-3.3.9-bin.tar.gz apache-maven-3.3.9.patch &&\
+    sudo sh -c "echo JAVA_HOME=/usr/jdk/jdk1.7.0_80 >> /etc/profile" &&\
+    sudo sh -c "echo export JAVA_HOME >> /etc/profile" &&\
+    sudo sh -c "echo MAVEN_HOME=/opt/apache-maven-3.3.9 >> /etc/profile" &&\
+    sudo sh -c "echo export MAVEN_HOME >> /etc/profile" &&\
+    sudo sh -c "echo PATH=${MAVEN_HOME}/bin:${PATH} >> /etc/profile" &&\
+    sudo sh -c "echo export PATH >> /etc/profile"
+  SHELL
+end

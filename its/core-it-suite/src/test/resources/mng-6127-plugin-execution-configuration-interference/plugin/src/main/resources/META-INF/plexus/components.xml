@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-set>
+    <components>
+        <component>
+            <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+            <role-hint>mng-6127</role-hint>
+            <implementation>
+                org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+            </implementation>
+            <configuration>
+                <lifecycles>
+                    <lifecycle>
+                        <id>default</id>
+                        <lifecyclePhases>
+                            <generate-sources>
+                              <mojos>
+                                <mojo>
+                                  <goal>mng-6127:mng-6127-plugin:test</goal>
+                                  <configuration>
+                                    <secondName>second from components.xml</secondName>
+                                  </configuration>
+                                </mojo>
+                              </mojos>
+                            </generate-sources>
+                        </lifecyclePhases>
+                    </lifecycle>
+                </lifecycles>
+            </configuration>
+        </component>
+        <component>
+            <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+            <role-hint>mng-6127</role-hint>
+            <implementation>
+                org.apache.maven.artifact.handler.DefaultArtifactHandler
+            </implementation>
+            <configuration>
+                <type>mng-6127</type>
+                <extension>jar</extension>
+                <language>java</language>
+                <addedToClasspath>true</addedToClasspath>
+            </configuration>
+        </component>
+    </components>
+</component-set>

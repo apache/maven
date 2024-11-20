@@ -24,8 +24,6 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -35,7 +33,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
@@ -43,7 +40,6 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
-import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.SettingsBuilder;
@@ -62,14 +58,13 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.cli.CLIReportingUtils;
-import org.apache.maven.cli.logging.Slf4jConfiguration;
-import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
-import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
-import org.apache.maven.cli.transfer.QuietMavenTransferListener;
-import org.apache.maven.cli.transfer.SimplexTransferListener;
-import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
-import org.apache.maven.cling.invoker.mvn.ProtoSession;
+import org.apache.maven.cling.logging.Slf4jConfiguration;
+import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
+import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
+import org.apache.maven.cling.transfer.QuietMavenTransferListener;
+import org.apache.maven.cling.transfer.SimplexTransferListener;
+import org.apache.maven.cling.transfer.Slf4jMavenTransferListener;
+import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
@@ -82,7 +77,6 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
 
@@ -91,108 +85,11 @@ import static org.apache.maven.cling.invoker.Utils.toMavenExecutionRequestLoggin
 import static org.apache.maven.cling.invoker.Utils.toProperties;
 
 /**
- * Plexus invoker implementation, that boots up Plexus DI container. This class expects fully setup ClassWorld via constructor.
+ * Lookup invoker implementation, that boots up DI container.
  *
- * @param <O> the options type
- * @param <R> the request type
- * @param <C> the context type
+ * @param <C> The context type.
  */
-public abstract class LookupInvoker<
-                O extends Options, R extends InvokerRequest<O>, C extends LookupInvoker.LookupInvokerContext<O, R, C>>
-        implements Invoker<R> {
-
-    /**
-     * Exception for intentional exit: No message or anything will be displayed, just the
-     * carried exit code will be returned from {@link #invoke(InvokerRequest)} method.
-     */
-    public static final class ExitException extends InvokerException {
-        private final int exitCode;
-
-        public ExitException(int exitCode) {
-            super("EXIT");
-            this.exitCode = exitCode;
-        }
-    }
-
-    @SuppressWarnings("VisibilityModifier")
-    public static class LookupInvokerContext<
-                    O extends Options, R extends InvokerRequest<O>, C extends LookupInvokerContext<O, R, C>>
-            implements AutoCloseable {
-        public final LookupInvoker<O, R, C> invoker;
-        public final ProtoLookup protoLookup;
-        public final R invokerRequest;
-        public final Function<String, Path> cwdResolver;
-        public final Function<String, Path> installationResolver;
-        public final Function<String, Path> userResolver;
-        public final Session session;
-
-        protected LookupInvokerContext(LookupInvoker<O, R, C> invoker, R invokerRequest) {
-            this.invoker = invoker;
-            this.protoLookup = invoker.protoLookup;
-            this.invokerRequest = requireNonNull(invokerRequest);
-            this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
-            this.installationResolver = s -> invokerRequest
-                    .installationDirectory()
-                    .resolve(s)
-                    .normalize()
-                    .toAbsolutePath();
-            this.userResolver = s ->
-                    invokerRequest.userHomeDirectory().resolve(s).normalize().toAbsolutePath();
-            this.logger = invokerRequest.parserRequest().logger();
-
-            Map<String, String> user = new HashMap<>(invokerRequest.userProperties());
-            user.put("session.rootDirectory", invokerRequest.rootDirectory().toString());
-            user.put("session.topDirectory", invokerRequest.topDirectory().toString());
-            Map<String, String> system = new HashMap<>(invokerRequest.systemProperties());
-            this.session = ProtoSession.create(user, system);
-        }
-
-        public Logger logger;
-        public ILoggerFactory loggerFactory;
-        public Slf4jConfiguration slf4jConfiguration;
-        public Slf4jConfiguration.Level loggerLevel;
-        public Boolean coloredOutput;
-        public Terminal terminal;
-        public Consumer<String> writer;
-        public ClassLoader currentThreadContextClassLoader;
-        public ContainerCapsule containerCapsule;
-        public Lookup lookup;
-        public SettingsBuilder settingsBuilder;
-
-        public boolean interactive;
-        public Path localRepositoryPath;
-        public Path installationSettingsPath;
-        public Path projectSettingsPath;
-        public Path userSettingsPath;
-        public Settings effectiveSettings;
-
-        public final List<AutoCloseable> closeables = new ArrayList<>();
-
-        @Override
-        public void close() throws InvokerException {
-            List<Exception> causes = null;
-            List<AutoCloseable> cs = new ArrayList<>(closeables);
-            Collections.reverse(cs);
-            for (AutoCloseable c : cs) {
-                if (c != null) {
-                    try {
-                        c.close();
-                    } catch (Exception e) {
-                        if (causes == null) {
-                            causes = new ArrayList<>();
-                        }
-                        causes.add(e);
-                    }
-                }
-            }
-            if (causes != null) {
-                InvokerException exception = new InvokerException("Unable to close context");
-                causes.forEach(exception::addSuppressed);
-                throw exception;
-            }
-        }
-    }
-
+public abstract class LookupInvoker<C extends LookupContext> implements Invoker {
     protected final ProtoLookup protoLookup;
 
     public LookupInvoker(ProtoLookup protoLookup) {
@@ -200,19 +97,23 @@ public abstract class LookupInvoker<
     }
 
     @Override
-    public int invoke(R invokerRequest) throws InvokerException {
+    public int invoke(InvokerRequest invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
 
         Properties oldProps = (Properties) System.getProperties().clone();
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try (C context = createContext(invokerRequest)) {
             try {
-                if (context.currentThreadContextClassLoader != null) {
-                    Thread.currentThread().setContextClassLoader(context.currentThreadContextClassLoader);
+                if (context.containerCapsule != null
+                        && context.containerCapsule.currentThreadClassLoader().isPresent()) {
+                    Thread.currentThread()
+                            .setContextClassLoader(context.containerCapsule
+                                    .currentThreadClassLoader()
+                                    .get());
                 }
                 return doInvoke(context);
-            } catch (ExitException e) {
-                return e.exitCode;
+            } catch (InvokerException.ExitException e) {
+                return e.getExitCode();
             } catch (Exception e) {
                 throw handleException(context, e);
             }
@@ -238,8 +139,7 @@ public abstract class LookupInvoker<
         return execute(context);
     }
 
-    protected InvokerException handleException(LookupInvokerContext<O, R, C> context, Exception e)
-            throws InvokerException {
+    protected InvokerException handleException(C context, Exception e) throws InvokerException {
         boolean showStackTrace = context.invokerRequest.options().showErrors().orElse(false);
         if (showStackTrace) {
             context.logger.error(
@@ -255,10 +155,10 @@ public abstract class LookupInvoker<
         return new InvokerException(e.getMessage(), e);
     }
 
-    protected abstract C createContext(R invokerRequest) throws InvokerException;
+    protected abstract C createContext(InvokerRequest invokerRequest) throws InvokerException;
 
     protected void pushProperties(C context) throws Exception {
-        R invokerRequest = context.invokerRequest;
+        InvokerRequest invokerRequest = context.invokerRequest;
         HashSet<String> sys = new HashSet<>(invokerRequest.systemProperties().keySet());
         invokerRequest.userProperties().entrySet().stream()
                 .filter(k -> !sys.contains(k.getKey()))
@@ -272,7 +172,7 @@ public abstract class LookupInvoker<
     protected void prepare(C context) throws Exception {}
 
     protected void configureLogging(C context) throws Exception {
-        R invokerRequest = context.invokerRequest;
+        InvokerRequest invokerRequest = context.invokerRequest;
         // LOG COLOR
         Options mavenOptions = invokerRequest.options();
         Map<String, String> userProperties = invokerRequest.userProperties();
@@ -338,7 +238,7 @@ public abstract class LookupInvoker<
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
-        O options = context.invokerRequest.options();
+        Options options = context.invokerRequest.options();
         if (options.rawStreams().isEmpty() || !options.rawStreams().get()) {
             MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
             MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
@@ -358,7 +258,7 @@ public abstract class LookupInvoker<
     }
 
     protected Consumer<String> doDetermineWriter(C context) {
-        O options = context.invokerRequest.options();
+        Options options = context.invokerRequest.options();
         if (options.logFile().isPresent()) {
             Path logFile = context.cwdResolver.apply(options.logFile().get());
             try {
@@ -380,7 +280,7 @@ public abstract class LookupInvoker<
     }
 
     protected void activateLogging(C context) throws Exception {
-        R invokerRequest = context.invokerRequest;
+        InvokerRequest invokerRequest = context.invokerRequest;
         Options mavenOptions = invokerRequest.options();
 
         context.slf4jConfiguration.activate();
@@ -412,21 +312,21 @@ public abstract class LookupInvoker<
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {
-        R invokerRequest = context.invokerRequest;
+        InvokerRequest invokerRequest = context.invokerRequest;
         if (invokerRequest.options().help().isPresent()) {
             Consumer<String> writer = determineWriter(context);
             invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), writer);
-            throw new ExitException(0);
+            throw new InvokerException.ExitException(0);
         }
         if (invokerRequest.options().showVersionAndExit().isPresent()) {
             showVersion(context);
-            throw new ExitException(0);
+            throw new InvokerException.ExitException(0);
         }
     }
 
     protected void showVersion(C context) {
         Consumer<String> writer = determineWriter(context);
-        R invokerRequest = context.invokerRequest;
+        InvokerRequest invokerRequest = context.invokerRequest;
         if (invokerRequest.options().quiet().orElse(false)) {
             writer.accept(CLIReportingUtils.showVersionMinimal());
         } else if (invokerRequest.options().verbose().orElse(false)) {
@@ -466,10 +366,9 @@ public abstract class LookupInvoker<
     }
 
     protected void container(C context) throws Exception {
-        context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(context);
+        context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
         context.closeables.add(context.containerCapsule);
         context.lookup = context.containerCapsule.getLookup();
-        context.settingsBuilder = context.lookup.lookup(SettingsBuilder.class);
 
         // refresh logger in case container got customized by spy
         org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
@@ -478,7 +377,7 @@ public abstract class LookupInvoker<
                 .log(message);
     }
 
-    protected ContainerCapsuleFactory<O, R, C> createContainerCapsuleFactory() {
+    protected ContainerCapsuleFactory<C> createContainerCapsuleFactory() {
         return new PlexusContainerCapsuleFactory<>();
     }
 
@@ -487,7 +386,7 @@ public abstract class LookupInvoker<
     protected void init(C context) throws Exception {}
 
     protected void postCommands(C context) throws Exception {
-        R invokerRequest = context.invokerRequest;
+        InvokerRequest invokerRequest = context.invokerRequest;
         Logger logger = context.logger;
         if (invokerRequest.options().showErrors().orElse(false)) {
             logger.info("Error stacktraces are turned on.");
@@ -513,7 +412,7 @@ public abstract class LookupInvoker<
     }
 
     protected void settings(C context) throws Exception {
-        settings(context, context.settingsBuilder);
+        settings(context, context.lookup.lookup(SettingsBuilder.class));
     }
 
     protected void settings(C context, SettingsBuilder settingsBuilder) throws Exception {

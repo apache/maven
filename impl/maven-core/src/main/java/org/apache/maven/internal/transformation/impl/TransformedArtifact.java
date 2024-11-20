@@ -31,9 +31,9 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.internal.transformation.TransformationFailedException;
-import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -97,13 +97,12 @@ class TransformedArtifact extends DefaultArtifact {
                 return null;
             }
             return target.toFile();
-        } catch (IOException | NoSuchAlgorithmException | XMLStreamException | ModelBuildingException e) {
+        } catch (IOException | NoSuchAlgorithmException | XMLStreamException | ModelBuilderException e) {
             throw new TransformationFailedException(e);
         }
     }
 
-    private String mayUpdate()
-            throws IOException, NoSuchAlgorithmException, XMLStreamException, ModelBuildingException {
+    private String mayUpdate() throws IOException, NoSuchAlgorithmException, XMLStreamException, ModelBuilderException {
         String result;
         Path src = sourcePathProvider.get();
         if (src == null) {

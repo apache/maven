@@ -53,6 +53,7 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.settings.v4.SettingsMerger;
 import org.apache.maven.settings.v4.SettingsTransformer;
+import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
@@ -67,13 +68,23 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final Interpolator interpolator;
 
+    private final SecDispatcher secDispatcher;
+
+    /**
+     * This ctor is used in legacy components, and when in legacy, {@link SecDispatcher} is {@code null} and
+     * Maven3 exposes decryption with other means.
+     */
     public DefaultSettingsBuilder() {
-        this(new DefaultInterpolator());
+        this(new DefaultInterpolator(), null);
     }
 
+    /**
+     * In Maven4 the {@link SecDispatcher} is injected and build settings are fully decrypted as well.
+     */
     @Inject
-    public DefaultSettingsBuilder(Interpolator interpolator) {
+    public DefaultSettingsBuilder(Interpolator interpolator, SecDispatcher secDispatcher) {
         this.interpolator = interpolator;
+        this.secDispatcher = secDispatcher;
     }
 
     @Override
@@ -200,6 +211,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         settings = interpolate(settings, request, problems);
+        settings = decrypt(settingsSource, settings, request, problems);
 
         settingsValidator.validate(settings, isProjectSettings, problems);
 
@@ -250,6 +262,41 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             // do not interpolate the condition activation
             return builder;
         }
+    }
+
+    private Settings decrypt(
+            Source settingsSource, Settings settings, SettingsBuilderRequest request, List<BuilderProblem> problems) {
+        if (secDispatcher == null) {
+            return settings;
+        }
+        Function<String, String> decryptFunction = str -> {
+            if (secDispatcher.isAnyEncryptedString(str)) {
+                if (secDispatcher.isLegacyEncryptedString(str)) {
+                    // add a problem
+                    problems.add(new DefaultBuilderProblem(
+                            settingsSource.getLocation(),
+                            -1,
+                            -1,
+                            null,
+                            "Pre-Maven 4 legacy encrypted password detected "
+                                    + " - configure password encryption with the help of mvnenc to be compatible with Maven 4.",
+                            BuilderProblem.Severity.WARNING));
+                }
+                try {
+                    return secDispatcher.decrypt(str);
+                } catch (Exception e) {
+                    problems.add(new DefaultBuilderProblem(
+                            settingsSource.getLocation(),
+                            -1,
+                            -1,
+                            e,
+                            "Could not decrypt password (fix the corrupted password or remove it, if unused) " + str,
+                            BuilderProblem.Severity.ERROR));
+                }
+            }
+            return str;
+        };
+        return new SettingsTransformer(decryptFunction).visit(settings);
     }
 
     @Override

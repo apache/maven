@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.apache.maven.it.mresolver614</groupId>
+    <artifactId>level2</artifactId>
+    <version>1.0.0</version>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- should not override own dependency spec -->
+            <dependency>
+                <groupId>org.apache.maven.it.mresolver614</groupId>
+                <artifactId>level3</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <!-- manages child dependency -->
+            <dependency>
+                <groupId>org.apache.maven.it.mresolver614</groupId>
+                <artifactId>level4</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <!-- should lose to level1 depMgt which is closer to root -->
+            <dependency>
+                <groupId>org.apache.maven.it.mresolver614</groupId>
+                <artifactId>level5</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven.it.mresolver614</groupId>
+            <artifactId>level3</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+</project>

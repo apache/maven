@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><archetype>
+  <id>maven-it-sample</id>
+  <testSources>
+    <source>src/test/java/MavenITmngXXXXDescriptionOfProblemTest.java</source>
+  </testSources>
+  <testResources>
+    <resource>src/test/resources/mng-xxxx/checkstyle-assembly/pom.xml</resource>
+    <resource>src/test/resources/mng-xxxx/checkstyle-assembly/src/main/resources/rule_set.xml</resource>
+    <resource>src/test/resources/mng-xxxx/checkstyle-assembly/src/main/resources/stc_checks.xml</resource>
+    <resource>src/test/resources/mng-xxxx/checkstyle-test/pom.xml</resource>
+    <resource>src/test/resources/mng-xxxx/checkstyle-test/src/main/java/Class.java</resource>
+    <resource>src/test/resources/mng-xxxx/pom.xml</resource>
+    <resource>src/test/resources/mng-xxxx/readme.txt</resource>
+  </testResources>
+</archetype>

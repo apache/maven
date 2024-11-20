@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng5889</groupId>
+  <artifactId>test</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: MNG-5889</name>
+  <description>Verify that path/to/.mvn directory is found when using -f/--file path/to/[module/]pom.xml.</description>
+
+  <properties>
+    <jvm-config>${jvm.config}</jvm-config>
+    <maven-config>${maven.config}</maven-config>
+    <user-dir>${user.dir}</user-dir>
+    <maven-multiModuleProjectDirectory>${maven.multiModuleProjectDirectory}</maven-multiModuleProjectDirectory>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <expressions>
+            <expression>project/properties/jvm-config</expression>
+            <expression>project/properties/maven-config</expression>
+            <expression>project/properties/user-dir</expression>
+            <expression>project/properties/maven-multiModuleProjectDirectory</expression>
+            <expression>project/basedir</expression>
+          </expressions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

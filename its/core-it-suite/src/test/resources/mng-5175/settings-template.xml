@@ -1,0 +1,24 @@
+<settings>
+  <servers>
+    <server>
+      <id>test-small-timeout</id>
+      <!-- Plexus Configuration: legacy (only all supported) -->
+      <configuration>
+        <httpConfiguration>
+          <all>
+            <readTimeout>10</readTimeout>
+          </all>
+        </httpConfiguration>
+      </configuration>
+    </server>
+  </servers>
+  <mirrors>
+    <mirror>
+      <name>archiva</name>
+      <mirrorOf>*</mirrorOf>
+      <id>test-small-timeout</id>
+      <url>http://localhost:@port@/archiva/repository/internal/</url>
+    </mirror>
+  </mirrors>
+</settings>
+

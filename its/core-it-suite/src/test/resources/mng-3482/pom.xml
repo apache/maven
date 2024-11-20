@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3482</groupId>
+  <artifactId>mng-3482</artifactId>
+  <version>2</version>
+  <packaging>jar</packaging>
+
+  <name>Integration Test Project for MNG-3482</name>
+  <description>This project verifies that MNG-3482 is fixed. It is controlled by a JUnit test called org.apache.maven.it.MNG3482Test</description>
+
+  <url>https://issues.apache.org/jira/browse/MNG-3482</url>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng3482</groupId>
+      <artifactId>dep</artifactId>
+      <version>1</version>
+      <type>pom</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <compileClassPath>target/classpath.txt</compileClassPath>
+          <significantPathLevels>1</significantPathLevels>
+        </configuration>
+        <executions>
+          <execution>
+            <id>resolve</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

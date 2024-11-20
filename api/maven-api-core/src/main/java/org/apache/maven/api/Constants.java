@@ -291,8 +291,8 @@ public final class Constants {
     public static final String MAVEN_RELOCATIONS_ENTRIES = "maven.relocations.entries";
 
     /**
-     * User property for version filters expression, a semicolon separated list of filters to apply. By default, no version
-     * filter is applied (like in Maven 3).
+     * User property for version filter expression used in session, applied to resolving ranges: a semicolon separated
+     * list of filters to apply. By default, no version filter is applied (like in Maven 3).
      * <br/>
      * Supported filters:
      * <ul>
@@ -303,22 +303,45 @@ public final class Constants {
      * </ul>
      * Example filter expression: <code>"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for "top 5" (instead
      * full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is
-     * being processed, version 1 is omitted.
+     * being processed, version 1 is omitted. Value in this property builds
+     * <code>org.eclipse.aether.collection.VersionFilter</code> instance.
      *
      * @since 4.0.0
      */
     @Config
-    public static final String MAVEN_VERSION_FILTERS = "maven.versionFilters";
+    public static final String MAVEN_VERSION_FILTER = "maven.session.versionFilter";
+
+    /**
+     * User property for chained LRM: the new "head" local repository to use, and "push" the existing into tail.
+     * Similar to <code>maven.repo.local.tail</code>, this property may contain comma separated list of paths to be
+     * used as local repositories (combine with chained local repository), but while latter is "appending" this
+     * one is "prepending".
+     *
+     * @since 4.0.0
+     */
+    @Config
+    public static final String MAVEN_REPO_LOCAL_HEAD = "maven.repo.local.head";
 
     /**
      * User property for chained LRM: list of "tail" local repository paths (separated by comma), to be used with
-     * {@code org.eclipse.aether.util.repository.ChainedLocalRepositoryManager}.
+     * <code>org.eclipse.aether.util.repository.ChainedLocalRepositoryManager</code>.
      * Default value: <code>null</code>, no chained LRM is used.
      *
      * @since 3.9.0
      */
     @Config
     public static final String MAVEN_REPO_LOCAL_TAIL = "maven.repo.local.tail";
+
+    /**
+     * User property for chained LRM: whether to ignore "availability check" in tail or not. Usually you do want
+     * to ignore it. This property is mapped onto corresponding Resolver 2.x property, is like a synonym for it.
+     * Default value: <code>true</code>.
+     *
+     * @since 3.9.0
+     * @see <a href="https://maven.apache.org/resolver/configuration.html">Resolver Configuration: aether.chainedLocalRepository.ignoreTailAvailability</a>
+     */
+    @Config
+    public static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
 
     /**
      * User property for reverse dependency tree. If enabled, Maven will record ".tracking" directory into local
@@ -385,6 +408,29 @@ public final class Constants {
      */
     @Config(type = "java.lang.Boolean", defaultValue = "true")
     public static final String MAVEN_CONSUMER_POM = "maven.consumer.pom";
+
+    /**
+     * User property for disabling version resolver cache.
+     *
+     * @since 3.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_VERSION_RESOLVER_NO_CACHE = "maven.versionResolver.noCache";
+
+    /**
+     * User property for overriding calculated "build number" for snapshot deploys. Caution: this property should
+     * be RARELY used (if used at all). It may help in special cases like "aligning" a reactor build subprojects
+     * build numbers to perform a "snapshot lock down". Value given here must be <code>maxRemoteBuildNumber + 1</code>
+     * or greater, otherwise build will fail. How the number to be obtained is left to user (ie by inspecting
+     * snapshot repository metadata or alike).
+     *
+     * Note: this feature is present in Maven 3.9.7 but with different key: <code>maven.buildNumber</code>. In Maven 4
+     * as part of cleanup effort this key was renamed to properly reflect its purpose.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Integer")
+    public static final String MAVEN_DEPLOY_SNAPSHOT_BUILD_NUMBER = "maven.deploy.snapshot.buildNumber";
 
     private Constants() {}
 }

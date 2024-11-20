@@ -40,7 +40,7 @@ public interface ProjectBuilder extends Service {
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
      */
     @Nonnull
-    ProjectBuilderResult build(ProjectBuilderRequest request);
+    ProjectBuilderResult build(ProjectBuilderRequest request) throws ProjectBuilderException;
 
     /**
      * Creates a {@link org.apache.maven.api.Project} from a POM file.
@@ -52,7 +52,8 @@ public interface ProjectBuilder extends Service {
      * @see #build(ProjectBuilderRequest)
      */
     @Nonnull
-    default ProjectBuilderResult build(@Nonnull Session session, @Nonnull Source source) {
+    default ProjectBuilderResult build(@Nonnull Session session, @Nonnull Source source)
+            throws ProjectBuilderException {
         return build(ProjectBuilderRequest.build(session, source));
     }
 
@@ -66,7 +67,7 @@ public interface ProjectBuilder extends Service {
      * @see #build(ProjectBuilderRequest)
      */
     @Nonnull
-    default ProjectBuilderResult build(@Nonnull Session session, @Nonnull Path path) {
+    default ProjectBuilderResult build(@Nonnull Session session, @Nonnull Path path) throws ProjectBuilderException {
         return build(ProjectBuilderRequest.build(session, path));
     }
 }

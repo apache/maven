@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd">
+
+  <groupId>mng7804</groupId>
+  <artifactId>plugin-execution-order</artifactId>
+  <version>1.0</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>100. This should be first</id>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <phase>clean[100]</phase>
+          </execution>
+          <execution>
+            <id>300. This should be third</id>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <phase>clean[300]</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>200. This should be second</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>clean[200]</phase>
+          </execution>
+          <execution>
+            <id>400. This should be fourth</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>clean[400]</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

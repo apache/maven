@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng3401</groupId>
+  <artifactId>test</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: MNG-3401</name>
+  <description>Test that the configuration of an execution block with the id "default-cli" applies to direct CLI
+    invocations of a goal as well.</description>
+
+  <build>
+    <!-- NOTE: This variant of the test uses plugin management -->
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.its.plugins</groupId>
+          <artifactId>maven-it-plugin-configuration</artifactId>
+          <version>2.1-SNAPSHOT</version>
+          <configuration>
+            <!-- plugin-level config still applies as well but is recessive -->
+            <propertiesFile>target/config.properties</propertiesFile>
+            <stringParam>FAILED</stringParam>
+          </configuration>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <stringParam>PASSED</stringParam>
+                <!-- NOTE: Intentionally using append mode here to check the config gets processed only once -->
+                <stringParams combine.children="append">
+                  <!-- NOTE: These values are deliberately not in alpha order! -->
+                  <stringParam>a</stringParam>
+                  <stringParam>c</stringParam>
+                  <stringParam>b</stringParam>
+                  <stringParam>d</stringParam>
+                </stringParams>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
