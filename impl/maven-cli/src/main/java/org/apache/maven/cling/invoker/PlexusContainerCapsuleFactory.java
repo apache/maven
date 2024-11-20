@@ -47,6 +47,7 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
+import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -286,7 +287,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             invoker.settings(context, container.lookup(SettingsBuilder.class));
 
             MavenExecutionRequest mer = new DefaultMavenExecutionRequest();
-            invoker.populateRequest(context, mer);
+            invoker.populateRequest(context, new DefaultLookup(container), mer);
             mer = container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(mer);
             return Collections.unmodifiableList(container
                     .lookup(BootstrapCoreExtensionManager.class)

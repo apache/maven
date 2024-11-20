@@ -41,6 +41,7 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.SettingsBuilder;
@@ -572,7 +573,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 .resolve("repository");
     }
 
-    protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
+    protected void populateRequest(C context, Lookup lookup, MavenExecutionRequest request) throws Exception {
         populateRequestFromSettings(request, context.effectiveSettings);
 
         Options options = context.invokerRequest.options();

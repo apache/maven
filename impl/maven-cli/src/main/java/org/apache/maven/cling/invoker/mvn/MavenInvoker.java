@@ -38,6 +38,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.Source;
@@ -90,7 +91,7 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
     protected int execute(C context) throws Exception {
         MavenExecutionRequest request = prepareMavenExecutionRequest();
         toolchains(context, request);
-        populateRequest(context, request);
+        populateRequest(context, context.lookup, request);
         return doExecute(context, request);
     }
 
@@ -262,8 +263,8 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
     }
 
     @Override
-    protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
-        super.populateRequest(context, request);
+    protected void populateRequest(C context, Lookup lookup, MavenExecutionRequest request) throws Exception {
+        super.populateRequest(context, lookup, request);
         if (context.invokerRequest.rootDirectory().isEmpty()) {
             // maven requires this to be set; so default it (and see below at POM)
             request.setMultiModuleProjectDirectory(
@@ -280,7 +281,7 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         request.setUpdateSnapshots(options.updateSnapshots().orElse(false));
         request.setGlobalChecksumPolicy(determineGlobalChecksumPolicy(context));
 
-        Path pom = determinePom(context);
+        Path pom = determinePom(context, lookup);
         if (pom != null) {
             request.setPom(pom.toFile());
             if (pom.getParent() != null) {
@@ -344,14 +345,14 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         }
     }
 
-    protected Path determinePom(C context) {
+    protected Path determinePom(C context, Lookup lookup) {
         Path current = context.invokerRequest.cwd();
         MavenOptions options = (MavenOptions) context.invokerRequest.options();
         if (options.alternatePomFile().isPresent()) {
             current = context.cwdResolver.apply(options.alternatePomFile().get());
         }
         ModelProcessor modelProcessor =
-                context.lookup.lookupOptional(ModelProcessor.class).orElse(null);
+                lookup.lookupOptional(ModelProcessor.class).orElse(null);
         if (modelProcessor != null) {
             return modelProcessor.locateExistingPom(current);
         } else {
