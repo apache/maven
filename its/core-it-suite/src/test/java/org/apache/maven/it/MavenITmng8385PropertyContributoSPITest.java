@@ -47,8 +47,7 @@ class MavenITmng8385PropertyContributoSPITest extends AbstractMavenIntegrationTe
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(new File(testDir, "spi-consumer").getAbsolutePath());
-        verifier.addCliArgument("help:evaluate");
-        verifier.addCliArgument("-Dexpression=mng8385");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

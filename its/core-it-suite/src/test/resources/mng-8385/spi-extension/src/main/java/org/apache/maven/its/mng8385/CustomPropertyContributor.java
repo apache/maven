@@ -18,18 +18,15 @@
  */
 package org.apache.maven.its.mng8385;
 
-import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.spi.PropertyContributor;
 
 @Named
 public class CustomPropertyContributor implements PropertyContributor {
     @Override
-    public ProtoSession contribute(ProtoSession protoSession) {
-        HashMap<String, String> userProperties = new HashMap<>(protoSession.getUserProperties());
+    public void contribute(Map<String, String> userProperties) {
         userProperties.put("mng8385", "washere!");
-        return protoSession.toBuilder().withUserProperties(userProperties).build();
     }
 }

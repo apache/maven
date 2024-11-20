@@ -1,0 +1,7 @@
+<extensions>
+    <extension>
+        <groupId>org.apache.maven.its.mng8385</groupId>
+        <artifactId>spi-extension</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </extension>
+</extensions>
