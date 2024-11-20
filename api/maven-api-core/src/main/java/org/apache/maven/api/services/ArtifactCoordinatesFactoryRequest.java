@@ -167,7 +167,7 @@ public interface ArtifactCoordinatesFactoryRequest {
                     session, groupId, artifactId, version, classifier, extension, type, coordinateString);
         }
 
-        private static class DefaultArtifactFactoryRequestArtifact extends BaseRequest
+        private static class DefaultArtifactFactoryRequestArtifact extends BaseRequest<Session>
                 implements ArtifactCoordinatesFactoryRequest {
             private final String groupId;
             private final String artifactId;

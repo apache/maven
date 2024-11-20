@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.maven.api.Session;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -32,16 +32,16 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0.0
  */
 @Experimental
-abstract class BaseRequest {
+abstract class BaseRequest<S extends ProtoSession> {
 
-    private final Session session;
+    private final S session;
 
-    protected BaseRequest(@Nonnull Session session) {
+    protected BaseRequest(@Nonnull S session) {
         this.session = nonNull(session, "session cannot be null");
     }
 
     @Nonnull
-    public Session getSession() {
+    public S getSession() {
         return session;
     }
 

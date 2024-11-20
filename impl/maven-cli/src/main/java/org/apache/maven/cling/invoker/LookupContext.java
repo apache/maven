@@ -27,13 +27,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.maven.api.Session;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.settings.Settings;
-import org.apache.maven.cling.invoker.mvn.ProtoSession;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.jline.terminal.Terminal;
 import org.slf4j.ILoggerFactory;
@@ -46,7 +45,6 @@ public class LookupContext implements AutoCloseable {
     public final Function<String, Path> cwdResolver;
     public final Function<String, Path> installationResolver;
     public final Function<String, Path> userResolver;
-    public final Session session;
 
     protected LookupContext(InvokerRequest invokerRequest) {
         this.invokerRequest = requireNonNull(invokerRequest);
@@ -58,11 +56,22 @@ public class LookupContext implements AutoCloseable {
         this.logger = invokerRequest.parserRequest().logger();
 
         Map<String, String> user = new HashMap<>(invokerRequest.userProperties());
-        user.put("session.rootDirectory", invokerRequest.rootDirectory().toString());
         user.put("session.topDirectory", invokerRequest.topDirectory().toString());
-        Map<String, String> system = new HashMap<>(invokerRequest.systemProperties());
-        this.session = ProtoSession.create(user, system);
+        if (invokerRequest.rootDirectory().isEmpty()) {
+            user.put(
+                    "session.rootDirectory",
+                    invokerRequest.rootDirectory().get().toString());
+        }
+        this.protoSession = ProtoSession.newBuilder()
+                .withSystemProperties(invokerRequest.systemProperties())
+                .withUserProperties(user)
+                .withTopDirectory(invokerRequest.topDirectory())
+                .withRootDirectory(invokerRequest.rootDirectory().orElse(null))
+                .build();
     }
+
+    // this one "evolves" as process progresses (instance is immutable but instances are replaced)
+    public ProtoSession protoSession;
 
     public Logger logger;
     public ILoggerFactory loggerFactory;
@@ -76,9 +85,6 @@ public class LookupContext implements AutoCloseable {
 
     public boolean interactive;
     public Path localRepositoryPath;
-    public Path installationSettingsPath;
-    public Path projectSettingsPath;
-    public Path userSettingsPath;
     public Settings effectiveSettings;
 
     public final List<AutoCloseable> closeables = new ArrayList<>();

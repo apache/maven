@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.apache.maven.api.Session;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
@@ -40,7 +40,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 public interface SettingsBuilderRequest {
 
     @Nonnull
-    Session getSession();
+    ProtoSession getSession();
 
     /**
      * Gets the installation settings source.
@@ -76,19 +76,21 @@ public interface SettingsBuilderRequest {
 
     @Nonnull
     static SettingsBuilderRequest build(
-            @Nonnull Session session, @Nonnull Source installationSettingsSource, @Nonnull Source userSettingsSource) {
+            @Nonnull ProtoSession session,
+            @Nonnull Source installationSettingsSource,
+            @Nonnull Source userSettingsSource) {
         return build(session, installationSettingsSource, null, userSettingsSource);
     }
 
     @Nonnull
     static SettingsBuilderRequest build(
-            @Nonnull Session session, @Nonnull Path installationSettingsPath, @Nonnull Path userSettingsPath) {
+            @Nonnull ProtoSession session, @Nonnull Path installationSettingsPath, @Nonnull Path userSettingsPath) {
         return build(session, Source.fromPath(installationSettingsPath), null, Source.fromPath(userSettingsPath));
     }
 
     @Nonnull
     static SettingsBuilderRequest build(
-            @Nonnull Session session,
+            @Nonnull ProtoSession session,
             @Nullable Source installationSettingsSource,
             @Nullable Source projectSettingsSource,
             @Nullable Source userSettingsSource) {
@@ -102,7 +104,7 @@ public interface SettingsBuilderRequest {
 
     @Nonnull
     static SettingsBuilderRequest build(
-            @Nonnull Session session,
+            @Nonnull ProtoSession session,
             @Nullable Path installationSettingsPath,
             @Nullable Path projectSettingsPath,
             @Nullable Path userSettingsPath) {
@@ -130,13 +132,13 @@ public interface SettingsBuilderRequest {
 
     @NotThreadSafe
     class SettingsBuilderRequestBuilder {
-        Session session;
+        ProtoSession session;
         Source installationSettingsSource;
         Source projectSettingsSource;
         Source userSettingsSource;
         Function<String, String> interpolationSource;
 
-        public SettingsBuilderRequestBuilder session(Session session) {
+        public SettingsBuilderRequestBuilder session(ProtoSession session) {
             this.session = session;
             return this;
         }
@@ -170,7 +172,8 @@ public interface SettingsBuilderRequest {
                     interpolationSource);
         }
 
-        private static class DefaultSettingsBuilderRequest extends BaseRequest implements SettingsBuilderRequest {
+        private static class DefaultSettingsBuilderRequest extends BaseRequest<ProtoSession>
+                implements SettingsBuilderRequest {
             private final Source installationSettingsSource;
             private final Source projectSettingsSource;
             private final Source userSettingsSource;
@@ -178,7 +181,7 @@ public interface SettingsBuilderRequest {
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultSettingsBuilderRequest(
-                    @Nonnull Session session,
+                    @Nonnull ProtoSession session,
                     @Nullable Source installationSettingsSource,
                     @Nullable Source projectSettingsSource,
                     @Nullable Source userSettingsSource,

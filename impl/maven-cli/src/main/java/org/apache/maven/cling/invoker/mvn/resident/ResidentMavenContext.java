@@ -51,15 +51,9 @@ public class ResidentMavenContext extends MavenContext {
 
         shadow.interactive = interactive;
         shadow.localRepositoryPath = localRepositoryPath;
-        shadow.installationSettingsPath = installationSettingsPath;
-        shadow.projectSettingsPath = projectSettingsPath;
-        shadow.userSettingsPath = userSettingsPath;
         shadow.effectiveSettings = effectiveSettings;
 
-        shadow.mavenExecutionRequest = mavenExecutionRequest;
         shadow.eventSpyDispatcher = eventSpyDispatcher;
-        shadow.mavenExecutionRequestPopulator = mavenExecutionRequestPopulator;
-        shadow.modelProcessor = modelProcessor;
         shadow.maven = maven;
 
         return shadow;

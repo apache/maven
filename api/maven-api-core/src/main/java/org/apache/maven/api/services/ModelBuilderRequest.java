@@ -290,7 +290,7 @@ public interface ModelBuilderRequest {
                     lifecycleBindingsInjector);
         }
 
-        private static class DefaultModelBuilderRequest extends BaseRequest implements ModelBuilderRequest {
+        private static class DefaultModelBuilderRequest extends BaseRequest<Session> implements ModelBuilderRequest {
             private final RequestType requestType;
             private final boolean locationTracking;
             private final boolean recursive;

@@ -18,8 +18,10 @@
  */
 package org.apache.maven.api.spi;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.di.Named;
@@ -38,6 +40,21 @@ public interface PropertyContributor extends SpiService {
      * Invoked just before session is created with a mutable map that carries collected user properties so far.
      *
      * @param userProperties The mutable user properties, never {@code null}.
+     * @see #contribute(ProtoSession)
      */
-    void contribute(Map<String, String> userProperties);
+    default void contribute(Map<String, String> userProperties) {}
+
+    /**
+     * Invoked just before session is created with proto session instance. The proto session contains user and
+     * system properties collected so far, along with other information. This method should return altered
+     * (contributions applied) user properties, not only the "new" or "added" properties!
+     *
+     * @param protoSession The proto session, never {@code null}.
+     * @return The user properties with contributions.
+     */
+    default Map<String, String> contribute(ProtoSession protoSession) {
+        HashMap<String, String> userProperties = new HashMap<>(protoSession.getUserProperties());
+        contribute(userProperties);
+        return userProperties;
+    }
 }

@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
@@ -40,6 +41,7 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.SettingsBuilder;
@@ -52,12 +54,14 @@ import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.spi.PropertyContributor;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.cling.invoker.spi.PropertyContributorsHolder;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
@@ -124,7 +128,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int doInvoke(C context) throws Exception {
-        pushProperties(context);
+        pushCoreProperties(context);
         validate(context);
         prepare(context);
         configureLogging(context);
@@ -132,6 +136,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         helpOrVersionAndMayExit(context);
         preCommands(context);
         container(context);
+        postContainer(context);
+        pushUserProperties(context);
         lookup(context);
         init(context);
         postCommands(context);
@@ -157,14 +163,18 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected abstract C createContext(InvokerRequest invokerRequest) throws InvokerException;
 
-    protected void pushProperties(C context) throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
-        HashSet<String> sys = new HashSet<>(invokerRequest.systemProperties().keySet());
-        invokerRequest.userProperties().entrySet().stream()
+    protected void pushCoreProperties(C context) throws Exception {
+        System.setProperty(
+                Constants.MAVEN_HOME,
+                context.invokerRequest.installationDirectory().toString());
+    }
+
+    protected void pushUserProperties(C context) throws Exception {
+        ProtoSession protoSession = context.protoSession;
+        HashSet<String> sys = new HashSet<>(protoSession.getSystemProperties().keySet());
+        protoSession.getUserProperties().entrySet().stream()
                 .filter(k -> !sys.contains(k.getKey()))
                 .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
-        System.setProperty(
-                Constants.MAVEN_HOME, invokerRequest.installationDirectory().toString());
     }
 
     protected void validate(C context) throws Exception {}
@@ -172,10 +182,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected void prepare(C context) throws Exception {}
 
     protected void configureLogging(C context) throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
         // LOG COLOR
-        Options mavenOptions = invokerRequest.options();
-        Map<String, String> userProperties = invokerRequest.userProperties();
+        Options mavenOptions = context.invokerRequest.options();
+        Map<String, String> userProperties = context.protoSession.getUserProperties();
         String styleColor = mavenOptions
                 .color()
                 .orElse(userProperties.getOrDefault(
@@ -381,6 +390,19 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         return new PlexusContainerCapsuleFactory<>();
     }
 
+    protected void postContainer(C context) throws Exception {
+        ProtoSession protoSession = context.protoSession;
+        for (PropertyContributor propertyContributor : context.lookup
+                .lookup(PropertyContributorsHolder.class)
+                .getPropertyContributors()
+                .values()) {
+            protoSession = protoSession.toBuilder()
+                    .withUserProperties(propertyContributor.contribute(protoSession))
+                    .build();
+        }
+        context.protoSession = protoSession;
+    }
+
     protected void lookup(C context) throws Exception {}
 
     protected void init(C context) throws Exception {}
@@ -427,7 +449,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 throw new FileNotFoundException("The specified user settings file does not exist: " + userSettingsFile);
             }
         } else {
-            String userSettingsFileStr = context.invokerRequest.userProperties().get(Constants.MAVEN_USER_SETTINGS);
+            String userSettingsFileStr =
+                    context.protoSession.getUserProperties().get(Constants.MAVEN_USER_SETTINGS);
             if (userSettingsFileStr != null) {
                 userSettingsFile = context.userResolver.apply(userSettingsFileStr);
             }
@@ -445,7 +468,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         } else {
             String projectSettingsFileStr =
-                    context.invokerRequest.userProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
+                    context.protoSession.getUserProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
             if (projectSettingsFileStr != null) {
                 projectSettingsFile = context.cwdResolver.apply(projectSettingsFileStr);
             }
@@ -463,20 +486,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         } else {
             String installationSettingsFileStr =
-                    context.invokerRequest.userProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
+                    context.protoSession.getUserProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
             if (installationSettingsFileStr != null) {
                 installationSettingsFile = context.installationResolver.apply(installationSettingsFileStr);
             }
         }
 
-        context.installationSettingsPath = installationSettingsFile;
-        context.projectSettingsPath = projectSettingsFile;
-        context.userSettingsPath = userSettingsFile;
-
         Function<String, String> interpolationSource = Interpolator.chain(
-                context.invokerRequest.userProperties()::get, context.invokerRequest.systemProperties()::get);
+                context.protoSession.getUserProperties()::get, context.protoSession.getSystemProperties()::get);
         SettingsBuilderRequest settingsRequest = SettingsBuilderRequest.builder()
-                .session(context.session)
+                .session(context.protoSession)
                 .installationSettingsSource(
                         installationSettingsFile != null && Files.exists(installationSettingsFile)
                                 ? Source.fromPath(installationSettingsFile)
@@ -540,9 +559,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected Path localRepositoryPath(C context) {
         // user override
-        String userDefinedLocalRepo = context.invokerRequest.userProperties().get(Constants.MAVEN_REPO_LOCAL);
+        String userDefinedLocalRepo = context.protoSession.getUserProperties().get(Constants.MAVEN_REPO_LOCAL);
         if (userDefinedLocalRepo == null) {
-            userDefinedLocalRepo = context.invokerRequest.systemProperties().get(Constants.MAVEN_REPO_LOCAL);
+            userDefinedLocalRepo = context.protoSession.getUserProperties().get(Constants.MAVEN_REPO_LOCAL);
             if (userDefinedLocalRepo != null) {
                 context.logger.warn("The property '" + Constants.MAVEN_REPO_LOCAL
                         + "' has been set using a JVM system property which is deprecated. "
@@ -560,11 +579,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
         // defaults
         return context.userResolver
-                .apply(context.invokerRequest.userProperties().get(Constants.MAVEN_USER_CONF))
+                .apply(context.protoSession.getUserProperties().get(Constants.MAVEN_USER_CONF))
                 .resolve("repository");
     }
 
-    protected void populateRequest(C context, MavenExecutionRequest request) throws Exception {
+    protected void populateRequest(C context, Lookup lookup, MavenExecutionRequest request) throws Exception {
         populateRequestFromSettings(request, context.effectiveSettings);
 
         Options options = context.invokerRequest.options();
@@ -575,8 +594,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         request.setInteractiveMode(context.interactive);
         request.setShowErrors(options.showErrors().orElse(false));
         request.setBaseDirectory(context.invokerRequest.topDirectory().toFile());
-        request.setSystemProperties(toProperties(context.invokerRequest.systemProperties()));
-        request.setUserProperties(toProperties(context.invokerRequest.userProperties()));
+        request.setSystemProperties(toProperties(context.protoSession.getSystemProperties()));
+        request.setUserProperties(toProperties(context.protoSession.getUserProperties()));
 
         request.setTopDirectory(context.invokerRequest.topDirectory());
         if (context.invokerRequest.rootDirectory().isPresent()) {
@@ -720,7 +739,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected boolean isRunningOnCI(C context) {
-        String ciEnv = context.invokerRequest.systemProperties().get("env.CI");
+        String ciEnv = context.protoSession.getSystemProperties().get("env.CI");
         return ciEnv != null && !"false".equals(ciEnv);
     }
 

@@ -360,7 +360,8 @@ public interface DependencyResolverRequest {
                     repositories);
         }
 
-        static class DefaultDependencyResolverRequest extends BaseRequest implements DependencyResolverRequest {
+        static class DefaultDependencyResolverRequest extends BaseRequest<Session>
+                implements DependencyResolverRequest {
             private final RequestType requestType;
             private final Project project;
             private final Artifact rootArtifact;

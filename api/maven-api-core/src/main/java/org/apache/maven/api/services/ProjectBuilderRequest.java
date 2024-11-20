@@ -125,7 +125,8 @@ public interface ProjectBuilderRequest {
                     session, path, source, allowStubModel, recursive, processPlugins, repositories);
         }
 
-        private static class DefaultProjectBuilderRequest extends BaseRequest implements ProjectBuilderRequest {
+        private static class DefaultProjectBuilderRequest extends BaseRequest<Session>
+                implements ProjectBuilderRequest {
             private final Path path;
             private final Source source;
             private final boolean allowStubModel;

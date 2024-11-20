@@ -16,22 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn;
+package org.apache.maven.cling.invoker.spi;
 
-import org.apache.maven.Maven;
-import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.cling.invoker.LookupContext;
-import org.apache.maven.eventspy.internal.EventSpyDispatcher;
-import org.apache.maven.logging.BuildEventListener;
+import java.util.Map;
 
-@SuppressWarnings("VisibilityModifier")
-public class MavenContext extends LookupContext {
-    public MavenContext(InvokerRequest invokerRequest) {
-        super(invokerRequest);
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.spi.PropertyContributor;
+
+/**
+ * Hack: to circumvent sisu/plexus/di stuff.
+ */
+@Named
+public final class PropertyContributorsHolder {
+    private final Map<String, PropertyContributor> propertyContributors;
+
+    @Inject
+    public PropertyContributorsHolder(Map<String, PropertyContributor> propertyContributors) {
+        this.propertyContributors = propertyContributors;
     }
 
-    public BuildEventListener buildEventListener;
-    public EventSpyDispatcher eventSpyDispatcher;
-
-    public Maven maven;
+    public Map<String, PropertyContributor> getPropertyContributors() {
+        return propertyContributors;
+    }
 }

@@ -96,7 +96,8 @@ public interface VersionResolverRequest {
             return new DefaultVersionResolverRequest(session, artifactCoordinates, repositories);
         }
 
-        private static class DefaultVersionResolverRequest extends BaseRequest implements VersionResolverRequest {
+        private static class DefaultVersionResolverRequest extends BaseRequest<Session>
+                implements VersionResolverRequest {
             private final ArtifactCoordinates artifactCoordinates;
             private final List<RemoteRepository> repositories;
 

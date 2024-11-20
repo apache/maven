@@ -202,7 +202,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                     exclusions);
         }
 
-        private static class DefaultDependencyCoordinatesFactoryRequest extends BaseRequest
+        private static class DefaultDependencyCoordinatesFactoryRequest extends BaseRequest<Session>
                 implements DependencyCoordinatesFactoryRequest {
             private final String groupId;
             private final String artifactId;

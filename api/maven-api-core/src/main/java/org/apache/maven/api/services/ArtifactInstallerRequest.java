@@ -83,7 +83,7 @@ public interface ArtifactInstallerRequest {
             return new DefaultArtifactInstallerRequest(session, artifacts);
         }
 
-        static class DefaultArtifactInstallerRequest extends BaseRequest implements ArtifactInstallerRequest {
+        static class DefaultArtifactInstallerRequest extends BaseRequest<Session> implements ArtifactInstallerRequest {
 
             private final Collection<ProducedArtifact> artifacts;
 

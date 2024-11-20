@@ -106,7 +106,8 @@ public interface ArtifactResolverRequest {
             return new DefaultArtifactResolverRequest(session, coordinates, repositories);
         }
 
-        private static class DefaultArtifactResolverRequest extends BaseRequest implements ArtifactResolverRequest {
+        private static class DefaultArtifactResolverRequest extends BaseRequest<Session>
+                implements ArtifactResolverRequest {
             @Nonnull
             private final Collection<? extends ArtifactCoordinates> coordinates;
 

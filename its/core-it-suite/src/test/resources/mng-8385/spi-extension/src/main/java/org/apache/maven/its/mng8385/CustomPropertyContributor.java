@@ -16,16 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether;
+package org.apache.maven.its.mng8385;
 
-import org.apache.maven.execution.MavenExecutionRequest;
+import java.util.Map;
 
-/**
- * Strictly internal component able to "extend" {@link MavenExecutionRequest} in some way before it is used to
- * construct resolver session.
- *
- * @since 4.0.0
- */
-interface MavenExecutionRequestExtender {
-    void extend(MavenExecutionRequest mavenExecutionRequest);
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.spi.PropertyContributor;
+
+@Named
+public class CustomPropertyContributor implements PropertyContributor {
+    @Override
+    public void contribute(Map<String, String> userProperties) {
+        userProperties.put("mng8385", "washere!");
+    }
 }
