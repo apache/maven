@@ -48,6 +48,8 @@ class MavenITmng8385PropertyContributoSPITest extends AbstractMavenIntegrationTe
 
         verifier = newVerifier(new File(testDir, "spi-consumer").getAbsolutePath());
         verifier.addCliArgument("validate");
+        verifier.addCliArgument("-X");
+        verifier.setForkJvm(true); // TODO: remove when we updated MavenCLI+Invoker
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

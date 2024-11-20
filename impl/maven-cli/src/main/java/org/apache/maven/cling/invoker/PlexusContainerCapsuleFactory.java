@@ -30,6 +30,7 @@ import java.util.function.Function;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
@@ -109,11 +110,11 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
         container.setLoggerManager(createLoggerManager());
-        InvokerRequest invokerRequest = context.invokerRequest;
+        ProtoSession protoSession = context.protoSession;
         Function<String, String> extensionSource = expression -> {
-            String value = invokerRequest.userProperties().get(expression);
+            String value = protoSession.getUserProperties().get(expression);
             if (value == null) {
-                value = invokerRequest.systemProperties().get(expression);
+                value = protoSession.getSystemProperties().get(expression);
             }
             return value;
         };
@@ -190,10 +191,10 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
     protected void customizeContainer(C context, PlexusContainer container) throws Exception {}
 
     protected List<Path> parseExtClasspath(C context) throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
-        String extClassPath = invokerRequest.userProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
+        ProtoSession protoSession = context.protoSession;
+        String extClassPath = protoSession.getUserProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
         if (extClassPath == null) {
-            extClassPath = invokerRequest.systemProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
+            extClassPath = protoSession.getSystemProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
             if (extClassPath != null) {
                 context.logger.warn("The property '" + Constants.MAVEN_EXT_CLASS_PATH
                         + "' has been set using a JVM system property which is deprecated. "
