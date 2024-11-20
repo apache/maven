@@ -16,10 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.it;
+package org.apache.maven.it.it8xxx.it8005;
 
 import java.nio.file.Path;
 
+import org.apache.maven.it.AbstractMavenIntegrationTestCase;
+import org.apache.maven.it.Verifier;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng8005IdeWorkspaceReaderUsedTest extends AbstractMavenIntegrationTestCase {
