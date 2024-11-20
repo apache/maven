@@ -476,6 +476,12 @@ under the License.
         <directory>src/test/resources</directory>
       </testResource>
       <testResource>
+        <directory>src/test/java</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </testResource>
+      <testResource>
         <filtering>true</filtering>
         <directory>src/test/resources-filtered</directory>
       </testResource>
