@@ -386,7 +386,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void postContainer(C context) throws Exception {
         ProtoSession protoSession = context.protoSession;
-        for (PropertyContributor propertyContributor : context.lookup.lookupMap(PropertyContributor.class).values()) {
+        for (PropertyContributor propertyContributor :
+                context.lookup.lookupMap(PropertyContributor.class).values()) {
             protoSession = propertyContributor.contribute(protoSession);
         }
         context.protoSession = protoSession;
