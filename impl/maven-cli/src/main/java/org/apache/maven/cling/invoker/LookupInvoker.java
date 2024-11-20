@@ -396,7 +396,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 .lookup(PropertyContributorsHolder.class)
                 .getPropertyContributors()
                 .values()) {
-            protoSession = propertyContributor.contribute(protoSession);
+            protoSession = protoSession.toBuilder()
+                    .withUserProperties(propertyContributor.contribute(protoSession))
+                    .build();
         }
         context.protoSession = protoSession;
     }

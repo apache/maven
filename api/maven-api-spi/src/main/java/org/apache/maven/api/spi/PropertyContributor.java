@@ -45,14 +45,16 @@ public interface PropertyContributor extends SpiService {
     default void contribute(Map<String, String> userProperties) {}
 
     /**
-     * Invoked just before session is created with proto session instance.
+     * Invoked just before session is created with proto session instance. The proto session contains user and
+     * system properties collected so far, along with other information. This method should return altered
+     * (contributions applied) user properties, not only the "new" or "added" properties!
      *
      * @param protoSession The proto session, never {@code null}.
-     * @return The proto session, with possibly altered user properties.
+     * @return The user properties with contributions.
      */
-    default ProtoSession contribute(ProtoSession protoSession) {
+    default Map<String, String> contribute(ProtoSession protoSession) {
         HashMap<String, String> userProperties = new HashMap<>(protoSession.getUserProperties());
         contribute(userProperties);
-        return protoSession.toBuilder().withUserProperties(userProperties).build();
+        return userProperties;
     }
 }
