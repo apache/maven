@@ -69,7 +69,7 @@ public class RepositoryUtils {
         return (string == null || string.isEmpty()) ? null : string;
     }
 
-    private static org.apache.maven.artifact.Artifact toArtifact(Dependency dependency) {
+    public static org.apache.maven.artifact.Artifact toArtifact(Dependency dependency) {
         if (dependency == null) {
             return null;
         }
