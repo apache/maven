@@ -34,7 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +120,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.slf4j.Logger;
@@ -463,12 +461,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     }
 
     private List<Artifact> toMavenArtifacts(DependencyResult dependencyResult) {
-        List<Artifact> artifacts =
-                new ArrayList<>(dependencyResult.getArtifactResults().size());
-        dependencyResult.getArtifactResults().stream()
-                .filter(ArtifactResult::isResolved)
-                .forEach(a -> artifacts.add(RepositoryUtils.toArtifact(a.getArtifact())));
-        return Collections.unmodifiableList(artifacts);
+        return dependencyResult.getDependencyNodeResults().stream()
+                .filter(n -> n.getArtifact().getPath() != null)
+                .map(n -> RepositoryUtils.toArtifact(n.getDependency()))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private Map<String, ClassLoader> calcImports(
