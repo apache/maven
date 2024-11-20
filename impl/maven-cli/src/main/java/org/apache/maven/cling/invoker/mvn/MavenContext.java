@@ -20,11 +20,8 @@ package org.apache.maven.cling.invoker.mvn;
 
 import org.apache.maven.Maven;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.logging.BuildEventListener;
 
 @SuppressWarnings("VisibilityModifier")
@@ -34,9 +31,7 @@ public class MavenContext extends LookupContext {
     }
 
     public BuildEventListener buildEventListener;
-    public MavenExecutionRequest mavenExecutionRequest;
     public EventSpyDispatcher eventSpyDispatcher;
-    public MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
-    public ModelProcessor modelProcessor;
+
     public Maven maven;
 }

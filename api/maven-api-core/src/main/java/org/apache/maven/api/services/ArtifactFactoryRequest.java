@@ -136,7 +136,8 @@ public interface ArtifactFactoryRequest {
                     session, groupId, artifactId, version, classifier, extension, type);
         }
 
-        private static class DefaultArtifactFactoryRequest extends BaseRequest implements ArtifactFactoryRequest {
+        private static class DefaultArtifactFactoryRequest extends BaseRequest<Session>
+                implements ArtifactFactoryRequest {
             private final String groupId;
             private final String artifactId;
             private final String version;

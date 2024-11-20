@@ -22,7 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.apache.maven.api.Session;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
@@ -37,7 +37,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 @Experimental
 public interface ToolchainsBuilderRequest {
     @Nonnull
-    Session getSession();
+    ProtoSession getSession();
 
     /**
      * Gets the installation Toolchains source.
@@ -57,7 +57,7 @@ public interface ToolchainsBuilderRequest {
 
     @Nonnull
     static ToolchainsBuilderRequest build(
-            @Nonnull Session session,
+            @Nonnull ProtoSession session,
             @Nullable Source installationToolchainsFile,
             @Nullable Source userToolchainsSource) {
         return builder()
@@ -69,7 +69,9 @@ public interface ToolchainsBuilderRequest {
 
     @Nonnull
     static ToolchainsBuilderRequest build(
-            @Nonnull Session session, @Nullable Path installationToolchainsFile, @Nullable Path userToolchainsPath) {
+            @Nonnull ProtoSession session,
+            @Nullable Path installationToolchainsFile,
+            @Nullable Path userToolchainsPath) {
         return builder()
                 .session(nonNull(session, "session cannot be null"))
                 .installationToolchainsSource(
@@ -90,11 +92,11 @@ public interface ToolchainsBuilderRequest {
 
     @NotThreadSafe
     class ToolchainsBuilderRequestBuilder {
-        Session session;
+        ProtoSession session;
         Source installationToolchainsSource;
         Source userToolchainsSource;
 
-        public ToolchainsBuilderRequestBuilder session(Session session) {
+        public ToolchainsBuilderRequestBuilder session(ProtoSession session) {
             this.session = session;
             return this;
         }
@@ -114,13 +116,14 @@ public interface ToolchainsBuilderRequest {
                     session, installationToolchainsSource, userToolchainsSource);
         }
 
-        private static class DefaultToolchainsBuilderRequest extends BaseRequest implements ToolchainsBuilderRequest {
+        private static class DefaultToolchainsBuilderRequest extends BaseRequest<ProtoSession>
+                implements ToolchainsBuilderRequest {
             private final Source installationToolchainsSource;
             private final Source userToolchainsSource;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultToolchainsBuilderRequest(
-                    @Nonnull Session session,
+                    @Nonnull ProtoSession session,
                     @Nullable Source installationToolchainsSource,
                     @Nullable Source userToolchainsSource) {
                 super(session);

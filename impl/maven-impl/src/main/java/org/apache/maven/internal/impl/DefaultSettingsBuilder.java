@@ -64,6 +64,8 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final SettingsMerger settingsMerger = new SettingsMerger();
 
+    private final SettingsXmlFactory settingsXmlFactory;
+
     private final Interpolator interpolator;
 
     private final SecDispatcher secDispatcher;
@@ -73,14 +75,16 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
      * Maven3 exposes decryption with other means.
      */
     public DefaultSettingsBuilder() {
-        this(new DefaultInterpolator(), null);
+        this(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), null);
     }
 
     /**
      * In Maven4 the {@link SecDispatcher} is injected and build settings are fully decrypted as well.
      */
     @Inject
-    public DefaultSettingsBuilder(Interpolator interpolator, SecDispatcher secDispatcher) {
+    public DefaultSettingsBuilder(
+            SettingsXmlFactory settingsXmlFactory, Interpolator interpolator, SecDispatcher secDispatcher) {
+        this.settingsXmlFactory = settingsXmlFactory;
         this.interpolator = interpolator;
         this.secDispatcher = secDispatcher;
     }
@@ -161,22 +165,18 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         try {
             try (InputStream is = settingsSource.openStream()) {
-                settings = request.getSession()
-                        .getService(SettingsXmlFactory.class)
-                        .read(XmlReaderRequest.builder()
-                                .inputStream(is)
-                                .location(settingsSource.getLocation())
-                                .strict(true)
-                                .build());
+                settings = settingsXmlFactory.read(XmlReaderRequest.builder()
+                        .inputStream(is)
+                        .location(settingsSource.getLocation())
+                        .strict(true)
+                        .build());
             } catch (XmlReaderException e) {
                 try (InputStream is = settingsSource.openStream()) {
-                    settings = request.getSession()
-                            .getService(SettingsXmlFactory.class)
-                            .read(XmlReaderRequest.builder()
-                                    .inputStream(is)
-                                    .location(settingsSource.getLocation())
-                                    .strict(false)
-                                    .build());
+                    settings = settingsXmlFactory.read(XmlReaderRequest.builder()
+                            .inputStream(is)
+                            .location(settingsSource.getLocation())
+                            .strict(false)
+                            .build());
                     Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
                     problems.add(new DefaultBuilderProblem(
                             settingsSource.getLocation(),

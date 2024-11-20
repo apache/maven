@@ -101,7 +101,8 @@ public interface ArtifactDeployerRequest {
             return new DefaultArtifactDeployerRequest(session, repository, artifacts, retryFailedDeploymentCount);
         }
 
-        private static class DefaultArtifactDeployerRequest extends BaseRequest implements ArtifactDeployerRequest {
+        private static class DefaultArtifactDeployerRequest extends BaseRequest<Session>
+                implements ArtifactDeployerRequest {
 
             private final RemoteRepository repository;
             private final Collection<ProducedArtifact> artifacts;

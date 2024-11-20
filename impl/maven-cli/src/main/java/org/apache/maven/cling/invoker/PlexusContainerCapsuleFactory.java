@@ -272,7 +272,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
             @Override
             protected void configure() {
-                bind(ILoggerFactory.class).toInstance(context.loggerFactory);
+                bind(ILoggerFactory.class).toProvider(() -> context.loggerFactory);
             }
         });
 

@@ -127,8 +127,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
     private final VersionScheme versionScheme;
 
-    private final Map<String, MavenExecutionRequestExtender> requestExtenders;
-
     private final Map<String, RepositorySystemSessionExtender> sessionExtenders;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -139,14 +137,12 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             RuntimeInformation runtimeInformation,
             TypeRegistry typeRegistry,
             VersionScheme versionScheme,
-            Map<String, MavenExecutionRequestExtender> requestExtenders,
             Map<String, RepositorySystemSessionExtender> sessionExtenders) {
         this.repoSystem = repoSystem;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.runtimeInformation = runtimeInformation;
         this.typeRegistry = typeRegistry;
         this.versionScheme = versionScheme;
-        this.requestExtenders = requestExtenders;
         this.sessionExtenders = sessionExtenders;
     }
 
@@ -158,11 +154,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
     @SuppressWarnings({"checkstyle:methodLength"})
     public SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
         requireNonNull(request, "request");
-
-        // apply MavenExecutionRequestExtenders
-        for (MavenExecutionRequestExtender requestExtender : requestExtenders.values()) {
-            requestExtender.extend(request);
-        }
 
         MavenSessionBuilderSupplier supplier = new MavenSessionBuilderSupplier(repoSystem);
         SessionBuilder sessionBuilder = supplier.get();

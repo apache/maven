@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
@@ -52,6 +53,7 @@ import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.spi.PropertyContributor;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -132,6 +134,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         helpOrVersionAndMayExit(context);
         preCommands(context);
         container(context);
+        postContainer(context);
         lookup(context);
         init(context);
         postCommands(context);
@@ -381,6 +384,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         return new PlexusContainerCapsuleFactory<>();
     }
 
+    protected void postContainer(C context) throws Exception {
+        ProtoSession protoSession = context.protoSession;
+        for (PropertyContributor propertyContributor : context.lookup.lookupMap(PropertyContributor.class).values()) {
+            protoSession = propertyContributor.contribute(protoSession);
+        }
+        context.protoSession = protoSession;
+    }
+
     protected void lookup(C context) throws Exception {}
 
     protected void init(C context) throws Exception {}
@@ -469,14 +480,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
 
-        context.installationSettingsPath = installationSettingsFile;
-        context.projectSettingsPath = projectSettingsFile;
-        context.userSettingsPath = userSettingsFile;
-
         Function<String, String> interpolationSource = Interpolator.chain(
                 context.invokerRequest.userProperties()::get, context.invokerRequest.systemProperties()::get);
         SettingsBuilderRequest settingsRequest = SettingsBuilderRequest.builder()
-                .session(context.session)
+                .session(context.protoSession)
                 .installationSettingsSource(
                         installationSettingsFile != null && Files.exists(installationSettingsFile)
                                 ? Source.fromPath(installationSettingsFile)

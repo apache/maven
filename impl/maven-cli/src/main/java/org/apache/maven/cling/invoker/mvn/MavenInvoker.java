@@ -88,13 +88,13 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
 
     @Override
     protected int execute(C context) throws Exception {
-        toolchains(context);
-        populateRequest(context, context.mavenExecutionRequest);
-        return doExecute(context);
+        MavenExecutionRequest request = prepareMavenExecutionRequest();
+        toolchains(context, request);
+        populateRequest(context, request);
+        return doExecute(context, request);
     }
 
-    @Override
-    protected void prepare(C context) throws Exception {
+    protected MavenExecutionRequest prepareMavenExecutionRequest() throws Exception {
         // explicitly fill in "defaults"?
         DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         mavenExecutionRequest.setRepositoryCache(new DefaultRepositoryCache());
@@ -108,26 +108,24 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         mavenExecutionRequest.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_INFO);
         mavenExecutionRequest.setDegreeOfConcurrency(1);
         mavenExecutionRequest.setBuilderId("singlethreaded");
-
-        context.mavenExecutionRequest = mavenExecutionRequest;
+        return mavenExecutionRequest;
     }
 
     @Override
     protected void lookup(C context) throws Exception {
         context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
-        context.mavenExecutionRequestPopulator = context.lookup.lookup(MavenExecutionRequestPopulator.class);
-        context.modelProcessor = context.lookup.lookup(ModelProcessor.class);
         context.maven = context.lookup.lookup(Maven.class);
     }
 
     @Override
     protected void init(C context) throws Exception {
+        super.init(context);
         InvokerRequest invokerRequest = context.invokerRequest;
         Map<String, Object> data = new HashMap<>();
         data.put("plexus", context.lookup.lookup(PlexusContainer.class));
         data.put("workingDirectory", invokerRequest.cwd().toString());
-        data.put("systemProperties", toProperties(invokerRequest.systemProperties()));
-        data.put("userProperties", toProperties(invokerRequest.userProperties()));
+        data.put("systemProperties", toProperties(context.protoSession.getSystemProperties()));
+        data.put("userProperties", toProperties(context.protoSession.getUserProperties()));
         data.put("versionProperties", CLIReportingUtils.getBuildProperties());
         context.eventSpyDispatcher.init(() -> data);
     }
@@ -181,7 +179,7 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         }
     }
 
-    protected void toolchains(C context) throws Exception {
+    protected void toolchains(C context, MavenExecutionRequest request) throws Exception {
         Path userToolchainsFile = null;
 
         if (context.invokerRequest.options().altUserToolchains().isPresent()) {
@@ -218,13 +216,12 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
             }
         }
 
-        context.mavenExecutionRequest.setInstallationToolchainsFile(
+        request.setInstallationToolchainsFile(
                 installationToolchainsFile != null ? installationToolchainsFile.toFile() : null);
-        context.mavenExecutionRequest.setUserToolchainsFile(
-                userToolchainsFile != null ? userToolchainsFile.toFile() : null);
+        request.setUserToolchainsFile(userToolchainsFile != null ? userToolchainsFile.toFile() : null);
 
         ToolchainsBuilderRequest toolchainsRequest = ToolchainsBuilderRequest.builder()
-                .session(context.session)
+                .session(context.protoSession)
                 .installationToolchainsSource(
                         installationToolchainsFile != null && Files.isRegularFile(installationToolchainsFile)
                                 ? Source.fromPath(installationToolchainsFile)
@@ -245,9 +242,12 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
 
         context.eventSpyDispatcher.onEvent(toolchainsResult);
 
-        context.mavenExecutionRequestPopulator.populateFromToolchains(
-                context.mavenExecutionRequest,
-                new org.apache.maven.toolchain.model.PersistedToolchains(toolchainsResult.getEffectiveToolchains()));
+        context.lookup
+                .lookup(MavenExecutionRequestPopulator.class)
+                .populateFromToolchains(
+                        request,
+                        new org.apache.maven.toolchain.model.PersistedToolchains(
+                                toolchainsResult.getEffectiveToolchains()));
 
         if (!toolchainsResult.getProblems().isEmpty()) {
             context.logger.warn("");
@@ -350,8 +350,10 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         if (options.alternatePomFile().isPresent()) {
             current = context.cwdResolver.apply(options.alternatePomFile().get());
         }
-        if (context.modelProcessor != null) {
-            return context.modelProcessor.locateExistingPom(current);
+        ModelProcessor modelProcessor =
+                context.lookup.lookupOptional(ModelProcessor.class).orElse(null);
+        if (modelProcessor != null) {
+            return modelProcessor.locateExistingPom(current);
         } else {
             return Files.isRegularFile(current) ? current : null;
         }
@@ -467,9 +469,7 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         }
     }
 
-    protected int doExecute(C context) throws Exception {
-        MavenExecutionRequest request = context.mavenExecutionRequest;
-
+    protected int doExecute(C context, MavenExecutionRequest request) throws Exception {
         context.eventSpyDispatcher.onEvent(request);
 
         MavenExecutionResult result;
