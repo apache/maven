@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -43,6 +44,7 @@ import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.RepositoryPolicy;
@@ -245,8 +247,21 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             Map<String, String> systemProperties = request.getSession().getSystemProperties();
             src = Interpolator.chain(userProperties::get, systemProperties::get);
         }
-        return new SettingsTransformer(value -> value != null ? interpolator.interpolate(value, src) : null)
+        return new DefSettingsTransformer(value -> value != null ? interpolator.interpolate(value, src) : null)
                 .visit(settings);
+    }
+
+    static class DefSettingsTransformer extends SettingsTransformer {
+        DefSettingsTransformer(Function<String, String> transformer) {
+            super(transformer);
+        }
+
+        @Override
+        protected Activation.Builder transformActivation_Condition(
+                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
+            // do not interpolate the condition activation
+            return builder;
+        }
     }
 
     private Settings decrypt(
