@@ -20,7 +20,6 @@ package org.apache.maven.api.cli;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.services.MavenException;
 
 /**
  * Represents an exception that occurs during the execution of a Maven build or command.
@@ -30,7 +29,7 @@ import org.apache.maven.api.services.MavenException;
  * @since 4.0.0
  */
 @Experimental
-public class ExecutorException extends MavenException {
+public class ExecutorException extends RuntimeException {
     /**
      * Constructs a new {@code InvokerException} with the specified detail message.
      *

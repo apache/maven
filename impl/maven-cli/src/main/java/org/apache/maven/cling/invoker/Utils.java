@@ -18,7 +18,6 @@
  */
 package org.apache.maven.cling.invoker;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -46,14 +45,6 @@ import static java.util.Objects.requireNonNull;
  */
 public final class Utils {
     private Utils() {}
-
-    @Nullable
-    public static File toFile(Path path) {
-        if (path != null) {
-            return path.toFile();
-        }
-        return null;
-    }
 
     @Nonnull
     public static String stripLeadingAndTrailingQuotes(String str) {

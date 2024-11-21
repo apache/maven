@@ -40,7 +40,50 @@ import org.apache.maven.api.services.MessageBuilderFactory;
  */
 @Immutable
 @Experimental
-public interface InvokerRequest extends ExecutorRequest {
+public interface InvokerRequest {
+    /**
+     * The parser request this instance was created from.
+     */
+    @Nonnull
+    ParserRequest parserRequest();
+
+    /**
+     * Returns the current working directory for the Maven execution.
+     * This is typically the directory from which Maven was invoked.
+     *
+     * @return the current working directory path
+     */
+    @Nonnull
+    Path cwd();
+
+    /**
+     * Returns the Maven installation directory.
+     * This is usually set by the Maven launcher script using the "maven.home" system property.
+     *
+     * @return the Maven installation directory path
+     */
+    @Nonnull
+    Path installationDirectory();
+
+    /**
+     * Returns the user's home directory.
+     * This is typically obtained from the "user.home" system property.
+     *
+     * @return the user's home directory path
+     */
+    @Nonnull
+    Path userHomeDirectory();
+
+    /**
+     * Returns the list of extra JVM arguments to be passed to the forked process.
+     * These arguments allow for customization of the JVM environment in which tool will run.
+     * This property is used ONLY by executors and invokers that spawn a new JVM.
+     *
+     * @return an Optional containing the list of extra JVM arguments, or empty if not specified
+     */
+    @Nonnull
+    Optional<List<String>> jvmArguments();
+
     /**
      * Shorthand for {@link Logger} to use.
      */

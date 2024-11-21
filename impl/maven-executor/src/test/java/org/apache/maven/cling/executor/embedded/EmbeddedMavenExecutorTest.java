@@ -16,16 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.embedded;
+package org.apache.maven.cling.executor.embedded;
 
 import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.maven.api.cli.Executor;
-import org.apache.maven.api.cli.Parser;
-import org.apache.maven.cling.invoker.mvn.MavenExecutorTestSupport;
-import org.apache.maven.cling.invoker.mvn.MavenParser;
-import org.junit.jupiter.api.Disabled;
+import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
@@ -33,8 +30,6 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Forked UT: it cannot use jimFS as it runs in child process.
  */
-@Disabled(
-        "The tests reuse properties from the JVM being launched, thus may lead to failures depending on which options are used")
 public class EmbeddedMavenExecutorTest extends MavenExecutorTestSupport {
 
     @Override
@@ -42,20 +37,25 @@ public class EmbeddedMavenExecutorTest extends MavenExecutorTestSupport {
         return new EmbeddedMavenExecutor();
     }
 
-    @Override
-    protected Parser createParser() {
-        return new MavenParser();
-    }
-
     @Test
     void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        System.setProperty("maven.home", "/home/cstamas/Tools/maven/apache-maven-4.0.0-beta-6-SNAPSHOT");
-        execute(tempDir, List.of("verify"));
+        layDownFiles(tempDir);
+        execute(List.of(mvn4ExecutorRequestBuilder()
+                .cwd(tempDir)
+                .argument("verify")
+                .argument("-l")
+                .argument("embedded4.log")
+                .build()));
     }
 
     @Test
     void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        System.setProperty("maven.home", "/home/cstamas/.sdkman/candidates/maven/3.9.9");
-        execute(tempDir, List.of("verify"));
+        layDownFiles(tempDir);
+        execute(List.of(mvn3ExecutorRequestBuilder()
+                .cwd(tempDir)
+                .argument("verify")
+                .argument("-l")
+                .argument("embedded3.log")
+                .build()));
     }
 }

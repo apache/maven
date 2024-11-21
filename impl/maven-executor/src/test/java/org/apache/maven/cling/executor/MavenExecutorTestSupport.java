@@ -16,11 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn;
+package org.apache.maven.cling.executor;
 
-public final class MavenTestSupport {
-    private MavenTestSupport() {}
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
 
+import org.apache.maven.api.cli.Executor;
+import org.apache.maven.api.cli.ExecutorRequest;
+
+public abstract class MavenExecutorTestSupport {
     public static final String POM_STRING =
             """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -66,4 +73,52 @@ public final class MavenTestSupport {
                 }
             }
             """;
+
+    protected void execute(Collection<ExecutorRequest> requests) throws FailedExecution {
+        try (Executor invoker = createExecutor()) {
+            for (ExecutorRequest request : requests) {
+                int exitCode = invoker.execute(request);
+                if (exitCode != 0) {
+                    throw new FailedExecution(request, exitCode);
+                }
+            }
+        }
+    }
+
+    protected ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
+        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")));
+    }
+
+    protected ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
+        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")));
+    }
+
+    protected void layDownFiles(Path cwd) throws IOException {
+        Files.createDirectory(cwd.resolve(".mvn"));
+        Path pom = cwd.resolve("pom.xml").toAbsolutePath();
+        Files.writeString(pom, POM_STRING);
+        Path appJava = cwd.resolve("src/main/java/org/apache/maven/samples/sample/App.java");
+        Files.createDirectories(appJava.getParent());
+        Files.writeString(appJava, APP_JAVA_STRING);
+    }
+
+    protected static class FailedExecution extends Exception {
+        private final ExecutorRequest request;
+        private final int exitCode;
+
+        public FailedExecution(ExecutorRequest request, int exitCode) {
+            this.request = request;
+            this.exitCode = exitCode;
+        }
+
+        public ExecutorRequest getRequest() {
+            return request;
+        }
+
+        public int getExitCode() {
+            return exitCode;
+        }
+    }
+
+    protected abstract Executor createExecutor();
 }

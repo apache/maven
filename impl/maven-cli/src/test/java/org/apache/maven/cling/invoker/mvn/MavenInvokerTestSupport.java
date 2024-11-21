@@ -34,6 +34,51 @@ import org.junit.jupiter.api.Assumptions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class MavenInvokerTestSupport {
+    public static final String POM_STRING =
+            """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+
+                    <modelVersion>4.0.0</modelVersion>
+
+                    <groupId>org.apache.maven.samples</groupId>
+                    <artifactId>sample</artifactId>
+                    <version>1.0.0</version>
+
+                    <dependencyManagement>
+                      <dependencies>
+                        <dependency>
+                          <groupId>org.junit</groupId>
+                          <artifactId>junit-bom</artifactId>
+                          <version>5.11.1</version>
+                          <type>pom</type>
+                          <scope>import</scope>
+                        </dependency>
+                      </dependencies>
+                    </dependencyManagement>
+
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-api</artifactId>
+                        <scope>test</scope>
+                      </dependency>
+                    </dependencies>
+
+                </project>
+                """;
+
+    public static final String APP_JAVA_STRING =
+            """
+            package org.apache.maven.samples.sample;
+
+            public class App {
+                public static void main(String... args) {
+                    System.out.println("Hello World!");
+                }
+            }
+            """;
 
     protected void invoke(Path cwd, Collection<String> goals) throws Exception {
         // works only in recent Maven4
@@ -45,10 +90,10 @@ public abstract class MavenInvokerTestSupport {
 
         Files.createDirectory(cwd.resolve(".mvn"));
         Path pom = cwd.resolve("pom.xml").toAbsolutePath();
-        Files.writeString(pom, MavenTestSupport.POM_STRING);
+        Files.writeString(pom, POM_STRING);
         Path appJava = cwd.resolve("src/main/java/org/apache/maven/samples/sample/App.java");
         Files.createDirectories(appJava.getParent());
-        Files.writeString(appJava, MavenTestSupport.APP_JAVA_STRING);
+        Files.writeString(appJava, APP_JAVA_STRING);
 
         Parser parser = createParser();
         try (Invoker invoker = createInvoker()) {

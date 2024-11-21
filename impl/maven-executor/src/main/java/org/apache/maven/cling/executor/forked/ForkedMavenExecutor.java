@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.forked;
+package org.apache.maven.cling.executor.forked;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
-import org.apache.maven.internal.impl.model.profile.Os;
 
 import static java.util.Objects.requireNonNull;
 
@@ -41,13 +40,10 @@ public class ForkedMavenExecutor implements Executor {
         cmdAndArguments.add(executorRequest
                 .installationDirectory()
                 .resolve("bin")
-                .resolve(
-                        Os.IS_WINDOWS
-                                ? executorRequest.parserRequest().command() + ".cmd"
-                                : executorRequest.parserRequest().command())
+                .resolve(IS_WINDOWS ? executorRequest.command() + ".cmd" : executorRequest.command())
                 .toString());
 
-        cmdAndArguments.addAll(executorRequest.parserRequest().args());
+        cmdAndArguments.addAll(executorRequest.arguments());
 
         try {
             ProcessBuilder pb = new ProcessBuilder()

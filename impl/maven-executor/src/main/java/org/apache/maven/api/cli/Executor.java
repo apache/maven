@@ -30,6 +30,9 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 public interface Executor extends AutoCloseable {
+    // Logic borrowed from Commons-Lang3
+    boolean IS_WINDOWS = System.getProperty("os.name", "unknown").startsWith("Windows");
+
     /**
      * Invokes the tool application using the provided {@link ExecutorRequest}.
      * This method is responsible for executing the command or build

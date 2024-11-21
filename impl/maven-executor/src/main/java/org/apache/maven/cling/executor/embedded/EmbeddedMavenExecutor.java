@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.embedded;
+package org.apache.maven.cling.executor.embedded;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -160,10 +160,7 @@ public class EmbeddedMavenExecutor implements Executor {
                     exec = r -> {
                         try {
                             return (int) doMain.invoke(mavenCli, new Object[] {
-                                r.parserRequest().args().toArray(new String[0]),
-                                r.cwd().toString(),
-                                null,
-                                null
+                                r.arguments().toArray(new String[0]), r.cwd().toString(), null, null
                             });
                         } catch (Exception e) {
                             throw new ExecutorException("Failed to execute", e);
@@ -174,8 +171,7 @@ public class EmbeddedMavenExecutor implements Executor {
                     Method mainMethod = cliClass.getMethod("main", String[].class, classWorld.getClass());
                     exec = r -> {
                         try {
-                            return (int) mainMethod.invoke(
-                                    null, r.parserRequest().args().toArray(new String[0]), classWorld);
+                            return (int) mainMethod.invoke(null, r.arguments().toArray(new String[0]), classWorld);
                         } catch (Exception e) {
                             throw new ExecutorException("Failed to execute", e);
                         }
