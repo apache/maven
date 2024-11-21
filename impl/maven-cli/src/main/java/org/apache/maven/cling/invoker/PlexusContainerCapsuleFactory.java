@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import com.google.inject.AbstractModule;
@@ -73,19 +72,17 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
     @Override
     public ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws InvokerException {
         try {
-            AtomicReference<ILoggerFactory> loggerFactoryRef = new AtomicReference<>(context.loggerFactory);
             return new PlexusContainerCapsule(
                     context,
                     Thread.currentThread().getContextClassLoader(),
-                    loggerFactoryRef,
-                    container(invoker, loggerFactoryRef, context));
+                    container(invoker, context));
         } catch (Exception e) {
             throw new InvokerException("Failed to create plexus container capsule", e);
         }
     }
 
     protected DefaultPlexusContainer container(
-            LookupInvoker<C> invoker, AtomicReference<ILoggerFactory> loggerFactoryRef, C context) throws Exception {
+            LookupInvoker<C> invoker, C context) throws Exception {
         ClassWorld classWorld = invoker.protoLookup.lookup(ClassWorld.class);
         ClassRealm coreRealm = classWorld.getClassRealm("plexus.core");
         List<Path> extClassPath = parseExtClasspath(context);
@@ -110,7 +107,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 collectExportedPackages(coreEntry, extensions));
         Thread.currentThread().setContextClassLoader(containerRealm);
         DefaultPlexusContainer container =
-                new DefaultPlexusContainer(cc, getCustomModule(context, loggerFactoryRef, exports));
+                new DefaultPlexusContainer(cc, getCustomModule(context, exports));
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm(null);
@@ -172,11 +169,11 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
      * where the components are on index (are annotated with JSR330 annotations and Sisu index is created) and, they
      * have priorities set.
      */
-    protected Module getCustomModule(C context, AtomicReference<ILoggerFactory> loggerFactoryRef, CoreExports exports) {
+    protected Module getCustomModule(C context, CoreExports exports) {
         return new AbstractModule() {
             @Override
             protected void configure() {
-                bind(ILoggerFactory.class).toProvider(loggerFactoryRef::get);
+                bind(ILoggerFactory.class).toInstance(context.loggerFactory);
                 bind(CoreExports.class).toInstance(exports);
                 bind(MessageBuilderFactory.class).toInstance(context.invokerRequest.messageBuilderFactory());
             }
