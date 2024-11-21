@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.local;
+package org.apache.maven.cling.invoker.mvn.resident;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -36,12 +36,13 @@ import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Local UT.
+ * Resident UT.
  */
-public class DefaultLocalMavenInvokerTest extends MavenInvokerTestSupport {
+public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
+
     @Override
     protected Invoker createInvoker() {
-        return new LocalMavenInvoker(ProtoLookup.builder()
+        return new ResidentMavenInvoker(ProtoLookup.builder()
                 .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
                 .build());
     }
