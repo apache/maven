@@ -74,6 +74,8 @@ public class ResidentMavenInvoker extends MavenInvoker<ResidentMavenContext> {
     protected void container(ResidentMavenContext context) throws Exception {
         if (context.containerCapsule == null) {
             super.container(context);
+        } else {
+            context.containerCapsule.updateLogging(context);
         }
     }
 

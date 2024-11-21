@@ -29,6 +29,11 @@ import org.apache.maven.api.services.Lookup;
  */
 public interface ContainerCapsule extends AutoCloseable {
     /**
+     * Updates the existing capsule logging setup.
+     */
+    void updateLogging(LookupContext context);
+
+    /**
      * The {@link Lookup} service backed by container in this capsule.
      */
     @Nonnull

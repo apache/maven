@@ -19,25 +19,45 @@
 package org.apache.maven.cling.invoker;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.internal.impl.DefaultLookup;
-import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.slf4j.ILoggerFactory;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
 
 /**
  * Container capsule backed by Plexus Container.
  */
 public class PlexusContainerCapsule implements ContainerCapsule {
     private final ClassLoader previousClassLoader;
-    private final PlexusContainer plexusContainer;
+    private final AtomicReference<ILoggerFactory> loggerFactoryRef;
+    private final DefaultPlexusContainer plexusContainer;
     private final Lookup lookup;
 
-    public PlexusContainerCapsule(ClassLoader previousClassLoader, PlexusContainer plexusContainer) {
+    public PlexusContainerCapsule(
+            LookupContext context,
+            ClassLoader previousClassLoader,
+            AtomicReference<ILoggerFactory> loggerFactoryRef,
+            DefaultPlexusContainer plexusContainer) {
         this.previousClassLoader = requireNonNull(previousClassLoader, "previousClassLoader");
+        this.loggerFactoryRef = requireNonNull(loggerFactoryRef, "loggerFactoryRef");
         this.plexusContainer = requireNonNull(plexusContainer, "plexusContainer");
         this.lookup = new DefaultLookup(plexusContainer);
+        updateLogging(context);
+    }
+
+    @Override
+    public void updateLogging(LookupContext context) {
+        loggerFactoryRef.set(context.loggerFactory);
+        plexusContainer.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
+        org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
+        context.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
+                .setCause(error)
+                .log(message);
     }
 
     @Override
