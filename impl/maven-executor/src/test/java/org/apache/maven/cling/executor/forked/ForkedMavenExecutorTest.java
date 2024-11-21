@@ -41,22 +41,28 @@ public class ForkedMavenExecutorTest extends MavenExecutorTestSupport {
     @Test
     void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
-        execute(List.of(mvn4ExecutorRequestBuilder()
-                .cwd(tempDir)
-                .argument("verify")
-                .argument("-l")
-                .argument("forked4.log")
-                .build()));
+        String logfile = "forked4.log";
+        execute(
+                tempDir.resolve(logfile),
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("verify")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
     }
 
     @Test
     void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
-        execute(List.of(mvn3ExecutorRequestBuilder()
-                .cwd(tempDir)
-                .argument("verify")
-                .argument("-l")
-                .argument("forked3.log")
-                .build()));
+        String logfile = "forked3.log";
+        execute(
+                tempDir.resolve(logfile),
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("verify")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
     }
 }

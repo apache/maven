@@ -264,6 +264,17 @@ public interface ExecutorRequest {
             public Optional<List<String>> jvmArguments() {
                 return Optional.ofNullable(jvmArguments);
             }
+
+            @Override
+            public String toString() {
+                return "ExecutionRequest{" + "command='"
+                        + command + '\'' + ", arguments="
+                        + arguments + ", cwd="
+                        + cwd + ", installationDirectory="
+                        + installationDirectory + ", userHomeDirectory="
+                        + userHomeDirectory + ", jvmArguments="
+                        + jvmArguments + '}';
+            }
         }
     }
 

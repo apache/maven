@@ -40,22 +40,28 @@ public class EmbeddedMavenExecutorTest extends MavenExecutorTestSupport {
     @Test
     void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
-        execute(List.of(mvn4ExecutorRequestBuilder()
-                .cwd(tempDir)
-                .argument("verify")
-                .argument("-l")
-                .argument("embedded4.log")
-                .build()));
+        String logfile = "embedded4.log";
+        execute(
+                tempDir.resolve(logfile),
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("verify")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
     }
 
     @Test
     void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
-        execute(List.of(mvn3ExecutorRequestBuilder()
-                .cwd(tempDir)
-                .argument("verify")
-                .argument("-l")
-                .argument("embedded3.log")
-                .build()));
+        String logfile = "embedded3.log";
+        execute(
+                tempDir.resolve(logfile),
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("verify")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
     }
 }

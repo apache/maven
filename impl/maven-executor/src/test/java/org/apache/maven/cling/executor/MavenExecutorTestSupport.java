@@ -74,12 +74,12 @@ public abstract class MavenExecutorTestSupport {
             }
             """;
 
-    protected void execute(Collection<ExecutorRequest> requests) throws FailedExecution {
+    protected void execute(Path logFile, Collection<ExecutorRequest> requests) throws Exception {
         try (Executor invoker = createExecutor()) {
             for (ExecutorRequest request : requests) {
                 int exitCode = invoker.execute(request);
                 if (exitCode != 0) {
-                    throw new FailedExecution(request, exitCode);
+                    throw new FailedExecution(request, exitCode, Files.readString(logFile));
                 }
             }
         }
@@ -105,10 +105,13 @@ public abstract class MavenExecutorTestSupport {
     protected static class FailedExecution extends Exception {
         private final ExecutorRequest request;
         private final int exitCode;
+        private final String log;
 
-        public FailedExecution(ExecutorRequest request, int exitCode) {
+        public FailedExecution(ExecutorRequest request, int exitCode, String log) {
+            super(request.toString() + " => " + exitCode + "\n" + log);
             this.request = request;
             this.exitCode = exitCode;
+            this.log = log;
         }
 
         public ExecutorRequest getRequest() {
@@ -117,6 +120,10 @@ public abstract class MavenExecutorTestSupport {
 
         public int getExitCode() {
             return exitCode;
+        }
+
+        public String getLog() {
+            return log;
         }
     }
 
