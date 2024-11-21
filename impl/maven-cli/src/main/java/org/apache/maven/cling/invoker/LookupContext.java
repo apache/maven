@@ -112,4 +112,15 @@ public class LookupContext implements AutoCloseable {
             throw exception;
         }
     }
+
+    protected void closeContainer() {
+        if (containerCapsule != null) {
+            try {
+                containerCapsule.close();
+            } finally {
+                lookup = null;
+                containerCapsule = null;
+            }
+        }
+    }
 }

@@ -32,6 +32,12 @@ public class MavenContext extends LookupContext {
 
     public BuildEventListener buildEventListener;
     public EventSpyDispatcher eventSpyDispatcher;
-
     public Maven maven;
+
+    @Override
+    protected void closeContainer() {
+        eventSpyDispatcher = null;
+        maven = null;
+        super.closeContainer();
+    }
 }

@@ -50,6 +50,10 @@ import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.Utils;
+import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
+import org.apache.maven.cling.transfer.QuietMavenTransferListener;
+import org.apache.maven.cling.transfer.SimplexTransferListener;
+import org.apache.maven.cling.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
@@ -389,12 +393,27 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         if (context.eventSpyDispatcher != null) {
             listener = context.eventSpyDispatcher.chainListener(listener);
         }
-        listener = new LoggingExecutionListener(listener, determineBuildEventListener(context));
-        return listener;
+        return new LoggingExecutionListener(listener, determineBuildEventListener(context));
     }
 
     protected TransferListener determineTransferListener(C context, boolean noTransferProgress) {
-        TransferListener delegate = super.determineTransferListener(context, noTransferProgress);
+        boolean quiet = context.invokerRequest.options().quiet().orElse(false);
+        boolean logFile = context.invokerRequest.options().logFile().isPresent();
+        boolean runningOnCI = isRunningOnCI(context);
+        boolean quietCI = runningOnCI
+                && !context.invokerRequest.options().forceInteractive().orElse(false);
+
+        TransferListener delegate;
+        if (quiet || noTransferProgress || quietCI) {
+            delegate = new QuietMavenTransferListener();
+        } else if (context.interactive && !logFile) {
+            delegate = new SimplexTransferListener(new ConsoleMavenTransferListener(
+                    context.invokerRequest.messageBuilderFactory(),
+                    context.terminal.writer(),
+                    context.invokerRequest.options().verbose().orElse(false)));
+        } else {
+            delegate = new Slf4jMavenTransferListener();
+        }
         return new MavenTransferListener(delegate, determineBuildEventListener(context));
     }
 
