@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-executor</artifactId>
 
   <name>Maven 4 Executor</name>
-  <description>Maven 4 Executor, for invoking Maven 3/4.</description>
+  <description>Maven 4 Executor, for executing Maven 3/4.</description>
 
   <properties>
     <maven3version>3.9.9</maven3version>
@@ -48,12 +48,6 @@ under the License.
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.jimfs</groupId>
-      <artifactId>jimfs</artifactId>
-      <version>1.3.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -97,8 +91,6 @@ under the License.
         <version>3.5.2</version>
         <configuration>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
-          <!--forkCount>1</forkCount>
-          <reuseForks>false</reuseForks-->
           <systemPropertyVariables>
             <maven3home>${project.build.directory}/dependency/apache-maven-${maven3version}</maven3home>
             <maven4home>${project.build.directory}/dependency/apache-maven-${maven4version}</maven4home>
