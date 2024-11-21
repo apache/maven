@@ -73,16 +73,13 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
     public ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws InvokerException {
         try {
             return new PlexusContainerCapsule(
-                    context,
-                    Thread.currentThread().getContextClassLoader(),
-                    container(invoker, context));
+                    context, Thread.currentThread().getContextClassLoader(), container(invoker, context));
         } catch (Exception e) {
             throw new InvokerException("Failed to create plexus container capsule", e);
         }
     }
 
-    protected DefaultPlexusContainer container(
-            LookupInvoker<C> invoker, C context) throws Exception {
+    protected DefaultPlexusContainer container(LookupInvoker<C> invoker, C context) throws Exception {
         ClassWorld classWorld = invoker.protoLookup.lookup(ClassWorld.class);
         ClassRealm coreRealm = classWorld.getClassRealm("plexus.core");
         List<Path> extClassPath = parseExtClasspath(context);
@@ -106,8 +103,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 collectExportedArtifacts(coreEntry, extensions),
                 collectExportedPackages(coreEntry, extensions));
         Thread.currentThread().setContextClassLoader(containerRealm);
-        DefaultPlexusContainer container =
-                new DefaultPlexusContainer(cc, getCustomModule(context, exports));
+        DefaultPlexusContainer container = new DefaultPlexusContainer(cc, getCustomModule(context, exports));
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm(null);

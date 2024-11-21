@@ -36,9 +36,7 @@ public class PlexusContainerCapsule implements ContainerCapsule {
     private final Lookup lookup;
 
     public PlexusContainerCapsule(
-            LookupContext context,
-            ClassLoader previousClassLoader,
-            DefaultPlexusContainer plexusContainer) {
+            LookupContext context, ClassLoader previousClassLoader, DefaultPlexusContainer plexusContainer) {
         this.previousClassLoader = requireNonNull(previousClassLoader, "previousClassLoader");
         this.plexusContainer = requireNonNull(plexusContainer, "plexusContainer");
         this.lookup = new DefaultLookup(plexusContainer);
