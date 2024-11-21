@@ -73,13 +73,13 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
     public ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws InvokerException {
         try {
             return new PlexusContainerCapsule(
-                    Thread.currentThread().getContextClassLoader(), container(invoker, context));
+                    context, Thread.currentThread().getContextClassLoader(), container(invoker, context));
         } catch (Exception e) {
             throw new InvokerException("Failed to create plexus container capsule", e);
         }
     }
 
-    protected PlexusContainer container(LookupInvoker<C> invoker, C context) throws Exception {
+    protected DefaultPlexusContainer container(LookupInvoker<C> invoker, C context) throws Exception {
         ClassWorld classWorld = invoker.protoLookup.lookup(ClassWorld.class);
         ClassRealm coreRealm = classWorld.getClassRealm("plexus.core");
         List<Path> extClassPath = parseExtClasspath(context);
@@ -138,12 +138,6 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
 
         container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
         customizeContainer(context, container);
-
-        // refresh logger in case container got customized by spy
-        org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
-        context.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
-                .setCause(error)
-                .log(message);
 
         return container;
     }
