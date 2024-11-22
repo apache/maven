@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl.model.profile;
 
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.maven.api.model.Model;
@@ -25,6 +26,7 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
 import org.apache.maven.internal.impl.model.DefaultProfileActivationContext;
+import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -35,6 +37,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
+    static class FakeRootLocator extends DefaultRootLocator {
+        @Override
+        protected boolean isRootDirectory(Path dir) {
+            return true;
+        }
+    }
 
     protected T activator;
 
