@@ -48,7 +48,7 @@ public class DefaultRootLocator implements RootLocator {
 
     @Override
     public Path findRoot(Path basedir) {
-        requireNonNull(basedir, "basedir is null");
+        requireNonNull(basedir, getNoRootMessage());
         Path rootDirectory = basedir;
         while (rootDirectory != null && !isRootDirectory(rootDirectory)) {
             rootDirectory = rootDirectory.getParent();

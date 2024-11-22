@@ -53,7 +53,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     @Override
     void setUp() throws Exception {
         activator = new FileProfileActivator(new ProfileActivationFilePathInterpolator(
-                new DefaultPathTranslator(), bd -> true, new DefaultInterpolator()));
+                new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator()));
 
         context.setModel(Model.newBuilder().pomFile(tempDir.resolve("pom.xml")).build());
 
@@ -64,11 +64,11 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testRootDirectoryWithNull() {
-        context.setModel(Model.newInstance());
+    void testRootDirectoryWithNull(@TempDir Path tempDir) throws IOException {
+        context.setModel(Model.newBuilder(true).build());
 
-        IllegalStateException e = assertThrows(
-                IllegalStateException.class,
+        NullPointerException e = assertThrows(
+                NullPointerException.class,
                 () -> assertActivation(false, newExistsProfile("${project.rootDirectory}"), context));
         assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
     }

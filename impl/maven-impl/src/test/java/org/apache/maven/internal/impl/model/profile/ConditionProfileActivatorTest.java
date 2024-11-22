@@ -33,8 +33,8 @@ import org.apache.maven.internal.impl.DefaultVersionParser;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultProfileActivationContext;
-import org.apache.maven.internal.impl.model.DefaultRootLocator;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
+import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -57,7 +57,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         activator = new ConditionProfileActivator(
                 new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme())),
                 new ProfileActivationFilePathInterpolator(
-                        new DefaultPathTranslator(), bd -> true, new DefaultInterpolator()),
+                        new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator()),
                 new DefaultRootLocator());
 
         Path file = tempDir.resolve("file.txt");

@@ -29,9 +29,9 @@ import org.apache.maven.internal.impl.DefaultVersionParser;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultProfileActivationContext;
-import org.apache.maven.internal.impl.model.DefaultRootLocator;
 import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.internal.impl.model.profile.ConditionParser.ExpressionFunction;
+import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,9 @@ class ConditionParserTest {
         DefaultVersionParser versionParser =
                 new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()));
         ProfileActivationFilePathInterpolator interpolator = new ProfileActivationFilePathInterpolator(
-                new DefaultPathTranslator(), bd -> true, new DefaultInterpolator());
+                new DefaultPathTranslator(),
+                new AbstractProfileActivatorTest.FakeRootLocator(),
+                new DefaultInterpolator());
         DefaultRootLocator rootLocator = new DefaultRootLocator();
 
         functions = ConditionProfileActivator.registerFunctions(context, versionParser, interpolator);
