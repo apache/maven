@@ -23,11 +23,61 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.CleanupMode;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class MavenExecutorTestSupport {
+    @Test
+    void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
+        layDownFiles(tempDir);
+        String logfile = "m4.log";
+        execute(
+                tempDir.resolve(logfile),
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("verify")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
+    }
+
+    @Test
+    void version() throws Exception {
+        assertEquals(
+                System.getProperty("maven4version"),
+                mavenVersion(mvn4ExecutorRequestBuilder().build()));
+    }
+
+    @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
+    @Test
+    void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
+        layDownFiles(tempDir);
+        String logfile = "m3.log";
+        execute(
+                tempDir.resolve(logfile),
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("verify")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
+    }
+
+    @Test
+    void version3x() throws Exception {
+        assertEquals(
+                System.getProperty("maven3version"),
+                mavenVersion(mvn3ExecutorRequestBuilder().build()));
+    }
+
     public static final String POM_STRING =
             """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -82,6 +132,12 @@ public abstract class MavenExecutorTestSupport {
                     throw new FailedExecution(request, exitCode, Files.readString(logFile));
                 }
             }
+        }
+    }
+
+    protected String mavenVersion(ExecutorRequest request) throws Exception {
+        try (Executor invoker = createExecutor()) {
+            return invoker.mavenVersion(request);
         }
     }
 

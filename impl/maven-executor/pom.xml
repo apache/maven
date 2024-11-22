@@ -91,6 +91,8 @@ under the License.
         <configuration>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
+            <maven3version>${maven3version}</maven3version>
+            <maven4version>${maven4version}</maven4version>
             <maven3home>${project.build.directory}/dependency/apache-maven-${maven3version}</maven3home>
             <maven4home>${project.build.directory}/dependency/apache-maven-${maven4version}</maven4home>
           </systemPropertyVariables>

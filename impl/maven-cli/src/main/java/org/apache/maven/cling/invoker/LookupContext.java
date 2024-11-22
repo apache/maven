@@ -57,7 +57,7 @@ public class LookupContext implements AutoCloseable {
 
         Map<String, String> user = new HashMap<>(invokerRequest.userProperties());
         user.put("session.topDirectory", invokerRequest.topDirectory().toString());
-        if (invokerRequest.rootDirectory().isEmpty()) {
+        if (invokerRequest.rootDirectory().isPresent()) {
             user.put(
                     "session.rootDirectory",
                     invokerRequest.rootDirectory().get().toString());

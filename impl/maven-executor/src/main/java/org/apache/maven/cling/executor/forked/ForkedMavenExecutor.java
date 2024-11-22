@@ -18,8 +18,15 @@
  */
 package org.apache.maven.cling.executor.forked;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorException;
@@ -36,6 +43,55 @@ public class ForkedMavenExecutor implements Executor {
         requireNonNull(executorRequest);
         validate(executorRequest);
 
+        return doExecute(executorRequest, null);
+    }
+
+    @Override
+    public String mavenVersion(ExecutorRequest executorRequest) throws ExecutorException {
+        requireNonNull(executorRequest);
+        validate(executorRequest);
+        try {
+            Path cwd = Files.createTempDirectory("forked-executor-maven-version");
+            try {
+                ArrayList<String> stdout = new ArrayList<>();
+                int exitCode = doExecute(
+                        executorRequest.toBuilder()
+                                .cwd(cwd)
+                                .arguments(List.of("--version", "--color", "never"))
+                                .build(),
+                        p -> {
+                            String line;
+                            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                                while ((line = br.readLine()) != null) {
+                                    stdout.add(line);
+                                }
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                        });
+                if (exitCode == 0) {
+                    for (String line : stdout) {
+                        if (line.startsWith("Apache Maven ")) {
+                            return line.substring(13, line.indexOf("(") - 1);
+                        }
+                    }
+                    return UNKNOWN_VERSION;
+                } else {
+                    throw new ExecutorException(
+                            "Maven version query unexpected exitCode=" + exitCode + "\nLog: " + stdout);
+                }
+            } finally {
+                Files.deleteIfExists(cwd);
+            }
+        } catch (IOException e) {
+            throw new ExecutorException("Failed to determine maven version", e);
+        }
+    }
+
+    protected void validate(ExecutorRequest executorRequest) throws ExecutorException {}
+
+    protected int doExecute(ExecutorRequest executorRequest, Consumer<Process> processConsumer)
+            throws ExecutorException {
         ArrayList<String> cmdAndArguments = new ArrayList<>();
         cmdAndArguments.add(executorRequest
                 .installationDirectory()
@@ -57,13 +113,15 @@ public class ForkedMavenExecutor implements Executor {
                                 String.join(" ", executorRequest.jvmArguments().get()));
             }
 
-            return pb.start().waitFor();
+            Process process = pb.start();
+            if (processConsumer != null) {
+                processConsumer.accept(process);
+            }
+            return process.waitFor();
         } catch (IOException e) {
             throw new ExecutorException("IO problem while executing command: " + cmdAndArguments, e);
         } catch (InterruptedException e) {
             throw new ExecutorException("Interrupted while executing command: " + cmdAndArguments, e);
         }
     }
-
-    protected void validate(ExecutorRequest executorRequest) throws ExecutorException {}
 }

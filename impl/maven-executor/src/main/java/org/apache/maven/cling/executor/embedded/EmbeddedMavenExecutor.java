@@ -102,6 +102,13 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
+    @Override
+    public String mavenVersion(ExecutorRequest executorRequest) throws ExecutorException {
+        requireNonNull(executorRequest);
+        validate(executorRequest);
+        return mayCreate(executorRequest).version;
+    }
+
     protected Context mayCreate(ExecutorRequest executorRequest) {
         Path installation = executorRequest.installationDirectory();
         if (!Files.isDirectory(installation)) {
@@ -148,7 +155,7 @@ public class EmbeddedMavenExecutor implements Executor {
                 Object classWorld = launcherClass.getMethod("getWorld").invoke(launcher);
                 Class<?> cliClass =
                         (Class<?>) launcherClass.getMethod("getMainClass").invoke(launcher);
-                String version = getMavenVersion(cliClass.getClassLoader());
+                String version = getMavenVersion(cliClass);
                 Function<ExecutorRequest, Integer> exec;
 
                 if (version.startsWith("3.")) {
@@ -246,10 +253,9 @@ public class EmbeddedMavenExecutor implements Executor {
                 urls.toArray(new URL[0]), ClassLoader.getSystemClassLoader().getParent());
     }
 
-    public String getMavenVersion(ClassLoader classLoader) throws IOException {
+    protected String getMavenVersion(Class<?> clazz) throws IOException {
         Properties props = new Properties();
-        try (InputStream is =
-                classLoader.getResourceAsStream("/META-INF/maven/org.apache.maven/maven-core/pom.properties")) {
+        try (InputStream is = clazz.getResourceAsStream("/META-INF/maven/org.apache.maven/maven-core/pom.properties")) {
             if (is != null) {
                 props.load(is);
             }
@@ -257,7 +263,7 @@ public class EmbeddedMavenExecutor implements Executor {
             if (version != null) {
                 return version;
             }
-            return "unknown";
+            return UNKNOWN_VERSION;
         }
     }
 }

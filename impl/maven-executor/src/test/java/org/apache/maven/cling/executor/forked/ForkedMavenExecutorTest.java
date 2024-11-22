@@ -18,16 +18,8 @@
  */
 package org.apache.maven.cling.executor.forked;
 
-import java.nio.file.Path;
-import java.util.List;
-
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
-import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.CleanupMode;
-import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Forked UT: it cannot use jimFS as it runs in child process.
@@ -36,35 +28,6 @@ public class ForkedMavenExecutorTest extends MavenExecutorTestSupport {
 
     @Override
     protected Executor createExecutor() {
-        return new EmbeddedMavenExecutor();
-    }
-
-    @Test
-    void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
-        String logfile = "forked4.log";
-        execute(
-                tempDir.resolve(logfile),
-                List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(tempDir)
-                        .argument("verify")
-                        .argument("-l")
-                        .argument(logfile)
-                        .build()));
-    }
-
-    @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
-    @Test
-    void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
-        String logfile = "forked3.log";
-        execute(
-                tempDir.resolve(logfile),
-                List.of(mvn3ExecutorRequestBuilder()
-                        .cwd(tempDir)
-                        .argument("verify")
-                        .argument("-l")
-                        .argument(logfile)
-                        .build()));
+        return new ForkedMavenExecutor();
     }
 }

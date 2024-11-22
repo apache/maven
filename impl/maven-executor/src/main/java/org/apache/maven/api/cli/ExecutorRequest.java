@@ -228,7 +228,7 @@ public interface ExecutorRequest {
                     Path userHomeDirectory,
                     List<String> jvmArguments) {
                 this.command = requireNonNull(command);
-                this.arguments = List.copyOf(arguments);
+                this.arguments = arguments == null ? List.of() : List.copyOf(arguments);
                 this.cwd = requireNonNull(cwd);
                 this.installationDirectory = requireNonNull(installationDirectory);
                 this.userHomeDirectory = requireNonNull(userHomeDirectory);

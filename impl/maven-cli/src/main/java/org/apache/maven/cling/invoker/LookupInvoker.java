@@ -266,7 +266,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (options.logFile().isPresent()) {
             Path logFile = context.cwdResolver.apply(options.logFile().get());
             try {
-                PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile));
+                PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
                 return printWriter::println;
             } catch (IOException e) {
