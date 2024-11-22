@@ -18,7 +18,6 @@
  */
 package org.apache.maven.cling.transfer;
 
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -42,11 +41,6 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     private final boolean printResourceNames;
     private int lastLength;
-
-    public ConsoleMavenTransferListener(
-            MessageBuilderFactory messageBuilderFactory, PrintStream out, boolean printResourceNames) {
-        this(messageBuilderFactory, new PrintWriter(out), printResourceNames);
-    }
 
     public ConsoleMavenTransferListener(
             MessageBuilderFactory messageBuilderFactory, PrintWriter out, boolean printResourceNames) {

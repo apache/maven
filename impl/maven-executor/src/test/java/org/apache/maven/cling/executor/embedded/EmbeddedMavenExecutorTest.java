@@ -16,28 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn;
+package org.apache.maven.cling.executor.embedded;
 
-import org.apache.maven.Maven;
-import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.cling.invoker.LookupContext;
-import org.apache.maven.eventspy.internal.EventSpyDispatcher;
-import org.apache.maven.logging.BuildEventListener;
+import org.apache.maven.api.cli.Executor;
+import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 
-@SuppressWarnings("VisibilityModifier")
-public class MavenContext extends LookupContext {
-    public MavenContext(InvokerRequest invokerRequest) {
-        super(invokerRequest);
-    }
-
-    public BuildEventListener buildEventListener;
-    public EventSpyDispatcher eventSpyDispatcher;
-    public Maven maven;
+/**
+ * Embedded executor UT
+ */
+public class EmbeddedMavenExecutorTest extends MavenExecutorTestSupport {
 
     @Override
-    protected void closeContainer() {
-        eventSpyDispatcher = null;
-        maven = null;
-        super.closeContainer();
+    protected Executor createExecutor() {
+        return new EmbeddedMavenExecutor();
     }
 }

@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.Parser;
@@ -92,25 +91,6 @@ public abstract class BaseParser implements Parser {
             }
             return extra;
         }
-    }
-
-    @Override
-    public ExecutorRequest parseExecution(ParserRequest parserRequest) throws ParserException, IOException {
-        requireNonNull(parserRequest);
-
-        LocalContext context = new LocalContext(parserRequest);
-
-        // the basics
-        context.cwd = requireNonNull(getCwd(context));
-        context.installationDirectory = requireNonNull(getInstallationDirectory(context));
-        context.userHomeDirectory = requireNonNull(getUserHomeDirectory(context));
-
-        return getExecutionRequest(context);
-    }
-
-    protected ExecutorRequest getExecutionRequest(LocalContext context) {
-        return new BaseExecutorRequest(
-                context.parserRequest, context.cwd, context.installationDirectory, context.userHomeDirectory, null);
     }
 
     @Override

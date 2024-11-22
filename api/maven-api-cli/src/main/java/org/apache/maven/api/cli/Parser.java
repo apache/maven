@@ -31,18 +31,6 @@ import org.apache.maven.api.annotations.Nonnull;
 @Experimental
 public interface Parser {
     /**
-     * Parses the given ParserRequest to create an {@link ExecutorRequest}.
-     * This method does not interpret tool arguments.
-     *
-     * @param parserRequest the request containing all necessary information for parsing
-     * @return the parsed executor request
-     * @throws ParserException if there's an error during parsing of the request
-     * @throws IOException if there's an I/O error during the parsing process
-     */
-    @Nonnull
-    ExecutorRequest parseExecution(@Nonnull ParserRequest parserRequest) throws ParserException, IOException;
-
-    /**
      * Parses the given ParserRequest to create an {@link InvokerRequest}.
      * This method does interpret tool arguments.
      *

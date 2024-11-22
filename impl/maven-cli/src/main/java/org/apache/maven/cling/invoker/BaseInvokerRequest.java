@@ -33,7 +33,12 @@ import org.apache.maven.api.cli.extensions.CoreExtension;
 
 import static java.util.Objects.requireNonNull;
 
-public abstract class BaseInvokerRequest extends BaseExecutorRequest implements InvokerRequest {
+public abstract class BaseInvokerRequest implements InvokerRequest {
+    private final ParserRequest parserRequest;
+    private final Path cwd;
+    private final Path installationDirectory;
+    private final Path userHomeDirectory;
+    private final List<String> jvmArguments;
     private final Map<String, String> userProperties;
     private final Map<String, String> systemProperties;
     private final Path topDirectory;
@@ -58,7 +63,12 @@ public abstract class BaseInvokerRequest extends BaseExecutorRequest implements 
             @Nullable OutputStream err,
             @Nullable List<CoreExtension> coreExtensions,
             @Nullable List<String> jvmArguments) {
-        super(parserRequest, cwd, installationDirectory, userHomeDirectory, jvmArguments);
+        this.parserRequest = requireNonNull(parserRequest);
+        this.cwd = requireNonNull(cwd);
+        this.installationDirectory = requireNonNull(installationDirectory);
+        this.userHomeDirectory = requireNonNull(userHomeDirectory);
+        this.jvmArguments = jvmArguments;
+
         this.userProperties = requireNonNull(userProperties);
         this.systemProperties = requireNonNull(systemProperties);
         this.topDirectory = requireNonNull(topDirectory);
@@ -68,6 +78,31 @@ public abstract class BaseInvokerRequest extends BaseExecutorRequest implements 
         this.in = in;
         this.out = out;
         this.err = err;
+    }
+
+    @Override
+    public ParserRequest parserRequest() {
+        return parserRequest;
+    }
+
+    @Override
+    public Path cwd() {
+        return cwd;
+    }
+
+    @Override
+    public Path installationDirectory() {
+        return installationDirectory;
+    }
+
+    @Override
+    public Path userHomeDirectory() {
+        return userHomeDirectory;
+    }
+
+    @Override
+    public Optional<List<String>> jvmArguments() {
+        return Optional.ofNullable(jvmArguments);
     }
 
     @Override

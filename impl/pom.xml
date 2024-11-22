@@ -38,5 +38,6 @@ under the License.
     <module>maven-logging</module>
     <module>maven-core</module>
     <module>maven-cli</module>
+    <module>maven-executor</module>
   </modules>
 </project>

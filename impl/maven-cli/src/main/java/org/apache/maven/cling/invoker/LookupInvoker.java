@@ -64,10 +64,6 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.cling.invoker.spi.PropertyContributorsHolder;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
-import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
-import org.apache.maven.cling.transfer.QuietMavenTransferListener;
-import org.apache.maven.cling.transfer.SimplexTransferListener;
-import org.apache.maven.cling.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.SettingsUtilsV4;
@@ -76,7 +72,6 @@ import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.slf4j.MavenSimpleLogger;
-import org.eclipse.aether.transfer.TransferListener;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
@@ -132,6 +127,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         validate(context);
         prepare(context);
         configureLogging(context);
+        createTerminal(context);
         activateLogging(context);
         helpOrVersionAndMayExit(context);
         preCommands(context);
@@ -216,18 +212,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
-
-        // JLine is quite slow to start due to the native library unpacking and loading
-        // so boot it asynchronously
-        context.terminal = createTerminal(context);
-        context.closeables.add(MessageUtils::systemUninstall);
-        MessageUtils.registerShutdownHook(); // safety belt
-        if (context.coloredOutput != null) {
-            MessageUtils.setColorEnabled(context.coloredOutput);
-        }
     }
 
-    protected Terminal createTerminal(C context) {
+    protected void createTerminal(C context) {
         MessageUtils.systemInstall(
                 builder -> {
                     builder.streams(
@@ -243,7 +230,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     }
                 },
                 terminal -> doConfigureWithTerminal(context, terminal));
-        return MessageUtils.getTerminal();
+
+        context.terminal = MessageUtils.getTerminal();
+        // JLine is quite slow to start due to the native library unpacking and loading
+        // so boot it asynchronously
+        context.closeables.add(MessageUtils::systemUninstall);
+        MessageUtils.registerShutdownHook(); // safety belt
+        if (context.coloredOutput != null) {
+            MessageUtils.setColorEnabled(context.coloredOutput);
+        }
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
@@ -271,7 +266,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (options.logFile().isPresent()) {
             Path logFile = context.cwdResolver.apply(options.logFile().get());
             try {
-                PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile));
+                PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
                 return printWriter::println;
             } catch (IOException e) {
@@ -376,7 +371,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void container(C context) throws Exception {
         context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
-        context.closeables.add(context.containerCapsule);
+        context.closeables.add(context::closeContainer);
         context.lookup = context.containerCapsule.getLookup();
 
         // refresh logger in case container got customized by spy
@@ -741,25 +736,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected boolean isRunningOnCI(C context) {
         String ciEnv = context.protoSession.getSystemProperties().get("env.CI");
         return ciEnv != null && !"false".equals(ciEnv);
-    }
-
-    protected TransferListener determineTransferListener(C context, boolean noTransferProgress) {
-        boolean quiet = context.invokerRequest.options().quiet().orElse(false);
-        boolean logFile = context.invokerRequest.options().logFile().isPresent();
-        boolean runningOnCI = isRunningOnCI(context);
-        boolean quietCI = runningOnCI
-                && !context.invokerRequest.options().forceInteractive().orElse(false);
-
-        if (quiet || noTransferProgress || quietCI) {
-            return new QuietMavenTransferListener();
-        } else if (context.interactive && !logFile) {
-            return new SimplexTransferListener(new ConsoleMavenTransferListener(
-                    context.invokerRequest.messageBuilderFactory(),
-                    context.terminal.writer(),
-                    context.invokerRequest.options().verbose().orElse(false)));
-        } else {
-            return new Slf4jMavenTransferListener();
-        }
     }
 
     protected abstract int execute(C context) throws Exception;

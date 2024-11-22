@@ -31,6 +31,7 @@ import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
@@ -38,9 +39,8 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Local UT.
  */
-@Disabled(
-        "The tests reuse properties from the JVM being launched, thus may lead to failures depending on which options are used")
-public class DefaultLocalMavenInvokerTest extends MavenInvokerTestSupport {
+@Order(200)
+public class LocalMavenInvokerTest extends MavenInvokerTestSupport {
     @Override
     protected Invoker createInvoker() {
         return new LocalMavenInvoker(ProtoLookup.builder()

@@ -18,7 +18,6 @@
  */
 package org.apache.maven.cling.transfer;
 
-import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import org.apache.maven.api.services.MessageBuilder;
@@ -36,10 +35,6 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     protected final MessageBuilderFactory messageBuilderFactory;
     protected final PrintWriter out;
-
-    protected AbstractMavenTransferListener(MessageBuilderFactory messageBuilderFactory, PrintStream out) {
-        this(messageBuilderFactory, new PrintWriter(out));
-    }
 
     protected AbstractMavenTransferListener(MessageBuilderFactory messageBuilderFactory, PrintWriter out) {
         this.messageBuilderFactory = messageBuilderFactory;

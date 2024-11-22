@@ -29,12 +29,12 @@ public class ResidentMavenContext extends MavenContext {
     }
 
     @Override
-    public void close() throws InvokerException {
-        // we are resident, we do not shut down here
+    protected void closeContainer() {
+        // we are resident; we do not shut down here
     }
 
     public void shutDown() throws InvokerException {
-        super.close();
+        super.closeContainer();
     }
 
     public ResidentMavenContext copy(InvokerRequest invokerRequest) {
@@ -43,16 +43,9 @@ public class ResidentMavenContext extends MavenContext {
         }
         ResidentMavenContext shadow = new ResidentMavenContext(invokerRequest);
 
-        shadow.logger = logger;
-        shadow.loggerFactory = loggerFactory;
-        shadow.loggerLevel = loggerLevel;
+        // we carry over only "resident" things
         shadow.containerCapsule = containerCapsule;
         shadow.lookup = lookup;
-
-        shadow.interactive = interactive;
-        shadow.localRepositoryPath = localRepositoryPath;
-        shadow.effectiveSettings = effectiveSettings;
-
         shadow.eventSpyDispatcher = eventSpyDispatcher;
         shadow.maven = maven;
 
