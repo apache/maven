@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
@@ -52,6 +53,7 @@ public class ForkedMavenExecutorTest extends MavenExecutorTestSupport {
                         .build()));
     }
 
+    @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
     @Test
     void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
