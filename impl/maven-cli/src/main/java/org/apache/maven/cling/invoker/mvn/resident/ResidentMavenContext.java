@@ -34,11 +34,7 @@ public class ResidentMavenContext extends MavenContext {
     }
 
     public void shutDown() throws InvokerException {
-        try {
-            super.close();
-        } finally {
-            super.closeContainer();
-        }
+        super.closeContainer();
     }
 
     public ResidentMavenContext copy(InvokerRequest invokerRequest) {
