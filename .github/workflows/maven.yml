@@ -193,6 +193,13 @@ jobs:
             maven-${{ runner.os }}-its
             maven-${{ runner.os }}-
 
+      # we use two steps so that we can cache artifacts downloaded from Maven Central repository
+      # without installing any local artifacts to not pollute the cache
+      - name: Build maven and ITs
+        shell: bash
+        run: mvn package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.m2/repository/cached
+
+      # Now run tests and ITs using a separate local repo (using the previous filled repo as tail)
       - name: Run integration tests
         shell: bash
         run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local=$HOME/.m2/repository/local -Dmaven.repo.local.tail=$HOME/.m2/repository/cached
