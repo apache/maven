@@ -25,6 +25,7 @@ import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Forked UT: it cannot use jimFS as it runs in child process.
  */
+@Order(300)
 public class ForkedMavenInvokerTest extends MavenInvokerTestSupport {
 
     @Override

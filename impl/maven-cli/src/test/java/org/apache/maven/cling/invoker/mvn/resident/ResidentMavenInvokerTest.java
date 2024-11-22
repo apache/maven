@@ -31,6 +31,7 @@ import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Resident UT.
  */
+@Order(100)
 public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
 
     @Override
