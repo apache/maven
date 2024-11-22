@@ -22,7 +22,7 @@ import org.apache.maven.api.cli.Executor;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 
 /**
- * Forked UT: it cannot use jimFS as it runs in child process.
+ * Embedded executor UT
  */
 public class EmbeddedMavenExecutorTest extends MavenExecutorTestSupport {
 

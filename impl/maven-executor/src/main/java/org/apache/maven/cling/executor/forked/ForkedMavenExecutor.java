@@ -35,7 +35,8 @@ import org.apache.maven.api.cli.ExecutorRequest;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Forked executor implementation, that spawns a subprocess with Maven from the installation directory.
+ * Forked executor implementation, that spawns a subprocess with Maven from the installation directory. Very costly
+ * but provides the best isolation.
  */
 public class ForkedMavenExecutor implements Executor {
     @Override
