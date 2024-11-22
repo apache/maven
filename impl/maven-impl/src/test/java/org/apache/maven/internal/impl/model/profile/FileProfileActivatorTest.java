@@ -64,7 +64,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testRootDirectoryWithNull() throws IOException {
+    void testRootDirectoryWithNull() {
         context.setModel(Model.newInstance());
 
         NullPointerException e = assertThrows(
