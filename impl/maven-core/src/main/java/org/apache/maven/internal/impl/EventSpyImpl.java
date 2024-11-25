@@ -55,7 +55,7 @@ public class EventSpyImpl implements EventSpy {
     }
 
     /**
-     * Simple "conversion" from Maven3 event type enum to Maven4 enum,
+     * Simple "conversion" from Maven3 event type enum to Maven4 enum.
      */
     protected EventType convert(ExecutionEvent.Type type) {
         return EventType.values()[type.ordinal()];
