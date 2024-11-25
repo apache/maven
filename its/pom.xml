@@ -73,7 +73,7 @@ under the License.
     <!--    <maven.compiler.source>8</maven.compiler.source>-->
     <!--    <maven.compiler.target>8</maven.compiler.target>-->
 
-    <maven-version>4.0.0-beta-6-SNAPSHOT</maven-version>
+    <maven-version>${project.parent.version}</maven-version>
     <maven-plugin-tools-version>3.15.1</maven-plugin-tools-version>
   </properties>
 
