@@ -170,9 +170,6 @@ under the License.
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>7.1.0</woodstoxVersion>
     <xmlunitVersion>2.10.0</xmlunitVersion>
-
-    <!-- ITs inherited property -->
-    <maven-version>${project.version}</maven-version>
   </properties>
 
   <!--bootstrap-start-comment-->
