@@ -124,6 +124,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected int doInvoke(C context) throws Exception {
         pushCoreProperties(context);
+        pushUserProperties(context);
         validate(context);
         prepare(context);
         configureLogging(context);
