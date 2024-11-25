@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -85,7 +86,7 @@ public class BuildPlan {
     }
 
     public BuildStep requiredStep(MavenProject project, String name) {
-        return step(project, name).get();
+        return step(project, name).orElseThrow(() -> new NoSuchElementException("Step " + name + " not found"));
     }
 
     // add a follow-up plan to this one
