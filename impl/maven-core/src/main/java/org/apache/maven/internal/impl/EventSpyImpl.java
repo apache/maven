@@ -18,45 +18,47 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.Collection;
 
 import org.apache.maven.api.Event;
+import org.apache.maven.api.EventType;
 import org.apache.maven.api.Listener;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
 
+/**
+ * Bridges between Maven3 events and Maven4 events.
+ */
 @Named
 @Singleton
 public class EventSpyImpl implements EventSpy {
-
-    private DefaultSessionFactory sessionFactory;
-
-    @Inject
-    EventSpyImpl(DefaultSessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
-
     @Override
     public void init(Context context) throws Exception {}
 
     @Override
     public void onEvent(Object arg) throws Exception {
-        if (arg instanceof ExecutionEvent) {
-            ExecutionEvent ee = (ExecutionEvent) arg;
+        if (arg instanceof ExecutionEvent ee) {
             InternalMavenSession session =
                     InternalMavenSession.from(ee.getSession().getSession());
+            EventType eventType = convert(ee.getType());
             Collection<Listener> listeners = session.getListeners();
             if (!listeners.isEmpty()) {
-                Event event = new DefaultEvent(session, ee);
+                Event event = new DefaultEvent(session, ee, eventType);
                 for (Listener listener : listeners) {
                     listener.onEvent(event);
                 }
             }
         }
+    }
+
+    /**
+     * Simple "conversion" from Maven3 event type enum to Maven4 enum,
+     */
+    protected EventType convert(ExecutionEvent.Type type) {
+        return EventType.values()[type.ordinal()];
     }
 
     @Override
