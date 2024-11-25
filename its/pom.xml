@@ -81,22 +81,22 @@ under the License.
     <dependencies>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-plugin-api</artifactId>
-        <version>${maven-version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
         <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-settings</artifactId>
+        <artifactId>maven-builder-support</artifactId>
         <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-compat</artifactId>
+        <artifactId>maven-jline</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-logging</artifactId>
         <version>${maven-version}</version>
       </dependency>
       <dependency>
@@ -106,7 +106,92 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
+        <artifactId>maven-impl</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-embedder</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-cli</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-core</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-meta</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-model</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-settings</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-spi</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-toolchain</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-plugin</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-xml</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-di</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-metadata</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-cli</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-di</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-model-builder</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-plugin-api</artifactId>
         <version>${maven-version}</version>
       </dependency>
       <dependency>
@@ -114,6 +199,42 @@ under the License.
         <artifactId>maven-repository-metadata</artifactId>
         <version>${maven-version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-resolver-provider</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-settings</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-settings-builder</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-toolchain-model</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-toolchain-builder</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-xml</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-compat</artifactId>
+        <version>${maven-version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-verifier</artifactId>
