@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>4.0.0-rc-1</version>
+  <version>4.0.0-rc-2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -140,7 +140,7 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2024-11-25T10:56:23Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2024-11-25T10:57:49Z</project.build.outputTimestamp>
     <!-- various versions -->
     <assertjVersion>3.26.3</assertjVersion>
     <asmVersion>9.7.1</asmVersion>
