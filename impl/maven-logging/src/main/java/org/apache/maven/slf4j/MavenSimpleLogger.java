@@ -160,6 +160,11 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         } else {
             this.currentLogLevel = defaultLogLevel;
         }
+        traceRenderedLevel = builder().trace("TRACE").build();
+        debugRenderedLevel = builder().debug("DEBUG").build();
+        infoRenderedLevel = builder().info("INFO").build();
+        warnRenderedLevel = builder().warning("WARNING").build();
+        errorRenderedLevel = builder().error("ERROR").build();
     }
 
     public void setLogLevel(int logLevel) {
