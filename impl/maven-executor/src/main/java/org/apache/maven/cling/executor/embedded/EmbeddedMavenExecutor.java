@@ -74,11 +74,13 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
+    private final PrintStream originalStdout;
     private final Properties originalProperties;
     private final ClassLoader originalClassLoader;
     private final ConcurrentHashMap<Path, Context> contexts;
 
     public EmbeddedMavenExecutor() {
+        this.originalStdout = System.out;
         this.originalClassLoader = Thread.currentThread().getContextClassLoader();
         this.contexts = new ConcurrentHashMap<>();
         this.originalProperties = System.getProperties();
@@ -93,10 +95,14 @@ public class EmbeddedMavenExecutor implements Executor {
         System.setProperties(context.properties);
         Thread.currentThread().setContextClassLoader(context.tccl);
         try {
+            if (executorRequest.stdoutConsumer().isPresent()) {
+                System.setOut(new PrintStream(executorRequest.stdoutConsumer().get(), true));
+            }
             return context.exec.apply(executorRequest);
         } catch (Exception e) {
             throw new ExecutorException("Failed to execute", e);
         } finally {
+            System.setOut(originalStdout);
             Thread.currentThread().setContextClassLoader(originalClassLoader);
             System.setProperties(originalProperties);
         }
@@ -113,6 +119,12 @@ public class EmbeddedMavenExecutor implements Executor {
         Path installation = executorRequest.installationDirectory();
         if (!Files.isDirectory(installation)) {
             throw new IllegalArgumentException("Installation directory must point to existing directory");
+        }
+        if (executorRequest.environmentVariables().isPresent()) {
+            throw new IllegalArgumentException(getClass().getSimpleName() + " does not support environment variables");
+        }
+        if (executorRequest.jvmArguments().isPresent()) {
+            throw new IllegalArgumentException(getClass().getSimpleName() + " does not support jvmArguments");
         }
         return contexts.computeIfAbsent(installation, k -> {
             Path mavenHome = installation.toAbsolutePath().normalize();

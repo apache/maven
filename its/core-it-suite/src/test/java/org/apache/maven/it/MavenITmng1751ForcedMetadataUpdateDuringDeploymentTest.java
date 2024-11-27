@@ -19,9 +19,9 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Properties;
 
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -52,9 +52,9 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
         File dir = new File(testDir, "repo/org/apache/maven/its/mng1751/dep/0.1-SNAPSHOT");
         File templateMetadataFile = new File(dir, "template-metadata.xml");
         File metadataFile = new File(dir, "maven-metadata.xml");
-        FileUtils.copyFile(templateMetadataFile, metadataFile);
+        Files.copy(templateMetadataFile.toPath(), metadataFile.toPath());
         String checksum = ItUtils.calcHash(metadataFile, "SHA-1");
-        FileUtils.fileWrite(metadataFile.getPath() + ".sha1", checksum);
+        Files.writeString(metadataFile.toPath().getParent().resolve(metadataFile.getName() + ".sha1"), checksum);
 
         // phase 1: deploy a new snapshot, this should update the metadata despite its future timestamp
         Verifier verifier = newVerifier(new File(testDir, "dep").getAbsolutePath());

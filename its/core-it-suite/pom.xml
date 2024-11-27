@@ -98,17 +98,6 @@ under the License.
       <artifactId>plexus-utils</artifactId>
       <!-- NOTE: Use compile scope for transitivity. -->
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-verifier</artifactId>
-      <!-- TODO: not transitive in tests artifact, so must be left in main
-        scope <scope>test</scope> -->
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-shared-utils</artifactId>
-      <version>3.4.2</version>
-    </dependency>
 
     <!-- Jetty (as test HTTP server) -->
     <dependency>

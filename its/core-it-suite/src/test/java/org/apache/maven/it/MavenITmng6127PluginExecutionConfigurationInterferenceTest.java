@@ -19,8 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
 
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -65,15 +65,15 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends 
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent(modAconfigurationFile.getCanonicalPath());
-        String modAactual = FileUtils.fileRead(modAconfigurationFile);
+        String modAactual = Files.readString(modAconfigurationFile.toPath());
         assertEquals("name=mod-a, secondName=second from components.xml", modAactual);
 
         verifier.verifyFilePresent(modBconfigurationFile.getCanonicalPath());
-        String modBactual = FileUtils.fileRead(modBconfigurationFile);
+        String modBactual = Files.readString(modBconfigurationFile.toPath());
         assertEquals("name=mod-b, secondName=second from components.xml", modBactual);
 
         verifier.verifyFilePresent(modCconfigurationFile.getCanonicalPath());
-        String modCactual = FileUtils.fileRead(modCconfigurationFile);
+        String modCactual = Files.readString(modCconfigurationFile.toPath());
         assertEquals("secondName=second from components.xml", modCactual);
     }
 }
