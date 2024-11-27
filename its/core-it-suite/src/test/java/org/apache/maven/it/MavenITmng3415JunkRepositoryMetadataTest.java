@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -261,7 +262,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
 
         System.out.println("Copying dependency POM\nfrom: " + pomSrc + "\nto: " + pom);
         Files.createDirectories(pom.toPath().getParent());
-        Files.copy(pomSrc.toPath(), pom.toPath());
+        Files.copy(pomSrc.toPath(), pom.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     private File getMetadataFile(Verifier verifier) {
