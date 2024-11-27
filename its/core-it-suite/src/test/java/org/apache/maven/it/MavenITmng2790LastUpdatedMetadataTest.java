@@ -19,11 +19,11 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -102,7 +102,7 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
     }
 
     private Date getLastUpdated(File metadataFile) throws Exception {
-        String xml = FileUtils.fileRead(metadataFile, "UTF-8");
+        String xml = Files.readString(metadataFile.toPath());
         String timestamp = xml.replaceAll("(?s)\\A.*<lastUpdated>\\s*([0-9]++)\\s*</lastUpdated>.*\\z", "$1");
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         format.setTimeZone(TimeZone.getTimeZone("UTC"));

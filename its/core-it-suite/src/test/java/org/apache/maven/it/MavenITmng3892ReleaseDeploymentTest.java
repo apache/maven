@@ -19,9 +19,9 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Locale;
 
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -85,7 +85,7 @@ public class MavenITmng3892ReleaseDeploymentTest extends AbstractMavenIntegratio
     }
 
     private String readChecksum(File checksumFile) throws Exception {
-        String checksum = FileUtils.fileRead(checksumFile, "UTF-8").trim();
+        String checksum = Files.readString(checksumFile.toPath()).trim();
         if (checksum.indexOf(' ') >= 0) {
             checksum = checksum.substring(0, checksum.indexOf(' '));
         }
