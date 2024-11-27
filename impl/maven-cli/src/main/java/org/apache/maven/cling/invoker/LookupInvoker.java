@@ -434,8 +434,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void settings(C context, SettingsBuilder settingsBuilder) throws Exception {
         Options mavenOptions = context.invokerRequest.options();
-        Path userSettingsFile = null;
 
+        Path userSettingsFile = null;
         if (mavenOptions.altUserSettings().isPresent()) {
             userSettingsFile =
                     context.cwdResolver.apply(mavenOptions.altUserSettings().get());
@@ -452,7 +452,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         Path projectSettingsFile = null;
-
         if (mavenOptions.altProjectSettings().isPresent()) {
             projectSettingsFile =
                     context.cwdResolver.apply(mavenOptions.altProjectSettings().get());
@@ -470,7 +469,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         Path installationSettingsFile = null;
-
         if (mavenOptions.altInstallationSettings().isPresent()) {
             installationSettingsFile = context.cwdResolver.apply(
                     mavenOptions.altInstallationSettings().get());
@@ -486,6 +484,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 installationSettingsFile = context.installationResolver.apply(installationSettingsFileStr);
             }
         }
+
+        context.installationSettingsPath = installationSettingsFile;
+        context.projectSettingsPath = projectSettingsFile;
+        context.userSettingsPath = userSettingsFile;
 
         Function<String, String> interpolationSource = Interpolator.chain(
                 context.protoSession.getUserProperties()::get, context.protoSession.getSystemProperties()::get);
@@ -591,6 +593,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         request.setBaseDirectory(context.invokerRequest.topDirectory().toFile());
         request.setSystemProperties(toProperties(context.protoSession.getSystemProperties()));
         request.setUserProperties(toProperties(context.protoSession.getUserProperties()));
+
+        request.setInstallationSettingsFile(
+                context.installationSettingsPath != null ? context.installationSettingsPath.toFile() : null);
+        request.setProjectSettingsFile(
+                context.projectSettingsPath != null ? context.projectSettingsPath.toFile() : null);
+        request.setUserSettingsFile(context.userSettingsPath != null ? context.userSettingsPath.toFile() : null);
 
         request.setTopDirectory(context.invokerRequest.topDirectory());
         if (context.invokerRequest.rootDirectory().isPresent()) {
