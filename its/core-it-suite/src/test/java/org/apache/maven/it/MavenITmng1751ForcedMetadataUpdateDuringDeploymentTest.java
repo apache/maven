@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
@@ -52,7 +53,7 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
         File dir = new File(testDir, "repo/org/apache/maven/its/mng1751/dep/0.1-SNAPSHOT");
         File templateMetadataFile = new File(dir, "template-metadata.xml");
         File metadataFile = new File(dir, "maven-metadata.xml");
-        Files.copy(templateMetadataFile.toPath(), metadataFile.toPath());
+        Files.copy(templateMetadataFile.toPath(), metadataFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         String checksum = ItUtils.calcHash(metadataFile, "SHA-1");
         Files.writeString(metadataFile.toPath().getParent().resolve(metadataFile.getName() + ".sha1"), checksum);
 

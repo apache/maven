@@ -110,9 +110,10 @@ public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCas
     }
 
     static void assertTextEquals(File file1, File file2) throws IOException {
+        // we need to ignore line endings
         assertEquals(
-                Files.readString(file1.toPath()),
-                Files.readString(file2.toPath()),
+                String.join("\n", Files.readAllLines(file1.toPath())),
+                String.join("\n", Files.readAllLines(file2.toPath())),
                 "pom files differ " + file1 + " " + file2);
     }
 }
