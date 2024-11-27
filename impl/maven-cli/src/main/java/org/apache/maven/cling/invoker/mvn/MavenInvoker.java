@@ -171,14 +171,14 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
     }
 
     @Override
-    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) {
+    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) throws Exception {
         if (context.eventSpyDispatcher != null) {
             context.eventSpyDispatcher.onEvent(settingsBuilderRequest);
         }
     }
 
     @Override
-    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) {
+    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception {
         if (context.eventSpyDispatcher != null) {
             context.eventSpyDispatcher.onEvent(settingsBuilderResult);
         }
