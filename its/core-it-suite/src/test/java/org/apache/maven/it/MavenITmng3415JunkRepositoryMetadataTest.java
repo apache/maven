@@ -260,6 +260,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         File pomSrc = new File(testDir, "dependency-pom.xml");
 
         System.out.println("Copying dependency POM\nfrom: " + pomSrc + "\nto: " + pom);
+        Files.createDirectories(pom.toPath().getParent());
         Files.copy(pomSrc.toPath(), pom.toPath());
     }
 
