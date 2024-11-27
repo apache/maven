@@ -2062,11 +2062,12 @@
             The version of the platform where the code will be executed.
             In a Java environment, this is the value of the {@code --release} compiler option.
             If a Java project contains multiple main sources with different target versions,
-            then a multi-version <abbr>JAR</abbr> file will be created.
+            then a multi-version <abbr>JAR</abbr> file will be created
+            with the lowest version taken as the <dfn>base version</dfn>.
             If this element is omitted, then the default target version is the compiler default value,
             which is usually the version of the Java environment running Maven.
 
-            <p>If a target version is specified for resources or script files,
+            <p>If a target version, different from the base version, is specified for resources or script files,
             then this value modifies the directory where the files will be copied.
             For example, if {@code targetVersion} is 17, then the {@code foo/bar.properties}
             resource file will be copied as {@code META-INF/versions/17/foo/bar.properties}.</p>
@@ -2100,16 +2101,13 @@
           <type>String</type>
         </field>
         <field>
-          <name>filtering</name>
+          <name>stringFiltering</name>
           <version>4.1.0+</version>
           <description>
             <![CDATA[
             Whether resources are filtered to replace tokens with parameterized values.
             The values are taken from the {@code properties} element and from the properties
             in the files listed in the {@code filters} element.
-
-            <p>This filtering should not be confused with the filtering of paths done by the
-            {@code includes} and {@code excludes} patterns.</p>
 
             <p>The default value is {@code false}.</p>
             ]]>
