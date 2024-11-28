@@ -48,7 +48,7 @@ public class MavenITmng3529QuotedCliArgTest extends AbstractMavenIntegrationTest
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setForkJvm(true); // NOTE: We want to go through the launcher script
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dtest.a=  ");
         verifier.addCliArgument("validate");

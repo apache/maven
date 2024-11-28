@@ -48,7 +48,7 @@ public class MavenITmng3208ProfileAwareReactorSortingTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3208");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pmng3208");
         verifier.addCliArgument("validate");

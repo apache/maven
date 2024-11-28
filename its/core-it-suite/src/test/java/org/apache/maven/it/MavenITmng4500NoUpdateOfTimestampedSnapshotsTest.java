@@ -93,7 +93,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
             }
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng4500");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

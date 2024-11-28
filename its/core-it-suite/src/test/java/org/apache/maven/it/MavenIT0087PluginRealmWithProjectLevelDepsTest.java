@@ -49,7 +49,7 @@ public class MavenIT0087PluginRealmWithProjectLevelDepsTest extends AbstractMave
     public void testit0087() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0087");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0087");
         verifier.filterFile("settings-template.xml", "settings.xml");

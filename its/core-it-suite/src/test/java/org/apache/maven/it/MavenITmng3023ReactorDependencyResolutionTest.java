@@ -58,7 +58,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
 
         // First pass. Make sure the dependency cannot be resolved.
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("log-a.txt");
 
         verifier.deleteDirectory("dependency/dependency-classes");
@@ -86,7 +86,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3023");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("log-b.txt");
         // The IT doesn't actually run the compiler but merely mimics its effect, i.e. the creation of the output dir
         new File(testDir, "dependency/dependency-classes").mkdirs();
@@ -121,7 +121,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3023");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
 
         verifier.deleteArtifacts("org.apache.maven.its.mng3023");
 

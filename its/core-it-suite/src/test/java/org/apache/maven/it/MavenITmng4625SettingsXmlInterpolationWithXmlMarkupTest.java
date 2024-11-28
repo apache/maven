@@ -49,7 +49,7 @@ public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest extends Abs
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4625");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
 
         // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6468220

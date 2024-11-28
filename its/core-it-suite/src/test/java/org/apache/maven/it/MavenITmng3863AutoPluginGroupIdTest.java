@@ -48,7 +48,7 @@ public class MavenITmng3863AutoPluginGroupIdTest extends AbstractMavenIntegratio
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3863");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         try {
             verifier.addCliArgument("validate");

@@ -47,7 +47,7 @@ public class MavenITmng5572ReactorPluginExtensionsTest extends AbstractMavenInte
 
         // plugin must be available in local repo, otherwise the project couldn't be built
         Verifier setup = newVerifier(testDir.getAbsolutePath());
-        setup.setAutoclean(true);
+        setup.setAutoClean(true);
         setup.addCliArgument("-f");
         setup.addCliArgument("plugin/pom.xml");
         setup.addCliArgument("install");
@@ -56,7 +56,7 @@ public class MavenITmng5572ReactorPluginExtensionsTest extends AbstractMavenInte
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setLogFileName("log2.txt");
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

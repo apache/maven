@@ -53,7 +53,7 @@ public class MavenITmng4415InheritedPluginOrderTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4415");
 
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

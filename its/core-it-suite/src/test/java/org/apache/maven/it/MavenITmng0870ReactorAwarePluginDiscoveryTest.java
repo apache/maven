@@ -46,7 +46,7 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest extends AbstractMaven
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0870");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("project/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0870");
         verifier.filterFile("settings-template.xml", "settings.xml");

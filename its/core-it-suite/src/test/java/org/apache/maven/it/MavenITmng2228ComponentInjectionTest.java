@@ -48,7 +48,7 @@ public class MavenITmng2228ComponentInjectionTest extends AbstractMavenIntegrati
     public void testitMNG2228() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2228");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2228");
         verifier.filterFile("settings-template.xml", "settings.xml");

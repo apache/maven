@@ -48,7 +48,7 @@ public class MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest extends
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4779");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("test/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4779");
         verifier.addCliArgument("validate");

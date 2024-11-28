@@ -44,7 +44,7 @@ public class MavenITmng0823MojoContextPassingTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0823");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArguments(
                 "org.apache.maven.its.plugins:maven-it-plugin-context-passing:throw",

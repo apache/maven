@@ -45,7 +45,7 @@ public class MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest extend
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5011");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dconfig.stringParams=");
         verifier.addCliArgument("-Dconfig.fileParams=foo,bar");

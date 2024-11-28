@@ -48,7 +48,7 @@ public class MavenITmng3422ActiveComponentCollectionTest extends AbstractMavenIn
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3422");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

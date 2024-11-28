@@ -94,7 +94,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
             }
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng5064");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

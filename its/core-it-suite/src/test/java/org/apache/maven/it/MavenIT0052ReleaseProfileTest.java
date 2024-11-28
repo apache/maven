@@ -39,7 +39,7 @@ public class MavenIT0052ReleaseProfileTest extends AbstractMavenIntegrationTestC
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0052");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("package");
         verifier.execute();

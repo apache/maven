@@ -50,7 +50,7 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest extends A
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4814");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4814");

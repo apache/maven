@@ -50,7 +50,7 @@ public class MavenITmng1323AntrunDependenciesTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1323");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("a/target");
         verifier.deleteDirectory("b/target");

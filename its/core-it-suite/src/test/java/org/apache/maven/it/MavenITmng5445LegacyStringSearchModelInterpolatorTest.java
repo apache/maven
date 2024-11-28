@@ -42,7 +42,7 @@ public class MavenITmng5445LegacyStringSearchModelInterpolatorTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5445");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

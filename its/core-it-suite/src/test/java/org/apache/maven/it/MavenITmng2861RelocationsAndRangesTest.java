@@ -42,7 +42,7 @@ public class MavenITmng2861RelocationsAndRangesTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2861");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("A/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2861");
         verifier.filterFile("settings-template.xml", "settings.xml");

@@ -45,7 +45,7 @@ public class MavenIT0131SiteLifecycleTest extends AbstractMavenIntegrationTestCa
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("site-deploy");
         verifier.execute();
         verifier.verifyFilePresent("target/site-site.txt");

@@ -48,7 +48,7 @@ public class MavenITmng4423SessionDataFromPluginParameterExpressionTest extends 
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4423");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.getSystemProperties().setProperty("mng4423", "PASSED");
         verifier.addCliArgument("validate");

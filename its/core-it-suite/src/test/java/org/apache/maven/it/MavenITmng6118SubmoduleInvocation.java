@@ -60,7 +60,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
 
         final File submoduleDirectory = new File(testDir, "app");
         verifier = newVerifier(submoduleDirectory.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("log-insubmodule.txt");
         verifier.addCliArgument("compile");
         verifier.execute();
@@ -79,7 +79,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         verifier.execute();
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("log-withfile.txt");
         verifier.addCliArgument("-f");
         verifier.addCliArgument("app/pom.xml");

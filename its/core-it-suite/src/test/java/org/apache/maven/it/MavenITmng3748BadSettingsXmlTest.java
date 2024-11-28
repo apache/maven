@@ -47,7 +47,7 @@ public class MavenITmng3748BadSettingsXmlTest extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3748");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
 

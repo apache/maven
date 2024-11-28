@@ -49,7 +49,7 @@ public class MavenITmng3813PluginClassPathOrderingTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3813");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3813");
         verifier.filterFile("settings-template.xml", "settings.xml");

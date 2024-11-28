@@ -48,7 +48,7 @@ public class MavenITmng4009InheritProfileEffectsTest extends AbstractMavenIntegr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4009");
 
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pparent-profile");
         verifier.addCliArgument("validate");

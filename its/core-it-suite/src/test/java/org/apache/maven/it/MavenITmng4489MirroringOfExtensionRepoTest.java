@@ -96,7 +96,7 @@ public class MavenITmng4489MirroringOfExtensionRepoTest extends AbstractMavenInt
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
             Verifier verifier = newVerifier(testDir.getAbsolutePath());
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng4489");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

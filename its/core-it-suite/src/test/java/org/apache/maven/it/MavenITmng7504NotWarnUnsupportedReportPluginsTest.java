@@ -48,7 +48,7 @@ public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractM
         File rootDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
 
         Verifier verifier = newVerifier(rootDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("site");
         verifier.execute();

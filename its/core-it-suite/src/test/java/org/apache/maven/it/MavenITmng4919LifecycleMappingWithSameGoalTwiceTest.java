@@ -48,7 +48,7 @@ public class MavenITmng4919LifecycleMappingWithSameGoalTwiceTest extends Abstrac
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4919");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArguments("clean", "validate");
         verifier.execute();

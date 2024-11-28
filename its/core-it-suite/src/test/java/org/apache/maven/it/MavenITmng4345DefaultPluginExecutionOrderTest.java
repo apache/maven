@@ -50,7 +50,7 @@ public class MavenITmng4345DefaultPluginExecutionOrderTest extends AbstractMaven
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4345");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("process-resources");
         verifier.execute();

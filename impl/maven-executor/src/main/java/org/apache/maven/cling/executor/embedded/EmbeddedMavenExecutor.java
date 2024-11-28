@@ -33,6 +33,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -121,6 +122,10 @@ public class EmbeddedMavenExecutor implements Executor {
         if (!Files.isDirectory(installation)) {
             throw new IllegalArgumentException("Installation directory must point to existing directory");
         }
+        if (!Objects.equals(executorRequest.command(), ExecutorRequest.MVN)) {
+            throw new IllegalArgumentException(
+                    getClass().getSimpleName() + " does not support command " + executorRequest.command());
+        }
         if (executorRequest.environmentVariables().isPresent()) {
             throw new IllegalArgumentException(getClass().getSimpleName() + " does not support environment variables");
         }
@@ -155,6 +160,9 @@ public class EmbeddedMavenExecutor implements Executor {
             properties.put(
                     "library.jline.path", mavenHome.resolve("lib/jline-native").toString());
             properties.put("org.jline.terminal.provider", "dumb");
+            if (executorRequest.jvmSystemProperties().isPresent()) {
+                properties.putAll(executorRequest.jvmSystemProperties().get());
+            }
 
             System.setProperties(properties);
             URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());

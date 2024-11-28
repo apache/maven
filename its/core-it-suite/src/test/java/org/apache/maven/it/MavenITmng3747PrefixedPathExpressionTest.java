@@ -45,7 +45,7 @@ public class MavenITmng3747PrefixedPathExpressionTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3747");
 
         Verifier verifier = newVerifier(testDir.getCanonicalPath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

@@ -88,7 +88,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         Verifier verifier;
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3415");
 
         setupDummyDependency(verifier, testDir, true);
@@ -159,7 +159,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         Verifier verifier;
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3415");
 
         final Deque<String> requestUris = new ConcurrentLinkedDeque<>();

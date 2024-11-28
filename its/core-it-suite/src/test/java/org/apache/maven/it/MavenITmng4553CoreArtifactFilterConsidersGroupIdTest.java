@@ -48,7 +48,7 @@ public class MavenITmng4553CoreArtifactFilterConsidersGroupIdTest extends Abstra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4553");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4553");
         verifier.filterFile("settings-template.xml", "settings.xml");

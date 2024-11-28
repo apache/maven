@@ -47,7 +47,7 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4400");
 
         Verifier verifier = newVerifier(new File(testDir, "settings").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4400");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
@@ -70,7 +70,7 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4400");
 
         Verifier verifier = newVerifier(new File(testDir, "pom").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4400");
         verifier.filterFile("pom-template.xml", "pom.xml");
         verifier.addCliArgument("-s");

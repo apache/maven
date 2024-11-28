@@ -44,7 +44,7 @@ public class MavenIT0025MultipleExecutionLevelConfigsTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0025");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

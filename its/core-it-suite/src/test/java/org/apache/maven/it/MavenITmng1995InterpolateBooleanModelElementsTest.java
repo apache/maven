@@ -49,7 +49,7 @@ public class MavenITmng1995InterpolateBooleanModelElementsTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1995");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
 
         verifier.addCliArgument("validate");
         verifier.execute();

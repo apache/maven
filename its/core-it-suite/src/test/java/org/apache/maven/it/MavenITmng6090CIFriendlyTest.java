@@ -52,7 +52,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6090-ci-friendly");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
 
         verifier.addCliArgument("-Drevision=1.2");
         verifier.addCliArgument("-Dmaven.consumerpom=false");
@@ -62,7 +62,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
 
         verifier.addCliArgument("-Drevision=1.2");
         verifier.addCliArgument("-pl");
@@ -77,7 +77,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6090-ci-friendly");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setForkJvm(true);
 
         verifier.addCliArgument("-Drevision=1.2");
@@ -88,7 +88,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setForkJvm(true);
 
         verifier.addCliArgument("-Drevision=1.2");

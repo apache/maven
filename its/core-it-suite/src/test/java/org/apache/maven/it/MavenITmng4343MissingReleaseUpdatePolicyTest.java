@@ -129,7 +129,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4343");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4343");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
@@ -180,7 +180,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4343");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4343");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

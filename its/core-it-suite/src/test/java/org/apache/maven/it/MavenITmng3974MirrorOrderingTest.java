@@ -46,7 +46,7 @@ public class MavenITmng3974MirrorOrderingTest extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3974");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3974");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");

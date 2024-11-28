@@ -44,7 +44,7 @@ public class MavenIT0041ArtifactTypeFromPluginExtensionTest extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0041");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven", "maven-core-it-support", "1.2");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

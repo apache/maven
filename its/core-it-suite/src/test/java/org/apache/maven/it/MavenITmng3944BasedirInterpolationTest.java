@@ -46,7 +46,7 @@ public class MavenITmng3944BasedirInterpolationTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3944");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-f");
         verifier.addCliArgument("pom-with-unusual-name.xml");

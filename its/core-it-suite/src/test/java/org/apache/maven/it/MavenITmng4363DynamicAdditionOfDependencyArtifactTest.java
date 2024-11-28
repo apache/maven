@@ -48,7 +48,7 @@ public class MavenITmng4363DynamicAdditionOfDependencyArtifactTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4363");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4363");
         verifier.addCliArgument("-s");

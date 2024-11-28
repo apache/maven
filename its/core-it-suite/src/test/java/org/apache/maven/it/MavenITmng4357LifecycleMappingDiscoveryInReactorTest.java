@@ -45,7 +45,7 @@ public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest extends Abstra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4357");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");

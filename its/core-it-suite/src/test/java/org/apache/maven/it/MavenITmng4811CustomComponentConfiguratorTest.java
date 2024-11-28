@@ -45,7 +45,7 @@ public class MavenITmng4811CustomComponentConfiguratorTest extends AbstractMaven
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4811");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

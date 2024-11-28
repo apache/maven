@@ -50,7 +50,7 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config");
         verifier.execute();
         verifier.verifyFilePresent("target/build.txt");
@@ -69,7 +69,7 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         if (matchesVersionRange("(,3.0-alpha-1)")) {
             verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-site:2.1-SNAPSHOT:generate");
             verifier.execute();

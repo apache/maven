@@ -37,7 +37,7 @@ public class MavenIT0019PluginVersionMgmtBySuperPomTest extends AbstractMavenInt
     public void testit0019() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0019");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("process-resources");
         verifier.execute();

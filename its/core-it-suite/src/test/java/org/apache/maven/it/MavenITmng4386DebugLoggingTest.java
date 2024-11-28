@@ -47,7 +47,7 @@ public class MavenITmng4386DebugLoggingTest extends AbstractMavenIntegrationTest
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4386");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-X");
         verifier.setLogFileName("log.txt");

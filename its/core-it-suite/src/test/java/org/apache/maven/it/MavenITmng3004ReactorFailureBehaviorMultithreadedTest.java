@@ -46,7 +46,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
         verifier.deleteDirectory("subproject2/target");
@@ -80,7 +80,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
         verifier.deleteDirectory("subproject2/target");
@@ -109,7 +109,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
         verifier.deleteDirectory("subproject2/target");
@@ -142,7 +142,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
         verifier.deleteDirectory("subproject2/target");
@@ -171,7 +171,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
         verifier.deleteDirectory("subproject2/target");

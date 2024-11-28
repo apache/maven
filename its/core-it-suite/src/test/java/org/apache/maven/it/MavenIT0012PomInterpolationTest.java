@@ -37,7 +37,7 @@ public class MavenIT0012PomInterpolationTest extends AbstractMavenIntegrationTes
     public void testit0012() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0012");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("child-project/target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-touch:touch");

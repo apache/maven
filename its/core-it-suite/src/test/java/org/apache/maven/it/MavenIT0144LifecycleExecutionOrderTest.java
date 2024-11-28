@@ -48,7 +48,7 @@ public class MavenIT0144LifecycleExecutionOrderTest extends AbstractMavenIntegra
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArguments("post-clean", "deploy", "site-deploy");
         verifier.execute();
         verifier.verifyErrorFreeLog();

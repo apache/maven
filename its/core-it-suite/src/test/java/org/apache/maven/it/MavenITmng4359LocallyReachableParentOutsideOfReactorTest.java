@@ -49,7 +49,7 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest extends Ab
         testDir = new File(testDir, "reactor-parent");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("mod-c/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4359");
         verifier.addCliArgument("validate");

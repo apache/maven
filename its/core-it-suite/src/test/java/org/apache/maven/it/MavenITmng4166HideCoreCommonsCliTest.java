@@ -49,7 +49,7 @@ public class MavenITmng4166HideCoreCommonsCliTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4166");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifact("commons-cli", "commons-cli", "0.1.4166", "jar");
         verifier.deleteArtifact("commons-cli", "commons-cli", "0.1.4166", "pom");

@@ -18,33 +18,9 @@
  */
 package org.apache.maven.shared.verifier;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -57,27 +33,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 
-import org.apache.maven.settings.building.DefaultSettingsBuilder;
-import org.apache.maven.settings.building.DefaultSettingsBuilderFactory;
-import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsBuildingException;
-import org.apache.maven.settings.building.SettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsBuildingResult;
+import org.apache.maven.api.cli.ExecutorException;
+import org.apache.maven.api.cli.ExecutorRequest;
+import org.apache.maven.cling.executor.ExecutorHelper;
+import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author Jason van Zyl
@@ -86,242 +57,65 @@ import org.xml.sax.helpers.DefaultHandler;
 public class Verifier {
     private static final String LOG_FILENAME = "log.txt";
 
-    private static final String[] DEFAULT_CLI_ARGUMENTS = {"--errors", "--batch-mode"};
+    private static final List<String> DEFAULT_CLI_ARGUMENTS = Arrays.asList("--errors", "--batch-mode");
 
-    /**
-     * Command used to clean project before execution.
-     * <p
-     * NOTE: Neither test lifecycle binding nor prefix resolution here but call the goal directly.
-     */
-    private static final String CLEAN_CLI_ARGUMENT = "org.apache.maven.plugins:maven-clean-plugin:clean";
+    private static final String AUTO_CLEAN_ARGUMENT = "org.apache.maven.plugins:maven-clean-plugin:clean";
 
-    public static final String USER_HOME = System.getProperty("user.home");
+    private final ExecutorHelper executorHelper;
 
-    public static final File USER_MAVEN_CONFIGURATION_HOME = new File(USER_HOME, ".m2");
+    private final Path basedir;
 
-    public static final File DEFAULT_USER_SETTINGS_FILE = new File(USER_MAVEN_CONFIGURATION_HOME, "settings.xml");
+    private final Path userHomeDirectory;
 
-    public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File(System.getProperty("maven.conf"), "settings.xml");
+    private final List<String> defaultCliArguments;
 
-    private String localRepo;
+    private final Properties systemProperties = new Properties();
 
-    private final String basedir;
+    private final Map<String, String> environmentVariables = new HashMap<>();
 
-    private String[] defaultCliArguments;
+    private final List<String> cliArguments = new ArrayList<>();
 
-    private List<String> cliArguments = new ArrayList<>();
+    private boolean autoClean = true;
 
-    private Properties systemProperties = new Properties();
-
-    private Map<String, String> environmentVariables = new HashMap<>();
-
-    private Properties verifierProperties = new Properties();
-
-    private boolean autoclean = true;
-
-    private String localRepoLayout = "default";
-
-    /**
-     * If {@code true} uses {@link ForkedLauncher}, if {@code false} uses {@link Embedded3xLauncher},
-     * otherwise considers the value {@link #forkMode}.
-     */
-    private Boolean forkJvm;
+    private boolean forkJvm = false;
 
     private String logFileName = LOG_FILENAME;
 
-    private File logFile;
-
-    private String mavenHome;
-
-    // will launch mvn with -X
-    private boolean mavenDebug = false;
+    private Path logFile;
 
     /**
-     * Either "auto" (use {@link ForkedLauncher} when {@link #environmentVariables} is not empty,
-     * otherwise use {@link Embedded3xLauncher}) , "embedder" (always use {@link Embedded3xLauncher})
-     * or something else (always use {@link ForkedLauncher}).
-     * Set through system property {@code verifier.forkMode}.
-     * Only relevant if {@link #forkJvm} is {@code null}.
+     * Creates verifier instance.
+     *
+     * @param basedir The basedir, cannot be {@code null}
+     * @param defaultCliArguments The defaultCliArguments override, may be {@code null}
+     *
+     * @see #DEFAULT_CLI_ARGUMENTS
      */
-    private String forkMode;
+    public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
+        requireNonNull(basedir);
+        this.basedir = Paths.get(basedir);
+        this.userHomeDirectory = Paths.get(System.getProperty("user.home"));
+        this.executorHelper = new HelperImpl(Paths.get(System.getProperty("maven.home")));
+        this.defaultCliArguments =
+                new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
 
-    private boolean debugJvm = false;
-
-    private boolean useWrapper;
-
-    private static MavenLauncher embeddedLauncher;
-
-    private String settingsFile;
-
-    public Verifier(String basedir) throws VerificationException {
-        this.basedir = basedir;
-
-        this.forkMode = System.getProperty("verifier.forkMode");
-
-        findLocalRepo(settingsFile);
-
-        this.mavenHome = System.getProperty("maven.home");
-
-        setForkMode();
-
-        useWrapper = Files.exists(Paths.get(getBasedir(), "mvnw"));
-
-        this.defaultCliArguments = DEFAULT_CLI_ARGUMENTS.clone();
+        this.logFile = this.basedir.resolve(logFileName);
     }
 
-    /**
-     * @deprecated to be removed
-     * use <ul>
-     * <li>{@link #Verifier(String basedir)}</li>
-     * </ul>
-     */
-    @Deprecated
-    public Verifier(String basedir, boolean debug) throws VerificationException {
-        this(basedir);
+    public String getLogFileName() {
+        return logFileName;
     }
 
-    /**
-     * @deprecated to be removed
-     * use <ul>
-     * <li>{@link #Verifier(String basedir)}</li>
-     * <li>{@link #setSettingsFile(String settingsFile)} to set settings file</li>
-     * </ul>
-     */
-    @Deprecated
-    public Verifier(String basedir, String settingsFile) throws VerificationException {
-        this(basedir);
-        setSettingsFile(settingsFile);
+    public Path getLogFile() {
+        return logFile;
     }
 
-    /**
-     * @deprecated to be removed
-     * use <ul>
-     * <li>{@link #Verifier(String basedir)}</li>
-     * <li>{@link #setSettingsFile(String settingsFile)} to set settings file</li>
-     * </ul>
-     */
-    @Deprecated
-    public Verifier(String basedir, String settingsFile, boolean debug) throws VerificationException {
-        this(basedir);
-        setSettingsFile(settingsFile);
-    }
-
-    /**
-     * @deprecated to be removed
-     * use <uL>
-     * <li>{@link #Verifier(String basedir)}</li>
-     * <li>{@link #setSettingsFile(String settingsFile)} to set settings file</li>
-     * <li>{@link #setDefaultCliArguments(String[] defaultCliArguments)} to set default cliArguments</li>
-     * </ul>
-     */
-    @Deprecated
-    public Verifier(String basedir, String settingsFile, boolean debug, String[] defaultCliArguments)
-            throws VerificationException {
-        this(basedir);
-        setSettingsFile(settingsFile);
-        setDefaultCliArguments(defaultCliArguments);
-    }
-
-    /**
-     * @deprecated to be removed
-     * use <ul>
-     * <li>{@link #Verifier(String)}</li>
-     * <li>{@link #setSettingsFile(String)} to set settings file</li>
-     * <li>{@link #setForkJvm(boolean)} to set forkJvm status</li>
-     * </ul>
-     */
-    @Deprecated
-    public Verifier(String basedir, String settingsFile, boolean debug, boolean forkJvm) throws VerificationException {
-        this(basedir);
-        setSettingsFile(settingsFile);
-        setForkJvm(forkJvm);
-    }
-
-    /**
-     * @deprecated to be removed
-     * use <ul>
-     * <li>{@link #Verifier(String basedir)}</li>
-     * <li>{@link #setSettingsFile(String settingsFile)} to set settings file</li>
-     * <li>{@link #setForkJvm(boolean)} to set forkJvm status and</li>
-     * <li>{@link #setDefaultCliArguments(String[] defaultCliArguments)} to set settings file</li>
-     * </ul>
-     */
-    @Deprecated
-    public Verifier(String basedir, String settingsFile, boolean debug, boolean forkJvm, String[] defaultCliArguments)
-            throws VerificationException {
-        this(basedir);
-        setSettingsFile(settingsFile);
-        setForkJvm(forkJvm);
-        setDefaultCliArguments(defaultCliArguments);
-    }
-
-    /**
-     * @deprecated to be removed
-     * use <ul>
-     * <li>{@link #Verifier(String basedir)}</li>
-     * <li>{@link #setSettingsFile(String settingsFile)} to set settings file</li>
-     * <li>{@link #setMavenHome(String mavenHome)}  to set maven home</li>
-     * </ul>
-     */
-    @Deprecated
-    public Verifier(String basedir, String settingsFile, boolean debug, String mavenHome) throws VerificationException {
-        this(basedir);
-        setSettingsFile(settingsFile);
-        setMavenHome(mavenHome);
-    }
-
-    /**
-     * @deprecated to be removed
-     * use <ul>
-     * <li>{@link #Verifier(String basedir)}</li>
-     * <li>{@link #setSettingsFile(String settingsFile)} to set settings file</li>
-     * <li>{@link #setMavenHome(String mavenHome)}  to set maven home</li>
-     * <li>{@link #setDefaultCliArguments(String[] defaultCliArguments)} to set settings file</li>
-     * </ul>
-     */
-    @Deprecated
-    public Verifier(String basedir, String settingsFile, boolean debug, String mavenHome, String[] defaultCliArguments)
-            throws VerificationException {
-        this(basedir);
-        setSettingsFile(settingsFile);
-        setDefaultCliArguments(defaultCliArguments);
-        setMavenHome(mavenHome);
-    }
-
-    public void setLocalRepo(String localRepo) {
-        this.localRepo = localRepo;
-    }
-
-    /**
-     * @deprecated will be removed without replacement
-     */
-    @Deprecated
-    public void resetStreams() {}
-
-    /**
-     * @deprecated will be removed without replacement
-     */
-    @Deprecated
-    public void displayStreamBuffers() {}
-
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    public void verify(boolean chokeOnErrorOutput) throws VerificationException {
-        List<String> lines = loadFile(getBasedir(), "expected-results.txt", false);
-
-        for (String line : lines) {
-            verifyExpectedResult(line);
-        }
-
-        if (chokeOnErrorOutput) {
-            verifyErrorFreeLog();
-        }
+    public void setLogFile(Path logFile) {
+        this.logFile = logFile;
     }
 
     public void verifyErrorFreeLog() throws VerificationException {
-        List<String> lines = loadFile(getLogFile(), false);
+        List<String> lines = loadFile(logFile.toFile(), false);
 
         for (String line : lines) {
             // A hack to keep stupid velocity resource loader errors from triggering failure
@@ -349,7 +143,7 @@ public class Verifier {
      * @throws VerificationException if text is not found in log
      */
     public void verifyTextInLog(String text) throws VerificationException {
-        List<String> lines = loadFile(getLogFile(), false);
+        List<String> lines = loadFile(logFile.toFile(), false);
 
         boolean result = false;
         for (String line : lines) {
@@ -533,37 +327,26 @@ public class Verifier {
      *         never null.
      */
     public String getArtifactPath(String gid, String aid, String version, String ext, String classifier) {
-        if (classifier != null && classifier.length() == 0) {
+        if (classifier != null && classifier.isEmpty()) {
             classifier = null;
         }
         if ("maven-plugin".equals(ext)) {
             ext = "jar";
-        }
-        if ("coreit-artifact".equals(ext)) {
+        } else if ("coreit-artifact".equals(ext)) {
             ext = "jar";
             classifier = "it";
-        }
-        if ("test-jar".equals(ext)) {
+        } else if ("test-jar".equals(ext)) {
             ext = "jar";
             classifier = "tests";
         }
 
-        String repositoryPath;
-        if ("legacy".equals(localRepoLayout)) {
-            repositoryPath = gid + "/" + ext + "s/" + aid + "-" + version + "." + ext;
-        } else if ("default".equals(localRepoLayout)) {
-            repositoryPath = gid.replace('.', '/');
-            repositoryPath = repositoryPath + "/" + aid + "/" + version;
-            repositoryPath = repositoryPath + "/" + aid + "-" + version;
-            if (classifier != null) {
-                repositoryPath = repositoryPath + "-" + classifier;
-            }
-            repositoryPath = repositoryPath + "." + ext;
+        String gav;
+        if (classifier != null) {
+            gav = gid + ":" + aid + ":" + classifier + ":" + ext + ":" + version;
         } else {
-            throw new IllegalStateException("Unknown layout: " + localRepoLayout);
+            gav = gid + ":" + aid + ":" + ext + ":" + version;
         }
-
-        return localRepo + "/" + repositoryPath;
+        return executorHelper.artifactPath(executorHelper.executorRequest(), gav, null);
     }
 
     public List<String> getArtifactFileNameList(String org, String name, String version, String ext) {
@@ -600,31 +383,24 @@ public class Verifier {
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
     public String getArtifactMetadataPath(String gid, String aid, String version, String filename) {
-        StringBuilder buffer = new StringBuilder(256);
-
-        buffer.append(localRepo);
-        buffer.append('/');
-
-        if ("default".equals(localRepoLayout)) {
-            buffer.append(gid.replace('.', '/'));
-            buffer.append('/');
-
-            if (aid != null) {
-                buffer.append(aid);
-                buffer.append('/');
-
-                if (version != null) {
-                    buffer.append(version);
-                    buffer.append('/');
-                }
-            }
-
-            buffer.append(filename);
+        String gav;
+        if (gid != null) {
+            gav = gid + ":";
         } else {
-            throw new IllegalStateException("Unsupported repository layout: " + localRepoLayout);
+            gav = ":";
         }
-
-        return buffer.toString();
+        if (aid != null) {
+            gav += aid + ":";
+        } else {
+            gav += ":";
+        }
+        if (version != null) {
+            gav += version + ":";
+        } else {
+            gav += ":";
+        }
+        gav += filename;
+        return executorHelper.metadataPath(executorHelper.executorRequest(), gav, null);
     }
 
     /**
@@ -637,27 +413,6 @@ public class Verifier {
      */
     public String getArtifactMetadataPath(String gid, String aid) {
         return getArtifactMetadataPath(gid, aid, null);
-    }
-
-    static String retrieveLocalRepo(String settingsXmlPath) throws SettingsBuildingException {
-        DefaultSettingsBuilderFactory settingsBuilderFactory = new DefaultSettingsBuilderFactory();
-        DefaultSettingsBuilder settingsBuilder = settingsBuilderFactory.newInstance();
-
-        File userSettingsFile;
-        if (settingsXmlPath != null) {
-            userSettingsFile = new File(settingsXmlPath);
-        } else {
-            userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
-        }
-
-        SettingsBuildingRequest settingsBuildingRequest = new DefaultSettingsBuildingRequest();
-        settingsBuildingRequest.setGlobalSettingsFile(DEFAULT_GLOBAL_SETTINGS_FILE);
-        settingsBuildingRequest.setUserSettingsFile(userSettingsFile);
-        settingsBuildingRequest.setSystemProperties(System.getProperties());
-
-        // takes care of interpolation and merging
-        SettingsBuildingResult result = settingsBuilder.build(settingsBuildingRequest);
-        return result.getEffectiveSettings().getLocalRepository();
     }
 
     public void deleteArtifact(String org, String name, String version, String ext) throws IOException {
@@ -675,16 +430,10 @@ public class Verifier {
      * @since 1.2
      */
     public void deleteArtifacts(String gid) throws IOException {
-        String path;
-        if ("default".equals(localRepoLayout)) {
-            path = gid.replace('.', '/');
-        } else if ("legacy".equals(localRepoLayout)) {
-            path = gid;
-        } else {
-            throw new IllegalStateException("Unsupported repository layout: " + localRepoLayout);
-        }
-
-        FileUtils.deleteDirectory(new File(localRepo, path));
+        String mdPath = executorHelper.metadataPath(executorHelper.executorRequest(), gid, null);
+        String localRepo = executorHelper.localRepository(executorHelper.executorRequest());
+        Path dir = Paths.get(localRepo).resolve(mdPath).getParent();
+        FileUtils.deleteDirectory(dir.toFile());
     }
 
     /**
@@ -697,14 +446,15 @@ public class Verifier {
      * @since 1.3
      */
     public void deleteArtifacts(String gid, String aid, String version) throws IOException {
-        String path;
-        if ("default".equals(localRepoLayout)) {
-            path = gid.replace('.', '/') + '/' + aid + '/' + version;
-        } else {
-            throw new IllegalStateException("Unsupported repository layout: " + localRepoLayout);
-        }
+        requireNonNull(gid, "gid is null");
+        requireNonNull(aid, "aid is null");
+        requireNonNull(version, "version is null");
 
-        FileUtils.deleteDirectory(new File(localRepo, path));
+        String mdPath =
+                executorHelper.metadataPath(executorHelper.executorRequest(), gid + ":" + aid + ":" + version, null);
+        String localRepo = executorHelper.localRepository(executorHelper.executorRequest());
+        Path dir = Paths.get(localRepo).resolve(mdPath).getParent();
+        FileUtils.deleteDirectory(dir.toFile());
     }
 
     /**
@@ -716,18 +466,6 @@ public class Verifier {
      */
     public void deleteDirectory(String path) throws IOException {
         FileUtils.deleteDirectory(new File(getBasedir(), path));
-    }
-
-    /**
-     * Writes a text file with the specified contents. The contents will be encoded using UTF-8.
-     *
-     * @param path     The path to the file, relative to the base directory, must not be <code>null</code>.
-     * @param contents The contents to write, must not be <code>null</code>.
-     * @throws IOException If the file could not be written.
-     * @since 1.2
-     */
-    public void writeFile(String path, String contents) throws IOException {
-        FileUtils.fileWrite(new File(getBasedir(), path).getAbsolutePath(), "UTF-8", contents);
     }
 
     /**
@@ -785,43 +523,6 @@ public class Verifier {
     }
 
     /**
-     * There are 226 references to this method in Maven core ITs. In most (all?) cases it is used together with
-     * {@link #newDefaultFilterProperties()}. Need to remove both methods and update all clients eventually/
-     *
-     * @param srcPath          The path to the input file, relative to the base directory, must not be
-     *                         <code>null</code>.
-     * @param dstPath          The path to the output file, relative to the base directory and possibly equal to the
-     *                         input file, must not be <code>null</code>.
-     * @param fileEncoding     The file encoding to use, may be <code>null</code> or empty to use the platform's default
-     *                         encoding.
-     * @param filterProperties The mapping from tokens to replacement values, must not be <code>null</code>.
-     * @return The path to the filtered output file, never <code>null</code>.
-     * @throws IOException If the file could not be filtered.
-     * @deprecated use {@link #filterFile(String, String, String, Map)}
-     */
-    @Deprecated
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public File filterFile(String srcPath, String dstPath, String fileEncoding, Properties filterProperties)
-            throws IOException {
-        return filterFile(srcPath, dstPath, fileEncoding, (Map) filterProperties);
-    }
-
-    /**
-     * Gets a new copy of the default filter properties. These default filter properties map the tokens "@basedir@" and
-     * "@baseurl@" to the test's base directory and its base <code>file:</code> URL, respectively.
-     *
-     * @return The (modifiable) map with the default filter properties, never <code>null</code>.
-     * @since 1.2
-     * @deprecated use {@link #newDefaultFilterMap()}
-     */
-    @Deprecated
-    public Properties newDefaultFilterProperties() {
-        Properties filterProperties = new Properties();
-        filterProperties.putAll(newDefaultFilterMap());
-        return filterProperties;
-    }
-
-    /**
      * Gets a new copy of the default filter map. These default filter map, contains the tokens "@basedir@" and
      * "@baseurl@" to the test's base directory and its base <code>file:</code> URL, respectively.
      *
@@ -846,27 +547,6 @@ public class Verifier {
      */
     public void verifyFilePresent(String file) throws VerificationException {
         verifyFilePresence(file, true);
-    }
-
-    /**
-     * Verifies the given file's content matches an regular expression.
-     * Note this method also checks that the file exists and is readable.
-     *
-     * @param file the path of the file to check
-     * @param regex a regular expression
-     * @throws VerificationException in case the file was not found or its content does not match the given pattern
-     * @see Pattern
-     */
-    public void verifyFileContentMatches(String file, String regex) throws VerificationException {
-        verifyFilePresent(file);
-        try {
-            String content = FileUtils.fileRead(file);
-            if (!Pattern.matches(regex, content)) {
-                throw new VerificationException("Content of " + file + " does not match " + regex);
-            }
-        } catch (IOException e) {
-            throw new VerificationException("Could not read from " + file, e);
-        }
     }
 
     /**
@@ -913,16 +593,6 @@ public class Verifier {
     public void verifyArtifactNotPresent(String groupId, String artifactId, String version, String ext)
             throws VerificationException {
         verifyArtifactPresence(false, groupId, artifactId, version, ext);
-    }
-
-    private void verifyExpectedResult(String line) throws VerificationException {
-        boolean wanted = true;
-        if (line.startsWith("!")) {
-            line = line.substring(1);
-            wanted = false;
-        }
-
-        verifyFilePresence(line, wanted);
     }
 
     private void verifyFilePresence(String filePath, boolean wanted) throws VerificationException {
@@ -1013,250 +683,57 @@ public class Verifier {
         }
     }
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
-
-    /**
-     * Execute Maven.
-     *
-     * @deprecated will be removed.
-     * <p>
-     * For replacement please use:
-     * <pre>
-     *   verifier.addCliArgument( "goal" );
-     *   verifier.execute();
-     * </pre>
-     */
-    @Deprecated
-    public void executeGoal(String goal) throws VerificationException {
-        executeGoal(goal, environmentVariables);
-    }
-
-    /**
-     * Execute Maven.
-     *
-     * @deprecated will be removed.
-     * <p>
-     * For replacement please use:
-     * <pre>
-     *   verifier.addCliArgument( "goal" );
-     *   verifier.setEnvironmentVariable( "key1", "value1" );
-     *   verifier.setEnvironmentVariable( "key2", "value2" );
-     *   verifier.execute();
-     * </pre>
-     */
-    @Deprecated
-    public void executeGoal(String goal, Map<String, String> envVars) throws VerificationException {
-        executeGoals(Collections.singletonList(goal), envVars);
-    }
-
-    /**
-     * Execute Maven.
-     *
-     * @deprecated will be removed
-     * <p>
-     * For replacement please use:
-     * <pre>
-     *   verifier.addCliArguments( "goal1", "goal2" );
-     *   verifier.execute();
-     * </pre>
-     */
-    @Deprecated
-    public void executeGoals(List<String> goals) throws VerificationException {
-        executeGoals(goals, environmentVariables);
-    }
-
     public String getExecutable() {
-        // Use a strategy for finding the maven executable, John has a simple method like this
-        // but a little strategy + chain of command would be nicer.
-
-        if (mavenHome != null) {
-            return mavenHome + "/bin/mvn";
-        } else {
-            return "mvn";
-        }
+        return ExecutorRequest.MVN;
     }
 
-    /**
-     * Execute Maven.
-     *
-     * @deprecated will be removed
-     * <p>
-     * For replacement please use:
-     * <pre>
-     *   verifier.addCliArguments( "goal1", "goal2" );
-     *   verifier.setEnvironmentVariable( "key1", "value1" );
-     *   verifier.setEnvironmentVariable( "key2", "value2" );
-     *   verifier.execute();
-     * </pre>
-     */
-    @Deprecated
-    public void executeGoals(List<String> goals, Map<String, String> envVars) throws VerificationException {
-        cliArguments.addAll(goals);
-        environmentVariables.putAll(envVars);
-        execute();
-    }
-
-    /**
-     * Execute Maven.
-     */
     public void execute() throws VerificationException {
-
-        List<String> args = new ArrayList<>();
-
-        Collections.addAll(args, defaultCliArguments);
-
-        if (this.mavenDebug) {
-            args.add("-X");
+        List<String> args = new ArrayList<>(defaultCliArguments);
+        if (autoClean) {
+            args.add(AUTO_CLEAN_ARGUMENT);
         }
-
-        /*
-         * NOTE: Unless explicitly requested by the caller, the forked builds should use the current local
-         * repository. Otherwise, the forked builds would in principle leave the sandbox environment which has been
-         * setup for the current build. In particular, using "maven.repo.local" will make sure the forked builds use
-         * the same local repo as the parent build even if a custom user settings is provided.
-         */
-        boolean useMavenRepoLocal = Boolean.valueOf(verifierProperties.getProperty("use.mavenRepoLocal", "true"));
-
-        if (useMavenRepoLocal) {
-            args.add("-Dmaven.repo.local=" + localRepo);
-        }
-
-        if (autoclean) {
-            args.add(CLEAN_CLI_ARGUMENT);
-        }
-
         for (String cliArgument : cliArguments) {
             args.add(cliArgument.replace("${basedir}", getBasedir()));
         }
-
-        int ret;
-        File logFile = getLogFile();
-
         try {
-            MavenLauncher launcher = getMavenLauncher(environmentVariables);
+            ExecutorRequest.Builder builder =
+                    executorHelper.executorRequest().cwd(basedir).userHomeDirectory(userHomeDirectory);
+            if (!systemProperties.isEmpty()) {
+                builder.jvmSystemProperties(new HashMap(systemProperties));
+            }
+            if (!environmentVariables.isEmpty()) {
+                builder.environmentVariables(environmentVariables);
+            }
+            if (logFileName != null) {
+                builder.argument("-l").argument(logFileName);
+            }
+            builder.arguments(args);
 
-            String[] cliArgs = args.toArray(new String[0]);
-            ret = launcher.run(cliArgs, systemProperties, getBasedir(), logFile);
-        } catch (LauncherException e) {
+            ExecutorHelper.Mode mode = ExecutorHelper.Mode.AUTO;
+            if (forkJvm) {
+                mode = ExecutorHelper.Mode.FORKED;
+            }
+            int ret = executorHelper.execute(mode, builder.build());
+            if (ret > 0) {
+                throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
+                        + getExecutable() + " "
+                        + StringUtils.join(args.iterator(), " ") + "\n" + getLogContents(logFile));
+            }
+        } catch (ExecutorException e) {
             throw new VerificationException("Failed to execute Maven", e);
-        } catch (IOException e) {
-            throw new VerificationException(e);
         }
-
-        if (ret > 0) {
-            throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
-                    + new File(mavenHome, "bin/mvn") + " "
-                    + StringUtils.join(args.iterator(), " ") + "\n" + getLogContents(logFile));
-        }
-    }
-
-    protected MavenLauncher getMavenLauncher(Map<String, String> envVars) throws LauncherException {
-        boolean fork;
-        if (useWrapper) {
-            fork = true;
-        } else if (forkJvm != null) {
-            fork = forkJvm;
-        } else if ((envVars.isEmpty() && "auto".equalsIgnoreCase(forkMode)) || "embedded".equalsIgnoreCase(forkMode)) {
-            fork = false;
-
-            try {
-                initEmbeddedLauncher();
-            } catch (Exception e) {
-                fork = true;
-            }
-        } else {
-            fork = true;
-        }
-
-        if (!fork) {
-            if (!envVars.isEmpty()) {
-                throw new LauncherException("Environment variables are not supported in embedded runtime");
-            }
-
-            initEmbeddedLauncher();
-
-            return embeddedLauncher;
-        } else {
-            return new ForkedLauncher(mavenHome, envVars, debugJvm, useWrapper);
-        }
-    }
-
-    private void initEmbeddedLauncher() throws LauncherException {
-        if (embeddedLauncher == null) {
-            if (mavenHome == null || mavenHome.isEmpty()) {
-                embeddedLauncher = Embedded3xLauncher.createFromClasspath();
-            } else {
-                String defaultClasspath = System.getProperty("maven.bootclasspath");
-                String defaultClassworldConf = System.getProperty("classworlds.conf");
-                embeddedLauncher = Embedded3xLauncher.createFromMavenHome(
-                        mavenHome, defaultClassworldConf, parseClasspath(defaultClasspath));
-            }
-        }
-    }
-
-    private static List<URL> parseClasspath(String classpath) throws LauncherException {
-        if (classpath == null) {
-            return null;
-        }
-        ArrayList<URL> classpathUrls = new ArrayList<>();
-        StringTokenizer st = new StringTokenizer(classpath, File.pathSeparator);
-        while (st.hasMoreTokens()) {
-            try {
-                classpathUrls.add(new File(st.nextToken()).toURI().toURL());
-            } catch (MalformedURLException e) {
-                throw new LauncherException("Invalid launcher classpath " + classpath, e);
-            }
-        }
-        return classpathUrls;
     }
 
     public String getMavenVersion() throws VerificationException {
-        try {
-            return getMavenLauncher(Collections.emptyMap()).getMavenVersion();
-        } catch (LauncherException | IOException e) {
-            throw new VerificationException(e);
-        }
+        return executorHelper.mavenVersion();
     }
 
-    private static String getLogContents(File logFile) {
+    private String getLogContents(Path logFile) {
         try {
-            return Files.readString(logFile.toPath());
+            return Files.readString(logFile);
         } catch (IOException e) {
-            // ignore
             return "(Error reading log contents: " + e.getMessage() + ")";
         }
-    }
-
-    private void findLocalRepo(String settingsFile) throws VerificationException {
-        if (localRepo == null) {
-            localRepo = System.getProperty("maven.repo.local");
-        }
-
-        if (localRepo == null) {
-            try {
-                localRepo = retrieveLocalRepo(settingsFile);
-            } catch (SettingsBuildingException e) {
-                throw new VerificationException("Cannot read settings.xml to determine local repository location", e);
-            }
-        }
-
-        if (localRepo == null) {
-            localRepo = USER_HOME + "/.m2/repository";
-        }
-
-        File repoDir = new File(localRepo);
-
-        if (!repoDir.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            repoDir.mkdirs();
-        }
-
-        // normalize path
-        localRepo = repoDir.getAbsolutePath();
-
-        localRepoLayout = System.getProperty("maven.repo.local.layout", "default");
     }
 
     /**
@@ -1276,103 +753,6 @@ public class Verifier {
         if (!content.equals(FileUtils.fileRead(fileName))) {
             throw new VerificationException("Content of " + fileName + " does not equal " + content);
         }
-    }
-
-    static class UserModelReader extends DefaultHandler {
-        private String localRepository;
-
-        private StringBuilder currentBody = new StringBuilder();
-
-        public void parse(File file) throws VerificationException {
-            try {
-                SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-
-                SAXParser parser = saxFactory.newSAXParser();
-
-                InputSource is = new InputSource(new FileInputStream(file));
-
-                parser.parse(is, this);
-            } catch (FileNotFoundException e) {
-                throw new VerificationException("file not found path : " + file.getAbsolutePath(), e);
-            } catch (IOException e) {
-                throw new VerificationException(" IOException path : " + file.getAbsolutePath(), e);
-            } catch (ParserConfigurationException e) {
-                throw new VerificationException(e);
-            } catch (SAXException e) {
-                throw new VerificationException("Parsing exception for file " + file.getAbsolutePath(), e);
-            }
-        }
-
-        public void warning(SAXParseException spe) {
-            // ignore warnings
-        }
-
-        public void error(SAXParseException spe) throws SAXException {
-            throw new SAXException(spe);
-        }
-
-        public void fatalError(SAXParseException spe) throws SAXException {
-            throw new SAXException(spe);
-        }
-
-        public String getLocalRepository() {
-            return localRepository;
-        }
-
-        public void characters(char[] ch, int start, int length) throws SAXException {
-            currentBody.append(ch, start, length);
-        }
-
-        public void endElement(String uri, String localName, String rawName) throws SAXException {
-            if ("localRepository".equals(rawName)) {
-                if (notEmpty(currentBody.toString())) {
-                    localRepository = currentBody.toString().trim();
-                } else {
-                    throw new SAXException(
-                            "Invalid mavenProfile entry. Missing one or more " + "fields: {localRepository}.");
-                }
-            }
-
-            currentBody = new StringBuilder();
-        }
-
-        private boolean notEmpty(String test) {
-            return test != null && test.trim().length() > 0;
-        }
-
-        public void reset() {
-            currentBody = null;
-            localRepository = null;
-        }
-    }
-
-    /**
-     * @deprecated will be removed without replacement,
-     * for arguments adding please use {@link #addCliArgument(String)}, {@link #addCliArguments(String...)}
-     */
-    @Deprecated
-    public List<String> getCliOptions() {
-        return cliArguments;
-    }
-
-    /**
-     * @deprecated will be removed
-     */
-    @Deprecated
-    public void setCliOptions(List<String> cliOptions) {
-        this.cliArguments = cliOptions;
-    }
-
-    /**
-     * Add a command line argument, each argument must be set separately one by one.
-     * <p>
-     * <code>${basedir}</code> in argument will be replaced by value of {@link #getBasedir()} during execution.
-     * @param option an argument to add
-     * @deprecated please use {@link #addCliArgument(String)}
-     */
-    @Deprecated
-    public void addCliOption(String option) {
-        addCliArgument(option);
     }
 
     /**
@@ -1401,26 +781,6 @@ public class Verifier {
         return systemProperties;
     }
 
-    public void setSystemProperties(Properties systemProperties) {
-        this.systemProperties = systemProperties;
-    }
-
-    public void setSystemProperty(String key, String value) {
-        if (value != null) {
-            systemProperties.setProperty(key, value);
-        } else {
-            systemProperties.remove(key);
-        }
-    }
-
-    public Map<String, String> getEnvironmentVariables() {
-        return environmentVariables;
-    }
-
-    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
-        this.environmentVariables = environmentVariables;
-    }
-
     public void setEnvironmentVariable(String key, String value) {
         if (value != null) {
             environmentVariables.put(key, value);
@@ -1429,153 +789,27 @@ public class Verifier {
         }
     }
 
-    public Properties getVerifierProperties() {
-        return verifierProperties;
-    }
-
-    public void setVerifierProperties(Properties verifierProperties) {
-        this.verifierProperties = verifierProperties;
-    }
-
-    public boolean isAutoclean() {
-        return autoclean;
-    }
-
-    /**
-     * Clean project before execution by adding {@link #CLEAN_CLI_ARGUMENT} to command line.
-     * <p>
-     * By default, options is enabled.
-     *
-     * @param autoclean indicate if option is enabled
-     */
-    public void setAutoclean(boolean autoclean) {
-        this.autoclean = autoclean;
+    public void setAutoClean(boolean autoClean) {
+        this.autoClean = autoClean;
     }
 
     public String getBasedir() {
-        return basedir;
+        return basedir.toString();
     }
 
-    /**
-     * Gets the name of the file used to log build output.
-     *
-     * @return The name of the log file, relative to the base directory, never <code>null</code>.
-     * @since 1.2
-     */
-    public String getLogFileName() {
-        return this.logFileName;
-    }
-
-    /**
-     * Sets the name of the file used to log build output.
-     *
-     * @param logFileName The name of the log file, relative to the base directory, must not be empty or
-     *                    <code>null</code>.
-     * @since 1.2
-     */
     public void setLogFileName(String logFileName) {
         if (logFileName == null || logFileName.isEmpty()) {
             throw new IllegalArgumentException("log file name unspecified");
         }
         this.logFileName = logFileName;
-    }
-
-    /**
-     *
-     * @param logFile configure the log file used to log build output
-     * @since 2.0 ish (not really sure if this will be this)
-     */
-    public void setLogFile(File logFile) {
-        this.logFile = Objects.requireNonNull(logFile, "log file cannot be null");
-    }
-
-    /**
-     *
-     * @return The log file used to log build output
-     * @since 2.0 ish (not really sure if this will be this)
-     */
-    public File getLogFile() {
-        return logFile == null ? new File(getBasedir(), logFileName) : logFile;
-    }
-
-    /**
-     * @deprecated will be removed without replacement
-     */
-    @Deprecated
-    public void setDebug(boolean debug) {}
-
-    /**
-     * @deprecated will be removed without replacement
-     */
-    @Deprecated
-    public boolean isMavenDebug() {
-        return mavenDebug;
-    }
-
-    /**
-     * For replacement please use:
-     * <pre>
-     *     verifier.addCliArgument( "-X" );
-     * </pre>
-     *
-     * @deprecated will be removed without replacement.
-     */
-    @Deprecated
-    public void setMavenDebug(boolean mavenDebug) {
-        this.mavenDebug = mavenDebug;
+        this.logFile = this.basedir.resolve(this.logFileName);
     }
 
     public void setForkJvm(boolean forkJvm) {
         this.forkJvm = forkJvm;
     }
 
-    public boolean isDebugJvm() {
-        return debugJvm;
-    }
-
-    public void setDebugJvm(boolean debugJvm) {
-        this.debugJvm = debugJvm;
-    }
-
-    public String getLocalRepoLayout() {
-        return localRepoLayout;
-    }
-
-    public void setLocalRepoLayout(String localRepoLayout) {
-        this.localRepoLayout = localRepoLayout;
-    }
-
     public String getLocalRepository() {
-        return localRepo;
-    }
-
-    public void setMavenHome(String mavenHome) {
-        this.mavenHome = mavenHome;
-        setUseWrapper(false);
-        setForkMode();
-    }
-
-    public void setForkMode(String forkMode) {
-        this.forkMode = forkMode;
-        setForkMode();
-    }
-
-    public void setUseWrapper(boolean useWrapper) {
-        this.useWrapper = useWrapper;
-    }
-
-    public void setSettingsFile(String settingsFile) throws VerificationException {
-        this.settingsFile = settingsFile;
-        findLocalRepo(settingsFile);
-    }
-
-    public void setDefaultCliArguments(String[] defaultCliArguments) {
-        this.defaultCliArguments = defaultCliArguments == null ? new String[0] : defaultCliArguments.clone();
-    }
-
-    private void setForkMode() {
-        if ((mavenHome == null || mavenHome.isEmpty()) && (forkMode == null || forkMode.isEmpty())) {
-            forkMode = "auto";
-        }
+        return executorHelper.localRepository(executorHelper.executorRequest());
     }
 }

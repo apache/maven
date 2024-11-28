@@ -49,7 +49,7 @@ public class MavenITmng2254PomEncodingTest extends AbstractMavenIntegrationTestC
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2254");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("utf-8/target");
         verifier.deleteDirectory("latin-1/target");
         verifier.addCliArgument("validate");

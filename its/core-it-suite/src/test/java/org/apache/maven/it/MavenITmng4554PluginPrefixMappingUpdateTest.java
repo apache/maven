@@ -92,7 +92,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
             }
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteDirectory("target");
             try {
                 verifier.deleteArtifacts("org.apache.maven.its.mng4554");
@@ -171,7 +171,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
             }
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteDirectory("target");
             try {
                 verifier.deleteArtifacts("org.apache.maven.its.mng4554");
@@ -253,7 +253,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
             }
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteDirectory("target");
             try {
                 verifier.deleteArtifacts("org.apache.maven.its.mng4554");

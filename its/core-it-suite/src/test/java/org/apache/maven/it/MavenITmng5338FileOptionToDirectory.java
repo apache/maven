@@ -46,7 +46,7 @@ public class MavenITmng5338FileOptionToDirectory extends AbstractMavenIntegratio
     public void testFileOptionToADirectory() throws Exception {
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5338");
 

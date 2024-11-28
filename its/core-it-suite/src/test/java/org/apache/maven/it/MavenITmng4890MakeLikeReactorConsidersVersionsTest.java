@@ -45,7 +45,7 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends Abstract
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4890");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");
@@ -73,7 +73,7 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends Abstract
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4890");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");

@@ -45,7 +45,7 @@ public class MavenIT0024MultipleGoalExecutionsTest extends AbstractMavenIntegrat
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0024");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
         verifier.execute();

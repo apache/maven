@@ -42,7 +42,7 @@ public class MavenIT0009GoalConfigurationTest extends AbstractMavenIntegrationTe
 
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0009");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

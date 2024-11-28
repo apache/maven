@@ -64,7 +64,7 @@ public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegratio
                 .delete();
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("log-default.txt");
         verifier.filterFile("settings-default-template.xml", "settings-default.xml");
         verifier.addCliArgument("--settings");
@@ -74,7 +74,7 @@ public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegratio
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("log-custom.txt");
         verifier.filterFile("settings-custom-template.xml", "settings-custom.xml");
         verifier.addCliArgument("--settings");

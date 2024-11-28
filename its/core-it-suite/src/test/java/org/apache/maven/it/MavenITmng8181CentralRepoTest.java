@@ -44,7 +44,7 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8181-central-repo");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("--install-settings=install-settings.xml");
         verifier.addCliArgument("--settings=settings.xml");
         verifier.addCliArgument("-Dmaven.repo.local=" + testDir.toPath().resolve("target/local-repo"));

@@ -49,7 +49,7 @@ public class MavenITmng2006ChildPathAwareUrlInheritanceTest extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2006");
 
         Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

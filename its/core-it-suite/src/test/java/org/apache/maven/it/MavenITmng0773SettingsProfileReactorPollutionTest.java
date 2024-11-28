@@ -44,7 +44,7 @@ public class MavenITmng0773SettingsProfileReactorPollutionTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0773");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

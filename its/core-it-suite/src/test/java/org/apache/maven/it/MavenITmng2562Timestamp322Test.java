@@ -43,7 +43,7 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2562/default");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -67,7 +67,7 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2562/custom");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -87,7 +87,7 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2562/reactor");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("child-1/target");
         verifier.deleteDirectory("child-2/target");

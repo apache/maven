@@ -46,7 +46,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4291");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-direct.txt");
         verifier.addCliArgument("--offline");
@@ -71,7 +71,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4291");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-lifecycle.txt");
         verifier.addCliArgument("--offline");

@@ -56,7 +56,7 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest extends AbstractMavenInt
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4199");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4199");
         verifier.filterFile("pom-template.xml", "pom.xml");

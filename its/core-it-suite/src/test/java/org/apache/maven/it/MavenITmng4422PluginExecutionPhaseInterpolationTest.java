@@ -44,7 +44,7 @@ public class MavenITmng4422PluginExecutionPhaseInterpolationTest extends Abstrac
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4422");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

@@ -21,7 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -29,21 +29,16 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 public class Verifier extends org.apache.maven.shared.verifier.Verifier {
     public Verifier(String basedir) throws VerificationException {
-        this(basedir, false);
+        super(basedir, defaultCliArguments());
     }
 
-    public Verifier(String basedir, boolean debug) throws VerificationException {
-        super(basedir, null, debug, defaultCliArguments());
-    }
-
-    static String[] defaultCliArguments() {
-        return new String[] {
-            "-e", "--batch-mode", "-Dmaven.repo.local.tail=" + System.getProperty("maven.repo.local.tail")
-        };
+    static List<String> defaultCliArguments() {
+        return Arrays.asList(
+                "-e", "--batch-mode", "-Dmaven.repo.local.tail=" + System.getProperty("maven.repo.local.tail"));
     }
 
     public String loadLogContent() throws IOException {
-        return Files.readString(Paths.get(getBasedir(), getLogFileName()));
+        return Files.readString(getLogFile());
     }
 
     public List<String> loadLogLines() throws IOException {
@@ -100,9 +95,5 @@ public class Verifier extends org.apache.maven.shared.verifier.Verifier {
 
     public static long textOccurencesInLog(List<String> lines, String text) {
         return lines.stream().filter(line -> stripAnsi(line).contains(text)).count();
-    }
-
-    public void execute() throws VerificationException {
-        super.execute();
     }
 }

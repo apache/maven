@@ -50,7 +50,7 @@ public class MavenITmng4106InterpolationUsesDominantProfileTest extends Abstract
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4106");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         if (matchesVersionRange("[4.0.0-alpha-1,)")) {

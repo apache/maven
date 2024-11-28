@@ -44,7 +44,7 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest extends Abstract
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4036/default");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.filterFile("settings.xml", "settings.xml");
         verifier.deleteArtifacts("org.apache.maven.its.mng4036");
         verifier.addCliArgument("-s");

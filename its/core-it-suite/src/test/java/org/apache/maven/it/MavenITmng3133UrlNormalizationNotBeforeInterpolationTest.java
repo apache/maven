@@ -49,7 +49,7 @@ public class MavenITmng3133UrlNormalizationNotBeforeInterpolationTest extends Ab
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3133");
 
         Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

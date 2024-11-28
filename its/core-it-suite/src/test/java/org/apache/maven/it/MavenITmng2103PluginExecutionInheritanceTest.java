@@ -48,7 +48,7 @@ public class MavenITmng2103PluginExecutionInheritanceTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2103");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("child-1/target");
         verifier.deleteDirectory("child-2/target");
         verifier.addCliArgument("validate");

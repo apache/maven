@@ -62,7 +62,7 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2741");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("log-" + test + ".txt");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

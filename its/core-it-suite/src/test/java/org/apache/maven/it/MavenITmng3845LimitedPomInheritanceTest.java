@@ -48,7 +48,7 @@ public class MavenITmng3845LimitedPomInheritanceTest extends AbstractMavenIntegr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3845");
 
         Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

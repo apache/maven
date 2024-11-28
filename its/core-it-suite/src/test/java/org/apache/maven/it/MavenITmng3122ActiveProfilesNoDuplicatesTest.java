@@ -49,7 +49,7 @@ public class MavenITmng3122ActiveProfilesNoDuplicatesTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3122");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

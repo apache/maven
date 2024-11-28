@@ -40,7 +40,7 @@ public class MavenITmng1491ReactorArtifactIdCollisionTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1491");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
 
         try {
             verifier.addCliArgument("initialize");

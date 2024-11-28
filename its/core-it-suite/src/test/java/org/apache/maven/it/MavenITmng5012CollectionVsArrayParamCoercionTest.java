@@ -46,7 +46,7 @@ public class MavenITmng5012CollectionVsArrayParamCoercionTest extends AbstractMa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5012");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

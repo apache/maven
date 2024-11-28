@@ -44,7 +44,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3641");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
 
         // Delete this artifact. Just in case.
         verifier.deleteArtifact("org.apache.maven.its.mng3641", "parent", "1.0", "pom");

@@ -117,7 +117,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
             }
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteArtifacts("org.apache.maven.its.mng4428");
             verifier.deleteDirectory("target");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

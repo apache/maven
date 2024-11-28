@@ -52,7 +52,7 @@ public class MavenIT0142DirectDependencyScopesTest extends AbstractMavenIntegrat
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0142");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0142");
         verifier.filterFile("pom-template.xml", "pom.xml");

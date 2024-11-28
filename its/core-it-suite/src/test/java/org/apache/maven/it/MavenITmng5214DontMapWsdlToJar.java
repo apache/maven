@@ -43,7 +43,7 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
         File setupDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5214/dependency");
 
         Verifier setupVerifier = newVerifier(setupDir.getAbsolutePath());
-        setupVerifier.setAutoclean(false);
+        setupVerifier.setAutoClean(false);
         setupVerifier.addCliArgument("-X");
         setupVerifier.deleteDirectory("target");
         setupVerifier.deleteArtifacts("org.apache.maven.its.mng5214");
@@ -55,7 +55,7 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5214");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.deleteDirectory("dependency/target");
         verifier.setLogFileName("log-test.txt");

@@ -48,7 +48,7 @@ public class MavenITmng4022IdempotentPluginConfigMergingTest extends AbstractMav
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4022");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pmng4022a,mng4022b");
         verifier.addCliArgument("validate");

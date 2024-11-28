@@ -75,7 +75,7 @@ public class MavenITmng4053PluginConfigAttributesTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4053/" + test);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

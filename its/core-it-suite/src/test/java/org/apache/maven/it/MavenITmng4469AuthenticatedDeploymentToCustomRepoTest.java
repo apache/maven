@@ -131,7 +131,7 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4469");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("-Dfile=settings.xml");

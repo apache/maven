@@ -45,7 +45,7 @@ public class MavenITmng4207PluginWithLog4JTest extends AbstractMavenIntegrationT
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4207");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4207");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

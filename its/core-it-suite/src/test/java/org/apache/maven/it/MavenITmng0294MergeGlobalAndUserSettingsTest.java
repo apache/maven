@@ -45,7 +45,7 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0294");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("user-settings.xml");

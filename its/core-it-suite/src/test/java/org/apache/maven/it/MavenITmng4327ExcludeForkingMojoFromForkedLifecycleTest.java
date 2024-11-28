@@ -49,7 +49,7 @@ public class MavenITmng4327ExcludeForkingMojoFromForkedLifecycleTest extends Abs
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4327");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("generate-sources");
         verifier.execute();

@@ -51,7 +51,7 @@ public class MavenITmng4403LenientDependencyPomParsingTest extends AbstractMaven
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4403");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4403");
         verifier.filterFile("settings-template.xml", "settings.xml");

@@ -117,7 +117,7 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
             }
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteArtifacts("org.apache.maven.its.mng4360");
             verifier.deleteDirectory("target");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

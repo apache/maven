@@ -49,7 +49,7 @@ public class MavenITmng5503ZipInReactorTest extends AbstractMavenIntegrationTest
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5503");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("verify");
         verifier.execute();

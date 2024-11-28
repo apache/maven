@@ -50,7 +50,7 @@ public class MavenITmng5006VersionRangeDependencyParentResolutionTest extends Ab
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5006");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5006");
         verifier.addCliArgument("-s");

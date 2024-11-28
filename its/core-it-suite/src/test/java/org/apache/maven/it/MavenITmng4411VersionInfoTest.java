@@ -44,7 +44,7 @@ public class MavenITmng4411VersionInfoTest extends AbstractMavenIntegrationTestC
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4411");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("--version");
         verifier.execute();
         verifier.verifyErrorFreeLog();

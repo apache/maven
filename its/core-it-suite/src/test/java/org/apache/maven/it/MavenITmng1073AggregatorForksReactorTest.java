@@ -47,7 +47,7 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1073");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-1/target");
         verifier.deleteDirectory("sub-2/target");
@@ -72,7 +72,7 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1073");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-1/target");
         verifier.deleteDirectory("sub-2/target");

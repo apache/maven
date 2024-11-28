@@ -44,7 +44,7 @@ public class MavenIT0038AlternatePomFileDifferentDirTest extends AbstractMavenIn
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0038");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("project/target");
         verifier.addCliArgument("-f");
         verifier.addCliArgument("project/pom2.xml");

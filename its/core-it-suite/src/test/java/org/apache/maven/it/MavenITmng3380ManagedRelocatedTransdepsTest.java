@@ -54,7 +54,7 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest extends AbstractMavenIn
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3380");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3380");
         verifier.filterFile("settings-template.xml", "settings.xml");

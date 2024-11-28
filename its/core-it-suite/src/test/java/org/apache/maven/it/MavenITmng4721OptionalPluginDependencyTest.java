@@ -47,7 +47,7 @@ public class MavenITmng4721OptionalPluginDependencyTest extends AbstractMavenInt
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4721");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4721");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

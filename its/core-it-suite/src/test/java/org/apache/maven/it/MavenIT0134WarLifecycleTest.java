@@ -45,7 +45,7 @@ public class MavenIT0134WarLifecycleTest extends AbstractMavenIntegrationTestCas
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("deploy");
         verifier.execute();
         verifier.verifyFilePresent("target/resources-resources.txt");

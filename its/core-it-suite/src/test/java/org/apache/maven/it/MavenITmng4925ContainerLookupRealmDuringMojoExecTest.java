@@ -45,7 +45,7 @@ public class MavenITmng4925ContainerLookupRealmDuringMojoExecTest extends Abstra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4925");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4925");
         verifier.addCliArgument("-s");

@@ -41,7 +41,7 @@ public class MavenIT0063SystemScopeDependencyTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0063");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.getSystemProperties().setProperty("jre.home", new File(testDir, "jdk/jre").getPath());
         verifier.addCliArgument(

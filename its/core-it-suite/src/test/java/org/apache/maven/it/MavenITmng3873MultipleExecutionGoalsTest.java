@@ -64,7 +64,7 @@ public class MavenITmng3873MultipleExecutionGoalsTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3873");
 
         Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

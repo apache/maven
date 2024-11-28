@@ -45,7 +45,7 @@ public class MavenITmng5013ConfigureParamBeanFromScalarValueTest extends Abstrac
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5013");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

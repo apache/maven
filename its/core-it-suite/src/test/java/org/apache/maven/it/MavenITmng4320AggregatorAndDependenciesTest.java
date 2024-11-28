@@ -49,7 +49,7 @@ public class MavenITmng4320AggregatorAndDependenciesTest extends AbstractMavenIn
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4320");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4320");
         verifier.addCliArgument("-s");

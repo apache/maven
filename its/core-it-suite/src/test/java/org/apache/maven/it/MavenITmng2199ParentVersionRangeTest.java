@@ -45,7 +45,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
 
         verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-U");
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -66,7 +66,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
 
         verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-U");
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -85,7 +85,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
 
         try {
             verifier = newVerifier(testDir.getAbsolutePath());
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.addCliArgument("-U");
             verifier.addCliArgument("verify");
             verifier.execute();
@@ -107,7 +107,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
 
         try {
             verifier = newVerifier(testDir.getAbsolutePath());
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.addCliArgument("-U");
             verifier.addCliArgument("verify");
             verifier.execute();
@@ -127,7 +127,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
 
         try {
             verifier = newVerifier(testDir.getAbsolutePath());
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.addCliArgument("-U");
             verifier.addCliArgument("verify");
             verifier.execute();

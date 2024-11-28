@@ -118,19 +118,21 @@ public class ForkedMavenExecutor implements Executor {
             if (executorRequest.environmentVariables().isPresent()) {
                 pb.environment().putAll(executorRequest.environmentVariables().get());
             }
+            if (executorRequest.jvmSystemProperties().isPresent()) {
+                String mavenOpts = pb.environment().getOrDefault("MAVEN_OPTS", "");
+                mavenOpts += " "
+                        + String.join(
+                                " ",
+                                executorRequest.jvmSystemProperties().get().entrySet().stream()
+                                        .map(e -> "-D" + e.getKey() + "=" + e.getValue())
+                                        .toList());
+                pb.environment().put("MAVEN_OPTS", mavenOpts);
+            }
             if (executorRequest.jvmArguments().isPresent()) {
-                if (pb.environment().containsKey("MAVEN_OPTS")) {
-                    String mavenOpts = pb.environment().get("MAVEN_OPTS");
-                    mavenOpts += " "
-                            + String.join(" ", executorRequest.jvmArguments().get());
-                    pb.environment().put("MAVEN_OPTS", mavenOpts);
-                } else {
-                    pb.environment()
-                            .put(
-                                    "MAVEN_OPTS",
-                                    String.join(
-                                            " ", executorRequest.jvmArguments().get()));
-                }
+                String mavenOpts = pb.environment().getOrDefault("MAVEN_OPTS", "");
+                mavenOpts +=
+                        " " + String.join(" ", executorRequest.jvmArguments().get());
+                pb.environment().put("MAVEN_OPTS", mavenOpts);
             }
 
             Process process = pb.start();

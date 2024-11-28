@@ -57,7 +57,7 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4800");
 
         Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4800");
         verifier.addCliArgument("-s");

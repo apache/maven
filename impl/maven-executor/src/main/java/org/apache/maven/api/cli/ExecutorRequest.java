@@ -47,6 +47,11 @@ import static java.util.Objects.requireNonNull;
 @Experimental
 public interface ExecutorRequest {
     /**
+     * The Maven command.
+     */
+    String MVN = "mvn";
+
+    /**
      * The command to execute, ie "mvn".
      */
     @Nonnull
@@ -84,6 +89,14 @@ public interface ExecutorRequest {
      */
     @Nonnull
     Path userHomeDirectory();
+
+    /**
+     * Returns the map of Java System Properties to set before executing process.
+     *
+     * @return an Optional containing the map of Java System Properties, or empty if not specified
+     */
+    @Nonnull
+    Optional<Map<String, String>> jvmSystemProperties();
 
     /**
      * Returns the map of environment variables to set before executing process.
@@ -124,17 +137,10 @@ public interface ExecutorRequest {
                 cwd(),
                 installationDirectory(),
                 userHomeDirectory(),
+                jvmSystemProperties().orElse(null),
                 environmentVariables().orElse(null),
                 jvmArguments().orElse(null),
                 stdoutConsumer().orElse(null));
-    }
-
-    /**
-     * Returns new empty builder.
-     */
-    @Nonnull
-    static Builder empyBuilder() {
-        return new Builder();
     }
 
     /**
@@ -143,11 +149,12 @@ public interface ExecutorRequest {
     @Nonnull
     static Builder mavenBuilder(@Nullable Path installationDirectory) {
         return new Builder(
-                "mvn",
+                MVN,
                 null,
                 getCanonicalPath(Paths.get(System.getProperty("user.dir"))),
                 installationDirectory != null ? getCanonicalPath(installationDirectory) : discoverMavenHome(),
                 getCanonicalPath(Paths.get(System.getProperty("user.home"))),
+                null,
                 null,
                 null,
                 null);
@@ -159,6 +166,7 @@ public interface ExecutorRequest {
         private Path cwd;
         private Path installationDirectory;
         private Path userHomeDirectory;
+        private Map<String, String> jvmSystemProperties;
         private Map<String, String> environmentVariables;
         private List<String> jvmArguments;
         private OutputStream stdoutConsumer;
@@ -172,6 +180,7 @@ public interface ExecutorRequest {
                 Path cwd,
                 Path installationDirectory,
                 Path userHomeDirectory,
+                Map<String, String> jvmSystemProperties,
                 Map<String, String> environmentVariables,
                 List<String> jvmArguments,
                 OutputStream stdoutConsumer) {
@@ -180,6 +189,7 @@ public interface ExecutorRequest {
             this.cwd = cwd;
             this.installationDirectory = installationDirectory;
             this.userHomeDirectory = userHomeDirectory;
+            this.jvmSystemProperties = jvmSystemProperties;
             this.environmentVariables = environmentVariables;
             this.jvmArguments = jvmArguments;
             this.stdoutConsumer = stdoutConsumer;
@@ -221,6 +231,23 @@ public interface ExecutorRequest {
         @Nonnull
         public Builder userHomeDirectory(Path userHomeDirectory) {
             this.userHomeDirectory = requireNonNull(userHomeDirectory, "userHomeDirectory");
+            return this;
+        }
+
+        @Nonnull
+        public Builder jvmSystemProperties(Map<String, String> jvmSystemProperties) {
+            this.jvmSystemProperties = jvmSystemProperties;
+            return this;
+        }
+
+        @Nonnull
+        public Builder jvmSystemProperty(String key, String value) {
+            requireNonNull(key, "env key");
+            requireNonNull(value, "env value");
+            if (jvmSystemProperties == null) {
+                this.jvmSystemProperties = new HashMap<>();
+            }
+            this.jvmSystemProperties.put(key, value);
             return this;
         }
 
@@ -270,6 +297,7 @@ public interface ExecutorRequest {
                     cwd,
                     installationDirectory,
                     userHomeDirectory,
+                    jvmSystemProperties,
                     environmentVariables,
                     jvmArguments,
                     stdoutConsumer);
@@ -281,6 +309,7 @@ public interface ExecutorRequest {
             private final Path cwd;
             private final Path installationDirectory;
             private final Path userHomeDirectory;
+            private final Map<String, String> jvmSystemProperties;
             private final Map<String, String> environmentVariables;
             private final List<String> jvmArguments;
             private final OutputStream stdoutConsumer;
@@ -292,6 +321,7 @@ public interface ExecutorRequest {
                     Path cwd,
                     Path installationDirectory,
                     Path userHomeDirectory,
+                    Map<String, String> jvmSystemProperties,
                     Map<String, String> environmentVariables,
                     List<String> jvmArguments,
                     OutputStream stdoutConsumer) {
@@ -300,6 +330,7 @@ public interface ExecutorRequest {
                 this.cwd = requireNonNull(cwd);
                 this.installationDirectory = requireNonNull(installationDirectory);
                 this.userHomeDirectory = requireNonNull(userHomeDirectory);
+                this.jvmSystemProperties = jvmSystemProperties != null ? Map.copyOf(jvmSystemProperties) : null;
                 this.environmentVariables = environmentVariables != null ? Map.copyOf(environmentVariables) : null;
                 this.jvmArguments = jvmArguments != null ? List.copyOf(jvmArguments) : null;
                 this.stdoutConsumer = stdoutConsumer;
@@ -331,6 +362,11 @@ public interface ExecutorRequest {
             }
 
             @Override
+            public Optional<Map<String, String>> jvmSystemProperties() {
+                return Optional.ofNullable(jvmSystemProperties);
+            }
+
+            @Override
             public Optional<Map<String, String>> environmentVariables() {
                 return Optional.ofNullable(environmentVariables);
             }
@@ -352,7 +388,8 @@ public interface ExecutorRequest {
                         + arguments + ", cwd="
                         + cwd + ", installationDirectory="
                         + installationDirectory + ", userHomeDirectory="
-                        + userHomeDirectory + ", environmentVariables="
+                        + userHomeDirectory + ", jvmSystemProperties="
+                        + jvmSystemProperties + ", environmentVariables="
                         + environmentVariables + ", jvmArguments="
                         + jvmArguments + ", stdoutConsumer="
                         + stdoutConsumer + '}';

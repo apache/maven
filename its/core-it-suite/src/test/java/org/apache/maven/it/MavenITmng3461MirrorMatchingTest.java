@@ -56,7 +56,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3461/test-1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3461");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
@@ -118,7 +118,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
 
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteArtifacts("org.apache.maven.its.mng3461");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@test.port@", Integer.toString(port));
@@ -149,7 +149,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3461/test-3");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3461");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");

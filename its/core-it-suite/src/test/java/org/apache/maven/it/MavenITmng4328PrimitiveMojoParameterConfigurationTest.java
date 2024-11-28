@@ -49,7 +49,7 @@ public class MavenITmng4328PrimitiveMojoParameterConfigurationTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4328");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--offline");
         verifier.addCliArgument("validate");

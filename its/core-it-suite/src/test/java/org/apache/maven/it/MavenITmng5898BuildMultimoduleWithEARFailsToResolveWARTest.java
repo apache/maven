@@ -43,7 +43,7 @@ public class MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest extends 
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5898");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("test");
         verifier.execute();

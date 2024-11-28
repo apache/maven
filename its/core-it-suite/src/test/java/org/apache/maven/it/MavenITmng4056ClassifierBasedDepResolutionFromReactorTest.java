@@ -48,7 +48,7 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest extends A
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4056");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4056");
         verifier.addCliArgument("validate");

@@ -56,7 +56,7 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
         filterProps.put("@port@", Integer.toString(port));
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
 
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3477");
         verifier.addCliArgument("-U");
         verifier.addCliArguments("--settings", "settings.xml");

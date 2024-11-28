@@ -44,7 +44,7 @@ public class MavenITmng2318LocalParentResolutionTest extends AbstractMavenIntegr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2318");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

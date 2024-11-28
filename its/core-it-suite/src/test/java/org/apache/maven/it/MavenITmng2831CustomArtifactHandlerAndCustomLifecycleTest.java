@@ -44,7 +44,7 @@ public class MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest extends A
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2831");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("package");
         verifier.execute();

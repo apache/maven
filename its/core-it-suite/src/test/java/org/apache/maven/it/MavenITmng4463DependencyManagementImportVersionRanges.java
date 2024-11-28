@@ -43,7 +43,7 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
     public void testInclusiveUpperBoundResolvesToHighestVersion() throws Exception {
         final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4463/inclusive-upper-bound");
         final Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -57,7 +57,7 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
     public void testExclusiveUpperBoundResolvesToHighestVersion() throws Exception {
         final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4463/exclusive-upper-bound");
         final Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -73,7 +73,7 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
         final Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         try {
-            verifier.setAutoclean(false);
+            verifier.setAutoClean(false);
             verifier.deleteDirectory("target");
             verifier.addCliArgument("validate");
             verifier.execute();

@@ -57,7 +57,7 @@ public class MavenITmng5716ToolchainsTypeTest extends AbstractMavenIntegrationTe
 
         verifier.filterFile("toolchains.xml", "toolchains.xml", properties);
 
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--toolchains");
         verifier.addCliArgument("toolchains.xml");

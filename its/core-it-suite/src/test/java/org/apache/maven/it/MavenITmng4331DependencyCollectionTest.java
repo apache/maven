@@ -50,7 +50,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4331");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4331");
         verifier.deleteDirectory("sub-2/target");
         verifier.setLogFileName("log-lifecycle.txt");
@@ -74,7 +74,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4331");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4331");
         verifier.addCliArgument("-Ddepres.projectArtifacts=target/@artifactId@.txt");

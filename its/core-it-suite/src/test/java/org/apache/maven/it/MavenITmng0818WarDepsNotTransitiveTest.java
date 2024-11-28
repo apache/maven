@@ -48,7 +48,7 @@ public class MavenITmng0818WarDepsNotTransitiveTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0818");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0080");
         verifier.filterFile("settings-template.xml", "settings.xml");

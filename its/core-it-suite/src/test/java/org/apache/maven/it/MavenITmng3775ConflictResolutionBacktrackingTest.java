@@ -76,7 +76,7 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest extends AbstractMa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3775");
 
         Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3775");
         verifier.addCliArgument("-s");

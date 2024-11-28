@@ -47,7 +47,7 @@ public class MavenITmng2848ProfileActivationByEnvironmentVariableTest extends Ab
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2848");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.setEnvironmentVariable("MNG2848", "GO");
         verifier.addCliArgument("validate");

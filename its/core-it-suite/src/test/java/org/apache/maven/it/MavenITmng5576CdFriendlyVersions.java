@@ -49,7 +49,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5576-cd-friendly-versions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dchangelist=changelist");
         verifier.addCliArgument("-Dmaven.consumerpom=false");
@@ -82,7 +82,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setLogFileName("log-bc.txt");
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dchangelist=changelist");
         verifier.addCliArgument("-Dmaven.consumerpom=true");

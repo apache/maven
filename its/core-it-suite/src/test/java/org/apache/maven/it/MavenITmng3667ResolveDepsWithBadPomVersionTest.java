@@ -50,7 +50,7 @@ public class MavenITmng3667ResolveDepsWithBadPomVersionTest extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3667");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3667");
         verifier.addCliArgument("-s");

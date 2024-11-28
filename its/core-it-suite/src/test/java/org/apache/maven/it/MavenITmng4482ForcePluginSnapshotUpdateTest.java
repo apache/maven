@@ -49,7 +49,7 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest extends AbstractMavenIn
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4482");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4482");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

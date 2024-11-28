@@ -41,16 +41,16 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
         String tailRepo = System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository";
 
         Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
-        verifier.setLocalRepo(repo);
         verifier.addCliArgument("-X");
+        verifier.addCliArgument("-Dmaven.repo.local=" + repo);
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + tailRepo);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(new File(testDir, "jar").getAbsolutePath());
-        verifier.setLocalRepo(repo);
         verifier.addCliArgument("-X");
+        verifier.addCliArgument("-Dmaven.repo.local=" + repo);
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + tailRepo);
         verifier.addCliArgument("install");
         verifier.execute();

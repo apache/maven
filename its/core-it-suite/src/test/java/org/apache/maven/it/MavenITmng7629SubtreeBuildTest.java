@@ -44,13 +44,13 @@ class MavenITmng7629SubtreeBuildTest extends AbstractMavenIntegrationTestCase {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7629");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(true);
+        verifier.setAutoClean(true);
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(true);
+        verifier.setAutoClean(true);
         verifier.addCliArguments("-f", "child-2", "verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

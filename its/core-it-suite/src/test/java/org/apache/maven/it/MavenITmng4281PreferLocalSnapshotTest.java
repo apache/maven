@@ -49,7 +49,7 @@ public class MavenITmng4281PreferLocalSnapshotTest extends AbstractMavenIntegrat
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4281");
 
         Verifier verifier = newVerifier(new File(testDir, "dependency").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4281");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -59,7 +59,7 @@ public class MavenITmng4281PreferLocalSnapshotTest extends AbstractMavenIntegrat
         verifier.verifyArtifactPresent("org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "pom");
 
         verifier = newVerifier(new File(testDir, "project").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

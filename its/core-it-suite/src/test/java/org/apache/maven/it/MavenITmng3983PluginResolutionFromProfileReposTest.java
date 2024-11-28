@@ -48,7 +48,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setForkJvm(true); // Don't lock up plugin files in class loader within current JVM
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3983");
         verifier.filterFile("pom.xml", "pom.xml");
@@ -70,7 +70,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setForkJvm(true); // Don't lock up plugin files in class loader within current JVM
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3983");
         verifier.filterFile("settings.xml", "settings.xml");

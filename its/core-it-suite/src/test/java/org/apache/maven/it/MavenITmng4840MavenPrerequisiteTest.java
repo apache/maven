@@ -44,7 +44,7 @@ public class MavenITmng4840MavenPrerequisiteTest extends AbstractMavenIntegratio
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4840");
 
         Verifier verifier = newVerifier(new File(testDir, "test-1").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4840");
         verifier.addCliArgument("-s");
@@ -71,7 +71,7 @@ public class MavenITmng4840MavenPrerequisiteTest extends AbstractMavenIntegratio
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4840");
 
         Verifier verifier = newVerifier(new File(testDir, "test-2").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4840");
         verifier.addCliArgument("-s");

@@ -47,7 +47,7 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
         testDir = new File(testDir, "lifecycle");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         try {
             verifier.deleteArtifacts("org.apache.maven.its.mng0449");
@@ -84,7 +84,7 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
         testDir = new File(testDir, "direct");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         try {
             verifier.deleteArtifacts("org.apache.maven.its.mng0449");

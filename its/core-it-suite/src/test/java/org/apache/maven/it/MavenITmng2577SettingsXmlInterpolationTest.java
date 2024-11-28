@@ -47,7 +47,7 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2577");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings-env.xml");
@@ -73,7 +73,7 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2577");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings-sys.xml");

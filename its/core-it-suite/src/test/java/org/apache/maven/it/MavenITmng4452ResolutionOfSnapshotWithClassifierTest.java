@@ -50,7 +50,7 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4452");
 
         Verifier verifier = newVerifier(new File(testDir, "producer").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4452");
         verifier.addCliArgument("-Dmng4452.type=jar");
@@ -73,7 +73,7 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(new File(testDir, "consumer").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4452");
         verifier.addCliArgument("-s");

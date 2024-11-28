@@ -46,7 +46,7 @@ public class MavenITmng5418FileProjectPropertiesActivatorTest extends AbstractMa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5418");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

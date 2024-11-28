@@ -43,7 +43,7 @@ class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7939-plugins-validation-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("with-warning-log.txt");
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dmaven.plugin.validation=verbose");
@@ -69,7 +69,7 @@ class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7939-plugins-validation-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("without-warning-log.txt");
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dmaven.plugin.validation=verbose");

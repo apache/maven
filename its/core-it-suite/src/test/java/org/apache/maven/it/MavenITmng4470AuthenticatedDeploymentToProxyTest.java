@@ -198,7 +198,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4470/" + project);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.filterFile(
                 "settings-template.xml",
                 "settings.xml",

@@ -44,7 +44,7 @@ public class MavenITmng0557UserSettingsCliOptionTest extends AbstractMavenIntegr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0557");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

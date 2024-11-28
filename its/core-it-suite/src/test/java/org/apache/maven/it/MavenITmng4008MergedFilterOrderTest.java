@@ -49,7 +49,7 @@ public class MavenITmng4008MergedFilterOrderTest extends AbstractMavenIntegratio
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4008");
 
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

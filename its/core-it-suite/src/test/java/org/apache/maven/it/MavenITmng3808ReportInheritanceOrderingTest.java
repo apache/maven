@@ -49,7 +49,7 @@ public class MavenITmng3808ReportInheritanceOrderingTest extends AbstractMavenIn
         testDir = new File(testDir, "child");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

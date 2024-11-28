@@ -79,7 +79,7 @@ public class MavenITmng4690InterdependentConflictResolutionTest extends Abstract
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4690");
 
         Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4690");
         verifier.addCliArgument("-s");

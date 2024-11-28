@@ -50,7 +50,7 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest extends AbstractM
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4347");
 
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
 
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

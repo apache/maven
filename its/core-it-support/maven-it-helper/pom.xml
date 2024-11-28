@@ -31,6 +31,13 @@ under the License.
   <name>Maven IT Helper Library</name>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-executor</artifactId>
+      <!-- TODO: hack -->
+      <version>4.0.0-rc-2-SNAPSHOT</version>
+    </dependency>
+
     <!-- needed for VersionRange and Version -->
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -46,4 +53,18 @@ under the License.
       <artifactId>junit-jupiter</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <maven.home>${maven.home}</maven.home>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

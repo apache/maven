@@ -49,7 +49,7 @@ public class MavenITmng3906MergedPluginClassPathOrderingTest extends AbstractMav
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3906");
 
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3906");
         verifier.filterFile("settings-template.xml", "settings.xml");

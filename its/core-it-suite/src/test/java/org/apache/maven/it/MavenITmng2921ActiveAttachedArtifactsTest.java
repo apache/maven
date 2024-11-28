@@ -55,7 +55,7 @@ public class MavenITmng2921ActiveAttachedArtifactsTest extends AbstractMavenInte
     public void testitMNG2921() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2921");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.addCliArgument("validate");
         verifier.execute();

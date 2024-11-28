@@ -49,7 +49,7 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest extends AbstractMa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5137");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("producer/target");
         verifier.deleteDirectory("consumer/target");

@@ -45,7 +45,7 @@ public class MavenITmng4408NonExistentSettingsFileTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4408");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("log-user.txt");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("non-existing-settings.xml");
@@ -69,7 +69,7 @@ public class MavenITmng4408NonExistentSettingsFileTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4408");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.setLogFileName("log-global.txt");
         verifier.addCliArgument("--global-settings");
         verifier.addCliArgument("non-existing-settings.xml");

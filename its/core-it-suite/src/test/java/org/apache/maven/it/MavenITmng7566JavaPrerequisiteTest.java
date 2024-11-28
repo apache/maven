@@ -44,7 +44,7 @@ class MavenITmng7566JavaPrerequisiteTest extends AbstractMavenIntegrationTestCas
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7566");
 
         Verifier verifier = newVerifier(new File(testDir, "test-1").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng7566");
         verifier.addCliArgument("-s");
@@ -71,7 +71,7 @@ class MavenITmng7566JavaPrerequisiteTest extends AbstractMavenIntegrationTestCas
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7566");
 
         Verifier verifier = newVerifier(new File(testDir, "test-2").getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng7566");
         verifier.addCliArgument("-s");

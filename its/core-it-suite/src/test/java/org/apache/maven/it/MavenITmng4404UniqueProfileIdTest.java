@@ -45,7 +45,7 @@ public class MavenITmng4404UniqueProfileIdTest extends AbstractMavenIntegrationT
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4404");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.deleteDirectory("target");
         try {
             verifier.addCliArgument("validate");

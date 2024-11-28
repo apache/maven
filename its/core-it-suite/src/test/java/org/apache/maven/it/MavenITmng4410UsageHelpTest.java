@@ -44,7 +44,7 @@ public class MavenITmng4410UsageHelpTest extends AbstractMavenIntegrationTestCas
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4410");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("--help");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -44,7 +44,7 @@ public class MavenITmng4572ModelVersionSurroundedByWhitespaceTest extends Abstra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4572");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoclean(false);
+        verifier.setAutoClean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
