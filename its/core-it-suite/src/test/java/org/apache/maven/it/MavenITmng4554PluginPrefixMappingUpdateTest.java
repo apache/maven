@@ -28,8 +28,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;

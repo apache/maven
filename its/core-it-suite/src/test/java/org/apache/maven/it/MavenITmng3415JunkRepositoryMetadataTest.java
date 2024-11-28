@@ -23,11 +23,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -260,7 +260,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         File pomSrc = new File(testDir, "dependency-pom.xml");
 
         System.out.println("Copying dependency POM\nfrom: " + pomSrc + "\nto: " + pom);
-        Files.copy(pomSrc.toPath(), pom.toPath());
+        FileUtils.copyFile(pomSrc, pom);
     }
 
     private File getMetadataFile(Verifier verifier) {

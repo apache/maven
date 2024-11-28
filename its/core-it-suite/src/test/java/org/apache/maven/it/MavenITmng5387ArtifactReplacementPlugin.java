@@ -19,8 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.nio.file.Files;
 
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegr
         v0.verifyErrorFreeLog();
 
         String path = v0.getArtifactPath("org.apache.maven.its.mng5387", "mng5387-it", "0.0.1-SNAPSHOT", "txt", "c");
-        String contents = Files.readString(new File(path).toPath());
+        String contents = FileUtils.fileRead(new File(path), "utf-8");
         assertTrue(contents.contains("This is the second file"));
     }
 }

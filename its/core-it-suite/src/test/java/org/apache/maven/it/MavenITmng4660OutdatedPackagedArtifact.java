@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         final Path resourcesDirectory =
                 Files.createDirectories(Paths.get(testDir.toString(), "module-a", "src", "main", "resources"));
         final Path fileToWrite = resourcesDirectory.resolve("example.properties");
-        Files.writeString(fileToWrite, "x=42");
+        FileUtils.fileWrite(fileToWrite.toString(), "x=42");
 
         verifier2.setAutoclean(false);
         verifier2.addCliArgument("--projects");

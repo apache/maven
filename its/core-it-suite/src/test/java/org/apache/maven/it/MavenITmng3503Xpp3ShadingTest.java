@@ -19,8 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.nio.file.Files;
 
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +49,7 @@ public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestC
 
         verifier.verifyErrorFreeLog();
 
-        assertEquals("<root />", Files.readString(new File(dir, "target/serialized.xml").toPath()));
+        assertEquals("<root />", FileUtils.fileRead(new File(dir, "target/serialized.xml"), "UTF-8"));
     }
 
     @Test
@@ -62,6 +62,6 @@ public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestC
 
         verifier.verifyErrorFreeLog();
 
-        assertEquals("root", Files.readString(new File(dir, "target/serialized.xml").toPath()));
+        assertEquals("root", FileUtils.fileRead(new File(dir, "target/serialized.xml"), "UTF-8"));
     }
 }

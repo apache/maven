@@ -23,10 +23,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
+import org.apache.maven.shared.utils.StringUtils;
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -145,11 +145,11 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String settings = Files.readString(new File(testDir, "settings-template.xml").toPath());
+        String settings = FileUtils.fileRead(new File(testDir, "settings-template.xml"));
         settings = StringUtils.replace(settings, "@port@", Integer.toString(port));
         String newSettings = StringUtils.replace(settings, "@protocol@", "http");
 
-        Files.writeString(new File(testDir, "settings.xml").getAbsoluteFile().toPath(), newSettings);
+        FileUtils.fileWrite(new File(testDir, "settings.xml").getAbsolutePath(), newSettings);
 
         verifier = newVerifier(testDir.getAbsolutePath());
 
@@ -187,11 +187,11 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String settings = Files.readString(new File(testDir, "settings-template.xml").toPath());
+        String settings = FileUtils.fileRead(new File(testDir, "settings-template.xml"));
         settings = StringUtils.replace(settings, "@port@", Integer.toString(port));
         String newSettings = StringUtils.replace(settings, "@protocol@", "dav");
 
-        Files.writeString(new File(testDir, "settings.xml").getAbsoluteFile().toPath(), newSettings);
+        FileUtils.fileWrite(new File(testDir, "settings.xml").getAbsolutePath(), newSettings);
 
         verifier = newVerifier(testDir.getAbsolutePath());
 

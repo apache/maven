@@ -19,9 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -73,13 +72,13 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
     }
 
     private void assertPomUtf8(File pomFile) throws Exception {
-        String pom = Files.readString(pomFile.toPath());
+        String pom = FileUtils.fileRead(pomFile, "UTF-8");
         String chars = "\u00DF\u0131\u03A3\u042F\u05D0\u20AC";
         assertPom(pomFile, pom, chars);
     }
 
     private void assertPomLatin1(File pomFile) throws Exception {
-        String pom = Files.readString(pomFile.toPath(), StandardCharsets.ISO_8859_1);
+        String pom = FileUtils.fileRead(pomFile, "ISO-8859-1");
         String chars = "\u00C4\u00D6\u00DC\u00E4\u00F6\u00FC\u00DF";
         assertPom(pomFile, pom, chars);
     }

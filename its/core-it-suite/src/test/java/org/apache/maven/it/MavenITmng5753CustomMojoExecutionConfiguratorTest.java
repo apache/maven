@@ -19,8 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.nio.file.Files;
 
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -61,7 +61,7 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest extends AbstractM
         // The <name/> element in the original configuration is "ORIGINAL". We want to assert that our
         // custom MojoExecutionConfigurator made the transformation of the element from "ORIGINAL" to "TRANSFORMED"
         //
-        String actual = Files.readString(configurationFile.toPath());
+        String actual = FileUtils.fileRead(configurationFile);
         assertEquals("TRANSFORMED", actual);
     }
 }

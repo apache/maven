@@ -19,10 +19,10 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -163,6 +163,6 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
 
         File metadata = new File(testdir, "repo/org/apache/maven/its/mng4745/maven-it-plugin/maven-metadata.xml");
         metadata.getParentFile().mkdirs();
-        Files.writeString(metadata.getAbsoluteFile().toPath(), content.toString());
+        FileUtils.fileWrite(metadata.getAbsolutePath(), "UTF-8", content.toString());
     }
 }
