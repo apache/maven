@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cling.executor.impl;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,7 +74,10 @@ public class HelperImplTest {
         try (ExecutorHelper helper =
                 new HelperImpl(mvn3ExecutorRequestBuilder().build().installationDirectory())) {
             String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
-            assertEquals("aopalliance/aopalliance/1.0/aopalliance-1.0.jar", path);
+            assertEquals(
+                    "aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
+                            + "aopalliance-1.0.jar",
+                    path);
         }
     }
 
@@ -82,7 +86,10 @@ public class HelperImplTest {
         try (ExecutorHelper helper =
                 new HelperImpl(mvn4ExecutorRequestBuilder().build().installationDirectory())) {
             String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
-            assertEquals("aopalliance/aopalliance/1.0/aopalliance-1.0.jar", path);
+            assertEquals(
+                    "aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
+                            + "aopalliance-1.0.jar",
+                    path);
         }
     }
 
@@ -91,7 +98,7 @@ public class HelperImplTest {
         try (ExecutorHelper helper =
                 new HelperImpl(mvn3ExecutorRequestBuilder().build().installationDirectory())) {
             String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
-            assertEquals("aopalliance/maven-metadata-someremote.xml", path);
+            assertEquals("aopalliance" + File.separator + "maven-metadata-someremote.xml", path);
         }
     }
 
@@ -100,7 +107,7 @@ public class HelperImplTest {
         try (ExecutorHelper helper =
                 new HelperImpl(mvn4ExecutorRequestBuilder().build().installationDirectory())) {
             String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
-            assertEquals("aopalliance/maven-metadata-someremote.xml", path);
+            assertEquals("aopalliance" + File.separator + "maven-metadata-someremote.xml", path);
         }
     }
 }
