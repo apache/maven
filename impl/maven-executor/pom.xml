@@ -35,7 +35,7 @@ under the License.
 
   <properties>
     <maven3version>3.9.9</maven3version>
-    <maven4version>4.0.0-beta-5</maven4version>
+    <maven4version>4.0.0-rc-1</maven4version>
   </properties>
 
   <dependencies>

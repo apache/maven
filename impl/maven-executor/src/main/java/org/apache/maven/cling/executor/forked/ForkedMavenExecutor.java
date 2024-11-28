@@ -65,7 +65,10 @@ public class ForkedMavenExecutor implements Executor {
                         .build());
                 if (exitCode == 0) {
                     if (stdout.size() > 0) {
-                        return stdout.toString().replace("\n", "").replace("\r", "");
+                        return stdout.toString()
+                                .replace("\n", "")
+                                .replace("\r", "")
+                                .trim();
                     }
                     return UNKNOWN_VERSION;
                 } else {

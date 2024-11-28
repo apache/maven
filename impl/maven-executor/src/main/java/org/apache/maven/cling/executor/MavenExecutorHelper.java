@@ -45,8 +45,11 @@ public class MavenExecutorHelper {
         this.installationDirectory = requireNonNull(installationDirectory);
     }
 
+    /**
+     * Returns the location of local repository, as detected by Maven. The {@code userSettings} param may contain
+     * and override (equivalent of {@code -s settings.xml} on CLI).
+     */
     public Path localRepository(@Nullable Path userSettings) {
-        // mvn help:evaluate -Dexpression=settings.localRepository -q -DforceStdout
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         try (Executor ex = new ForkedMavenExecutor()) {
             ex.execute(ExecutorRequest.mavenBuilder(installationDirectory)
