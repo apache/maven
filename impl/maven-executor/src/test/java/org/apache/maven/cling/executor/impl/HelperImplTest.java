@@ -16,29 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.executor;
+package org.apache.maven.cling.executor.impl;
 
-import java.nio.file.Path;
-
+import org.apache.maven.cling.executor.ExecutorHelper;
+import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn3ExecutorRequestBuilder;
 import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn4ExecutorRequestBuilder;
 
-public class MavenExecutorHelperTest {
+public class HelperImplTest {
     @Test
     void smoke3() {
-        MavenExecutorHelper mvn3 =
-                new MavenExecutorHelper(mvn3ExecutorRequestBuilder().build().installationDirectory());
-        Path localRepository = mvn3.localRepository(null);
-        System.out.println(localRepository);
+        try (ExecutorHelper mvn3 =
+                new HelperImpl(mvn3ExecutorRequestBuilder().build().installationDirectory())) {
+            String localRepository = mvn3.localRepository(mvn3.executorRequest());
+            System.out.println(localRepository);
+        }
     }
 
     @Test
     void smoke4() {
-        MavenExecutorHelper mvn4 =
-                new MavenExecutorHelper(mvn4ExecutorRequestBuilder().build().installationDirectory());
-        Path localRepository = mvn4.localRepository(null);
-        System.out.println(localRepository);
+        try (ExecutorHelper mvn4 =
+                new HelperImpl(mvn4ExecutorRequestBuilder().build().installationDirectory())) {
+            String localRepository = mvn4.localRepository(mvn4.executorRequest());
+            System.out.println(localRepository);
+        }
     }
 }

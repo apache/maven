@@ -141,11 +141,11 @@ public abstract class MavenExecutorTestSupport {
         }
     }
 
-    static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
+    public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
         return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")));
     }
 
-    static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
+    public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
         return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")));
     }
 
