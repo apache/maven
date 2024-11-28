@@ -33,8 +33,6 @@ import org.apache.maven.internal.impl.DefaultVersionParser;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultProfileActivationContext;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
-import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -55,10 +53,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     @Override
     void setUp() throws Exception {
         activator = new ConditionProfileActivator(
-                new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme())),
-                new ProfileActivationFilePathInterpolator(
-                        new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator()),
-                new DefaultRootLocator());
+                new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme())));
 
         Path file = tempDir.resolve("file.txt");
         Files.createFile(file);
@@ -484,7 +479,9 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     protected ProfileActivationContext newFileContext(Path path) {
-        DefaultProfileActivationContext context = new DefaultProfileActivationContext();
+        DefaultProfileActivationContext context = new DefaultProfileActivationContext(
+                new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator());
+
         context.setModel(Model.newBuilder().pomFile(path.resolve("pom.xml")).build());
         return context;
     }

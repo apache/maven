@@ -18,21 +18,12 @@
  */
 package org.apache.maven.internal.impl.model.profile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.maven.api.services.InterpolatorException;
+import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.model.ProfileActivationContext;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 
 import static org.apache.maven.internal.impl.model.profile.ConditionParser.toInt;
 
@@ -45,22 +36,16 @@ import static org.apache.maven.internal.impl.model.profile.ConditionParser.toInt
 public class ConditionFunctions {
     private final ProfileActivationContext context;
     private final VersionParser versionParser;
-    private final ProfileActivationFilePathInterpolator interpolator;
 
     /**
      * Constructs a new ConditionFunctions instance.
      *
      * @param context The profile activation context
      * @param versionParser The version parser for comparing versions
-     * @param interpolator The interpolator for resolving file paths
      */
-    public ConditionFunctions(
-            ProfileActivationContext context,
-            VersionParser versionParser,
-            ProfileActivationFilePathInterpolator interpolator) {
+    public ConditionFunctions(ProfileActivationContext context, VersionParser versionParser) {
         this.context = context;
         this.versionParser = versionParser;
-        this.interpolator = interpolator;
     }
 
     /**
@@ -207,75 +192,34 @@ public class ConditionFunctions {
      * Checks if a file or directory exists at the given path.
      *
      * @param args A list containing a single string argument representing the path
-     * @return true if the file or directory exists, false otherwise
+     * @return {@code true} if the file or directory exists, {@code false} otherwise
      * @throws IllegalArgumentException if the number of arguments is not exactly one
-     * @throws IOException if a problem occurs while walking the file system
+     * @throws ModelBuilderException if a problem occurs while walking the file system
+     * @throws InterpolatorException if an error occurs during interpolation
      */
-    public Object exists(List<Object> args) throws IOException {
+    public Object exists(List<Object> args) {
         if (args.size() != 1) {
             throw new IllegalArgumentException("exists function requires exactly one argument");
         }
         String path = ConditionParser.toString(args.get(0));
-        return fileExists(path);
+        return context.exists(path, true);
     }
 
     /**
      * Checks if a file or directory is missing at the given path.
      *
      * @param args A list containing a single string argument representing the path
-     * @return true if the file or directory does not exist, false otherwise
+     * @return {@code true} if the file or directory does not exist, {@code false} otherwise
      * @throws IllegalArgumentException if the number of arguments is not exactly one
-     * @throws IOException if a problem occurs while walking the file system
+     * @throws ModelBuilderException if a problem occurs while walking the file system
+     * @throws InterpolatorException if an error occurs during interpolation
      */
-    public Object missing(List<Object> args) throws IOException {
+    public Object missing(List<Object> args) {
         if (args.size() != 1) {
             throw new IllegalArgumentException("missing function requires exactly one argument");
         }
         String path = ConditionParser.toString(args.get(0));
-        return !fileExists(path);
-    }
-
-    private boolean fileExists(String path) throws IOException {
-        String pattern = interpolator.interpolate(path, context);
-        int asteriskIndex = pattern.indexOf('*');
-        int questionMarkIndex = pattern.indexOf('?');
-        int firstWildcardIndex = questionMarkIndex < 0
-                ? asteriskIndex
-                : asteriskIndex < 0 ? questionMarkIndex : Math.min(asteriskIndex, questionMarkIndex);
-        String fixed, glob;
-        if (firstWildcardIndex < 0) {
-            fixed = pattern;
-            glob = "";
-        } else {
-            int lastSep = pattern.substring(0, firstWildcardIndex).lastIndexOf(File.separatorChar);
-            if (lastSep < 0) {
-                fixed = "";
-                glob = pattern;
-            } else {
-                fixed = pattern.substring(0, lastSep);
-                glob = pattern.substring(lastSep + 1);
-            }
-        }
-        Path fixedPath = Paths.get(fixed);
-        if (!Files.exists(fixedPath)) {
-            return false;
-        }
-        if (!glob.isEmpty()) {
-            PathMatcher matcher = fixedPath.getFileSystem().getPathMatcher("glob:" + glob);
-            AtomicBoolean found = new AtomicBoolean(false);
-            Files.walkFileTree(fixedPath, new SimpleFileVisitor<>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                    if (found.get() || matcher.matches(fixedPath.relativize(file))) {
-                        found.set(true);
-                        return FileVisitResult.TERMINATE;
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-            return found.get();
-        }
-        return true;
+        return !context.exists(path, true);
     }
 
     /**

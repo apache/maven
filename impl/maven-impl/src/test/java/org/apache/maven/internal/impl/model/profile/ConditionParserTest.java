@@ -28,7 +28,6 @@ import org.apache.maven.internal.impl.DefaultVersionParser;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultProfileActivationContext;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.internal.impl.model.profile.ConditionParser.ExpressionFunction;
 import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.eclipse.aether.util.version.GenericVersionScheme;
@@ -51,19 +50,18 @@ class ConditionParserTest {
         ProfileActivationContext context = createMockContext();
         DefaultVersionParser versionParser =
                 new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()));
-        ProfileActivationFilePathInterpolator interpolator = new ProfileActivationFilePathInterpolator(
-                new DefaultPathTranslator(),
-                new AbstractProfileActivatorTest.FakeRootLocator(),
-                new DefaultInterpolator());
         DefaultRootLocator rootLocator = new DefaultRootLocator();
 
-        functions = ConditionProfileActivator.registerFunctions(context, versionParser, interpolator);
-        propertyResolver = s -> ConditionProfileActivator.property(context, rootLocator, s);
+        functions = ConditionProfileActivator.registerFunctions(context, versionParser);
+        propertyResolver = s -> ConditionProfileActivator.property(context, s);
         parser = new ConditionParser(functions, propertyResolver);
     }
 
     private ProfileActivationContext createMockContext() {
-        DefaultProfileActivationContext context = new DefaultProfileActivationContext();
+        DefaultProfileActivationContext context = new DefaultProfileActivationContext(
+                new DefaultPathTranslator(),
+                new AbstractProfileActivatorTest.FakeRootLocator(),
+                new DefaultInterpolator());
         context.setSystemProperties(Map.of(
                 "os.name", "windows",
                 "os.arch", "amd64",

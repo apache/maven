@@ -99,6 +99,7 @@ import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.api.services.model.ModelUrlNormalizer;
 import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.services.model.ModelVersionParser;
+import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.PluginConfigurationExpander;
 import org.apache.maven.api.services.model.PluginManagementInjector;
 import org.apache.maven.api.services.model.ProfileInjector;
@@ -145,12 +146,13 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final DependencyManagementInjector dependencyManagementInjector;
     private final DependencyManagementImporter dependencyManagementImporter;
     private final PluginConfigurationExpander pluginConfigurationExpander;
-    private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelVersionParser versionParser;
     private final List<ModelTransformer> transformers;
     private final ModelCacheFactory modelCacheFactory;
     private final ModelResolver modelResolver;
     private final Interpolator interpolator;
+    private final PathTranslator pathTranslator;
+    private final RootLocator rootLocator;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
@@ -169,12 +171,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             DependencyManagementInjector dependencyManagementInjector,
             DependencyManagementImporter dependencyManagementImporter,
             PluginConfigurationExpander pluginConfigurationExpander,
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelVersionParser versionParser,
             List<ModelTransformer> transformers,
             ModelCacheFactory modelCacheFactory,
             ModelResolver modelResolver,
-            Interpolator interpolator) {
+            Interpolator interpolator,
+            PathTranslator pathTranslator,
+            RootLocator rootLocator) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
         this.modelNormalizer = modelNormalizer;
@@ -189,12 +192,13 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.dependencyManagementInjector = dependencyManagementInjector;
         this.dependencyManagementImporter = dependencyManagementImporter;
         this.pluginConfigurationExpander = pluginConfigurationExpander;
-        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.versionParser = versionParser;
         this.transformers = transformers;
         this.modelCacheFactory = modelCacheFactory;
         this.modelResolver = modelResolver;
         this.interpolator = interpolator;
+        this.pathTranslator = pathTranslator;
+        this.rootLocator = rootLocator;
     }
 
     public ModelBuilderSession newSession() {
@@ -862,12 +866,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        Model readParent(Model childModel) throws ModelBuilderException {
+        Model readParent(Model childModel, DefaultProfileActivationContext profileActivationContext) {
             Model parentModel;
 
             Parent parent = childModel.getParent();
             if (parent != null) {
-                parentModel = resolveParent(childModel);
+                parentModel = resolveParent(childModel, profileActivationContext);
 
                 if (!"pom".equals(parentModel.getPackaging())) {
                     add(
@@ -892,18 +896,20 @@ public class DefaultModelBuilder implements ModelBuilder {
             return parentModel;
         }
 
-        private Model resolveParent(Model childModel) throws ModelBuilderException {
+        private Model resolveParent(Model childModel, DefaultProfileActivationContext profileActivationContext)
+                throws ModelBuilderException {
             Model parentModel = null;
             if (isBuildRequest()) {
-                parentModel = readParentLocally(childModel);
+                parentModel = readParentLocally(childModel, profileActivationContext);
             }
             if (parentModel == null) {
-                parentModel = resolveAndReadParentExternally(childModel);
+                parentModel = resolveAndReadParentExternally(childModel, profileActivationContext);
             }
             return parentModel;
         }
 
-        private Model readParentLocally(Model childModel) throws ModelBuilderException {
+        private Model readParentLocally(Model childModel, DefaultProfileActivationContext profileActivationContext)
+                throws ModelBuilderException {
             ModelSource candidateSource;
 
             Parent parent = childModel.getParent();
@@ -938,7 +944,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return null;
             }
 
-            Model candidateModel = derive(candidateSource).readAsParentModel();
+            ModelBuilderSessionState derived = derive(candidateSource);
+            Model candidateModel = derived.readAsParentModel(profileActivationContext);
+            addActivePomProfiles(derived.result.getActivePomProfiles());
 
             String groupId = getGroupId(candidateModel);
             String artifactId = candidateModel.getArtifactId();
@@ -1020,7 +1028,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             add(Severity.FATAL, Version.BASE, buffer.toString(), parent.getLocation(""));
         }
 
-        Model resolveAndReadParentExternally(Model childModel) throws ModelBuilderException {
+        Model resolveAndReadParentExternally(Model childModel, DefaultProfileActivationContext profileActivationContext)
+                throws ModelBuilderException {
             ModelBuilderRequest request = this.request;
             setSource(childModel);
 
@@ -1078,7 +1087,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .source(modelSource)
                     .build();
 
-            Model parentModel = derive(lenientRequest).readAsParentModel();
+            Model parentModel = derive(lenientRequest).readAsParentModel(profileActivationContext);
 
             if (!parent.getVersion().equals(version)) {
                 String rawChildModelVersion = childModel.getVersion();
@@ -1119,7 +1128,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 for (Profile profile : activeExternalProfiles) {
                     profileProps.putAll(profile.getProperties());
                 }
-                profileProps.putAll(profileActivationContext.getUserProperties());
+                profileProps.putAll(request.getUserProperties());
                 profileActivationContext.setUserProperties(profileProps);
             }
 
@@ -1163,11 +1172,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                 for (Profile profile : activeExternalProfiles) {
                     profileProps.putAll(profile.getProperties());
                 }
-                profileProps.putAll(profileActivationContext.getUserProperties());
+                profileProps.putAll(request.getUserProperties());
                 profileActivationContext.setUserProperties(profileProps);
             }
 
-            Model parentModel = readParent(activatedFileModel);
+            Model parentModel = readParent(activatedFileModel, profileActivationContext);
+
             // Now that we have read the parent, we can set the relative
             // path correctly if it was not set in the input model
             if (inputModel.getParent() != null && inputModel.getParent().getRelativePath() == null) {
@@ -1186,16 +1196,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inputModel = inputModel.withParent(inputModel.getParent().withRelativePath(relPath));
             }
 
-            List<Profile> parentInterpolatedProfiles =
-                    interpolateActivations(parentModel.getProfiles(), profileActivationContext, this);
-            // profile injection
-            List<Profile> parentActivePomProfiles =
-                    getActiveProfiles(parentInterpolatedProfiles, profileActivationContext);
-            Model injectedParentModel = profileInjector
-                    .injectProfiles(parentModel, parentActivePomProfiles, request, this)
-                    .withProfiles(List.of());
-
-            Model model = inheritanceAssembler.assembleModelInheritance(inputModel, injectedParentModel, request, this);
+            Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
 
             // model normalization
             model = modelNormalizer.mergeDuplicates(model, request, this);
@@ -1211,10 +1212,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
             model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
 
-            List<Profile> allProfiles = new ArrayList<>(parentActivePomProfiles.size() + activePomProfiles.size());
-            allProfiles.addAll(parentActivePomProfiles);
-            allProfiles.addAll(activePomProfiles);
-            result.setActivePomProfiles(allProfiles);
+            addActivePomProfiles(activePomProfiles);
 
             // model interpolation
             Model resultModel = model;
@@ -1237,6 +1235,15 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             return resultModel;
+        }
+
+        private void addActivePomProfiles(List<Profile> activePomProfiles) {
+            if (activePomProfiles != null) {
+                if (result.getActivePomProfiles() == null) {
+                    result.setActivePomProfiles(new ArrayList<>());
+                }
+                result.getActivePomProfiles().addAll(activePomProfiles);
+            }
         }
 
         private List<Profile> getActiveProfiles(
@@ -1491,13 +1498,25 @@ public class DefaultModelBuilder implements ModelBuilder {
         /**
          * Reads the request source's parent.
          */
-        Model readAsParentModel() throws ModelBuilderException {
-            return cache(request.getSource(), PARENT, this::doReadAsParentModel);
+        Model readAsParentModel(DefaultProfileActivationContext profileActivationContext) throws ModelBuilderException {
+            Map<DefaultProfileActivationContext.Record, Model> parentsPerContext =
+                    cache(request.getSource(), PARENT, ConcurrentHashMap::new);
+            for (Map.Entry<DefaultProfileActivationContext.Record, Model> e : parentsPerContext.entrySet()) {
+                if (e.getKey().matches(profileActivationContext)) {
+                    return e.getValue();
+                }
+            }
+            DefaultProfileActivationContext.Record prev = profileActivationContext.start();
+            Model model = doReadAsParentModel(profileActivationContext);
+            DefaultProfileActivationContext.Record record = profileActivationContext.stop(prev);
+            parentsPerContext.put(record, model);
+            return model;
         }
 
-        private Model doReadAsParentModel() throws ModelBuilderException {
+        private Model doReadAsParentModel(DefaultProfileActivationContext profileActivationContext)
+                throws ModelBuilderException {
             Model raw = readRawModel();
-            Model parentData = readParent(raw);
+            Model parentData = readParent(raw, profileActivationContext);
             Model parent = new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
                         @Override
                         protected void mergeModel_Modules(
@@ -1514,23 +1533,21 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 Model source,
                                 boolean sourceDominant,
                                 Map<Object, Object> context) {}
-
-                        @SuppressWarnings("deprecation")
-                        @Override
-                        protected void mergeModel_Profiles(
-                                Model.Builder builder,
-                                Model target,
-                                Model source,
-                                boolean sourceDominant,
-                                Map<Object, Object> context) {
-                            builder.profiles(Stream.concat(source.getProfiles().stream(), target.getProfiles().stream())
-                                    .map(p -> p.withModules(null).withSubprojects(null))
-                                    .toList());
-                        }
                     })
                     .assembleModelInheritance(raw, parentData, request, this);
 
-            return parent.withParent(null);
+            // activate profiles
+            List<Profile> parentInterpolatedProfiles =
+                    interpolateActivations(parent.getProfiles(), profileActivationContext, this);
+            // profile injection
+            List<Profile> parentActivePomProfiles =
+                    getActiveProfiles(parentInterpolatedProfiles, profileActivationContext);
+            Model injectedParentModel = profileInjector
+                    .injectProfiles(parent, parentActivePomProfiles, request, this)
+                    .withProfiles(List.of());
+            addActivePomProfiles(parentActivePomProfiles);
+
+            return injectedParentModel.withParent(null);
         }
 
         private Model importDependencyManagement(Model model, Collection<String> importIds) {
@@ -1763,9 +1780,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 ProfileInterpolator() {
                     super(s -> {
                         try {
-                            Map<String, String> map1 = context.getUserProperties();
-                            Map<String, String> map2 = context.getSystemProperties();
-                            return interpolator.interpolate(s, Interpolator.chain(map1::get, map2::get));
+                            return interpolator.interpolate(
+                                    s, Interpolator.chain(context::getUserProperty, context::getSystemProperty));
                         } catch (InterpolatorException e) {
                             problems.add(Severity.ERROR, Version.BASE, e.getMessage(), e);
                         }
@@ -1809,7 +1825,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                 private String transformPath(String path, ActivationFile target, String locationKey) {
                     try {
-                        return profileActivationFilePathInterpolator.interpolate(path, context);
+                        return context.interpolatePath(path);
                     } catch (InterpolatorException e) {
                         problems.add(
                                 Severity.ERROR,
@@ -1860,7 +1876,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private DefaultProfileActivationContext getProfileActivationContext(ModelBuilderRequest request, Model model) {
-        DefaultProfileActivationContext context = new DefaultProfileActivationContext();
+        DefaultProfileActivationContext context =
+                new DefaultProfileActivationContext(pathTranslator, rootLocator, interpolator);
 
         context.setActiveProfileIds(request.getActiveProfileIds());
         context.setInactiveProfileIds(request.getInactiveProfileIds());

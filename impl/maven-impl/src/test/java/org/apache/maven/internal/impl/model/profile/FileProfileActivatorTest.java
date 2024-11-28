@@ -27,10 +27,7 @@ import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.model.RootLocator;
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
-import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultProfileActivationContext;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -47,13 +44,12 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     @TempDir
     Path tempDir;
 
-    private final DefaultProfileActivationContext context = new DefaultProfileActivationContext();
+    private final DefaultProfileActivationContext context = newContext();
 
     @BeforeEach
     @Override
     void setUp() throws Exception {
-        activator = new FileProfileActivator(new ProfileActivationFilePathInterpolator(
-                new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator()));
+        activator = new FileProfileActivator();
 
         context.setModel(Model.newBuilder().pomFile(tempDir.resolve("pom.xml")).build());
 

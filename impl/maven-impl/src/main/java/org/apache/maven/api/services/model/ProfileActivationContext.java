@@ -18,11 +18,11 @@
  */
 package org.apache.maven.api.services.model;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.InterpolatorException;
+import org.apache.maven.api.services.ModelBuilderException;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.
@@ -34,45 +34,100 @@ import org.apache.maven.api.model.Model;
 public interface ProfileActivationContext {
 
     /**
-     * Gets the identifiers of those profiles that should be activated by explicit demand.
+     * Checks if the specified profile has been explicitly activated.
      *
-     * @return The identifiers of those profiles to activate, never {@code null}.
+     * @param profileId the profile id
+     * @return whether the profile has been activated
      */
-    @Nonnull
-    List<String> getActiveProfileIds();
+    boolean isProfileActive(@Nonnull String profileId);
 
     /**
-     * Gets the identifiers of those profiles that should be deactivated by explicit demand.
+     * Checks if the specified profile has been explicitly deactivated.
      *
-     * @return The identifiers of those profiles to deactivate, never {@code null}.
+     * @param profileId the profile id
+     * @return whether the profile has been deactivated
      */
-    @Nonnull
-    List<String> getInactiveProfileIds();
+    boolean isProfileInactive(@Nonnull String profileId);
 
     /**
-     * Gets the system properties to use for interpolation and profile activation. The system properties are collected
+     * Gets the system property to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
      *
-     * @return The execution properties, never {@code null}.
+     * @param key the name of the system property
+     * @return the system property for the specified key, or {@code null}
      */
-    @Nonnull
-    Map<String, String> getSystemProperties();
+    @Nullable
+    String getSystemProperty(@Nonnull String key);
 
     /**
-     * Gets the user properties to use for interpolation and profile activation. The user properties have been
-     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
-     * line.
+     * Gets the user property to use for interpolation and profile activation. The user properties have been
+     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command line.
      *
-     * @return The user properties, never {@code null}.
+     * @param key the name of the user property
+     * @return The user property for the specified key, or {@code null}.
      */
-    @Nonnull
-    Map<String, String> getUserProperties();
+    @Nullable
+    String getUserProperty(@Nonnull String key);
 
     /**
-     * Gets the model which is being activated.
+     * Gets the model property to use for interpolation and profile activation.
      *
-     * @return The project model, never {@code null}.
+     * @param key the name of the model property
+     * @return The model property for the specified key, or {@code null};
      */
-    @Nonnull
-    Model getModel();
+    @Nullable
+    String getModelProperty(@Nonnull String key);
+
+    /**
+     * Gets the artifactId from the current model.
+     *
+     * @return The artifactId of the current model, or {@code null} if not set.
+     */
+    @Nullable
+    String getModelArtifactId();
+
+    /**
+     * Gets the packaging type from the current model.
+     *
+     * @return The packaging type of the current model, or {@code null} if not set.
+     */
+    @Nullable
+    String getModelPackaging();
+
+    /**
+     * Gets the root directory of the current model.
+     *
+     * @return The root directory path of the current model, or {@code null} if not set.
+     */
+    @Nullable
+    String getModelRootDirectory();
+
+    /**
+     * Gets the base directory of the current model.
+     *
+     * @return The base directory path of the current model, or {@code null} if not set.
+     */
+    @Nullable
+    String getModelBaseDirectory();
+
+    /**
+     * Interpolates the given path string using the current context's properties.
+     *
+     * @param path The path string to interpolate
+     * @return The interpolated path string
+     * @throws InterpolatorException if an error occurs during interpolation
+     */
+    @Nullable
+    String interpolatePath(@Nullable String path);
+
+    /**
+     * Checks if a file or directory matching the given glob pattern exists at the specified path.
+     *
+     * @param path the base path to check
+     * @param glob whether the path can be a glob expression
+     * @return {@code true} if a matching file exists, {@code false} otherwise
+     * @throws ModelBuilderException if an error occurs while checking the path
+     * @throws InterpolatorException if an error occurs during interpolation
+     */
+    boolean exists(@Nullable String path, boolean glob);
 }
