@@ -18,29 +18,89 @@
  */
 package org.apache.maven.cling.executor.impl;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.apache.maven.cling.executor.ExecutorHelper;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn3ExecutorRequestBuilder;
 import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn4ExecutorRequestBuilder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelperImplTest {
     @Test
-    void smoke3() {
-        try (ExecutorHelper mvn3 =
+    void version3() {
+        try (ExecutorHelper helper =
                 new HelperImpl(mvn3ExecutorRequestBuilder().build().installationDirectory())) {
-            String localRepository = mvn3.localRepository(mvn3.executorRequest());
-            System.out.println(localRepository);
+            assertEquals(System.getProperty("maven3version"), helper.mavenVersion());
         }
     }
 
     @Test
-    void smoke4() {
-        try (ExecutorHelper mvn4 =
+    void version4() {
+        try (ExecutorHelper helper =
                 new HelperImpl(mvn4ExecutorRequestBuilder().build().installationDirectory())) {
-            String localRepository = mvn4.localRepository(mvn4.executorRequest());
-            System.out.println(localRepository);
+            assertEquals(System.getProperty("maven4version"), helper.mavenVersion());
+        }
+    }
+
+    @Test
+    void localRepository3() {
+        try (ExecutorHelper helper =
+                new HelperImpl(mvn3ExecutorRequestBuilder().build().installationDirectory())) {
+            String localRepository = helper.localRepository(helper.executorRequest());
+            Path local = Paths.get(localRepository);
+            assertTrue(Files.isDirectory(local));
+        }
+    }
+
+    @Test
+    void localRepository4() {
+        try (ExecutorHelper helper =
+                new HelperImpl(mvn4ExecutorRequestBuilder().build().installationDirectory())) {
+            String localRepository = helper.localRepository(helper.executorRequest());
+            Path local = Paths.get(localRepository);
+            assertTrue(Files.isDirectory(local));
+        }
+    }
+
+    @Test
+    void artifactPath3() {
+        try (ExecutorHelper helper =
+                new HelperImpl(mvn3ExecutorRequestBuilder().build().installationDirectory())) {
+            String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
+            assertEquals("aopalliance/aopalliance/1.0/aopalliance-1.0.jar", path);
+        }
+    }
+
+    @Test
+    void artifactPath4() {
+        try (ExecutorHelper helper =
+                new HelperImpl(mvn4ExecutorRequestBuilder().build().installationDirectory())) {
+            String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
+            assertEquals("aopalliance/aopalliance/1.0/aopalliance-1.0.jar", path);
+        }
+    }
+
+    @Test
+    void metadataPath3() {
+        try (ExecutorHelper helper =
+                new HelperImpl(mvn3ExecutorRequestBuilder().build().installationDirectory())) {
+            String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
+            assertEquals("aopalliance/maven-metadata-someremote.xml", path);
+        }
+    }
+
+    @Test
+    void metadataPath4() {
+        try (ExecutorHelper helper =
+                new HelperImpl(mvn4ExecutorRequestBuilder().build().installationDirectory())) {
+            String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
+            assertEquals("aopalliance/maven-metadata-someremote.xml", path);
         }
     }
 }

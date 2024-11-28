@@ -153,6 +153,7 @@ public class EmbeddedMavenExecutor implements Executor {
             properties.put("maven.mainClass", "org.apache.maven.cling.MavenCling");
             properties.put(
                     "library.jline.path", mavenHome.resolve("lib/jline-native").toString());
+            properties.put("org.jline.terminal.provider", "dumb");
 
             System.setProperties(properties);
             URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());

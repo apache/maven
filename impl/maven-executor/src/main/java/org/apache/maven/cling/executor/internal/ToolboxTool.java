@@ -57,7 +57,7 @@ public class ToolboxTool implements ExecutorTool {
     public String artifactPath(ExecutorRequest.Builder executorRequest, String gav, String repositoryId)
             throws ExecutorException {
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-        ExecutorRequest.Builder builder = mojo(helper.executorRequest(), "gav-artifact-path")
+        ExecutorRequest.Builder builder = mojo(executorRequest, "gav-artifact-path")
                 .argument("-Dgav=" + gav)
                 .stdoutConsumer(stdout);
         if (repositoryId != null) {
@@ -74,7 +74,7 @@ public class ToolboxTool implements ExecutorTool {
     public String metadataPath(ExecutorRequest.Builder executorRequest, String gav, String repositoryId)
             throws ExecutorException {
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-        ExecutorRequest.Builder builder = mojo(helper.executorRequest(), "gav-metadata-path")
+        ExecutorRequest.Builder builder = mojo(executorRequest, "gav-metadata-path")
                 .argument("-Dgav=" + gav)
                 .stdoutConsumer(stdout);
         if (repositoryId != null) {

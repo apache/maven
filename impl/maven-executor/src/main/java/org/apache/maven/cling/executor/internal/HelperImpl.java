@@ -21,6 +21,7 @@ package org.apache.maven.cling.executor.internal;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
@@ -39,6 +40,8 @@ public class HelperImpl implements ExecutorHelper {
     private final ExecutorTool executorTool;
     private final HashMap<String, Executor> executors;
 
+    private final ConcurrentHashMap<String, String> cache;
+
     public HelperImpl(@Nullable Path installationDirectory) {
         this.installationDirectory = installationDirectory != null
                 ? ExecutorRequest.getCanonicalPath(installationDirectory)
@@ -48,6 +51,7 @@ public class HelperImpl implements ExecutorHelper {
 
         this.executors.put(EmbeddedMavenExecutor.class.getSimpleName(), new EmbeddedMavenExecutor());
         this.executors.put(ForkedMavenExecutor.class.getSimpleName(), new ForkedMavenExecutor());
+        this.cache = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -79,24 +83,35 @@ public class HelperImpl implements ExecutorHelper {
 
     @Override
     public String mavenVersion() {
-        ExecutorRequest request = executorRequest().build();
-        return getExecutor(Mode.AUTO, request).mavenVersion(request);
+        return cache.computeIfAbsent("maven.version", k -> {
+            ExecutorRequest request = executorRequest().build();
+            return getExecutor(Mode.AUTO, request).mavenVersion(request);
+        });
     }
 
     @Override
     public String localRepository(ExecutorRequest.Builder request) throws ExecutorException {
+        if (mavenVersion().startsWith("5.")) {
+            request.argument("--raw-streams");
+        }
         return executorTool.localRepository(request);
     }
 
     @Override
     public String artifactPath(ExecutorRequest.Builder request, String gav, String repositoryId)
             throws ExecutorException {
+        if (mavenVersion().startsWith("5.")) {
+            request.argument("--raw-streams");
+        }
         return executorTool.artifactPath(request, gav, repositoryId);
     }
 
     @Override
     public String metadataPath(ExecutorRequest.Builder request, String gav, String repositoryId)
             throws ExecutorException {
+        if (mavenVersion().startsWith("5.")) {
+            request.argument("--raw-streams");
+        }
         return executorTool.metadataPath(request, gav, repositoryId);
     }
 
