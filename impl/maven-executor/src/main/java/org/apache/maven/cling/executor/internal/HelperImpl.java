@@ -91,7 +91,7 @@ public class HelperImpl implements ExecutorHelper {
 
     @Override
     public String localRepository(ExecutorRequest.Builder request) throws ExecutorException {
-        if (mavenVersion().startsWith("5.")) {
+        if (mavenVersion().startsWith("4.")) {
             request.argument("--raw-streams");
         }
         return executorTool.localRepository(request);
@@ -100,7 +100,7 @@ public class HelperImpl implements ExecutorHelper {
     @Override
     public String artifactPath(ExecutorRequest.Builder request, String gav, String repositoryId)
             throws ExecutorException {
-        if (mavenVersion().startsWith("5.")) {
+        if (mavenVersion().startsWith("4.")) {
             request.argument("--raw-streams");
         }
         return executorTool.artifactPath(request, gav, repositoryId);
@@ -109,7 +109,7 @@ public class HelperImpl implements ExecutorHelper {
     @Override
     public String metadataPath(ExecutorRequest.Builder request, String gav, String repositoryId)
             throws ExecutorException {
-        if (mavenVersion().startsWith("5.")) {
+        if (mavenVersion().startsWith("4.")) {
             request.argument("--raw-streams");
         }
         return executorTool.metadataPath(request, gav, repositoryId);
