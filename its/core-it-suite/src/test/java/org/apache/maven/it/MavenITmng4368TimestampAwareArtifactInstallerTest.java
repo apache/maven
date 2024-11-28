@@ -19,8 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
 
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -69,7 +69,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         File installedPom =
                 new File(verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom"));
 
-        String pom = FileUtils.fileRead(installedPom, "UTF-8");
+        String pom = Files.readString(installedPom.toPath());
         assertTrue(pom.indexOf("Branch-A") > 0);
         assertFalse(pom.contains("Branch-B"));
 
@@ -84,7 +84,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        pom = FileUtils.fileRead(installedPom, "UTF-8");
+        pom = Files.readString(installedPom.toPath());
         assertFalse(pom.contains("Branch-A"));
         assertTrue(pom.indexOf("Branch-B") > 0);
     }
@@ -106,9 +106,9 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         File bDir = new File(testDir, "branch-b");
         File bArtifact = new File(bDir, "artifact.jar");
 
-        FileUtils.fileWrite(aArtifact.getPath(), "UTF-8", "from Branch-A");
+        Files.writeString(aArtifact.toPath(), "from Branch-A");
         aArtifact.setLastModified(System.currentTimeMillis());
-        FileUtils.fileWrite(bArtifact.getPath(), "UTF-8", "from Branch-B");
+        Files.writeString(bArtifact.toPath(), "from Branch-B");
         bArtifact.setLastModified(aArtifact.lastModified() - 1000 * 60);
 
         Verifier verifier = newVerifier(aDir.getAbsolutePath());
@@ -122,7 +122,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         File installedArtifact =
                 new File(verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "jar"));
 
-        String data = FileUtils.fileRead(installedArtifact, "UTF-8");
+        String data = Files.readString(installedArtifact.toPath());
         assertTrue(data.indexOf("Branch-A") > 0);
         assertFalse(data.contains("Branch-B"));
 
@@ -137,12 +137,12 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        data = FileUtils.fileRead(installedArtifact, "UTF-8");
+        data = Files.readString(installedArtifact.toPath());
         assertFalse(data.contains("Branch-A"));
         assertTrue(data.indexOf("Branch-B") > 0);
 
         long lastModified = installedArtifact.lastModified();
-        FileUtils.fileWrite(installedArtifact.getPath(), "UTF-8", "from Branch-C");
+        Files.writeString(installedArtifact.toPath(), "from Branch-C");
         installedArtifact.setLastModified(lastModified);
 
         verifier = newVerifier(bDir.getAbsolutePath());
@@ -153,7 +153,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        data = FileUtils.fileRead(installedArtifact, "UTF-8");
+        data = Files.readString(installedArtifact.toPath());
         assertFalse(data.contains("Branch-B"));
         assertTrue(data.indexOf("Branch-C") > 0);
     }

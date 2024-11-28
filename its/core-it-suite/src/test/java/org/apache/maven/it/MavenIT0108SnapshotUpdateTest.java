@@ -20,14 +20,15 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
                 repository,
                 "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-core-it-support-1.0-SNAPSHOT.jar");
         artifact.getParentFile().mkdirs();
-        FileUtils.fileWrite(artifact.getAbsolutePath(), "originalArtifact");
+        Files.writeString(artifact.getAbsoluteFile().toPath(), "originalArtifact");
 
         verifier.verifyArtifactNotPresent("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar");
     }
@@ -86,7 +87,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
         // set in the past to ensure it is downloaded
         localRepoFile.setLastModified(System.currentTimeMillis() - TIME_OFFSET);
 
-        FileUtils.fileWrite(artifact.getAbsolutePath(), "updatedArtifact");
+        Files.writeString(artifact.getAbsoluteFile().toPath(), "updatedArtifact");
 
         verifier.addCliArgument("package");
         verifier.execute();
@@ -99,8 +100,9 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
     @Test
     public void testSnapshotUpdatedWithMetadata() throws Exception {
         File metadata = new File(repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        FileUtils.fileWrite(
-                metadata.getAbsolutePath(), constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, true));
+        Files.writeString(
+                metadata.getAbsoluteFile().toPath(),
+                constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, true));
 
         verifier.addCliArgument("package");
         verifier.execute();
@@ -109,9 +111,10 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
 
         verifyArtifactContent("originalArtifact");
 
-        FileUtils.fileWrite(artifact.getAbsolutePath(), "updatedArtifact");
+        Files.writeString(artifact.getAbsoluteFile().toPath(), "updatedArtifact");
         metadata = new File(repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        FileUtils.fileWrite(metadata.getAbsolutePath(), constructMetadata("2", System.currentTimeMillis(), true));
+        Files.writeString(
+                metadata.getAbsoluteFile().toPath(), constructMetadata("2", System.currentTimeMillis(), true));
 
         verifier.addCliArgument("package");
         verifier.execute();
@@ -130,8 +133,9 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
         localMetadata.getParentFile().mkdirs();
 
         File metadata = new File(repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        FileUtils.fileWrite(
-                metadata.getAbsolutePath(), constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, true));
+        Files.writeString(
+                metadata.getAbsoluteFile().toPath(),
+                constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, true));
 
         verifier.addCliArgument("package");
         verifier.execute();
@@ -141,9 +145,9 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
         verifyArtifactContent("originalArtifact");
         assertFalse(localMetadata.exists());
 
-        FileUtils.fileWrite(localRepoFile.getAbsolutePath(), "localArtifact");
-        FileUtils.fileWrite(
-                localMetadata.getAbsolutePath(),
+        Files.writeString(localRepoFile.getAbsoluteFile().toPath(), "localArtifact");
+        Files.writeString(
+                localMetadata.getAbsoluteFile().toPath(),
                 constructLocalMetadata("org.apache.maven", "maven-core-it-support", System.currentTimeMillis(), true));
         // update the remote file, but we shouldn't be looking
         artifact.setLastModified(System.currentTimeMillis());
@@ -157,11 +161,11 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, -1);
-        FileUtils.fileWrite(
-                localMetadata.getAbsolutePath(),
+        Files.writeString(
+                localMetadata.getAbsoluteFile().toPath(),
                 constructLocalMetadata("org.apache.maven", "maven-core-it-support", cal.getTimeInMillis(), true));
-        FileUtils.fileWrite(
-                metadata.getAbsolutePath(), constructMetadata("2", System.currentTimeMillis() - 2000, true));
+        Files.writeString(
+                metadata.getAbsoluteFile().toPath(), constructMetadata("2", System.currentTimeMillis() - 2000, true));
         artifact.setLastModified(System.currentTimeMillis());
 
         verifier.addCliArgument("package");
@@ -175,8 +179,9 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
     @Test
     public void testSnapshotUpdatedWithMetadataUsingFileTimestamp() throws Exception {
         File metadata = new File(repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        FileUtils.fileWrite(
-                metadata.getAbsolutePath(), constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, false));
+        Files.writeString(
+                metadata.getAbsoluteFile().toPath(),
+                constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, false));
         metadata.setLastModified(System.currentTimeMillis() - TIME_OFFSET);
 
         verifier.addCliArgument("package");
@@ -186,9 +191,10 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
 
         verifyArtifactContent("originalArtifact");
 
-        FileUtils.fileWrite(artifact.getAbsolutePath(), "updatedArtifact");
+        Files.writeString(artifact.getAbsoluteFile().toPath(), "updatedArtifact");
         metadata = new File(repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        FileUtils.fileWrite(metadata.getAbsolutePath(), constructMetadata("2", System.currentTimeMillis(), false));
+        Files.writeString(
+                metadata.getAbsoluteFile().toPath(), constructMetadata("2", System.currentTimeMillis(), false));
 
         verifier.addCliArgument("package");
         verifier.execute();

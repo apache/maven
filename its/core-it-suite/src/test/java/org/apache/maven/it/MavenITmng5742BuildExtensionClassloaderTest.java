@@ -19,8 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
 
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +53,7 @@ public class MavenITmng5742BuildExtensionClassloaderTest extends AbstractMavenIn
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent("target/execution-success.txt");
 
-        String actual = FileUtils.fileRead(new File(projectDir, "target/execution-success.txt"));
+        String actual = Files.readString(new File(projectDir, "target/execution-success.txt").toPath());
         assertEquals("executed", actual);
     }
 }
