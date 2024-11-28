@@ -695,6 +695,10 @@ public class Verifier {
         for (String cliArgument : cliArguments) {
             args.add(cliArgument.replace("${basedir}", getBasedir()));
         }
+        if (logFileName != null) {
+            args.add("-l");
+            args.add(logFileName);
+        }
         try {
             ExecutorRequest.Builder builder =
                     executorHelper.executorRequest().cwd(basedir).userHomeDirectory(userHomeDirectory);
@@ -703,9 +707,6 @@ public class Verifier {
             }
             if (!environmentVariables.isEmpty()) {
                 builder.environmentVariables(environmentVariables);
-            }
-            if (logFileName != null) {
-                builder.argument("-l").argument(logFileName);
             }
             builder.arguments(args);
 
