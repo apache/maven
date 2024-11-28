@@ -713,11 +713,12 @@ public class Verifier {
             if (forkJvm) {
                 mode = ExecutorHelper.Mode.FORKED;
             }
-            int ret = executorHelper.execute(mode, builder.build());
+            ExecutorRequest request = builder.build();
+            int ret = executorHelper.execute(mode, request);
             if (ret > 0) {
                 throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
                         + getExecutable() + " "
-                        + StringUtils.join(args.iterator(), " ") + "\n" + getLogContents(logFile));
+                        + request + "\n" + getLogContents(logFile));
             }
         } catch (ExecutorException e) {
             throw new VerificationException("Failed to execute Maven", e);
