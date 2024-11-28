@@ -43,7 +43,7 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest extends AbstractMaven
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5965-parallel-build-multiplies-work");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         verifier.setLogFileName("log-only.txt");
         verifier.addCliArgument("-T1");

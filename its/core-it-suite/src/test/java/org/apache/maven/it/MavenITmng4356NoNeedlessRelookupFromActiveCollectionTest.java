@@ -50,7 +50,7 @@ public class MavenITmng4356NoNeedlessRelookupFromActiveCollectionTest extends Ab
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4356");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

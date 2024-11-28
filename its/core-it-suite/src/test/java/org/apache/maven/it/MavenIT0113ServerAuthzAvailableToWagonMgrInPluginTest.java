@@ -42,7 +42,7 @@ public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0113");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

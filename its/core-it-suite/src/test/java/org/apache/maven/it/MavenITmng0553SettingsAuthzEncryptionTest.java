@@ -119,7 +119,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         filterProps.put("@port@", Integer.toString(port));
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng0553");
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
@@ -151,7 +151,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         filterProps.put("@relocation@", secUrl);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng0553");
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
 
@@ -185,7 +185,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         testDir = new File(testDir, "test-3");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         ItUtils.setUserHome(verifier, new File(testDir, "userhome"));
         verifier.addCliArgument("--encrypt-master-password");
         verifier.addCliArgument("test");
@@ -198,7 +198,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         assertNotNull(findPassword(log));
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         ItUtils.setUserHome(verifier, new File(testDir, "userhome"));
         verifier.addCliArgument("--encrypt-password");
         verifier.addCliArgument("testpass");

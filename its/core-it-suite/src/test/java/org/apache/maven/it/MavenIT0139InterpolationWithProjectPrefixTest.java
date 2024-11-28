@@ -48,7 +48,7 @@ public class MavenIT0139InterpolationWithProjectPrefixTest extends AbstractMaven
         File child = new File(testDir, "child");
 
         Verifier verifier = newVerifier(child.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
         verifier.execute();

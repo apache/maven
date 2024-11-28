@@ -44,7 +44,7 @@ public class MavenIT0037AlternatePomFileSameDirTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0037");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-f");
         verifier.addCliArgument("pom2.xml");

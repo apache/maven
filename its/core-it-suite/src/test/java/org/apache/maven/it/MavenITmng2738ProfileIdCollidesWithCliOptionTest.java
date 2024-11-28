@@ -45,7 +45,7 @@ public class MavenITmng2738ProfileIdCollidesWithCliOptionTest extends AbstractMa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2738");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pe");
         verifier.addCliArgument("validate");

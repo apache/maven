@@ -42,7 +42,7 @@ class MavenITmng5600DependencyManagementImportExclusionsTest extends AbstractMav
         final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5600/exclusions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.filterFile("../settings-template.xml", "settings.xml", verifier.newDefaultFilterMap());
 
         verifier.addCliArguments("-s", "settings.xml");

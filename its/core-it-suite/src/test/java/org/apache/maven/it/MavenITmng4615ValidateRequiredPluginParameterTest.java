@@ -49,7 +49,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-0");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -71,7 +71,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-a.txt");
         try {
@@ -95,7 +95,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dconfig.requiredParam=CLI");
         verifier.setLogFileName("log-b.txt");
@@ -122,7 +122,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-2a");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {
             verifier.addCliArgument("validate");
@@ -145,7 +145,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-2b");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

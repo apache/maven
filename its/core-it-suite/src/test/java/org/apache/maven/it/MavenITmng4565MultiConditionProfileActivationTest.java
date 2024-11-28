@@ -51,7 +51,7 @@ public class MavenITmng4565MultiConditionProfileActivationTest extends AbstractM
         Verifier verifier;
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dprofile1.on=true");
         verifier.addCliArgument("validate");

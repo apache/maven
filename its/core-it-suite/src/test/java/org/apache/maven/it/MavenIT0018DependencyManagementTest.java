@@ -39,7 +39,7 @@ public class MavenIT0018DependencyManagementTest extends AbstractMavenIntegratio
     public void testit0018() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0018");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.it0018");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");

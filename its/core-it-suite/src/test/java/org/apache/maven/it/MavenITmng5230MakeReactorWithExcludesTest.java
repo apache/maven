@@ -52,7 +52,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), true);
         verifier.addCliArgument("-X");
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("!mod-b");
@@ -78,7 +78,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5230-make-reactor-with-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("mod-b,!mod-a");
@@ -105,7 +105,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5230-make-reactor-with-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("mod-b,!mod-c");
@@ -132,7 +132,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5230-make-reactor-with-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("mod-b,!mod-a");
@@ -160,7 +160,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5230-make-reactor-with-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.verifyFileNotPresent("mod-d/pom.xml");
         verifier.addCliArgument("-pl");
@@ -187,7 +187,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5230-make-reactor-with-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.verifyFileNotPresent("mod-d/pom.xml");
         verifier.addCliArgument("-pl");
@@ -214,7 +214,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5230-make-reactor-with-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("!org.apache.maven.its.mng5230:mod-b");
@@ -240,7 +240,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5230-make-reactor-with-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("!:mod-b");
@@ -266,7 +266,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5230-make-reactor-with-excludes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-rf");
         verifier.addCliArgument("mod-b");

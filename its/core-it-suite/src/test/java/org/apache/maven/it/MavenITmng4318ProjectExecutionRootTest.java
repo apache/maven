@@ -48,7 +48,7 @@ public class MavenITmng4318ProjectExecutionRootTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4318");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-1/target");
         verifier.deleteDirectory("sub-2/target");

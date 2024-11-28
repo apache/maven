@@ -52,7 +52,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         Files.createDirectories(testDir.toPath().resolve(".mvn"));
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
@@ -108,7 +108,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3043");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
@@ -168,7 +168,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3043");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
@@ -180,7 +180,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.setLogFileName("log-package-pre.txt");
         verifier.addCliArguments("--projects", ":consumer-a,:consumer-b,:consumer-c", "package");
         verifier.execute();

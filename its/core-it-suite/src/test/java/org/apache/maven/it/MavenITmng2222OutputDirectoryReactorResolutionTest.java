@@ -49,7 +49,7 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest extends Abstract
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2222");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2222");

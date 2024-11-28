@@ -254,7 +254,7 @@ public abstract class AbstractMavenIntegrationTestCase {
     protected Verifier newVerifier(String basedir, String settings, boolean debug) throws VerificationException {
         Verifier verifier = new Verifier(basedir);
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         if (settings != null) {
             File settingsFile;

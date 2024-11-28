@@ -66,7 +66,7 @@ public class MavenITmng6957BuildConsumer extends AbstractMavenIntegrationTestCas
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6957-buildconsumer");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("-Dchangelist=MNG6957");
 
         verifier.addCliArgument("install");

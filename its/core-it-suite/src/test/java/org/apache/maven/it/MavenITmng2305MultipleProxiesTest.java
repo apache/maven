@@ -93,7 +93,7 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
         System.out.println("Bound server socket to the proxy port " + proxyPort);
 
         try {
-            verifier.setAutoClean(false);
+            verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng2305");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

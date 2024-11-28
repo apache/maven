@@ -47,7 +47,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest extends AbstractMav
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3970/test-2");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3970");
         verifier.filterFile("pom.xml", "pom.xml");
         verifier.addCliArgument("validate");
@@ -67,7 +67,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest extends AbstractMav
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3970/test-3");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3970");
         verifier.filterFile("settings.xml", "settings.xml");
         verifier.addCliArgument("--settings");

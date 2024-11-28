@@ -55,7 +55,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
         verifier.filterFile(".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties);
 
         verifier.setForkJvm(true); // pick up agent
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("-q");
         verifier.addCliArgument("-U");
         verifier.addCliArgument("-Dmaven.consumerpom=false");
@@ -91,7 +91,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
 
         verifier.setLogFileName("log-bc.txt");
         verifier.setForkJvm(true); // pick up agent
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("-q");
         verifier.addCliArgument("-U");
         verifier.addCliArgument("-Dmaven.consumerpom=true");

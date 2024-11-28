@@ -49,7 +49,7 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4262");
 
         Verifier verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
         verifier.addCliArgument(".");
@@ -72,7 +72,7 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4262");
 
         Verifier verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("../sub-a");

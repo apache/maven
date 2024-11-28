@@ -44,7 +44,7 @@ public class MavenITmng0471CustomLifecycleTest extends AbstractMavenIntegrationT
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0471");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArguments(
                 "org.apache.maven.its.plugins:maven-it-plugin-fork:fork",

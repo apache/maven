@@ -90,7 +90,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMav
             }
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
-            verifier.setAutoClean(false);
+            verifier.setAutoclean(false);
             verifier.deleteArtifacts("org.apache.maven.its.mng4348");
             verifier.deleteDirectory("target");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

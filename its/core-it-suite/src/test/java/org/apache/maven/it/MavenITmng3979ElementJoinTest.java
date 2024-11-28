@@ -48,7 +48,7 @@ public class MavenITmng3979ElementJoinTest extends AbstractMavenIntegrationTestC
         testDir = new File(testDir, "sub");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

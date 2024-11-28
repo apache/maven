@@ -49,7 +49,7 @@ public class MavenITmng3052DepRepoAggregationTest extends AbstractMavenIntegrati
                 .getCanonicalFile();
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3052");
         verifier.filterFile("settings-template.xml", "settings.xml");

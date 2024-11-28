@@ -50,7 +50,7 @@ public class MavenITmng4273RestrictedCoreRealmAccessForPluginTest extends Abstra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4273");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

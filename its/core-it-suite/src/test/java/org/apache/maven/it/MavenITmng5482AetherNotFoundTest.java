@@ -64,7 +64,7 @@ public class MavenITmng5482AetherNotFoundTest extends AbstractMavenIntegrationTe
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5482/" + dir);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
         VerificationException exception =

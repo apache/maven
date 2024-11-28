@@ -48,7 +48,7 @@ public class MavenITmng4975ProfileInjectedPluginExecutionOrderTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4975");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pprofile2,profile1");
         verifier.addCliArgument("validate");

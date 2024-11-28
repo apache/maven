@@ -42,7 +42,7 @@ public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIn
 
         verifier.addCliArgument("-X");
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("verify");
 
         if (matchesVersionRange("[4.0.0-beta-5,)")) {
@@ -64,7 +64,7 @@ public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIn
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3535/failure");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("-X");
         verifier.addCliArgument("verify");
 

@@ -40,7 +40,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
         Verifier verifier;
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Dversion=foo");
         verifier.addCliArgument("validate");
@@ -58,7 +58,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
         Verifier verifier;
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
         verifier.setLogFileName("log-pom-specified.txt");
@@ -72,7 +72,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
         verifier.addCliArgument("-Dversion=2");

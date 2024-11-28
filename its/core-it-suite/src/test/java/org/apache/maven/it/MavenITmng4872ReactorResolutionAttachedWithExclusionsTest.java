@@ -48,7 +48,7 @@ public class MavenITmng4872ReactorResolutionAttachedWithExclusionsTest extends A
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4872");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4872");
         verifier.addCliArgument("validate");

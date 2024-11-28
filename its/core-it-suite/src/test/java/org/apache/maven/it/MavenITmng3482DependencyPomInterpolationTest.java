@@ -43,7 +43,7 @@ public class MavenITmng3482DependencyPomInterpolationTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3482");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3482");

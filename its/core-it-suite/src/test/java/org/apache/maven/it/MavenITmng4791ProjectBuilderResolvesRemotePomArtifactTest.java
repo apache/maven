@@ -49,7 +49,7 @@ public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest extends A
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4791");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4791");
         verifier.addCliArgument("-s");

@@ -118,7 +118,7 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4781");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("-DdeploymentPort=" + port);
         verifier.addCliArgument("validate");
         verifier.execute();

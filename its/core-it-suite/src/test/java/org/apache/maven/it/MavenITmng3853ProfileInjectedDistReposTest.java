@@ -52,7 +52,7 @@ public class MavenITmng3853ProfileInjectedDistReposTest extends AbstractMavenInt
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3853");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pcoreit");
         verifier.addCliArgument("validate");

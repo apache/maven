@@ -56,7 +56,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6391-print-version");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");
         verifier.addCliArgument("clean");
@@ -97,7 +97,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6391-print-version-aggregator");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");
         verifier.addCliArguments("clean");

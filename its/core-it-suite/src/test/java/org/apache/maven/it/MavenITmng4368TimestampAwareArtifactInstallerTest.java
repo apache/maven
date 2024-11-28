@@ -59,7 +59,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         bPom.setLastModified(aPom.lastModified() - 1000 * 60);
 
         Verifier verifier = newVerifier(aDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4368");
         verifier.addCliArgument("initialize");
@@ -78,7 +78,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         assertTrue(installedPom.lastModified() > bPom.lastModified());
 
         verifier = newVerifier(bDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
         verifier.execute();
@@ -112,7 +112,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         bArtifact.setLastModified(aArtifact.lastModified() - 1000 * 60);
 
         Verifier verifier = newVerifier(aDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4368");
         verifier.addCliArgument("initialize");
@@ -131,7 +131,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         assertTrue(installedArtifact.lastModified() > bArtifact.lastModified());
 
         verifier = newVerifier(bDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
         verifier.execute();
@@ -146,7 +146,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         installedArtifact.setLastModified(lastModified);
 
         verifier = newVerifier(bDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-b.txt");
         verifier.addCliArgument("initialize");

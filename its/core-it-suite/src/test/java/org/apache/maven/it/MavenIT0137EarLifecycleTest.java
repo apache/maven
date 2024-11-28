@@ -45,7 +45,7 @@ public class MavenIT0137EarLifecycleTest extends AbstractMavenIntegrationTestCas
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("deploy");
         verifier.execute();
         verifier.verifyFilePresent("target/ear-generate-application-xml.txt");

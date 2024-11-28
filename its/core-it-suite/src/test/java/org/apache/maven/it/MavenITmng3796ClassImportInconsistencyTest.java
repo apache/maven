@@ -48,7 +48,7 @@ public class MavenITmng3796ClassImportInconsistencyTest extends AbstractMavenInt
     public void testitMNG3796() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3796");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

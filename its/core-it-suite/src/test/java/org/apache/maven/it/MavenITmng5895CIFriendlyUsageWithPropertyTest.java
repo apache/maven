@@ -53,7 +53,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
                 ResourceExtractor.simpleExtractResources(getClass(), "/mng-5895-ci-friendly-usage-with-property");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         // verifier.setLogFileName( "log-only.txt" );
         verifier.addCliArgument("-Drevision=1.2");
@@ -71,7 +71,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
                 ResourceExtractor.simpleExtractResources(getClass(), "/mng-5895-ci-friendly-usage-with-property");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         verifier.setLogFileName("log-bc.txt");
         verifier.addCliArgument("-Drevision=1.2");

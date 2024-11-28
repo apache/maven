@@ -46,7 +46,7 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest extends Abst
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4776");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub/target");
         verifier.setLogFileName("log-lifecycle.txt");
@@ -69,7 +69,7 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest extends Abst
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4776");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub/target");
         verifier.setLogFileName("log-cli.txt");

@@ -41,7 +41,7 @@ public class MavenIT0008SimplePluginTest extends AbstractMavenIntegrationTestCas
     public void testit0008() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0008");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifact("org.apache.maven.its.plugins", "maven-it-plugin-touch", "1.0", "maven-plugin");
         verifier.addCliArgument("process-sources");

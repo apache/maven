@@ -48,7 +48,7 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest extends AbstractMa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4269");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         // NOTE: It's a crucial prerequisite to create the output directory, i.e. the bad choice
         new File(testDir, "target/classes").mkdirs();
         verifier.deleteArtifacts("org.apache.maven.its.mng4269");

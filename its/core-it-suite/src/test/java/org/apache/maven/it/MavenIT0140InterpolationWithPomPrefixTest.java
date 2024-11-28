@@ -50,7 +50,7 @@ public class MavenIT0140InterpolationWithPomPrefixTest extends AbstractMavenInte
         File child = new File(testDir, "child");
 
         Verifier verifier = newVerifier(child.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
         verifier.execute();

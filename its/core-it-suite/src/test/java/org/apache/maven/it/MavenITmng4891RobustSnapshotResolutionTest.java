@@ -48,7 +48,7 @@ public class MavenITmng4891RobustSnapshotResolutionTest extends AbstractMavenInt
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4891");
 
         Verifier verifier = newVerifier(new File(testDir, "producer").getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4891");
         verifier.addCliArgument("validate");
@@ -56,7 +56,7 @@ public class MavenITmng4891RobustSnapshotResolutionTest extends AbstractMavenInt
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(new File(testDir, "consumer").getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

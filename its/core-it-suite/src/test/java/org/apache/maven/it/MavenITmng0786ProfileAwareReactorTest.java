@@ -45,7 +45,7 @@ public class MavenITmng0786ProfileAwareReactorTest extends AbstractMavenIntegrat
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0786");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("sub1/target");
         verifier.deleteDirectory("sub2/target");
         verifier.addCliArgument("-Dexpression.outputFile=target/expression.properties");

@@ -48,7 +48,7 @@ public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setForkJvm(true);
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dmaven.ext.class.path=spy-0.1.jar");
         verifier.addCliArgument("-X");

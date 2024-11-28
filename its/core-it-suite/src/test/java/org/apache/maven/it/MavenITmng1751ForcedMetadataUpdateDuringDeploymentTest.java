@@ -59,7 +59,7 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
 
         // phase 1: deploy a new snapshot, this should update the metadata despite its future timestamp
         Verifier verifier = newVerifier(new File(testDir, "dep").getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1751");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -67,7 +67,7 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
 
         // phase 2: resolve snapshot, if the previous deployment didn't update the metadata, we get the wrong file
         verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1751");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");

@@ -49,7 +49,7 @@ public class MavenITmng4203TransitiveDependencyExclusionTest extends AbstractMav
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4203");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4203");
         verifier.filterFile("settings-template.xml", "settings.xml");

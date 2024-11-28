@@ -67,7 +67,7 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4633");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("-T");
         verifier.addCliArgument("2W");
         verifier.addCliArgument("install");

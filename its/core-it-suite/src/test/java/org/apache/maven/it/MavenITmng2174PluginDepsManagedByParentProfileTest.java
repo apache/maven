@@ -50,7 +50,7 @@ public class MavenITmng2174PluginDepsManagedByParentProfileTest extends Abstract
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2174");
 
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2174");
         verifier.filterFile("settings-template.xml", "settings.xml");

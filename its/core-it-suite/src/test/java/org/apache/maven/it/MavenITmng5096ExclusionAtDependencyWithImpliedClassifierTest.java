@@ -50,7 +50,7 @@ public class MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest extend
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5096");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5096");
         verifier.addCliArgument("-s");

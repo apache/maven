@@ -55,7 +55,7 @@ public class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTe
         testDir = testDir.getCanonicalFile();
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("test-1/target");
         verifier.deleteDirectory("test-2/target");
         verifier.deleteDirectory("test-2/child-1/target");

@@ -48,7 +48,7 @@ public class MavenITmng4385LifecycleMappingFromExtensionInReactorTest extends Ab
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4385");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         try {
             verifier.addCliArgument("validate");
             verifier.execute();

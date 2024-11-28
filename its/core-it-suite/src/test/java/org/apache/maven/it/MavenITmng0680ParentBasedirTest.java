@@ -51,7 +51,7 @@ public class MavenITmng0680ParentBasedirTest extends AbstractMavenIntegrationTes
         File subDir = new File(testDir, "subproject");
 
         Verifier verifier = newVerifier(subDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

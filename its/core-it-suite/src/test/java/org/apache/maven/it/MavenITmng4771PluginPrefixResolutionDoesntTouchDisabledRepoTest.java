@@ -84,7 +84,7 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest ext
             }
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
-            verifier.setAutoClean(false);
+            verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@port@", Integer.toString(port));

@@ -48,7 +48,7 @@ public class MavenITmng1701DuplicatePluginTest extends AbstractMavenIntegrationT
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1701");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         try {
             verifier.addCliArgument("validate");
             verifier.execute();

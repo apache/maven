@@ -45,7 +45,7 @@ public class MavenITmng4453PluginVersionFromLifecycleMappingTest extends Abstrac
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4453");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("process-resources");
         verifier.execute();

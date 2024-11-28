@@ -47,7 +47,7 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest extends Abstra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2045");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("test-user/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2045");
         verifier.addCliArgument("validate");

@@ -50,7 +50,7 @@ public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest ext
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4580");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub/target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-class-loader:load");

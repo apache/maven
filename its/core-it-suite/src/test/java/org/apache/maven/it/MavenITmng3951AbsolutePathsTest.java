@@ -57,7 +57,7 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
             verifier.addCliArgument("-Dmaven.repo.local=" + repoDir.substring(repoDir.indexOf(File.separator)));
         }
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

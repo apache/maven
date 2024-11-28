@@ -60,7 +60,7 @@ public class MavenITmng3940EnvVarInterpolationTest extends AbstractMavenIntegrat
             verifier.setEnvironmentVariable("MAVEN_MNG_3940", "PASSED");
         }
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

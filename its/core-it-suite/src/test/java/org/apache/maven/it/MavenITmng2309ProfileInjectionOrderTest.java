@@ -48,7 +48,7 @@ public class MavenITmng2309ProfileInjectionOrderTest extends AbstractMavenIntegr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2309");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         if (matchesVersionRange("[4.0.0-alpha-1,)")) {

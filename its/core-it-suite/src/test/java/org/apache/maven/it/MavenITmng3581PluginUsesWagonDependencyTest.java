@@ -45,7 +45,7 @@ public class MavenITmng3581PluginUsesWagonDependencyTest extends AbstractMavenIn
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3581");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.addCliArgument("-B");

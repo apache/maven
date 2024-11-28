@@ -64,7 +64,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
 
         // setup: install a local snapshot
         Verifier verifier = newVerifier(new File(testDir, "dependency").getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4326");
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -137,7 +137,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
             System.out.println("Bound server socket to the port " + port);
             // test 1: resolve snapshot, just built local copy should suppress daily remote update check
             verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
-            verifier.setAutoClean(false);
+            verifier.setAutoclean(false);
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@port@", Integer.toString(port));
             verifier.filterFile("settings-template.xml", "settings.xml", filterProps);

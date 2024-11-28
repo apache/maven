@@ -45,7 +45,7 @@ public class MavenITBootstrapTest extends AbstractMavenIntegrationTestCase {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/bootstrap");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("-Dbootstrap="

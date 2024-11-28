@@ -45,7 +45,7 @@ public class MavenITmng2052InterpolateWithSettingsProfilePropertiesTest extends 
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2052");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

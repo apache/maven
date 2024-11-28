@@ -49,7 +49,7 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2362");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("utf-8/target");
         verifier.deleteDirectory("latin-1/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2362");

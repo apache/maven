@@ -86,7 +86,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5280");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
@@ -121,7 +121,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5280");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();

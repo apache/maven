@@ -48,7 +48,7 @@ public class MavenITmng4116UndecodedUrlsTest extends AbstractMavenIntegrationTes
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4116");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

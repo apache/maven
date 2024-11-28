@@ -42,7 +42,7 @@ public class MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest extend
                 getClass(), "/mng-5935-optional-lost-in-transtive-managed-dependencies");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

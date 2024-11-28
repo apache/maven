@@ -51,7 +51,7 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends A
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4750");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4750");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

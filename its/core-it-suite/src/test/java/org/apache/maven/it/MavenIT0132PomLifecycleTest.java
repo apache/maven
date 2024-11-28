@@ -45,7 +45,7 @@ public class MavenIT0132PomLifecycleTest extends AbstractMavenIntegrationTestCas
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("deploy");
         verifier.execute();
         if (matchesVersionRange("(2.0.1,3.0-alpha-1)")) {

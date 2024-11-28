@@ -44,7 +44,7 @@ public class MavenITmng2135PluginBuildInReactorTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2135");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("plugin/target");
         verifier.deleteDirectory("project/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2135");

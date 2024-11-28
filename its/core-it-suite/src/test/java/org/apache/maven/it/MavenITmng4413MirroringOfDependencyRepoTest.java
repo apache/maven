@@ -96,7 +96,7 @@ public class MavenITmng4413MirroringOfDependencyRepoTest extends AbstractMavenIn
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
             Verifier verifier = newVerifier(testDir.getAbsolutePath());
-            verifier.setAutoClean(false);
+            verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng4413");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

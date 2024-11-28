@@ -48,7 +48,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest extends AbstractMavenIntegr
 
         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -62,7 +62,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest extends AbstractMavenIntegr
 
         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-2:jar
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -78,7 +78,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest extends AbstractMavenIntegr
 
         // revert back to org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

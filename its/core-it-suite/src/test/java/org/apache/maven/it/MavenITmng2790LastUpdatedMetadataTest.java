@@ -57,7 +57,7 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
          */
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteArtifacts("org.apache.maven.its.mng2790");
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -85,7 +85,7 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
          * Phase 2: Re-install snapshot and check for proper timestamp update in local metadata.
          */
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

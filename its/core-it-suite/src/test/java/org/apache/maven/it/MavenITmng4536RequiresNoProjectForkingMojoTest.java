@@ -46,7 +46,7 @@ public class MavenITmng4536RequiresNoProjectForkingMojoTest extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4536");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");

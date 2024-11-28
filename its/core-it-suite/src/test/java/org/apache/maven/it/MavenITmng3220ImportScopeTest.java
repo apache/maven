@@ -44,7 +44,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
         testDir = new File(testDir, "imported-pom-depMgmt");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3220");
         verifier.filterFile("../settings-template.xml", "settings.xml");
@@ -62,7 +62,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
         testDir = new File(testDir, "depMgmt-pom-module-notImported");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3220");
         verifier.filterFile("../settings-template.xml", "settings.xml");

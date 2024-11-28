@@ -789,7 +789,7 @@ public class Verifier {
         }
     }
 
-    public void setAutoClean(boolean autoClean) {
+    public void setAutoclean(boolean autoClean) {
         this.autoClean = autoClean;
     }
 

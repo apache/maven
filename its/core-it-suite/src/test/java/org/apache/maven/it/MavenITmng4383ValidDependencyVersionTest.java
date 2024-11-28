@@ -45,7 +45,7 @@ public class MavenITmng4383ValidDependencyVersionTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4383");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {
             verifier.addCliArgument("validate");

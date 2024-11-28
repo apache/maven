@@ -47,7 +47,7 @@ public class MavenITmng4429CompRequirementOnNonDefaultImplTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4429");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

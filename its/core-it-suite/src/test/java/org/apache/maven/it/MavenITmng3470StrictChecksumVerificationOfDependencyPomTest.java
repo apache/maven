@@ -45,7 +45,7 @@ public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest extends
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3470");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3470");
         verifier.filterFile("settings-template.xml", "settings.xml");

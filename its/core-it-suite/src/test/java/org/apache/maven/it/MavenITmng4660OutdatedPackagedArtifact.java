@@ -85,7 +85,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         final Path fileToWrite = resourcesDirectory.resolve("example.properties");
         Files.writeString(fileToWrite, "x=42");
 
-        verifier2.setAutoClean(false);
+        verifier2.setAutoclean(false);
         verifier2.addCliArgument("--projects");
         verifier2.addCliArgument(":module-a");
         verifier2.addCliArgument("compile");
@@ -108,7 +108,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         // 3. Resume project build from module B, that depends on module A we just touched. Its packaged artifact
         // is no longer in sync with its compiled artifacts.
         final Verifier verifier3 = newVerifier(testDir.getAbsolutePath());
-        verifier3.setAutoClean(false);
+        verifier3.setAutoclean(false);
         verifier3.addCliArgument("--resume-from");
         verifier3.addCliArgument(":module-b");
         verifier3.addCliArgument("compile");

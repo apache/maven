@@ -44,7 +44,7 @@ public class MavenITmng0282NonReactorExecWhenProjectIndependentTest extends Abst
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0282");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject/target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-no-project:light-touch");

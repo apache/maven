@@ -48,7 +48,7 @@ public class MavenITmng0848UserPropertyOverridesDefaultValueTest extends Abstrac
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0848");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dconfig.aliasDefaultExpressionParam=PASSED");
         verifier.addCliArgument("validate");

@@ -45,7 +45,7 @@ public class MavenITmng4283ParentPomPackagingTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4283");
 
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         try {
             verifier.addCliArgument("validate");
             verifier.execute();

@@ -48,7 +48,7 @@ public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest ex
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4795");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub/target");
         verifier.addCliArgument("process-sources");

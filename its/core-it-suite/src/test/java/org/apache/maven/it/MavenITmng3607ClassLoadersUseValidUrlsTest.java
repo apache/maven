@@ -50,7 +50,7 @@ public class MavenITmng3607ClassLoadersUseValidUrlsTest extends AbstractMavenInt
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3607");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.getSystemProperties().setProperty("test.home", testDir.getAbsolutePath());
         verifier.addCliArgument("validate");

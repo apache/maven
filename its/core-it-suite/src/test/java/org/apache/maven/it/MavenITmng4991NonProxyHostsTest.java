@@ -82,7 +82,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
                 fail("Couldn't bind the server socket to a free port!");
             }
 
-            verifier.setAutoClean(false);
+            verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng4991");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

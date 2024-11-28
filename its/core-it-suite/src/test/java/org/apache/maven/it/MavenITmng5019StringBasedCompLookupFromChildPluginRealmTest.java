@@ -44,7 +44,7 @@ public class MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest extends
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5019");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5019");
         verifier.addCliArgument("-s");

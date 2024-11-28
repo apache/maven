@@ -81,7 +81,7 @@ public class MavenITmng4768NearestMatchConflictResolutionTest extends AbstractMa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4768");
 
         Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4768");
         verifier.addCliArgument("-s");

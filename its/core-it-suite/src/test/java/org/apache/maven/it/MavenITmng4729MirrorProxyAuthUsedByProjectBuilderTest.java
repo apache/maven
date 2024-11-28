@@ -98,7 +98,7 @@ public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest extends Abstr
             }
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
-            verifier.setAutoClean(false);
+            verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng4729");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

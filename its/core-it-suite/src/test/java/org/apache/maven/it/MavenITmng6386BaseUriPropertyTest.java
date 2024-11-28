@@ -43,7 +43,7 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
                 .getCanonicalFile();
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-basic.txt");
         verifier.addCliArgument("validate");
@@ -72,7 +72,7 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
                     .getCanonicalFile();
 
             Verifier verifier = newVerifier(testDir.getAbsolutePath());
-            verifier.setAutoClean(false);
+            verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.setLogFileName("log-basic.txt");
             verifier.addCliArgument("validate");

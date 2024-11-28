@@ -50,7 +50,7 @@ public class MavenITmng3183LoggingToFileTest extends AbstractMavenIntegrationTes
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3183");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("-l");
         verifier.addCliArgument("maven.log");
         verifier.setLogFileName("stdout.txt");

@@ -51,7 +51,7 @@ public class MavenITmng3890TransitiveDependencyScopeUpdateTest extends AbstractM
     public void testitMNG3890() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3890");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3890");
         verifier.filterFile("settings-template.xml", "settings.xml");

@@ -50,7 +50,7 @@ public class MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest exten
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4233");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.addCliArgument("validate");
         verifier.execute();

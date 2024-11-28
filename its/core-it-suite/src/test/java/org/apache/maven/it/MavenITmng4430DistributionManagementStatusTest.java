@@ -46,7 +46,7 @@ public class MavenITmng4430DistributionManagementStatusTest extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4430");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {
             verifier.addCliArgument("validate");

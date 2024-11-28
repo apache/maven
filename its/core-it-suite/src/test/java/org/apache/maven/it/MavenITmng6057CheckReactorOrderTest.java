@@ -53,7 +53,7 @@ public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegratio
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6057-check-reactor-order");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         verifier.setLogFileName("log-only.txt");
         verifier.addCliArgument("-Drevision=1.3.0-SNAPSHOT");

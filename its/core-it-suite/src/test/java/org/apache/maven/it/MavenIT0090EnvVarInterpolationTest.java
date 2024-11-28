@@ -42,7 +42,7 @@ public class MavenIT0090EnvVarInterpolationTest extends AbstractMavenIntegration
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0090");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setEnvironmentVariable("MAVEN_TEST_ENVAR", "MAVEN_TEST_ENVAR_VALUE");
         verifier.addCliArgument("validate");

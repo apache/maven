@@ -49,7 +49,7 @@ public class MavenITmng4789ScopeInheritanceMeetsConflictTest extends AbstractMav
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4789");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4789");
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-s");

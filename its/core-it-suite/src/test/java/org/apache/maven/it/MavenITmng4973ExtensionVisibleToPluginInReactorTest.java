@@ -49,7 +49,7 @@ public class MavenITmng4973ExtensionVisibleToPluginInReactorTest extends Abstrac
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4973");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-b/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4973");
         verifier.addCliArgument("-s");

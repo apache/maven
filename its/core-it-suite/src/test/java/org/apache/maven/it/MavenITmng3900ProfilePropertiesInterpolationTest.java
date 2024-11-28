@@ -48,7 +48,7 @@ public class MavenITmng3900ProfilePropertiesInterpolationTest extends AbstractMa
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3900");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pinterpolation-profile");
         verifier.addCliArgument("validate");

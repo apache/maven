@@ -48,7 +48,7 @@ public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4679");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4679");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

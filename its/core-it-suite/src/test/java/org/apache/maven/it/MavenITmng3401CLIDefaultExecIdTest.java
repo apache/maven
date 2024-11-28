@@ -64,7 +64,7 @@ public class MavenITmng3401CLIDefaultExecIdTest extends AbstractMavenIntegration
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3401/" + project);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config");
         verifier.execute();

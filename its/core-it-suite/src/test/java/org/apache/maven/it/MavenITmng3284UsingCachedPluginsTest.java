@@ -50,7 +50,7 @@ public class MavenITmng3284UsingCachedPluginsTest extends AbstractMavenIntegrati
          * to expose here.
          */
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3284");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
@@ -63,7 +63,7 @@ public class MavenITmng3284UsingCachedPluginsTest extends AbstractMavenIntegrati
          * Phase 2: Now that the plugin versions have been downloaded to the local repo, run the actual test.
          */
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");
         verifier.addCliArgument("--settings");

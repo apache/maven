@@ -44,7 +44,7 @@ public class MavenITmng1144MultipleDefaultGoalsTest extends AbstractMavenIntegra
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1144");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.execute();
         verifier.verifyErrorFreeLog();

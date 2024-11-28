@@ -47,7 +47,7 @@ public class MavenITmng4309StrictChecksumValidationForMetadataTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4309");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4309");
         FileUtils.copyDirectoryStructure(new File(testDir, "repo"), new File(testDir, "target/repo"));

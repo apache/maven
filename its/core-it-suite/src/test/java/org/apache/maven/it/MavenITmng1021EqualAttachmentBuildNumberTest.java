@@ -46,7 +46,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
     public void testitMNG1021() throws Exception {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1021");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("repo");
         verifier.deleteArtifacts("org.apache.maven.its.mng1021");
         verifier.addCliArgument("-Dmaven.consumer.pom=false");

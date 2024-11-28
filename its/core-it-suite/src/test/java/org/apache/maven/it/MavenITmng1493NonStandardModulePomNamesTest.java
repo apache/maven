@@ -38,7 +38,7 @@ public class MavenITmng1493NonStandardModulePomNamesTest extends AbstractMavenIn
         Verifier verifier;
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         verifier.addCliArgument("initialize");
         verifier.execute();

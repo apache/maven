@@ -48,7 +48,7 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest extend
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4379");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4379");
         verifier.filterFile("settings-template.xml", "settings.xml");

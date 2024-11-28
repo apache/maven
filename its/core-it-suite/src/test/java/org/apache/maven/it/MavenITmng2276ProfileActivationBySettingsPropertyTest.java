@@ -47,7 +47,7 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2276");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -71,7 +71,7 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest extends Abstr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2276");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

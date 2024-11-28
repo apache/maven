@@ -47,7 +47,7 @@ public class MavenITmng0461TolerateMissingDependencyPomTest extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0461");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0461");
         verifier.filterFile("settings-template.xml", "settings.xml");

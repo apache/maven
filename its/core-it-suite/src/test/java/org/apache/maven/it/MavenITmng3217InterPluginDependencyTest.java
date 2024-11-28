@@ -46,7 +46,7 @@ public class MavenITmng3217InterPluginDependencyTest extends AbstractMavenIntegr
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3217");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-1/target");
         verifier.deleteDirectory("sub-2/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3217");

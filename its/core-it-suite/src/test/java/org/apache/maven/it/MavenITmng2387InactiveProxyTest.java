@@ -116,7 +116,7 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
         properties.put("@proxyPort@", Integer.toString(proxyPort));
         verifier.filterFile("settings-template.xml", "settings.xml", properties);
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2387");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

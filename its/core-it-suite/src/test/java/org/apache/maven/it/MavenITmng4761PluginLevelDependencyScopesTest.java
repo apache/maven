@@ -50,7 +50,7 @@ public class MavenITmng4761PluginLevelDependencyScopesTest extends AbstractMaven
         final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4761");
 
         final Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4761");
         verifier.filterFile("settings-template.xml", "settings.xml");

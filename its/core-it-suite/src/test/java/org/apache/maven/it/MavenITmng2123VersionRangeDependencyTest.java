@@ -40,7 +40,7 @@ public class MavenITmng2123VersionRangeDependencyTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2123");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2123");
         verifier.filterFile("settings-template.xml", "settings.xml");

@@ -59,7 +59,7 @@ public class MavenITmng3714ToolchainsCliOptionTest extends AbstractMavenIntegrat
 
         verifier.filterFile("toolchains.xml", "toolchains.xml", properties);
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--toolchains");
         verifier.addCliArgument("toolchains.xml");

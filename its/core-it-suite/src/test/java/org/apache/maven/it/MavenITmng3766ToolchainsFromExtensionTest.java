@@ -47,7 +47,7 @@ public class MavenITmng3766ToolchainsFromExtensionTest extends AbstractMavenInte
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3766");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--toolchains");
         verifier.addCliArgument("toolchains.xml");

@@ -46,7 +46,7 @@ public class MavenITmng1415QuotedSystemPropertiesTest extends AbstractMavenInteg
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1415");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dtest.property=Test Property");
         verifier.addCliArgument("validate");

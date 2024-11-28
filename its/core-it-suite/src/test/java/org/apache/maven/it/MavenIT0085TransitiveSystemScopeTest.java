@@ -44,7 +44,7 @@ public class MavenIT0085TransitiveSystemScopeTest extends AbstractMavenIntegrati
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0085");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0085");
         verifier.getSystemProperties().setProperty("test.home", testDir.getAbsolutePath());

@@ -52,7 +52,7 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4293");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4293");
         verifier.filterFile("pom-template.xml", "pom.xml");

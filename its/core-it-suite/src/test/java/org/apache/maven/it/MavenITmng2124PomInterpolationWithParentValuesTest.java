@@ -45,7 +45,7 @@ public class MavenITmng2124PomInterpolationWithParentValuesTest extends Abstract
         File child = new File(testDir, "parent/child");
 
         Verifier verifier = newVerifier(child.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
         verifier.execute();

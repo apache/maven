@@ -96,7 +96,7 @@ public class MavenITmng4561MirroringOfPluginRepoTest extends AbstractMavenIntegr
             }
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
-            verifier.setAutoClean(false);
+            verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng4561");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();

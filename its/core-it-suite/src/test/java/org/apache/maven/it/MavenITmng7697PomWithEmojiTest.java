@@ -44,7 +44,7 @@ class MavenITmng7697PomWithEmojiTest extends AbstractMavenIntegrationTestCase {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7697-emoji");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

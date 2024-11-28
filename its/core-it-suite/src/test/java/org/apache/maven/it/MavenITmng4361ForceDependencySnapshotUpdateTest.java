@@ -50,7 +50,7 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest extends AbstractMav
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4361");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4361");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

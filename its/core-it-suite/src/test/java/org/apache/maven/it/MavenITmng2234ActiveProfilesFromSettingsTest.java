@@ -43,7 +43,7 @@ public class MavenITmng2234ActiveProfilesFromSettingsTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2234");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
         verifier.addCliArgument("-s");

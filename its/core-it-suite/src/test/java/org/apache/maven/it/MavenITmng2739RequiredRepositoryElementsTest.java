@@ -46,7 +46,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
         Verifier verifier;
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         try {
             verifier.addCliArgument("validate");
@@ -78,7 +78,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
         Verifier verifier;
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
 
         try {
             verifier.addCliArgument("validate");

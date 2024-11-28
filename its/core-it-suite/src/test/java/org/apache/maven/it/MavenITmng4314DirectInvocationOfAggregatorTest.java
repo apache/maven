@@ -44,7 +44,7 @@ public class MavenITmng4314DirectInvocationOfAggregatorTest extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4314");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer/target");
         verifier.deleteDirectory("dependency/target");

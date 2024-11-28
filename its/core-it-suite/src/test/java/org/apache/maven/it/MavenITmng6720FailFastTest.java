@@ -45,7 +45,7 @@ class MavenITmng6720FailFastTest extends AbstractMavenIntegrationTestCase {
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6720-fail-fast");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArguments("-T", "2");
         verifier.addCliArgument("-Dmaven.test.redirectTestOutputToFile=true");
         verifier.addCliArguments("clean", "test");

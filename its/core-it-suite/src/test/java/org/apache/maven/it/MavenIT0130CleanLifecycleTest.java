@@ -45,7 +45,7 @@ public class MavenIT0130CleanLifecycleTest extends AbstractMavenIntegrationTestC
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyFilePresent("target/clean-clean.txt");

@@ -109,7 +109,7 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         Path tmp = Files.createTempFile(testDir.toPath(), "FOO", "txt");
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5868");
         verifier.addCliArgument("-Dartifact.attachedFile=" + tmp.toFile().getCanonicalPath());

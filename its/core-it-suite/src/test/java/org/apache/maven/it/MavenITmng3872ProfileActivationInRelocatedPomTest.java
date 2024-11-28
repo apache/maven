@@ -48,7 +48,7 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest extends AbstractM
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3872");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3872");
         verifier.filterFile("settings-template.xml", "settings.xml");

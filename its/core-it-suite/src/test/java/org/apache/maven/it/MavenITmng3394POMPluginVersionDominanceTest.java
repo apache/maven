@@ -46,7 +46,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIn
                 getClass(), BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("process-resources");
         verifier.execute();
@@ -63,7 +63,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIn
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("clean");
         verifier.execute();

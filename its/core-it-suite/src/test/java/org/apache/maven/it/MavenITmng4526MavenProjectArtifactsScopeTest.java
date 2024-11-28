@@ -49,7 +49,7 @@ public class MavenITmng4526MavenProjectArtifactsScopeTest extends AbstractMavenI
         File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4526");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setAutoClean(false);
+        verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4526");
         verifier.filterFile("settings-template.xml", "settings.xml");
