@@ -204,11 +204,15 @@ public class EmbeddedMavenExecutor implements Executor {
                     exec = r -> {
                         try {
                             try {
-                                ansiConsoleInstalled.set(null, 1);
+                                if (r.stdoutConsumer().isPresent()) {
+                                    ansiConsoleInstalled.set(null, 1);
+                                }
                                 return (int)
                                         mainMethod.invoke(null, r.arguments().toArray(new String[0]), classWorld);
                             } finally {
-                                ansiConsoleInstalled.set(null, 0);
+                                if (r.stdoutConsumer().isPresent()) {
+                                    ansiConsoleInstalled.set(null, 0);
+                                }
                             }
                         } catch (Exception e) {
                             throw new ExecutorException("Failed to execute", e);

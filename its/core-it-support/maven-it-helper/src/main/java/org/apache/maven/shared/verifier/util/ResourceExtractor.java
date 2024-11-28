@@ -43,7 +43,7 @@ public class ResourceExtractor {
 
         FileUtils.deleteDirectory(testDir);
 
-        testDir = ResourceExtractor.extractResourcePath(cl, resourcePath, tempDir, false);
+        testDir = extractResourcePath(cl, resourcePath, tempDir, false);
         return testDir;
     }
 
