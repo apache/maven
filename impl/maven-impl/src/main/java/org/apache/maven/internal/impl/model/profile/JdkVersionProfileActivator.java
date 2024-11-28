@@ -60,7 +60,7 @@ public class JdkVersionProfileActivator implements ProfileActivator {
             return false;
         }
 
-        String version = context.getSystemProperties().get("java.version");
+        String version = context.getSystemProperty("java.version");
 
         if (version == null || version.isEmpty()) {
             problems.add(

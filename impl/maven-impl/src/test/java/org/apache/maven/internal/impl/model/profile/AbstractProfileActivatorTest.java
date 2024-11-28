@@ -25,6 +25,8 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultProfileActivationContext;
 import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.junit.jupiter.api.AfterEach;
@@ -55,7 +57,8 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
     }
 
     protected DefaultProfileActivationContext newContext() {
-        return new DefaultProfileActivationContext();
+        return new DefaultProfileActivationContext(
+                new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator());
     }
 
     protected ProfileActivationContext newContext(
