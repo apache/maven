@@ -20,8 +20,8 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
@@ -111,8 +111,16 @@ public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCas
 
     static void assertTextEquals(File file1, File file2) throws IOException {
         assertEquals(
-                String.join("\n", FileUtils.loadFile(file1)),
-                String.join("\n", FileUtils.loadFile(file2)),
+                String.join(
+                        "\n",
+                        Files.readAllLines(file1.toPath()).stream()
+                                .map(String::trim)
+                                .toList()),
+                String.join(
+                        "\n",
+                        Files.readAllLines(file2.toPath()).stream()
+                                .map(String::trim)
+                                .toList()),
                 "pom files differ " + file1 + " " + file2);
     }
 }
