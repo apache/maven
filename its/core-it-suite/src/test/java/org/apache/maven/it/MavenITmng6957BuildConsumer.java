@@ -136,8 +136,16 @@ public class MavenITmng6957BuildConsumer extends AbstractMavenIntegrationTestCas
 
     static void assertTextEquals(File file1, File file2) throws IOException {
         assertEquals(
-                String.join("\n", Files.readAllLines(file1.toPath()).stream().map(String::trim).toList()),
-                String.join("\n", Files.readAllLines(file2.toPath()).stream().map(String::trim).toList()),
+                String.join(
+                        "\n",
+                        Files.readAllLines(file1.toPath()).stream()
+                                .map(String::trim)
+                                .toList()),
+                String.join(
+                        "\n",
+                        Files.readAllLines(file2.toPath()).stream()
+                                .map(String::trim)
+                                .toList()),
                 "pom files differ " + file1 + " " + file2);
     }
 }
