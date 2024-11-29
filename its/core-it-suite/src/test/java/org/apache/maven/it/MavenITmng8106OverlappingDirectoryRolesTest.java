@@ -56,7 +56,7 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File metadataFile = new File(new File(verifier.getLocalRepository()), "mng-8106/it/maven-metadata-local.xml");
+        File metadataFile = new File(new File(repo), "mng-8106/it/maven-metadata-local.xml");
         Xpp3Dom dom;
         try (FileReader reader = new FileReader(metadataFile)) {
             dom = Xpp3DomBuilder.build(reader);

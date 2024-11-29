@@ -97,7 +97,7 @@ public class Verifier {
      */
     public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
         requireNonNull(basedir);
-        this.basedir = Paths.get(basedir);
+        this.basedir = Paths.get(basedir).toAbsolutePath();
         this.userHomeDirectory = Paths.get(System.getProperty("user.home"));
         this.executorHelper = HELPER;
         this.defaultCliArguments =
@@ -346,11 +346,13 @@ public class Verifier {
 
         String gav;
         if (classifier != null) {
-            gav = gid + ":" + aid + ":" + classifier + ":" + ext + ":" + version;
+            gav = gid + ":" + aid + ":" + ext + ":" + classifier + ":" + version;
         } else {
             gav = gid + ":" + aid + ":" + ext + ":" + version;
         }
-        return executorHelper.artifactPath(executorHelper.executorRequest(), gav, null);
+        return getLocalRepository()
+                + File.separator
+                + executorHelper.artifactPath(executorHelper.executorRequest(), gav, null);
     }
 
     public List<String> getArtifactFileNameList(String org, String name, String version, String ext) {
