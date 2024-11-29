@@ -19,6 +19,7 @@
 package org.apache.maven.shared.verifier;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -55,6 +56,9 @@ import static java.util.Objects.requireNonNull;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class Verifier {
+    private static final ExecutorHelper HELPER =
+            new HelperImpl(ExecutorHelper.Mode.FORKED, Paths.get(System.getProperty("maven.home")));
+
     private static final String LOG_FILENAME = "log.txt";
 
     private static final List<String> DEFAULT_CLI_ARGUMENTS = Arrays.asList("--errors", "--batch-mode");
@@ -95,7 +99,7 @@ public class Verifier {
         requireNonNull(basedir);
         this.basedir = Paths.get(basedir);
         this.userHomeDirectory = Paths.get(System.getProperty("user.home"));
-        this.executorHelper = new HelperImpl(Paths.get(System.getProperty("maven.home")));
+        this.executorHelper = HELPER;
         this.defaultCliArguments =
                 new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
 
@@ -710,11 +714,12 @@ public class Verifier {
             }
             builder.arguments(args);
 
-            ExecutorHelper.Mode mode = ExecutorHelper.Mode.AUTO;
+            ExecutorHelper.Mode mode = executorHelper.getDefaultMode();
             if (forkJvm) {
                 mode = ExecutorHelper.Mode.FORKED;
             }
-            ExecutorRequest request = builder.build();
+            ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+            ExecutorRequest request = builder.stderrConsumer(stderr).build();
             int ret = executorHelper.execute(mode, request);
             if (ret > 0) {
                 String env = "";
@@ -725,6 +730,7 @@ public class Verifier {
                 }
                 throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
                         + getExecutable() + " "
+                        + "srderr: " + stderr
                         + request
                         + "\n" + env
                         + "\n" + getLogContents(logFile));

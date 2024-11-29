@@ -48,6 +48,12 @@ public interface ExecutorHelper extends ExecutorTool, AutoCloseable {
     }
 
     /**
+     * Returns the "preferred" mode of this helper.
+     */
+    @Nonnull
+    Mode getDefaultMode();
+
+    /**
      * Creates pre-populated builder for {@link ExecutorRequest}.
      */
     @Nonnull
@@ -57,7 +63,7 @@ public interface ExecutorHelper extends ExecutorTool, AutoCloseable {
      * Executes the request with automatically chosen executor.
      */
     default int execute(ExecutorRequest executorRequest) throws ExecutorException {
-        return execute(Mode.AUTO, executorRequest);
+        return execute(getDefaultMode(), executorRequest);
     }
 
     /**

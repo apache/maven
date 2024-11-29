@@ -35,10 +35,13 @@ import org.apache.maven.cling.executor.ExecutorTool;
 import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
 import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Helper class for some common tasks.
  */
 public class HelperImpl implements ExecutorHelper {
+    private final Mode defaultMode;
     private final Path installationDirectory;
     private final ExecutorTool executorTool;
     private final HashMap<String, Executor> executors;
@@ -46,6 +49,11 @@ public class HelperImpl implements ExecutorHelper {
     private final ConcurrentHashMap<String, String> cache;
 
     public HelperImpl(@Nullable Path installationDirectory) {
+        this(Mode.AUTO, installationDirectory);
+    }
+
+    public HelperImpl(Mode defaultMode, @Nullable Path installationDirectory) {
+        this.defaultMode = requireNonNull(defaultMode);
         this.installationDirectory = installationDirectory != null
                 ? ExecutorRequest.getCanonicalPath(installationDirectory)
                 : ExecutorRequest.discoverMavenHome();
@@ -55,6 +63,11 @@ public class HelperImpl implements ExecutorHelper {
         this.executors.put(EmbeddedMavenExecutor.class.getSimpleName(), new EmbeddedMavenExecutor());
         this.executors.put(ForkedMavenExecutor.class.getSimpleName(), new ForkedMavenExecutor());
         this.cache = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public Mode getDefaultMode() {
+        return defaultMode;
     }
 
     @Override

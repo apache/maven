@@ -77,12 +77,14 @@ public class EmbeddedMavenExecutor implements Executor {
     }
 
     private final PrintStream originalStdout;
+    private final PrintStream originalStderr;
     private final Properties originalProperties;
     private final ClassLoader originalClassLoader;
     private final ConcurrentHashMap<Path, Context> contexts;
 
     public EmbeddedMavenExecutor() {
         this.originalStdout = System.out;
+        this.originalStderr = System.err;
         this.originalClassLoader = Thread.currentThread().getContextClassLoader();
         this.contexts = new ConcurrentHashMap<>();
         this.originalProperties = System.getProperties();
@@ -100,11 +102,15 @@ public class EmbeddedMavenExecutor implements Executor {
             if (executorRequest.stdoutConsumer().isPresent()) {
                 System.setOut(new PrintStream(executorRequest.stdoutConsumer().get(), true));
             }
+            if (executorRequest.stderrConsumer().isPresent()) {
+                System.setErr(new PrintStream(executorRequest.stderrConsumer().get(), true));
+            }
             return context.exec.apply(executorRequest);
         } catch (Exception e) {
             throw new ExecutorException("Failed to execute", e);
         } finally {
             System.setOut(originalStdout);
+            System.setErr(originalStderr);
             Thread.currentThread().setContextClassLoader(originalClassLoader);
             System.setProperties(originalProperties);
         }

@@ -33,8 +33,12 @@ public class Verifier extends org.apache.maven.shared.verifier.Verifier {
     }
 
     static List<String> defaultCliArguments() {
-        return Arrays.asList(
-                "-e", "--batch-mode", "-Dmaven.repo.local.tail=" + System.getProperty("maven.repo.local.tail"));
+        if ("notset".equals(System.getProperty("maven.repo.local.tail", "notset"))) {
+            return Arrays.asList("-e", "--batch-mode");
+        } else {
+            return Arrays.asList(
+                    "-e", "--batch-mode", "-Dmaven.repo.local.tail=" + System.getProperty("maven.repo.local.tail"));
+        }
     }
 
     public String loadLogContent() throws IOException {

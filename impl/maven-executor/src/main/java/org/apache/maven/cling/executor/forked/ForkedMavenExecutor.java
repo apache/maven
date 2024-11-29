@@ -20,7 +20,6 @@ package org.apache.maven.cling.executor.forked;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,9 +44,7 @@ public class ForkedMavenExecutor implements Executor {
         requireNonNull(executorRequest);
         validate(executorRequest);
 
-        return doExecute(
-                executorRequest,
-                wrapStdoutConsumer(executorRequest.stdoutConsumer().orElse(null)));
+        return doExecute(executorRequest, wrapStdouterrConsumer(executorRequest));
     }
 
     @Override
@@ -86,13 +83,21 @@ public class ForkedMavenExecutor implements Executor {
     protected void validate(ExecutorRequest executorRequest) throws ExecutorException {}
 
     @Nullable
-    protected Consumer<Process> wrapStdoutConsumer(@Nullable OutputStream stdoutConsumer) {
-        if (stdoutConsumer == null) {
+    protected Consumer<Process> wrapStdouterrConsumer(ExecutorRequest executorRequest) {
+        if (executorRequest.stdoutConsumer().isEmpty()
+                && executorRequest.stderrConsumer().isEmpty()) {
             return null;
         } else {
             return p -> {
                 try {
-                    p.getInputStream().transferTo(stdoutConsumer);
+                    if (executorRequest.stdoutConsumer().isPresent()) {
+                        p.getInputStream()
+                                .transferTo(executorRequest.stdoutConsumer().get());
+                    }
+                    if (executorRequest.stderrConsumer().isPresent()) {
+                        p.getErrorStream()
+                                .transferTo(executorRequest.stderrConsumer().get());
+                    }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
