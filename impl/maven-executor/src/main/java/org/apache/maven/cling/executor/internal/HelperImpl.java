@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -89,6 +90,14 @@ public class HelperImpl implements ExecutorHelper {
             ExecutorRequest request = executorRequest().build();
             return getExecutor(Mode.AUTO, request).mavenVersion(request);
         });
+    }
+
+    @Override
+    public Map<String, String> dump(ExecutorRequest.Builder request) throws ExecutorException {
+        if (mavenVersion().startsWith("4.")) {
+            request.argument("--raw-streams");
+        }
+        return executorTool.dump(request);
     }
 
     @Override
