@@ -34,6 +34,7 @@ public interface ArtifactFilterManager {
      * @deprecated use {@code META-INF/maven/extension.xml} to define artifacts exported by Maven core and plugin
      *             extensions.
      */
+    @Deprecated
     ArtifactFilter getArtifactFilter();
 
     /**
@@ -50,6 +51,7 @@ public interface ArtifactFilterManager {
      * @deprecated use {@code META-INF/maven/extension.xml} to define artifacts exported by Maven core and plugin
      *             extensions.
      */
+    @Deprecated
     void excludeArtifact(String artifactId);
 
     Set<String> getCoreArtifactExcludes();
