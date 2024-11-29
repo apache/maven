@@ -57,7 +57,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class Verifier {
     private static final ExecutorHelper HELPER =
-            new HelperImpl(ExecutorHelper.Mode.FORKED, Paths.get(System.getProperty("maven.home")));
+            new HelperImpl(ExecutorHelper.Mode.AUTO, Paths.get(System.getProperty("maven.home")));
 
     private static final String LOG_FILENAME = "log.txt";
 
@@ -722,17 +722,17 @@ public class Verifier {
             ExecutorRequest request = builder.stderrConsumer(stderr).build();
             int ret = executorHelper.execute(mode, request);
             if (ret > 0) {
-                String env = "";
+                String dump = "";
                 try {
-                    executorHelper.dump(executorHelper.executorRequest());
+                    dump = executorHelper.dump(executorHelper.executorRequest()).toString();
                 } catch (Exception e) {
-                    env = "FAILED: " + e.getMessage();
+                    dump = "FAILED: " + e.getMessage();
                 }
                 throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
                         + getExecutable() + " "
-                        + "srderr: " + stderr
-                        + request
-                        + "\n" + env
+                        + "\nstderr: " + stderr
+                        + "\nreq: " + request
+                        + "\ndump: " + dump
                         + "\n" + getLogContents(logFile));
             }
         } catch (ExecutorException e) {

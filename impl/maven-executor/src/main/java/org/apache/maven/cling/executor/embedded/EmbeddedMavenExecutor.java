@@ -53,7 +53,6 @@ import static java.util.Objects.requireNonNull;
  */
 public class EmbeddedMavenExecutor implements Executor {
     protected static final class Context {
-        private final Properties properties;
         private final URLClassLoader bootClassLoader;
         private final String version;
         private final Object classWorld;
@@ -61,13 +60,11 @@ public class EmbeddedMavenExecutor implements Executor {
         private final Function<ExecutorRequest, Integer> exec;
 
         public Context(
-                Properties properties,
                 URLClassLoader bootClassLoader,
                 String version,
                 Object classWorld,
                 ClassLoader tccl,
                 Function<ExecutorRequest, Integer> exec) {
-            this.properties = properties;
             this.bootClassLoader = bootClassLoader;
             this.version = version;
             this.classWorld = classWorld;
@@ -96,7 +93,6 @@ public class EmbeddedMavenExecutor implements Executor {
         validate(executorRequest);
         Context context = mayCreate(executorRequest);
 
-        System.setProperties(context.properties);
         Thread.currentThread().setContextClassLoader(context.tccl);
         try {
             if (executorRequest.stdoutConsumer().isPresent()) {
@@ -146,29 +142,7 @@ public class EmbeddedMavenExecutor implements Executor {
                 throw new IllegalArgumentException("Installation directory does not point to Maven installation");
             }
 
-            Properties properties = new Properties();
-            properties.putAll(System.getProperties());
-            properties.put(
-                    "user.dir",
-                    executorRequest.cwd().toAbsolutePath().normalize().toString());
-            properties.put(
-                    "maven.multiModuleProjectDirectory",
-                    executorRequest.cwd().toAbsolutePath().normalize().toString());
-            properties.put(
-                    "user.home",
-                    executorRequest
-                            .userHomeDirectory()
-                            .toAbsolutePath()
-                            .normalize()
-                            .toString());
-            properties.put("maven.home", mavenHome.toString());
-            properties.put("maven.mainClass", "org.apache.maven.cling.MavenCling");
-            properties.put(
-                    "library.jline.path", mavenHome.resolve("lib/jline-native").toString());
-            properties.put("org.jline.terminal.provider", "dumb");
-            if (executorRequest.jvmSystemProperties().isPresent()) {
-                properties.putAll(executorRequest.jvmSystemProperties().get());
-            }
+            Properties properties = prepareProperties(executorRequest);
 
             System.setProperties(properties);
             URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());
@@ -193,6 +167,7 @@ public class EmbeddedMavenExecutor implements Executor {
                     Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
                     Method doMain = cliClass.getMethod("doMain", parameterTypes);
                     exec = r -> {
+                        System.setProperties(prepareProperties(r));
                         try {
                             return (int) doMain.invoke(mavenCli, new Object[] {
                                 r.arguments().toArray(new String[0]), r.cwd().toString(), null, null
@@ -208,15 +183,18 @@ public class EmbeddedMavenExecutor implements Executor {
                     Field ansiConsoleInstalled = ansiConsole.getDeclaredField("installed");
                     ansiConsoleInstalled.setAccessible(true);
                     exec = r -> {
+                        System.setProperties(prepareProperties(r));
                         try {
                             try {
-                                if (r.stdoutConsumer().isPresent()) {
+                                if (r.stdoutConsumer().isPresent()
+                                        || r.stderrConsumer().isPresent()) {
                                     ansiConsoleInstalled.set(null, 1);
                                 }
                                 return (int)
                                         mainMethod.invoke(null, r.arguments().toArray(new String[0]), classWorld);
                             } finally {
-                                if (r.stdoutConsumer().isPresent()) {
+                                if (r.stdoutConsumer().isPresent()
+                                        || r.stderrConsumer().isPresent()) {
                                     ansiConsoleInstalled.set(null, 0);
                                 }
                             }
@@ -226,7 +204,7 @@ public class EmbeddedMavenExecutor implements Executor {
                     };
                 }
 
-                return new Context(properties, bootClassLoader, version, classWorld, cliClass.getClassLoader(), exec);
+                return new Context(bootClassLoader, version, classWorld, cliClass.getClassLoader(), exec);
             } catch (Exception e) {
                 throw new ExecutorException("Failed to create executor", e);
             } finally {
@@ -234,6 +212,28 @@ public class EmbeddedMavenExecutor implements Executor {
                 System.setProperties(originalProperties);
             }
         });
+    }
+
+    private Properties prepareProperties(ExecutorRequest request) {
+        Path mavenHome = ExecutorRequest.getCanonicalPath(request.installationDirectory());
+        Properties properties = new Properties();
+        properties.putAll(System.getProperties());
+        properties.put("user.dir", request.cwd().toAbsolutePath().normalize().toString());
+        properties.put(
+                "maven.multiModuleProjectDirectory",
+                request.cwd().toAbsolutePath().normalize().toString());
+        properties.put(
+                "user.home",
+                request.userHomeDirectory().toAbsolutePath().normalize().toString());
+        properties.put("maven.home", mavenHome.toString());
+        properties.put("maven.mainClass", "org.apache.maven.cling.MavenCling");
+        properties.put(
+                "library.jline.path", mavenHome.resolve("lib/jline-native").toString());
+        properties.put("org.jline.terminal.provider", "dumb");
+        if (request.jvmSystemProperties().isPresent()) {
+            properties.putAll(request.jvmSystemProperties().get());
+        }
+        return properties;
     }
 
     @Override
