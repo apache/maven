@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Unit tests on <code>MavenProperties</code>.
  */
+@Deprecated
 public class MavenPropertiesTest {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");

@@ -131,11 +131,6 @@ import org.slf4j.LoggerFactory;
 import static java.util.Comparator.comparing;
 import static org.apache.maven.api.Constants.MAVEN_HOME;
 import static org.apache.maven.api.Constants.MAVEN_INSTALLATION_CONF;
-import static org.apache.maven.cli.CLIManager.BATCH_MODE;
-import static org.apache.maven.cli.CLIManager.COLOR;
-import static org.apache.maven.cli.CLIManager.FORCE_INTERACTIVE;
-import static org.apache.maven.cli.CLIManager.NON_INTERACTIVE;
-import static org.apache.maven.cli.ResolveFile.resolveFile;
 
 // TODO push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
 
@@ -488,7 +483,7 @@ public class MavenCli {
         // LOG COLOR
         String styleColor = cliRequest.getUserProperties().getProperty("style.color", "auto");
         styleColor = cliRequest.getUserProperties().getProperty(Constants.MAVEN_STYLE_COLOR_PROPERTY, styleColor);
-        styleColor = commandLine.getOptionValue(COLOR, styleColor);
+        styleColor = commandLine.getOptionValue(CLIManager.COLOR, styleColor);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
             MessageUtils.setColorEnabled(true);
         } else if ("never".equals(styleColor) || "no".equals(styleColor) || "none".equals(styleColor)) {
@@ -497,8 +492,9 @@ public class MavenCli {
             throw new IllegalArgumentException(
                     "Invalid color configuration value '" + styleColor + "'. Supported are 'auto', 'always', 'never'.");
         } else {
-            boolean isBatchMode = !commandLine.hasOption(FORCE_INTERACTIVE)
-                    && (commandLine.hasOption(BATCH_MODE) || commandLine.hasOption(NON_INTERACTIVE));
+            boolean isBatchMode = !commandLine.hasOption(CLIManager.FORCE_INTERACTIVE)
+                    && (commandLine.hasOption(CLIManager.BATCH_MODE)
+                            || commandLine.hasOption(CLIManager.NON_INTERACTIVE));
             if (isBatchMode || commandLine.hasOption(CLIManager.LOG_FILE)) {
                 MessageUtils.setColorEnabled(false);
             }
@@ -520,7 +516,7 @@ public class MavenCli {
         // LOG STREAMS
         if (commandLine.hasOption(CLIManager.LOG_FILE)) {
             File logFile = new File(commandLine.getOptionValue(CLIManager.LOG_FILE));
-            logFile = resolveFile(logFile, cliRequest.workingDirectory);
+            logFile = ResolveFile.resolveFile(logFile, cliRequest.workingDirectory);
 
             // redirect stdout and stderr to file
             try {
@@ -926,7 +922,7 @@ public class MavenCli {
 
         if (extClassPath != null && !extClassPath.isEmpty()) {
             for (String jar : extClassPath.split(File.pathSeparator)) {
-                File file = resolveFile(new File(jar), cliRequest.workingDirectory);
+                File file = ResolveFile.resolveFile(new File(jar), cliRequest.workingDirectory);
 
                 slf4jLogger.debug("  included '{}'", file);
 
@@ -1200,7 +1196,7 @@ public class MavenCli {
 
         if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_USER_TOOLCHAINS)) {
             userToolchainsFile = new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_USER_TOOLCHAINS));
-            userToolchainsFile = resolveFile(userToolchainsFile, cliRequest.workingDirectory);
+            userToolchainsFile = ResolveFile.resolveFile(userToolchainsFile, cliRequest.workingDirectory);
 
             if (!userToolchainsFile.isFile()) {
                 throw new FileNotFoundException(
@@ -1218,7 +1214,8 @@ public class MavenCli {
         if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_INSTALLATION_TOOLCHAINS)) {
             installationToolchainsFile =
                     new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_INSTALLATION_TOOLCHAINS));
-            installationToolchainsFile = resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
+            installationToolchainsFile =
+                    ResolveFile.resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
 
             if (!installationToolchainsFile.isFile()) {
                 throw new FileNotFoundException(
@@ -1227,7 +1224,8 @@ public class MavenCli {
         } else if (cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS)) {
             installationToolchainsFile =
                     new File(cliRequest.commandLine.getOptionValue(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS));
-            installationToolchainsFile = resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
+            installationToolchainsFile =
+                    ResolveFile.resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
 
             if (!installationToolchainsFile.isFile()) {
                 throw new FileNotFoundException(
@@ -1238,7 +1236,8 @@ public class MavenCli {
                     cliRequest.getUserProperties().getProperty(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
             if (installationToolchainsFileStr != null) {
                 installationToolchainsFile = new File(installationToolchainsFileStr);
-                installationToolchainsFile = resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
+                installationToolchainsFile =
+                        ResolveFile.resolveFile(installationToolchainsFile, cliRequest.workingDirectory);
             }
         }
 
@@ -1377,11 +1376,11 @@ public class MavenCli {
 
     private void disableInteractiveModeIfNeeded(final CliRequest cliRequest, final MavenExecutionRequest request) {
         CommandLine commandLine = cliRequest.getCommandLine();
-        if (commandLine.hasOption(FORCE_INTERACTIVE)) {
+        if (commandLine.hasOption(CLIManager.FORCE_INTERACTIVE)) {
             return;
         }
 
-        if (commandLine.hasOption(BATCH_MODE) || commandLine.hasOption(NON_INTERACTIVE)) {
+        if (commandLine.hasOption(CLIManager.BATCH_MODE) || commandLine.hasOption(CLIManager.NON_INTERACTIVE)) {
             request.setInteractiveMode(false);
         } else {
             boolean runningOnCI = isRunningOnCI(cliRequest.getSystemProperties());
@@ -1422,7 +1421,7 @@ public class MavenCli {
 
         File current = baseDirectory;
         if (alternatePomFile != null) {
-            current = resolveFile(new File(alternatePomFile), workingDirectory);
+            current = ResolveFile.resolveFile(new File(alternatePomFile), workingDirectory);
         }
 
         if (modelProcessor != null) {
@@ -1524,7 +1523,7 @@ public class MavenCli {
             final CommandLine commandLine,
             final MavenExecutionRequest request) {
         boolean runningOnCI = isRunningOnCI(request.getSystemProperties());
-        boolean quietCI = runningOnCI && !commandLine.hasOption(FORCE_INTERACTIVE);
+        boolean quietCI = runningOnCI && !commandLine.hasOption(CLIManager.FORCE_INTERACTIVE);
 
         if (quiet || commandLine.hasOption(CLIManager.NO_TRANSFER_PROGRESS) || quietCI) {
             return new QuietMavenTransferListener();

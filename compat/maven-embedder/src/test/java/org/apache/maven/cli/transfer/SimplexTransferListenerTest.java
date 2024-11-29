@@ -31,6 +31,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Deprecated
 class SimplexTransferListenerTest {
     @Test
     void cancellation() throws InterruptedException {

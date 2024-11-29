@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  */
+@Deprecated
 class CleanArgumentTest {
 
     @Test
