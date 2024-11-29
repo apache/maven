@@ -18,7 +18,7 @@
  */
 package org.apache.maven.internal.impl.model.profile;
 
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Profile;
@@ -50,10 +50,8 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
         return p;
     }
 
-    private Properties newProperties(String javaVersion) {
-        Properties props = new Properties();
-        props.setProperty("java.version", javaVersion);
-        return props;
+    private Map<String, String> newProperties(String javaVersion) {
+        return Map.of("java.version", javaVersion);
     }
 
     @Test

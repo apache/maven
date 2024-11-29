@@ -18,7 +18,7 @@
  */
 package org.apache.maven.internal.impl.model.profile;
 
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationOS;
@@ -46,12 +46,8 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
         return p;
     }
 
-    private Properties newProperties(String osName, String osVersion, String osArch) {
-        Properties props = new Properties();
-        props.setProperty("os.name", osName);
-        props.setProperty("os.version", osVersion);
-        props.setProperty("os.arch", osArch);
-        return props;
+    private Map<String, String> newProperties(String osName, String osVersion, String osArch) {
+        return Map.of("os.name", osName, "os.version", osVersion, "os.arch", osArch);
     }
 
     @Test
