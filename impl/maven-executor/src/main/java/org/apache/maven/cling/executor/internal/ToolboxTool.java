@@ -18,7 +18,13 @@
  */
 package org.apache.maven.cling.executor.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
@@ -33,12 +39,35 @@ import static java.util.Objects.requireNonNull;
  * @see <a href="https://github.com/maveniverse/toolbox">Maveniverse Toolbox</a>
  */
 public class ToolboxTool implements ExecutorTool {
-    private static final String TOOLBOX = "eu.maveniverse.maven.plugins:toolbox:0.5.1:";
+    private static final String TOOLBOX = "eu.maveniverse.maven.plugins:toolbox:0.5.2:";
 
     private final ExecutorHelper helper;
 
     public ToolboxTool(ExecutorHelper helper) {
         this.helper = requireNonNull(helper);
+    }
+
+    @Override
+    public Map<String, String> dump(ExecutorRequest.Builder executorRequest) throws ExecutorException {
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        ExecutorRequest.Builder builder =
+                mojo(executorRequest, "gav-dump").argument("-DasProperties").stdoutConsumer(stdout);
+        int ec = helper.execute(builder.build());
+        if (ec != 0) {
+            throw new ExecutorException("Unexpected exit code=" + ec);
+        }
+        try {
+            Properties properties = new Properties();
+            properties.load(new ByteArrayInputStream(stdout.toByteArray()));
+            return properties.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            e -> String.valueOf(e.getKey()),
+                            e -> String.valueOf(e.getValue()),
+                            (prev, next) -> next,
+                            HashMap::new));
+        } catch (IOException e) {
+            throw new ExecutorException("Unable to parse properties", e);
+        }
     }
 
     @Override

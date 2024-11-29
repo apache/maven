@@ -18,6 +18,8 @@
  */
 package org.apache.maven.cling.executor;
 
+import java.util.Map;
+
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
@@ -26,6 +28,13 @@ import org.apache.maven.api.cli.ExecutorRequest;
  * A tool implementing some common Maven operations.
  */
 public interface ExecutorTool {
+    /**
+     * Performs a diagnostic dump of the environment.
+     *
+     * @param request never {@code null}
+     */
+    Map<String, String> dump(ExecutorRequest.Builder request) throws ExecutorException;
+
     /**
      * Returns the location of local repository, as detected by Maven. The {@code userSettings} param may contain
      * and override (equivalent of {@code -s settings.xml} on CLI).

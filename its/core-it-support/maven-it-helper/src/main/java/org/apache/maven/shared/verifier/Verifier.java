@@ -717,9 +717,17 @@ public class Verifier {
             ExecutorRequest request = builder.build();
             int ret = executorHelper.execute(mode, request);
             if (ret > 0) {
+                String env = "";
+                try {
+                    executorHelper.dump(executorHelper.executorRequest());
+                } catch (Exception e) {
+                    env = "FAILED: " + e.getMessage();
+                }
                 throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
                         + getExecutable() + " "
-                        + request + "\n" + getLogContents(logFile));
+                        + request
+                        + "\n" + env
+                        + "\n" + getLogContents(logFile));
             }
         } catch (ExecutorException e) {
             throw new VerificationException("Failed to execute Maven", e);
