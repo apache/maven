@@ -171,7 +171,7 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
     }
 
     @Override
-    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) {
+    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) throws Exception {
         if (context.eventSpyDispatcher != null) {
             context.eventSpyDispatcher.onEvent(settingsBuilderRequest);
         }
@@ -186,7 +186,6 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
 
     protected void toolchains(C context, MavenExecutionRequest request) throws Exception {
         Path userToolchainsFile = null;
-
         if (context.invokerRequest.options().altUserToolchains().isPresent()) {
             userToolchainsFile = context.cwdResolver.apply(
                     context.invokerRequest.options().altUserToolchains().get());
@@ -204,7 +203,6 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         }
 
         Path installationToolchainsFile = null;
-
         if (context.invokerRequest.options().altInstallationToolchains().isPresent()) {
             installationToolchainsFile = context.cwdResolver.apply(
                     context.invokerRequest.options().altInstallationToolchains().get());

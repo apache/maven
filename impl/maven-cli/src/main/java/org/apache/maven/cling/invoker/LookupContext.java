@@ -86,6 +86,11 @@ public class LookupContext implements AutoCloseable {
     public ContainerCapsule containerCapsule;
     public Lookup lookup;
 
+    // paths user can override from CLI, and we need to set on MavenExReq
+    public Path installationSettingsPath;
+    public Path projectSettingsPath;
+    public Path userSettingsPath;
+
     public boolean interactive;
     public Path localRepositoryPath;
     public Settings effectiveSettings;
