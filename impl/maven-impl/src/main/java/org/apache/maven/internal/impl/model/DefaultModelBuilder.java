@@ -34,7 +34,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -1116,7 +1115,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             result.setActiveExternalProfiles(activeExternalProfiles);
 
             if (!activeExternalProfiles.isEmpty()) {
-                Properties profileProps = new Properties();
+                Map<String, String> profileProps = new HashMap<>();
                 for (Profile profile : activeExternalProfiles) {
                     profileProps.putAll(profile.getProperties());
                 }
@@ -1160,7 +1159,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             List<Profile> activeExternalProfiles = result.getActiveExternalProfiles();
 
             if (!activeExternalProfiles.isEmpty()) {
-                Properties profileProps = new Properties();
+                Map<String, String> profileProps = new HashMap<>();
                 for (Profile profile : activeExternalProfiles) {
                     profileProps.putAll(profile.getProperties());
                 }

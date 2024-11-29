@@ -19,7 +19,6 @@
 package org.apache.maven.internal.impl.model.profile;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.function.Function;
 
 import org.apache.maven.api.model.Model;
@@ -65,12 +64,11 @@ class ConditionParserTest {
 
     private ProfileActivationContext createMockContext() {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext();
-        Properties systemProperties = new Properties();
-        systemProperties.setProperty("os.name", "windows");
-        systemProperties.setProperty("os.arch", "amd64");
-        systemProperties.setProperty("os.version", "10.0");
-        systemProperties.setProperty("java.version", "1.8.0_292");
-        context.setSystemProperties(systemProperties);
+        context.setSystemProperties(Map.of(
+                "os.name", "windows",
+                "os.arch", "amd64",
+                "os.version", "10.0",
+                "java.version", "1.8.0_292"));
         context.setModel(Model.newInstance());
         return context;
     }

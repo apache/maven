@@ -21,8 +21,6 @@ package org.apache.maven.internal.impl.model;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.model.ProfileActivationContext;
@@ -87,18 +85,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      * @param systemProperties The system properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    @SuppressWarnings("unchecked")
-    public DefaultProfileActivationContext setSystemProperties(Properties systemProperties) {
-        return setSystemProperties(toMap(systemProperties));
-    }
-
-    /**
-     * Sets the system properties to use for interpolation and profile activation. The system properties are collected
-     * from the runtime environment like {@link System#getProperties()} and environment variables.
-     *
-     * @param systemProperties The system properties, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
     public DefaultProfileActivationContext setSystemProperties(Map<String, String> systemProperties) {
         this.systemProperties = unmodifiable(systemProperties);
         return this;
@@ -107,19 +93,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     @Override
     public Map<String, String> getUserProperties() {
         return userProperties;
-    }
-
-    /**
-     * Sets the user properties to use for interpolation and profile activation. The user properties have been
-     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
-     * line.
-     *
-     * @param userProperties The user properties, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
-    @SuppressWarnings("unchecked")
-    public DefaultProfileActivationContext setUserProperties(Properties userProperties) {
-        return setUserProperties(toMap(userProperties));
     }
 
     /**
@@ -152,15 +125,5 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     private static Map<String, String> unmodifiable(Map<String, String> map) {
         return map != null ? Collections.unmodifiableMap(map) : Collections.emptyMap();
-    }
-
-    private static Map<String, String> toMap(Properties properties) {
-        if (properties != null && !properties.isEmpty()) {
-            return properties.entrySet().stream()
-                    .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue())));
-
-        } else {
-            return null;
-        }
     }
 }

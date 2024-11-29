@@ -18,7 +18,7 @@
  */
 package org.apache.maven.internal.impl.model.profile;
 
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationProperty;
@@ -49,10 +49,8 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
         return p;
     }
 
-    private Properties newProperties(String key, String value) {
-        Properties props = new Properties();
-        props.setProperty(key, value);
-        return props;
+    private Map<String, String> newProperties(String key, String value) {
+        return Map.of(key, value);
     }
 
     @Test
@@ -158,8 +156,8 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     void testWithValue_UserPropertyDominantOverSystemProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 
-        Properties props1 = newProperties("prop", "value");
-        Properties props2 = newProperties("prop", "other");
+        Map<String, String> props1 = newProperties("prop", "value");
+        Map<String, String> props2 = newProperties("prop", "other");
 
         assertActivation(true, profile, newContext(props1, props2));
 
