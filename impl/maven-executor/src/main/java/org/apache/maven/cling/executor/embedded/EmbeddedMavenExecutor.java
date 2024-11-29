@@ -73,6 +73,7 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
+    private final boolean cacheContexts;
     private final PrintStream originalStdout;
     private final PrintStream originalStderr;
     private final Properties originalProperties;
@@ -80,6 +81,11 @@ public class EmbeddedMavenExecutor implements Executor {
     private final ConcurrentHashMap<Path, Context> contexts;
 
     public EmbeddedMavenExecutor() {
+        this(false);
+    }
+
+    public EmbeddedMavenExecutor(boolean cacheContexts) {
+        this.cacheContexts = cacheContexts;
         this.originalStdout = System.out;
         this.originalStderr = System.err;
         this.originalClassLoader = Thread.currentThread().getContextClassLoader();
@@ -109,6 +115,9 @@ public class EmbeddedMavenExecutor implements Executor {
             System.setErr(originalStderr);
             Thread.currentThread().setContextClassLoader(originalClassLoader);
             System.setProperties(originalProperties);
+            if (!cacheContexts) {
+                doClose(context);
+            }
         }
     }
 
@@ -120,6 +129,15 @@ public class EmbeddedMavenExecutor implements Executor {
     }
 
     protected Context mayCreate(ExecutorRequest executorRequest) {
+        if (cacheContexts) {
+            return contexts.computeIfAbsent(
+                    executorRequest.cwd().toAbsolutePath().toAbsolutePath(), k -> doCreate(executorRequest));
+        } else {
+            return doCreate(executorRequest);
+        }
+    }
+
+    protected Context doCreate(ExecutorRequest executorRequest) {
         Path installation = executorRequest.installationDirectory();
         if (!Files.isDirectory(installation)) {
             throw new IllegalArgumentException("Installation directory must point to existing directory");
@@ -134,84 +152,81 @@ public class EmbeddedMavenExecutor implements Executor {
         if (executorRequest.jvmArguments().isPresent()) {
             throw new IllegalArgumentException(getClass().getSimpleName() + " does not support jvmArguments");
         }
-        return contexts.computeIfAbsent(installation, k -> {
-            Path mavenHome = installation.toAbsolutePath().normalize();
-            Path boot = mavenHome.resolve("boot");
-            Path m2conf = mavenHome.resolve("bin/m2.conf");
-            if (!Files.isDirectory(boot) || !Files.isRegularFile(m2conf)) {
-                throw new IllegalArgumentException("Installation directory does not point to Maven installation");
+        Path mavenHome = installation.toAbsolutePath().normalize();
+        Path boot = mavenHome.resolve("boot");
+        Path m2conf = mavenHome.resolve("bin/m2.conf");
+        if (!Files.isDirectory(boot) || !Files.isRegularFile(m2conf)) {
+            throw new IllegalArgumentException("Installation directory does not point to Maven installation");
+        }
+
+        Properties properties = prepareProperties(executorRequest);
+
+        System.setProperties(properties);
+        URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());
+        Thread.currentThread().setContextClassLoader(bootClassLoader);
+        try {
+            Class<?> launcherClass = bootClassLoader.loadClass("org.codehaus.plexus.classworlds.launcher.Launcher");
+            Object launcher = launcherClass.getDeclaredConstructor().newInstance();
+            Method configure = launcherClass.getMethod("configure", InputStream.class);
+            try (InputStream inputStream = Files.newInputStream(m2conf)) {
+                configure.invoke(launcher, inputStream);
             }
+            Object classWorld = launcherClass.getMethod("getWorld").invoke(launcher);
+            Class<?> cliClass =
+                    (Class<?>) launcherClass.getMethod("getMainClass").invoke(launcher);
+            String version = getMavenVersion(cliClass);
+            Function<ExecutorRequest, Integer> exec;
 
-            Properties properties = prepareProperties(executorRequest);
-
-            System.setProperties(properties);
-            URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());
-            Thread.currentThread().setContextClassLoader(bootClassLoader);
-            try {
-                Class<?> launcherClass = bootClassLoader.loadClass("org.codehaus.plexus.classworlds.launcher.Launcher");
-                Object launcher = launcherClass.getDeclaredConstructor().newInstance();
-                Method configure = launcherClass.getMethod("configure", InputStream.class);
-                try (InputStream inputStream = Files.newInputStream(m2conf)) {
-                    configure.invoke(launcher, inputStream);
-                }
-                Object classWorld = launcherClass.getMethod("getWorld").invoke(launcher);
-                Class<?> cliClass =
-                        (Class<?>) launcherClass.getMethod("getMainClass").invoke(launcher);
-                String version = getMavenVersion(cliClass);
-                Function<ExecutorRequest, Integer> exec;
-
-                if (version.startsWith("3.")) {
-                    // 3.x
-                    Constructor<?> newMavenCli = cliClass.getConstructor(classWorld.getClass());
-                    Object mavenCli = newMavenCli.newInstance(classWorld);
-                    Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
-                    Method doMain = cliClass.getMethod("doMain", parameterTypes);
-                    exec = r -> {
-                        System.setProperties(prepareProperties(r));
+            if (version.startsWith("3.")) {
+                // 3.x
+                Constructor<?> newMavenCli = cliClass.getConstructor(classWorld.getClass());
+                Object mavenCli = newMavenCli.newInstance(classWorld);
+                Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
+                Method doMain = cliClass.getMethod("doMain", parameterTypes);
+                exec = r -> {
+                    System.setProperties(prepareProperties(r));
+                    try {
+                        return (int) doMain.invoke(mavenCli, new Object[] {
+                            r.arguments().toArray(new String[0]), r.cwd().toString(), null, null
+                        });
+                    } catch (Exception e) {
+                        throw new ExecutorException("Failed to execute", e);
+                    }
+                };
+            } else {
+                // assume 4.x
+                Method mainMethod = cliClass.getMethod("main", String[].class, classWorld.getClass());
+                Class<?> ansiConsole = cliClass.getClassLoader().loadClass("org.jline.jansi.AnsiConsole");
+                Field ansiConsoleInstalled = ansiConsole.getDeclaredField("installed");
+                ansiConsoleInstalled.setAccessible(true);
+                exec = r -> {
+                    System.setProperties(prepareProperties(r));
+                    try {
                         try {
-                            return (int) doMain.invoke(mavenCli, new Object[] {
-                                r.arguments().toArray(new String[0]), r.cwd().toString(), null, null
-                            });
-                        } catch (Exception e) {
-                            throw new ExecutorException("Failed to execute", e);
-                        }
-                    };
-                } else {
-                    // assume 4.x
-                    Method mainMethod = cliClass.getMethod("main", String[].class, classWorld.getClass());
-                    Class<?> ansiConsole = cliClass.getClassLoader().loadClass("org.jline.jansi.AnsiConsole");
-                    Field ansiConsoleInstalled = ansiConsole.getDeclaredField("installed");
-                    ansiConsoleInstalled.setAccessible(true);
-                    exec = r -> {
-                        System.setProperties(prepareProperties(r));
-                        try {
-                            try {
-                                if (r.stdoutConsumer().isPresent()
-                                        || r.stderrConsumer().isPresent()) {
-                                    ansiConsoleInstalled.set(null, 1);
-                                }
-                                return (int)
-                                        mainMethod.invoke(null, r.arguments().toArray(new String[0]), classWorld);
-                            } finally {
-                                if (r.stdoutConsumer().isPresent()
-                                        || r.stderrConsumer().isPresent()) {
-                                    ansiConsoleInstalled.set(null, 0);
-                                }
+                            if (r.stdoutConsumer().isPresent()
+                                    || r.stderrConsumer().isPresent()) {
+                                ansiConsoleInstalled.set(null, 1);
                             }
-                        } catch (Exception e) {
-                            throw new ExecutorException("Failed to execute", e);
+                            return (int) mainMethod.invoke(null, r.arguments().toArray(new String[0]), classWorld);
+                        } finally {
+                            if (r.stdoutConsumer().isPresent()
+                                    || r.stderrConsumer().isPresent()) {
+                                ansiConsoleInstalled.set(null, 0);
+                            }
                         }
-                    };
-                }
-
-                return new Context(bootClassLoader, version, classWorld, cliClass.getClassLoader(), exec);
-            } catch (Exception e) {
-                throw new ExecutorException("Failed to create executor", e);
-            } finally {
-                Thread.currentThread().setContextClassLoader(originalClassLoader);
-                System.setProperties(originalProperties);
+                    } catch (Exception e) {
+                        throw new ExecutorException("Failed to execute", e);
+                    }
+                };
             }
-        });
+
+            return new Context(bootClassLoader, version, classWorld, cliClass.getClassLoader(), exec);
+        } catch (Exception e) {
+            throw new ExecutorException("Failed to create executor", e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
+            System.setProperties(originalProperties);
+        }
     }
 
     private Properties prepareProperties(ExecutorRequest request) {
@@ -257,7 +272,7 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
-    protected void doClose(Context context) throws Exception {
+    protected void doClose(Context context) throws ExecutorException {
         Thread.currentThread().setContextClassLoader(context.bootClassLoader);
         try {
             try {
@@ -265,6 +280,8 @@ public class EmbeddedMavenExecutor implements Executor {
             } finally {
                 context.bootClassLoader.close();
             }
+        } catch (Exception e) {
+            throw new ExecutorException("Failed to close cleanly", e);
         } finally {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }

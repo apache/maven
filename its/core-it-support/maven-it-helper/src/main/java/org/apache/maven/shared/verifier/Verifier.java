@@ -56,7 +56,7 @@ import static java.util.Objects.requireNonNull;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class Verifier {
-    private static final ExecutorHelper HELPER =
+    public static final ExecutorHelper HELPER =
             new HelperImpl(ExecutorHelper.Mode.AUTO, Paths.get(System.getProperty("maven.home")));
 
     private static final String LOG_FILENAME = "log.txt";
