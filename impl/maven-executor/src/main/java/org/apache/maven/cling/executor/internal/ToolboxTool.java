@@ -34,7 +34,8 @@ import org.apache.maven.cling.executor.ExecutorTool;
 import static java.util.Objects.requireNonNull;
 
 /**
- * {@link ExecutorTool} implementation based on Maveniverse Toolbox.
+ * {@link ExecutorTool} implementation based on Maveniverse Toolbox. It uses Toolbox mojo to implement all the
+ * required operations.
  *
  * @see <a href="https://github.com/maveniverse/toolbox">Maveniverse Toolbox</a>
  */
@@ -117,6 +118,9 @@ public class ToolboxTool implements ExecutorTool {
     }
 
     private ExecutorRequest.Builder mojo(ExecutorRequest.Builder builder, String mojo) {
+        if (helper.mavenVersion().startsWith("4.")) {
+            builder.argument("--raw-streams");
+        }
         return builder.argument(TOOLBOX + mojo).argument("--quiet").argument("-DforceStdout");
     }
 

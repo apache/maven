@@ -107,35 +107,23 @@ public class HelperImpl implements ExecutorHelper {
 
     @Override
     public Map<String, String> dump(ExecutorRequest.Builder request) throws ExecutorException {
-        if (mavenVersion().startsWith("4.")) {
-            request.argument("--raw-streams");
-        }
         return executorTool.dump(request);
     }
 
     @Override
     public String localRepository(ExecutorRequest.Builder request) throws ExecutorException {
-        if (mavenVersion().startsWith("4.")) {
-            request.argument("--raw-streams");
-        }
         return executorTool.localRepository(request);
     }
 
     @Override
     public String artifactPath(ExecutorRequest.Builder request, String gav, String repositoryId)
             throws ExecutorException {
-        if (mavenVersion().startsWith("4.")) {
-            request.argument("--raw-streams");
-        }
         return executorTool.artifactPath(request, gav, repositoryId);
     }
 
     @Override
     public String metadataPath(ExecutorRequest.Builder request, String gav, String repositoryId)
             throws ExecutorException {
-        if (mavenVersion().startsWith("4.")) {
-            request.argument("--raw-streams");
-        }
         return executorTool.metadataPath(request, gav, repositoryId);
     }
 

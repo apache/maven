@@ -138,8 +138,8 @@ public class EmbeddedMavenExecutor implements Executor {
     }
 
     protected Context doCreate(ExecutorRequest executorRequest) {
-        Path installation = executorRequest.installationDirectory();
-        if (!Files.isDirectory(installation)) {
+        Path mavenHome = ExecutorRequest.getCanonicalPath(executorRequest.installationDirectory());
+        if (!Files.isDirectory(mavenHome)) {
             throw new IllegalArgumentException("Installation directory must point to existing directory");
         }
         if (!Objects.equals(executorRequest.command(), ExecutorRequest.MVN)) {
@@ -152,7 +152,6 @@ public class EmbeddedMavenExecutor implements Executor {
         if (executorRequest.jvmArguments().isPresent()) {
             throw new IllegalArgumentException(getClass().getSimpleName() + " does not support jvmArguments");
         }
-        Path mavenHome = installation.toAbsolutePath().normalize();
         Path boot = mavenHome.resolve("boot");
         Path m2conf = mavenHome.resolve("bin/m2.conf");
         if (!Files.isDirectory(boot) || !Files.isRegularFile(m2conf)) {
@@ -233,13 +232,13 @@ public class EmbeddedMavenExecutor implements Executor {
         Path mavenHome = ExecutorRequest.getCanonicalPath(request.installationDirectory());
         Properties properties = new Properties();
         properties.putAll(System.getProperties());
-        properties.put("user.dir", request.cwd().toAbsolutePath().normalize().toString());
+        properties.put("user.dir", ExecutorRequest.getCanonicalPath(request.cwd()).toString());
         properties.put(
                 "maven.multiModuleProjectDirectory",
-                request.cwd().toAbsolutePath().normalize().toString());
+                ExecutorRequest.getCanonicalPath(request.cwd()).toString());
         properties.put(
                 "user.home",
-                request.userHomeDirectory().toAbsolutePath().normalize().toString());
+                ExecutorRequest.getCanonicalPath(request.userHomeDirectory()).toString());
         properties.put("maven.home", mavenHome.toString());
         properties.put("maven.mainClass", "org.apache.maven.cling.MavenCling");
         properties.put(
