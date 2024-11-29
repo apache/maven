@@ -124,6 +124,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected int doInvoke(C context) throws Exception {
         pushCoreProperties(context);
+        pushUserProperties(context);
         validate(context);
         prepare(context);
         configureLogging(context);
@@ -133,7 +134,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         preCommands(context);
         container(context);
         postContainer(context);
-        pushUserProperties(context);
+        pushUserProperties(context); // after PropertyContributor SPI
         lookup(context);
         init(context);
         postCommands(context);
@@ -165,12 +166,27 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 context.invokerRequest.installationDirectory().toString());
     }
 
+    /**
+     * Note: this method is called twice from {@link #doInvoke(LookupContext)} and modifies context. First invocation
+     * when {@link LookupContext#pushedUserProperties} is null will push user properties IF key does not already
+     * exist among Java System Properties, and collects all they key it pushes. Second invocation happens AFTER
+     * {@link PropertyContributor} SPI invocation, and "refreshes" already pushed user properties by re-writing them
+     * as SPI may have modified them.
+     */
     protected void pushUserProperties(C context) throws Exception {
         ProtoSession protoSession = context.protoSession;
         HashSet<String> sys = new HashSet<>(protoSession.getSystemProperties().keySet());
-        protoSession.getUserProperties().entrySet().stream()
-                .filter(k -> !sys.contains(k.getKey()))
-                .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+        if (context.pushedUserProperties == null) {
+            context.pushedUserProperties = new HashSet<>();
+            protoSession.getUserProperties().entrySet().stream()
+                    .filter(k -> !sys.contains(k.getKey()))
+                    .peek(k -> context.pushedUserProperties.add(k.getKey()))
+                    .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+        } else {
+            protoSession.getUserProperties().entrySet().stream()
+                    .filter(k -> context.pushedUserProperties.contains(k.getKey()) || !sys.contains(k.getKey()))
+                    .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+        }
     }
 
     protected void validate(C context) throws Exception {}
