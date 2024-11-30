@@ -29,6 +29,9 @@ public interface ExecutionEvent {
 
     /**
      * The possible types of execution events.
+     *
+     * Note: do not modify this enum, or, make sure that this enum and
+     * {@link org.apache.maven.api.EventType} have same elements in same order.
      */
     enum Type {
         ProjectDiscoveryStarted,

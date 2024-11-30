@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -72,6 +73,8 @@ public class LookupContext implements AutoCloseable {
 
     // this one "evolves" as process progresses (instance is immutable but instances are replaced)
     public ProtoSession protoSession;
+    // here we track which user properties we pushed to Java System Properties (internal only)
+    public Set<String> pushedUserProperties;
 
     public Logger logger;
     public ILoggerFactory loggerFactory;
@@ -82,6 +85,11 @@ public class LookupContext implements AutoCloseable {
     public Consumer<String> writer;
     public ContainerCapsule containerCapsule;
     public Lookup lookup;
+
+    // paths user can override from CLI, and we need to set on MavenExReq
+    public Path installationSettingsPath;
+    public Path projectSettingsPath;
+    public Path userSettingsPath;
 
     public boolean interactive;
     public Path localRepositoryPath;

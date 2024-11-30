@@ -124,6 +124,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected int doInvoke(C context) throws Exception {
         pushCoreProperties(context);
+        pushUserProperties(context);
         validate(context);
         prepare(context);
         configureLogging(context);
@@ -133,7 +134,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         preCommands(context);
         container(context);
         postContainer(context);
-        pushUserProperties(context);
+        pushUserProperties(context); // after PropertyContributor SPI
         lookup(context);
         init(context);
         postCommands(context);
@@ -165,12 +166,27 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 context.invokerRequest.installationDirectory().toString());
     }
 
+    /**
+     * Note: this method is called twice from {@link #doInvoke(LookupContext)} and modifies context. First invocation
+     * when {@link LookupContext#pushedUserProperties} is null will push user properties IF key does not already
+     * exist among Java System Properties, and collects all they key it pushes. Second invocation happens AFTER
+     * {@link PropertyContributor} SPI invocation, and "refreshes" already pushed user properties by re-writing them
+     * as SPI may have modified them.
+     */
     protected void pushUserProperties(C context) throws Exception {
         ProtoSession protoSession = context.protoSession;
         HashSet<String> sys = new HashSet<>(protoSession.getSystemProperties().keySet());
-        protoSession.getUserProperties().entrySet().stream()
-                .filter(k -> !sys.contains(k.getKey()))
-                .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+        if (context.pushedUserProperties == null) {
+            context.pushedUserProperties = new HashSet<>();
+            protoSession.getUserProperties().entrySet().stream()
+                    .filter(k -> !sys.contains(k.getKey()))
+                    .peek(k -> context.pushedUserProperties.add(k.getKey()))
+                    .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+        } else {
+            protoSession.getUserProperties().entrySet().stream()
+                    .filter(k -> context.pushedUserProperties.contains(k.getKey()) || !sys.contains(k.getKey()))
+                    .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+        }
     }
 
     protected void validate(C context) throws Exception {}
@@ -434,8 +450,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void settings(C context, SettingsBuilder settingsBuilder) throws Exception {
         Options mavenOptions = context.invokerRequest.options();
-        Path userSettingsFile = null;
 
+        Path userSettingsFile = null;
         if (mavenOptions.altUserSettings().isPresent()) {
             userSettingsFile =
                     context.cwdResolver.apply(mavenOptions.altUserSettings().get());
@@ -452,7 +468,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         Path projectSettingsFile = null;
-
         if (mavenOptions.altProjectSettings().isPresent()) {
             projectSettingsFile =
                     context.cwdResolver.apply(mavenOptions.altProjectSettings().get());
@@ -470,7 +485,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         Path installationSettingsFile = null;
-
         if (mavenOptions.altInstallationSettings().isPresent()) {
             installationSettingsFile = context.cwdResolver.apply(
                     mavenOptions.altInstallationSettings().get());
@@ -486,6 +500,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 installationSettingsFile = context.installationResolver.apply(installationSettingsFileStr);
             }
         }
+
+        context.installationSettingsPath = installationSettingsFile;
+        context.projectSettingsPath = projectSettingsFile;
+        context.userSettingsPath = userSettingsFile;
 
         Function<String, String> interpolationSource = Interpolator.chain(
                 context.protoSession.getUserProperties()::get, context.protoSession.getSystemProperties()::get);
@@ -591,6 +609,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         request.setBaseDirectory(context.invokerRequest.topDirectory().toFile());
         request.setSystemProperties(toProperties(context.protoSession.getSystemProperties()));
         request.setUserProperties(toProperties(context.protoSession.getUserProperties()));
+
+        request.setInstallationSettingsFile(
+                context.installationSettingsPath != null ? context.installationSettingsPath.toFile() : null);
+        request.setProjectSettingsFile(
+                context.projectSettingsPath != null ? context.projectSettingsPath.toFile() : null);
+        request.setUserSettingsFile(context.userSettingsPath != null ? context.userSettingsPath.toFile() : null);
 
         request.setTopDirectory(context.invokerRequest.topDirectory());
         if (context.invokerRequest.rootDirectory().isPresent()) {

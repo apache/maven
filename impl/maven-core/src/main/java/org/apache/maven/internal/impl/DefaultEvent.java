@@ -30,15 +30,17 @@ import org.apache.maven.execution.ExecutionEvent;
 public class DefaultEvent implements Event {
     private final InternalMavenSession session;
     private final ExecutionEvent delegate;
+    private final EventType eventType;
 
-    public DefaultEvent(InternalMavenSession session, ExecutionEvent delegate) {
+    public DefaultEvent(InternalMavenSession session, ExecutionEvent delegate, EventType eventType) {
         this.session = session;
         this.delegate = delegate;
+        this.eventType = eventType;
     }
 
     @Override
     public EventType getType() {
-        return EventType.valueOf(delegate.getType().name());
+        return eventType;
     }
 
     @Override
