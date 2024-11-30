@@ -129,16 +129,15 @@ public class EmbeddedMavenExecutor implements Executor {
     }
 
     protected Context mayCreate(ExecutorRequest executorRequest) {
+        Path mavenHome = ExecutorRequest.getCanonicalPath(executorRequest.installationDirectory());
         if (cacheContexts) {
-            return contexts.computeIfAbsent(
-                    executorRequest.cwd().toAbsolutePath().toAbsolutePath(), k -> doCreate(executorRequest));
+            return contexts.computeIfAbsent(mavenHome, k -> doCreate(mavenHome, executorRequest));
         } else {
-            return doCreate(executorRequest);
+            return doCreate(mavenHome, executorRequest);
         }
     }
 
-    protected Context doCreate(ExecutorRequest executorRequest) {
-        Path mavenHome = ExecutorRequest.getCanonicalPath(executorRequest.installationDirectory());
+    protected Context doCreate(Path mavenHome, ExecutorRequest executorRequest) {
         if (!Files.isDirectory(mavenHome)) {
             throw new IllegalArgumentException("Installation directory must point to existing directory");
         }
