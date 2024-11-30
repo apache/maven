@@ -81,7 +81,7 @@ public class EmbeddedMavenExecutor implements Executor {
     private final ConcurrentHashMap<Path, Context> contexts;
 
     public EmbeddedMavenExecutor() {
-        this(false);
+        this(true);
     }
 
     public EmbeddedMavenExecutor(boolean cacheContexts) {
