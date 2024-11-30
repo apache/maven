@@ -24,6 +24,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.MavenProject;
@@ -39,6 +40,8 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
     private final Map<MavenProject, ?> whiteList;
 
     private final List<MavenProject> sortedProjects;
+
+    private final ConcurrentHashMap<String, List<MavenProject>> cache;
 
     /**
      * Creates a new project dependency graph from the specified graph.
@@ -57,6 +60,7 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
         this.sortedProjects = projectDependencyGraph.getSortedProjects().stream()
                 .filter(this.whiteList::containsKey)
                 .toList();
+        this.cache = new ConcurrentHashMap<>();
     }
 
     /**
@@ -74,12 +78,22 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
 
     @Override
     public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
-        return applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive), transitive, false);
+        // key = 'ds' + project GAV + transitive
+        String key = "ds:" + project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion() + ":"
+                + transitive;
+        return cache.computeIfAbsent(
+                key,
+                k -> applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive), transitive, false));
     }
 
     @Override
     public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
-        return applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive), transitive, true);
+        // key = 'us' + project GAV + transitive
+        String key = "us:" + project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion() + ":"
+                + transitive;
+        return cache.computeIfAbsent(
+                key,
+                k -> applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive), transitive, true));
     }
 
     /**
