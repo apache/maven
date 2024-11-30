@@ -232,7 +232,8 @@ public class EmbeddedMavenExecutor implements Executor {
         Path mavenHome = ExecutorRequest.getCanonicalPath(request.installationDirectory());
         Properties properties = new Properties();
         properties.putAll(System.getProperties());
-        properties.put("user.dir", ExecutorRequest.getCanonicalPath(request.cwd()).toString());
+        properties.put(
+                "user.dir", ExecutorRequest.getCanonicalPath(request.cwd()).toString());
         properties.put(
                 "maven.multiModuleProjectDirectory",
                 ExecutorRequest.getCanonicalPath(request.cwd()).toString());
