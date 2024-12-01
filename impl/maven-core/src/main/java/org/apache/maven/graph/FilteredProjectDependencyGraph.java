@@ -80,6 +80,8 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
     @Override
     public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
         Key key = new Key(project, transitive, false);
+        // Do not use computeIfAbsent here, as the computation is recursive
+        // and this is not supported by computeIfAbsent.
         List<MavenProject> list = cache.get(key);
         if (list == null) {
             list = applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive), transitive, false);
@@ -91,6 +93,8 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
     @Override
     public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
         Key key = new Key(project, transitive, true);
+        // Do not use computeIfAbsent here, as the computation is recursive
+        // and this is not supported by computeIfAbsent.
         List<MavenProject> list = cache.get(key);
         if (list == null) {
             list = applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive), transitive, true);
