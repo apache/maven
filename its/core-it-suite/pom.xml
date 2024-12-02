@@ -640,28 +640,6 @@ under the License.
       </build>
     </profile>
     <profile>
-      <id>maven-repo-local-layout</id>
-      <activation>
-        <property>
-          <name>maven.repo.local.layout</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <!-- Pass this through to the tests (if set!) to have them
-                  pick the right repository layout -->
-                <maven.repo.local.layout>${maven.repo.local.layout}</maven.repo.local.layout>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>jdk-properties</id>
       <activation>
         <jdk>(,1.8)</jdk>
