@@ -32,9 +32,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -56,6 +58,7 @@ public class EmbeddedMavenExecutor implements Executor {
         private final URLClassLoader bootClassLoader;
         private final String version;
         private final Object classWorld;
+        private final Set<String> originalClassRealmIds;
         private final ClassLoader tccl;
         private final Function<ExecutorRequest, Integer> exec;
 
@@ -63,11 +66,13 @@ public class EmbeddedMavenExecutor implements Executor {
                 URLClassLoader bootClassLoader,
                 String version,
                 Object classWorld,
+                Set<String> originalClassRealmIds,
                 ClassLoader tccl,
                 Function<ExecutorRequest, Integer> exec) {
             this.bootClassLoader = bootClassLoader;
             this.version = version;
             this.classWorld = classWorld;
+            this.originalClassRealmIds = originalClassRealmIds;
             this.tccl = tccl;
             this.exec = exec;
         }
@@ -111,13 +116,33 @@ public class EmbeddedMavenExecutor implements Executor {
         } catch (Exception e) {
             throw new ExecutorException("Failed to execute", e);
         } finally {
-            System.setOut(originalStdout);
-            System.setErr(originalStderr);
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-            System.setProperties(originalProperties);
-            if (!cacheContexts) {
-                doClose(context);
+            try {
+                disposeRuntimeCreatedRealms(context);
+            } finally {
+                System.setOut(originalStdout);
+                System.setErr(originalStderr);
+                Thread.currentThread().setContextClassLoader(originalClassLoader);
+                System.setProperties(originalProperties);
+                if (!cacheContexts) {
+                    doClose(context);
+                }
             }
+        }
+    }
+
+    private void disposeRuntimeCreatedRealms(Context context) {
+        try {
+            Method getRealms = context.classWorld.getClass().getMethod("getRealms");
+            Method disposeRealm = context.classWorld.getClass().getMethod("disposeRealm", String.class);
+            List<Object> realms = (List<Object>) getRealms.invoke(context.classWorld);
+            for (Object realm : realms) {
+                String realmId = (String) realm.getClass().getMethod("getId").invoke(realm);
+                if (!context.originalClassRealmIds.contains(realmId)) {
+                    disposeRealm.invoke(context.classWorld, realmId);
+                }
+            }
+        } catch (Exception e) {
+            throw new ExecutorException("Failed to dispose runtime created realms", e);
         }
     }
 
@@ -170,6 +195,16 @@ public class EmbeddedMavenExecutor implements Executor {
                 configure.invoke(launcher, inputStream);
             }
             Object classWorld = launcherClass.getMethod("getWorld").invoke(launcher);
+            Set<String> originalClassRealmIds = new HashSet<>();
+
+            // collect pre-created (in m2.conf) class realms as "original ones"; the rest are created at runtime
+            Method getRealms = classWorld.getClass().getMethod("getRealms");
+            List<Object> realms = (List<Object>) getRealms.invoke(classWorld);
+            for (Object realm : realms) {
+                Method realmGetId = realm.getClass().getMethod("getId");
+                originalClassRealmIds.add((String) realmGetId.invoke(realm));
+            }
+
             Class<?> cliClass =
                     (Class<?>) launcherClass.getMethod("getMainClass").invoke(launcher);
             String version = getMavenVersion(cliClass);
@@ -218,7 +253,8 @@ public class EmbeddedMavenExecutor implements Executor {
                 };
             }
 
-            return new Context(bootClassLoader, version, classWorld, cliClass.getClassLoader(), exec);
+            return new Context(
+                    bootClassLoader, version, classWorld, originalClassRealmIds, cliClass.getClassLoader(), exec);
         } catch (Exception e) {
             throw new ExecutorException("Failed to create executor", e);
         } finally {
