@@ -20,7 +20,7 @@ package org.apache.maven.internal.impl.model.profile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
@@ -33,8 +33,6 @@ import org.apache.maven.internal.impl.DefaultVersionParser;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultProfileActivationContext;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
-import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -55,10 +53,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     @Override
     void setUp() throws Exception {
         activator = new ConditionProfileActivator(
-                new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme())),
-                new ProfileActivationFilePathInterpolator(
-                        new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator()),
-                new DefaultRootLocator());
+                new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme())));
 
         Path file = tempDir.resolve("file.txt");
         Files.createFile(file);
@@ -74,10 +69,8 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         return p;
     }
 
-    private Properties newJdkProperties(String javaVersion) {
-        Properties props = new Properties();
-        props.setProperty("java.version", javaVersion);
-        return props;
+    private Map<String, String> newJdkProperties(String javaVersion) {
+        return Map.of("java.version", javaVersion);
     }
 
     @Test
@@ -223,12 +216,8 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
                 problems.getWarnings().toString());
     }
 
-    private Properties newOsProperties(String osName, String osVersion, String osArch) {
-        Properties props = new Properties();
-        props.setProperty("os.name", osName);
-        props.setProperty("os.version", osVersion);
-        props.setProperty("os.arch", osArch);
-        return props;
+    private Map<String, String> newOsProperties(String osName, String osVersion, String osArch) {
+        return Map.of("os.name", osName, "os.version", osVersion, "os.arch", osArch);
     }
 
     @Test
@@ -323,10 +312,8 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         assertActivation(true, profile, newContext(null, newOsProperties("Mac OS X", "14.5", "aarch64")));
     }
 
-    private Properties newPropProperties(String key, String value) {
-        Properties props = new Properties();
-        props.setProperty(key, value);
-        return props;
+    private Map<String, String> newPropProperties(String key, String value) {
+        return Map.of(key, value);
     }
 
     @Test
@@ -405,8 +392,8 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     void testPropWithValue_UserPropertyDominantOverSystemProperty() throws Exception {
         Profile profile = newProfile("${prop} == 'value'");
 
-        Properties props1 = newPropProperties("prop", "value");
-        Properties props2 = newPropProperties("prop", "other");
+        Map<String, String> props1 = newPropProperties("prop", "value");
+        Map<String, String> props2 = newPropProperties("prop", "other");
 
         assertActivation(true, profile, newContext(props1, props2));
         assertActivation(false, profile, newContext(props2, props1));
@@ -492,7 +479,9 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     protected ProfileActivationContext newFileContext(Path path) {
-        DefaultProfileActivationContext context = new DefaultProfileActivationContext();
+        DefaultProfileActivationContext context = new DefaultProfileActivationContext(
+                new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator());
+
         context.setModel(Model.newBuilder().pomFile(path.resolve("pom.xml")).build());
         return context;
     }

@@ -37,6 +37,7 @@ import static java.util.Objects.nonNull;
  * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code
  * should not be necessary as unit test but should be run during site generation (Velocity? Doxia macro?)
  */
+@Deprecated
 class CLIManagerDocumentationTest {
     private static final String LS = System.lineSeparator();
 

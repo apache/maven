@@ -69,12 +69,12 @@ public class PropertyProfileActivator implements ProfileActivator {
             return false;
         }
 
-        String sysValue = context.getUserProperties().get(name);
+        String sysValue = context.getUserProperty(name);
         if (sysValue == null && "packaging".equals(name)) {
-            sysValue = context.getModel().getPackaging();
+            sysValue = context.getModelPackaging();
         }
         if (sysValue == null) {
-            sysValue = context.getSystemProperties().get(name);
+            sysValue = context.getSystemProperty(name);
         }
 
         String propValue = property.getValue();

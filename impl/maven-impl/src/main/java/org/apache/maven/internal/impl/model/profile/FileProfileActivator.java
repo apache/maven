@@ -18,21 +18,17 @@
  */
 package org.apache.maven.internal.impl.model.profile;
 
-import java.io.File;
-
-import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.BuilderProblem;
-import org.apache.maven.api.services.InterpolatorException;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 
 /**
  * Determines profile activation based on the existence/absence of some file.
@@ -45,13 +41,6 @@ import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolato
 @Named("file")
 @Singleton
 public class FileProfileActivator implements ProfileActivator {
-
-    private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
-
-    @Inject
-    public FileProfileActivator(ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator) {
-        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
-    }
 
     @Override
     public boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
@@ -92,30 +81,19 @@ public class FileProfileActivator implements ProfileActivator {
             return false;
         }
 
+        boolean fileExists;
         try {
-            path = profileActivationFilePathInterpolator.interpolate(path, context);
-        } catch (InterpolatorException e) {
+            fileExists = context.exists(path, false);
+        } catch (MavenException e) {
             problems.add(
                     BuilderProblem.Severity.ERROR,
                     ModelProblem.Version.BASE,
-                    "Failed to interpolate file location " + path + " for profile " + profile.getId() + ": "
+                    "Failed to check file existence " + path + " for profile " + profile.getId() + ": "
                             + e.getMessage(),
                     file.getLocation(missing ? "missing" : "exists"),
                     e);
             return false;
         }
-
-        if (path == null) {
-            return false;
-        }
-
-        File f = new File(path);
-
-        if (!f.isAbsolute()) {
-            return false;
-        }
-
-        boolean fileExists = f.exists();
 
         return missing != fileExists;
     }

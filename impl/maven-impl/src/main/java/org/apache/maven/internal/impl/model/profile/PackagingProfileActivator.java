@@ -47,7 +47,7 @@ public class PackagingProfileActivator implements ProfileActivator {
     }
 
     private static boolean isPackaging(ProfileActivationContext context, String p) {
-        String packaging = context.getModel().getPackaging();
+        String packaging = context.getModelPackaging();
         return Objects.equals(p, packaging);
     }
 
