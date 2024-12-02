@@ -240,6 +240,8 @@ public class EmbeddedMavenExecutor implements Executor {
                                     || r.stderrConsumer().isPresent()) {
                                 ansiConsoleInstalled.set(null, 1);
                             }
+                            // CWD
+                            System.setProperty("user.dir", r.cwd().toString());
                             return (int) mainMethod.invoke(null, r.arguments().toArray(new String[0]), classWorld);
                         } finally {
                             if (r.stdoutConsumer().isPresent()
