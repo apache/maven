@@ -515,6 +515,7 @@ under the License.
           <forkCount>0</forkCount>
           <reuseForks>true</reuseForks>
           <skip>true</skip>
+          <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
             <maven.version>${maven.version}</maven.version>
             <maven.home>${preparedMavenHome}</maven.home>
@@ -560,7 +561,7 @@ under the License.
         <dependency>
           <groupId>org.apache.maven</groupId>
           <artifactId>apache-maven</artifactId>
-          <version>4.0.0-beta-6-SNAPSHOT</version>
+          <version>${maven-version}</version>
           <classifier>bin</classifier>
           <type>zip</type>
         </dependency>
