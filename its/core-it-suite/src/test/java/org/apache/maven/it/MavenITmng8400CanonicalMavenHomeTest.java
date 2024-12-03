@@ -62,6 +62,8 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
         verifier.addCliArgument("-DforceStdout");
         verifier.addCliArgument("-DasProperties");
         verifier.addCliArgument("eu.maveniverse.maven.plugins:toolbox:0.5.2:gav-dump");
+        // TODO: fork until new entry point CLIng is used
+        verifier.setForkJvm(true);
         verifier.execute();
 
         String dump = verifier.loadLogContent();
