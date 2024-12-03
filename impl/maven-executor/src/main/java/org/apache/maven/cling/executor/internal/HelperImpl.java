@@ -19,7 +19,6 @@
 package org.apache.maven.cling.executor.internal;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,27 +31,22 @@ import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.ExecutorHelper;
 import org.apache.maven.cling.executor.ExecutorTool;
-import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
-import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Helper class for some common tasks.
+ * Helper class for some common tasks. This class statically holds instances of (stateless) embedded and forked
+ * executors. The goal is to keep embedded alive as needed, as it keeps "hot" Maven.
  */
 public class HelperImpl implements ExecutorHelper {
     private final Mode defaultMode;
     private final Path installationDirectory;
     private final ExecutorTool executorTool;
-    private final HashMap<String, Executor> executors;
+    private final HashMap<Mode, Executor> executors;
 
     private final ConcurrentHashMap<String, String> cache;
 
-    public HelperImpl(@Nullable Path installationDirectory) {
-        this(Mode.AUTO, installationDirectory);
-    }
-
-    public HelperImpl(Mode defaultMode, @Nullable Path installationDirectory) {
+    public HelperImpl(Mode defaultMode, @Nullable Path installationDirectory, Executor embedded, Executor forked) {
         this.defaultMode = requireNonNull(defaultMode);
         this.installationDirectory = installationDirectory != null
                 ? ExecutorRequest.getCanonicalPath(installationDirectory)
@@ -60,8 +54,8 @@ public class HelperImpl implements ExecutorHelper {
         this.executorTool = new ToolboxTool(this);
         this.executors = new HashMap<>();
 
-        this.executors.put(EmbeddedMavenExecutor.class.getSimpleName(), new EmbeddedMavenExecutor());
-        this.executors.put(ForkedMavenExecutor.class.getSimpleName(), new ForkedMavenExecutor());
+        this.executors.put(Mode.EMBEDDED, requireNonNull(embedded, "embedded"));
+        this.executors.put(Mode.FORKED, requireNonNull(forked, "forked"));
         this.cache = new ConcurrentHashMap<>();
     }
 
@@ -78,23 +72,6 @@ public class HelperImpl implements ExecutorHelper {
     @Override
     public int execute(Mode mode, ExecutorRequest executorRequest) throws ExecutorException {
         return getExecutor(mode, executorRequest).execute(executorRequest);
-    }
-
-    @Override
-    public void close() throws ExecutorException {
-        ArrayList<Exception> exceptions = new ArrayList<>();
-        for (Executor executor : executors.values()) {
-            try {
-                executor.close();
-            } catch (Exception e) {
-                exceptions.add(e);
-            }
-        }
-        if (!exceptions.isEmpty()) {
-            ExecutorException e = new ExecutorException("Could not cleanly close");
-            exceptions.forEach(e::addSuppressed);
-            throw e;
-        }
     }
 
     @Override
@@ -130,8 +107,8 @@ public class HelperImpl implements ExecutorHelper {
     protected Executor getExecutor(Mode mode, ExecutorRequest request) throws ExecutorException {
         return switch (mode) {
             case AUTO -> getExecutorByRequest(request);
-            case EMBEDDED -> executors.get(EmbeddedMavenExecutor.class.getSimpleName());
-            case FORKED -> executors.get(ForkedMavenExecutor.class.getSimpleName());
+            case EMBEDDED -> executors.get(Mode.EMBEDDED);
+            case FORKED -> executors.get(Mode.FORKED);
         };
     }
 

@@ -51,12 +51,12 @@ public class ToolboxTool implements ExecutorTool {
     @Override
     public Map<String, String> dump(ExecutorRequest.Builder executorRequest) throws ExecutorException {
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-        ExecutorRequest.Builder builder =
-                mojo(executorRequest, "gav-dump").argument("-DasProperties").stdoutConsumer(stdout);
-        int ec = helper.execute(builder.build());
-        if (ec != 0) {
-            throw new ExecutorException("Unexpected exit code=" + ec);
-        }
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+        ExecutorRequest.Builder builder = mojo(executorRequest, "gav-dump")
+                .argument("-DasProperties")
+                .stdoutConsumer(stdout)
+                .stderrConsumer(stderr);
+        doExecute(builder);
         try {
             Properties properties = new Properties();
             properties.load(new ByteArrayInputStream(stdout.toByteArray()));
@@ -74,12 +74,11 @@ public class ToolboxTool implements ExecutorTool {
     @Override
     public String localRepository(ExecutorRequest.Builder executorRequest) throws ExecutorException {
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-        ExecutorRequest.Builder builder =
-                mojo(executorRequest, "gav-local-repository-path").stdoutConsumer(stdout);
-        int ec = helper.execute(builder.build());
-        if (ec != 0) {
-            throw new ExecutorException("Unexpected exit code=" + ec);
-        }
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+        ExecutorRequest.Builder builder = mojo(executorRequest, "gav-local-repository-path")
+                .stdoutConsumer(stdout)
+                .stderrConsumer(stderr);
+        doExecute(builder);
         return shaveStdout(stdout);
     }
 
@@ -87,16 +86,15 @@ public class ToolboxTool implements ExecutorTool {
     public String artifactPath(ExecutorRequest.Builder executorRequest, String gav, String repositoryId)
             throws ExecutorException {
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
         ExecutorRequest.Builder builder = mojo(executorRequest, "gav-artifact-path")
                 .argument("-Dgav=" + gav)
-                .stdoutConsumer(stdout);
+                .stdoutConsumer(stdout)
+                .stderrConsumer(stderr);
         if (repositoryId != null) {
             builder.argument("-Drepository=" + repositoryId + "::unimportant");
         }
-        int ec = helper.execute(builder.build());
-        if (ec != 0) {
-            throw new ExecutorException("Unexpected exit code=" + ec);
-        }
+        doExecute(builder);
         return shaveStdout(stdout);
     }
 
@@ -104,16 +102,15 @@ public class ToolboxTool implements ExecutorTool {
     public String metadataPath(ExecutorRequest.Builder executorRequest, String gav, String repositoryId)
             throws ExecutorException {
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        ByteArrayOutputStream stderr = new ByteArrayOutputStream();
         ExecutorRequest.Builder builder = mojo(executorRequest, "gav-metadata-path")
                 .argument("-Dgav=" + gav)
-                .stdoutConsumer(stdout);
+                .stdoutConsumer(stdout)
+                .stderrConsumer(stderr);
         if (repositoryId != null) {
             builder.argument("-Drepository=" + repositoryId + "::unimportant");
         }
-        int ec = helper.execute(builder.build());
-        if (ec != 0) {
-            throw new ExecutorException("Unexpected exit code=" + ec);
-        }
+        doExecute(builder);
         return shaveStdout(stdout);
     }
 
@@ -122,6 +119,16 @@ public class ToolboxTool implements ExecutorTool {
             builder.argument("--raw-streams");
         }
         return builder.argument(TOOLBOX + mojo).argument("--quiet").argument("-DforceStdout");
+    }
+
+    private void doExecute(ExecutorRequest.Builder builder) {
+        ExecutorRequest request = builder.build();
+        int ec = helper.execute(request);
+        if (ec != 0) {
+            throw new ExecutorException("Unexpected exit code=" + ec + "; stdout="
+                    + request.stdoutConsumer().orElse(null) + "; stderr="
+                    + request.stderrConsumer().orElse(null));
+        }
     }
 
     private String shaveStdout(ByteArrayOutputStream stdout) {

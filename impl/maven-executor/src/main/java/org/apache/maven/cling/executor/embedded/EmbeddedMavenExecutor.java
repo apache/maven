@@ -38,6 +38,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -79,6 +80,7 @@ public class EmbeddedMavenExecutor implements Executor {
     }
 
     private final boolean cacheContexts;
+    private final AtomicBoolean closed;
     private final PrintStream originalStdout;
     private final PrintStream originalStderr;
     private final Properties originalProperties;
@@ -91,6 +93,7 @@ public class EmbeddedMavenExecutor implements Executor {
 
     public EmbeddedMavenExecutor(boolean cacheContexts) {
         this.cacheContexts = cacheContexts;
+        this.closed = new AtomicBoolean(false);
         this.originalStdout = System.out;
         this.originalStderr = System.err;
         this.originalClassLoader = Thread.currentThread().getContextClassLoader();
@@ -101,6 +104,9 @@ public class EmbeddedMavenExecutor implements Executor {
     @Override
     public int execute(ExecutorRequest executorRequest) throws ExecutorException {
         requireNonNull(executorRequest);
+        if (closed.get()) {
+            throw new ExecutorException("Executor is closed");
+        }
         validate(executorRequest);
         Context context = mayCreate(executorRequest);
 
@@ -150,6 +156,9 @@ public class EmbeddedMavenExecutor implements Executor {
     public String mavenVersion(ExecutorRequest executorRequest) throws ExecutorException {
         requireNonNull(executorRequest);
         validate(executorRequest);
+        if (closed.get()) {
+            throw new ExecutorException("Executor is closed");
+        }
         return mayCreate(executorRequest).version;
     }
 
@@ -290,22 +299,24 @@ public class EmbeddedMavenExecutor implements Executor {
 
     @Override
     public void close() throws ExecutorException {
-        try {
-            ArrayList<Exception> exceptions = new ArrayList<>();
-            for (Context context : contexts.values()) {
-                try {
-                    doClose(context);
-                } catch (Exception e) {
-                    exceptions.add(e);
+        if (closed.compareAndExchange(false, true)) {
+            try {
+                ArrayList<Exception> exceptions = new ArrayList<>();
+                for (Context context : contexts.values()) {
+                    try {
+                        doClose(context);
+                    } catch (Exception e) {
+                        exceptions.add(e);
+                    }
                 }
+                if (!exceptions.isEmpty()) {
+                    ExecutorException e = new ExecutorException("Could not close cleanly");
+                    exceptions.forEach(e::addSuppressed);
+                    throw e;
+                }
+            } finally {
+                System.setProperties(originalProperties);
             }
-            if (!exceptions.isEmpty()) {
-                ExecutorException e = new ExecutorException("Could not close cleanly");
-                exceptions.forEach(e::addSuppressed);
-                throw e;
-            }
-        } finally {
-            System.setProperties(originalProperties);
         }
     }
 

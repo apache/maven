@@ -26,7 +26,7 @@ import org.apache.maven.api.cli.ExecutorRequest;
 /**
  * Helper class for some common tasks.
  */
-public interface ExecutorHelper extends ExecutorTool, AutoCloseable {
+public interface ExecutorHelper extends ExecutorTool {
     /**
      * The preferred mode of execution.
      */
@@ -79,10 +79,4 @@ public interface ExecutorHelper extends ExecutorTool, AutoCloseable {
      */
     @Nonnull
     String mavenVersion();
-
-    /**
-     * Closes helper, frees resources.
-     */
-    @Override
-    void close() throws ExecutorException;
 }

@@ -45,6 +45,8 @@ import java.util.StringTokenizer;
 import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.ExecutorHelper;
+import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
+import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
@@ -59,8 +61,8 @@ import static java.util.Objects.requireNonNull;
  */
 @Deprecated
 public class Verifier {
-    public static final ExecutorHelper HELPER =
-            new HelperImpl(ExecutorHelper.Mode.AUTO, Paths.get(System.getProperty("maven.home")));
+    private static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
+    private static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
 
     private static final String LOG_FILENAME = "log.txt";
 
@@ -70,7 +72,11 @@ public class Verifier {
 
     private final ExecutorHelper executorHelper;
 
-    private final Path basedir;
+    private final Path basedir; // the basedir of IT
+
+    private final Path
+            tempBasedir; // create new empty directory to invoke maven queries without having trying to load up
+    // extension.xml and project
 
     private final Path userHomeDirectory;
 
@@ -100,13 +106,22 @@ public class Verifier {
      */
     public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
         requireNonNull(basedir);
-        this.basedir = Paths.get(basedir).toAbsolutePath();
-        this.userHomeDirectory = Paths.get(System.getProperty("user.home"));
-        this.executorHelper = HELPER;
-        this.defaultCliArguments =
-                new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
+        try {
+            this.basedir = Paths.get(basedir).toAbsolutePath();
+            this.tempBasedir = Files.createTempDirectory("verifier");
+            this.userHomeDirectory = Paths.get(System.getProperty("user.home"));
+            this.executorHelper = new HelperImpl(
+                    ExecutorHelper.Mode.AUTO,
+                    Paths.get(System.getProperty("maven.home")),
+                    EMBEDDED_MAVEN_EXECUTOR,
+                    FORKED_MAVEN_EXECUTOR);
+            this.defaultCliArguments =
+                    new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
 
-        this.logFile = this.basedir.resolve(logFileName);
+            this.logFile = this.basedir.resolve(logFileName);
+        } catch (IOException e) {
+            throw new VerificationException("Could not create verifier", e);
+        }
     }
 
     public String getLogFileName() {
@@ -853,15 +868,23 @@ public class Verifier {
 
     public String getLocalRepositoryWithSettings(String settingsXml) {
         if (settingsXml != null) {
-            // it must exist
-            Path settingsFile = basedir.resolve(settingsXml);
+            // when invoked with settings.xml, the file must be resolved from basedir (as Maven does)
+            // but we should not use basedir, as it may contain extensions.xml or a project, that Maven will eagerly
+            // load, and may fail, as it would need more (like CI friendly versioning, etc).
+            // if given, it must exist
+            Path settingsFile = basedir.resolve(settingsXml).toAbsolutePath().normalize();
             if (!Files.isRegularFile(settingsFile)) {
                 throw new IllegalArgumentException("settings xml does not exist: " + settingsXml);
             }
-            return executorHelper.localRepository(
-                    executorHelper.executorRequest().argument("-s").argument(settingsXml));
+            return executorHelper.localRepository(executorHelper
+                    .executorRequest()
+                    .cwd(tempBasedir)
+                    .userHomeDirectory(userHomeDirectory)
+                    .argument("-s")
+                    .argument(settingsFile.toString()));
         } else {
-            return executorHelper.localRepository(executorHelper.executorRequest());
+            return executorHelper.localRepository(
+                    executorHelper.executorRequest().cwd(tempBasedir).userHomeDirectory(userHomeDirectory));
         }
     }
 }
