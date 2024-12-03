@@ -116,15 +116,13 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
     }
 
     private void assertMetadata(Verifier verifier, String gid, String aid, String ver, String sha1) throws Exception {
-        File file =
-                new File(verifier.getArtifactMetadataPath(gid, aid, ver, "maven-metadata.xml", "maven-core-it"));
+        File file = new File(verifier.getArtifactMetadataPath(gid, aid, ver, "maven-metadata.xml", "maven-core-it"));
         assertTrue(file.isFile(), file.getAbsolutePath());
         assertEquals(sha1, ItUtils.calcHash(file, "SHA-1"));
     }
 
     private void assertMetadata(Verifier verifier, String gid, String aid, String sha1) throws Exception {
-        File file =
-                new File(verifier.getArtifactMetadataPath(gid, aid, null, "maven-metadata.xml", "maven-core-it"));
+        File file = new File(verifier.getArtifactMetadataPath(gid, aid, null, "maven-metadata.xml", "maven-core-it"));
         assertTrue(file.isFile(), file.getAbsolutePath());
         assertEquals(sha1, ItUtils.calcHash(file, "SHA-1"));
     }
