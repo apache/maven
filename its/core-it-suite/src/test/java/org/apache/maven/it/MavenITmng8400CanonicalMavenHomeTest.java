@@ -52,10 +52,10 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
 
         Path linkedMavenHome = tempDir.resolve("linked-maven-home");
 
-        Path mavenHome = Paths.get(System.getProperty("maven.home"));
-        Files.createSymbolicLink(linkedMavenHome, mavenHome);
-
+        Path oldMavenHome = Paths.get(System.getProperty("maven.home"));
+        Files.createSymbolicLink(linkedMavenHome, oldMavenHome);
         System.setProperty("maven.home", linkedMavenHome.toString());
+
         Verifier verifier = newVerifier(basedir.toString(), null);
         verifier.addCliArgument("--raw-streams");
         verifier.addCliArgument("--quiet");
@@ -72,7 +72,9 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
 
         Path installationSettingsXml = Paths.get(props.getProperty("maven.settings"));
         Path installationToolchainsXml = Paths.get(props.getProperty("maven.toolchains"));
+        Path mavenHome = Paths.get(props.getProperty("maven.home"));
 
-        assertEquals(installationToolchainsXml.getParent(), installationSettingsXml.getParent());
+        assertEquals(mavenHome, installationSettingsXml.getParent().getParent()); // remove conf
+        assertEquals(mavenHome, installationToolchainsXml.getParent().getParent()); // remove conf
     }
 }
