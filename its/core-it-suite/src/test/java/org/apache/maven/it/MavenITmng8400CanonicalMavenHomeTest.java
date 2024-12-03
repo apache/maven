@@ -56,7 +56,7 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
         Files.createSymbolicLink(linkedMavenHome, mavenHome);
 
         System.setProperty("maven.home", linkedMavenHome.toString());
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir.toString(), null);
         verifier.addCliArgument("--raw-streams");
         verifier.addCliArgument("--quiet");
         verifier.addCliArgument("-DforceStdout");
