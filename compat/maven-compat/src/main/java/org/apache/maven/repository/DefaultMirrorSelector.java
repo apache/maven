@@ -34,6 +34,7 @@ import org.apache.maven.settings.Mirror;
  */
 @Named
 @Singleton
+@Deprecated
 public class DefaultMirrorSelector implements MirrorSelector {
 
     private static final String WILDCARD = "*";

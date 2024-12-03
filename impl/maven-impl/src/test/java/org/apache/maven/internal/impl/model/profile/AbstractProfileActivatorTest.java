@@ -19,12 +19,14 @@
 package org.apache.maven.internal.impl.model.profile;
 
 import java.nio.file.Path;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultProfileActivationContext;
 import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.junit.jupiter.api.AfterEach;
@@ -54,9 +56,15 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
         activator = null;
     }
 
-    protected ProfileActivationContext newContext(final Properties userProperties, final Properties systemProperties) {
-        DefaultProfileActivationContext context = new DefaultProfileActivationContext();
-        return context.setUserProperties(userProperties)
+    protected DefaultProfileActivationContext newContext() {
+        return new DefaultProfileActivationContext(
+                new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator());
+    }
+
+    protected ProfileActivationContext newContext(
+            Map<String, String> userProperties, Map<String, String> systemProperties) {
+        return newContext()
+                .setUserProperties(userProperties)
                 .setSystemProperties(systemProperties)
                 .setModel(Model.newInstance());
     }

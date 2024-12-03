@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl.model.profile;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -34,9 +33,7 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
-import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 
 import static org.apache.maven.internal.impl.model.profile.ConditionParser.toBoolean;
 
@@ -49,22 +46,15 @@ import static org.apache.maven.internal.impl.model.profile.ConditionParser.toBoo
 public class ConditionProfileActivator implements ProfileActivator {
 
     private final VersionParser versionParser;
-    private final ProfileActivationFilePathInterpolator interpolator;
-    private final RootLocator rootLocator;
 
     /**
      * Constructs a new ConditionProfileActivator with the necessary dependencies.
      *
      * @param versionParser The parser for handling version comparisons
-     * @param interpolator The interpolator for resolving file paths
-     * @param rootLocator The locator for finding the project root directory
      */
     @Inject
-    public ConditionProfileActivator(
-            VersionParser versionParser, ProfileActivationFilePathInterpolator interpolator, RootLocator rootLocator) {
+    public ConditionProfileActivator(VersionParser versionParser) {
         this.versionParser = versionParser;
-        this.interpolator = interpolator;
-        this.rootLocator = rootLocator;
     }
 
     /**
@@ -82,9 +72,8 @@ public class ConditionProfileActivator implements ProfileActivator {
         }
         String condition = profile.getActivation().getCondition();
         try {
-            Map<String, ConditionParser.ExpressionFunction> functions =
-                    registerFunctions(context, versionParser, interpolator);
-            Function<String, String> propertyResolver = s -> property(context, rootLocator, s);
+            Map<String, ConditionParser.ExpressionFunction> functions = registerFunctions(context, versionParser);
+            Function<String, String> propertyResolver = s -> property(context, s);
             return toBoolean(new ConditionParser(functions, propertyResolver).parse(condition));
         } catch (Exception e) {
             problems.add(
@@ -115,16 +104,13 @@ public class ConditionProfileActivator implements ProfileActivator {
      *
      * @param context The profile activation context
      * @param versionParser The parser for handling version comparisons
-     * @param interpolator The interpolator for resolving file paths
      * @return A map of function names to their implementations
      */
     public static Map<String, ConditionParser.ExpressionFunction> registerFunctions(
-            ProfileActivationContext context,
-            VersionParser versionParser,
-            ProfileActivationFilePathInterpolator interpolator) {
+            ProfileActivationContext context, VersionParser versionParser) {
         Map<String, ConditionParser.ExpressionFunction> functions = new HashMap<>();
 
-        ConditionFunctions conditionFunctions = new ConditionFunctions(context, versionParser, interpolator);
+        ConditionFunctions conditionFunctions = new ConditionFunctions(context, versionParser);
 
         for (java.lang.reflect.Method method : ConditionFunctions.class.getDeclaredMethods()) {
             String methodName = method.getName();
@@ -170,43 +156,37 @@ public class ConditionProfileActivator implements ProfileActivator {
      * @return The value of the property, or null if not found
      * @throws IllegalArgumentException if the number of arguments is not exactly one
      */
-    static String property(ProfileActivationContext context, RootLocator rootLocator, String name) {
-        String value = doGetProperty(context, rootLocator, name);
-        return new DefaultInterpolator().interpolate(value, s -> doGetProperty(context, rootLocator, s));
+    static String property(ProfileActivationContext context, String name) {
+        String value = doGetProperty(context, name);
+        return new DefaultInterpolator().interpolate(value, s -> doGetProperty(context, s));
     }
 
-    static String doGetProperty(ProfileActivationContext context, RootLocator rootLocator, String name) {
+    static String doGetProperty(ProfileActivationContext context, String name) {
         // Handle special project-related properties
         if ("project.basedir".equals(name)) {
-            Path basedir = context.getModel().getProjectDirectory();
-            return basedir != null ? basedir.toFile().getAbsolutePath() : null;
+            return context.getModelBaseDirectory();
         }
         if ("project.rootDirectory".equals(name)) {
-            Path basedir = context.getModel().getProjectDirectory();
-            if (basedir != null) {
-                Path root = rootLocator.findMandatoryRoot(basedir);
-                return root.toFile().getAbsolutePath();
-            }
-            return null;
+            return context.getModelRootDirectory();
         }
         if ("project.artifactId".equals(name)) {
-            return context.getModel().getArtifactId();
+            return context.getModelArtifactId();
         }
         if ("project.packaging".equals(name)) {
-            return context.getModel().getPackaging();
+            return context.getModelPackaging();
         }
 
         // Check user properties
-        String v = context.getUserProperties().get(name);
+        String v = context.getUserProperty(name);
         if (v == null) {
             // Check project properties
             // TODO: this may leads to instability between file model activation and effective model activation
             //       as the effective model properties may be different from the file model
-            v = context.getModel().getProperties().get(name);
+            v = context.getModelProperty(name);
         }
         if (v == null) {
             // Check system properties
-            v = context.getSystemProperties().get(name);
+            v = context.getSystemProperty(name);
         }
         return v;
     }

@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,8 +51,6 @@ import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.api.Constants.MAVEN_HOME;
-import static org.apache.maven.api.Constants.MAVEN_INSTALLATION_CONF;
 import static org.apache.maven.cling.invoker.Utils.getCanonicalPath;
 import static org.apache.maven.cling.invoker.Utils.or;
 import static org.apache.maven.cling.invoker.Utils.prefix;
@@ -140,23 +139,26 @@ public abstract class BaseParser implements Parser {
             context.systemPropertiesOverrides.put("user.dir", result.toString());
             return result;
         } else {
-            return getCanonicalPath(Paths.get(System.getProperty("user.dir")));
+            Path result = getCanonicalPath(Paths.get(System.getProperty("user.dir")));
+            mayOverrideDirectorySystemProperty(context, "user.dir", result);
+            return result;
         }
     }
 
     protected Path getInstallationDirectory(LocalContext context) throws ParserException {
-        Path result;
         if (context.parserRequest.mavenHome() != null) {
-            result = getCanonicalPath(context.parserRequest.mavenHome());
-            context.systemPropertiesOverrides.put(MAVEN_HOME, result.toString());
+            Path result = getCanonicalPath(context.parserRequest.mavenHome());
+            context.systemPropertiesOverrides.put(Constants.MAVEN_HOME, result.toString());
+            return result;
         } else {
             String mavenHome = System.getProperty(Constants.MAVEN_HOME);
             if (mavenHome == null) {
                 throw new ParserException("local mode requires " + Constants.MAVEN_HOME + " Java System Property set");
             }
-            result = getCanonicalPath(Paths.get(mavenHome));
+            Path result = getCanonicalPath(Paths.get(mavenHome));
+            mayOverrideDirectorySystemProperty(context, Constants.MAVEN_HOME, result);
+            return result;
         }
-        return result;
     }
 
     protected Path getUserHomeDirectory(LocalContext context) throws ParserException {
@@ -165,7 +167,20 @@ public abstract class BaseParser implements Parser {
             context.systemPropertiesOverrides.put("user.home", result.toString());
             return result;
         } else {
-            return getCanonicalPath(Paths.get(System.getProperty("user.home")));
+            Path result = getCanonicalPath(Paths.get(System.getProperty("user.home")));
+            mayOverrideDirectorySystemProperty(context, "user.home", result);
+            return result;
+        }
+    }
+
+    /**
+     * This method is needed to "align" values used later on for interpolations and path calculations.
+     * We enforce "canonical" paths, so IF key and canonical path value disagree, let override it.
+     */
+    protected void mayOverrideDirectorySystemProperty(LocalContext context, String javaSystemPropertyKey, Path value) {
+        String valueString = value.toString();
+        if (!Objects.equals(System.getProperty(javaSystemPropertyKey), valueString)) {
+            context.systemPropertiesOverrides.put(javaSystemPropertyKey, valueString);
         }
     }
 
@@ -252,13 +267,14 @@ public abstract class BaseParser implements Parser {
                 or(paths::get, prefix("cli.", userSpecifiedProperties::get), context.systemProperties::get);
 
         Path mavenConf;
-        if (context.systemProperties.get(MAVEN_INSTALLATION_CONF) != null) {
-            mavenConf = context.installationDirectory.resolve(context.systemProperties.get(MAVEN_INSTALLATION_CONF));
+        if (context.systemProperties.get(Constants.MAVEN_INSTALLATION_CONF) != null) {
+            mavenConf = context.installationDirectory.resolve(
+                    context.systemProperties.get(Constants.MAVEN_INSTALLATION_CONF));
         } else if (context.systemProperties.get("maven.conf") != null) {
             mavenConf = context.installationDirectory.resolve(context.systemProperties.get("maven.conf"));
-        } else if (context.systemProperties.get(MAVEN_HOME) != null) {
+        } else if (context.systemProperties.get(Constants.MAVEN_HOME) != null) {
             mavenConf = context.installationDirectory
-                    .resolve(context.systemProperties.get(MAVEN_HOME))
+                    .resolve(context.systemProperties.get(Constants.MAVEN_HOME))
                     .resolve("conf");
         } else {
             mavenConf = context.installationDirectory.resolve("");

@@ -20,7 +20,6 @@ package org.apache.maven.internal.impl.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.api.di.Inject;
@@ -64,16 +63,13 @@ public class DefaultProfileSelector implements ProfileSelector {
     @Override
     public List<Profile> getActiveProfiles(
             Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems) {
-        Collection<String> activatedIds = new HashSet<>(context.getActiveProfileIds());
-        Collection<String> deactivatedIds = new HashSet<>(context.getInactiveProfileIds());
-
         List<Profile> activeProfiles = new ArrayList<>(profiles.size());
         List<Profile> activePomProfilesByDefault = new ArrayList<>();
         boolean activatedPomProfileNotByDefault = false;
 
         for (Profile profile : profiles) {
-            if (!deactivatedIds.contains(profile.getId())) {
-                if (activatedIds.contains(profile.getId()) || isActive(profile, context, problems)) {
+            if (!context.isProfileInactive(profile.getId())) {
+                if (context.isProfileActive(profile.getId()) || isActive(profile, context, problems)) {
                     activeProfiles.add(profile);
                     if (Profile.SOURCE_POM.equals(profile.getSource())) {
                         activatedPomProfileNotByDefault = true;
