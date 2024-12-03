@@ -232,19 +232,20 @@ public interface ExecutorRequest {
 
         @Nonnull
         public Builder cwd(Path cwd) {
-            this.cwd = requireNonNull(cwd, "cwd");
+            this.cwd = getCanonicalPath(requireNonNull(cwd, "cwd"));
             return this;
         }
 
         @Nonnull
         public Builder installationDirectory(Path installationDirectory) {
-            this.installationDirectory = requireNonNull(installationDirectory, "installationDirectory");
+            this.installationDirectory =
+                    getCanonicalPath(requireNonNull(installationDirectory, "installationDirectory"));
             return this;
         }
 
         @Nonnull
         public Builder userHomeDirectory(Path userHomeDirectory) {
-            this.userHomeDirectory = requireNonNull(userHomeDirectory, "userHomeDirectory");
+            this.userHomeDirectory = getCanonicalPath(requireNonNull(userHomeDirectory, "userHomeDirectory"));
             return this;
         }
 
@@ -350,9 +351,9 @@ public interface ExecutorRequest {
                     OutputStream stderrConsumer) {
                 this.command = requireNonNull(command);
                 this.arguments = arguments == null ? List.of() : List.copyOf(arguments);
-                this.cwd = requireNonNull(cwd);
-                this.installationDirectory = requireNonNull(installationDirectory);
-                this.userHomeDirectory = requireNonNull(userHomeDirectory);
+                this.cwd = getCanonicalPath(requireNonNull(cwd));
+                this.installationDirectory = getCanonicalPath(requireNonNull(installationDirectory));
+                this.userHomeDirectory = getCanonicalPath(requireNonNull(userHomeDirectory));
                 this.jvmSystemProperties = jvmSystemProperties != null ? Map.copyOf(jvmSystemProperties) : null;
                 this.environmentVariables = environmentVariables != null ? Map.copyOf(environmentVariables) : null;
                 this.jvmArguments = jvmArguments != null ? List.copyOf(jvmArguments) : null;

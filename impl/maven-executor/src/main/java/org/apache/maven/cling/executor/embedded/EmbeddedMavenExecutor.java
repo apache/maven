@@ -240,8 +240,6 @@ public class EmbeddedMavenExecutor implements Executor {
                                     || r.stderrConsumer().isPresent()) {
                                 ansiConsoleInstalled.set(null, 1);
                             }
-                            // CWD
-                            System.setProperty("user.dir", r.cwd().toString());
                             return (int) mainMethod.invoke(null, r.arguments().toArray(new String[0]), classWorld);
                         } finally {
                             if (r.stdoutConsumer().isPresent()
@@ -266,25 +264,26 @@ public class EmbeddedMavenExecutor implements Executor {
     }
 
     private Properties prepareProperties(ExecutorRequest request) {
-        Path mavenHome = ExecutorRequest.getCanonicalPath(request.installationDirectory());
         Properties properties = new Properties();
         properties.putAll(System.getProperties());
-        properties.put(
-                "user.dir", ExecutorRequest.getCanonicalPath(request.cwd()).toString());
-        properties.put(
-                "maven.multiModuleProjectDirectory",
-                ExecutorRequest.getCanonicalPath(request.cwd()).toString());
-        properties.put(
-                "user.home",
-                ExecutorRequest.getCanonicalPath(request.userHomeDirectory()).toString());
-        properties.put("maven.home", mavenHome.toString());
-        properties.put("maven.mainClass", "org.apache.maven.cling.MavenCling");
-        properties.put(
+
+        properties.setProperty("user.dir", request.cwd().toString());
+        properties.setProperty("user.home", request.userHomeDirectory().toString());
+
+        Path mavenHome = request.installationDirectory();
+        properties.setProperty("maven.home", mavenHome.toString());
+        properties.setProperty(
+                "maven.multiModuleProjectDirectory", request.cwd().toString());
+        properties.setProperty("maven.mainClass", "org.apache.maven.cling.MavenCling");
+        properties.setProperty(
                 "library.jline.path", mavenHome.resolve("lib/jline-native").toString());
-        properties.put("org.jline.terminal.provider", "dumb");
+        // TODO: is this needed?
+        properties.setProperty("org.jline.terminal.provider", "dumb");
+
         if (request.jvmSystemProperties().isPresent()) {
             properties.putAll(request.jvmSystemProperties().get());
         }
+
         return properties;
     }
 
