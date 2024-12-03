@@ -392,6 +392,21 @@ public class Verifier {
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
     public String getArtifactMetadataPath(String gid, String aid, String version, String filename) {
+        return getArtifactMetadataPath(gid, aid, version, filename, null);
+    }
+
+    /**
+     * Gets the path to a file in the local artifact directory. Note that the method does not check whether the returned
+     * path actually points to an existing file.
+     *
+     * @param gid      The group id, must not be <code>null</code>.
+     * @param aid      The artifact id, may be <code>null</code>.
+     * @param version  The artifact version, may be <code>null</code>.
+     * @param filename The filename to use, must not be <code>null</code>.
+     * @param repoId   The remote repository ID from where metadata originate, may be <code>null</code>.
+     * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
+     */
+    public String getArtifactMetadataPath(String gid, String aid, String version, String filename, String repoId) {
         String gav;
         if (gid != null) {
             gav = gid + ":";
@@ -411,7 +426,7 @@ public class Verifier {
         gav += filename;
         return getLocalRepository()
                 + File.separator
-                + executorHelper.metadataPath(executorHelper.executorRequest(), gav, null);
+                + executorHelper.metadataPath(executorHelper.executorRequest(), gav, repoId);
     }
 
     /**
@@ -833,6 +848,20 @@ public class Verifier {
     }
 
     public String getLocalRepository() {
-        return executorHelper.localRepository(executorHelper.executorRequest());
+        return getLocalRepositoryWithSettings(null);
+    }
+
+    public String getLocalRepositoryWithSettings(String settingsXml) {
+        if (settingsXml != null) {
+            // it must exist
+            Path settingsFile = basedir.resolve(settingsXml);
+            if (!Files.isRegularFile(settingsFile)) {
+                throw new IllegalArgumentException("settings xml does not exist: " + settingsXml);
+            }
+            return executorHelper.localRepository(
+                    executorHelper.executorRequest().argument("-s").argument(settingsXml));
+        } else {
+            return executorHelper.localRepository(executorHelper.executorRequest());
+        }
     }
 }

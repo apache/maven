@@ -35,6 +35,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class MavenExecutorTestSupport {
+    @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
     @Test
     void dump3(
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,

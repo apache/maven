@@ -62,7 +62,7 @@ public class MavenITmng3955EffectiveSettingsTest extends AbstractMavenIntegratio
         assertEquals("true", props.getProperty("settings.offline"));
         assertEquals("false", props.getProperty("settings.interactiveMode"));
         assertEquals(
-                new File(verifier.getLocalRepository()).getAbsoluteFile(),
+                new File(verifier.getLocalRepositoryWithSettings("settings.xml")).getAbsoluteFile(),
                 new File(props.getProperty("settings.localRepository")).getAbsoluteFile());
     }
 }
