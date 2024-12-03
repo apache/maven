@@ -64,7 +64,6 @@ import org.apache.maven.internal.impl.resolver.scopes.Maven4ScopeManagerConfigur
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -78,6 +77,7 @@ public class ApiRunner {
         Injector injector = Injector.create();
         injector.bindInstance(Injector.class, injector);
         injector.bindImplicit(ApiRunner.class);
+        injector.bindImplicit(RepositorySystemSupplier.class);
         injector.discover(ApiRunner.class.getClassLoader());
         Session session = injector.getInstance(Session.class);
         SessionScope scope = new SessionScope();
@@ -284,24 +284,6 @@ public class ApiRunner {
                 return List.of();
             }
         };
-    }
-
-    @Provides
-    @SuppressWarnings("unused")
-    static RepositorySystemSupplier newRepositorySystemSupplier() {
-        return new RepositorySystemSupplier();
-    }
-
-    @Provides
-    @SuppressWarnings("unused")
-    static RepositorySystem newRepositorySystem(RepositorySystemSupplier repositorySystemSupplier) {
-        return repositorySystemSupplier.getRepositorySystem();
-    }
-
-    @Provides
-    @SuppressWarnings("unused")
-    static RemoteRepositoryManager newRemoteRepositoryManager(RepositorySystemSupplier repositorySystemSupplier) {
-        return repositorySystemSupplier.getRemoteRepositoryManager();
     }
 
     @Provides
