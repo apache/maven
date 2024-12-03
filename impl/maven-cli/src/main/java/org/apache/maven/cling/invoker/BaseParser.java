@@ -221,6 +221,8 @@ public abstract class BaseParser implements Parser {
 
         Properties buildProperties = CLIReportingUtils.getBuildProperties();
 
+        // TODO
+
         String mavenVersion = buildProperties.getProperty(CLIReportingUtils.BUILD_VERSION_PROPERTY);
         systemProperties.setProperty("maven.version", mavenVersion);
 
