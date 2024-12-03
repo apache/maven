@@ -233,6 +233,7 @@ public class EmbeddedMavenExecutor implements Executor {
                 Field ansiConsoleInstalled = ansiConsole.getDeclaredField("installed");
                 ansiConsoleInstalled.setAccessible(true);
                 exec = r -> {
+                    System.setProperties(null);
                     System.setProperties(prepareProperties(r));
                     try {
                         try {

@@ -54,7 +54,10 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Jason van Zyl
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ *
+ * @deprecated See {@link org.apache.maven.it.Verifier} instead.
  */
+@Deprecated
 public class Verifier {
     public static final ExecutorHelper HELPER =
             new HelperImpl(ExecutorHelper.Mode.AUTO, Paths.get(System.getProperty("maven.home")));
@@ -375,7 +378,7 @@ public class Verifier {
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
     public String getArtifactMetadataPath(String gid, String aid, String version) {
-        return getArtifactMetadataPath(gid, aid, version, "maven-metadata-local.xml");
+        return getArtifactMetadataPath(gid, aid, version, "maven-metadata.xml");
     }
 
     /**
@@ -406,7 +409,9 @@ public class Verifier {
             gav += ":";
         }
         gav += filename;
-        return executorHelper.metadataPath(executorHelper.executorRequest(), gav, null);
+        return getLocalRepository()
+                + File.separator
+                + executorHelper.metadataPath(executorHelper.executorRequest(), gav, null);
     }
 
     /**
