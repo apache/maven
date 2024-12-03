@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -33,6 +35,7 @@ import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.maven.api.cli.ExecutorRequest.getCanonicalPath;
 
 /**
  * Forked executor implementation, that spawns a subprocess with Maven from the installation directory. Very costly
@@ -116,28 +119,38 @@ public class ForkedMavenExecutor implements Executor {
 
         cmdAndArguments.addAll(executorRequest.arguments());
 
+        ArrayList<String> jvmArgs = new ArrayList<>();
+        if (!executorRequest.userHomeDirectory().equals(getCanonicalPath(Paths.get(System.getProperty("user.home"))))) {
+            jvmArgs.add("-Duser.home=" + executorRequest.userHomeDirectory().toString());
+        }
+        if (executorRequest.jvmArguments().isPresent()) {
+            jvmArgs.addAll(executorRequest.jvmArguments().get());
+        }
+        if (executorRequest.jvmSystemProperties().isPresent()) {
+            jvmArgs.addAll(executorRequest.jvmSystemProperties().get().entrySet().stream()
+                    .map(e -> "-D" + e.getKey() + "=" + e.getValue())
+                    .toList());
+        }
+
+        HashMap<String, String> env = new HashMap<>();
+        if (executorRequest.environmentVariables().isPresent()) {
+            env.putAll(executorRequest.environmentVariables().get());
+        }
+        if (!jvmArgs.isEmpty()) {
+            String mavenOpts = env.getOrDefault("MAVEN_OPTS", "");
+            if (!mavenOpts.isEmpty()) {
+                mavenOpts += " ";
+            }
+            mavenOpts += String.join(" ", jvmArgs);
+            env.put("MAVEN_OPTS", mavenOpts);
+        }
+
         try {
             ProcessBuilder pb = new ProcessBuilder()
                     .directory(executorRequest.cwd().toFile())
                     .command(cmdAndArguments);
-            if (executorRequest.environmentVariables().isPresent()) {
-                pb.environment().putAll(executorRequest.environmentVariables().get());
-            }
-            if (executorRequest.jvmSystemProperties().isPresent()) {
-                String mavenOpts = pb.environment().getOrDefault("MAVEN_OPTS", "");
-                mavenOpts += " "
-                        + String.join(
-                                " ",
-                                executorRequest.jvmSystemProperties().get().entrySet().stream()
-                                        .map(e -> "-D" + e.getKey() + "=" + e.getValue())
-                                        .toList());
-                pb.environment().put("MAVEN_OPTS", mavenOpts);
-            }
-            if (executorRequest.jvmArguments().isPresent()) {
-                String mavenOpts = pb.environment().getOrDefault("MAVEN_OPTS", "");
-                mavenOpts +=
-                        " " + String.join(" ", executorRequest.jvmArguments().get());
-                pb.environment().put("MAVEN_OPTS", mavenOpts);
+            if (!env.isEmpty()) {
+                pb.environment().putAll(env);
             }
 
             Process process = pb.start();

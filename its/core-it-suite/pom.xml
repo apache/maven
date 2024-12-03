@@ -589,6 +589,7 @@ under the License.
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
+              <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
               <skip>false</skip>
             </configuration>
           </plugin>
@@ -665,7 +666,6 @@ under the License.
               <useSystemClassLoader>false</useSystemClassLoader>
               <systemPropertyVariables>
                 <verifier.forkMode>auto</verifier.forkMode>
-                <emma.rt.control>false</emma.rt.control>
               </systemPropertyVariables>
             </configuration>
           </plugin>

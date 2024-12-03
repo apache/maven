@@ -36,6 +36,42 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class MavenExecutorTestSupport {
     @Test
+    void dump3(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String logfile = "m3.log";
+        execute(
+                cwd.resolve(logfile),
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(cwd)
+                        .userHomeDirectory(userHome)
+                        .argument("eu.maveniverse.maven.plugins:toolbox:0.5.2:gav-dump")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
+        System.out.println(Files.readString(cwd.resolve(logfile)));
+    }
+
+    @Test
+    void dump4(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String logfile = "m4.log";
+        execute(
+                cwd.resolve(logfile),
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(cwd)
+                        .userHomeDirectory(userHome)
+                        .argument("eu.maveniverse.maven.plugins:toolbox:0.5.2:gav-dump")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
+        System.out.println(Files.readString(cwd.resolve(logfile)));
+    }
+
+    @Test
     void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
         String logfile = "m4.log";
