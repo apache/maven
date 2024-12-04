@@ -24,7 +24,7 @@ import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
 
 /**
- * Helper class for some common tasks.
+ * Helper class for routing Maven execution based on preferences and/or issued execution requests.
  */
 public interface ExecutorHelper extends ExecutorTool {
     /**
@@ -42,7 +42,7 @@ public interface ExecutorHelper extends ExecutorTool {
          */
         EMBEDDED,
         /**
-         * Forces forked execution. Always carried out, but slow as it uses child process.
+         * Forces forked execution. Always carried out, most isolated and "most correct", but is slow as it uses child process.
          */
         FORKED
     }
@@ -54,26 +54,27 @@ public interface ExecutorHelper extends ExecutorTool {
     Mode getDefaultMode();
 
     /**
-     * Creates pre-populated builder for {@link ExecutorRequest}.
+     * Creates pre-populated builder for {@link ExecutorRequest}. Users of helper must use this method to create
+     * properly initialized request builder.
      */
     @Nonnull
     ExecutorRequest.Builder executorRequest();
 
     /**
-     * Executes the request with automatically chosen executor.
+     * Executes the request with preferred mode executor.
      */
     default int execute(ExecutorRequest executorRequest) throws ExecutorException {
         return execute(getDefaultMode(), executorRequest);
     }
 
     /**
-     * Executes the request with chosen executor by passed in mode.
+     * Executes the request with passed in mode executor.
      */
     int execute(Mode mode, ExecutorRequest executorRequest) throws ExecutorException;
 
     /**
-     * High level operation.
-     * Returns the version of the Maven covered by this helper.
+     * High level operation, returns the version of the Maven covered by this helper. This method call caches
+     * underlying operation, and is safe to invoke as many times needed.
      *
      * @see Executor#mavenVersion(ExecutorRequest)
      */

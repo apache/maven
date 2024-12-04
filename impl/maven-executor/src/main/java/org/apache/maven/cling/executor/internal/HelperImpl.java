@@ -35,8 +35,7 @@ import org.apache.maven.cling.executor.ExecutorTool;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Helper class for some common tasks. This class statically holds instances of (stateless) embedded and forked
- * executors. The goal is to keep embedded alive as needed, as it keeps "hot" Maven.
+ * Simple router to executors, and delegate to executor tool.
  */
 public class HelperImpl implements ExecutorHelper {
     private final Mode defaultMode;

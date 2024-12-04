@@ -37,7 +37,7 @@ public interface ExecutorTool {
 
     /**
      * Returns the location of local repository, as detected by Maven. The {@code userSettings} param may contain
-     * and override (equivalent of {@code -s settings.xml} on CLI).
+     * some override (equivalent of {@code -s settings.xml} on CLI).
      *
      * @param request never {@code null}
      */

@@ -38,7 +38,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Represents a request to execute Maven with command-line arguments.
  * This interface encapsulates all the necessary information needed to execute
- * Maven command with arguments. The arguments were not parsed, they are just passed over
+ * Maven command with arguments. The arguments are not parsed, they are just passed over
  * to executed tool.
  *
  * @since 4.0.0
@@ -136,7 +136,7 @@ public interface ExecutorRequest {
     Optional<OutputStream> stderrConsumer();
 
     /**
-     * Returns {@link Builder} for this instance.
+     * Returns {@link Builder} created from this instance.
      */
     @Nonnull
     default Builder toBuilder() {
@@ -154,7 +154,8 @@ public interface ExecutorRequest {
     }
 
     /**
-     * Returns new builder pre-set to run Maven. The discovery of maven home is attempted.
+     * Returns new builder pre-set to run Maven. The discovery of maven home is attempted, user cwd and home are
+     * also discovered by standard means.
      */
     @Nonnull
     static Builder mavenBuilder(@Nullable Path installationDirectory) {

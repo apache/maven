@@ -34,7 +34,7 @@ import org.apache.maven.cling.executor.ExecutorTool;
 import static java.util.Objects.requireNonNull;
 
 /**
- * {@link ExecutorTool} implementation based on Maveniverse Toolbox. It uses Toolbox mojo to implement all the
+ * {@link ExecutorTool} implementation based on Maveniverse Toolbox. It uses Toolbox mojos to implement all the
  * required operations.
  *
  * @see <a href="https://github.com/maveniverse/toolbox">Maveniverse Toolbox</a>

@@ -50,9 +50,8 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Embedded executor implementation, that invokes Maven from installation directory within this same JVM but in isolated
- * classloader. This class supports Maven 4.x and Maven 3.x as well.
- * The class world with Maven is kept in memory as long as instance of this class is not closed. Subsequent execution
- * requests over same installation home are cached.
+ * classloader. This class supports Maven 4.x and Maven 3.x as well. The ClassWorld of Maven is kept in memory as
+ * long as instance of this class is not closed. Subsequent execution requests over same installation home are cached.
  */
 public class EmbeddedMavenExecutor implements Executor {
     protected static final class Context {
@@ -79,13 +78,13 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
-    private final boolean cacheContexts;
-    private final AtomicBoolean closed;
-    private final PrintStream originalStdout;
-    private final PrintStream originalStderr;
-    private final Properties originalProperties;
-    private final ClassLoader originalClassLoader;
-    private final ConcurrentHashMap<Path, Context> contexts;
+    protected final boolean cacheContexts;
+    protected final AtomicBoolean closed;
+    protected final PrintStream originalStdout;
+    protected final PrintStream originalStderr;
+    protected final Properties originalProperties;
+    protected final ClassLoader originalClassLoader;
+    protected final ConcurrentHashMap<Path, Context> contexts;
 
     public EmbeddedMavenExecutor() {
         this(true);
@@ -136,7 +135,7 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
-    private void disposeRuntimeCreatedRealms(Context context) {
+    protected void disposeRuntimeCreatedRealms(Context context) {
         try {
             Method getRealms = context.classWorld.getClass().getMethod("getRealms");
             Method disposeRealm = context.classWorld.getClass().getMethod("disposeRealm", String.class);
@@ -226,6 +225,7 @@ public class EmbeddedMavenExecutor implements Executor {
                 Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
                 Method doMain = cliClass.getMethod("doMain", parameterTypes);
                 exec = r -> {
+                    System.setProperties(null);
                     System.setProperties(prepareProperties(r));
                     try {
                         return (int) doMain.invoke(mavenCli, new Object[] {
@@ -273,7 +273,7 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
-    private Properties prepareProperties(ExecutorRequest request) {
+    protected Properties prepareProperties(ExecutorRequest request) {
         Properties properties = new Properties();
         properties.putAll(System.getProperties());
 
