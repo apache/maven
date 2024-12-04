@@ -306,6 +306,8 @@ public class ApiRunner {
         // Java System properties
         System.getProperties().forEach((k, v) -> properties.put(k.toString(), v.toString()));
 
+        // Do not allow user settings to interfere with our unit tests
+        // TODO: remove that when this go more public
         properties.put("user.home", "target");
 
         // SettingsDecrypter settingsDecrypter =
