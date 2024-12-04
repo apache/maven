@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Priority;
+import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;
@@ -72,7 +73,7 @@ class DefaultModelInterpolatorTest {
         context.put("project.baseUri", "myBaseUri");
 
         session = ApiRunner.createSession(injector -> {
-            injector.bindInstance(RootLocator.class, new TestRootLocator());
+            injector.bindInstance(DefaultModelInterpolatorTest.class, this);
         });
         interpolator = session.getService(Lookup.class).lookup(DefaultModelInterpolator.class);
     }
@@ -559,17 +560,21 @@ class DefaultModelInterpolatorTest {
         assertEquals(uninterpolatedName, out.getName());
     }
 
+    @Provides
     @Priority(10)
-    class TestRootLocator implements RootLocator {
-        @Override
-        public Path findRoot(Path basedir) {
-            return rootDirectory != null ? rootDirectory.get() : basedir;
-        }
+    @SuppressWarnings("unused")
+    RootLocator testRootLocator() {
+        return new RootLocator() {
+            @Override
+            public Path findRoot(Path basedir) {
+                return rootDirectory != null ? rootDirectory.get() : basedir;
+            }
 
-        @Override
-        public Path findMandatoryRoot(Path basedir) {
-            return Optional.ofNullable(findRoot(basedir))
-                    .orElseThrow(() -> new IllegalStateException(getNoRootMessage()));
-        }
+            @Override
+            public Path findMandatoryRoot(Path basedir) {
+                return Optional.ofNullable(findRoot(basedir))
+                        .orElseThrow(() -> new IllegalStateException(getNoRootMessage()));
+            }
+        };
     }
 }
