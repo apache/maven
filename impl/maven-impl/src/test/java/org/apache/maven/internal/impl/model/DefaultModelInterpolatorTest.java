@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl.model;
 
+import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -32,6 +33,8 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
@@ -303,8 +306,9 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testBasedir() throws Exception {
-        Path projectBasedir = Paths.get("projectBasedir");
+    public void testBasedirUnx() throws Exception {
+        FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
+        Path projectBasedir = fs.getPath("projectBasedir");
 
         Model model = Model.newBuilder()
                 .version("3.8.1")
@@ -319,7 +323,29 @@ class DefaultModelInterpolatorTest {
         assertProblemFree(collector);
 
         assertEquals(
-                projectBasedir.resolve("temp-repo").toAbsolutePath().toString(),
+                projectBasedir.toAbsolutePath() + "/temp-repo",
+                (out.getRepositories().get(0)).getUrl());
+    }
+
+    @Test
+    public void testBasedirWin() throws Exception {
+        FileSystem fs = Jimfs.newFileSystem(Configuration.windows());
+        Path projectBasedir = fs.getPath("projectBasedir");
+
+        Model model = Model.newBuilder()
+                .version("3.8.1")
+                .artifactId("foo")
+                .repositories(Collections.singletonList(
+                        Repository.newBuilder().url("${basedir}/temp-repo").build()))
+                .build();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, projectBasedir, createModelBuildingRequest(context).build(), collector);
+        assertProblemFree(collector);
+
+        assertEquals(
+                projectBasedir.toAbsolutePath() + "/temp-repo",
                 (out.getRepositories().get(0)).getUrl());
     }
 

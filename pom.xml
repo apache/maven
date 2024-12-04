@@ -648,6 +648,11 @@ under the License.
         <artifactId>byte-buddy</artifactId>
         <version>${byteBuddyVersion}</version>
       </dependency>
+      <dependency>
+        <groupId>com.google.jimfs</groupId>
+        <artifactId>jimfs</artifactId>
+        <version>1.3.0</version>
+      </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
   </dependencyManagement>
