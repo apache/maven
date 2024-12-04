@@ -184,8 +184,12 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 }
             }
         }
+        // un-prefixed model reflection
+        String value = projectProperty(model, projectDir, expression, false);
         // user properties
-        String value = request.getUserProperties().get(expression);
+        if (value == null) {
+            value = request.getUserProperties().get(expression);
+        }
         // model properties
         if (value == null) {
             value = model.getProperties().get(expression);
@@ -198,11 +202,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
         if (value == null) {
             value = request.getSystemProperties().get("env." + expression);
         }
-        if (value != null) {
-            return value;
-        }
-        // model reflection
-        return projectProperty(model, projectDir, expression, false);
+        return value;
     }
 
     String projectProperty(Model model, Path projectDir, String subExpr, boolean prefixed) {
@@ -223,7 +223,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             } else if (prefixed && subExpr.startsWith("baseUri.")) {
                 try {
                     Object value = ReflectionValueExtractor.evaluate(
-                            subExpr, projectDir.toAbsolutePath().toUri(), false);
+                            subExpr, projectDir.toAbsolutePath().toUri(), true);
                     if (value != null) {
                         return value.toString();
                     }
@@ -234,8 +234,8 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 return rootLocator.findMandatoryRoot(projectDir).toString();
             } else if (prefixed && subExpr.startsWith("rootDirectory.")) {
                 try {
-                    Object value = ReflectionValueExtractor.evaluate(
-                            subExpr, projectDir.toAbsolutePath().toUri(), false);
+                    Object value =
+                            ReflectionValueExtractor.evaluate(subExpr, rootLocator.findMandatoryRoot(projectDir), true);
                     if (value != null) {
                         return value.toString();
                     }

@@ -105,17 +105,22 @@ public class SimpleProblemCollector implements ModelProblemCollector {
         throw new UnsupportedOperationException();
     }
 
+    public List<String> getFatals() {
+        return getForLevel(ModelProblem.Severity.FATAL);
+    }
+
     public List<String> getErrors() {
-        return problems.stream()
-                .filter(p -> p.getSeverity() == ModelProblem.Severity.ERROR)
-                .map(p -> p.getMessage())
-                .toList();
+        return getForLevel(ModelProblem.Severity.ERROR);
     }
 
     public List<String> getWarnings() {
+        return getForLevel(ModelProblem.Severity.WARNING);
+    }
+
+    private List<String> getForLevel(BuilderProblem.Severity severity) {
         return problems.stream()
-                .filter(p -> p.getSeverity() == ModelProblem.Severity.WARNING)
-                .map(p -> p.getMessage())
+                .filter(p -> p.getSeverity() == severity)
+                .map(BuilderProblem::getMessage)
                 .toList();
     }
 }

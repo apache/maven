@@ -18,46 +18,11 @@
  */
 package org.apache.maven.internal.impl.standalone;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 
-import org.apache.maven.api.services.ModelBuilder;
-import org.apache.maven.internal.impl.DefaultModelUrlNormalizer;
-import org.apache.maven.internal.impl.DefaultModelVersionParser;
-import org.apache.maven.internal.impl.DefaultModelXmlFactory;
-import org.apache.maven.internal.impl.DefaultPluginConfigurationExpander;
-import org.apache.maven.internal.impl.DefaultSuperPomProvider;
-import org.apache.maven.internal.impl.DefaultUrlNormalizer;
-import org.apache.maven.internal.impl.model.DefaultDependencyManagementImporter;
-import org.apache.maven.internal.impl.model.DefaultDependencyManagementInjector;
-import org.apache.maven.internal.impl.model.DefaultInheritanceAssembler;
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
-import org.apache.maven.internal.impl.model.DefaultModelBuilder;
-import org.apache.maven.internal.impl.model.DefaultModelCacheFactory;
-import org.apache.maven.internal.impl.model.DefaultModelInterpolator;
-import org.apache.maven.internal.impl.model.DefaultModelNormalizer;
-import org.apache.maven.internal.impl.model.DefaultModelPathTranslator;
-import org.apache.maven.internal.impl.model.DefaultModelProcessor;
-import org.apache.maven.internal.impl.model.DefaultModelValidator;
-import org.apache.maven.internal.impl.model.DefaultPathTranslator;
-import org.apache.maven.internal.impl.model.DefaultPluginManagementInjector;
-import org.apache.maven.internal.impl.model.DefaultProfileInjector;
-import org.apache.maven.internal.impl.model.DefaultProfileSelector;
-import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
-import org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader;
-import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
-import org.apache.maven.internal.impl.resolver.DefaultVersionRangeResolver;
-import org.apache.maven.internal.impl.resolver.DefaultVersionResolver;
-import org.apache.maven.internal.impl.resolver.MavenArtifactRelocationSource;
-import org.apache.maven.internal.impl.resolver.PluginsMetadataGeneratorFactory;
-import org.apache.maven.internal.impl.resolver.SnapshotMetadataGeneratorFactory;
-import org.apache.maven.internal.impl.resolver.VersionsMetadataGeneratorFactory;
-import org.apache.maven.internal.impl.resolver.relocation.DistributionManagementArtifactRelocationSource;
-import org.apache.maven.internal.impl.resolver.relocation.UserPropertiesArtifactRelocationSource;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Provides;
 import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
@@ -79,34 +44,7 @@ import org.eclipse.aether.impl.UpdateCheckManager;
 import org.eclipse.aether.impl.UpdatePolicyAnalyzer;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
-import org.eclipse.aether.internal.impl.DefaultArtifactPredicateFactory;
-import org.eclipse.aether.internal.impl.DefaultArtifactResolver;
-import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
-import org.eclipse.aether.internal.impl.DefaultChecksumProcessor;
-import org.eclipse.aether.internal.impl.DefaultDeployer;
-import org.eclipse.aether.internal.impl.DefaultInstaller;
-import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
-import org.eclipse.aether.internal.impl.DefaultLocalPathPrefixComposerFactory;
-import org.eclipse.aether.internal.impl.DefaultLocalRepositoryProvider;
-import org.eclipse.aether.internal.impl.DefaultMetadataResolver;
-import org.eclipse.aether.internal.impl.DefaultOfflineController;
-import org.eclipse.aether.internal.impl.DefaultPathProcessor;
-import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
-import org.eclipse.aether.internal.impl.DefaultRepositoryConnectorProvider;
-import org.eclipse.aether.internal.impl.DefaultRepositoryEventDispatcher;
-import org.eclipse.aether.internal.impl.DefaultRepositoryLayoutProvider;
-import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
-import org.eclipse.aether.internal.impl.DefaultRepositorySystemLifecycle;
-import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
-import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
-import org.eclipse.aether.internal.impl.DefaultUpdateCheckManager;
-import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
-import org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory;
-import org.eclipse.aether.internal.impl.LocalPathComposer;
-import org.eclipse.aether.internal.impl.LocalPathPrefixComposerFactory;
-import org.eclipse.aether.internal.impl.Maven2RepositoryLayoutFactory;
-import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
-import org.eclipse.aether.internal.impl.TrackingFileManager;
+import org.eclipse.aether.internal.impl.*;
 import org.eclipse.aether.internal.impl.checksum.DefaultChecksumAlgorithmFactorySelector;
 import org.eclipse.aether.internal.impl.checksum.Md5ChecksumAlgorithmFactory;
 import org.eclipse.aether.internal.impl.checksum.Sha1ChecksumAlgorithmFactory;
@@ -122,7 +60,6 @@ import org.eclipse.aether.internal.impl.collect.df.DfDependencyCollector;
 import org.eclipse.aether.internal.impl.filter.DefaultRemoteRepositoryFilterManager;
 import org.eclipse.aether.internal.impl.filter.GroupIdRemoteRepositoryFilterSource;
 import org.eclipse.aether.internal.impl.filter.PrefixesRemoteRepositoryFilterSource;
-import org.eclipse.aether.internal.impl.resolution.TrustedChecksumsArtifactResolverPostProcessor;
 import org.eclipse.aether.internal.impl.synccontext.DefaultSyncContextFactory;
 import org.eclipse.aether.internal.impl.synccontext.named.NameMapper;
 import org.eclipse.aether.internal.impl.synccontext.named.NameMappers;
@@ -159,942 +96,460 @@ import org.eclipse.aether.spi.resolution.ArtifactResolverPostProcessor;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.util.version.GenericVersionScheme;
-import org.eclipse.aether.version.VersionScheme;
 
 /**
- * A simple memorizing {@link Supplier} of {@link RepositorySystem} instance, that on first call
- * supplies lazily constructed instance, and on each subsequent call same instance. Hence, this instance should be
- * thrown away immediately once repository system was created and there is no need for more instances. If new
- * repository system instance needed, new instance of this class must be created. For proper shut down of returned
- * repository system instance(s) use {@link RepositorySystem#shutdown()} method on supplied instance(s).
- * <p>
- * Since Resolver 2.0 this class offers access to various components via public getters, and allows even partial object
- * graph construction.
- * <p>
- * Extend this class {@code createXXX()} methods and override to customize, if needed. The contract of this class makes
- * sure that these (potentially overridden) methods are invoked only once, and instance created by those methods are
- * memorized and kept as long as supplier instance is kept open.
- * <p>
- * This class is not thread safe and must be used from one thread only, while the constructed {@link RepositorySystem}
- * is thread safe.
- * <p>
- * Important: Given the instance of supplier memorizes the supplier {@link RepositorySystem} instance it supplies,
- * their lifecycle is shared as well: once supplied repository system is shut-down, this instance becomes closed as
- * well. Any subsequent {@code getXXX} method invocation attempt will fail with {@link IllegalStateException}.
+ * DI Bridge for Maven Resolver
  */
-public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
-    private final AtomicBoolean closed = new AtomicBoolean(false);
+@SuppressWarnings("unused")
+public class RepositorySystemSupplier {
 
-    public RepositorySystemSupplier() {}
-
-    private void checkClosed() {
-        if (closed.get()) {
-            throw new IllegalStateException("Supplier is closed");
-        }
+    @Provides
+    static MetadataResolver newMetadataResolver(
+            RepositoryEventDispatcher repositoryEventDispatcher,
+            UpdateCheckManager updateCheckManager,
+            RepositoryConnectorProvider repositoryConnectorProvider,
+            RemoteRepositoryManager remoteRepositoryManager,
+            SyncContextFactory syncContextFactory,
+            OfflineController offlineController,
+            RemoteRepositoryFilterManager remoteRepositoryFilterManager,
+            PathProcessor pathProcessor) {
+        return new DefaultMetadataResolver(
+                repositoryEventDispatcher,
+                updateCheckManager,
+                repositoryConnectorProvider,
+                remoteRepositoryManager,
+                syncContextFactory,
+                offlineController,
+                remoteRepositoryFilterManager,
+                pathProcessor);
     }
 
-    private PathProcessor pathProcessor;
-
-    public final PathProcessor getPathProcessor() {
-        checkClosed();
-        if (pathProcessor == null) {
-            pathProcessor = createPathProcessor();
-        }
-        return pathProcessor;
+    @Provides
+    static RepositoryEventDispatcher newRepositoryEventDispatcher(@Nullable Map<String, RepositoryListener> listeners) {
+        return new DefaultRepositoryEventDispatcher(listeners != null ? listeners : Map.of());
     }
 
-    protected PathProcessor createPathProcessor() {
-        return new DefaultPathProcessor();
+    @Provides
+    static UpdateCheckManager newUpdateCheckManager(
+            TrackingFileManager trackingFileManager,
+            UpdatePolicyAnalyzer updatePolicyAnalyzer,
+            PathProcessor pathProcessor) {
+        return new DefaultUpdateCheckManager(trackingFileManager, updatePolicyAnalyzer, pathProcessor);
     }
 
-    private ChecksumProcessor checksumProcessor;
-
-    public final ChecksumProcessor getChecksumProcessor() {
-        checkClosed();
-        if (checksumProcessor == null) {
-            checksumProcessor = createChecksumProcessor();
-        }
-        return checksumProcessor;
-    }
-
-    protected ChecksumProcessor createChecksumProcessor() {
-        return new DefaultChecksumProcessor(getPathProcessor());
-    }
-
-    private TrackingFileManager trackingFileManager;
-
-    public final TrackingFileManager getTrackingFileManager() {
-        checkClosed();
-        if (trackingFileManager == null) {
-            trackingFileManager = createTrackingFileManager();
-        }
-        return trackingFileManager;
-    }
-
-    protected TrackingFileManager createTrackingFileManager() {
+    @Provides
+    static TrackingFileManager newTrackingFileManager() {
         return new DefaultTrackingFileManager();
     }
 
-    private LocalPathComposer localPathComposer;
-
-    public final LocalPathComposer getLocalPathComposer() {
-        checkClosed();
-        if (localPathComposer == null) {
-            localPathComposer = createLocalPathComposer();
-        }
-        return localPathComposer;
-    }
-
-    protected LocalPathComposer createLocalPathComposer() {
-        return new DefaultLocalPathComposer();
-    }
-
-    private LocalPathPrefixComposerFactory localPathPrefixComposerFactory;
-
-    public final LocalPathPrefixComposerFactory getLocalPathPrefixComposerFactory() {
-        checkClosed();
-        if (localPathPrefixComposerFactory == null) {
-            localPathPrefixComposerFactory = createLocalPathPrefixComposerFactory();
-        }
-        return localPathPrefixComposerFactory;
-    }
-
-    protected LocalPathPrefixComposerFactory createLocalPathPrefixComposerFactory() {
-        return new DefaultLocalPathPrefixComposerFactory();
-    }
-
-    private RepositorySystemLifecycle repositorySystemLifecycle;
-
-    public final RepositorySystemLifecycle getRepositorySystemLifecycle() {
-        checkClosed();
-        if (repositorySystemLifecycle == null) {
-            repositorySystemLifecycle = createRepositorySystemLifecycle();
-            repositorySystemLifecycle.addOnSystemEndedHandler(() -> closed.set(true));
-        }
-        return repositorySystemLifecycle;
-    }
-
-    protected RepositorySystemLifecycle createRepositorySystemLifecycle() {
-        return new DefaultRepositorySystemLifecycle();
-    }
-
-    private OfflineController offlineController;
-
-    public final OfflineController getOfflineController() {
-        checkClosed();
-        if (offlineController == null) {
-            offlineController = createOfflineController();
-        }
-        return offlineController;
-    }
-
-    protected OfflineController createOfflineController() {
-        return new DefaultOfflineController();
-    }
-
-    private UpdatePolicyAnalyzer updatePolicyAnalyzer;
-
-    public final UpdatePolicyAnalyzer getUpdatePolicyAnalyzer() {
-        checkClosed();
-        if (updatePolicyAnalyzer == null) {
-            updatePolicyAnalyzer = createUpdatePolicyAnalyzer();
-        }
-        return updatePolicyAnalyzer;
-    }
-
-    protected UpdatePolicyAnalyzer createUpdatePolicyAnalyzer() {
+    @Provides
+    static UpdatePolicyAnalyzer newUpdatePolicyAnalyzer() {
         return new DefaultUpdatePolicyAnalyzer();
     }
 
-    private ChecksumPolicyProvider checksumPolicyProvider;
-
-    public final ChecksumPolicyProvider getChecksumPolicyProvider() {
-        checkClosed();
-        if (checksumPolicyProvider == null) {
-            checksumPolicyProvider = createChecksumPolicyProvider();
-        }
-        return checksumPolicyProvider;
+    @Provides
+    static RepositoryConnectorProvider newRepositoryConnectorProvider(
+            Map<String, RepositoryConnectorFactory> connectorFactories,
+            RemoteRepositoryFilterManager remoteRepositoryFilterManager) {
+        return new DefaultRepositoryConnectorProvider(connectorFactories, remoteRepositoryFilterManager);
     }
 
-    protected ChecksumPolicyProvider createChecksumPolicyProvider() {
+    @Named("basic")
+    @Provides
+    static BasicRepositoryConnectorFactory newBasicRepositoryConnectorFactory(
+            TransporterProvider transporterProvider,
+            RepositoryLayoutProvider layoutProvider,
+            ChecksumPolicyProvider checksumPolicyProvider,
+            ChecksumProcessor checksumProcessor,
+            Map<String, ProvidedChecksumsSource> providedChecksumsSources) {
+        return new BasicRepositoryConnectorFactory(
+                transporterProvider,
+                layoutProvider,
+                checksumPolicyProvider,
+                checksumProcessor,
+                providedChecksumsSources);
+    }
+
+    @Provides
+    static RepositoryLayoutProvider newRepositoryLayoutProvider(Map<String, RepositoryLayoutFactory> layoutFactories) {
+        return new DefaultRepositoryLayoutProvider(layoutFactories);
+    }
+
+    @Provides
+    @Named(Maven2RepositoryLayoutFactory.NAME)
+    static Maven2RepositoryLayoutFactory newMaven2RepositoryLayoutFactory(
+            ChecksumAlgorithmFactorySelector checksumAlgorithmFactorySelector,
+            ArtifactPredicateFactory artifactPredicateFactory) {
+        return new Maven2RepositoryLayoutFactory(checksumAlgorithmFactorySelector, artifactPredicateFactory);
+    }
+
+    @Provides
+    static SyncContextFactory newSyncContextFactory(NamedLockFactoryAdapterFactory namedLockFactoryAdapterFactory) {
+        return new DefaultSyncContextFactory(namedLockFactoryAdapterFactory);
+    }
+
+    @Provides
+    static OfflineController newOfflineController() {
+        return new DefaultOfflineController();
+    }
+
+    @Provides
+    static RemoteRepositoryFilterManager newRemoteRepositoryFilterManager(
+            Map<String, RemoteRepositoryFilterSource> sources) {
+        return new DefaultRemoteRepositoryFilterManager(sources);
+    }
+
+    @Provides
+    @Named(GroupIdRemoteRepositoryFilterSource.NAME)
+    static GroupIdRemoteRepositoryFilterSource newGroupIdRemoteRepositoryFilterSource(
+            RepositorySystemLifecycle repositorySystemLifecycle) {
+        return new GroupIdRemoteRepositoryFilterSource(repositorySystemLifecycle);
+    }
+
+    @Provides
+    @Named(PrefixesRemoteRepositoryFilterSource.NAME)
+    static PrefixesRemoteRepositoryFilterSource newPrefixesRemoteRepositoryFilterSource(
+            RepositoryLayoutProvider repositoryLayoutProvider) {
+        return new PrefixesRemoteRepositoryFilterSource(repositoryLayoutProvider);
+    }
+
+    @Provides
+    static PathProcessor newPathProcessor() {
+        return new DefaultPathProcessor();
+    }
+
+    @Provides
+    static RepositorySystem newRepositorySystem(
+            VersionResolver versionResolver,
+            VersionRangeResolver versionRangeResolver,
+            ArtifactResolver artifactResolver,
+            MetadataResolver metadataResolver,
+            ArtifactDescriptorReader artifactDescriptorReader,
+            DependencyCollector dependencyCollector,
+            Installer installer,
+            Deployer deployer,
+            LocalRepositoryProvider localRepositoryProvider,
+            SyncContextFactory syncContextFactory,
+            RemoteRepositoryManager remoteRepositoryManager,
+            RepositorySystemLifecycle repositorySystemLifecycle,
+            @Nullable Map<String, ArtifactDecoratorFactory> artifactDecoratorFactories) {
+        return new DefaultRepositorySystem(
+                versionResolver,
+                versionRangeResolver,
+                artifactResolver,
+                metadataResolver,
+                artifactDescriptorReader,
+                dependencyCollector,
+                installer,
+                deployer,
+                localRepositoryProvider,
+                syncContextFactory,
+                remoteRepositoryManager,
+                repositorySystemLifecycle,
+                artifactDecoratorFactories != null ? artifactDecoratorFactories : Map.of());
+    }
+
+    @Provides
+    static RemoteRepositoryManager newRemoteRepositoryManager(
+            UpdatePolicyAnalyzer updatePolicyAnalyzer, ChecksumPolicyProvider checksumPolicyProvider) {
+        return new DefaultRemoteRepositoryManager(updatePolicyAnalyzer, checksumPolicyProvider);
+    }
+
+    @Provides
+    static ChecksumPolicyProvider newChecksumPolicyProvider() {
         return new DefaultChecksumPolicyProvider();
     }
 
-    private UpdateCheckManager updateCheckManager;
-
-    public final UpdateCheckManager getUpdateCheckManager() {
-        checkClosed();
-        if (updateCheckManager == null) {
-            updateCheckManager = createUpdateCheckManager();
-        }
-        return updateCheckManager;
+    @Provides
+    static NamedLockFactoryAdapterFactory newNamedLockFactoryAdapterFactory(
+            Map<String, NamedLockFactory> factories,
+            Map<String, NameMapper> nameMappers,
+            RepositorySystemLifecycle lifecycle) {
+        return new NamedLockFactoryAdapterFactoryImpl(factories, nameMappers, lifecycle);
     }
 
-    protected UpdateCheckManager createUpdateCheckManager() {
-        return new DefaultUpdateCheckManager(getTrackingFileManager(), getUpdatePolicyAnalyzer(), getPathProcessor());
+    @Provides
+    @Named(FileLockNamedLockFactory.NAME)
+    static FileLockNamedLockFactory newFileLockNamedLockFactory() {
+        return new FileLockNamedLockFactory();
     }
 
-    private Map<String, NamedLockFactory> namedLockFactories;
-
-    public final Map<String, NamedLockFactory> getNamedLockFactories() {
-        checkClosed();
-        if (namedLockFactories == null) {
-            namedLockFactories = createNamedLockFactories();
-        }
-        return namedLockFactories;
+    @Provides
+    @Named(LocalReadWriteLockNamedLockFactory.NAME)
+    static LocalReadWriteLockNamedLockFactory newLocalReadWriteLockNamedLockFactory() {
+        return new LocalReadWriteLockNamedLockFactory();
     }
 
-    protected Map<String, NamedLockFactory> createNamedLockFactories() {
-        HashMap<String, NamedLockFactory> result = new HashMap<>();
-        result.put(NoopNamedLockFactory.NAME, new NoopNamedLockFactory());
-        result.put(LocalReadWriteLockNamedLockFactory.NAME, new LocalReadWriteLockNamedLockFactory());
-        result.put(LocalSemaphoreNamedLockFactory.NAME, new LocalSemaphoreNamedLockFactory());
-        result.put(FileLockNamedLockFactory.NAME, new FileLockNamedLockFactory());
-        return result;
+    @Provides
+    @Named(LocalSemaphoreNamedLockFactory.NAME)
+    static LocalSemaphoreNamedLockFactory newLocalSemaphoreNamedLockFactory() {
+        return new LocalSemaphoreNamedLockFactory();
     }
 
-    private Map<String, NameMapper> nameMappers;
-
-    public final Map<String, NameMapper> getNameMappers() {
-        checkClosed();
-        if (nameMappers == null) {
-            nameMappers = createNameMappers();
-        }
-        return nameMappers;
+    @Provides
+    @Named(NoopNamedLockFactory.NAME)
+    static NoopNamedLockFactory newNoopNamedLockFactory() {
+        return new NoopNamedLockFactory();
     }
 
-    protected Map<String, NameMapper> createNameMappers() {
-        HashMap<String, NameMapper> result = new HashMap<>();
-        result.put(NameMappers.STATIC_NAME, NameMappers.staticNameMapper());
-        result.put(NameMappers.GAV_NAME, NameMappers.gavNameMapper());
-        result.put(NameMappers.DISCRIMINATING_NAME, NameMappers.discriminatingNameMapper());
-        result.put(NameMappers.FILE_GAV_NAME, NameMappers.fileGavNameMapper());
-        result.put(NameMappers.FILE_HGAV_NAME, NameMappers.fileHashingGavNameMapper());
-        return result;
+    @Provides
+    @Named(NameMappers.STATIC_NAME)
+    static NameMapper staticNameMapper() {
+        return NameMappers.staticNameMapper();
     }
 
-    private NamedLockFactoryAdapterFactory namedLockFactoryAdapterFactory;
-
-    public final NamedLockFactoryAdapterFactory getNamedLockFactoryAdapterFactory() {
-        checkClosed();
-        if (namedLockFactoryAdapterFactory == null) {
-            namedLockFactoryAdapterFactory = createNamedLockFactoryAdapterFactory();
-        }
-        return namedLockFactoryAdapterFactory;
+    @Provides
+    @Named(NameMappers.GAV_NAME)
+    static NameMapper gavNameMapper() {
+        return NameMappers.gavNameMapper();
     }
 
-    protected NamedLockFactoryAdapterFactory createNamedLockFactoryAdapterFactory() {
-        return new NamedLockFactoryAdapterFactoryImpl(
-                getNamedLockFactories(), getNameMappers(), getRepositorySystemLifecycle());
+    @Provides
+    @Named(NameMappers.DISCRIMINATING_NAME)
+    static NameMapper discriminatingNameMapper() {
+        return NameMappers.discriminatingNameMapper();
     }
 
-    private SyncContextFactory syncContextFactory;
-
-    public final SyncContextFactory getSyncContextFactory() {
-        checkClosed();
-        if (syncContextFactory == null) {
-            syncContextFactory = createSyncContextFactory();
-        }
-        return syncContextFactory;
+    @Provides
+    @Named(NameMappers.FILE_GAV_NAME)
+    static NameMapper fileGavNameMapper() {
+        return NameMappers.fileGavNameMapper();
     }
 
-    protected SyncContextFactory createSyncContextFactory() {
-        return new DefaultSyncContextFactory(getNamedLockFactoryAdapterFactory());
+    @Provides
+    @Named(NameMappers.FILE_HGAV_NAME)
+    static NameMapper fileHashingGavNameMapper() {
+        return NameMappers.fileHashingGavNameMapper();
     }
 
-    private Map<String, ChecksumAlgorithmFactory> checksumAlgorithmFactories;
-
-    public final Map<String, ChecksumAlgorithmFactory> getChecksumAlgorithmFactories() {
-        checkClosed();
-        if (checksumAlgorithmFactories == null) {
-            checksumAlgorithmFactories = createChecksumAlgorithmFactories();
-        }
-        return checksumAlgorithmFactories;
+    @Provides
+    static RepositorySystemLifecycle newRepositorySystemLifecycle() {
+        return new DefaultRepositorySystemLifecycle();
     }
 
-    protected Map<String, ChecksumAlgorithmFactory> createChecksumAlgorithmFactories() {
-        HashMap<String, ChecksumAlgorithmFactory> result = new HashMap<>();
-        result.put(Sha512ChecksumAlgorithmFactory.NAME, new Sha512ChecksumAlgorithmFactory());
-        result.put(Sha256ChecksumAlgorithmFactory.NAME, new Sha256ChecksumAlgorithmFactory());
-        result.put(Sha1ChecksumAlgorithmFactory.NAME, new Sha1ChecksumAlgorithmFactory());
-        result.put(Md5ChecksumAlgorithmFactory.NAME, new Md5ChecksumAlgorithmFactory());
-        return result;
-    }
-
-    private ChecksumAlgorithmFactorySelector checksumAlgorithmFactorySelector;
-
-    public final ChecksumAlgorithmFactorySelector getChecksumAlgorithmFactorySelector() {
-        checkClosed();
-        if (checksumAlgorithmFactorySelector == null) {
-            checksumAlgorithmFactorySelector = createChecksumAlgorithmFactorySelector();
-        }
-        return checksumAlgorithmFactorySelector;
-    }
-
-    protected ChecksumAlgorithmFactorySelector createChecksumAlgorithmFactorySelector() {
-        return new DefaultChecksumAlgorithmFactorySelector(getChecksumAlgorithmFactories());
-    }
-
-    private ArtifactPredicateFactory artifactPredicateFactory;
-
-    public final ArtifactPredicateFactory getArtifactPredicateFactory() {
-        checkClosed();
-        if (artifactPredicateFactory == null) {
-            artifactPredicateFactory = createArtifactPredicateFactory();
-        }
-        return artifactPredicateFactory;
-    }
-
-    protected ArtifactPredicateFactory createArtifactPredicateFactory() {
-        return new DefaultArtifactPredicateFactory(getChecksumAlgorithmFactorySelector());
-    }
-
-    private Map<String, RepositoryLayoutFactory> repositoryLayoutFactories;
-
-    public final Map<String, RepositoryLayoutFactory> getRepositoryLayoutFactories() {
-        checkClosed();
-        if (repositoryLayoutFactories == null) {
-            repositoryLayoutFactories = createRepositoryLayoutFactories();
-        }
-        return repositoryLayoutFactories;
-    }
-
-    protected Map<String, RepositoryLayoutFactory> createRepositoryLayoutFactories() {
-        HashMap<String, RepositoryLayoutFactory> result = new HashMap<>();
-        result.put(
-                Maven2RepositoryLayoutFactory.NAME,
-                new Maven2RepositoryLayoutFactory(
-                        getChecksumAlgorithmFactorySelector(), getArtifactPredicateFactory()));
-        return result;
-    }
-
-    private RepositoryLayoutProvider repositoryLayoutProvider;
-
-    public final RepositoryLayoutProvider getRepositoryLayoutProvider() {
-        checkClosed();
-        if (repositoryLayoutProvider == null) {
-            repositoryLayoutProvider = createRepositoryLayoutProvider();
-        }
-        return repositoryLayoutProvider;
-    }
-
-    protected RepositoryLayoutProvider createRepositoryLayoutProvider() {
-        return new DefaultRepositoryLayoutProvider(getRepositoryLayoutFactories());
-    }
-
-    private LocalRepositoryProvider localRepositoryProvider;
-
-    public final LocalRepositoryProvider getLocalRepositoryProvider() {
-        checkClosed();
-        if (localRepositoryProvider == null) {
-            localRepositoryProvider = createLocalRepositoryProvider();
-        }
-        return localRepositoryProvider;
-    }
-
-    protected LocalRepositoryProvider createLocalRepositoryProvider() {
-        LocalPathComposer localPathComposer = getLocalPathComposer();
-        HashMap<String, LocalRepositoryManagerFactory> localRepositoryProviders = new HashMap<>(2);
-        localRepositoryProviders.put(
-                SimpleLocalRepositoryManagerFactory.NAME, new SimpleLocalRepositoryManagerFactory(localPathComposer));
-        localRepositoryProviders.put(
-                EnhancedLocalRepositoryManagerFactory.NAME,
-                new EnhancedLocalRepositoryManagerFactory(
-                        localPathComposer, getTrackingFileManager(), getLocalPathPrefixComposerFactory()));
-        return new DefaultLocalRepositoryProvider(localRepositoryProviders);
-    }
-
-    private RemoteRepositoryManager remoteRepositoryManager;
-
-    public final RemoteRepositoryManager getRemoteRepositoryManager() {
-        checkClosed();
-        if (remoteRepositoryManager == null) {
-            remoteRepositoryManager = createRemoteRepositoryManager();
-        }
-        return remoteRepositoryManager;
-    }
-
-    protected RemoteRepositoryManager createRemoteRepositoryManager() {
-        return new DefaultRemoteRepositoryManager(getUpdatePolicyAnalyzer(), getChecksumPolicyProvider());
-    }
-
-    private Map<String, RemoteRepositoryFilterSource> remoteRepositoryFilterSources;
-
-    public final Map<String, RemoteRepositoryFilterSource> getRemoteRepositoryFilterSources() {
-        checkClosed();
-        if (remoteRepositoryFilterSources == null) {
-            remoteRepositoryFilterSources = createRemoteRepositoryFilterSources();
-        }
-        return remoteRepositoryFilterSources;
-    }
-
-    protected Map<String, RemoteRepositoryFilterSource> createRemoteRepositoryFilterSources() {
-        HashMap<String, RemoteRepositoryFilterSource> result = new HashMap<>();
-        result.put(
-                GroupIdRemoteRepositoryFilterSource.NAME,
-                new GroupIdRemoteRepositoryFilterSource(getRepositorySystemLifecycle()));
-        result.put(
-                PrefixesRemoteRepositoryFilterSource.NAME,
-                new PrefixesRemoteRepositoryFilterSource(getRepositoryLayoutProvider()));
-        return result;
-    }
-
-    private RemoteRepositoryFilterManager remoteRepositoryFilterManager;
-
-    public final RemoteRepositoryFilterManager getRemoteRepositoryFilterManager() {
-        checkClosed();
-        if (remoteRepositoryFilterManager == null) {
-            remoteRepositoryFilterManager = createRemoteRepositoryFilterManager();
-        }
-        return remoteRepositoryFilterManager;
-    }
-
-    protected RemoteRepositoryFilterManager createRemoteRepositoryFilterManager() {
-        return new DefaultRemoteRepositoryFilterManager(getRemoteRepositoryFilterSources());
-    }
-
-    private Map<String, RepositoryListener> repositoryListeners;
-
-    public final Map<String, RepositoryListener> getRepositoryListeners() {
-        checkClosed();
-        if (repositoryListeners == null) {
-            repositoryListeners = createRepositoryListeners();
-        }
-        return repositoryListeners;
-    }
-
-    protected Map<String, RepositoryListener> createRepositoryListeners() {
-        return new HashMap<>();
-    }
-
-    private RepositoryEventDispatcher repositoryEventDispatcher;
-
-    public final RepositoryEventDispatcher getRepositoryEventDispatcher() {
-        checkClosed();
-        if (repositoryEventDispatcher == null) {
-            repositoryEventDispatcher = createRepositoryEventDispatcher();
-        }
-        return repositoryEventDispatcher;
-    }
-
-    protected RepositoryEventDispatcher createRepositoryEventDispatcher() {
-        return new DefaultRepositoryEventDispatcher(getRepositoryListeners());
-    }
-
-    private Map<String, TrustedChecksumsSource> trustedChecksumsSources;
-
-    public final Map<String, TrustedChecksumsSource> getTrustedChecksumsSources() {
-        checkClosed();
-        if (trustedChecksumsSources == null) {
-            trustedChecksumsSources = createTrustedChecksumsSources();
-        }
-        return trustedChecksumsSources;
-    }
-
-    protected Map<String, TrustedChecksumsSource> createTrustedChecksumsSources() {
-        HashMap<String, TrustedChecksumsSource> result = new HashMap<>();
-        result.put(
-                SparseDirectoryTrustedChecksumsSource.NAME,
-                new SparseDirectoryTrustedChecksumsSource(getChecksumProcessor(), getLocalPathComposer()));
-        result.put(
-                SummaryFileTrustedChecksumsSource.NAME,
-                new SummaryFileTrustedChecksumsSource(getLocalPathComposer(), getRepositorySystemLifecycle()));
-        return result;
-    }
-
-    private Map<String, ProvidedChecksumsSource> providedChecksumsSources;
-
-    public final Map<String, ProvidedChecksumsSource> getProvidedChecksumsSources() {
-        checkClosed();
-        if (providedChecksumsSources == null) {
-            providedChecksumsSources = createProvidedChecksumsSources();
-        }
-        return providedChecksumsSources;
-    }
-
-    protected Map<String, ProvidedChecksumsSource> createProvidedChecksumsSources() {
-        HashMap<String, ProvidedChecksumsSource> result = new HashMap<>();
-        result.put(
-                TrustedToProvidedChecksumsSourceAdapter.NAME,
-                new TrustedToProvidedChecksumsSourceAdapter(getTrustedChecksumsSources()));
-        return result;
-    }
-
-    private Map<String, ChecksumExtractorStrategy> checksumExtractorStrategies;
-
-    public final Map<String, ChecksumExtractorStrategy> getChecksumExtractorStrategies() {
-        checkClosed();
-        if (checksumExtractorStrategies == null) {
-            checksumExtractorStrategies = createChecksumExtractorStrategies();
-        }
-        return checksumExtractorStrategies;
-    }
-
-    protected Map<String, ChecksumExtractorStrategy> createChecksumExtractorStrategies() {
-        HashMap<String, ChecksumExtractorStrategy> result = new HashMap<>();
-        result.put(XChecksumExtractor.NAME, new XChecksumExtractor());
-        result.put(Nx2ChecksumExtractor.NAME, new Nx2ChecksumExtractor());
-        return result;
-    }
-
-    private ChecksumExtractor checksumExtractor;
-
-    public final ChecksumExtractor getChecksumExtractor() {
-        checkClosed();
-        if (checksumExtractor == null) {
-            checksumExtractor = createChecksumExtractor();
-        }
-        return checksumExtractor;
-    }
-
-    protected ChecksumExtractor createChecksumExtractor() {
-        return new DefaultChecksumExtractor(getChecksumExtractorStrategies());
-    }
-
-    private Map<String, TransporterFactory> transporterFactories;
-
-    public final Map<String, TransporterFactory> getTransporterFactories() {
-        checkClosed();
-        if (transporterFactories == null) {
-            transporterFactories = createTransporterFactories();
-        }
-        return transporterFactories;
-    }
-
-    protected Map<String, TransporterFactory> createTransporterFactories() {
-        HashMap<String, TransporterFactory> result = new HashMap<>();
-        result.put(FileTransporterFactory.NAME, new FileTransporterFactory());
-        result.put(
-                ApacheTransporterFactory.NAME,
-                new ApacheTransporterFactory(getChecksumExtractor(), getPathProcessor()));
-        return result;
-    }
-
-    private TransporterProvider transporterProvider;
-
-    public final TransporterProvider getTransporterProvider() {
-        checkClosed();
-        if (transporterProvider == null) {
-            transporterProvider = createTransporterProvider();
-        }
-        return transporterProvider;
-    }
-
-    protected TransporterProvider createTransporterProvider() {
-        return new DefaultTransporterProvider(getTransporterFactories());
-    }
-
-    private BasicRepositoryConnectorFactory basicRepositoryConnectorFactory;
-
-    public final BasicRepositoryConnectorFactory getBasicRepositoryConnectorFactory() {
-        checkClosed();
-        if (basicRepositoryConnectorFactory == null) {
-            basicRepositoryConnectorFactory = createBasicRepositoryConnectorFactory();
-        }
-        return basicRepositoryConnectorFactory;
-    }
-
-    protected BasicRepositoryConnectorFactory createBasicRepositoryConnectorFactory() {
-        return new BasicRepositoryConnectorFactory(
-                getTransporterProvider(),
-                getRepositoryLayoutProvider(),
-                getChecksumPolicyProvider(),
-                getChecksumProcessor(),
-                getProvidedChecksumsSources());
-    }
-
-    private Map<String, RepositoryConnectorFactory> repositoryConnectorFactories;
-
-    public final Map<String, RepositoryConnectorFactory> getRepositoryConnectorFactories() {
-        checkClosed();
-        if (repositoryConnectorFactories == null) {
-            repositoryConnectorFactories = createRepositoryConnectorFactories();
-        }
-        return repositoryConnectorFactories;
-    }
-
-    protected Map<String, RepositoryConnectorFactory> createRepositoryConnectorFactories() {
-        HashMap<String, RepositoryConnectorFactory> result = new HashMap<>();
-        result.put(BasicRepositoryConnectorFactory.NAME, getBasicRepositoryConnectorFactory());
-        return result;
-    }
-
-    private RepositoryConnectorProvider repositoryConnectorProvider;
-
-    public final RepositoryConnectorProvider getRepositoryConnectorProvider() {
-        checkClosed();
-        if (repositoryConnectorProvider == null) {
-            repositoryConnectorProvider = createRepositoryConnectorProvider();
-        }
-        return repositoryConnectorProvider;
-    }
-
-    protected RepositoryConnectorProvider createRepositoryConnectorProvider() {
-        return new DefaultRepositoryConnectorProvider(
-                getRepositoryConnectorFactories(), getRemoteRepositoryFilterManager());
-    }
-
-    private Installer installer;
-
-    public final Installer getInstaller() {
-        checkClosed();
-        if (installer == null) {
-            installer = createInstaller();
-        }
-        return installer;
-    }
-
-    protected Installer createInstaller() {
-        return new DefaultInstaller(
-                getPathProcessor(),
-                getRepositoryEventDispatcher(),
-                getArtifactGeneratorFactories(),
-                getMetadataGeneratorFactories(),
-                getSyncContextFactory());
-    }
-
-    private Deployer deployer;
-
-    public final Deployer getDeployer() {
-        checkClosed();
-        if (deployer == null) {
-            deployer = createDeployer();
-        }
-        return deployer;
-    }
-
-    protected Deployer createDeployer() {
-        return new DefaultDeployer(
-                getPathProcessor(),
-                getRepositoryEventDispatcher(),
-                getRepositoryConnectorProvider(),
-                getRemoteRepositoryManager(),
-                getUpdateCheckManager(),
-                getArtifactGeneratorFactories(),
-                getMetadataGeneratorFactories(),
-                getSyncContextFactory(),
-                getOfflineController());
-    }
-
-    private Map<String, DependencyCollectorDelegate> dependencyCollectorDelegates;
-
-    public final Map<String, DependencyCollectorDelegate> getDependencyCollectorDelegates() {
-        checkClosed();
-        if (dependencyCollectorDelegates == null) {
-            dependencyCollectorDelegates = createDependencyCollectorDelegates();
-        }
-        return dependencyCollectorDelegates;
-    }
-
-    protected Map<String, DependencyCollectorDelegate> createDependencyCollectorDelegates() {
-        RemoteRepositoryManager remoteRepositoryManager = getRemoteRepositoryManager();
-        ArtifactDescriptorReader artifactDescriptorReader = getArtifactDescriptorReader();
-        VersionRangeResolver versionRangeResolver = getVersionRangeResolver();
-        HashMap<String, DependencyCollectorDelegate> result = new HashMap<>();
-        result.put(
-                DfDependencyCollector.NAME,
-                new DfDependencyCollector(
-                        remoteRepositoryManager,
-                        artifactDescriptorReader,
-                        versionRangeResolver,
-                        getArtifactDecoratorFactories()));
-        result.put(
-                BfDependencyCollector.NAME,
-                new BfDependencyCollector(
-                        remoteRepositoryManager,
-                        artifactDescriptorReader,
-                        versionRangeResolver,
-                        getArtifactDecoratorFactories()));
-        return result;
-    }
-
-    private DependencyCollector dependencyCollector;
-
-    public final DependencyCollector getDependencyCollector() {
-        checkClosed();
-        if (dependencyCollector == null) {
-            dependencyCollector = createDependencyCollector();
-        }
-        return dependencyCollector;
-    }
-
-    protected DependencyCollector createDependencyCollector() {
-        return new DefaultDependencyCollector(getDependencyCollectorDelegates());
-    }
-
-    private Map<String, ArtifactResolverPostProcessor> artifactResolverPostProcessors;
-
-    public final Map<String, ArtifactResolverPostProcessor> getArtifactResolverPostProcessors() {
-        checkClosed();
-        if (artifactResolverPostProcessors == null) {
-            artifactResolverPostProcessors = createArtifactResolverPostProcessors();
-        }
-        return artifactResolverPostProcessors;
-    }
-
-    protected Map<String, ArtifactResolverPostProcessor> createArtifactResolverPostProcessors() {
-        HashMap<String, ArtifactResolverPostProcessor> result = new HashMap<>();
-        result.put(
-                TrustedChecksumsArtifactResolverPostProcessor.NAME,
-                new TrustedChecksumsArtifactResolverPostProcessor(
-                        getChecksumAlgorithmFactorySelector(), getTrustedChecksumsSources()));
-        return result;
-    }
-
-    private ArtifactResolver artifactResolver;
-
-    public final ArtifactResolver getArtifactResolver() {
-        checkClosed();
-        if (artifactResolver == null) {
-            artifactResolver = createArtifactResolver();
-        }
-        return artifactResolver;
-    }
-
-    protected ArtifactResolver createArtifactResolver() {
+    @Provides
+    static ArtifactResolver newArtifactResolver(
+            PathProcessor pathProcessor,
+            RepositoryEventDispatcher repositoryEventDispatcher,
+            VersionResolver versionResolver,
+            UpdateCheckManager updateCheckManager,
+            RepositoryConnectorProvider repositoryConnectorProvider,
+            RemoteRepositoryManager remoteRepositoryManager,
+            SyncContextFactory syncContextFactory,
+            OfflineController offlineController,
+            Map<String, ArtifactResolverPostProcessor> artifactResolverPostProcessors,
+            RemoteRepositoryFilterManager remoteRepositoryFilterManager) {
         return new DefaultArtifactResolver(
-                getPathProcessor(),
-                getRepositoryEventDispatcher(),
-                getVersionResolver(),
-                getUpdateCheckManager(),
-                getRepositoryConnectorProvider(),
-                getRemoteRepositoryManager(),
-                getSyncContextFactory(),
-                getOfflineController(),
-                getArtifactResolverPostProcessors(),
-                getRemoteRepositoryFilterManager());
+                pathProcessor,
+                repositoryEventDispatcher,
+                versionResolver,
+                updateCheckManager,
+                repositoryConnectorProvider,
+                remoteRepositoryManager,
+                syncContextFactory,
+                offlineController,
+                artifactResolverPostProcessors,
+                remoteRepositoryFilterManager);
     }
 
-    private MetadataResolver metadataResolver;
-
-    public final MetadataResolver getMetadataResolver() {
-        checkClosed();
-        if (metadataResolver == null) {
-            metadataResolver = createMetadataResolver();
-        }
-        return metadataResolver;
+    @Provides
+    static DependencyCollector newDependencyCollector(Map<String, DependencyCollectorDelegate> delegates) {
+        return new DefaultDependencyCollector(delegates);
     }
 
-    protected MetadataResolver createMetadataResolver() {
-        return new DefaultMetadataResolver(
-                getRepositoryEventDispatcher(),
-                getUpdateCheckManager(),
-                getRepositoryConnectorProvider(),
-                getRemoteRepositoryManager(),
-                getSyncContextFactory(),
-                getOfflineController(),
-                getRemoteRepositoryFilterManager(),
-                getPathProcessor());
+    @Provides
+    @Named(BfDependencyCollector.NAME)
+    static BfDependencyCollector newBfDependencyCollector(
+            RemoteRepositoryManager remoteRepositoryManager,
+            ArtifactDescriptorReader artifactDescriptorReader,
+            VersionRangeResolver versionRangeResolver,
+            @Nullable Map<String, ArtifactDecoratorFactory> artifactDecoratorFactories) {
+        return new BfDependencyCollector(
+                remoteRepositoryManager,
+                artifactDescriptorReader,
+                versionRangeResolver,
+                artifactDecoratorFactories != null ? artifactDecoratorFactories : Map.of());
     }
 
-    private VersionScheme versionScheme;
-
-    public final VersionScheme getVersionScheme() {
-        checkClosed();
-        if (versionScheme == null) {
-            versionScheme = createVersionScheme();
-        }
-        return versionScheme;
+    @Provides
+    @Named(DfDependencyCollector.NAME)
+    static DfDependencyCollector newDfDependencyCollector(
+            RemoteRepositoryManager remoteRepositoryManager,
+            ArtifactDescriptorReader artifactDescriptorReader,
+            VersionRangeResolver versionRangeResolver,
+            @Nullable Map<String, ArtifactDecoratorFactory> artifactDecoratorFactories) {
+        return new DfDependencyCollector(
+                remoteRepositoryManager,
+                artifactDescriptorReader,
+                versionRangeResolver,
+                artifactDecoratorFactories != null ? artifactDecoratorFactories : Map.of());
     }
 
-    protected VersionScheme createVersionScheme() {
-        return new GenericVersionScheme();
+    @Provides
+    static Installer newInstaller(
+            PathProcessor pathProcessor,
+            RepositoryEventDispatcher repositoryEventDispatcher,
+            @Nullable Map<String, ArtifactGeneratorFactory> artifactFactories,
+            Map<String, MetadataGeneratorFactory> metadataFactories,
+            SyncContextFactory syncContextFactory) {
+        return new DefaultInstaller(
+                pathProcessor,
+                repositoryEventDispatcher,
+                artifactFactories != null ? artifactFactories : Map.of(),
+                metadataFactories,
+                syncContextFactory);
     }
 
-    private Map<String, ArtifactGeneratorFactory> artifactGeneratorFactories;
-
-    public final Map<String, ArtifactGeneratorFactory> getArtifactGeneratorFactories() {
-        checkClosed();
-        if (artifactGeneratorFactories == null) {
-            artifactGeneratorFactories = createArtifactGeneratorFactories();
-        }
-        return artifactGeneratorFactories;
+    @Provides
+    static Deployer newDeployer(
+            PathProcessor pathProcessor,
+            RepositoryEventDispatcher repositoryEventDispatcher,
+            RepositoryConnectorProvider repositoryConnectorProvider,
+            RemoteRepositoryManager remoteRepositoryManager,
+            UpdateCheckManager updateCheckManager,
+            @Nullable Map<String, ArtifactGeneratorFactory> artifactFactories,
+            Map<String, MetadataGeneratorFactory> metadataFactories,
+            SyncContextFactory syncContextFactory,
+            OfflineController offlineController) {
+        return new DefaultDeployer(
+                pathProcessor,
+                repositoryEventDispatcher,
+                repositoryConnectorProvider,
+                remoteRepositoryManager,
+                updateCheckManager,
+                artifactFactories != null ? artifactFactories : Map.of(),
+                metadataFactories,
+                syncContextFactory,
+                offlineController);
     }
 
-    protected Map<String, ArtifactGeneratorFactory> createArtifactGeneratorFactories() {
-        // by default none, this is extension point
-        return new HashMap<>();
+    @Provides
+    static LocalRepositoryProvider newLocalRepositoryProvider(
+            Map<String, LocalRepositoryManagerFactory> localRepositoryManagerFactories) {
+        return new DefaultLocalRepositoryProvider(localRepositoryManagerFactories);
     }
 
-    private Map<String, ArtifactDecoratorFactory> artifactDecoratorFactories;
-
-    public final Map<String, ArtifactDecoratorFactory> getArtifactDecoratorFactories() {
-        checkClosed();
-        if (artifactDecoratorFactories == null) {
-            artifactDecoratorFactories = createArtifactDecoratorFactories();
-        }
-        return artifactDecoratorFactories;
+    @Provides
+    @Named(EnhancedLocalRepositoryManagerFactory.NAME)
+    static EnhancedLocalRepositoryManagerFactory newEnhancedLocalRepositoryManagerFactory(
+            LocalPathComposer localPathComposer,
+            TrackingFileManager trackingFileManager,
+            LocalPathPrefixComposerFactory localPathPrefixComposerFactory) {
+        return new EnhancedLocalRepositoryManagerFactory(
+                localPathComposer, trackingFileManager, localPathPrefixComposerFactory);
     }
 
-    protected Map<String, ArtifactDecoratorFactory> createArtifactDecoratorFactories() {
-        // by default none, this is extension point
-        return new HashMap<>();
+    @Provides
+    @Named(SimpleLocalRepositoryManagerFactory.NAME)
+    static SimpleLocalRepositoryManagerFactory newSimpleLocalRepositoryManagerFactory(
+            LocalPathComposer localPathComposer) {
+        return new SimpleLocalRepositoryManagerFactory(localPathComposer);
     }
 
-    // Maven provided
-
-    private Map<String, MetadataGeneratorFactory> metadataGeneratorFactories;
-
-    public final Map<String, MetadataGeneratorFactory> getMetadataGeneratorFactories() {
-        checkClosed();
-        if (metadataGeneratorFactories == null) {
-            metadataGeneratorFactories = createMetadataGeneratorFactories();
-        }
-        return metadataGeneratorFactories;
+    @Provides
+    static LocalPathComposer newLocalPathComposer() {
+        return new DefaultLocalPathComposer();
     }
 
-    protected Map<String, MetadataGeneratorFactory> createMetadataGeneratorFactories() {
-        // from maven-resolver-provider
-        HashMap<String, MetadataGeneratorFactory> result = new HashMap<>();
-        result.put(PluginsMetadataGeneratorFactory.NAME, new PluginsMetadataGeneratorFactory());
-        result.put(VersionsMetadataGeneratorFactory.NAME, new VersionsMetadataGeneratorFactory());
-        result.put(SnapshotMetadataGeneratorFactory.NAME, new SnapshotMetadataGeneratorFactory());
-        return result;
+    @Provides
+    static LocalPathPrefixComposerFactory newLocalPathPrefixComposerFactory() {
+        return new DefaultLocalPathPrefixComposerFactory();
     }
 
-    private LinkedHashMap<String, MavenArtifactRelocationSource> artifactRelocationSources;
-
-    public final LinkedHashMap<String, MavenArtifactRelocationSource> getMavenArtifactRelocationSources() {
-        checkClosed();
-        if (artifactRelocationSources == null) {
-            artifactRelocationSources = createMavenArtifactRelocationSources();
-        }
-        return artifactRelocationSources;
+    @Provides
+    static TransporterProvider newTransportProvider(Map<String, TransporterFactory> transporterFactories) {
+        return new DefaultTransporterProvider(transporterFactories);
     }
 
-    protected LinkedHashMap<String, MavenArtifactRelocationSource> createMavenArtifactRelocationSources() {
-        // from maven-resolver-provider
-        LinkedHashMap<String, MavenArtifactRelocationSource> result = new LinkedHashMap<>();
-        result.put(UserPropertiesArtifactRelocationSource.NAME, new UserPropertiesArtifactRelocationSource());
-        result.put(
-                DistributionManagementArtifactRelocationSource.NAME,
-                new DistributionManagementArtifactRelocationSource());
-        return result;
+    @Provides
+    @Named(FileTransporterFactory.NAME)
+    static FileTransporterFactory newFileTransporterFactory() {
+        return new FileTransporterFactory();
     }
 
-    private ArtifactDescriptorReader artifactDescriptorReader;
-
-    public final ArtifactDescriptorReader getArtifactDescriptorReader() {
-        checkClosed();
-        if (artifactDescriptorReader == null) {
-            artifactDescriptorReader = createArtifactDescriptorReader();
-        }
-        return artifactDescriptorReader;
+    @Provides
+    @Named(ApacheTransporterFactory.NAME)
+    static ApacheTransporterFactory newApacheTransporterFactory(
+            ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
+        return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
     }
 
-    protected ArtifactDescriptorReader createArtifactDescriptorReader() {
-        // from maven-resolver-provider
-        return new DefaultArtifactDescriptorReader(
-                getVersionResolver(),
-                getArtifactResolver(),
-                getModelBuilder(),
-                getRepositoryEventDispatcher(),
-                getMavenArtifactRelocationSources());
+    @Provides
+    static ChecksumProcessor newChecksumProcessor(PathProcessor pathProcessor) {
+        return new DefaultChecksumProcessor(pathProcessor);
     }
 
-    private VersionResolver versionResolver;
-
-    public final VersionResolver getVersionResolver() {
-        checkClosed();
-        if (versionResolver == null) {
-            versionResolver = createVersionResolver();
-        }
-        return versionResolver;
+    @Provides
+    static ChecksumExtractor newChecksumExtractor(Map<String, ChecksumExtractorStrategy> strategies) {
+        return new DefaultChecksumExtractor(strategies);
     }
 
-    protected VersionResolver createVersionResolver() {
-        // from maven-resolver-provider
-        return new DefaultVersionResolver(
-                getMetadataResolver(), getSyncContextFactory(), getRepositoryEventDispatcher());
+    @Provides
+    @Named(Nx2ChecksumExtractor.NAME)
+    static Nx2ChecksumExtractor newNx2ChecksumExtractor() {
+        return new Nx2ChecksumExtractor();
     }
 
-    private VersionRangeResolver versionRangeResolver;
-
-    public final VersionRangeResolver getVersionRangeResolver() {
-        checkClosed();
-        if (versionRangeResolver == null) {
-            versionRangeResolver = createVersionRangeResolver();
-        }
-        return versionRangeResolver;
+    @Provides
+    @Named(XChecksumExtractor.NAME)
+    static XChecksumExtractor newXChecksumExtractor() {
+        return new XChecksumExtractor();
     }
 
-    protected VersionRangeResolver createVersionRangeResolver() {
-        // from maven-resolver-provider
-        return new DefaultVersionRangeResolver(
-                getMetadataResolver(), getSyncContextFactory(), getRepositoryEventDispatcher(), getVersionScheme());
+    @Provides
+    @Named(TrustedToProvidedChecksumsSourceAdapter.NAME)
+    static TrustedToProvidedChecksumsSourceAdapter newTrustedToProvidedChecksumsSourceAdapter(
+            Map<String, TrustedChecksumsSource> trustedChecksumsSources) {
+        return new TrustedToProvidedChecksumsSourceAdapter(trustedChecksumsSources);
     }
 
-    private ModelBuilder modelBuilder;
-
-    public final ModelBuilder getModelBuilder() {
-        checkClosed();
-        if (modelBuilder == null) {
-            modelBuilder = createModelBuilder();
-        }
-        return modelBuilder;
+    @Provides
+    @Named(SparseDirectoryTrustedChecksumsSource.NAME)
+    static SparseDirectoryTrustedChecksumsSource newSparseDirectoryTrustedChecksumsSource(
+            ChecksumProcessor checksumProcessor, LocalPathComposer localPathComposer) {
+        return new SparseDirectoryTrustedChecksumsSource(checksumProcessor, localPathComposer);
     }
 
-    protected ModelBuilder createModelBuilder() {
-        // from maven-model-builder
-        DefaultModelProcessor modelProcessor = new DefaultModelProcessor(new DefaultModelXmlFactory(), List.of());
-        return new DefaultModelBuilder(
-                modelProcessor,
-                new DefaultModelValidator(),
-                new DefaultModelNormalizer(),
-                new DefaultModelInterpolator(
-                        new DefaultPathTranslator(),
-                        new DefaultUrlNormalizer(),
-                        new DefaultRootLocator(),
-                        new DefaultInterpolator()),
-                new DefaultModelPathTranslator(new DefaultPathTranslator()),
-                new DefaultModelUrlNormalizer(new DefaultUrlNormalizer()),
-                new DefaultSuperPomProvider(modelProcessor),
-                new DefaultInheritanceAssembler(),
-                new DefaultProfileSelector(),
-                new DefaultProfileInjector(),
-                new DefaultPluginManagementInjector(),
-                new DefaultDependencyManagementInjector(),
-                new DefaultDependencyManagementImporter(),
-                new DefaultPluginConfigurationExpander(),
-                new DefaultModelVersionParser(getVersionScheme()),
-                List.of(),
-                new DefaultModelCacheFactory(),
-                new DefaultModelResolver(),
-                new DefaultInterpolator(),
-                new DefaultPathTranslator(),
-                new DefaultRootLocator());
+    @Provides
+    @Named(SummaryFileTrustedChecksumsSource.NAME)
+    static SummaryFileTrustedChecksumsSource newSummaryFileTrustedChecksumsSource(
+            LocalPathComposer localPathComposer, RepositorySystemLifecycle repositorySystemLifecycle) {
+        return new SummaryFileTrustedChecksumsSource(localPathComposer, repositorySystemLifecycle);
     }
 
-    private RepositorySystem repositorySystem;
-
-    public final RepositorySystem getRepositorySystem() {
-        checkClosed();
-        if (repositorySystem == null) {
-            repositorySystem = createRepositorySystem();
-        }
-        return repositorySystem;
+    @Provides
+    static ChecksumAlgorithmFactorySelector newChecksumAlgorithmFactorySelector(
+            Map<String, ChecksumAlgorithmFactory> factories) {
+        return new DefaultChecksumAlgorithmFactorySelector(factories);
     }
 
-    protected RepositorySystem createRepositorySystem() {
-        return new DefaultRepositorySystem(
-                getVersionResolver(),
-                getVersionRangeResolver(),
-                getArtifactResolver(),
-                getMetadataResolver(),
-                getArtifactDescriptorReader(),
-                getDependencyCollector(),
-                getInstaller(),
-                getDeployer(),
-                getLocalRepositoryProvider(),
-                getSyncContextFactory(),
-                getRemoteRepositoryManager(),
-                getRepositorySystemLifecycle(),
-                getArtifactDecoratorFactories());
+    @Provides
+    @Named(Md5ChecksumAlgorithmFactory.NAME)
+    static Md5ChecksumAlgorithmFactory newMd5ChecksumAlgorithmFactory() {
+        return new Md5ChecksumAlgorithmFactory();
     }
 
-    @Override
-    public RepositorySystem get() {
-        return getRepositorySystem();
+    @Provides
+    @Named(Sha1ChecksumAlgorithmFactory.NAME)
+    static Sha1ChecksumAlgorithmFactory newSh1ChecksumAlgorithmFactory() {
+        return new Sha1ChecksumAlgorithmFactory();
+    }
+
+    @Provides
+    @Named(Sha256ChecksumAlgorithmFactory.NAME)
+    static Sha256ChecksumAlgorithmFactory newSh256ChecksumAlgorithmFactory() {
+        return new Sha256ChecksumAlgorithmFactory();
+    }
+
+    @Provides
+    @Named(Sha512ChecksumAlgorithmFactory.NAME)
+    static Sha512ChecksumAlgorithmFactory newSh512ChecksumAlgorithmFactory() {
+        return new Sha512ChecksumAlgorithmFactory();
+    }
+
+    @Provides
+    static ArtifactPredicateFactory newArtifactPredicateFactory(
+            ChecksumAlgorithmFactorySelector checksumAlgorithmFactorySelector) {
+        return new DefaultArtifactPredicateFactory(checksumAlgorithmFactorySelector);
     }
 }
