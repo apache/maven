@@ -476,12 +476,30 @@ under the License.
         <directory>src/test/resources</directory>
       </testResource>
       <testResource>
+        <directory>src/test/java</directory>
+        <includes>
+          <include>org/apache/maven/it/it*/it*/*/**</include>
+        </includes>
+        <excludes>
+          <exclude>org/apache/maven/it/it*/it*/*.java</exclude>
+        </excludes>
+      </testResource>
+      <testResource>
         <filtering>true</filtering>
         <directory>src/test/resources-filtered</directory>
       </testResource>
     </testResources>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <excludes>
+              <exclude>org/apache/maven/it/it*/it*/*/**/*.java</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>com.diffplug.spotless</groupId>
           <artifactId>spotless-maven-plugin</artifactId>
