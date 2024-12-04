@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
@@ -64,7 +65,6 @@ import org.apache.maven.internal.impl.resolver.scopes.Maven4ScopeManagerConfigur
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -75,10 +75,21 @@ public class ApiRunner {
      * Create a new session.
      */
     public static Session createSession() {
+        return createSession(null);
+    }
+
+    /**
+     * Create a new session.
+     */
+    public static Session createSession(Consumer<Injector> injectorConsumer) {
         Injector injector = Injector.create();
         injector.bindInstance(Injector.class, injector);
         injector.bindImplicit(ApiRunner.class);
+        injector.bindImplicit(RepositorySystemSupplier.class);
         injector.discover(ApiRunner.class.getClassLoader());
+        if (injectorConsumer != null) {
+            injectorConsumer.accept(injector);
+        }
         Session session = injector.getInstance(Session.class);
         SessionScope scope = new SessionScope();
         scope.enter();
@@ -288,30 +299,16 @@ public class ApiRunner {
 
     @Provides
     @SuppressWarnings("unused")
-    static RepositorySystemSupplier newRepositorySystemSupplier() {
-        return new RepositorySystemSupplier();
-    }
-
-    @Provides
-    @SuppressWarnings("unused")
-    static RepositorySystem newRepositorySystem(RepositorySystemSupplier repositorySystemSupplier) {
-        return repositorySystemSupplier.getRepositorySystem();
-    }
-
-    @Provides
-    @SuppressWarnings("unused")
-    static RemoteRepositoryManager newRemoteRepositoryManager(RepositorySystemSupplier repositorySystemSupplier) {
-        return repositorySystemSupplier.getRemoteRepositoryManager();
-    }
-
-    @Provides
-    @SuppressWarnings("unused")
     static Session newSession(RepositorySystem system, Lookup lookup) {
         Map<String, String> properties = new HashMap<>();
         // Env variables prefixed with "env."
         System.getenv().forEach((k, v) -> properties.put("env." + k, v));
         // Java System properties
         System.getProperties().forEach((k, v) -> properties.put(k.toString(), v.toString()));
+
+        // Do not allow user settings to interfere with our unit tests
+        // TODO: remove that when this go more public
+        properties.put("user.home", "target");
 
         // SettingsDecrypter settingsDecrypter =
         // (SettingsDecrypter)Objects.requireNonNull(this.createSettingsDecrypter(preBoot));
