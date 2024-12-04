@@ -98,8 +98,6 @@ public class Verifier {
 
     private final Path userHomeDirectory;
 
-    private final Path integrationTestLocalRepository;
-
     private final List<String> defaultCliArguments;
 
     private final Properties systemProperties = new Properties();
@@ -133,8 +131,6 @@ public class Verifier {
             this.basedir = Paths.get(basedir).toAbsolutePath();
             this.tempBasedir = Files.createTempDirectory("verifier");
             this.userHomeDirectory = Paths.get(System.getProperty("user.home"));
-            this.integrationTestLocalRepository =
-                    Paths.get(System.getProperty("project.build.directory", "")).resolve("it-local-repository");
             this.executorHelper = new HelperImpl(
                     VERIFIER_FORK_MODE,
                     Paths.get(System.getProperty("maven.home")),
@@ -705,8 +701,7 @@ public class Verifier {
      */
     public void deleteArtifacts(String gid) throws IOException {
         String mdPath = executorHelper.metadataPath(executorHelper.executorRequest(), gid, null);
-        String localRepo = executorHelper.localRepository(executorHelper.executorRequest());
-        Path dir = Paths.get(localRepo).resolve(mdPath).getParent();
+        Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
         FileUtils.deleteDirectory(dir.toFile());
     }
 
@@ -726,8 +721,7 @@ public class Verifier {
 
         String mdPath =
                 executorHelper.metadataPath(executorHelper.executorRequest(), gid + ":" + aid + ":" + version, null);
-        String localRepo = executorHelper.localRepository(executorHelper.executorRequest());
-        Path dir = Paths.get(localRepo).resolve(mdPath).getParent();
+        Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
         FileUtils.deleteDirectory(dir.toFile());
     }
 
