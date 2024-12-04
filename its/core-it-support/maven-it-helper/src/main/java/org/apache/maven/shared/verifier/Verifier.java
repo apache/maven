@@ -189,7 +189,7 @@ public class Verifier {
                     // itHead present: itHead left as is, push all to itTail
                     args.add("-Dmaven.repo.local=" + itHead);
                     itTail = Stream.of(itTail, outerHead, outerTail)
-                            .filter(s -> !s.isBlank())
+                            .filter(s -> !s.isEmpty())
                             .collect(Collectors.joining(","));
                     if (!itTail.isEmpty()) {
                         args.add("-Dmaven.repo.local.tail=" + itTail);
@@ -200,7 +200,7 @@ public class Verifier {
                         args.add("-Dmaven.repo.local=" + outerHead);
                     }
                     itTail = Stream.of(itTail, outerTail)
-                            .filter(s -> !s.isBlank())
+                            .filter(s -> !s.isEmpty())
                             .collect(Collectors.joining(","));
                     if (!itTail.isEmpty()) {
                         args.add("-Dmaven.repo.local.tail=" + itTail);
@@ -219,15 +219,17 @@ public class Verifier {
         }
 
         try {
-            ExecutorRequest.Builder builder =
-                    executorHelper.executorRequest().cwd(basedir).userHomeDirectory(userHomeDirectory);
+            ExecutorRequest.Builder builder = executorHelper
+                    .executorRequest()
+                    .cwd(basedir)
+                    .userHomeDirectory(userHomeDirectory)
+                    .arguments(args);
             if (!systemProperties.isEmpty()) {
                 builder.jvmSystemProperties(new HashMap(systemProperties));
             }
             if (!environmentVariables.isEmpty()) {
                 builder.environmentVariables(environmentVariables);
             }
-            builder.arguments(args);
 
             ExecutorHelper.Mode mode = executorHelper.getDefaultMode();
             if (forkJvm) {
