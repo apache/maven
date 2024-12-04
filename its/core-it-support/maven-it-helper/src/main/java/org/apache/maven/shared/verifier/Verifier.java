@@ -38,9 +38,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
@@ -61,10 +64,27 @@ import static java.util.Objects.requireNonNull;
  */
 @Deprecated
 public class Verifier {
+    /**
+     * Keep executor alive, as long as Verifier is in classloader. Embedded classloader keeps embedded Maven
+     * ClassWorld alive, instead to re-create it per invocation, making embedded execution fast(er).
+     */
     private static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
+    /**
+     * Keep executor alive, as long as Verifier is in classloader. For forked this means nothing, but is
+     * at least "handled the same" as embedded counterpart. Later on, we could have some similar solution like
+     * mvnd has, and keep pool of "hot" processes maybe?
+     */
     private static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
 
-    private static final String LOG_FILENAME = "log.txt";
+    /**
+     * The "preferred" fork mode of Verifier, defaults to "auto". In fact, am unsure is any other fork mode usable,
+     * maybe "forked" that is slow, but offers maximum isolation?
+     *
+     * @see ExecutorHelper.Mode
+     */
+    private static final ExecutorHelper.Mode VERIFIER_FORK_MODE =
+            ExecutorHelper.Mode.valueOf(System.getProperty("verifier.forkMode", ExecutorHelper.Mode.AUTO.toString())
+                    .toUpperCase(Locale.ROOT));
 
     private static final List<String> DEFAULT_CLI_ARGUMENTS = Arrays.asList("--errors", "--batch-mode");
 
@@ -74,11 +94,11 @@ public class Verifier {
 
     private final Path basedir; // the basedir of IT
 
-    private final Path
-            tempBasedir; // create new empty directory to invoke maven queries without having trying to load up
-    // extension.xml and project
+    private final Path tempBasedir; // empty basedir for queries
 
     private final Path userHomeDirectory;
+
+    private final Path integrationTestLocalRepository;
 
     private final List<String> defaultCliArguments;
 
@@ -92,12 +112,15 @@ public class Verifier {
 
     private boolean forkJvm = false;
 
-    private String logFileName = LOG_FILENAME;
+    private boolean handleLocalRepoTail = true;
+
+    private String logFileName = "log.txt";
 
     private Path logFile;
 
     /**
-     * Creates verifier instance.
+     * Creates verifier instance using passed in basedir as "cwd" and passed in default CLI arguments (if not null).
+     * The discovery of user home and Maven installation directory is performed as well.
      *
      * @param basedir The basedir, cannot be {@code null}
      * @param defaultCliArguments The defaultCliArguments override, may be {@code null}
@@ -110,17 +133,231 @@ public class Verifier {
             this.basedir = Paths.get(basedir).toAbsolutePath();
             this.tempBasedir = Files.createTempDirectory("verifier");
             this.userHomeDirectory = Paths.get(System.getProperty("user.home"));
+            this.integrationTestLocalRepository =
+                    Paths.get(System.getProperty("project.build.directory", "")).resolve("it-local-repository");
             this.executorHelper = new HelperImpl(
-                    ExecutorHelper.Mode.AUTO,
+                    VERIFIER_FORK_MODE,
                     Paths.get(System.getProperty("maven.home")),
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
             this.defaultCliArguments =
                     new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
-
             this.logFile = this.basedir.resolve(logFileName);
         } catch (IOException e) {
             throw new VerificationException("Could not create verifier", e);
+        }
+    }
+
+    public String getExecutable() {
+        return ExecutorRequest.MVN;
+    }
+
+    public void execute() throws VerificationException {
+        List<String> args = new ArrayList<>(defaultCliArguments);
+        for (String cliArgument : cliArguments) {
+            args.add(cliArgument.replace("${basedir}", getBasedir()));
+        }
+
+        if (handleLocalRepoTail) {
+            // note: all used Strings are non-null/empty if "not present" for simpler handling
+            // "outer" build pass these in, check are they present or not
+            String outerTail = System.getProperty("maven.repo.local.tail", "").trim();
+            String outerHead = System.getProperty("maven.repo.local", "").trim();
+
+            // if none of the outer thing is set, we have nothing to do
+            if (!outerTail.isEmpty() || !outerHead.isEmpty()) {
+                String itTail = args.stream()
+                        .filter(s -> s.startsWith("-Dmaven.repo.local.tail="))
+                        .map(s -> s.substring(24).trim())
+                        .findFirst()
+                        .orElse("");
+                if (!itTail.isEmpty()) {
+                    // remove it
+                    args = args.stream()
+                            .filter(s -> !s.startsWith("-Dmaven.repo.local.tail="))
+                            .collect(Collectors.toList());
+                }
+                String itHead = args.stream()
+                        .filter(s -> s.startsWith("-Dmaven.repo.local="))
+                        .map(s -> s.substring(19).trim())
+                        .findFirst()
+                        .orElse("");
+                if (!itHead.isEmpty()) {
+                    // remove it
+                    args = args.stream()
+                            .filter(s -> !s.startsWith("-Dmaven.repo.local="))
+                            .collect(Collectors.toList());
+                }
+
+                if (!itHead.isEmpty()) {
+                    // itHead present: itHead left as is, push all to itTail
+                    args.add("-Dmaven.repo.local=" + itHead);
+                    itTail = Stream.of(itTail, outerHead, outerTail)
+                            .filter(s -> !s.isBlank())
+                            .collect(Collectors.joining(","));
+                    if (!itTail.isEmpty()) {
+                        args.add("-Dmaven.repo.local.tail=" + itTail);
+                    }
+                } else {
+                    // itHead not present: if outerHead present, make it itHead; join itTail and outerTail as tail
+                    if (!outerHead.isEmpty()) {
+                        args.add("-Dmaven.repo.local=" + outerHead);
+                    }
+                    itTail = Stream.of(itTail, outerTail)
+                            .filter(s -> !s.isBlank())
+                            .collect(Collectors.joining(","));
+                    if (!itTail.isEmpty()) {
+                        args.add("-Dmaven.repo.local.tail=" + itTail);
+                    }
+                }
+            }
+        }
+
+        // make sure these are first
+        if (autoClean) {
+            args.add(0, AUTO_CLEAN_ARGUMENT);
+        }
+        if (logFileName != null) {
+            args.add(0, logFileName);
+            args.add(0, "-l");
+        }
+
+        try {
+            ExecutorRequest.Builder builder =
+                    executorHelper.executorRequest().cwd(basedir).userHomeDirectory(userHomeDirectory);
+            if (!systemProperties.isEmpty()) {
+                builder.jvmSystemProperties(new HashMap(systemProperties));
+            }
+            if (!environmentVariables.isEmpty()) {
+                builder.environmentVariables(environmentVariables);
+            }
+            builder.arguments(args);
+
+            ExecutorHelper.Mode mode = executorHelper.getDefaultMode();
+            if (forkJvm) {
+                mode = ExecutorHelper.Mode.FORKED;
+            }
+            ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+            ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+            ExecutorRequest request =
+                    builder.stdoutConsumer(stdout).stderrConsumer(stderr).build();
+            int ret = executorHelper.execute(mode, request);
+            if (ret > 0) {
+                String dump;
+                try {
+                    dump = executorHelper.dump(request.toBuilder()).toString();
+                } catch (Exception e) {
+                    dump = "FAILED: " + e.getMessage();
+                }
+                throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
+                        + getExecutable() + " "
+                        + "\nstdout: " + stdout
+                        + "\nstderr: " + stderr
+                        + "\nreq: " + request
+                        + "\ndump: " + dump
+                        + "\n" + getLogContents(logFile));
+            }
+        } catch (ExecutorException e) {
+            throw new VerificationException("Failed to execute Maven", e);
+        }
+    }
+
+    public String getMavenVersion() throws VerificationException {
+        return executorHelper.mavenVersion();
+    }
+
+    /**
+     * Add a command line argument, each argument must be set separately one by one.
+     * <p>
+     * <code>${basedir}</code> in argument will be replaced by value of {@link #getBasedir()} during execution.
+     *
+     * @param cliArgument an argument to add
+     */
+    public void addCliArgument(String cliArgument) {
+        cliArguments.add(cliArgument);
+    }
+
+    /**
+     * Add a command line arguments, each argument must be set separately one by one.
+     * <p>
+     * <code>${basedir}</code> in argument will be replaced by value of {@link #getBasedir()} during execution.
+     *
+     * @param cliArguments an arguments list to add
+     */
+    public void addCliArguments(String... cliArguments) {
+        Collections.addAll(this.cliArguments, cliArguments);
+    }
+
+    public Properties getSystemProperties() {
+        return systemProperties;
+    }
+
+    public void setEnvironmentVariable(String key, String value) {
+        if (value != null) {
+            environmentVariables.put(key, value);
+        } else {
+            environmentVariables.remove(key);
+        }
+    }
+
+    public String getBasedir() {
+        return basedir.toString();
+    }
+
+    public void setLogFileName(String logFileName) {
+        if (logFileName == null || logFileName.isEmpty()) {
+            throw new IllegalArgumentException("log file name unspecified");
+        }
+        this.logFileName = logFileName;
+        this.logFile = this.basedir.resolve(this.logFileName);
+    }
+
+    public void setAutoclean(boolean autoClean) {
+        this.autoClean = autoClean;
+    }
+
+    public void setForkJvm(boolean forkJvm) {
+        this.forkJvm = forkJvm;
+    }
+
+    public void setHandleLocalRepoTail(boolean handleLocalRepoTail) {
+        this.handleLocalRepoTail = handleLocalRepoTail;
+    }
+
+    public String getLocalRepository() {
+        return getLocalRepositoryWithSettings(null);
+    }
+
+    public String getLocalRepositoryWithSettings(String settingsXml) {
+        String outerHead = System.getProperty("maven.repo.local", "").trim();
+        if (!outerHead.isEmpty()) {
+            return outerHead;
+        } else if (settingsXml != null) {
+            // when invoked with settings.xml, the file must be resolved from basedir (as Maven does)
+            // but we should not use basedir, as it may contain extensions.xml or a project, that Maven will eagerly
+            // load, and may fail, as it would need more (like CI friendly versioning, etc).
+            // if given, it must exist
+            Path settingsFile = basedir.resolve(settingsXml).toAbsolutePath().normalize();
+            if (!Files.isRegularFile(settingsFile)) {
+                throw new IllegalArgumentException("settings xml does not exist: " + settingsXml);
+            }
+            return executorHelper.localRepository(executorHelper
+                    .executorRequest()
+                    .cwd(tempBasedir)
+                    .userHomeDirectory(userHomeDirectory)
+                    .argument("-s")
+                    .argument(settingsFile.toString()));
+        } else {
+            return executorHelper.localRepository(
+                    executorHelper.executorRequest().cwd(tempBasedir).userHomeDirectory(userHomeDirectory));
+        }
+    }
+
+    private String getLogContents(Path logFile) {
+        try {
+            return Files.readString(logFile);
+        } catch (IOException e) {
+            return "(Error reading log contents: " + e.getMessage() + ")";
         }
     }
 
@@ -130,10 +367,6 @@ public class Verifier {
 
     public Path getLogFile() {
         return logFile;
-    }
-
-    public void setLogFile(Path logFile) {
-        this.logFile = logFile;
     }
 
     public void verifyErrorFreeLog() throws VerificationException {
@@ -724,71 +957,6 @@ public class Verifier {
         }
     }
 
-    public String getExecutable() {
-        return ExecutorRequest.MVN;
-    }
-
-    public void execute() throws VerificationException {
-        List<String> args = new ArrayList<>(defaultCliArguments);
-        if (autoClean) {
-            args.add(AUTO_CLEAN_ARGUMENT);
-        }
-        for (String cliArgument : cliArguments) {
-            args.add(cliArgument.replace("${basedir}", getBasedir()));
-        }
-        if (logFileName != null) {
-            args.add("-l");
-            args.add(logFileName);
-        }
-        try {
-            ExecutorRequest.Builder builder =
-                    executorHelper.executorRequest().cwd(basedir).userHomeDirectory(userHomeDirectory);
-            if (!systemProperties.isEmpty()) {
-                builder.jvmSystemProperties(new HashMap(systemProperties));
-            }
-            if (!environmentVariables.isEmpty()) {
-                builder.environmentVariables(environmentVariables);
-            }
-            builder.arguments(args);
-
-            ExecutorHelper.Mode mode = executorHelper.getDefaultMode();
-            if (forkJvm) {
-                mode = ExecutorHelper.Mode.FORKED;
-            }
-            ByteArrayOutputStream stderr = new ByteArrayOutputStream();
-            ExecutorRequest request = builder.stderrConsumer(stderr).build();
-            int ret = executorHelper.execute(mode, request);
-            if (ret > 0) {
-                String dump = "";
-                try {
-                    dump = executorHelper.dump(executorHelper.executorRequest()).toString();
-                } catch (Exception e) {
-                    dump = "FAILED: " + e.getMessage();
-                }
-                throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
-                        + getExecutable() + " "
-                        + "\nstderr: " + stderr
-                        + "\nreq: " + request
-                        + "\ndump: " + dump
-                        + "\n" + getLogContents(logFile));
-            }
-        } catch (ExecutorException e) {
-            throw new VerificationException("Failed to execute Maven", e);
-        }
-    }
-
-    public String getMavenVersion() throws VerificationException {
-        return executorHelper.mavenVersion();
-    }
-
-    private String getLogContents(Path logFile) {
-        try {
-            return Files.readString(logFile);
-        } catch (IOException e) {
-            return "(Error reading log contents: " + e.getMessage() + ")";
-        }
-    }
-
     /**
      * Verifies that the artifact given by its Maven coordinates exists and contains the given content.
      *
@@ -805,86 +973,6 @@ public class Verifier {
         String fileName = getArtifactPath(groupId, artifactId, version, ext);
         if (!content.equals(FileUtils.fileRead(fileName))) {
             throw new VerificationException("Content of " + fileName + " does not equal " + content);
-        }
-    }
-
-    /**
-     * Add a command line argument, each argument must be set separately one by one.
-     * <p>
-     * <code>${basedir}</code> in argument will be replaced by value of {@link #getBasedir()} during execution.
-     *
-     * @param cliArgument an argument to add
-     */
-    public void addCliArgument(String cliArgument) {
-        cliArguments.add(cliArgument);
-    }
-
-    /**
-     * Add a command line arguments, each argument must be set separately one by one.
-     * <p>
-     * <code>${basedir}</code> in argument will be replaced by value of {@link #getBasedir()} during execution.
-     *
-     * @param cliArguments an arguments list to add
-     */
-    public void addCliArguments(String... cliArguments) {
-        Collections.addAll(this.cliArguments, cliArguments);
-    }
-
-    public Properties getSystemProperties() {
-        return systemProperties;
-    }
-
-    public void setEnvironmentVariable(String key, String value) {
-        if (value != null) {
-            environmentVariables.put(key, value);
-        } else {
-            environmentVariables.remove(key);
-        }
-    }
-
-    public void setAutoclean(boolean autoClean) {
-        this.autoClean = autoClean;
-    }
-
-    public String getBasedir() {
-        return basedir.toString();
-    }
-
-    public void setLogFileName(String logFileName) {
-        if (logFileName == null || logFileName.isEmpty()) {
-            throw new IllegalArgumentException("log file name unspecified");
-        }
-        this.logFileName = logFileName;
-        this.logFile = this.basedir.resolve(this.logFileName);
-    }
-
-    public void setForkJvm(boolean forkJvm) {
-        this.forkJvm = forkJvm;
-    }
-
-    public String getLocalRepository() {
-        return getLocalRepositoryWithSettings(null);
-    }
-
-    public String getLocalRepositoryWithSettings(String settingsXml) {
-        if (settingsXml != null) {
-            // when invoked with settings.xml, the file must be resolved from basedir (as Maven does)
-            // but we should not use basedir, as it may contain extensions.xml or a project, that Maven will eagerly
-            // load, and may fail, as it would need more (like CI friendly versioning, etc).
-            // if given, it must exist
-            Path settingsFile = basedir.resolve(settingsXml).toAbsolutePath().normalize();
-            if (!Files.isRegularFile(settingsFile)) {
-                throw new IllegalArgumentException("settings xml does not exist: " + settingsXml);
-            }
-            return executorHelper.localRepository(executorHelper
-                    .executorRequest()
-                    .cwd(tempBasedir)
-                    .userHomeDirectory(userHomeDirectory)
-                    .argument("-s")
-                    .argument(settingsFile.toString()));
-        } else {
-            return executorHelper.localRepository(
-                    executorHelper.executorRequest().cwd(tempBasedir).userHomeDirectory(userHomeDirectory));
         }
     }
 }
