@@ -28,13 +28,13 @@ import org.apache.maven.api.cli.ExecutorRequest;
  */
 public interface ExecutorHelper extends ExecutorTool {
     /**
-     * The preferred mode of execution.
+     * The modes of execution.
      */
     enum Mode {
         /**
          * Automatically decide. For example, presence of {@link ExecutorRequest#environmentVariables()} or
-         * {@link ExecutorRequest#jvmArguments()} will result in choosing forked executor. Otherwise, embedded
-         * executor is preferred.
+         * {@link ExecutorRequest#jvmArguments()} will result in choosing {@link #FORKED} executor. Otherwise,
+         * {@link #EMBEDDED} executor is preferred.
          */
         AUTO,
         /**
@@ -48,7 +48,7 @@ public interface ExecutorHelper extends ExecutorTool {
     }
 
     /**
-     * Returns the "preferred" mode of this helper.
+     * Returns the preferred mode of this helper.
      */
     @Nonnull
     Mode getDefaultMode();
