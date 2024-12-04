@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
@@ -74,11 +75,21 @@ public class ApiRunner {
      * Create a new session.
      */
     public static Session createSession() {
+        return createSession(null);
+    }
+
+    /**
+     * Create a new session.
+     */
+    public static Session createSession(Consumer<Injector> injectorConsumer) {
         Injector injector = Injector.create();
         injector.bindInstance(Injector.class, injector);
         injector.bindImplicit(ApiRunner.class);
         injector.bindImplicit(RepositorySystemSupplier.class);
         injector.discover(ApiRunner.class.getClassLoader());
+        if (injectorConsumer != null) {
+            injectorConsumer.accept(injector);
+        }
         Session session = injector.getInstance(Session.class);
         SessionScope scope = new SessionScope();
         scope.enter();
@@ -294,6 +305,8 @@ public class ApiRunner {
         System.getenv().forEach((k, v) -> properties.put("env." + k, v));
         // Java System properties
         System.getProperties().forEach((k, v) -> properties.put(k.toString(), v.toString()));
+
+        properties.put("user.home", "target");
 
         // SettingsDecrypter settingsDecrypter =
         // (SettingsDecrypter)Objects.requireNonNull(this.createSettingsDecrypter(preBoot));

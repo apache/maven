@@ -243,8 +243,6 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                     // addFeedback("Failed to extract \'" + expression + "\' from: " + root, e);
                 }
             }
-        } else if (prefixed && (subExpr.equals("rootDirectory") || subExpr.startsWith("rootDirectory."))) {
-            throw new IllegalStateException(rootLocator.getNoRootMessage());
         }
         try {
             Object value = ReflectionValueExtractor.evaluate(subExpr, model, false);

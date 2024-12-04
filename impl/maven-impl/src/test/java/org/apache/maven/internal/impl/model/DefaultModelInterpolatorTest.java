@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.Session;
-import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
@@ -41,13 +41,12 @@ import org.apache.maven.api.model.Organization;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.model.Scm;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.model.ModelInterpolator;
 import org.apache.maven.api.services.model.RootLocator;
-import org.apache.maven.di.Injector;
 import org.apache.maven.internal.impl.model.profile.SimpleProblemCollector;
 import org.apache.maven.internal.impl.standalone.ApiRunner;
-import org.apache.maven.internal.impl.standalone.RepositorySystemSupplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +62,7 @@ class DefaultModelInterpolatorTest {
     Map<String, String> context;
     ModelInterpolator interpolator;
     Session session;
+    AtomicReference<Path> rootDirectory; // used in TestRootLocator below
 
     @BeforeEach
     public void setUp() {
@@ -71,15 +71,10 @@ class DefaultModelInterpolatorTest {
         context.put("anotherdir", "anotherBasedir");
         context.put("project.baseUri", "myBaseUri");
 
-        Injector injector = Injector.create();
-        injector.bindInstance(Injector.class, injector);
-        injector.bindInstance(RootLocator.class, new TestRootLocator());
-        injector.bindImplicit(ApiRunner.class);
-        injector.bindImplicit(RepositorySystemSupplier.class);
-        injector.discover(ApiRunner.class.getClassLoader());
-        session = injector.getInstance(Session.class);
-
-        interpolator = injector.getInstance(DefaultModelInterpolator.class);
+        session = ApiRunner.createSession(injector -> {
+            injector.bindInstance(RootLocator.class, new TestRootLocator());
+        });
+        interpolator = session.getService(Lookup.class).lookup(DefaultModelInterpolator.class);
     }
 
     protected void assertProblemFree(SimpleProblemCollector collector) {
@@ -393,6 +388,9 @@ class DefaultModelInterpolatorTest {
 
     @Test
     void testRootDirectoryWithNull() throws Exception {
+        Path projectDirectory = Paths.get("myProjectDirectory");
+        this.rootDirectory = new AtomicReference<>(null);
+
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
@@ -405,7 +403,10 @@ class DefaultModelInterpolatorTest {
         IllegalStateException e = assertThrows(
                 IllegalStateException.class,
                 () -> interpolator.interpolateModel(
-                        model, null, createModelBuildingRequest(context).build(), collector));
+                        model,
+                        projectDirectory,
+                        createModelBuildingRequest(context).build(),
+                        collector));
 
         assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
     }
@@ -558,12 +559,11 @@ class DefaultModelInterpolatorTest {
         assertEquals(uninterpolatedName, out.getName());
     }
 
-    @Named
     @Priority(10)
-    static class TestRootLocator implements RootLocator {
+    class TestRootLocator implements RootLocator {
         @Override
         public Path findRoot(Path basedir) {
-            return basedir;
+            return rootDirectory != null ? rootDirectory.get() : basedir;
         }
 
         @Override
