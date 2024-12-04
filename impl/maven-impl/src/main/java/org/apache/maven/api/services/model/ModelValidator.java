@@ -19,7 +19,6 @@
 package org.apache.maven.api.services.model;
 
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
@@ -60,13 +59,9 @@ public interface ModelValidator {
      *
      * @param model The model to validate, must not be {@code null}.
      * @param validationLevel The validation level.
-     * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    default void validateFileModel(
-            Model model, int validationLevel, ModelBuilderRequest request, ModelProblemCollector problems) {
-        // do nothing
-    }
+    void validateFileModel(Model model, int validationLevel, ModelProblemCollector problems);
 
     /**
      * Checks the specified (raw) model for missing or invalid values. The raw model is the file model + buildpom filter
@@ -74,11 +69,9 @@ public interface ModelValidator {
      *
      * @param model The model to validate, must not be {@code null}.
      * @param validationLevel The validation level.
-     * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void validateRawModel(
-            Model model, int validationLevel, ModelBuilderRequest request, ModelProblemCollector problems);
+    void validateRawModel(Model model, int validationLevel, ModelProblemCollector problems);
 
     /**
      * Checks the specified (effective) model for missing or invalid values. The effective model is fully assembled and
@@ -86,9 +79,7 @@ public interface ModelValidator {
      *
      * @param model The model to validate, must not be {@code null}.
      * @param validationLevel The validation level.
-     * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void validateEffectiveModel(
-            Model model, int validationLevel, ModelBuilderRequest request, ModelProblemCollector problems);
+    void validateEffectiveModel(Model model, int validationLevel, ModelProblemCollector problems);
 }

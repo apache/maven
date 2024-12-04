@@ -858,7 +858,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             modelValidator.validateEffectiveModel(
                     resultModel,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
-                    request,
                     this);
 
             if (hasErrors()) {
@@ -1453,7 +1452,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             modelValidator.validateFileModel(
                     model,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
-                    request,
                     this);
             if (hasFatalErrors()) {
                 throw newModelBuilderException();
@@ -1485,7 +1483,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             modelValidator.validateRawModel(
                     rawModel,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
-                    request,
                     this);
 
             if (hasFatalErrors()) {
