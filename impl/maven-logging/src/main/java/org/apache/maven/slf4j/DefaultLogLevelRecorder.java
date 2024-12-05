@@ -18,8 +18,6 @@
  */
 package org.apache.maven.slf4j;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.logging.api.LogLevelRecorder;
@@ -28,14 +26,6 @@ import org.apache.maven.logging.api.LogLevelRecorder;
  * Responsible for keeping state of whether the threshold of the --fail-on-severity flag has been hit.
  */
 public class DefaultLogLevelRecorder implements LogLevelRecorder {
-    private static final Map<String, Level> ACCEPTED_LEVELS = new HashMap<>();
-
-    static {
-        ACCEPTED_LEVELS.put("WARN", Level.WARN);
-        ACCEPTED_LEVELS.put("WARNING", Level.WARN);
-        ACCEPTED_LEVELS.put("ERROR", Level.ERROR);
-    }
-
     private Level maxAllowed;
     private final AtomicReference<Level> maxReached = new AtomicReference<>(Level.DEBUG);
 
