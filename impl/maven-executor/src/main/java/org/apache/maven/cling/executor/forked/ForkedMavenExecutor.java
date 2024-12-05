@@ -18,21 +18,24 @@
  */
 package org.apache.maven.cling.executor.forked;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.maven.api.cli.ExecutorRequest.getCanonicalPath;
 
 /**
  * Forked executor implementation, that spawns a subprocess with Maven from the installation directory. Very costly
@@ -44,7 +47,7 @@ public class ForkedMavenExecutor implements Executor {
         requireNonNull(executorRequest);
         validate(executorRequest);
 
-        return doExecute(executorRequest, null);
+        return doExecute(executorRequest, wrapStdouterrConsumer(executorRequest));
     }
 
     @Override
@@ -54,27 +57,18 @@ public class ForkedMavenExecutor implements Executor {
         try {
             Path cwd = Files.createTempDirectory("forked-executor-maven-version");
             try {
-                ArrayList<String> stdout = new ArrayList<>();
-                int exitCode = doExecute(
-                        executorRequest.toBuilder()
-                                .cwd(cwd)
-                                .arguments(List.of("--version", "--color", "never"))
-                                .build(),
-                        p -> {
-                            String line;
-                            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-                                while ((line = br.readLine()) != null) {
-                                    stdout.add(line);
-                                }
-                            } catch (IOException e) {
-                                throw new UncheckedIOException(e);
-                            }
-                        });
+                ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+                int exitCode = execute(executorRequest.toBuilder()
+                        .cwd(cwd)
+                        .arguments(List.of("--version", "--quiet"))
+                        .stdoutConsumer(stdout)
+                        .build());
                 if (exitCode == 0) {
-                    for (String line : stdout) {
-                        if (line.startsWith("Apache Maven ")) {
-                            return line.substring(13, line.indexOf("(") - 1);
-                        }
+                    if (stdout.size() > 0) {
+                        return stdout.toString()
+                                .replace("\n", "")
+                                .replace("\r", "")
+                                .trim();
                     }
                     return UNKNOWN_VERSION;
                 } else {
@@ -91,6 +85,29 @@ public class ForkedMavenExecutor implements Executor {
 
     protected void validate(ExecutorRequest executorRequest) throws ExecutorException {}
 
+    @Nullable
+    protected Consumer<Process> wrapStdouterrConsumer(ExecutorRequest executorRequest) {
+        if (executorRequest.stdoutConsumer().isEmpty()
+                && executorRequest.stderrConsumer().isEmpty()) {
+            return null;
+        } else {
+            return p -> {
+                try {
+                    if (executorRequest.stdoutConsumer().isPresent()) {
+                        p.getInputStream()
+                                .transferTo(executorRequest.stdoutConsumer().get());
+                    }
+                    if (executorRequest.stderrConsumer().isPresent()) {
+                        p.getErrorStream()
+                                .transferTo(executorRequest.stderrConsumer().get());
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            };
+        }
+    }
+
     protected int doExecute(ExecutorRequest executorRequest, Consumer<Process> processConsumer)
             throws ExecutorException {
         ArrayList<String> cmdAndArguments = new ArrayList<>();
@@ -102,16 +119,38 @@ public class ForkedMavenExecutor implements Executor {
 
         cmdAndArguments.addAll(executorRequest.arguments());
 
+        ArrayList<String> jvmArgs = new ArrayList<>();
+        if (!executorRequest.userHomeDirectory().equals(getCanonicalPath(Paths.get(System.getProperty("user.home"))))) {
+            jvmArgs.add("-Duser.home=" + executorRequest.userHomeDirectory().toString());
+        }
+        if (executorRequest.jvmArguments().isPresent()) {
+            jvmArgs.addAll(executorRequest.jvmArguments().get());
+        }
+        if (executorRequest.jvmSystemProperties().isPresent()) {
+            jvmArgs.addAll(executorRequest.jvmSystemProperties().get().entrySet().stream()
+                    .map(e -> "-D" + e.getKey() + "=" + e.getValue())
+                    .toList());
+        }
+
+        HashMap<String, String> env = new HashMap<>();
+        if (executorRequest.environmentVariables().isPresent()) {
+            env.putAll(executorRequest.environmentVariables().get());
+        }
+        if (!jvmArgs.isEmpty()) {
+            String mavenOpts = env.getOrDefault("MAVEN_OPTS", "");
+            if (!mavenOpts.isEmpty()) {
+                mavenOpts += " ";
+            }
+            mavenOpts += String.join(" ", jvmArgs);
+            env.put("MAVEN_OPTS", mavenOpts);
+        }
+
         try {
             ProcessBuilder pb = new ProcessBuilder()
                     .directory(executorRequest.cwd().toFile())
                     .command(cmdAndArguments);
-
-            if (executorRequest.jvmArguments().isPresent()) {
-                pb.environment()
-                        .put(
-                                "MAVEN_OPTS",
-                                String.join(" ", executorRequest.jvmArguments().get()));
+            if (!env.isEmpty()) {
+                pb.environment().putAll(env);
             }
 
             Process process = pb.start();

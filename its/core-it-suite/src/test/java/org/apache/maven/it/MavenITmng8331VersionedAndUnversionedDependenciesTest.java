@@ -50,7 +50,8 @@ class MavenITmng8331VersionedAndUnversionedDependenciesTest extends AbstractMave
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
         verifier.setLogFileName("allDependenciesArePresentInTheProject.txt");
-        verifier.executeGoal("test-compile");
+        verifier.addCliArgument("test-compile");
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }

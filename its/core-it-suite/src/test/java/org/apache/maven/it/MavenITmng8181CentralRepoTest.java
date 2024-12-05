@@ -51,6 +51,7 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
         verifier.addCliArgument("-Dmaven.repo.local.tail=target/null");
         verifier.addCliArgument("-Dmaven.repo.central=http://repo1.maven.org/");
         verifier.addCliArgument("validate");
+        verifier.setHandleLocalRepoTail(false); // we want isolation to have Maven fail due non-HTTPS repo
         assertThrows(VerificationException.class, verifier::execute);
         verifier.verifyTextInLog("central (http://repo1.maven.org/, default, releases)");
     }

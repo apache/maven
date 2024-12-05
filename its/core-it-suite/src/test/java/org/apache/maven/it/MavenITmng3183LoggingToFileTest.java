@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  *
  * @author Benjamin Bentmann
  */
+@Disabled(
+        "This IT is testing -l, while new Verifier uses same switch to make Maven4 log to file; in short, if that is broken, all ITs would be broken as well")
 public class MavenITmng3183LoggingToFileTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng3183LoggingToFileTest() {

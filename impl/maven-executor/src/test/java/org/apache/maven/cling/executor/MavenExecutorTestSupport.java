@@ -35,6 +35,43 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class MavenExecutorTestSupport {
+    @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
+    @Test
+    void dump3(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String logfile = "m3.log";
+        execute(
+                cwd.resolve(logfile),
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(cwd)
+                        .userHomeDirectory(userHome)
+                        .argument("eu.maveniverse.maven.plugins:toolbox:0.5.2:gav-dump")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
+        System.out.println(Files.readString(cwd.resolve(logfile)));
+    }
+
+    @Test
+    void dump4(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String logfile = "m4.log";
+        execute(
+                cwd.resolve(logfile),
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(cwd)
+                        .userHomeDirectory(userHome)
+                        .argument("eu.maveniverse.maven.plugins:toolbox:0.5.2:gav-dump")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
+        System.out.println(Files.readString(cwd.resolve(logfile)));
+    }
+
     @Test
     void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
@@ -141,11 +178,11 @@ public abstract class MavenExecutorTestSupport {
         }
     }
 
-    protected ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
+    public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
         return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")));
     }
 
-    protected ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
+    public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
         return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")));
     }
 

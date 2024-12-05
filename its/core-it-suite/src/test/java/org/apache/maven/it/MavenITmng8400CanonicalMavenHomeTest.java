@@ -57,16 +57,13 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
         System.setProperty("maven.home", linkedMavenHome.toString());
 
         Verifier verifier = newVerifier(basedir.toString(), null);
-        verifier.addCliArgument("--raw-streams");
-        verifier.addCliArgument("--quiet");
-        verifier.addCliArgument("-DforceStdout");
         verifier.addCliArgument("-DasProperties");
+        verifier.addCliArgument("-DtoFile=dump.properties");
         verifier.addCliArgument("eu.maveniverse.maven.plugins:toolbox:0.5.2:gav-dump");
-        // TODO: fork until new entry point CLIng is used
-        verifier.setForkJvm(true);
         verifier.execute();
+        verifier.verifyErrorFreeLog();
 
-        String dump = verifier.loadLogContent();
+        String dump = Files.readString(basedir.resolve("dump.properties"), StandardCharsets.UTF_8);
         Properties props = new Properties();
         props.load(new ByteArrayInputStream(dump.getBytes(StandardCharsets.UTF_8)));
 

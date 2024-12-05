@@ -54,8 +54,7 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
          */
         String repoDir = new File(verifier.getLocalRepository()).getAbsolutePath();
         if (getRoot(new File(repoDir)).equals(getRoot(testDir))) {
-            // NOTE: We can only test the local repo if it resides on the same drive as the test
-            verifier.setLocalRepo(repoDir.substring(repoDir.indexOf(File.separator)));
+            verifier.addCliArgument("-Dmaven.repo.local=" + repoDir.substring(repoDir.indexOf(File.separator)));
         }
 
         verifier.setAutoclean(false);
