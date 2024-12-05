@@ -39,14 +39,6 @@ public class DefaultLogLevelRecorder implements LogLevelRecorder {
     private Level maxAllowed;
     private final AtomicReference<Level> maxReached = new AtomicReference<>(Level.DEBUG);
 
-    public DefaultLogLevelRecorder(String threshold) {
-        this(determineThresholdLevel(threshold));
-    }
-
-    public DefaultLogLevelRecorder(Level maxAllowed) {
-        this.maxAllowed = maxAllowed;
-    }
-
     @Override
     public boolean hasReachedMaxLevel() {
         return maxReached.get().ordinal() > maxAllowed.ordinal();
@@ -65,16 +57,6 @@ public class DefaultLogLevelRecorder implements LogLevelRecorder {
     @Override
     public void setMaxLevelAllowed(Level level) {
         this.maxAllowed = level;
-    }
-
-    private static Level determineThresholdLevel(String input) {
-        final Level result = ACCEPTED_LEVELS.get(input);
-        if (result == null) {
-            String message = String.format(
-                    "%s is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.", input);
-            throw new IllegalArgumentException(message);
-        }
-        return result;
     }
 
     public void record(org.slf4j.event.Level logLevel) {
@@ -97,6 +79,6 @@ public class DefaultLogLevelRecorder implements LogLevelRecorder {
     }
 
     public boolean metThreshold() {
-        return maxReached.get().ordinal() >= maxAllowed.ordinal();
+        return maxAllowed != null && maxReached.get().ordinal() >= maxAllowed.ordinal();
     }
 }
