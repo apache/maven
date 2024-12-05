@@ -28,7 +28,7 @@ import org.slf4j.Logger;
  * LogFactory for Maven which can create a simple logger or one which, if set, fails the build on a severity threshold.
  */
 public class MavenLoggerFactory implements org.apache.maven.logging.api.LogLevelRecorder, ILoggerFactory {
-    DefaultLogLevelRecorder logLevelRecorder = null;
+    final DefaultLogLevelRecorder logLevelRecorder = new DefaultLogLevelRecorder();
     final ConcurrentMap<String, Logger> loggerMap = new ConcurrentHashMap<>();
 
     public MavenLoggerFactory() {
@@ -37,7 +37,7 @@ public class MavenLoggerFactory implements org.apache.maven.logging.api.LogLevel
 
     @Override
     public boolean hasReachedMaxLevel() {
-        return logLevelRecorder != null && logLevelRecorder.metThreshold();
+        return logLevelRecorder.metThreshold();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MavenLoggerFactory implements org.apache.maven.logging.api.LogLevel
 
     @Override
     public void setMaxLevelAllowed(Level level) {
-        this.logLevelRecorder = new DefaultLogLevelRecorder(level.name());
+        this.logLevelRecorder.setMaxLevelAllowed(level);
     }
     /**
      * Return an appropriate {@link Logger} instance by name.
@@ -62,12 +62,13 @@ public class MavenLoggerFactory implements org.apache.maven.logging.api.LogLevel
         return loggerMap.computeIfAbsent(name, this::getNewLoggingInstance);
     }
 
+    @Override
+    public void reset() {
+        logLevelRecorder.reset();
+    }
+
     protected Logger getNewLoggingInstance(String name) {
-        if (logLevelRecorder == null) {
-            return new MavenSimpleLogger(name);
-        } else {
-            return new MavenFailOnSeverityLogger(name, logLevelRecorder);
-        }
+        return new MavenFailOnSeverityLogger(name, logLevelRecorder);
     }
 
     public void reconfigure() {
@@ -78,5 +79,6 @@ public class MavenLoggerFactory implements org.apache.maven.logging.api.LogLevel
                 msl.configure(config.defaultLogLevel);
             }
         });
+        logLevelRecorder.reset();
     }
 }

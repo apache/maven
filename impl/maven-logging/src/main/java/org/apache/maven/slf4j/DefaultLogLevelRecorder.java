@@ -18,8 +18,6 @@
  */
 package org.apache.maven.slf4j;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.logging.api.LogLevelRecorder;
@@ -28,24 +26,8 @@ import org.apache.maven.logging.api.LogLevelRecorder;
  * Responsible for keeping state of whether the threshold of the --fail-on-severity flag has been hit.
  */
 public class DefaultLogLevelRecorder implements LogLevelRecorder {
-    private static final Map<String, Level> ACCEPTED_LEVELS = new HashMap<>();
-
-    static {
-        ACCEPTED_LEVELS.put("WARN", Level.WARN);
-        ACCEPTED_LEVELS.put("WARNING", Level.WARN);
-        ACCEPTED_LEVELS.put("ERROR", Level.ERROR);
-    }
-
     private Level maxAllowed;
     private final AtomicReference<Level> maxReached = new AtomicReference<>(Level.DEBUG);
-
-    public DefaultLogLevelRecorder(String threshold) {
-        this(determineThresholdLevel(threshold));
-    }
-
-    public DefaultLogLevelRecorder(Level maxAllowed) {
-        this.maxAllowed = maxAllowed;
-    }
 
     @Override
     public boolean hasReachedMaxLevel() {
@@ -67,14 +49,10 @@ public class DefaultLogLevelRecorder implements LogLevelRecorder {
         this.maxAllowed = level;
     }
 
-    private static Level determineThresholdLevel(String input) {
-        final Level result = ACCEPTED_LEVELS.get(input);
-        if (result == null) {
-            String message = String.format(
-                    "%s is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.", input);
-            throw new IllegalArgumentException(message);
-        }
-        return result;
+    @Override
+    public void reset() {
+        this.maxAllowed = null;
+        this.maxReached.set(Level.DEBUG);
     }
 
     public void record(org.slf4j.event.Level logLevel) {
@@ -97,6 +75,6 @@ public class DefaultLogLevelRecorder implements LogLevelRecorder {
     }
 
     public boolean metThreshold() {
-        return maxReached.get().ordinal() >= maxAllowed.ordinal();
+        return maxAllowed != null && maxReached.get().ordinal() >= maxAllowed.ordinal();
     }
 }

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.slf4j;
 
+import org.apache.maven.logging.api.LogLevelRecorder;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
@@ -56,7 +57,7 @@ class MavenLoggerFactoryTest {
     @Test
     void reportsWhenFailOnSeverityThresholdHasBeenHit() {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
-        mavenLoggerFactory.logLevelRecorder = new DefaultLogLevelRecorder("ERROR");
+        mavenLoggerFactory.logLevelRecorder.setMaxLevelAllowed(LogLevelRecorder.Level.ERROR);
 
         MavenFailOnSeverityLogger logger = (MavenFailOnSeverityLogger) mavenLoggerFactory.getLogger("Test");
         assertFalse(mavenLoggerFactory.logLevelRecorder.metThreshold());
