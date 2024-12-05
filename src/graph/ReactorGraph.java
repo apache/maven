@@ -208,6 +208,7 @@ public class ReactorGraph {
                                     .append(" title=\"")
                                     .append(nodeName)
                                     .append("\"")
+                                    .append(" target=\"_parent\"")
                                     .append(">")
                                     .append(nodeName)
                                     .append("</td>");
