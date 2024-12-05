@@ -36,7 +36,6 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
-        verifier.setForkJvm(true); // required due to --fail-on-severity
         verifier.addCliArgument("-fos");
         verifier.addCliArgument("WARN"); // ALSO NO WARNINGS
         verifier.addCliArgument(phase);
@@ -53,7 +52,6 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
-        verifier.setForkJvm(true); // required due to --fail-on-severity
         verifier.addCliArgument("-fos");
         verifier.addCliArgument("WARN"); // ALSO NO WARNINGS
         verifier.addCliArgument(phase);
