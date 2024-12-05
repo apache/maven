@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.shared.verifier.util;
+package org.apache.maven.it;
 
 import java.io.File;
 import java.io.FileOutputStream;
