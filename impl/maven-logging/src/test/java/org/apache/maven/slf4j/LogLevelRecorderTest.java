@@ -18,43 +18,19 @@
  */
 package org.apache.maven.slf4j;
 
+import org.apache.maven.logging.api.LogLevelRecorder;
 import org.junit.jupiter.api.Test;
 import org.slf4j.event.Level;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LogLevelRecorderTest {
     @Test
     void createsLogLevelRecorder() {
-        DefaultLogLevelRecorder logLevelRecorder = new DefaultLogLevelRecorder("WARN");
+        DefaultLogLevelRecorder logLevelRecorder = new DefaultLogLevelRecorder();
+        logLevelRecorder.setMaxLevelAllowed(LogLevelRecorder.Level.WARN);
         logLevelRecorder.record(Level.ERROR);
 
         assertTrue(logLevelRecorder.metThreshold());
-    }
-
-    @Test
-    void failsOnLowerThanWarn() {
-        assertThrows(IllegalArgumentException.class, () -> new DefaultLogLevelRecorder("INFO"));
-    }
-
-    @Test
-    void createsLogLevelRecorderWithWarning() {
-        DefaultLogLevelRecorder logLevelRecorder = new DefaultLogLevelRecorder("WARNING");
-        logLevelRecorder.record(Level.ERROR);
-
-        assertTrue(logLevelRecorder.metThreshold());
-    }
-
-    @Test
-    void failsOnUnknownLogLevel() {
-        Throwable thrown = assertThrows(IllegalArgumentException.class, () -> new DefaultLogLevelRecorder("SEVERE"));
-        String message = thrown.getMessage();
-        assertThat(message, containsString("SEVERE is not a valid log severity threshold"));
-        assertThat(message, containsString("WARN"));
-        assertThat(message, containsString("WARNING"));
-        assertThat(message, containsString("ERROR"));
     }
 }

@@ -34,4 +34,6 @@ public interface LogLevelRecorder {
     Level getMaxLevelAllowed();
 
     void setMaxLevelAllowed(Level level);
+
+    void reset();
 }
