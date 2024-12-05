@@ -29,7 +29,6 @@ import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.it.utils.DeployedResource;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;

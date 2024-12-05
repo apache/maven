@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.nio.file.Paths;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**

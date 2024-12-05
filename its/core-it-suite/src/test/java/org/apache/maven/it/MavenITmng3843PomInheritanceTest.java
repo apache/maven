@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Properties;
 import java.util.TreeSet;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

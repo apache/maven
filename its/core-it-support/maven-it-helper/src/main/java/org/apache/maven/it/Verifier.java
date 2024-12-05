@@ -51,7 +51,6 @@ import org.apache.maven.cling.executor.ExecutorHelper;
 import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
 import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.apache.maven.cling.executor.internal.HelperImpl;
-import org.apache.maven.shared.verifier.VerificationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 

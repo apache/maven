@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;

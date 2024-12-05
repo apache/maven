@@ -22,7 +22,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

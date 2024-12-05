@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.shared.verifier;
+package org.apache.maven.it;
 
 /**
  * @author Jason van Zyl

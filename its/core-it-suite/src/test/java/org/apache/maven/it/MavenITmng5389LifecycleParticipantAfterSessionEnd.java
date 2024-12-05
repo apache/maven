@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng5389LifecycleParticipantAfterSessionEnd extends AbstractMavenIntegrationTestCase {

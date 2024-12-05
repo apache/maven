@@ -20,8 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-
 /**
  * An integration test which proves that the bug of MNG-7310 is fixed.
  * The bug is about loading an extension in a sibling submodule, which ends up failing the build.
