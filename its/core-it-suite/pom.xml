@@ -98,17 +98,6 @@ under the License.
       <artifactId>plexus-utils</artifactId>
       <!-- NOTE: Use compile scope for transitivity. -->
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-verifier</artifactId>
-      <!-- TODO: not transitive in tests artifact, so must be left in main
-        scope <scope>test</scope> -->
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-shared-utils</artifactId>
-      <version>3.4.2</version>
-    </dependency>
 
     <!-- Jetty (as test HTTP server) -->
     <dependency>
@@ -526,6 +515,7 @@ under the License.
           <forkCount>0</forkCount>
           <reuseForks>true</reuseForks>
           <skip>true</skip>
+          <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
             <maven.version>${maven.version}</maven.version>
             <maven.home>${preparedMavenHome}</maven.home>
@@ -571,7 +561,7 @@ under the License.
         <dependency>
           <groupId>org.apache.maven</groupId>
           <artifactId>apache-maven</artifactId>
-          <version>4.0.0-beta-6-SNAPSHOT</version>
+          <version>${maven-version}</version>
           <classifier>bin</classifier>
           <type>zip</type>
         </dependency>
@@ -650,28 +640,6 @@ under the License.
       </build>
     </profile>
     <profile>
-      <id>maven-repo-local-layout</id>
-      <activation>
-        <property>
-          <name>maven.repo.local.layout</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <!-- Pass this through to the tests (if set!) to have them
-                  pick the right repository layout -->
-                <maven.repo.local.layout>${maven.repo.local.layout}</maven.repo.local.layout>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>jdk-properties</id>
       <activation>
         <jdk>(,1.8)</jdk>
@@ -697,7 +665,6 @@ under the License.
               <useSystemClassLoader>false</useSystemClassLoader>
               <systemPropertyVariables>
                 <verifier.forkMode>auto</verifier.forkMode>
-                <emma.rt.control>false</emma.rt.control>
               </systemPropertyVariables>
             </configuration>
           </plugin>

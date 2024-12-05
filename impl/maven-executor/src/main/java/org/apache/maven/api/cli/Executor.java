@@ -34,7 +34,7 @@ public interface Executor extends AutoCloseable {
     boolean IS_WINDOWS = System.getProperty("os.name", "unknown").startsWith("Windows");
 
     /**
-     * Maven version string returned when the actual version of Maven cannot be determinet.
+     * Maven version string returned when the actual version of Maven cannot be determined.
      */
     String UNKNOWN_VERSION = "unknown";
 
@@ -50,7 +50,7 @@ public interface Executor extends AutoCloseable {
     int execute(@Nonnull ExecutorRequest executorRequest) throws ExecutorException;
 
     /**
-     * Returns the Maven version that provided {@link ExecutorRequest} point at (would use). Please not, that this
+     * Returns the Maven version that provided {@link ExecutorRequest} point at (would use). Please note, that this
      * operation, depending on underlying implementation may be costly. If caller use this method often, it is
      * caller responsibility to properly cache returned values (key can be {@link ExecutorRequest#installationDirectory()}.
      *

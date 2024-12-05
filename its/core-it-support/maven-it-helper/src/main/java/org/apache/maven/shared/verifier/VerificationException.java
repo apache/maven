@@ -16,29 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.it;
+package org.apache.maven.shared.verifier;
 
 /**
- * Basic Ansi support: can't use Ansi because IT is executed in separate classloader.
+ * @author Jason van Zyl
  */
-class AnsiSupport {
-    private static final String ESC = String.valueOf((char) 27) + '[';
-
-    private static final String NORMAL = ESC + "0;39m";
-
-    static String success(String msg) {
-        return ESC + "1;32m" + msg + NORMAL;
+public class VerificationException extends Exception {
+    public VerificationException(String message) {
+        super(message);
     }
 
-    static String warning(String msg) {
-        return ESC + "1;33m" + msg + NORMAL;
+    public VerificationException(Throwable cause) {
+        super(cause);
     }
 
-    static String error(String msg) {
-        return ESC + "1;31m" + msg + NORMAL;
-    }
-
-    static String bold(String msg) {
-        return ESC + "1m" + msg + NORMAL;
+    public VerificationException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

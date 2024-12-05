@@ -19,10 +19,13 @@
 package org.apache.maven.api.cli;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -35,7 +38,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Represents a request to execute Maven with command-line arguments.
  * This interface encapsulates all the necessary information needed to execute
- * Maven command with arguments. The arguments were not parsed, they are just passed over
+ * Maven command with arguments. The arguments are not parsed, they are just passed over
  * to executed tool.
  *
  * @since 4.0.0
@@ -43,6 +46,11 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 @Experimental
 public interface ExecutorRequest {
+    /**
+     * The Maven command.
+     */
+    String MVN = "mvn";
+
     /**
      * The command to execute, ie "mvn".
      */
@@ -83,9 +91,26 @@ public interface ExecutorRequest {
     Path userHomeDirectory();
 
     /**
+     * Returns the map of Java System Properties to set before executing process.
+     *
+     * @return an Optional containing the map of Java System Properties, or empty if not specified
+     */
+    @Nonnull
+    Optional<Map<String, String>> jvmSystemProperties();
+
+    /**
+     * Returns the map of environment variables to set before executing process.
+     * This property is used ONLY by executors that spawn a new JVM.
+     *
+     * @return an Optional containing the map of environment variables, or empty if not specified
+     */
+    @Nonnull
+    Optional<Map<String, String>> environmentVariables();
+
+    /**
      * Returns the list of extra JVM arguments to be passed to the forked process.
      * These arguments allow for customization of the JVM environment in which tool will run.
-     * This property is used ONLY by executors and invokers that spawn a new JVM.
+     * This property is used ONLY by executors that spawn a new JVM.
      *
      * @return an Optional containing the list of extra JVM arguments, or empty if not specified
      */
@@ -93,7 +118,25 @@ public interface ExecutorRequest {
     Optional<List<String>> jvmArguments();
 
     /**
-     * Returns {@link Builder} for this instance.
+     * Optional consumer for STD out of the Maven. If given, this consumer will get all output from the std out of
+     * Maven. Note: whether consumer gets to consume anything depends on invocation arguments passed in
+     * {@link #arguments()}, as if log file is set, not much will go to stdout.
+     *
+     * @return an Optional containing the stdout consumer, or empty if not specified.
+     */
+    Optional<OutputStream> stdoutConsumer();
+
+    /**
+     * Optional consumer for STD err of the Maven. If given, this consumer will get all output from the std err of
+     * Maven. Note: whether consumer gets to consume anything depends on invocation arguments passed in
+     * {@link #arguments()}, as if log file is set, not much will go to stderr.
+     *
+     * @return an Optional containing the stderr consumer, or empty if not specified.
+     */
+    Optional<OutputStream> stderrConsumer();
+
+    /**
+     * Returns {@link Builder} created from this instance.
      */
     @Nonnull
     default Builder toBuilder() {
@@ -103,28 +146,29 @@ public interface ExecutorRequest {
                 cwd(),
                 installationDirectory(),
                 userHomeDirectory(),
-                jvmArguments().orElse(null));
+                jvmSystemProperties().orElse(null),
+                environmentVariables().orElse(null),
+                jvmArguments().orElse(null),
+                stdoutConsumer().orElse(null),
+                stderrConsumer().orElse(null));
     }
 
     /**
-     * Returns new empty builder.
-     */
-    @Nonnull
-    static Builder empyBuilder() {
-        return new Builder();
-    }
-
-    /**
-     * Returns new builder pre-set to run Maven. The discovery of maven home is attempted.
+     * Returns new builder pre-set to run Maven. The discovery of maven home is attempted, user cwd and home are
+     * also discovered by standard means.
      */
     @Nonnull
     static Builder mavenBuilder(@Nullable Path installationDirectory) {
         return new Builder(
-                "mvn",
+                MVN,
                 null,
                 getCanonicalPath(Paths.get(System.getProperty("user.dir"))),
                 installationDirectory != null ? getCanonicalPath(installationDirectory) : discoverMavenHome(),
                 getCanonicalPath(Paths.get(System.getProperty("user.home"))),
+                null,
+                null,
+                null,
+                null,
                 null);
     }
 
@@ -134,23 +178,36 @@ public interface ExecutorRequest {
         private Path cwd;
         private Path installationDirectory;
         private Path userHomeDirectory;
+        private Map<String, String> jvmSystemProperties;
+        private Map<String, String> environmentVariables;
         private List<String> jvmArguments;
+        private OutputStream stdoutConsumer;
+        private OutputStream stderrConsumer;
 
         private Builder() {}
 
+        @SuppressWarnings("ParameterNumber")
         private Builder(
                 String command,
                 List<String> arguments,
                 Path cwd,
                 Path installationDirectory,
                 Path userHomeDirectory,
-                List<String> jvmArguments) {
+                Map<String, String> jvmSystemProperties,
+                Map<String, String> environmentVariables,
+                List<String> jvmArguments,
+                OutputStream stdoutConsumer,
+                OutputStream stderrConsumer) {
             this.command = command;
             this.arguments = arguments;
             this.cwd = cwd;
             this.installationDirectory = installationDirectory;
             this.userHomeDirectory = userHomeDirectory;
+            this.jvmSystemProperties = jvmSystemProperties;
+            this.environmentVariables = environmentVariables;
             this.jvmArguments = jvmArguments;
+            this.stdoutConsumer = stdoutConsumer;
+            this.stderrConsumer = stderrConsumer;
         }
 
         @Nonnull
@@ -176,19 +233,54 @@ public interface ExecutorRequest {
 
         @Nonnull
         public Builder cwd(Path cwd) {
-            this.cwd = requireNonNull(cwd, "cwd");
+            this.cwd = getCanonicalPath(requireNonNull(cwd, "cwd"));
             return this;
         }
 
         @Nonnull
         public Builder installationDirectory(Path installationDirectory) {
-            this.installationDirectory = requireNonNull(installationDirectory, "installationDirectory");
+            this.installationDirectory =
+                    getCanonicalPath(requireNonNull(installationDirectory, "installationDirectory"));
             return this;
         }
 
         @Nonnull
         public Builder userHomeDirectory(Path userHomeDirectory) {
-            this.userHomeDirectory = requireNonNull(userHomeDirectory, "userHomeDirectory");
+            this.userHomeDirectory = getCanonicalPath(requireNonNull(userHomeDirectory, "userHomeDirectory"));
+            return this;
+        }
+
+        @Nonnull
+        public Builder jvmSystemProperties(Map<String, String> jvmSystemProperties) {
+            this.jvmSystemProperties = jvmSystemProperties;
+            return this;
+        }
+
+        @Nonnull
+        public Builder jvmSystemProperty(String key, String value) {
+            requireNonNull(key, "env key");
+            requireNonNull(value, "env value");
+            if (jvmSystemProperties == null) {
+                this.jvmSystemProperties = new HashMap<>();
+            }
+            this.jvmSystemProperties.put(key, value);
+            return this;
+        }
+
+        @Nonnull
+        public Builder environmentVariables(Map<String, String> environmentVariables) {
+            this.environmentVariables = environmentVariables;
+            return this;
+        }
+
+        @Nonnull
+        public Builder environmentVariable(String key, String value) {
+            requireNonNull(key, "env key");
+            requireNonNull(value, "env value");
+            if (environmentVariables == null) {
+                this.environmentVariables = new HashMap<>();
+            }
+            this.environmentVariables.put(key, value);
             return this;
         }
 
@@ -208,8 +300,30 @@ public interface ExecutorRequest {
         }
 
         @Nonnull
+        public Builder stdoutConsumer(OutputStream stdoutConsumer) {
+            this.stdoutConsumer = stdoutConsumer;
+            return this;
+        }
+
+        @Nonnull
+        public Builder stderrConsumer(OutputStream stderrConsumer) {
+            this.stderrConsumer = stderrConsumer;
+            return this;
+        }
+
+        @Nonnull
         public ExecutorRequest build() {
-            return new Impl(command, arguments, cwd, installationDirectory, userHomeDirectory, jvmArguments);
+            return new Impl(
+                    command,
+                    arguments,
+                    cwd,
+                    installationDirectory,
+                    userHomeDirectory,
+                    jvmSystemProperties,
+                    environmentVariables,
+                    jvmArguments,
+                    stdoutConsumer,
+                    stderrConsumer);
         }
 
         private static class Impl implements ExecutorRequest {
@@ -218,21 +332,34 @@ public interface ExecutorRequest {
             private final Path cwd;
             private final Path installationDirectory;
             private final Path userHomeDirectory;
+            private final Map<String, String> jvmSystemProperties;
+            private final Map<String, String> environmentVariables;
             private final List<String> jvmArguments;
+            private final OutputStream stdoutConsumer;
+            private final OutputStream stderrConsumer;
 
+            @SuppressWarnings("ParameterNumber")
             private Impl(
                     String command,
                     List<String> arguments,
                     Path cwd,
                     Path installationDirectory,
                     Path userHomeDirectory,
-                    List<String> jvmArguments) {
+                    Map<String, String> jvmSystemProperties,
+                    Map<String, String> environmentVariables,
+                    List<String> jvmArguments,
+                    OutputStream stdoutConsumer,
+                    OutputStream stderrConsumer) {
                 this.command = requireNonNull(command);
                 this.arguments = arguments == null ? List.of() : List.copyOf(arguments);
-                this.cwd = requireNonNull(cwd);
-                this.installationDirectory = requireNonNull(installationDirectory);
-                this.userHomeDirectory = requireNonNull(userHomeDirectory);
+                this.cwd = getCanonicalPath(requireNonNull(cwd));
+                this.installationDirectory = getCanonicalPath(requireNonNull(installationDirectory));
+                this.userHomeDirectory = getCanonicalPath(requireNonNull(userHomeDirectory));
+                this.jvmSystemProperties = jvmSystemProperties != null ? Map.copyOf(jvmSystemProperties) : null;
+                this.environmentVariables = environmentVariables != null ? Map.copyOf(environmentVariables) : null;
                 this.jvmArguments = jvmArguments != null ? List.copyOf(jvmArguments) : null;
+                this.stdoutConsumer = stdoutConsumer;
+                this.stderrConsumer = stderrConsumer;
             }
 
             @Override
@@ -261,19 +388,43 @@ public interface ExecutorRequest {
             }
 
             @Override
+            public Optional<Map<String, String>> jvmSystemProperties() {
+                return Optional.ofNullable(jvmSystemProperties);
+            }
+
+            @Override
+            public Optional<Map<String, String>> environmentVariables() {
+                return Optional.ofNullable(environmentVariables);
+            }
+
+            @Override
             public Optional<List<String>> jvmArguments() {
                 return Optional.ofNullable(jvmArguments);
             }
 
             @Override
+            public Optional<OutputStream> stdoutConsumer() {
+                return Optional.ofNullable(stdoutConsumer);
+            }
+
+            @Override
+            public Optional<OutputStream> stderrConsumer() {
+                return Optional.ofNullable(stderrConsumer);
+            }
+
+            @Override
             public String toString() {
-                return "ExecutionRequest{" + "command='"
+                return "Impl{" + "command='"
                         + command + '\'' + ", arguments="
                         + arguments + ", cwd="
                         + cwd + ", installationDirectory="
                         + installationDirectory + ", userHomeDirectory="
-                        + userHomeDirectory + ", jvmArguments="
-                        + jvmArguments + '}';
+                        + userHomeDirectory + ", jvmSystemProperties="
+                        + jvmSystemProperties + ", environmentVariables="
+                        + environmentVariables + ", jvmArguments="
+                        + jvmArguments + ", stdoutConsumer="
+                        + stdoutConsumer + ", stderrConsumer="
+                        + stderrConsumer + '}';
             }
         }
     }
