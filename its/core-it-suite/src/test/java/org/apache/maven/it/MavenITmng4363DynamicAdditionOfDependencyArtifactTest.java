@@ -44,7 +44,7 @@ public class MavenITmng4363DynamicAdditionOfDependencyArtifactTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4363");
+        File testDir = extractResources("/mng-4363");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

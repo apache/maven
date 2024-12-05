@@ -40,7 +40,7 @@ public class MavenITmng0471CustomLifecycleTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMNG471() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0471");
+        File testDir = extractResources("/mng-0471");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

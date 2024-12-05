@@ -46,7 +46,7 @@ public class MavenITmng3940EnvVarInterpolationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG3940() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3940");
+        File testDir = extractResources("/mng-3940");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         /*

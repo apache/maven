@@ -44,7 +44,7 @@ public class MavenITmng4975ProfileInjectedPluginExecutionOrderTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4975");
+        File testDir = extractResources("/mng-4975");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

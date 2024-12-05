@@ -44,7 +44,7 @@ public class MavenITmng4618AggregatorBuiltAfterModulesTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4618");
+        File testDir = extractResources("/mng-4618");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

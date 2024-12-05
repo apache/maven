@@ -44,7 +44,7 @@ public class MavenITmng3621UNCInheritedPathsTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3621() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3621");
+        File testDir = extractResources("/mng-3621");
 
         Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
         verifier.setAutoclean(false);

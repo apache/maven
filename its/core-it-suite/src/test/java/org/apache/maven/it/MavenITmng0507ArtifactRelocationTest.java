@@ -43,7 +43,7 @@ public class MavenITmng0507ArtifactRelocationTest extends AbstractMavenIntegrati
      */
     @Test
     public void testitMNG507() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0507");
+        File testDir = extractResources("/mng-0507");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

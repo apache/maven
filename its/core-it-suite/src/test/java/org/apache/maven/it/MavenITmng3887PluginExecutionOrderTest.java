@@ -61,7 +61,7 @@ public class MavenITmng3887PluginExecutionOrderTest extends AbstractMavenIntegra
     }
 
     private void testitMNG3887(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3887");
+        File testDir = extractResources("/mng-3887");
 
         Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
         verifier.setAutoclean(false);

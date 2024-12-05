@@ -46,7 +46,7 @@ public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3092");
+        File testDir = extractResources("/mng-3092");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

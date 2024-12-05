@@ -43,7 +43,7 @@ public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractM
 
     @Test
     public void testWarnNotPresent() throws IOException, VerificationException {
-        File rootDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        File rootDir = extractResources(PROJECT_PATH);
 
         Verifier verifier = newVerifier(rootDir.getAbsolutePath());
         verifier.setAutoclean(false);

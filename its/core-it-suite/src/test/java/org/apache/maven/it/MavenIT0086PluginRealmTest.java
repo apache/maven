@@ -46,7 +46,7 @@ public class MavenIT0086PluginRealmTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     public void testit0086() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0086");
+        File testDir = extractResources("/it0086");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

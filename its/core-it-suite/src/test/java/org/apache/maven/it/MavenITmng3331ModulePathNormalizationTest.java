@@ -36,7 +36,7 @@ public class MavenITmng3331ModulePathNormalizationTest extends AbstractMavenInte
     @Test
     public void testitMNG3331a() throws Exception {
         // testMNG3331ModuleWithSpaces
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3331/with-spaces");
+        File testDir = extractResources("/mng-3331/with-spaces");
 
         Verifier verifier;
 
@@ -60,7 +60,7 @@ public class MavenITmng3331ModulePathNormalizationTest extends AbstractMavenInte
     @Test
     public void testitMNG3331b() throws Exception {
         // testMNG3331ModuleWithRelativeParentDirRef
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3331/with-relative-parentDir-ref");
+        File testDir = extractResources("/mng-3331/with-relative-parentDir-ref");
 
         Verifier verifier;
 

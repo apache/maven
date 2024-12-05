@@ -40,7 +40,7 @@ public class MavenITmng0282NonReactorExecWhenProjectIndependentTest extends Abst
      */
     @Test
     public void testitMNG282() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0282");
+        File testDir = extractResources("/mng-0282");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

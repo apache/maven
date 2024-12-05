@@ -38,7 +38,7 @@ public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenInte
 
     @Test
     public void testitMNG3038() throws Exception {
-        File testDirBase = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3038");
+        File testDirBase = extractResources("/mng-3038");
 
         compileDDep(testDirBase, "D1", "1.0");
         compileDDep(testDirBase, "D2", "2.0");

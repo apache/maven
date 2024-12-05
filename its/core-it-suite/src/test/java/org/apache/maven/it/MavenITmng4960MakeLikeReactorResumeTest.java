@@ -41,7 +41,7 @@ public class MavenITmng4960MakeLikeReactorResumeTest extends AbstractMavenIntegr
      */
     @Test
     public void testitFromUpstream() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4960");
+        File testDir = extractResources("/mng-4960");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -71,7 +71,7 @@ public class MavenITmng4960MakeLikeReactorResumeTest extends AbstractMavenIntegr
      */
     @Test
     public void testitFromDownstream() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4960");
+        File testDir = extractResources("/mng-4960");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

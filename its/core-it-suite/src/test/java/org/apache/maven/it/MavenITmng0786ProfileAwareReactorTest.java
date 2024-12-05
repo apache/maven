@@ -41,7 +41,7 @@ public class MavenITmng0786ProfileAwareReactorTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG0786() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0786");
+        File testDir = extractResources("/mng-0786");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

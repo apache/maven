@@ -45,7 +45,7 @@ public class MavenITmng3586SystemScopePluginDependencyTest extends AbstractMaven
      */
     @Test
     public void testitFromPlugin() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3586/test-1");
+        File testDir = extractResources("/mng-3586/test-1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -71,7 +71,7 @@ public class MavenITmng3586SystemScopePluginDependencyTest extends AbstractMaven
      */
     @Test
     public void testitFromProject() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3586/test-2");
+        File testDir = extractResources("/mng-3586/test-2");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

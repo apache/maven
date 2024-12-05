@@ -41,7 +41,7 @@ public class MavenITmng0377PluginLookupFromPrefixTest extends AbstractMavenInteg
      */
     @Test
     public void testitMNG377() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0377");
+        File testDir = extractResources("/mng-0377");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

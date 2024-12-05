@@ -36,7 +36,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
     public MavenITmng6511OptionalProjectSelectionTest() throws IOException {
         super("[4.0.0-alpha-1,)");
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_PATH);
+        testDir = extractResources(RESOURCE_PATH);
     }
 
     @Test

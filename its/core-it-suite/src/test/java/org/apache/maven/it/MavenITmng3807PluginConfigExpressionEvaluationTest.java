@@ -46,7 +46,7 @@ public class MavenITmng3807PluginConfigExpressionEvaluationTest extends Abstract
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3807");
+        File testDir = extractResources("/mng-3807");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

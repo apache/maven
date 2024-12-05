@@ -45,7 +45,7 @@ public class MavenITmng4973ExtensionVisibleToPluginInReactorTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4973");
+        File testDir = extractResources("/mng-4973");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

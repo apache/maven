@@ -36,7 +36,7 @@ class MavenITmng8336UnknownPackagingTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     void testUnknownPackaging() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8336-unknown-packaging");
+        File testDir = extractResources("/mng-8336-unknown-packaging");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
         verifier.addCliArgument("clean");

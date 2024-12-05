@@ -60,7 +60,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0553");
+        testDir = extractResources("/mng-0553");
 
         Constraint constraint = new Constraint(__BASIC_AUTH, "user");
         constraint.setAuthenticate(true);

@@ -60,7 +60,7 @@ public class MavenITmng2591MergeInheritedPluginConfigTest extends AbstractMavenI
     }
 
     private void testit(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2591/" + project);
+        File testDir = extractResources("/mng-2591/" + project);
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("subproject/target");

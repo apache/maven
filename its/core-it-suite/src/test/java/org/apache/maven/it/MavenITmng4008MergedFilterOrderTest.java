@@ -45,7 +45,7 @@ public class MavenITmng4008MergedFilterOrderTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG4008() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4008");
+        File testDir = extractResources("/mng-4008");
 
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
         verifier.setAutoclean(false);

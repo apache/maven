@@ -40,7 +40,7 @@ public class MavenITmng4405ValidPluginVersionTest extends AbstractMavenIntegrati
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4405");
+        File testDir = extractResources("/mng-4405");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

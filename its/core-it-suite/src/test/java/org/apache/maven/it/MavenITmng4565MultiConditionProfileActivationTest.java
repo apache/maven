@@ -44,8 +44,7 @@ public class MavenITmng4565MultiConditionProfileActivationTest extends AbstractM
      */
     @Test
     public void testProfilesWithMultipleActivators() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-4565-multi-condition-profile-activation");
+        File testDir = extractResources("/mng-4565-multi-condition-profile-activation");
 
         Verifier verifier;
 

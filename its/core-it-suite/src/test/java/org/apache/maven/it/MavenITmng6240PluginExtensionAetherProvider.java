@@ -49,8 +49,7 @@ public class MavenITmng6240PluginExtensionAetherProvider extends AbstractMavenIn
      */
     @Test
     public void testPluginExtensionDependingOnMavenAetherProvider() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-6240-plugin-extension-aether-provider");
+        File testDir = extractResources("/mng-6240-plugin-extension-aether-provider");
         File pluginDir = new File(testDir, "plugin-extension");
         File projectDir = new File(testDir, "project");
 

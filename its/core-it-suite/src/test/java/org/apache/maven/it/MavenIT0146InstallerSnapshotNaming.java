@@ -42,7 +42,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
 
     public MavenIT0146InstallerSnapshotNaming() throws IOException {
         super("(2.0.2,)");
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0146");
+        testDir = extractResources("/it0146");
     }
 
     @BeforeEach

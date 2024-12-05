@@ -34,7 +34,7 @@ public class MavenITmng5659ProjectSettingsTest extends AbstractMavenIntegrationT
 
     @Test
     public void testProjectSettings() throws IOException, VerificationException {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5659-project-settings");
+        File testDir = extractResources("/mng-5659-project-settings");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("validate");

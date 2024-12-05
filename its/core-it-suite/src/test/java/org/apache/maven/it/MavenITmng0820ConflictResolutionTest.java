@@ -45,7 +45,7 @@ public class MavenITmng0820ConflictResolutionTest extends AbstractMavenIntegrati
      */
     @Test
     public void testitMNG0820() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0820");
+        File testDir = extractResources("/mng-0820");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

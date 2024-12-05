@@ -141,7 +141,7 @@ public class MavenITmng3953AuthenticatedDeploymentTest extends AbstractMavenInte
     }
 
     private void testitMNG3953(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3953/" + project);
+        File testDir = extractResources("/mng-3953/" + project);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

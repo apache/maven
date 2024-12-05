@@ -45,7 +45,7 @@ public class MavenITmng4328PrimitiveMojoParameterConfigurationTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4328");
+        File testDir = extractResources("/mng-4328");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

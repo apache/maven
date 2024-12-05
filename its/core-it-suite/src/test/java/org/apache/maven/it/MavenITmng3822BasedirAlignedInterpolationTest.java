@@ -45,7 +45,7 @@ public class MavenITmng3822BasedirAlignedInterpolationTest extends AbstractMaven
      */
     @Test
     public void testitMNG3822() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3822");
+        File testDir = extractResources("/mng-3822");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

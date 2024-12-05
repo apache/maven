@@ -47,7 +47,7 @@ public class MavenITmng4403LenientDependencyPomParsingTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4403");
+        File testDir = extractResources("/mng-4403");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

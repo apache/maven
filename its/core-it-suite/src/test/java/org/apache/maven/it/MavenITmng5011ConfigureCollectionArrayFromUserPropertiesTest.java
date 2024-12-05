@@ -41,7 +41,7 @@ public class MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest extend
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5011");
+        File testDir = extractResources("/mng-5011");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -37,7 +37,7 @@ public class MavenIT0063SystemScopeDependencyTest extends AbstractMavenIntegrati
      */
     @Test
     public void testit0063() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0063");
+        File testDir = extractResources("/it0063");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

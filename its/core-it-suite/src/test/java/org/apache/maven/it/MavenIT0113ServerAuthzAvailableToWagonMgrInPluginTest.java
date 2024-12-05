@@ -38,7 +38,7 @@ public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest extends Abstr
      */
     @Test
     public void testit0113() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0113");
+        File testDir = extractResources("/it0113");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

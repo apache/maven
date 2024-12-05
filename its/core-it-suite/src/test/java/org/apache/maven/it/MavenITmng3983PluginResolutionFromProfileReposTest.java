@@ -43,7 +43,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
     public void testitFromPom() throws Exception {
         requiresMavenVersion("[2.0,3.0-alpha-1),[3.0-alpha-3,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3983/test-1");
+        File testDir = extractResources("/mng-3983/test-1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setForkJvm(true); // Don't lock up plugin files in class loader within current JVM
@@ -65,7 +65,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
      */
     @Test
     public void testitFromSettings() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3983/test-3");
+        File testDir = extractResources("/mng-3983/test-3");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setForkJvm(true); // Don't lock up plugin files in class loader within current JVM

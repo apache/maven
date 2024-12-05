@@ -46,8 +46,7 @@ public class MavenITmng7982DependencyManagementTransitivityTest extends Abstract
      */
     @Test
     public void testitWithTransitiveDependencyManager() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-7982-transitive-dependency-management");
+        File testDir = extractResources("/mng-7982-transitive-dependency-management");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteArtifacts("org.apache.maven.its.mng7982");
@@ -90,8 +89,7 @@ public class MavenITmng7982DependencyManagementTransitivityTest extends Abstract
      */
     @Test
     public void testitWithTransitiveDependencyManagerDisabled() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-7982-transitive-dependency-management");
+        File testDir = extractResources("/mng-7982-transitive-dependency-management");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteArtifacts("org.apache.maven.its.mng7982");

@@ -40,7 +40,7 @@ public class MavenITmng0522InheritedPluginMgmtConfigTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG522() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0522");
+        File testDir = extractResources("/mng-0522");
 
         Verifier verifier = newVerifier(new File(testDir, "child-project").getAbsolutePath());
         verifier.setAutoclean(false);

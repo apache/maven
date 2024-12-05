@@ -49,7 +49,7 @@ public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest extends Abs
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4421");
+        File testDir = extractResources("/mng-4421");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

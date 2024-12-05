@@ -35,7 +35,7 @@ public class MavenIT0023SettingsProfileTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit0023() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0023");
+        File testDir = extractResources("/it0023");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -43,7 +43,7 @@ public class MavenITmng4829ChecksumFailureWarningTest extends AbstractMavenInteg
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4829");
+        File testDir = extractResources("/mng-4829");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

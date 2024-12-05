@@ -44,7 +44,7 @@ public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenInteg
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4679");
+        File testDir = extractResources("/mng-4679");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

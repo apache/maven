@@ -37,7 +37,7 @@ public class MavenITmng5591WorkspaceReader extends AbstractMavenIntegrationTestC
          * line argument. The multi-module build fails unless reactor resolution works properly.
          */
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5591-workspace-reader");
+        File testDir = extractResources("/mng-5591-workspace-reader");
         File extensionDir = new File(testDir, "extension");
         File projectDir = new File(testDir, "basic");
 

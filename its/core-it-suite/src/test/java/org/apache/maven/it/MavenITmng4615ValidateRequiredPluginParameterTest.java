@@ -44,7 +44,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitAllSet() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-0");
+        File testDir = extractResources("/mng-4615/test-0");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -66,7 +66,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitExprMissing() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-1");
+        File testDir = extractResources("/mng-4615/test-1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -90,7 +90,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitExprSet() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-1");
+        File testDir = extractResources("/mng-4615/test-1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -117,7 +117,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
         // cf. MNG-4764
         requiresMavenVersion("[3.0-beta-2,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-2a");
+        File testDir = extractResources("/mng-4615/test-2a");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -140,7 +140,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitPomValSet() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4615/test-2b");
+        File testDir = extractResources("/mng-4615/test-2b");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

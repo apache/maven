@@ -51,7 +51,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     @BeforeEach
     protected void setUp() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7470-resolver-transport");
+        File testDir = extractResources("/mng-7470-resolver-transport");
         projectDir = new File(testDir, "project");
 
         server = HttpServer.builder().port(0).source(new File(testDir, "repo")).build();

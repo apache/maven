@@ -40,7 +40,7 @@ public class MavenITmng5557ProperlyRestrictedReactor extends AbstractMavenIntegr
 
     @Test
     public void testRunningRestrictedReactor() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5557-properly-restricted-reactor");
+        File testDir = extractResources("/mng-5557-properly-restricted-reactor");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         //
         // Remove everything related to this project from the local repository as we want this to be resolution purely

@@ -44,7 +44,7 @@ public class MavenITmng0848UserPropertyOverridesDefaultValueTest extends Abstrac
      */
     @Test
     public void testitMNG848() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0848");
+        File testDir = extractResources("/mng-0848");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

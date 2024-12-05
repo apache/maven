@@ -40,7 +40,7 @@ public class MavenITmng4404UniqueProfileIdTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4404");
+        File testDir = extractResources("/mng-4404");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

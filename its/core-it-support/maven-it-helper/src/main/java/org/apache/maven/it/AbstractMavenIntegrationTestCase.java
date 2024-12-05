@@ -238,6 +238,11 @@ public abstract class AbstractMavenIntegrationTestCase {
         return version;
     }
 
+    protected File extractResources(String resourcePath) throws IOException {
+        return ResourceExtractor.simpleExtractResources(getClass(), resourcePath)
+                .getAbsoluteFile();
+    }
+
     protected Verifier newVerifier(String basedir) throws VerificationException {
         return newVerifier(basedir, false);
     }

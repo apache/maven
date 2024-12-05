@@ -43,7 +43,7 @@ public class MavenITmng4386DebugLoggingTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4386");
+        File testDir = extractResources("/mng-4386");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

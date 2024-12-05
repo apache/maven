@@ -29,7 +29,7 @@ public class MavenITmng8123BuildCacheTest extends AbstractMavenIntegrationTestCa
 
     @Test
     public void testBuildCacheExtension() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8123-build-cache");
+        File testDir = extractResources("/mng-8123-build-cache");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("install");

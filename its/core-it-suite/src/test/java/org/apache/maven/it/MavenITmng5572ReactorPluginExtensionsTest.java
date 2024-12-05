@@ -42,7 +42,7 @@ public class MavenITmng5572ReactorPluginExtensionsTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5572-reactor-plugin-extensions");
+        File testDir = extractResources("/mng-5572-reactor-plugin-extensions");
 
         // plugin must be available in local repo, otherwise the project couldn't be built
         Verifier setup = newVerifier(testDir.getAbsolutePath());

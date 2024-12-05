@@ -43,7 +43,7 @@ public class MavenITmng4765LocalPomProjectBuilderTest extends AbstractMavenInteg
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4765");
+        File testDir = extractResources("/mng-4765");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

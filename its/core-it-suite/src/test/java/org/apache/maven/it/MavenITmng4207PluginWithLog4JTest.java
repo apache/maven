@@ -41,7 +41,7 @@ public class MavenITmng4207PluginWithLog4JTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4207");
+        File testDir = extractResources("/mng-4207");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

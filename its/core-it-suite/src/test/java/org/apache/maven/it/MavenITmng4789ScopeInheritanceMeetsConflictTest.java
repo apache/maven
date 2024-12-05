@@ -45,7 +45,7 @@ public class MavenITmng4789ScopeInheritanceMeetsConflictTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4789");
+        File testDir = extractResources("/mng-4789");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

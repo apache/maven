@@ -40,7 +40,7 @@ public class MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest extends
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5019");
+        File testDir = extractResources("/mng-5019");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

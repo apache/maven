@@ -38,7 +38,7 @@ public class MavenITmng5338FileOptionToDirectory extends AbstractMavenIntegratio
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5338");
+        testDir = extractResources("/mng-5338");
     }
 
     @Test

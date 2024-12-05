@@ -45,7 +45,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
      */
     @Test
     void transitiveDependencyManager() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8347-transitive-dependency-manager");
+        File testDir = extractResources("/mng-8347-transitive-dependency-manager");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-V");
@@ -91,7 +91,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
      */
     @Test
     void useCaseBndPlugin() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8347-bnd-plugin");
+        File testDir = extractResources("/mng-8347-bnd-plugin");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-V");
@@ -117,7 +117,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
      */
     @Test
     void useCaseQuarkusTlsRegistry() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8347-quarkus-tls-registry");
+        File testDir = extractResources("/mng-8347-quarkus-tls-registry");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-V");

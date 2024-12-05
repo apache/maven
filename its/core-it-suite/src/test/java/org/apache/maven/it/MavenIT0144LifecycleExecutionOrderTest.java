@@ -43,7 +43,7 @@ public class MavenIT0144LifecycleExecutionOrderTest extends AbstractMavenIntegra
      */
     @Test
     public void testit0144() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0144");
+        File testDir = extractResources("/it0144");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");

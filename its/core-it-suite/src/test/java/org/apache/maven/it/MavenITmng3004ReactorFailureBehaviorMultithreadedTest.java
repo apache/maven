@@ -41,7 +41,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailFastSingleThread() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
+        File testDir = extractResources("/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -75,7 +75,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailNeverSingleThread() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
+        File testDir = extractResources("/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -104,7 +104,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailAtEndSingleThread() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
+        File testDir = extractResources("/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -137,7 +137,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailNeverTwoThreads() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
+        File testDir = extractResources("/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -166,7 +166,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailAtEndTwoThreads() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0095");
+        File testDir = extractResources("/mng-0095");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

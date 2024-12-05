@@ -46,7 +46,7 @@ public class MavenIT0087PluginRealmWithProjectLevelDepsTest extends AbstractMave
      */
     @Test
     public void testit0087() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0087");
+        File testDir = extractResources("/it0087");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

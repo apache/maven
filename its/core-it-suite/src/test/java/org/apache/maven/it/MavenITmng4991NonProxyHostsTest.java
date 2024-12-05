@@ -51,7 +51,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4991");
+        File testDir = extractResources("/mng-4991");
 
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());

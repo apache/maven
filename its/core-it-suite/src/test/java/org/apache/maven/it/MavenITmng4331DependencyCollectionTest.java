@@ -46,7 +46,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
      */
     @Test
     public void testitEarlyLifecyclePhase() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4331");
+        File testDir = extractResources("/mng-4331");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -70,7 +70,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
      */
     @Test
     public void testitCliAggregator() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4331");
+        File testDir = extractResources("/mng-4331");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

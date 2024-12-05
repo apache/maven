@@ -45,7 +45,7 @@ class MavenITmng8331VersionedAndUnversionedDependenciesTest extends AbstractMave
      */
     @Test
     void allDependenciesArePresentInTheProject() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8331-versioned-and-unversioned-deps");
+        File testDir = extractResources("/mng-8331-versioned-and-unversioned-deps");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
         verifier.setLogFileName("allDependenciesArePresentInTheProject.txt");

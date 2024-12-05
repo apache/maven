@@ -38,7 +38,7 @@ public class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5382");
+        testDir = extractResources("/mng-5382");
     }
 
     @Test

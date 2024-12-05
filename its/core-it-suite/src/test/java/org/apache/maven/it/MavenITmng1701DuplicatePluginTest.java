@@ -43,7 +43,7 @@ public class MavenITmng1701DuplicatePluginTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1701");
+        File testDir = extractResources("/mng-1701");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -42,7 +42,7 @@ public class MavenITmng3642DynamicResourcesTest extends AbstractMavenIntegration
     public void testitMNG3642() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3642");
+        File testDir = extractResources("/mng-3642");
 
         Verifier verifier;
 

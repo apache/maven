@@ -33,7 +33,7 @@ public class MavenITmng5742BuildExtensionClassloaderTest extends AbstractMavenIn
 
     @Test
     public void testBuildExtensionClassloader() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5742-build-extension-classloader");
+        File testDir = extractResources("/mng-5742-build-extension-classloader");
         File pluginDir = new File(testDir, "plugin");
         File projectDir = new File(testDir, "project");
 

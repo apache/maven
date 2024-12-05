@@ -59,7 +59,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4326");
+        File testDir = extractResources("/mng-4326");
 
         // setup: install a local snapshot
         Verifier verifier = newVerifier(new File(testDir, "dependency").getAbsolutePath());

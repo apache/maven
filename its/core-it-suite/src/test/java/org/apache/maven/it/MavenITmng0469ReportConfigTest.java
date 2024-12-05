@@ -45,7 +45,7 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitBuildConfigDominantDuringBuild() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0469/test1");
+        File testDir = extractResources("/mng-0469/test1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
@@ -64,7 +64,7 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitBuildConfigIrrelevantForReports() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0469/test2");
+        File testDir = extractResources("/mng-0469/test2");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");

@@ -40,7 +40,7 @@ public class MavenITmng2318LocalParentResolutionTest extends AbstractMavenIntegr
      */
     @Test
     public void testitMNG2318() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2318");
+        File testDir = extractResources("/mng-2318");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

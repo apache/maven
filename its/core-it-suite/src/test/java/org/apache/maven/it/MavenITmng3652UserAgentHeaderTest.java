@@ -103,7 +103,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testmng3652_UnConfiguredHttp() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3652");
+        File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");
 
@@ -146,7 +146,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
 
     @Test
     public void testmng3652_UnConfiguredDAV() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3652");
+        File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");
 
@@ -191,7 +191,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
 
     @Test
     public void testmng3652_ConfigurationInSettingsWithoutUserAgent() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3652");
+        File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");
 
@@ -238,7 +238,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
 
     @Test
     public void testmng3652_UserAgentConfiguredInSettings() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3652");
+        File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");
 
@@ -270,7 +270,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
 
     @Test
     public void testmng3652_AdditionnalHttpHeaderConfiguredInSettings() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3652");
+        File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");
 

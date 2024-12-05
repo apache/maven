@@ -75,7 +75,7 @@ public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTe
     }
 
     private void testit(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2865");
+        File testDir = extractResources("/mng-2865");
 
         Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
         verifier.setAutoclean(false);

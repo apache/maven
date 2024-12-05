@@ -47,21 +47,13 @@ public class ResourceExtractor {
         return testDir;
     }
 
-    public static File extractResourcePath(String resourcePath, File dest) throws IOException {
-        return extractResourcePath(ResourceExtractor.class, resourcePath, dest);
-    }
-
-    public static File extractResourcePath(Class<?> cl, String resourcePath, File dest) throws IOException {
-        return extractResourcePath(cl, resourcePath, dest, false);
-    }
-
-    public static File extractResourcePath(Class<?> cl, String resourcePath, File tempDir, boolean alwaysExtract)
+    private static File extractResourcePath(Class<?> cl, String resourcePath, File tempDir, boolean alwaysExtract)
             throws IOException {
         File dest = new File(tempDir, resourcePath);
         return extractResourceToDestination(cl, resourcePath, dest, alwaysExtract);
     }
 
-    public static File extractResourceToDestination(
+    private static File extractResourceToDestination(
             Class<?> cl, String resourcePath, File destination, boolean alwaysExtract) throws IOException {
         URL url = cl.getResource(resourcePath);
         if (url == null) {

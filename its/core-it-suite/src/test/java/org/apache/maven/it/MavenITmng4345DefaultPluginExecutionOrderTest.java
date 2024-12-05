@@ -46,7 +46,7 @@ public class MavenITmng4345DefaultPluginExecutionOrderTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4345");
+        File testDir = extractResources("/mng-4345");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

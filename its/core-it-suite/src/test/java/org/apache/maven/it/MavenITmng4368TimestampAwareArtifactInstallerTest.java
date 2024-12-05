@@ -47,7 +47,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
      */
     @Test
     public void testitPomPackaging() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4368/pom");
+        File testDir = extractResources("/mng-4368/pom");
 
         File aDir = new File(testDir, "branch-a");
         File aPom = new File(aDir, "pom.xml");
@@ -98,7 +98,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
     public void testitJarPackaging() throws Exception {
         requiresMavenVersion("[2.2.2,3.0-alpha-1),[3.0-alpha-6,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4368/jar");
+        File testDir = extractResources("/mng-4368/jar");
 
         File aDir = new File(testDir, "branch-a");
         File aArtifact = new File(aDir, "artifact.jar");

@@ -43,7 +43,7 @@ public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4936");
+        File testDir = extractResources("/mng-4936");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setForkJvm(true);

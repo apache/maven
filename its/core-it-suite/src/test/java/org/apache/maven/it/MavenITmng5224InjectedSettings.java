@@ -48,7 +48,7 @@ public class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTest
      */
     @Test
     public void testmng5224_ReadSettings() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5224");
+        File testDir = extractResources("/mng-5224");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 

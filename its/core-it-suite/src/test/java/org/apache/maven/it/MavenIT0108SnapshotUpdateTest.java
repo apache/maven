@@ -55,7 +55,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
 
     @BeforeEach
     protected void setUp() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0108");
+        File testDir = extractResources("/it0108");
         verifier = newVerifier(testDir.getAbsolutePath());
         localRepoFile = getLocalRepoFile(verifier);
         deleteLocalArtifact(verifier, localRepoFile);

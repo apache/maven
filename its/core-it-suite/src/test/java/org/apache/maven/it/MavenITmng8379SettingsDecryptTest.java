@@ -36,7 +36,7 @@ class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testLegacy() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8379-decrypt-settings");
+        File testDir = extractResources("/mng-8379-decrypt-settings");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setLogFileName("log-legacy.txt");
@@ -58,7 +58,7 @@ class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testModern() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8379-decrypt-settings");
+        File testDir = extractResources("/mng-8379-decrypt-settings");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setLogFileName("log-modern.txt");

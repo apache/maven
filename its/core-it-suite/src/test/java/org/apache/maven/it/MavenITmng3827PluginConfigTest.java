@@ -44,7 +44,7 @@ public class MavenITmng3827PluginConfigTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitMNG3827() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3827");
+        File testDir = extractResources("/mng-3827");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

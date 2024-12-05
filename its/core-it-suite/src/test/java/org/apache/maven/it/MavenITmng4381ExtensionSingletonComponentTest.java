@@ -44,7 +44,7 @@ public class MavenITmng4381ExtensionSingletonComponentTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4381");
+        File testDir = extractResources("/mng-4381");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

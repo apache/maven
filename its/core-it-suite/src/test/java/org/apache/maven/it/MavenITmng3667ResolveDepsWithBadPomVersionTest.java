@@ -46,7 +46,7 @@ public class MavenITmng3667ResolveDepsWithBadPomVersionTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3667");
+        File testDir = extractResources("/mng-3667");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -46,7 +46,7 @@ public class MavenITmng3805ExtensionClassPathOrderingTest extends AbstractMavenI
      */
     @Test
     public void testitMNG3805() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3805");
+        File testDir = extractResources("/mng-3805");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

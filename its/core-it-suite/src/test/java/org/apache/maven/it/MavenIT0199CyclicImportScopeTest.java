@@ -43,7 +43,7 @@ public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTe
     }
 
     private void build(String module, String expectedArtifact) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/cyclic-import-scope");
+        File testDir = extractResources("/cyclic-import-scope");
         Verifier verifier = newVerifier(new File(testDir.getAbsolutePath(), module).getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

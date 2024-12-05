@@ -45,7 +45,7 @@ public class MavenITmng4320AggregatorAndDependenciesTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4320");
+        File testDir = extractResources("/mng-4320");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -29,8 +29,7 @@ public class MavenITmng5389LifecycleParticipantAfterSessionEnd extends AbstractM
 
     @Test
     public void testit() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5389-lifecycleParticipant-afterSession");
+        File testDir = extractResources("/mng-5389-lifecycleParticipant-afterSession");
         File extensionDir = new File(testDir, "extension");
         File projectDir = new File(testDir, "basic");
 

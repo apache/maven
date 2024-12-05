@@ -41,7 +41,7 @@ public class MavenITmng3288SystemScopeDirTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitMNG3288() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3288");
+        File testDir = extractResources("/mng-3288");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

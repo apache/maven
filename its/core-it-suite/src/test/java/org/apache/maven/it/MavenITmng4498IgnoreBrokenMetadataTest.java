@@ -43,7 +43,7 @@ public class MavenITmng4498IgnoreBrokenMetadataTest extends AbstractMavenIntegra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4498");
+        File testDir = extractResources("/mng-4498");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

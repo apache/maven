@@ -41,7 +41,7 @@ public class MavenITmng4654ArtifactHandlerForMainArtifactTest extends AbstractMa
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4654");
+        File testDir = extractResources("/mng-4654");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

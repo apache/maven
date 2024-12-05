@@ -45,7 +45,7 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest extends AbstractM
      */
     @Test
     public void testitMNG2871() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2871");
+        File testDir = extractResources("/mng-2871");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");

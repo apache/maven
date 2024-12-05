@@ -45,7 +45,7 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2486");
+        File testDir = extractResources("/mng-2486");
 
         Verifier verifier;
 

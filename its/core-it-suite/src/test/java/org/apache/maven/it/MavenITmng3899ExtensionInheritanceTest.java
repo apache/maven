@@ -44,7 +44,7 @@ public class MavenITmng3899ExtensionInheritanceTest extends AbstractMavenIntegra
      */
     @Test
     public void testitMNG3899() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3899");
+        File testDir = extractResources("/mng-3899");
 
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
         verifier.setAutoclean(false);

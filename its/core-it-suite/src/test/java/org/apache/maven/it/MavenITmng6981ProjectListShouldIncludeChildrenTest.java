@@ -32,7 +32,7 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest extends Abstract
 
     @Test
     public void testProjectListShouldIncludeChildrenByDefault() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_PATH);
+        final File testDir = extractResources(RESOURCE_PATH);
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("-pl");
@@ -49,7 +49,7 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest extends Abstract
      */
     @Test
     public void testFileSwitchAllowsExcludeOfChildren() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_PATH);
+        final File testDir = extractResources(RESOURCE_PATH);
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("-f");

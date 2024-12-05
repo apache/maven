@@ -37,7 +37,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testitMNG3220a() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3220");
+        File testDir = extractResources("/mng-3220");
 
         testDir = new File(testDir, "imported-pom-depMgmt");
 
@@ -55,7 +55,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testitMNG3220b() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3220");
+        File testDir = extractResources("/mng-3220");
 
         testDir = new File(testDir, "depMgmt-pom-module-notImported");
 

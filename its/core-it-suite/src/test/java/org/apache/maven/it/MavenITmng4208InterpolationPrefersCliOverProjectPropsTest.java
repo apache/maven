@@ -43,7 +43,7 @@ public class MavenITmng4208InterpolationPrefersCliOverProjectPropsTest extends A
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4208");
+        File testDir = extractResources("/mng-4208");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

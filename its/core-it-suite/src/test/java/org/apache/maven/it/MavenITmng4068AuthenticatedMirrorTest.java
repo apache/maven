@@ -59,7 +59,7 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4068");
+        testDir = extractResources("/mng-4068");
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);

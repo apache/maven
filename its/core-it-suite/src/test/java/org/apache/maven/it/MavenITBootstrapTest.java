@@ -41,7 +41,7 @@ public class MavenITBootstrapTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testBootstrap() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/bootstrap");
+        File testDir = extractResources("/bootstrap");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
         verifier.setAutoclean(false);

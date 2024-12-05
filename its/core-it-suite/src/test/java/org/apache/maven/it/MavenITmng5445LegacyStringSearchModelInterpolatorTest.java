@@ -38,7 +38,7 @@ public class MavenITmng5445LegacyStringSearchModelInterpolatorTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5445");
+        File testDir = extractResources("/mng-5445");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

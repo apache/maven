@@ -45,7 +45,7 @@ public class MavenITmng4526MavenProjectArtifactsScopeTest extends AbstractMavenI
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4526");
+        File testDir = extractResources("/mng-4526");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

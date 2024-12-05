@@ -47,7 +47,7 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest extends AbstractMaven
 
     @Test
     public void testProjectPackagingUsage() throws IOException, VerificationException {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/" + AID);
+        File testDir = extractResources("/" + AID);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 

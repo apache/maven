@@ -39,7 +39,7 @@ class MavenITmng7965PomDuplicateTagsTest extends AbstractMavenIntegrationTestCas
 
     @Test
     void javadocIsExecutedAndFailed() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7965-pom-duplicate-tags");
+        File testDir = extractResources("/mng-7965-pom-duplicate-tags");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");

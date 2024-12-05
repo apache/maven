@@ -44,7 +44,7 @@ public class MavenITmng3645POMSyntaxErrorTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3645");
+        File testDir = extractResources("/mng-3645");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

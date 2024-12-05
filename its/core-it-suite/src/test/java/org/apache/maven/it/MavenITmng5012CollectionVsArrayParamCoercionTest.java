@@ -42,7 +42,7 @@ public class MavenITmng5012CollectionVsArrayParamCoercionTest extends AbstractMa
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5012");
+        File testDir = extractResources("/mng-5012");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

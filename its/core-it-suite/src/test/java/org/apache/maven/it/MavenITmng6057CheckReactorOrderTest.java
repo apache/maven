@@ -49,7 +49,7 @@ public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitReactorShouldResultInExpectedOrder() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6057-check-reactor-order");
+        File testDir = extractResources("/mng-6057-check-reactor-order");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);

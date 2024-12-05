@@ -61,7 +61,7 @@ public class MavenITmng3937MergedPluginExecutionGoalsTest extends AbstractMavenI
     }
 
     private void testitMNG3937(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3937");
+        File testDir = extractResources("/mng-3937");
 
         Verifier verifier = newVerifier(new File(new File(testDir, project), "sub").getAbsolutePath());
         verifier.setAutoclean(false);

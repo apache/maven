@@ -43,8 +43,7 @@ public class MavenITmng6173GetProjectsAndDependencyGraphTest extends AbstractMav
     @Test
     public void testitShouldReturnProjectsAndProjectDependencyGraph() throws Exception {
 
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-6173-get-projects-and-dependency-graph");
+        File testDir = extractResources("/mng-6173-get-projects-and-dependency-graph");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -44,7 +44,7 @@ public class MavenITmng4459InMemorySettingsKeptEncryptedTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4459");
+        File testDir = extractResources("/mng-4459");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

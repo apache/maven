@@ -45,7 +45,7 @@ public class MavenITmng2749ExtensionAvailableToPluginTest extends AbstractMavenI
      */
     @Test
     public void testitMNG2749() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2749");
+        File testDir = extractResources("/mng-2749");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

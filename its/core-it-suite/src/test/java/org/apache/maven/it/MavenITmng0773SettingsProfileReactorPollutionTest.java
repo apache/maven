@@ -40,7 +40,7 @@ public class MavenITmng0773SettingsProfileReactorPollutionTest extends AbstractM
      */
     @Test
     public void testitMNG773() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0773");
+        File testDir = extractResources("/mng-0773");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

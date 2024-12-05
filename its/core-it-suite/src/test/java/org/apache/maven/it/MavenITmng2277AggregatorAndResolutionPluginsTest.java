@@ -36,7 +36,7 @@ public class MavenITmng2277AggregatorAndResolutionPluginsTest extends AbstractMa
 
     @Test
     public void testitMNG2277() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2277");
+        File testDir = extractResources("/mng-2277");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

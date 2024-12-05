@@ -46,7 +46,7 @@ public class MavenITmng1323AntrunDependenciesTest extends AbstractMavenIntegrati
      */
     @Test
     public void testitMNG1323() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1323");
+        File testDir = extractResources("/mng-1323");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

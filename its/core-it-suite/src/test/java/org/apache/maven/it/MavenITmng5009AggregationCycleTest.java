@@ -38,7 +38,7 @@ public class MavenITmng5009AggregationCycleTest extends AbstractMavenIntegration
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5009");
+        File testDir = extractResources("/mng-5009");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

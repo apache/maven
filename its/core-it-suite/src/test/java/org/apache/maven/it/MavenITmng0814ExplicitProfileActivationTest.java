@@ -43,7 +43,7 @@ public class MavenITmng0814ExplicitProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG814() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0814");
+        File testDir = extractResources("/mng-0814");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

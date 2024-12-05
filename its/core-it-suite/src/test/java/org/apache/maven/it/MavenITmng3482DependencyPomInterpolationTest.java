@@ -39,7 +39,7 @@ public class MavenITmng3482DependencyPomInterpolationTest extends AbstractMavenI
 
     @Test
     public void testitMNG3482() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3482");
+        File testDir = extractResources("/mng-3482");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

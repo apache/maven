@@ -41,7 +41,7 @@ public class MavenITmng0781PluginConfigVsExecConfigTest extends AbstractMavenInt
      */
     @Test
     public void testitMNG0781() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0781");
+        File testDir = extractResources("/mng-0781");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

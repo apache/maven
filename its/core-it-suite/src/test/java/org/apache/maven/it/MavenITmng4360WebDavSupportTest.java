@@ -71,7 +71,7 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
     }
 
     private void test(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4360");
+        File testDir = extractResources("/mng-4360");
 
         testDir = new File(testDir, project);
 

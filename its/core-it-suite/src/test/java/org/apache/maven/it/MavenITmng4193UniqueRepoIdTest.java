@@ -40,7 +40,7 @@ public class MavenITmng4193UniqueRepoIdTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4193");
+        File testDir = extractResources("/mng-4193");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

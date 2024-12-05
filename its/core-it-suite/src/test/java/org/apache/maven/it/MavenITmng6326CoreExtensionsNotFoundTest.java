@@ -33,7 +33,7 @@ public class MavenITmng6326CoreExtensionsNotFoundTest extends AbstractMavenInteg
 
     @Test
     public void testCoreExtensionsNotFound() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6326-core-extensions-not-found");
+        File testDir = extractResources("/mng-6326-core-extensions-not-found");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         try {

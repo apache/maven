@@ -42,7 +42,7 @@ public class MavenITmng0836PluginParentResolutionTest extends AbstractMavenInteg
      */
     @Test
     public void testitMNG836() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0836");
+        File testDir = extractResources("/mng-0836");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

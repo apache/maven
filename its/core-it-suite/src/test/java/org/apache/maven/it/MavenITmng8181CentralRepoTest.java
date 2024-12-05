@@ -39,7 +39,7 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitModel() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8181-central-repo");
+        File testDir = extractResources("/mng-8181-central-repo");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
         verifier.setAutoclean(false);

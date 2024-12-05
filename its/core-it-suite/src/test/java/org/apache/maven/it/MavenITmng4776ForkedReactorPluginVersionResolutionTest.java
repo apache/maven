@@ -42,7 +42,7 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest extends Abst
      */
     @Test
     public void testitLifecycle() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4776");
+        File testDir = extractResources("/mng-4776");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -65,7 +65,7 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest extends Abst
      */
     @Test
     public void testitCmdLine() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4776");
+        File testDir = extractResources("/mng-4776");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

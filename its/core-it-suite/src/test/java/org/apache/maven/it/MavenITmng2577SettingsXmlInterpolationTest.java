@@ -43,7 +43,7 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
      */
     @Test
     public void testitEnvVars() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2577");
+        File testDir = extractResources("/mng-2577");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -69,7 +69,7 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
     public void testitSystemProps() throws Exception {
         requiresMavenVersion("[3.0-alpha-1,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2577");
+        File testDir = extractResources("/mng-2577");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

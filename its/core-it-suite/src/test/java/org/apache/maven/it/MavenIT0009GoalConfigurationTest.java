@@ -39,7 +39,7 @@ public class MavenIT0009GoalConfigurationTest extends AbstractMavenIntegrationTe
 
         boolean supportSpaceInXml = matchesVersionRange("[3.1.0,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0009");
+        File testDir = extractResources("/it0009");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

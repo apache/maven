@@ -47,7 +47,7 @@ public class MavenITmng2720SiblingClasspathArtifactsTest extends AbstractMavenIn
 
     @Test
     public void testIT() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2720");
+        File testDir = extractResources("/mng-2720");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

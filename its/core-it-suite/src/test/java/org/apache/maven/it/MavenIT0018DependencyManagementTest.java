@@ -36,7 +36,7 @@ public class MavenIT0018DependencyManagementTest extends AbstractMavenIntegratio
      */
     @Test
     public void testit0018() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0018");
+        File testDir = extractResources("/it0018");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.it0018");

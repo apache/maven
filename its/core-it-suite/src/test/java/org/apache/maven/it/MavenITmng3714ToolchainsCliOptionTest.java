@@ -44,7 +44,7 @@ public class MavenITmng3714ToolchainsCliOptionTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG3714() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3714");
+        File testDir = extractResources("/mng-3714");
 
         File javaHome = new File(testDir, "javaHome");
         javaHome.mkdirs();

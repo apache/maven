@@ -56,7 +56,7 @@ public class MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest ex
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4772");
+        File testDir = extractResources("/mng-4772");
 
         final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 

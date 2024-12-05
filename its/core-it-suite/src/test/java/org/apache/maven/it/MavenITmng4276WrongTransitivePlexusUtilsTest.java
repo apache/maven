@@ -44,7 +44,7 @@ public class MavenITmng4276WrongTransitivePlexusUtilsTest extends AbstractMavenI
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4276");
+        File testDir = extractResources("/mng-4276");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

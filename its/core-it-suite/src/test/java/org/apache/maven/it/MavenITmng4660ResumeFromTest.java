@@ -43,7 +43,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     public void testShouldResolveOutputDirectoryFromEarlierBuild() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4660-resume-from");
+        final File testDir = extractResources("/mng-4660-resume-from");
 
         final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
         verifier1.deleteDirectory("target");
@@ -76,7 +76,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     public void testShouldResolvePackagedArtifactFromEarlierBuild() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4660-resume-from");
+        final File testDir = extractResources("/mng-4660-resume-from");
 
         final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
         verifier1.deleteDirectory("target");

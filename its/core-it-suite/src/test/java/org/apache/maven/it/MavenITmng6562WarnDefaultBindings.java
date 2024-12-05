@@ -30,7 +30,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldNotWarn() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6562-default-bindings");
+        File testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "validate";
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
@@ -47,7 +47,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldNotWarn2() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6562-default-bindings");
+        File testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "process-resources";
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
@@ -64,7 +64,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldWarnForCompilerPlugin() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6562-default-bindings");
+        File testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "compile";
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
@@ -79,7 +79,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldWarnForCompilerPlugin2() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6562-default-bindings");
+        File testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "process-test-resources";
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
@@ -95,7 +95,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldWarnForCompilerPlugin3() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6562-default-bindings");
+        File testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "test-compile";
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
@@ -111,7 +111,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldWarnForCompilerPluginAndSurefirePlugin() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6562-default-bindings");
+        File testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "test";
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);

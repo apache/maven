@@ -44,7 +44,7 @@ public class MavenITmng4007PlatformFileSeparatorTest extends AbstractMavenIntegr
      */
     @Test
     public void testitMNG4007() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4007");
+        File testDir = extractResources("/mng-4007");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

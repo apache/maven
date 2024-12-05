@@ -45,7 +45,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitRepoPolicyAlways() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4745");
+        File testDir = extractResources("/mng-4745");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -80,7 +80,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitRepoPolicyNever() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4745");
+        File testDir = extractResources("/mng-4745");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -115,7 +115,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitForceUpdate() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4745");
+        File testDir = extractResources("/mng-4745");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

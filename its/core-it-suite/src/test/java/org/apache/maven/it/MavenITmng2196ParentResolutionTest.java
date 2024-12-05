@@ -40,7 +40,7 @@ public class MavenITmng2196ParentResolutionTest extends AbstractMavenIntegration
      */
     @Test
     public void testitMNG2196() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2196");
+        File testDir = extractResources("/mng-2196");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

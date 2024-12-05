@@ -40,7 +40,7 @@ public class MavenITmng4788InstallationToCustomLocalRepoTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4788");
+        File testDir = extractResources("/mng-4788");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -39,7 +39,7 @@ public class MavenITmng2234ActiveProfilesFromSettingsTest extends AbstractMavenI
      */
     @Test
     public void testitMNG2234() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2234");
+        File testDir = extractResources("/mng-2234");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

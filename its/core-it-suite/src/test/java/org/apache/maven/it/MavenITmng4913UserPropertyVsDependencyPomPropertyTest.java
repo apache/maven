@@ -44,7 +44,7 @@ public class MavenITmng4913UserPropertyVsDependencyPomPropertyTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4913");
+        File testDir = extractResources("/mng-4913");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -43,7 +43,7 @@ public class MavenITmng4052ReactorAwareImportScopeTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4052");
+        File testDir = extractResources("/mng-4052");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

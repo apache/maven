@@ -40,7 +40,7 @@ public class MavenIT0130CleanLifecycleTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testit0130() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0130");
+        File testDir = extractResources("/it0130");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");

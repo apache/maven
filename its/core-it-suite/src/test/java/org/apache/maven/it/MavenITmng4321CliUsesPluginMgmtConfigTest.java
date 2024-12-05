@@ -42,7 +42,7 @@ public class MavenITmng4321CliUsesPluginMgmtConfigTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4321");
+        File testDir = extractResources("/mng-4321");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

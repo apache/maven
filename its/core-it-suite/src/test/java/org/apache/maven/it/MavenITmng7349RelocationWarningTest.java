@@ -35,7 +35,7 @@ public class MavenITmng7349RelocationWarningTest extends AbstractMavenIntegratio
 
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7349-relocation-warning");
+        File testDir = extractResources("/mng-7349-relocation-warning");
         File artifactsDir = new File(testDir, "artifacts");
         File projectDir = new File(testDir, "project");
 

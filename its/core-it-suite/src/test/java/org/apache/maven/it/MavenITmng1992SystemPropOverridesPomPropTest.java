@@ -46,7 +46,7 @@ public class MavenITmng1992SystemPropOverridesPomPropTest extends AbstractMavenI
      */
     @Test
     public void testitMNG1992() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1992");
+        File testDir = extractResources("/mng-1992");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

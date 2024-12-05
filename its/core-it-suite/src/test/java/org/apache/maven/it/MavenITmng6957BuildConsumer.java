@@ -62,7 +62,7 @@ public class MavenITmng6957BuildConsumer extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testPublishedPoms() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6957-buildconsumer");
+        File testDir = extractResources("/mng-6957-buildconsumer");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);

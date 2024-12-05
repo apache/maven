@@ -30,7 +30,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
 
     @Test
     public void testPkgTypeMojoConfiguration() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5805-pkg-type-mojo-configuration2");
+        File testDir = extractResources("/mng-5805-pkg-type-mojo-configuration2");
 
         Verifier verifier;
 

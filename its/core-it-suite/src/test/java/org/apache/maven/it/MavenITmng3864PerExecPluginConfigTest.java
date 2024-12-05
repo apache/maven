@@ -44,7 +44,7 @@ public class MavenITmng3864PerExecPluginConfigTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG3864() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3864");
+        File testDir = extractResources("/mng-3864");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -40,7 +40,7 @@ public class MavenITmng1144MultipleDefaultGoalsTest extends AbstractMavenIntegra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1144");
+        File testDir = extractResources("/mng-1144");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

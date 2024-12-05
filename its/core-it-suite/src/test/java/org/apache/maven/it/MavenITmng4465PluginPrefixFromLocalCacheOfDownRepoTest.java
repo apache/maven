@@ -42,7 +42,7 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest extends Abst
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4465");
+        File testDir = extractResources("/mng-4465");
 
         // phase 1: get the metadata into the local repo
 

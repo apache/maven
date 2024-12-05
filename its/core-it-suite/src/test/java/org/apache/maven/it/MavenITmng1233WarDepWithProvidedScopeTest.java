@@ -44,7 +44,7 @@ public class MavenITmng1233WarDepWithProvidedScopeTest extends AbstractMavenInte
      */
     @Test
     public void testitMNG1233() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1233");
+        File testDir = extractResources("/mng-1233");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

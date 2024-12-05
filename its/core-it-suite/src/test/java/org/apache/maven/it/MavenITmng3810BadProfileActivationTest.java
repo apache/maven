@@ -36,7 +36,7 @@ public class MavenITmng3810BadProfileActivationTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3810Property() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3810/property");
+        File testDir = extractResources("/mng-3810/property");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

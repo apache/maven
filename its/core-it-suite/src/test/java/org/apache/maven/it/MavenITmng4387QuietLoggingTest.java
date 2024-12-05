@@ -45,7 +45,7 @@ public class MavenITmng4387QuietLoggingTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4387");
+        File testDir = extractResources("/mng-4387");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

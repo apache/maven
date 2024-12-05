@@ -74,7 +74,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4235");
+        testDir = extractResources("/mng-4235");
 
         repoHandler.setResourceBase(testDir.getAbsolutePath());
 

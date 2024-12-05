@@ -46,7 +46,7 @@ public class MavenITmng5000ChildPathAwareUrlInheritanceTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5000");
+        File testDir = extractResources("/mng-5000");
 
         Verifier verifier = newVerifier(new File(testDir, "different-from-artifactId").getAbsolutePath());
         verifier.setAutoclean(false);

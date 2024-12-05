@@ -43,7 +43,7 @@ public class MavenITmng4874UpdateLatestPluginVersionTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4874");
+        File testDir = extractResources("/mng-4874");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

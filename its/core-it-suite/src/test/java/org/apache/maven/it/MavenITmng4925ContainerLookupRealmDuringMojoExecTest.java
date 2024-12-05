@@ -41,7 +41,7 @@ public class MavenITmng4925ContainerLookupRealmDuringMojoExecTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4925");
+        File testDir = extractResources("/mng-4925");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

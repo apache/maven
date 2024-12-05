@@ -29,7 +29,7 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testBasic() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5578-session-scope");
+        File testDir = extractResources("/mng-5578-session-scope");
         File pluginDir = new File(testDir, "plugin");
         File projectDir = new File(testDir, "basic");
 
@@ -51,7 +51,7 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testBasic_multithreaded() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5578-session-scope");
+        File testDir = extractResources("/mng-5578-session-scope");
         File pluginDir = new File(testDir, "plugin");
         File projectDir = new File(testDir, "basic");
 
@@ -77,7 +77,7 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testBasic_buildExtension() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5578-session-scope");
+        File testDir = extractResources("/mng-5578-session-scope");
         File pluginDir = new File(testDir, "plugin");
         File projectDir = new File(testDir, "basic");
 
@@ -99,7 +99,7 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testExtension() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5578-session-scope");
+        File testDir = extractResources("/mng-5578-session-scope");
         File extensionDir = new File(testDir, "extension");
         File pluginDir = new File(testDir, "extension-plugin");
         File projectDir = new File(testDir, "extension-project");

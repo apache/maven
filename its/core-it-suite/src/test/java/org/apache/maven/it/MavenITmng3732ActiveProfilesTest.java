@@ -47,7 +47,7 @@ public class MavenITmng3732ActiveProfilesTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitMNG3732() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3732");
+        File testDir = extractResources("/mng-3732");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

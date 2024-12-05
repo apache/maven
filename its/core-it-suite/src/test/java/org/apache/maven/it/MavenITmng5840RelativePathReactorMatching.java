@@ -29,7 +29,7 @@ public class MavenITmng5840RelativePathReactorMatching extends AbstractMavenInte
 
     @Test
     public void testRelativePathPointsToWrongVersion() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5840-relative-path-reactor-matching");
+        File testDir = extractResources("/mng-5840-relative-path-reactor-matching");
 
         Verifier verifier = newVerifier(new File(testDir, "parent-1").getAbsolutePath());
         verifier.addCliArgument("install");

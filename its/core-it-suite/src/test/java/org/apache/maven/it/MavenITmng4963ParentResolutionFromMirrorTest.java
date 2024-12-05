@@ -42,7 +42,7 @@ public class MavenITmng4963ParentResolutionFromMirrorTest extends AbstractMavenI
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4963");
+        File testDir = extractResources("/mng-4963");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

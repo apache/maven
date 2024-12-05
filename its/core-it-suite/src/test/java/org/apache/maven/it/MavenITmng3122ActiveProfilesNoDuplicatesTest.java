@@ -45,7 +45,7 @@ public class MavenITmng3122ActiveProfilesNoDuplicatesTest extends AbstractMavenI
      */
     @Test
     public void testitMNG3122() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3122");
+        File testDir = extractResources("/mng-3122");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -40,7 +40,7 @@ public class MavenIT0136RarLifecycleTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testit0136() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0136");
+        File testDir = extractResources("/it0136");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");

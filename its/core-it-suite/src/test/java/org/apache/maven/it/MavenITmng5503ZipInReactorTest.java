@@ -45,7 +45,7 @@ public class MavenITmng5503ZipInReactorTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5503");
+        File testDir = extractResources("/mng-5503");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

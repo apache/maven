@@ -41,7 +41,7 @@ public class MavenITmng4338OptionalMojosTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4338");
+        File testDir = extractResources("/mng-4338");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

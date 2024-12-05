@@ -40,7 +40,7 @@ public class MavenIT0085TransitiveSystemScopeTest extends AbstractMavenIntegrati
      */
     @Test
     public void testit0085() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0085");
+        File testDir = extractResources("/it0085");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

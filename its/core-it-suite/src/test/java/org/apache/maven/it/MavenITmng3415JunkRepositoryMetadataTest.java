@@ -82,7 +82,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     public void testitTransferFailed() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_BASE);
+        File testDir = extractResources(RESOURCE_BASE);
 
         Verifier verifier;
 
@@ -153,7 +153,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     public void testShouldNotRepeatedlyUpdateOnResourceNotFoundException() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_BASE);
+        File testDir = extractResources(RESOURCE_BASE);
 
         Verifier verifier;
 

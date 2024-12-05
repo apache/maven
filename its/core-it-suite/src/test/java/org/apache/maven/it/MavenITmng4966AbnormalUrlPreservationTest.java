@@ -43,7 +43,7 @@ public class MavenITmng4966AbnormalUrlPreservationTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4966");
+        File testDir = extractResources("/mng-4966");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

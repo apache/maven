@@ -241,7 +241,7 @@ public class MavenIT0143TransitiveDependencyScopesTest extends AbstractMavenInte
     }
 
     private Verifier run(String scope) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0143");
+        File testDir = extractResources("/it0143");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

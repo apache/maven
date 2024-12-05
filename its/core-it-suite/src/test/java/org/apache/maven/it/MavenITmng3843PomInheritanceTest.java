@@ -49,7 +49,7 @@ public class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitMNG3843() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3843");
+        File testDir = extractResources("/mng-3843");
 
         testDir = testDir.getCanonicalFile();
 

@@ -45,7 +45,7 @@ public class MavenITmng4312TypeAwarePluginParameterExpressionInjectionTest exten
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4312");
+        File testDir = extractResources("/mng-4312");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

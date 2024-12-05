@@ -43,7 +43,7 @@ public class MavenITmng4429CompRequirementOnNonDefaultImplTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4429");
+        File testDir = extractResources("/mng-4429");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

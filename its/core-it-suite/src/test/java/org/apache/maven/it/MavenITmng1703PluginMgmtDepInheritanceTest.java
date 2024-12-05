@@ -46,7 +46,7 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest extends AbstractMavenInt
      */
     @Test
     public void testitMNG1703() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1703");
+        File testDir = extractResources("/mng-1703");
 
         Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
         verifier.setAutoclean(false);

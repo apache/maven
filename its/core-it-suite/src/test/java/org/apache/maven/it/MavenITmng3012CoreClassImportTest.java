@@ -44,7 +44,7 @@ public class MavenITmng3012CoreClassImportTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMNG3012() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3012");
+        File testDir = extractResources("/mng-3012");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

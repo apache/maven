@@ -44,7 +44,7 @@ public class MavenITmng2843PluginConfigPropertiesInjectionTest extends AbstractM
      */
     @Test
     public void testitMNG2843() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2843");
+        File testDir = extractResources("/mng-2843");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

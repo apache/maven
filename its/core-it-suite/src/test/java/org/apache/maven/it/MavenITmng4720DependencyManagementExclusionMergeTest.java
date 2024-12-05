@@ -48,7 +48,7 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
      */
     @Test
     public void testitWithTransitiveDependencyManager() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4720");
+        File testDir = extractResources("/mng-4720");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -85,7 +85,7 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
      */
     @Test
     public void testitWithTransitiveDependencyManagerDisabled() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4720");
+        File testDir = extractResources("/mng-4720");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

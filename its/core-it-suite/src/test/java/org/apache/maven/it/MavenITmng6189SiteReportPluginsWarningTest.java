@@ -36,7 +36,7 @@ public class MavenITmng6189SiteReportPluginsWarningTest extends AbstractMavenInt
 
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6189-site-reportPlugins-warning");
+        File testDir = extractResources("/mng-6189-site-reportPlugins-warning");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

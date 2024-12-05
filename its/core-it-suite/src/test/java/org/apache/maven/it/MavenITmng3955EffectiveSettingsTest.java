@@ -45,7 +45,7 @@ public class MavenITmng3955EffectiveSettingsTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3955() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3955");
+        File testDir = extractResources("/mng-3955");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

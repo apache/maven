@@ -43,7 +43,7 @@ public class MavenITmng3314OfflineSnapshotsTest extends AbstractMavenIntegration
      */
     @Test
     public void testitMNG3314() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3314");
+        File testDir = extractResources("/mng-3314");
 
         {
             // phase 1: run build in online mode to fill local repo

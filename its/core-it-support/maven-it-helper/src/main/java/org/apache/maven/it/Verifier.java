@@ -509,7 +509,7 @@ public class Verifier {
                     line = reader.readLine();
                 }
             } catch (IOException e) {
-                throw new VerificationException(e);
+                throw new VerificationException("Verifier loadFile failure", e);
             }
         }
 

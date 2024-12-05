@@ -53,7 +53,7 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest extends AbstractMavenI
      * its subtree (x) but in the wider scope (compile).
      */
     private void testit(String test) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4800");
+        File testDir = extractResources("/mng-4800");
 
         Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
         verifier.setAutoclean(false);

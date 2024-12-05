@@ -38,7 +38,7 @@ class MavenITmng8294ParentChecksTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitbadMismatch() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8294-parent-checks");
+        File testDir = extractResources("/mng-8294-parent-checks");
 
         Verifier verifier = newVerifier(new File(testDir, "bad-mismatch").getAbsolutePath());
         verifier.addCliArgument("validate");
@@ -52,7 +52,7 @@ class MavenITmng8294ParentChecksTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitbadNonResolvable() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8294-parent-checks");
+        File testDir = extractResources("/mng-8294-parent-checks");
 
         Verifier verifier = newVerifier(new File(testDir, "bad-non-resolvable").getAbsolutePath());
         verifier.addCliArgument("validate");
@@ -66,7 +66,7 @@ class MavenITmng8294ParentChecksTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitbadWrongPath() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8294-parent-checks");
+        File testDir = extractResources("/mng-8294-parent-checks");
 
         Verifier verifier = newVerifier(new File(testDir, "bad-wrong-path").getAbsolutePath());
         verifier.addCliArgument("validate");
@@ -79,7 +79,7 @@ class MavenITmng8294ParentChecksTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitokUsingEmpty() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8294-parent-checks");
+        File testDir = extractResources("/mng-8294-parent-checks");
 
         Verifier verifier = newVerifier(new File(testDir, "ok-using-empty").getAbsolutePath());
         verifier.addCliArgument("validate");
@@ -91,7 +91,7 @@ class MavenITmng8294ParentChecksTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitokUsingGav() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8294-parent-checks");
+        File testDir = extractResources("/mng-8294-parent-checks");
 
         Verifier verifier = newVerifier(new File(testDir, "ok-using-gav").getAbsolutePath());
         verifier.addCliArgument("validate");
@@ -103,7 +103,7 @@ class MavenITmng8294ParentChecksTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitokUsingPath() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8294-parent-checks");
+        File testDir = extractResources("/mng-8294-parent-checks");
 
         Verifier verifier = newVerifier(new File(testDir, "ok-using-path").getAbsolutePath());
         verifier.addCliArgument("validate");

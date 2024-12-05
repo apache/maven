@@ -43,7 +43,7 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
         // excluded 2.1.x and 2.2.x due to MNG-4325
         requiresMavenVersion("[2.0,2.1.0),[3.0-alpha-3,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1073");
+        File testDir = extractResources("/mng-1073");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -68,7 +68,7 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
      */
     @Test
     public void testitForkGoal() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1073");
+        File testDir = extractResources("/mng-1073");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

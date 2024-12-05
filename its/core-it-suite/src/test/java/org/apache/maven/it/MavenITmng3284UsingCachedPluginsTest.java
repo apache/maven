@@ -40,7 +40,7 @@ public class MavenITmng3284UsingCachedPluginsTest extends AbstractMavenIntegrati
      */
     @Test
     public void testitMNG3284() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3284");
+        File testDir = extractResources("/mng-3284");
 
         /*
          * Phase 1: Ensure both plugin versions are already in the local repo. This is a crucial prerequisite for the

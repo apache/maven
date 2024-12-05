@@ -40,7 +40,7 @@ public class MavenIT0037AlternatePomFileSameDirTest extends AbstractMavenIntegra
      */
     @Test
     public void testit0037() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0037");
+        File testDir = extractResources("/it0037");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

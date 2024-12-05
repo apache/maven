@@ -33,7 +33,7 @@ public class MavenITmng7404IgnorePrefixlessExpressionsTest extends AbstractMaven
 
     @Test
     public void testIgnorePrefixlessExpressions() throws IOException, VerificationException {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
         verifier.addCliArgument("validate");

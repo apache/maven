@@ -44,7 +44,7 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest extends AbstractMaven
      */
     @Test
     public void testitOneParent() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3846");
+        File testDir = extractResources("/mng-3846");
 
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
         verifier.setAutoclean(false);
@@ -77,7 +77,7 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest extends AbstractMaven
      */
     @Test
     public void testitTwoParents() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3846");
+        File testDir = extractResources("/mng-3846");
 
         Verifier verifier = newVerifier(new File(testDir, "another-parent/sub").getAbsolutePath());
         verifier.setAutoclean(false);

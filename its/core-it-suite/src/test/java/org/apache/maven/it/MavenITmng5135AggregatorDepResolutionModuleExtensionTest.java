@@ -43,7 +43,7 @@ public class MavenITmng5135AggregatorDepResolutionModuleExtensionTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5135");
+        File testDir = extractResources("/mng-5135");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

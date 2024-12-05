@@ -39,7 +39,7 @@ public class MavenITmng7529VersionRangeRepositorySelection extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7529");
+        File testDir = extractResources("/mng-7529");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

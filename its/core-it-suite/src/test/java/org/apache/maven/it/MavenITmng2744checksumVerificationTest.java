@@ -41,7 +41,7 @@ public class MavenITmng2744checksumVerificationTest extends AbstractMavenIntegra
      */
     @Test
     public void testitMNG2744() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2744");
+        File testDir = extractResources("/mng-2744");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

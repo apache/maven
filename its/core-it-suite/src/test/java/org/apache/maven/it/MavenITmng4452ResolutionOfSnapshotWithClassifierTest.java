@@ -46,7 +46,7 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4452");
+        File testDir = extractResources("/mng-4452");
 
         Verifier verifier = newVerifier(new File(testDir, "producer").getAbsolutePath());
         verifier.setAutoclean(false);

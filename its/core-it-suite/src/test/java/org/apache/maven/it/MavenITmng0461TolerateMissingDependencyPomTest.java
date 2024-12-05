@@ -43,7 +43,7 @@ public class MavenITmng0461TolerateMissingDependencyPomTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0461");
+        File testDir = extractResources("/mng-0461");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

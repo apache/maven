@@ -40,8 +40,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractM
      */
     @Test
     public void testBuildFailureUTFail() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5640-lifecycleParticipant-afterSession");
+        File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
         File extensionDir = new File(testDir, "extension");
         File projectDir = new File(testDir, "buildfailure-utfail");
 
@@ -76,8 +75,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractM
      */
     @Test
     public void testBuildFailureMissingDependency() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5640-lifecycleParticipant-afterSession");
+        File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
         File extensionDir = new File(testDir, "extension");
         File projectDir = new File(testDir, "buildfailure-depmissing");
 
@@ -112,8 +110,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractM
      */
     @Test
     public void testBuildError() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5640-lifecycleParticipant-afterSession");
+        File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
         File extensionDir = new File(testDir, "extension");
         File pluginDir = new File(testDir, "badplugin");
         File projectDir = new File(testDir, "builderror-mojoex");
@@ -155,8 +152,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractM
      */
     @Test
     public void testBuildErrorRt() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5640-lifecycleParticipant-afterSession");
+        File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
         File extensionDir = new File(testDir, "extension");
         File pluginDir = new File(testDir, "badplugin");
         File projectDir = new File(testDir, "builderror-runtimeex");

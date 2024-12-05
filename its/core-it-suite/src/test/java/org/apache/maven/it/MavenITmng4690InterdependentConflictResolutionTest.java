@@ -75,7 +75,7 @@ public class MavenITmng4690InterdependentConflictResolutionTest extends Abstract
      * levels) when the resolution of one conflict influences another conflict.
      */
     private void testit(String test) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4690");
+        File testDir = extractResources("/mng-4690");
 
         Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
         verifier.setAutoclean(false);

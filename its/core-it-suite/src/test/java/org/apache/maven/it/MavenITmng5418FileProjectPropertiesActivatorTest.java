@@ -42,7 +42,7 @@ public class MavenITmng5418FileProjectPropertiesActivatorTest extends AbstractMa
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5418");
+        File testDir = extractResources("/mng-5418");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

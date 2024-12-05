@@ -42,7 +42,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest extends Abstra
      */
     @Test
     public void testitMNG3139() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3139");
+        File testDir = extractResources("/mng-3139");
 
         // phase 1: get the metadata into the local repo
 

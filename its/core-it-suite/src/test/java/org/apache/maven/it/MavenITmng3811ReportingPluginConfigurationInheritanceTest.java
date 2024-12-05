@@ -44,7 +44,7 @@ public class MavenITmng3811ReportingPluginConfigurationInheritanceTest extends A
      */
     @Test
     public void testitMNG3811() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3811");
+        File testDir = extractResources("/mng-3811");
 
         Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
         verifier.setAutoclean(false);

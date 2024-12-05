@@ -55,7 +55,7 @@ public class MavenITmng4413MirroringOfDependencyRepoTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4413");
+        File testDir = extractResources("/mng-4413");
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);

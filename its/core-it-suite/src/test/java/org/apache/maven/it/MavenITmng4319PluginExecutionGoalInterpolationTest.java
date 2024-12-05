@@ -40,7 +40,7 @@ public class MavenITmng4319PluginExecutionGoalInterpolationTest extends Abstract
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4319");
+        File testDir = extractResources("/mng-4319");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

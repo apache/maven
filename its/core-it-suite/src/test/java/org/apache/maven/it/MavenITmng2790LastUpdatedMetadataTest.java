@@ -47,7 +47,7 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG2790() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2790");
+        File testDir = extractResources("/mng-2790");
 
         Date now = new Date();
 

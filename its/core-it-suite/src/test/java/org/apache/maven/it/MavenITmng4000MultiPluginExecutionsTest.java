@@ -46,7 +46,7 @@ public class MavenITmng4000MultiPluginExecutionsTest extends AbstractMavenIntegr
      */
     @Test
     public void testitWithoutPluginMngt() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4000/test-1");
+        File testDir = extractResources("/mng-4000/test-1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -68,7 +68,7 @@ public class MavenITmng4000MultiPluginExecutionsTest extends AbstractMavenIntegr
      */
     @Test
     public void testitWithPluginMngt() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4000/test-2");
+        File testDir = extractResources("/mng-4000/test-2");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
