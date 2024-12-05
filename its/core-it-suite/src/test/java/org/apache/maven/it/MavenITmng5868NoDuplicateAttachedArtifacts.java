@@ -25,7 +25,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -59,7 +58,7 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5868");
+        testDir = extractResources("/mng-5868");
 
         Handler repoHandler = new AbstractHandler() {
             @Override

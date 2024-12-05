@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -60,7 +59,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4326");
+        File testDir = extractResources("/mng-4326");
 
         // setup: install a local snapshot
         Verifier verifier = newVerifier(new File(testDir, "dependency").getAbsolutePath());

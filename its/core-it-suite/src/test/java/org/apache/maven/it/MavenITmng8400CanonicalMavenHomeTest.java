@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,9 +43,7 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8400")
-                .getAbsoluteFile()
-                .toPath();
+        Path basedir = extractResources("/mng-8400").getAbsoluteFile().toPath();
         Path tempDir = basedir.resolve("tmp");
         Files.createDirectories(tempDir);
 

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,10 +41,10 @@ public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6558");
+        File testDir = extractResources("/mng-6558");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // maven.ext.class.path used
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dmaven.ext.class.path=spy-0.1.jar");

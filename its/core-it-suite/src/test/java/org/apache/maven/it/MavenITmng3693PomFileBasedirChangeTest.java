@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +39,7 @@ public class MavenITmng3693PomFileBasedirChangeTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3693() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3693");
+        File testDir = extractResources("/mng-3693");
 
         File pluginDir = new File(testDir, "maven-mng3693-plugin");
         File projectsDir = new File(testDir, "projects");

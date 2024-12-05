@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +44,7 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4955");
+        File testDir = extractResources("/mng-4955");
 
         Verifier verifier = newVerifier(new File(testDir, "dep").getAbsolutePath());
         verifier.setAutoclean(false);

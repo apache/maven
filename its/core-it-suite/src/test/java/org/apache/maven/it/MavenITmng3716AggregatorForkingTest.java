@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,7 +38,7 @@ public class MavenITmng3716AggregatorForkingTest extends AbstractMavenIntegratio
 
     @Test
     public void testitMNG3716() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3716");
+        File testDir = extractResources("/mng-3716");
         File pluginDir = new File(testDir, "maven-mng3716-plugin");
         File projectsDir = new File(testDir, "projects");
 

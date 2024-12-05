@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +46,7 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4361");
+        File testDir = extractResources("/mng-4361");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

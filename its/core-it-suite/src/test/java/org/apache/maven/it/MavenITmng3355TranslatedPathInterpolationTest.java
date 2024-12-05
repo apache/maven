@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,7 +34,7 @@ public class MavenITmng3355TranslatedPathInterpolationTest extends AbstractMaven
 
     @Test
     public void testitMNG3355() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3355");
+        File testDir = extractResources("/mng-3355");
 
         Verifier verifier;
 

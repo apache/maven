@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,7 +41,7 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends Abstract
      */
     @Test
     public void testitAM() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4890");
+        File testDir = extractResources("/mng-4890");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -70,7 +69,7 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends Abstract
      */
     @Test
     public void testitAMD() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4890");
+        File testDir = extractResources("/mng-4890");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

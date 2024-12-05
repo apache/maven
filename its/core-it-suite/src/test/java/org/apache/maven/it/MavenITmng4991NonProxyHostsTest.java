@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
@@ -52,7 +51,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4991");
+        File testDir = extractResources("/mng-4991");
 
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());

@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,7 +42,7 @@ public class MavenITmng3979ElementJoinTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitMNG3979() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3979");
+        File testDir = extractResources("/mng-3979");
 
         testDir = new File(testDir, "sub");
 

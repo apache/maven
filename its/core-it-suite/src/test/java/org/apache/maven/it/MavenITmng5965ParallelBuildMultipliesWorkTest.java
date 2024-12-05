@@ -24,8 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,7 +38,7 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest extends AbstractMaven
 
     @Test
     public void testItShouldOnlyRunEachTaskOnce() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5965-parallel-build-multiplies-work");
+        File testDir = extractResources("/mng-5965-parallel-build-multiplies-work");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);

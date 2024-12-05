@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,7 +42,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenI
      */
     @Test
     public void testitNoLayout() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4367");
+        File testDir = extractResources("/mng-4367");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -72,7 +71,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenI
      */
     @Test
     public void testitSpecificLayouts() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4367");
+        File testDir = extractResources("/mng-4367");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -101,7 +100,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenI
      */
     @Test
     public void testitNonMatchingLayout() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4367");
+        File testDir = extractResources("/mng-4367");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

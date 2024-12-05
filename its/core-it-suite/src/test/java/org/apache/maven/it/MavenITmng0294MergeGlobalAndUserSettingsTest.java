@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,7 +41,7 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest extends AbstractMavenI
      */
     @Test
     public void testitMNG294() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0294");
+        File testDir = extractResources("/mng-0294");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

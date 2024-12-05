@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +32,7 @@ public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenInte
 
     @Test
     public void testBehaviourWhereThereIsOneUserSuppliedConfigurationProcessor() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5774-configuration-processors");
+        File testDir = extractResources("/mng-5774-configuration-processors");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -57,7 +55,7 @@ public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenInte
 
     @Test
     public void testBehaviourWhereThereAreTwoUserSuppliedConfigurationProcessor() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5774-configuration-processors");
+        File testDir = extractResources("/mng-5774-configuration-processors");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.filterFile("settings-template.xml", "settings.xml");

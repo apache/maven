@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +38,7 @@ public class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5382");
+        testDir = extractResources("/mng-5382");
     }
 
     @Test

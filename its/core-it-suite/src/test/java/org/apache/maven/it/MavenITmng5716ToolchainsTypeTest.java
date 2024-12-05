@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -43,7 +42,7 @@ public class MavenITmng5716ToolchainsTypeTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitMNG5716() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5716-toolchains-type");
+        File testDir = extractResources("/mng-5716-toolchains-type");
 
         File javaHome = new File(testDir, "javaHome");
         javaHome.mkdirs();

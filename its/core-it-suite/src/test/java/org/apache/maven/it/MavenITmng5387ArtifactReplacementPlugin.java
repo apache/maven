@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.nio.file.Files;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +36,7 @@ public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegr
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5387");
+        testDir = extractResources("/mng-5387");
     }
 
     @Test

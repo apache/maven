@@ -28,7 +28,6 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +45,7 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
 
     @Test
     public void testArtifactsHaveSameTimestamp() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_PATH);
+        final File testDir = extractResources(RESOURCE_PATH);
         final Verifier verifier = newVerifier(testDir.getAbsolutePath());
         final Path localRepoDir = Paths.get(verifier.getLocalRepository());
         final Path remoteRepoDir = Paths.get(verifier.getBasedir(), "repo");

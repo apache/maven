@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,7 +48,7 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
      */
     @Test
     public void testitWithTransitiveDependencyManager() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4720");
+        File testDir = extractResources("/mng-4720");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -86,7 +85,7 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
      */
     @Test
     public void testitWithTransitiveDependencyManagerDisabled() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4720");
+        File testDir = extractResources("/mng-4720");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

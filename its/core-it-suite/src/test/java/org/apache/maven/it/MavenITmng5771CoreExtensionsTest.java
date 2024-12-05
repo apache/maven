@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,7 +35,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testCoreExtension() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5771-core-extensions");
+        File testDir = extractResources("/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -53,7 +52,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testCoreExtensionNoDescriptor() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5771-core-extensions");
+        File testDir = extractResources("/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -76,7 +75,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     public void testCoreExtensionRetrievedFromAMirrorWithBasicAuthentication() throws Exception {
         requiresMavenVersion("[3.3.2,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5771-core-extensions");
+        File testDir = extractResources("/mng-5771-core-extensions");
 
         HttpServer server = HttpServer.builder() //
                 .port(0) //
@@ -117,7 +116,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     public void testCoreExtensionWithProperties() throws Exception {
         requiresMavenVersion("[3.8.5,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5771-core-extensions");
+        File testDir = extractResources("/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -140,7 +139,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     public void testCoreExtensionWithConfig() throws Exception {
         requiresMavenVersion("[3.8.5,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5771-core-extensions");
+        File testDir = extractResources("/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.filterFile("settings-template.xml", "settings.xml");

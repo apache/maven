@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,7 +36,7 @@ class MavenITmng8360SubprojectProfileActivationTest extends AbstractMavenIntegra
      */
     @Test
     void testDeadlock() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8360");
+        File testDir = extractResources("/mng-8360");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArguments("-s", "settings.xml");

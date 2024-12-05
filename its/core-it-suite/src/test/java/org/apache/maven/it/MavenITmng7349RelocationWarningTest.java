@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +35,7 @@ public class MavenITmng7349RelocationWarningTest extends AbstractMavenIntegratio
 
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7349-relocation-warning");
+        File testDir = extractResources("/mng-7349-relocation-warning");
         File artifactsDir = new File(testDir, "artifacts");
         File projectDir = new File(testDir, "project");
 

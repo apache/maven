@@ -22,7 +22,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Locale;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +46,7 @@ public class MavenITmng3892ReleaseDeploymentTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3892() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3892");
+        File testDir = extractResources("/mng-3892");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

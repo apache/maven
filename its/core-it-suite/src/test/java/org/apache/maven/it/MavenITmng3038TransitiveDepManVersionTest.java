@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +38,7 @@ public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenInte
 
     @Test
     public void testitMNG3038() throws Exception {
-        File testDirBase = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3038");
+        File testDirBase = extractResources("/mng-3038");
 
         compileDDep(testDirBase, "D1", "1.0");
         compileDDep(testDirBase, "D2", "2.0");

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.net.URI;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -44,7 +43,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     @Test
     public void testTransitiveDependenciesAccountForRepositoriesListedByDependencyTrailPredecessor() throws Exception {
         installDependencyCInCustomRepo();
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), projectBaseDir);
+        File testDir = extractResources(projectBaseDir);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
@@ -54,8 +53,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     }
 
     private void installDependencyCInCustomRepo() throws Exception {
-        File dependencyCProjectDir =
-                ResourceExtractor.simpleExtractResources(getClass(), projectBaseDir + "/dependency-in-custom-repo");
+        File dependencyCProjectDir = extractResources(projectBaseDir + "/dependency-in-custom-repo");
         URI customRepoUri = new File(new File(dependencyCProjectDir, "target"), "repo").toURI();
         Verifier verifier = newVerifier(dependencyCProjectDir.getAbsolutePath());
 

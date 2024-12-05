@@ -20,8 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,7 +39,7 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitModel() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8181-central-repo");
+        File testDir = extractResources("/mng-8181-central-repo");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
         verifier.setAutoclean(false);

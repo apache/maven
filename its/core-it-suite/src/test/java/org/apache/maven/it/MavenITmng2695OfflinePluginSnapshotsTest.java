@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -44,7 +43,7 @@ public class MavenITmng2695OfflinePluginSnapshotsTest extends AbstractMavenInteg
      */
     @Test
     public void testitMNG2695() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2695");
+        File testDir = extractResources("/mng-2695");
 
         {
             // phase 1: run build in online mode to fill local repo

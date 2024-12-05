@@ -29,7 +29,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -56,7 +55,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5280");
+        testDir = extractResources("/mng-5280");
         server = new Server(0);
     }
 

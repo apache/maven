@@ -26,8 +26,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -57,7 +55,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
 
     @BeforeEach
     protected void setUp() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0108");
+        File testDir = extractResources("/it0108");
         verifier = newVerifier(testDir.getAbsolutePath());
         localRepoFile = getLocalRepoFile(verifier);
         deleteLocalArtifact(verifier, localRepoFile);

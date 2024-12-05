@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,7 +37,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testitMNG3220a() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3220");
+        File testDir = extractResources("/mng-3220");
 
         testDir = new File(testDir, "imported-pom-depMgmt");
 
@@ -57,7 +55,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testitMNG3220b() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3220");
+        File testDir = extractResources("/mng-3220");
 
         testDir = new File(testDir, "depMgmt-pom-module-notImported");
 

@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,7 +41,7 @@ public class MavenITmng3814BogusProjectCycleTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3814() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3814");
+        File testDir = extractResources("/mng-3814");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -60,7 +59,7 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4068");
+        testDir = extractResources("/mng-4068");
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);

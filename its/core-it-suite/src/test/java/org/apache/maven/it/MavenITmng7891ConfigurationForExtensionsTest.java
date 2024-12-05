@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,7 +34,7 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
 
     @Test
     void testConfigurationForCoreExtension() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7891-extension-configuration");
+        File testDir = extractResources("/mng-7891-extension-configuration");
 
         Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
         verifier.addCliArgument("install");
@@ -59,7 +58,7 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
 
     @Test
     void testConfigurationForBuildExtension() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7891-extension-configuration");
+        File testDir = extractResources("/mng-7891-extension-configuration");
 
         Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
         verifier.addCliArgument("install");

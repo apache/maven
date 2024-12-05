@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,7 +40,7 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest extends Abstract
      */
     @Test
     public void testitDefaultLayout() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4036/default");
+        File testDir = extractResources("/mng-4036/default");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

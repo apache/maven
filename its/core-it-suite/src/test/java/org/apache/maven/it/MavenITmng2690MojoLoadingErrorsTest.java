@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,7 +45,7 @@ public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegratio
 
     @Test
     public void testNoClassDefFromMojoLoad() throws IOException, VerificationException {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2690/noclassdef-mojo");
+        File testDir = extractResources("/mng-2690/noclassdef-mojo");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -67,7 +65,7 @@ public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegratio
 
     @Test
     public void testNoClassDefFromMojoConfiguration() throws IOException, VerificationException {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2690/noclassdef-param");
+        File testDir = extractResources("/mng-2690/noclassdef-param");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -87,7 +85,7 @@ public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegratio
 
     @Test
     public void testMojoComponentLookupException() throws IOException, VerificationException {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2690/mojo-complookup");
+        File testDir = extractResources("/mng-2690/mojo-complookup");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -106,7 +104,7 @@ public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegratio
 
     @Test
     public void testMojoRequirementComponentLookupException() throws IOException, VerificationException {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2690/requirement-complookup");
+        File testDir = extractResources("/mng-2690/requirement-complookup");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

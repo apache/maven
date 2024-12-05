@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -59,7 +58,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4500");
+        File testDir = extractResources("/mng-4500");
 
         String pomUri = "/repo/org/apache/maven/its/mng4500/dep/0.1-SNAPSHOT/dep-0.1-20091219.230823-1.pom";
         String jarUri = "/repo/org/apache/maven/its/mng4500/dep/0.1-SNAPSHOT/dep-0.1-20091219.230823-1.jar";

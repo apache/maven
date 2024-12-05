@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng5561PluginRelocationLosesConfigurationTest extends AbstractMavenIntegrationTestCase {
@@ -31,8 +30,7 @@ public class MavenITmng5561PluginRelocationLosesConfigurationTest extends Abstra
 
     @Test
     public void testit() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5561-plugin-relocation-loses-configuration");
+        File testDir = extractResources("/mng-5561-plugin-relocation-loses-configuration");
         File oldPluginWithRelocationDir = new File(testDir, "old-plugin-with-relocation");
         File newPluginDir = new File(testDir, "new-plugin");
         File projectDir = new File(testDir, "project");

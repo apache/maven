@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +33,7 @@ public class MavenITmng5783PluginDependencyFiltering extends AbstractMavenIntegr
 
     @Test
     public void testSLF4j() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5783-plugin-dependency-filtering");
+        File testDir = extractResources("/mng-5783-plugin-dependency-filtering");
         Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();

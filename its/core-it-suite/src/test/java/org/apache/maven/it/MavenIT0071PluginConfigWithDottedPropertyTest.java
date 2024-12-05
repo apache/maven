@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,7 +41,7 @@ public class MavenIT0071PluginConfigWithDottedPropertyTest extends AbstractMaven
      */
     @Test
     public void testit0071() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0071");
+        File testDir = extractResources("/it0071");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

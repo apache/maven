@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +43,7 @@ class MavenITmng6609ProfileActivationForPackagingTest extends AbstractMavenInteg
      */
     @Test
     void testitMojoExecution() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6609");
+        File testDir = extractResources("/mng-6609");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

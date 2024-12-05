@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +44,7 @@ public class MavenITmng4919LifecycleMappingWithSameGoalTwiceTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4919");
+        File testDir = extractResources("/mng-4919");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -20,8 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-
 /**
  * An integration test which proves that the bug of MNG-7310 is fixed.
  * The bug is about loading an extension in a sibling submodule, which ends up failing the build.
@@ -38,8 +36,8 @@ public class MavenITmng7310LifecycleActivatedInSpecifiedModuleTest extends Abstr
     }
 
     public void testItShouldNotLoadAnExtensionInASiblingSubmodule() throws Exception {
-        File extensionTestDir = ResourceExtractor.simpleExtractResources(getClass(), BASE_TEST_DIR + "/extension");
-        File projectTestDir = ResourceExtractor.simpleExtractResources(getClass(), BASE_TEST_DIR + "/project");
+        File extensionTestDir = extractResources(BASE_TEST_DIR + "/extension");
+        File projectTestDir = extractResources(BASE_TEST_DIR + "/project");
 
         Verifier verifier = newVerifier(extensionTestDir.getAbsolutePath());
         verifier.addCliArgument("install");

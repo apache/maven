@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,7 +43,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
      */
     @Test
     public void testitMNG1021() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1021");
+        File testDir = extractResources("/mng-1021");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("repo");

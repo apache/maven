@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -39,7 +38,7 @@ class MavenITmng8341DeadlockTest extends AbstractMavenIntegrationTestCase {
     @Timeout(value = 60)
     @Test
     void testDeadlock() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8341-deadlock");
+        File testDir = extractResources("/mng-8341-deadlock");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("validate");

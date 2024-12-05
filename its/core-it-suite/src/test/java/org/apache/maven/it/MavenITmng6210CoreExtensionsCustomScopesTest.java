@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,7 +35,7 @@ public class MavenITmng6210CoreExtensionsCustomScopesTest extends AbstractMavenI
 
     @Test
     public void testCoreExtensionCustomScopes() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6210-core-extensions-scopes");
+        File testDir = extractResources("/mng-6210-core-extensions-scopes");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.filterFile("settings-template.xml", "settings.xml");

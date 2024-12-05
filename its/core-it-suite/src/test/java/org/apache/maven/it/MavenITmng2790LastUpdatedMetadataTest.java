@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -48,7 +47,7 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG2790() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2790");
+        File testDir = extractResources("/mng-2790");
 
         Date now = new Date();
 

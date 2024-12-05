@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -44,7 +43,7 @@ public class MavenITmng3723ConcreteParentProjectTest extends AbstractMavenIntegr
     public void testitMNG3723() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3723");
+        File testDir = extractResources("/mng-3723");
         File pluginDir = new File(testDir, "maven-mng3723-plugin");
         File projectDir = new File(testDir, "projects");
 

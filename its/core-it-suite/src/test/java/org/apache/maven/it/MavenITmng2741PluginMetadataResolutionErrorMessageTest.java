@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -59,7 +57,7 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
     }
 
     private void testit(String test, String goal) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2741");
+        File testDir = extractResources("/mng-2741");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,8 +33,7 @@ public class MavenITmng7443ConsistencyOfOptionalProjectsAndProfilesTest extends 
 
     @Test
     public void testConsistentLoggingOfOptionalProfilesAndProjects() throws IOException, VerificationException {
-        File testDir = ResourceExtractor.simpleExtractResources(
-                getClass(), "/mng-7443-consistency-of-optional-profiles-and-projects");
+        File testDir = extractResources("/mng-7443-consistency-of-optional-profiles-and-projects");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-pl");

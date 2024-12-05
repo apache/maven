@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,7 +42,7 @@ public class MavenITmng3701ImplicitProfileIdTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3701() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3701");
+        File testDir = extractResources("/mng-3701");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

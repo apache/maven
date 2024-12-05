@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,8 +41,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIn
     @Test
     public void testitMNG3394a() throws Exception {
         // testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins
-        File testDir = ResourceExtractor.simpleExtractResources(
-                getClass(), BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt");
+        File testDir = extractResources(BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -58,8 +56,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIn
     @Test
     public void testitMNG3394b() throws Exception {
         // testShouldPreferPluginVersionFromBuildPluginsOverThatInPluginMgmt
-        File testDir = ResourceExtractor.simpleExtractResources(
-                getClass(), BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt");
+        File testDir = extractResources(BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 

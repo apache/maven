@@ -22,7 +22,6 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,10 +37,10 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testLeakyModel() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7228-leaky-model");
+        File testDir = extractResources("/mng-7228-leaky-model");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // TODO: why?
 
         verifier.addCliArgument("-e");
         verifier.addCliArgument("-s");

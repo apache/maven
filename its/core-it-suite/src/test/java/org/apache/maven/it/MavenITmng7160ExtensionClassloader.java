@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7160ExtensionClassloader extends AbstractMavenIntegrationTestCase {
@@ -32,7 +30,7 @@ public class MavenITmng7160ExtensionClassloader extends AbstractMavenIntegration
 
     @Test
     public void testVerify() throws IOException, VerificationException {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7160-extensionclassloader");
+        final File projectDir = extractResources("/mng-7160-extensionclassloader");
 
         final Verifier extensionVerifier = newVerifier(new File(projectDir, "extension").getAbsolutePath());
         extensionVerifier.addCliArgument("install");

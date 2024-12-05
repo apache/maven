@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.maven.it.Verifier.verifyTextInLog;
@@ -42,7 +40,7 @@ class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegration
 
     @Test
     void javadocIsExecutedAndFailed() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7967-artifact-handler-language");
+        File testDir = extractResources("/mng-7967-artifact-handler-language");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");

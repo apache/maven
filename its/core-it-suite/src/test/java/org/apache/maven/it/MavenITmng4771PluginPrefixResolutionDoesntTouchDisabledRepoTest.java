@@ -26,8 +26,6 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -57,7 +55,7 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest ext
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4771");
+        File testDir = extractResources("/mng-4771");
 
         final Deque<String> requestedUris = new ConcurrentLinkedDeque<>();
 

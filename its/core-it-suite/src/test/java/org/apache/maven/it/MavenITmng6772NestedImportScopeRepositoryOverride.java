@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +43,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
     // This will test the behavior using ProjectModelResolver
     @Test
     public void testitInProject() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6772-override-in-project");
+        final File testDir = extractResources("/mng-6772-override-in-project");
 
         final Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
         overrideGlobalSettings(testDir, verifier);
@@ -60,7 +59,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
     // This will test the behavior using DefaultModelResolver
     @Test
     public void testitInDependency() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6772-override-in-dependency");
+        final File testDir = extractResources("/mng-6772-override-in-dependency");
 
         final Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
         overrideGlobalSettings(testDir, verifier);

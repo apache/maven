@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -58,7 +57,7 @@ public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4729");
+        File testDir = extractResources("/mng-4729");
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);

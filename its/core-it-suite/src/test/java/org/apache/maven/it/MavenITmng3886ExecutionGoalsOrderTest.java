@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,7 +61,7 @@ public class MavenITmng3886ExecutionGoalsOrderTest extends AbstractMavenIntegrat
     }
 
     private void testitMNG3886(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3886");
+        File testDir = extractResources("/mng-3886");
 
         Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
         verifier.setAutoclean(false);

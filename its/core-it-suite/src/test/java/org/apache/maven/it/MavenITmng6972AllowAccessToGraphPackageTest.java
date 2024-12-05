@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,8 +35,7 @@ public class MavenITmng6972AllowAccessToGraphPackageTest extends AbstractMavenIn
     public void testit() throws Exception {
 
         // The testdir is computed from the location of this file.
-        final File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-6972-allow-access-to-graph-package");
+        final File testDir = extractResources("/mng-6972-allow-access-to-graph-package");
 
         Verifier verifier;
 

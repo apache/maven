@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +44,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitModel() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0479");
+        File testDir = extractResources("/mng-0479");
 
         // Phase 1: Ensure the test plugin is downloaded before the test cuts off access to central
         File child1 = new File(testDir, "setup");
@@ -117,7 +115,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitResolution() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0479");
+        File testDir = extractResources("/mng-0479");
 
         Verifier verifier = newVerifier(new File(testDir, "test-1").getAbsolutePath());
         verifier.setAutoclean(false);

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +43,7 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest extends Abstr
      */
     @Test
     public void testitActivation() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2276");
+        File testDir = extractResources("/mng-2276");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -68,7 +67,7 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest extends Abstr
      */
     @Test
     public void testitCliWins() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2276");
+        File testDir = extractResources("/mng-2276");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

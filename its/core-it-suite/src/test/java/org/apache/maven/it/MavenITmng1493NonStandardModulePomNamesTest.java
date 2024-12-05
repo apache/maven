@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,7 +32,7 @@ public class MavenITmng1493NonStandardModulePomNamesTest extends AbstractMavenIn
 
     @Test
     public void testitMNG1493() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1493");
+        File testDir = extractResources("/mng-1493");
 
         Verifier verifier;
 

@@ -25,7 +25,6 @@ import java.io.File;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -115,7 +114,7 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4781");
+        File testDir = extractResources("/mng-4781");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

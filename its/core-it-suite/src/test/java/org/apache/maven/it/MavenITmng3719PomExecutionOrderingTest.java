@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,7 +46,7 @@ public class MavenITmng3719PomExecutionOrderingTest extends AbstractMavenIntegra
      */
     @Test
     public void testitMNG3719() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3719");
+        File testDir = extractResources("/mng-3719");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

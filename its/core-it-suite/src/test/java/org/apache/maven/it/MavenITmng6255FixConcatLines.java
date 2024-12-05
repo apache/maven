@@ -22,7 +22,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,7 +68,7 @@ public class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCa
     }
 
     protected void runWithLineEndings(String lineEndings) throws Exception {
-        File baseDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6255");
+        File baseDir = extractResources("/mng-6255");
         File mvnDir = new File(baseDir, ".mvn");
 
         File jvmConfig = new File(mvnDir, "jvm.config");
@@ -78,7 +77,7 @@ public class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCa
         Verifier verifier = newVerifier(baseDir.getAbsolutePath());
         verifier.addCliArgument(
                 "-Dexpression.outputFile=" + new File(baseDir, "expression.properties").getAbsolutePath());
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // custom .mvn/jvm.config
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

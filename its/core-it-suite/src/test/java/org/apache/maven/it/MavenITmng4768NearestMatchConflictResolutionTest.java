@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -78,7 +77,7 @@ public class MavenITmng4768NearestMatchConflictResolutionTest extends AbstractMa
      * order.
      */
     private void testit(String test) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4768");
+        File testDir = extractResources("/mng-4768");
 
         Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
         verifier.setAutoclean(false);

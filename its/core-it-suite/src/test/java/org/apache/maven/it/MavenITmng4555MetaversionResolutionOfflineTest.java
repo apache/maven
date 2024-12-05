@@ -26,8 +26,6 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -55,7 +53,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4555");
+        File testDir = extractResources("/mng-4555");
 
         final Deque<String> uris = new ConcurrentLinkedDeque<>();
 

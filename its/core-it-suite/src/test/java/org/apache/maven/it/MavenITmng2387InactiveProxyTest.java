@@ -22,7 +22,6 @@ import java.io.File;
 import java.net.InetAddress;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
@@ -56,7 +55,7 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2387");
+        testDir = extractResources("/mng-2387");
 
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());

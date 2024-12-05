@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +44,7 @@ public class MavenITmng3811ReportingPluginConfigurationInheritanceTest extends A
      */
     @Test
     public void testitMNG3811() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3811");
+        File testDir = extractResources("/mng-3811");
 
         Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
         verifier.setAutoclean(false);

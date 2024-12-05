@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,7 +40,7 @@ public class MavenITmng0823MojoContextPassingTest extends AbstractMavenIntegrati
      */
     @Test
     public void testitMNG0823() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0823");
+        File testDir = extractResources("/mng-0823");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

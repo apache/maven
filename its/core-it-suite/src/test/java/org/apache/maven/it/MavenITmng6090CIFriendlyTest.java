@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -49,7 +48,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     public void testitShouldResolveTheDependenciesWithoutBuildConsumer() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6090-ci-friendly");
+        File testDir = extractResources("/mng-6090-ci-friendly");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);
@@ -74,11 +73,11 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
 
     @Test
     public void testitShouldResolveTheDependenciesWithBuildConsumer() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6090-ci-friendly");
+        File testDir = extractResources("/mng-6090-ci-friendly");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // TODO: why?
 
         verifier.addCliArgument("-Drevision=1.2");
         verifier.addCliArgument("-Dmaven.consumerpom=true");
@@ -89,7 +88,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
 
         verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // TODO: why?
 
         verifier.addCliArgument("-Drevision=1.2");
         verifier.addCliArgument("-pl");

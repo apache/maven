@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 class MavenITmng7837ProjectElementInPomTest extends AbstractMavenIntegrationTestCase {
@@ -32,7 +31,7 @@ class MavenITmng7837ProjectElementInPomTest extends AbstractMavenIntegrationTest
 
     @Test
     void testProjectElementInPom() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7837-project-element-in-pom");
+        File testDir = extractResources("/mng-7837-project-element-in-pom");
 
         final Verifier pluginVerifier = newVerifier(testDir.getPath());
         pluginVerifier.addCliArgument("validate");

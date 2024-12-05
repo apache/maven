@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.shared.verifier;
+package org.apache.maven.it;
 
 /**
  * @author Jason van Zyl
@@ -24,10 +24,6 @@ package org.apache.maven.shared.verifier;
 public class VerificationException extends Exception {
     public VerificationException(String message) {
         super(message);
-    }
-
-    public VerificationException(Throwable cause) {
-        super(cause);
     }
 
     public VerificationException(String message, Throwable cause) {

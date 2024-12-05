@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,7 +43,7 @@ public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractM
 
     @Test
     public void testWarnNotPresent() throws IOException, VerificationException {
-        File rootDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        File rootDir = extractResources(PROJECT_PATH);
 
         Verifier verifier = newVerifier(rootDir.getAbsolutePath());
         verifier.setAutoclean(false);

@@ -22,7 +22,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +44,7 @@ public class MavenITmng4952MetadataReleaseInfoUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4952");
+        File testDir = extractResources("/mng-4952");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

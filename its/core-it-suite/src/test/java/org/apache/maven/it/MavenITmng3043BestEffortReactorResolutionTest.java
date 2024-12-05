@@ -22,7 +22,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -48,7 +47,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
      */
     @Test
     public void testitTestPhase() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3043");
+        File testDir = extractResources("/mng-3043");
         Files.createDirectories(testDir.toPath().resolve(".mvn"));
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
@@ -105,7 +104,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
      */
     @Test
     public void testitPackagePhase() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3043");
+        File testDir = extractResources("/mng-3043");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -165,7 +164,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     public void testitPackagePhasesSlitted() throws Exception {
         requiresMavenVersion("[4.0.0-beta-4,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3043");
+        File testDir = extractResources("/mng-3043");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

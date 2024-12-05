@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,7 +42,7 @@ public class MavenITmng3671PluginLevelDepInterpolationTest extends AbstractMaven
     public void testitMNG3671() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3671");
+        File testDir = extractResources("/mng-3671");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 

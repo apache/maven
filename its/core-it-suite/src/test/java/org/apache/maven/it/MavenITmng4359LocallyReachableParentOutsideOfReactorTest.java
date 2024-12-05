@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +44,7 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4359");
+        File testDir = extractResources("/mng-4359");
         testDir = new File(testDir, "reactor-parent");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());

@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +47,7 @@ public class MavenITmng6173GetAllProjectsInReactorTest extends AbstractMavenInte
     @Test
     public void testitShouldReturnAllProjectsInReactor() throws Exception {
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6173-get-all-projects-in-reactor");
+        File testDir = extractResources("/mng-6173-get-all-projects-in-reactor");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

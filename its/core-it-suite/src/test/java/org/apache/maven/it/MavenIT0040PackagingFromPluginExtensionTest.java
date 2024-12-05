@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,7 +41,7 @@ public class MavenIT0040PackagingFromPluginExtensionTest extends AbstractMavenIn
      */
     @Test
     public void testit0040() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0040");
+        File testDir = extractResources("/it0040");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

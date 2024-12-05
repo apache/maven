@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +44,7 @@ public class MavenITmng3714ToolchainsCliOptionTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG3714() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3714");
+        File testDir = extractResources("/mng-3714");
 
         File javaHome = new File(testDir, "javaHome");
         javaHome.mkdirs();

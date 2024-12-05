@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,8 +49,7 @@ public class MavenITmng6240PluginExtensionAetherProvider extends AbstractMavenIn
      */
     @Test
     public void testPluginExtensionDependingOnMavenAetherProvider() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-6240-plugin-extension-aether-provider");
+        File testDir = extractResources("/mng-6240-plugin-extension-aether-provider");
         File pluginDir = new File(testDir, "plugin-extension");
         File projectDir = new File(testDir, "project");
 

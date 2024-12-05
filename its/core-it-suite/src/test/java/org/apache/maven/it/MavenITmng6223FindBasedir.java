@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,7 +80,7 @@ public class MavenITmng6223FindBasedir extends AbstractMavenIntegrationTestCase 
     }
 
     protected void runCoreExtensionWithOption(String option, String subdir, boolean pom) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5889-find.mvn");
+        File testDir = extractResources("/mng-5889-find.mvn");
 
         File basedir =
                 new File(testDir, "../mng-" + (pom ? "5889" : "6223") + "-find.mvn" + option + (pom ? "Pom" : "Dir"));

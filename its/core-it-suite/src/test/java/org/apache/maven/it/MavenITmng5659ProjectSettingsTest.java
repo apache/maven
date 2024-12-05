@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +34,7 @@ public class MavenITmng5659ProjectSettingsTest extends AbstractMavenIntegrationT
 
     @Test
     public void testProjectSettings() throws IOException, VerificationException {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5659-project-settings");
+        File testDir = extractResources("/mng-5659-project-settings");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("validate");

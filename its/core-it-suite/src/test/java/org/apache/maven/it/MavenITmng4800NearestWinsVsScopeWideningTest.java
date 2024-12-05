@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -54,7 +53,7 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest extends AbstractMavenI
      * its subtree (x) but in the wider scope (compile).
      */
     private void testit(String test) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4800");
+        File testDir = extractResources("/mng-4800");
 
         Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
         verifier.setAutoclean(false);

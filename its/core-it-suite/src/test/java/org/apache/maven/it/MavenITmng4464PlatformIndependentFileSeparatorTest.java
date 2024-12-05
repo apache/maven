@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +44,7 @@ public class MavenITmng4464PlatformIndependentFileSeparatorTest extends Abstract
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4464");
+        File testDir = extractResources("/mng-4464");
 
         Verifier verifier = newVerifier(new File(testDir, "aggregator").getAbsolutePath());
         verifier.setAutoclean(false);

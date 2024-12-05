@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -61,7 +60,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0553");
+        testDir = extractResources("/mng-0553");
 
         Constraint constraint = new Constraint(__BASIC_AUTH, "user");
         constraint.setAuthenticate(true);

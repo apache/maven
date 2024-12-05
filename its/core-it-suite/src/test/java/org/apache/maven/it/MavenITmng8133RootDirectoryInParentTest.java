@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng8133RootDirectoryInParentTest extends AbstractMavenIntegrationTestCase {
@@ -30,7 +29,7 @@ public class MavenITmng8133RootDirectoryInParentTest extends AbstractMavenIntegr
 
     @Test
     public void testRootDirectoryInParent() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8133-root-directory-in-parent");
+        File testDir = extractResources("/mng-8133-root-directory-in-parent");
 
         Verifier verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
         verifier.addCliArgument("install");

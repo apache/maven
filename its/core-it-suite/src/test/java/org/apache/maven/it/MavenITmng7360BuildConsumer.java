@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,7 +39,7 @@ public class MavenITmng7360BuildConsumer extends AbstractMavenIntegrationTestCas
 
     @Test
     public void testSelectModuleByCoordinate() throws Exception {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.execute();

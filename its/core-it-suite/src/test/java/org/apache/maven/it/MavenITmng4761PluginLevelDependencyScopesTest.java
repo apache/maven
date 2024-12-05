@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +46,7 @@ public class MavenITmng4761PluginLevelDependencyScopesTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4761");
+        final File testDir = extractResources("/mng-4761");
 
         final Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

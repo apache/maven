@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -61,7 +60,7 @@ public class MavenITmng1142VersionRangeIntersectionTest extends AbstractMavenInt
     }
 
     private void testit(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1142");
+        File testDir = extractResources("/mng-1142");
 
         Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
         verifier.setAutoclean(false);

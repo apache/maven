@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,8 +36,7 @@ class MavenITmng8385PropertyContributoSPITest extends AbstractMavenIntegrationTe
      */
     @Test
     void testIt() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8385")
-                .getAbsoluteFile();
+        File testDir = extractResources("/mng-8385");
         Verifier verifier;
 
         verifier = newVerifier(new File(testDir, "spi-extension").getAbsolutePath());
@@ -49,7 +47,6 @@ class MavenITmng8385PropertyContributoSPITest extends AbstractMavenIntegrationTe
         verifier = newVerifier(new File(testDir, "spi-consumer").getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.addCliArgument("-X");
-        verifier.setForkJvm(true); // TODO: remove when we updated MavenCLI+Invoker
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

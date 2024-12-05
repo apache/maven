@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -242,7 +241,7 @@ public class MavenIT0143TransitiveDependencyScopesTest extends AbstractMavenInte
     }
 
     private Verifier run(String scope) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0143");
+        File testDir = extractResources("/it0143");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

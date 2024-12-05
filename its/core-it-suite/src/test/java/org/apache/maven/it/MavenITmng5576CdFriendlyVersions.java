@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +45,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
      */
     @Test
     public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithoutBuildConsumer() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5576-cd-friendly-versions");
+        File testDir = extractResources("/mng-5576-cd-friendly-versions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -78,7 +77,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
      */
     @Test
     public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithBuildConsumer() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5576-cd-friendly-versions");
+        File testDir = extractResources("/mng-5576-cd-friendly-versions");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setLogFileName("log-bc.txt");

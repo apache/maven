@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +45,7 @@ public class MavenITmng1995InterpolateBooleanModelElementsTest extends AbstractM
      */
     @Test
     public void testitMNG1995() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1995");
+        File testDir = extractResources("/mng-1995");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

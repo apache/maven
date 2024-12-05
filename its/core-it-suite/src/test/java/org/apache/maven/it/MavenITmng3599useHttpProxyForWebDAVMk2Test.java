@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -133,7 +132,7 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
 
     @Test
     public void testitUseHttpProxyForHttp() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3599-mk2");
+        File testDir = extractResources("/mng-3599-mk2");
 
         /*
          * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
@@ -175,7 +174,7 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
      */
     @Test
     public void testitUseHttpProxyForWebDAV() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3599-mk2");
+        File testDir = extractResources("/mng-3599-mk2");
 
         /*
          * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local

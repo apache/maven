@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +46,7 @@ public class MavenITmng2972OverridePluginDependencyTest extends AbstractMavenInt
      */
     @Test
     public void testitLifecycleInvocation() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2972/test1");
+        File testDir = extractResources("/mng-2972/test1");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -77,7 +76,7 @@ public class MavenITmng2972OverridePluginDependencyTest extends AbstractMavenInt
      */
     @Test
     public void testitCommandLineInvocation() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2972/test2");
+        File testDir = extractResources("/mng-2972/test2");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

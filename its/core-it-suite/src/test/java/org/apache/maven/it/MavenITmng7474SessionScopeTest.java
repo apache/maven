@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,7 +33,7 @@ public class MavenITmng7474SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testSessionScope() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7474-session-scope");
+        File testDir = extractResources("/mng-7474-session-scope");
 
         Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
         verifier.addCliArgument("install");

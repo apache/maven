@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -147,7 +146,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     }
 
     private List<String> performTest(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7468-unsupported-params");
+        File testDir = extractResources("/mng-7468-unsupported-params");
 
         Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
         verifier.addCliArgument("validate");

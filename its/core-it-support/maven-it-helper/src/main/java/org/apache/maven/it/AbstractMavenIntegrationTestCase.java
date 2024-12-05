@@ -30,7 +30,6 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.shared.verifier.VerificationException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
@@ -237,6 +236,13 @@ public abstract class AbstractMavenIntegrationTestCase {
             return new DefaultArtifactVersion(m.group(1));
         }
         return version;
+    }
+
+    protected File extractResources(String resourcePath) throws IOException {
+        return new File(
+                        new File(System.getProperty("maven.test.tmpdir", System.getProperty("java.io.tmpdir"))),
+                        resourcePath)
+                .getAbsoluteFile();
     }
 
     protected Verifier newVerifier(String basedir) throws VerificationException {

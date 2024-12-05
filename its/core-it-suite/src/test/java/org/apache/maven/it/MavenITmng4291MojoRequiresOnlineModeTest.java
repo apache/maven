@@ -20,8 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,7 +41,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
      */
     @Test
     public void testitDirectInvocation() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4291");
+        File testDir = extractResources("/mng-4291");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -68,7 +66,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
      */
     @Test
     public void testitLifecycleInvocation() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4291");
+        File testDir = extractResources("/mng-4291");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

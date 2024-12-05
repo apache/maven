@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,7 +34,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
     @Test
     public void testWithExtensionsXmlCoreExtensionsFound() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7772-core-extensions-found");
+        File testDir = extractResources("/mng-7772-core-extensions-found");
 
         Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
         verifier.addCliArgument("install");
@@ -44,7 +43,6 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
         verifier = newVerifier(testDir.getAbsolutePath());
         ItUtils.setUserHome(verifier, Paths.get(testDir.toPath().toString(), "home-extensions-xml"));
-        verifier.setForkJvm(true);
 
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -54,7 +52,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
     @Test
     public void testWithLibExtCoreExtensionsFound() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7772-core-extensions-found");
+        File testDir = extractResources("/mng-7772-core-extensions-found");
 
         Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
         verifier.addCliArgument("package");
@@ -72,7 +70,6 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
             verifier = newVerifier(testDir.getAbsolutePath());
             ItUtils.setUserHome(verifier, Paths.get(testDir.toPath().toString(), "home-lib-ext"));
-            verifier.setForkJvm(true);
             verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyTextInLog("[INFO] Extension loaded!");

@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,7 +38,7 @@ class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTes
 
     @Test
     void testAlternativeSyntax() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7836-alternative-pom-syntax");
+        File testDir = extractResources("/mng-7836-alternative-pom-syntax");
 
         final Verifier pluginVerifier = newVerifier(new File(testDir, "maven-hocon-extension").getPath());
         pluginVerifier.addCliArgument("clean");

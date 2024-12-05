@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +46,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest extends Abstract
      */
     @Test
     public void testitModel() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4600/model");
+        File testDir = extractResources("/mng-4600/model");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -69,7 +68,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest extends Abstract
      */
     @Test
     public void testitResolution() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4600/resolution");
+        File testDir = extractResources("/mng-4600/resolution");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

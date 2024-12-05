@@ -22,7 +22,6 @@ import java.io.File;
 import java.net.URI;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -47,7 +46,7 @@ public class MavenITmng3607ClassLoadersUseValidUrlsTest extends AbstractMavenInt
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3607");
+        File testDir = extractResources("/mng-3607");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

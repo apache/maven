@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -53,7 +52,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitExactMatchDominatesWildcard() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3461/test-1");
+        File testDir = extractResources("/mng-3461/test-1");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -76,7 +75,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitExternalWildcard() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3461/test-2");
+        File testDir = extractResources("/mng-3461/test-2");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
@@ -146,7 +145,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitNonGreedyWildcard() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3461/test-3");
+        File testDir = extractResources("/mng-3461/test-3");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

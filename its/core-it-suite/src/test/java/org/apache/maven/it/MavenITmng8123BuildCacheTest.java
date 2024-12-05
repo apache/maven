@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng8123BuildCacheTest extends AbstractMavenIntegrationTestCase {
@@ -30,7 +29,7 @@ public class MavenITmng8123BuildCacheTest extends AbstractMavenIntegrationTestCa
 
     @Test
     public void testBuildCacheExtension() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8123-build-cache");
+        File testDir = extractResources("/mng-8123-build-cache");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("install");

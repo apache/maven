@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +44,7 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest extends Abst
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1803");
+        File testDir = extractResources("/mng-1803");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

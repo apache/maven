@@ -27,7 +27,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -92,7 +91,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
     }
 
     private void testit(boolean fromHttp, boolean toHttp, boolean relativeLocation) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4428");
+        File testDir = extractResources("/mng-4428");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 

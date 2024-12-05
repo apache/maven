@@ -20,8 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,7 +33,7 @@ public class MavenITmng6326CoreExtensionsNotFoundTest extends AbstractMavenInteg
 
     @Test
     public void testCoreExtensionsNotFound() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6326-core-extensions-not-found");
+        File testDir = extractResources("/mng-6326-core-extensions-not-found");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         try {

@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.JRE;
@@ -45,8 +44,7 @@ class MavenITmng7587Jsr330 extends AbstractMavenIntegrationTestCase {
     @Test
     @EnabledOnJre(JRE.JAVA_17)
     void testJdk17() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7587-jsr330")
-                .getAbsoluteFile();
+        File testDir = extractResources("/mng-7587-jsr330").getAbsoluteFile();
 
         final Verifier pluginVerifier = newVerifier(new File(testDir, "plugin").getPath());
         pluginVerifier.addCliArgument("clean");

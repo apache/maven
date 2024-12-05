@@ -20,8 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7128BlockExternalHttpReactorTest extends AbstractMavenIntegrationTestCase {
@@ -38,7 +36,7 @@ public class MavenITmng7128BlockExternalHttpReactorTest extends AbstractMavenInt
      */
     @Test
     public void testBlockedHttpRepositoryInPom() throws Exception {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
         // ITs override global settings that provide blocked mirror: need to define the mirror in dedicated settings
         verifier.addCliArgument("-s");

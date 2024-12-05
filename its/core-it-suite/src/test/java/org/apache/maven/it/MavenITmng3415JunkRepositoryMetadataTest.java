@@ -29,7 +29,6 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -83,7 +82,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     public void testitTransferFailed() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_BASE);
+        File testDir = extractResources(RESOURCE_BASE);
 
         Verifier verifier;
 
@@ -154,7 +153,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     public void testShouldNotRepeatedlyUpdateOnResourceNotFoundException() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_BASE);
+        File testDir = extractResources(RESOURCE_BASE);
 
         Verifier verifier;
 

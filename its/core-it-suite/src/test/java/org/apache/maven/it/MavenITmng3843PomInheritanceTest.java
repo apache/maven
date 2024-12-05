@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Properties;
 import java.util.TreeSet;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,7 +49,7 @@ public class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitMNG3843() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3843");
+        File testDir = extractResources("/mng-3843");
 
         testDir = testDir.getCanonicalFile();
 

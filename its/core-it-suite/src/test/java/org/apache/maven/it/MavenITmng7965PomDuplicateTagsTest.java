@@ -22,8 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,7 +39,7 @@ class MavenITmng7965PomDuplicateTagsTest extends AbstractMavenIntegrationTestCas
 
     @Test
     void javadocIsExecutedAndFailed() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7965-pom-duplicate-tags");
+        File testDir = extractResources("/mng-7965-pom-duplicate-tags");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");

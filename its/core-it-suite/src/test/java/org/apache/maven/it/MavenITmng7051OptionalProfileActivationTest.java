@@ -20,8 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIntegrationTestCase {
@@ -38,7 +36,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testActivatingNonExistingProfileBreaks() throws Exception {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
         verifier.addCliArgument("-P");
@@ -63,7 +61,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testActivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
         verifier.addCliArgument("-P");
@@ -84,7 +82,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testActivatingExistingAndNonExistingProfiles() throws Exception {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
         verifier.addCliArgument("-P");
@@ -105,7 +103,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testDeactivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
         verifier.addCliArgument("-P");
@@ -126,7 +124,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testDeactivatingExistingAndNonExistingProfiles() throws Exception {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
         verifier.addCliArgument("-P");

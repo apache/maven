@@ -20,8 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,7 +35,7 @@ public class MavenITmng1491ReactorArtifactIdCollisionTest extends AbstractMavenI
 
     @Test
     public void testitMNG1491() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1491");
+        File testDir = extractResources("/mng-1491");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

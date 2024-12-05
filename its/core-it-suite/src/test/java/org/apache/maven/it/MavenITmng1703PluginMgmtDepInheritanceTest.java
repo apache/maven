@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +46,7 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest extends AbstractMavenInt
      */
     @Test
     public void testitMNG1703() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-1703");
+        File testDir = extractResources("/mng-1703");
 
         Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
         verifier.setAutoclean(false);

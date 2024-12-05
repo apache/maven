@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.nio.file.Files;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,8 +33,7 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends 
 
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(
-                getClass(), "/mng-6127-plugin-execution-configuration-interference");
+        File testDir = extractResources("/mng-6127-plugin-execution-configuration-interference");
         File pluginDir = new File(testDir, "plugin");
         File projectDir = new File(testDir, "project");
         File modAprojectDir = new File(projectDir, "mod-a");

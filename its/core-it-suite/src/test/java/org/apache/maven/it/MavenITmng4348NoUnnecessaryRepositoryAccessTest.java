@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -57,7 +56,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4348");
+        File testDir = extractResources("/mng-4348");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 

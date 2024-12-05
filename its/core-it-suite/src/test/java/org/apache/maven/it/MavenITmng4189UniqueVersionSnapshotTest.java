@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,7 +39,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest extends AbstractMavenIntegr
 
     @Test
     public void testit() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4189");
+        final File testDir = extractResources("/mng-4189");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteArtifacts("org.apache.maven.its.mng4189");

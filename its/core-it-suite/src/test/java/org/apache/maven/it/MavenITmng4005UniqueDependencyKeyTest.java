@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -79,7 +77,7 @@ public class MavenITmng4005UniqueDependencyKeyTest extends AbstractMavenIntegrat
     }
 
     private void test(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4005/" + project);
+        File testDir = extractResources("/mng-4005/" + project);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

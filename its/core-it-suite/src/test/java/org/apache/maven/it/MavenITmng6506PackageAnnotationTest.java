@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng6506PackageAnnotationTest extends AbstractMavenIntegrationTestCase {
@@ -31,7 +30,7 @@ public class MavenITmng6506PackageAnnotationTest extends AbstractMavenIntegratio
 
     @Test
     public void testGetPackageAnnotation() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6506-package-annotation");
+        File testDir = extractResources("/mng-6506-package-annotation");
         File pluginDir = new File(testDir, "plugin");
         File projectDir = new File(testDir, "project");
 

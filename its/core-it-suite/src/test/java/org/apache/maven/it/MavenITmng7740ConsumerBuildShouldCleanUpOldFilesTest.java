@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,7 +37,7 @@ class MavenITmng7740ConsumerBuildShouldCleanUpOldFilesTest extends AbstractMaven
 
     @Test
     void testConsumerBuildShouldCleanUpOldConsumerFiles() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7740-consumer-files");
+        File testDir = extractResources("/mng-7740-consumer-files");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("validate");

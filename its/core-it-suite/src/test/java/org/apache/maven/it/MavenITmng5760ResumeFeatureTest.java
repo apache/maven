@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -47,14 +45,10 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
 
     public MavenITmng5760ResumeFeatureTest() throws IOException {
         super("[4.0.0-alpha-1,)");
-        this.parentDependentTestDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5760-resume-feature/parent-dependent");
-        this.parentIndependentTestDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5760-resume-feature/parent-independent");
-        this.noProjectTestDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5760-resume-feature/no-project");
-        this.fourModulesTestDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-5760-resume-feature/four-modules");
+        this.parentDependentTestDir = extractResources("/mng-5760-resume-feature/parent-dependent");
+        this.parentIndependentTestDir = extractResources("/mng-5760-resume-feature/parent-independent");
+        this.noProjectTestDir = extractResources("/mng-5760-resume-feature/no-project");
+        this.fourModulesTestDir = extractResources("/mng-5760-resume-feature/four-modules");
     }
 
     /**

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +38,7 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_PATH);
+        testDir = extractResources(RESOURCE_PATH);
 
         File pluginDir = new File(testDir, "plugin");
         Verifier verifier = newVerifier(pluginDir.getAbsolutePath());

@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,11 +36,10 @@ class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testLegacy() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8379-decrypt-settings");
+        File testDir = extractResources("/mng-8379-decrypt-settings");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setLogFileName("log-legacy.txt");
-        verifier.setForkJvm(true);
         ItUtils.setUserHome(verifier, new File(testDir, "legacyhome"));
         verifier.addCliArgument("org.apache.maven.plugins:maven-help-plugin:3.3.0:effective-settings");
         verifier.addCliArgument("-DshowPasswords");
@@ -59,11 +57,10 @@ class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testModern() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-8379-decrypt-settings");
+        File testDir = extractResources("/mng-8379-decrypt-settings");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setLogFileName("log-modern.txt");
-        verifier.setForkJvm(true);
         verifier.setEnvironmentVariable("MAVEN_MASTER_PASSWORD", "master");
         ItUtils.setUserHome(verifier, new File(testDir, "home"));
         verifier.addCliArgument("org.apache.maven.plugins:maven-help-plugin:3.3.0:effective-settings");

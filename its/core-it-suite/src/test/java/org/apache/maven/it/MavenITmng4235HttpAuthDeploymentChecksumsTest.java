@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.it.utils.DeployedResource;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -75,7 +74,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4235");
+        testDir = extractResources("/mng-4235");
 
         repoHandler.setResourceBase(testDir.getAbsolutePath());
 

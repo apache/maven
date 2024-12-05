@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -59,7 +58,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5064");
+        File testDir = extractResources("/mng-5064");
 
         String metadataUri = "org/apache/maven/its/mng5064/dep/0.1-SNAPSHOT/maven-metadata.xml";
 

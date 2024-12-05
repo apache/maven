@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7244IgnorePomPrefixInExpressions extends AbstractMavenIntegrationTestCase {
@@ -35,7 +33,7 @@ public class MavenITmng7244IgnorePomPrefixInExpressions extends AbstractMavenInt
 
     @Test
     public void testIgnorePomPrefixInExpressions() throws IOException, VerificationException {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
 
         verifier.addCliArgument("validate");

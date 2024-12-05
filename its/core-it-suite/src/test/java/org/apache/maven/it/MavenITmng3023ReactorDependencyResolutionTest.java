@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -54,7 +52,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
      */
     @Test
     public void testitMNG3023A() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3023");
+        File testDir = extractResources("/mng-3023");
 
         // First pass. Make sure the dependency cannot be resolved.
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
@@ -83,7 +81,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
      */
     @Test
     public void testitMNG3023B() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3023");
+        File testDir = extractResources("/mng-3023");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -118,7 +116,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
      */
     @Test
     public void testitMNG3023C() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3023");
+        File testDir = extractResources("/mng-3023");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

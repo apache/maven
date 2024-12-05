@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,7 +42,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
 
     public MavenITmng6118SubmoduleInvocation() throws IOException {
         super("[4.0.0-alpha-1,)");
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_PATH);
+        testDir = extractResources(RESOURCE_PATH);
     }
 
     /**

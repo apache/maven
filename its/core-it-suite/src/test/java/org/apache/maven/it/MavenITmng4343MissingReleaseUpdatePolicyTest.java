@@ -28,8 +28,6 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -126,7 +124,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
      */
     @Test
     public void testitAlways() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4343");
+        File testDir = extractResources("/mng-4343");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
@@ -177,7 +175,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
      */
     @Test
     public void testitNever() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4343");
+        File testDir = extractResources("/mng-4343");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

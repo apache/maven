@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -64,8 +63,7 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation extends AbstractMave
     }
 
     private void runCoreExtensionWithOption(String option, String subDir) throws Exception {
-        File resourceDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-6256-special-chars-alternate-pom-location");
+        File resourceDir = extractResources("/mng-6256-special-chars-alternate-pom-location");
 
         File testDir = new File(resourceDir, "../mng-6256-" + subDir);
         testDir.mkdir();

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -45,7 +44,7 @@ class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
     @Test
     @Timeout(value = 120, unit = TimeUnit.SECONDS)
     void testNoDeadlockAtVersionUpdate() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7716");
+        File testDir = extractResources("/mng-7716");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-f");

@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,7 +49,7 @@ public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitReactorShouldResultInExpectedOrder() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-6057-check-reactor-order");
+        File testDir = extractResources("/mng-6057-check-reactor-order");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);

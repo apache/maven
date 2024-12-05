@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,7 +34,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
 
     @Test
     public void testitMNG2339a() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2339/a");
+        File testDir = extractResources("/mng-2339/a");
 
         Verifier verifier;
 
@@ -53,7 +52,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
     @Test
     public void testitMNG2339b() throws Exception {
         requiresMavenVersion("(2.0.8,4.0.0-alpha-1)");
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2339/b");
+        File testDir = extractResources("/mng-2339/b");
 
         Verifier verifier;
 

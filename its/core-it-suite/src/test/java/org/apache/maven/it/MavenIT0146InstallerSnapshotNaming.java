@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
@@ -43,7 +42,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
 
     public MavenIT0146InstallerSnapshotNaming() throws IOException {
         super("(2.0.2,)");
-        testDir = ResourceExtractor.simpleExtractResources(getClass(), "/it0146");
+        testDir = extractResources("/it0146");
     }
 
     @BeforeEach

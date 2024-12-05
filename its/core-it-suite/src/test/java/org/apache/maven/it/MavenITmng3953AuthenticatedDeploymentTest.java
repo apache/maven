@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -142,7 +141,7 @@ public class MavenITmng3953AuthenticatedDeploymentTest extends AbstractMavenInte
     }
 
     private void testitMNG3953(String project) throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3953/" + project);
+        File testDir = extractResources("/mng-3953/" + project);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

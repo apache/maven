@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +45,7 @@ class MavenITmng7804PluginExecutionOrderTest extends AbstractMavenIntegrationTes
      */
     @Test
     void testOrder() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7804-plugin-execution-order");
+        File testDir = extractResources("/mng-7804-plugin-execution-order");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("clean");

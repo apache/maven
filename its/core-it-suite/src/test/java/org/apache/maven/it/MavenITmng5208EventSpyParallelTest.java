@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -38,14 +37,14 @@ public class MavenITmng5208EventSpyParallelTest extends AbstractMavenIntegration
      */
     @Test
     public void testCorrectModuleFails() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5208");
+        File testDir = extractResources("/mng-5208");
 
         Verifier spy = newVerifier(testDir.getAbsolutePath() + "/spy");
         spy.addCliArgument("install");
         spy.execute();
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath() + "/project");
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // maven.ext.class.path used
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dmaven.ext.class.path=../spy/target/event-spy-0.0.1-SNAPSHOT.jar");

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,8 +46,7 @@ public class MavenITmng7982DependencyManagementTransitivityTest extends Abstract
      */
     @Test
     public void testitWithTransitiveDependencyManager() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-7982-transitive-dependency-management");
+        File testDir = extractResources("/mng-7982-transitive-dependency-management");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteArtifacts("org.apache.maven.its.mng7982");
@@ -91,8 +89,7 @@ public class MavenITmng7982DependencyManagementTransitivityTest extends Abstract
      */
     @Test
     public void testitWithTransitiveDependencyManagerDisabled() throws Exception {
-        File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-7982-transitive-dependency-management");
+        File testDir = extractResources("/mng-7982-transitive-dependency-management");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteArtifacts("org.apache.maven.its.mng7982");

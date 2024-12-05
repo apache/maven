@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,7 +40,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
     @Test
     public void testitMNG3641() throws Exception {
         // (0) Initialize.
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3641");
+        File testDir = extractResources("/mng-3641");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

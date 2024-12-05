@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -61,7 +60,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testitCached() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4554");
+        File testDir = extractResources("/mng-4554");
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
@@ -140,7 +139,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testitForcedUpdate() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4554");
+        File testDir = extractResources("/mng-4554");
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
@@ -222,7 +221,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
     public void testitRefetched() throws Exception {
         requiresMavenVersion("[3.0-alpha-3,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4554");
+        File testDir = extractResources("/mng-4554");
 
         String metadataUri = "/repo-it/org/apache/maven/its/mng4554/maven-metadata.xml";
 

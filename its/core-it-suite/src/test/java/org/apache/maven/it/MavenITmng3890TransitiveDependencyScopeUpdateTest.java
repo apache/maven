@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +48,7 @@ public class MavenITmng3890TransitiveDependencyScopeUpdateTest extends AbstractM
      */
     @Test
     public void testitMNG3890() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3890");
+        File testDir = extractResources("/mng-3890");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

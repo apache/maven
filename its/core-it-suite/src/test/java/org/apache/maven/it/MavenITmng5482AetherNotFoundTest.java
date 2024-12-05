@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -61,7 +59,7 @@ public class MavenITmng5482AetherNotFoundTest extends AbstractMavenIntegrationTe
     }*/
 
     public void check(String dir) throws IOException, VerificationException {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5482/" + dir);
+        File testDir = extractResources("/mng-5482/" + dir);
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

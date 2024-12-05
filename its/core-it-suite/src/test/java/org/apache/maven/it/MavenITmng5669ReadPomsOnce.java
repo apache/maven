@@ -26,7 +26,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,7 +46,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
     @Test
     public void testWithoutBuildConsumer() throws Exception {
         // prepare JavaAgent
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5669-read-poms-once");
+        File testDir = extractResources("/mng-5669-read-poms-once");
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         Map<String, String> filterProperties = Collections.singletonMap(
                 "${javaAgentJar}",
@@ -82,7 +81,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
     @Test
     public void testWithBuildConsumer() throws Exception {
         // prepare JavaAgent
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5669-read-poms-once");
+        File testDir = extractResources("/mng-5669-read-poms-once");
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         Map<String, String> filterProperties = Collections.singletonMap(
                 "${javaAgentJar}",

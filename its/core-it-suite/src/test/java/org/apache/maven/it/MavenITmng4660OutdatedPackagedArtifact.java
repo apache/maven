@@ -27,8 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
@@ -54,8 +52,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
      */
     @Test
     public void testShouldWarnWhenPackagedArtifactIsOutdated() throws Exception {
-        final File testDir =
-                ResourceExtractor.simpleExtractResources(getClass(), "/mng-4660-outdated-packaged-artifact");
+        final File testDir = extractResources("/mng-4660-outdated-packaged-artifact");
         Files.createDirectories(testDir.toPath().resolve(".mvn"));
 
         // 1. Package the whole project

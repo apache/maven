@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +43,7 @@ public class MavenITmng3529QuotedCliArgTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3529");
+        File testDir = extractResources("/mng-3529");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setForkJvm(true); // NOTE: We want to go through the launcher script

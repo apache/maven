@@ -27,7 +27,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -62,7 +61,7 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-2305");
+        File testDir = extractResources("/mng-2305");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 

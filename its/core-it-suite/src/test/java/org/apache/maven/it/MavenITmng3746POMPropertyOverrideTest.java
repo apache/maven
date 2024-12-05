@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,7 +39,7 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
     public void testitMNG3746_UsingDefaultSystemProperty() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3746");
+        File testDir = extractResources("/mng-3746");
         File pluginDir = new File(testDir, "maven-mng3746-plugin");
         File projectDir = new File(testDir, "project");
 
@@ -63,7 +62,7 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
     public void testitMNG3746_UsingCLIProperty() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-3746");
+        File testDir = extractResources("/mng-3746");
         File pluginDir = new File(testDir, "maven-mng3746-plugin");
         File projectDir = new File(testDir, "project");
 

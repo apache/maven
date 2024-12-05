@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,7 +46,7 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4452");
+        File testDir = extractResources("/mng-4452");
 
         Verifier verifier = newVerifier(new File(testDir, "producer").getAbsolutePath());
         verifier.setAutoclean(false);

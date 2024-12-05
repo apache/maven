@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,7 +41,7 @@ public class MavenITBootstrapTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testBootstrap() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/bootstrap");
+        File testDir = extractResources("/bootstrap");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
         verifier.setAutoclean(false);

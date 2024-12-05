@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,7 +45,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
      */
     @Test
     public void testitCore() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4842");
+        File testDir = extractResources("/mng-4842");
 
         Verifier verifier = newVerifier(new File(testDir, "core").getAbsolutePath());
         verifier.setAutoclean(false);
@@ -74,7 +73,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
      */
     @Test
     public void testitPlugin() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4842");
+        File testDir = extractResources("/mng-4842");
 
         Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
         verifier.setAutoclean(false);

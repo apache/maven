@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng6981ProjectListShouldIncludeChildrenTest extends AbstractMavenIntegrationTestCase {
@@ -33,7 +32,7 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest extends Abstract
 
     @Test
     public void testProjectListShouldIncludeChildrenByDefault() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_PATH);
+        final File testDir = extractResources(RESOURCE_PATH);
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("-pl");
@@ -50,7 +49,7 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest extends Abstract
      */
     @Test
     public void testFileSwitchAllowsExcludeOfChildren() throws Exception {
-        final File testDir = ResourceExtractor.simpleExtractResources(getClass(), RESOURCE_PATH);
+        final File testDir = extractResources(RESOURCE_PATH);
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("-f");

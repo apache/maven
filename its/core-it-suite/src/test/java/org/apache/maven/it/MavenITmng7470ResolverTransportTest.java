@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +51,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     @BeforeEach
     protected void setUp() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7470-resolver-transport");
+        File testDir = extractResources("/mng-7470-resolver-transport");
         projectDir = new File(testDir, "project");
 
         server = HttpServer.builder().port(0).source(new File(testDir, "repo")).build();
@@ -74,7 +73,6 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     private void performTest(/* nullable */ final String transport, final String logSnippet) throws Exception {
         Verifier verifier = newVerifier(projectDir.getAbsolutePath());
-        verifier.setForkJvm(true);
 
         Map<String, String> properties = new HashMap<>();
         properties.put("@port@", Integer.toString(port));

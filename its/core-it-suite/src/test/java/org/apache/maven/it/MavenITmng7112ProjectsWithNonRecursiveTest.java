@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenIntegrationTestCase {
@@ -34,7 +32,7 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenInt
 
     @Test
     public void testAggregatesCanBeBuiltNonRecursively() throws IOException, VerificationException {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         Verifier cleaner = newVerifier(projectDir.getAbsolutePath());
         cleaner.addCliArgument("clean");
         cleaner.execute();
@@ -57,7 +55,7 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenInt
 
     @Test
     public void testAggregatesCanBeDeselectedNonRecursively() throws IOException, VerificationException {
-        final File projectDir = ResourceExtractor.simpleExtractResources(getClass(), PROJECT_PATH);
+        final File projectDir = extractResources(PROJECT_PATH);
         Verifier cleaner = newVerifier(projectDir.getAbsolutePath());
         cleaner.addCliArgument("clean");
         cleaner.execute();

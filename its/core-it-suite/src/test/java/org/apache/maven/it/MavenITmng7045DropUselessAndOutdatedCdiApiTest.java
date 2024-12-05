@@ -21,8 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7045DropUselessAndOutdatedCdiApiTest extends AbstractMavenIntegrationTestCase {
@@ -36,7 +34,7 @@ public class MavenITmng7045DropUselessAndOutdatedCdiApiTest extends AbstractMave
         // in test Groovy 4.x is used which requires JDK 1.8, so simply skip it for older JDKs
         requiresJavaVersion("[1.8,)");
 
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-7045");
+        File testDir = extractResources("/mng-7045");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("process-classes");

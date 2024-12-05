@@ -29,8 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -59,7 +57,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitMNG768() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0768");
+        File testDir = extractResources("/mng-0768");
 
         final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 

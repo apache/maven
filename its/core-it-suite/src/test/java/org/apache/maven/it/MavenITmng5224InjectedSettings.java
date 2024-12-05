@@ -23,7 +23,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,7 @@ public class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTest
      */
     @Test
     public void testmng5224_ReadSettings() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5224");
+        File testDir = extractResources("/mng-5224");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 

@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,7 +40,7 @@ public class MavenITmng4840MavenPrerequisiteTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMojoExecution() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4840");
+        File testDir = extractResources("/mng-4840");
 
         Verifier verifier = newVerifier(new File(testDir, "test-1").getAbsolutePath());
         verifier.setAutoclean(false);
@@ -68,7 +67,7 @@ public class MavenITmng4840MavenPrerequisiteTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitPluginVersionResolution() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-4840");
+        File testDir = extractResources("/mng-4840");
 
         Verifier verifier = newVerifier(new File(testDir, "test-2").getAbsolutePath());
         verifier.setAutoclean(false);

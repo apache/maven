@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,7 +42,7 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest extends AbstractMaven
      */
     @Test
     public void testitMNG0870() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-0870");
+        File testDir = extractResources("/mng-0870");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);

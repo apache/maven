@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegrationTestCase {
@@ -31,7 +30,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
 
     @Test
     public void testPkgTypeMojoConfiguration() throws Exception {
-        File testDir = ResourceExtractor.simpleExtractResources(getClass(), "/mng-5805-pkg-type-mojo-configuration2");
+        File testDir = extractResources("/mng-5805-pkg-type-mojo-configuration2");
 
         Verifier verifier;
 
