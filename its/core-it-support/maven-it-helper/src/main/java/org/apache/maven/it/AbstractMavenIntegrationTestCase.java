@@ -239,7 +239,9 @@ public abstract class AbstractMavenIntegrationTestCase {
     }
 
     protected File extractResources(String resourcePath) throws IOException {
-        return ResourceExtractor.simpleExtractResources(getClass(), resourcePath)
+        return new File(
+                        new File(System.getProperty("maven.test.tmpdir", System.getProperty("java.io.tmpdir"))),
+                        resourcePath)
                 .getAbsoluteFile();
     }
 

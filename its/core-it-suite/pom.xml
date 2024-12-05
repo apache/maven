@@ -517,6 +517,7 @@ under the License.
           <skip>true</skip>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
+            <maven.test.tmpdir>${project.build.testOutputDirectory}</maven.test.tmpdir>
             <maven.version>${maven.version}</maven.version>
             <maven.home>${preparedMavenHome}</maven.home>
             <!-- TODO: This is for now legacy as Verifier is confused otherwise -->
