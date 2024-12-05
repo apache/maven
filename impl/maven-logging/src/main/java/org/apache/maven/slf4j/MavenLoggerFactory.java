@@ -62,6 +62,11 @@ public class MavenLoggerFactory implements org.apache.maven.logging.api.LogLevel
         return loggerMap.computeIfAbsent(name, this::getNewLoggingInstance);
     }
 
+    @Override
+    public void reset() {
+        logLevelRecorder.reset();
+    }
+
     protected Logger getNewLoggingInstance(String name) {
         return new MavenFailOnSeverityLogger(name, logLevelRecorder);
     }
@@ -74,6 +79,6 @@ public class MavenLoggerFactory implements org.apache.maven.logging.api.LogLevel
                 msl.configure(config.defaultLogLevel);
             }
         });
-        logLevelRecorder.setMaxLevelAllowed(null);
+        logLevelRecorder.reset();
     }
 }

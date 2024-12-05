@@ -49,6 +49,12 @@ public class DefaultLogLevelRecorder implements LogLevelRecorder {
         this.maxAllowed = level;
     }
 
+    @Override
+    public void reset() {
+        this.maxAllowed = null;
+        this.maxReached.set(Level.DEBUG);
+    }
+
     public void record(org.slf4j.event.Level logLevel) {
         Level level =
                 switch (logLevel) {
