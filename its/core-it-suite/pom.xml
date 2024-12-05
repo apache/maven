@@ -50,7 +50,7 @@ under the License.
 
     mvn clean test -Prun-its -DmavenDistro=<path-to-bin-archive>
 
-  To run the ITs using embedded Maven 3.x, additionally activate the profile "embedded".
+  To run all the ITs using forked Maven, additionally activate the profile "forked".
 
   ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
   Maven dependencies are added to the test class path.
@@ -512,9 +512,12 @@ under the License.
           </includes>
           <!-- test annotated by @Tag("disabled") will be skipped from executions -->
           <excludedGroups>disabled</excludedGroups>
-          <forkCount>0</forkCount>
-          <reuseForks>true</reuseForks>
           <skip>true</skip>
+          <forkCount>1</forkCount>
+          <reuseForks>true</reuseForks>
+          <argLine>${surefireMemory} -Dcom.sun.management.jmxremote=true</argLine>
+          <!-- NOTE: Maven plugins have access to the system class path, keep it clean -->
+          <useSystemClassLoader>false</useSystemClassLoader>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
             <maven.test.tmpdir>${project.build.testOutputDirectory}</maven.test.tmpdir>
@@ -648,22 +651,15 @@ under the License.
       </properties>
     </profile>
     <profile>
-      <id>embedded</id>
+      <id>forked</id>
       <build>
         <plugins>
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skip>false</skip>
-              <forkCount>1</forkCount>
-              <reuseForks>true</reuseForks>
-              <argLine>${surefireMemory}
-                -Dcom.sun.management.jmxremote=true</argLine>
-              <!-- NOTE: Maven plugins have access to the system class path
-                so keep it clean -->
-              <useSystemClassLoader>false</useSystemClassLoader>
               <systemPropertyVariables>
-                <verifier.forkMode>auto</verifier.forkMode>
+                <verifier.forkMode>forked</verifier.forkMode>
               </systemPropertyVariables>
             </configuration>
           </plugin>
