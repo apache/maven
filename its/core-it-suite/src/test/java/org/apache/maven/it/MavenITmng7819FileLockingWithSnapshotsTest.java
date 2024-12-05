@@ -75,7 +75,6 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
         File testDir = extractResources("/mng-7819-file-locking-with-snapshots");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setForkJvm(true);
 
         // produce required precondition state: local repository must not have any of the org.apache.maven.its.mng7819
         // artifacts

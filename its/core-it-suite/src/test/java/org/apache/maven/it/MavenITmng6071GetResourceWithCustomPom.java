@@ -43,7 +43,7 @@ public class MavenITmng6071GetResourceWithCustomPom extends AbstractMavenIntegra
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("-f");
         verifier.addCliArgument("./pom.xml");
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // TODO: why?
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

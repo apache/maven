@@ -40,7 +40,7 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
         File testDir = extractResources("/mng-7228-leaky-model");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // TODO: why?
 
         verifier.addCliArgument("-e");
         verifier.addCliArgument("-s");

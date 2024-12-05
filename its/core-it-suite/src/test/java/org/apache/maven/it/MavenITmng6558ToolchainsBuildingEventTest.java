@@ -44,7 +44,7 @@ public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenInte
         File testDir = extractResources("/mng-6558");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // maven.ext.class.path used
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dmaven.ext.class.path=spy-0.1.jar");

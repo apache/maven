@@ -58,9 +58,8 @@ public class MavenITmng5581LifecycleMappingDelegate extends AbstractMavenIntegra
 
         // run custom "test-only" build phase
         verifier = newVerifier(projectDir.getAbsolutePath());
-        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.setLogFileName("test-only-log.txt");
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // TODO: why?
         verifier.addCliArgument("-X");
         verifier.addCliArgument("test-only");
         verifier.execute();

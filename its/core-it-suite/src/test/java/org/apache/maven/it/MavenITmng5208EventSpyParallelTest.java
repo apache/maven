@@ -44,7 +44,7 @@ public class MavenITmng5208EventSpyParallelTest extends AbstractMavenIntegration
         spy.execute();
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath() + "/project");
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // maven.ext.class.path used
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dmaven.ext.class.path=../spy/target/event-spy-0.0.1-SNAPSHOT.jar");

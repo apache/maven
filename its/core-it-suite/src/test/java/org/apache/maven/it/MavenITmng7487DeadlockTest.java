@@ -41,8 +41,8 @@ public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase
 
         final File consumerDir = new File(rootDir, "consumer");
         final Verifier consumerVerifier = newVerifier(consumerDir.getAbsolutePath());
-        consumerVerifier.setForkJvm(true);
-        ;
+        consumerVerifier.setForkJvm(true); // TODO: why?
+
         consumerVerifier.addCliArgument("-T2");
         consumerVerifier.addCliArgument("package");
         consumerVerifier.execute();

@@ -43,7 +43,6 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
         verifier = newVerifier(testDir.getAbsolutePath());
         ItUtils.setUserHome(verifier, Paths.get(testDir.toPath().toString(), "home-extensions-xml"));
-        verifier.setForkJvm(true);
 
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -71,7 +70,6 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
             verifier = newVerifier(testDir.getAbsolutePath());
             ItUtils.setUserHome(verifier, Paths.get(testDir.toPath().toString(), "home-lib-ext"));
-            verifier.setForkJvm(true);
             verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyTextInLog("[INFO] Extension loaded!");

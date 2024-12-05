@@ -77,7 +77,7 @@ public class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCa
         Verifier verifier = newVerifier(baseDir.getAbsolutePath());
         verifier.addCliArgument(
                 "-Dexpression.outputFile=" + new File(baseDir, "expression.properties").getAbsolutePath());
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // custom .mvn/jvm.config
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

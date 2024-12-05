@@ -39,7 +39,7 @@ public class MavenITmng6330RelativePath extends AbstractMavenIntegrationTestCase
         File testDir = extractResources("/mng-6330-relative-path");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // TODO: why?
 
         try {
             verifier.addCliArgument("validate");

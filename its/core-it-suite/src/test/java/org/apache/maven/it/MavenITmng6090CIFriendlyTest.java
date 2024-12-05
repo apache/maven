@@ -77,7 +77,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // TODO: why?
 
         verifier.addCliArgument("-Drevision=1.2");
         verifier.addCliArgument("-Dmaven.consumerpom=true");
@@ -88,7 +88,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
 
         verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // TODO: why?
 
         verifier.addCliArgument("-Drevision=1.2");
         verifier.addCliArgument("-pl");

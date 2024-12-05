@@ -46,7 +46,7 @@ public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase
         File testDir = extractResources("/mng-4936");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setForkJvm(true);
+        verifier.setForkJvm(true); // maven.ext.class.path is not unloaded
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dmaven.ext.class.path=spy-0.1.jar");
