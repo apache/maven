@@ -43,7 +43,7 @@ under the License.
       <item name="Source Xref" href="xref/index.html"/>
       <!--item name="FAQ" href="faq.html"/-->
       <item name="License" href="https://www.apache.org/licenses/"/>
-      <item name="Download" href="/download.html"/>
+      <item name="Download" href="../../download.cgi"/>
     </menu>
 
     <menu inherit="bottom" name="Descriptors Reference">
