@@ -202,7 +202,7 @@ jobs:
       # Now run tests and ITs using a separate local repo (using the previous filled repo as tail)
       - name: Run integration tests
         shell: bash
-        run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local=$HOME/.m2/repository/local -Dmaven.repo.local.tail=$HOME/.m2/repository/cached
+        run: mvn install -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.m2/repository/local -Dmaven.repo.local.tail=$HOME/.m2/repository/cached
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
