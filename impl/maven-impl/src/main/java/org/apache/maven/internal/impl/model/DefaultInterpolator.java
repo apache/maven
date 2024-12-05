@@ -420,7 +420,7 @@ public class DefaultInterpolator implements Interpolator {
         int escape = val.indexOf(ESCAPE_CHAR);
         while (escape >= 0 && escape < val.length() - 1) {
             char c = val.charAt(escape + 1);
-            if (c == '{' || c == '}' || c == ESCAPE_CHAR) {
+            if (c == '{' || c == '}') {
                 val = val.substring(0, escape) + val.substring(escape + 1);
             }
             escape = val.indexOf(ESCAPE_CHAR, escape + 1);

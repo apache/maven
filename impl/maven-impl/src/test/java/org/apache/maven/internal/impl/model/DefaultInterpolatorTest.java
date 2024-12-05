@@ -98,6 +98,7 @@ class DefaultInterpolatorTest {
         assertEquals("${a}", substVars("$\\{a${#}\\}", "b"));
         assertEquals("${a}", substVars("$\\{a\\}${#}", "b"));
         assertEquals("${a}", substVars("$\\{a\\}", "b"));
+        assertEquals("\\\\", substVars("\\\\", "b"));
     }
 
     @Test
