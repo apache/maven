@@ -144,9 +144,9 @@ under the License.
 
   <exportedArtifacts>
     <!-- maven 4 api -->
+    <exportedArtifact>org.apache.maven:maven-api-annotations</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-core</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-di</exportedArtifact>
-    <exportedArtifact>org.apache.maven:maven-api-meta</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-metadata</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-model</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-api-plugin</exportedArtifact>

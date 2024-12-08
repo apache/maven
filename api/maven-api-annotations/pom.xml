@@ -26,7 +26,7 @@
     <version>4.0.0-rc-2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-api-meta</artifactId>
+  <artifactId>maven-api-annotations</artifactId>
   <name>Maven 4 API :: Meta annotations</name>
   <description>Maven 4 API - Java meta annotations.</description>
 
