@@ -136,7 +136,7 @@ public final class Constants {
      *
      * @since 4.0.0
      */
-    @Config(defaultValue = "${maven.user.home}/toolchains.xml")
+    @Config(defaultValue = "${maven.user.conf}/toolchains.xml")
     public static final String MAVEN_USER_TOOLCHAINS = "maven.user.toolchains";
 
     /**
@@ -144,6 +144,11 @@ public final class Constants {
      */
     @Config
     public static final String MAVEN_EXT_CLASS_PATH = "maven.ext.class.path";
+
+    @Config(defaultValue = "${maven.user.conf}/settings-security4.xml")
+    public static final String MAVEN_SETTINGS_SECURITY = "maven.settings.security";
+
+    public static final String MAVEN_SETTINGS_SECURITY_FILE_NAME = "settings-security4.xml";
 
     public static final String MAVEN_STYLE_PREFIX = "maven.style.";
 

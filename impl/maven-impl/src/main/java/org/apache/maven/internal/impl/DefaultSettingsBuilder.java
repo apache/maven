@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.Constants;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.BuilderProblem;
@@ -53,7 +55,9 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.settings.v4.SettingsMerger;
 import org.apache.maven.settings.v4.SettingsTransformer;
+import org.codehaus.plexus.components.secdispatcher.Dispatcher;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
+import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatcher;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
@@ -70,14 +74,13 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final Interpolator interpolator;
 
-    private final SecDispatcher secDispatcher;
+    private final Map<String, Dispatcher> dispatchers;
 
     /**
-     * This ctor is used in legacy components, and when in legacy, {@link SecDispatcher} is {@code null} and
-     * Maven3 exposes decryption with other means.
+     * This ctor is used in legacy components.
      */
     public DefaultSettingsBuilder() {
-        this(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), null);
+        this(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
     }
 
     /**
@@ -85,10 +88,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
      */
     @Inject
     public DefaultSettingsBuilder(
-            SettingsXmlFactory settingsXmlFactory, Interpolator interpolator, SecDispatcher secDispatcher) {
+            SettingsXmlFactory settingsXmlFactory, Interpolator interpolator, Map<String, Dispatcher> dispatchers) {
         this.settingsXmlFactory = settingsXmlFactory;
         this.interpolator = interpolator;
-        this.secDispatcher = secDispatcher;
+        this.dispatchers = dispatchers;
     }
 
     @Override
@@ -266,9 +269,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private Settings decrypt(
             Source settingsSource, Settings settings, SettingsBuilderRequest request, List<BuilderProblem> problems) {
-        if (secDispatcher == null) {
+        if (dispatchers.isEmpty()) {
             return settings;
         }
+        SecDispatcher secDispatcher = new DefaultSecDispatcher(dispatchers, getSecuritySettings(request.getSession()));
         Function<String, String> decryptFunction = str -> {
             if (secDispatcher.isAnyEncryptedString(str)) {
                 if (secDispatcher.isLegacyEncryptedString(str)) {
@@ -297,6 +301,19 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return str;
         };
         return new SettingsTransformer(decryptFunction).visit(settings);
+    }
+
+    private Path getSecuritySettings(ProtoSession session) {
+        Map<String, String> properties = session.getUserProperties();
+        String settingsSecurity = properties.get(Constants.MAVEN_SETTINGS_SECURITY);
+        if (settingsSecurity != null) {
+            return Paths.get(settingsSecurity);
+        }
+        String mavenUserConf = properties.get(Constants.MAVEN_USER_CONF);
+        if (mavenUserConf != null) {
+            return Paths.get(mavenUserConf, Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
+        }
+        return Paths.get(properties.get("user.home"), ".m2", Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
     }
 
     @Override
