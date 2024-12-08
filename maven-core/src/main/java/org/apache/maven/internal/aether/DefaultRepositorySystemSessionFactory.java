@@ -21,6 +21,7 @@ package org.apache.maven.internal.aether;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,8 +67,6 @@ import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 
-import static java.util.stream.Collectors.toList;
-
 /**
  * @since 3.3.0
  */
@@ -81,6 +80,16 @@ public class DefaultRepositorySystemSessionFactory {
      * @since 3.9.0
      */
     private static final String MAVEN_REPO_LOCAL_TAIL = "maven.repo.local.tail";
+
+    /**
+     * User property for chained LRM: the new "head" local repository to use, and "push" the existing into tail.
+     * Similar to <code>maven.repo.local.tail</code>, this property may contain comma separated list of paths to be
+     * used as local repositories (combine with chained local repository), but while latter is "appending" this
+     * one is "prepending".
+     *
+     * @since 3.9.10
+     */
+    public static final String MAVEN_REPO_LOCAL_HEAD = "maven.repo.local.head";
 
     /**
      * User property for chained LRM: should artifact availability be ignored in tail local repositories or not.
@@ -363,25 +372,54 @@ public class DefaultRepositorySystemSessionFactory {
     }
 
     private void setUpLocalRepositoryManager(MavenExecutionRequest request, DefaultRepositorySystemSession session) {
-        LocalRepository localRepo =
-                new LocalRepository(request.getLocalRepository().getBasedir());
+        List<String> paths = new ArrayList<>();
+        String localRepoHead = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_HEAD);
+        if (localRepoHead != null) {
+            Arrays.stream(localRepoHead.split(","))
+                    .filter(p -> p != null && !p.trim().isEmpty())
+                    .map(this::resolve)
+                    .forEach(paths::add);
+        }
 
-        LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(session, localRepo);
+        paths.add(request.getLocalRepository().getBasedir());
 
         String localRepoTail = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
-            boolean ignoreTailAvailability =
-                    ConfigUtils.getBoolean(session, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
-            List<LocalRepositoryManager> tail = new ArrayList<>();
-            List<String> paths = Arrays.stream(localRepoTail.split(","))
+            Arrays.stream(localRepoTail.split(","))
                     .filter(p -> p != null && !p.trim().isEmpty())
-                    .collect(toList());
+                    .map(this::resolve)
+                    .forEach(paths::add);
+        }
+
+        LocalRepository localRepo = new LocalRepository(paths.remove(0));
+        LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(session, localRepo);
+
+        if (paths.isEmpty()) {
+            // we have only one local repo path
+            session.setLocalRepositoryManager(lrm);
+        } else {
+            List<LocalRepositoryManager> tail = new ArrayList<>();
             for (String path : paths) {
                 tail.add(repoSystem.newLocalRepositoryManager(session, new LocalRepository(path)));
             }
+            boolean ignoreTailAvailability =
+                    ConfigUtils.getBoolean(session, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
+
             session.setLocalRepositoryManager(new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability));
+        }
+    }
+
+    private String resolve(String string) {
+        if (string.startsWith("~/") || string.startsWith("~\\")) {
+            // resolve based on $HOME
+            return Paths.get(System.getProperty("user.home"))
+                    .resolve(string.substring(2))
+                    .normalize()
+                    .toAbsolutePath()
+                    .toString();
         } else {
-            session.setLocalRepositoryManager(lrm);
+            // resolve based on $CWD
+            return Paths.get(string).normalize().toAbsolutePath().toString();
         }
     }
 
