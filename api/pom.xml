@@ -32,7 +32,7 @@
   <description>A new immutable API for Maven 4 to better manage what plugins and extensions can influence.</description>
 
   <modules>
-    <module>maven-api-meta</module>
+    <module>maven-api-annotations</module>
     <module>maven-api-di</module>
     <module>maven-api-xml</module>
     <module>maven-api-model</module>

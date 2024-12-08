@@ -53,7 +53,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-meta</artifactId>
+      <artifactId>maven-api-annotations</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
