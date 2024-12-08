@@ -45,8 +45,6 @@ import org.codehaus.plexus.components.secdispatcher.internal.sources.SystemPrope
 @Named
 public class SecDispatcherProvider {
 
-    private static final String FILE_NAME = "settings-security4.xml";
-
     @Provides
     public static SecDispatcher secDispatcher(Map<String, Dispatcher> dispatchers) {
         return new DefaultSecDispatcher(dispatchers, configurationFile());
@@ -96,11 +94,14 @@ public class SecDispatcherProvider {
     }
 
     private static Path configurationFile() {
+        String settingsSecurity = System.getProperty(Constants.MAVEN_SETTINGS_SECURITY);
+        if (settingsSecurity != null) {
+            return Paths.get(settingsSecurity);
+        }
         String mavenUserConf = System.getProperty(Constants.MAVEN_USER_CONF);
         if (mavenUserConf != null) {
-            return Paths.get(mavenUserConf, FILE_NAME);
+            return Paths.get(mavenUserConf, Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
         }
-        // this means we are in UT or alike
-        return Paths.get(System.getProperty("user.home"), ".m2", FILE_NAME);
+        return Paths.get(System.getProperty("user.home"), ".m2", Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
     }
 }
