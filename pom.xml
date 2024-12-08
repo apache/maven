@@ -137,7 +137,7 @@ under the License.
     <!-- Blocked by 3.4.0+ changes, see MNG-7710, downgrade from parent 4.0.1 -->
     <version.plexus-utils>3.5.1</version.plexus-utils>
     <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>33.2.1-jre</guavaVersion>
+    <guavaVersion>33.3.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.2</guavafailureaccessVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
