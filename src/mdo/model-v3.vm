@@ -280,7 +280,7 @@ public class ${class.name}
 
     public void setLocation(Object key, InputLocation location) {
         update(${packageModelV4}.${class.name}.newBuilder(getDelegate(), true)
-                        .location(key, location.toApiLocation()).build());
+                        .location(key, location != null ? location.toApiLocation() : null).build());
     }
 
     public InputLocation getImportedFrom() {
@@ -290,7 +290,7 @@ public class ${class.name}
 
     public void setImportedFrom(InputLocation location) {
         update(${packageModelV4}.${class.name}.newBuilder(getDelegate(), true)
-                        .importedFrom(location.toApiLocation()).build());
+                        .importedFrom(location != null ? location.toApiLocation() : null).build());
     }
 
     public Set<Object> getLocationKeys() {

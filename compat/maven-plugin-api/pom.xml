@@ -156,7 +156,6 @@ under the License.
         <configuration>
           <parameter>
             <excludes>
-              <exclude>org.apache.maven.monitor.logging.DefaultLog</exclude>
               <exclude>org.apache.maven.plugin.lifecycle</exclude>
               <exclude>org.apache.maven.plugin.descriptor.PluginDescriptor#getLifecycleMapping(java.lang.String)</exclude>
             </excludes>

@@ -129,8 +129,7 @@ under the License.
           <parameter>
             <excludes>
               <exclude>org.apache.maven.settings.io.xpp3.SettingsXpp3Reader#contentTransformer</exclude>
-              <exclude>org.apache.maven.settings.RuntimeInfo</exclude>
-              <exclude>org.apache.maven.settings.Settings#setModelEncoding(java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.settings.io.xpp3.SettingsXpp3Reader#read(org.codehaus.plexus.util.xml.pull.XmlPullParser,boolean):METHOD_REMOVED</exclude>
             </excludes>
           </parameter>
         </configuration>

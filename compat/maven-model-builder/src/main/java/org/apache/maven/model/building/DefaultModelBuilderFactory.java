@@ -18,13 +18,6 @@
  */
 package org.apache.maven.model.building;
 
-import java.util.Arrays;
-
-import org.apache.maven.api.Version;
-import org.apache.maven.api.VersionConstraint;
-import org.apache.maven.api.VersionRange;
-import org.apache.maven.api.services.model.ModelVersionParser;
-import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
@@ -69,165 +62,27 @@ import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
 import org.apache.maven.model.profile.activation.OperatingSystemProfileActivator;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 import org.apache.maven.model.profile.activation.PropertyProfileActivator;
-import org.apache.maven.model.root.DefaultRootLocator;
-import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.model.superpom.DefaultSuperPomProvider;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
 import org.apache.maven.model.validation.ModelValidator;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * A factory to create model builder instances when no dependency injection is available. <em>Note:</em> This class is
- * only meant as a utility for developers that want to employ the model builder outside the Maven build system, Maven
+ * only meant as a utility for developers that want to employ the model builder outside of the Maven build system, Maven
  * plugins should always acquire model builder instances via dependency injection. Developers might want to subclass
- * this factory to provide custom implementations for some of the components used by the model builder, or use the
- * builder API to inject custom instances.
+ * this factory to provide custom implementations for some of the components used by the model builder.
  *
  * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public class DefaultModelBuilderFactory {
 
-    private ModelProcessor modelProcessor;
-    private ModelValidator modelValidator;
-    private ModelNormalizer modelNormalizer;
-    private ModelInterpolator modelInterpolator;
-    private ModelPathTranslator modelPathTranslator;
-    private ModelUrlNormalizer modelUrlNormalizer;
-    private SuperPomProvider superPomProvider;
-    private InheritanceAssembler inheritanceAssembler;
-    private ProfileSelector profileSelector;
-    private ProfileInjector profileInjector;
-    private PluginManagementInjector pluginManagementInjector;
-    private DependencyManagementInjector dependencyManagementInjector;
-    private DependencyManagementImporter dependencyManagementImporter;
-    private LifecycleBindingsInjector lifecycleBindingsInjector;
-    private PluginConfigurationExpander pluginConfigurationExpander;
-    private ReportConfigurationExpander reportConfigurationExpander;
-    private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
-    private ModelVersionProcessor versionProcessor;
-    private ModelSourceTransformer transformer;
-    private ModelVersionParser versionParser;
-
-    public DefaultModelBuilderFactory setModelProcessor(ModelProcessor modelProcessor) {
-        this.modelProcessor = modelProcessor;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setModelValidator(ModelValidator modelValidator) {
-        this.modelValidator = modelValidator;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setModelNormalizer(ModelNormalizer modelNormalizer) {
-        this.modelNormalizer = modelNormalizer;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setModelInterpolator(ModelInterpolator modelInterpolator) {
-        this.modelInterpolator = modelInterpolator;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setModelPathTranslator(ModelPathTranslator modelPathTranslator) {
-        this.modelPathTranslator = modelPathTranslator;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setModelUrlNormalizer(ModelUrlNormalizer modelUrlNormalizer) {
-        this.modelUrlNormalizer = modelUrlNormalizer;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setSuperPomProvider(SuperPomProvider superPomProvider) {
-        this.superPomProvider = superPomProvider;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setInheritanceAssembler(InheritanceAssembler inheritanceAssembler) {
-        this.inheritanceAssembler = inheritanceAssembler;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setProfileSelector(ProfileSelector profileSelector) {
-        this.profileSelector = profileSelector;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setProfileInjector(ProfileInjector profileInjector) {
-        this.profileInjector = profileInjector;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setPluginManagementInjector(PluginManagementInjector pluginManagementInjector) {
-        this.pluginManagementInjector = pluginManagementInjector;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setDependencyManagementInjector(
-            DependencyManagementInjector dependencyManagementInjector) {
-        this.dependencyManagementInjector = dependencyManagementInjector;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setDependencyManagementImporter(
-            DependencyManagementImporter dependencyManagementImporter) {
-        this.dependencyManagementImporter = dependencyManagementImporter;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setLifecycleBindingsInjector(
-            LifecycleBindingsInjector lifecycleBindingsInjector) {
-        this.lifecycleBindingsInjector = lifecycleBindingsInjector;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setPluginConfigurationExpander(
-            PluginConfigurationExpander pluginConfigurationExpander) {
-        this.pluginConfigurationExpander = pluginConfigurationExpander;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setReportConfigurationExpander(
-            ReportConfigurationExpander reportConfigurationExpander) {
-        this.reportConfigurationExpander = reportConfigurationExpander;
-        return this;
-    }
-
-    @Deprecated
-    public DefaultModelBuilderFactory setReportingConverter(ReportingConverter reportingConverter) {
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setProfileActivationFilePathInterpolator(
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator) {
-        this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setVersionProcessor(ModelVersionProcessor versionProcessor) {
-        this.versionProcessor = versionProcessor;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setTransformer(ModelSourceTransformer transformer) {
-        this.transformer = transformer;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setModelVersionParser(ModelVersionParser versionParser) {
-        this.versionParser = versionParser;
-        return this;
-    }
-
     protected ModelProcessor newModelProcessor() {
-        return new DefaultModelProcessor(Arrays.asList(newModelParsers()), newModelLocator(), newModelReader());
-    }
-
-    protected ModelParser[] newModelParsers() {
-        return new ModelParser[0];
+        DefaultModelProcessor processor = new DefaultModelProcessor();
+        processor.setModelLocator(newModelLocator());
+        processor.setModelReader(newModelReader());
+        return processor;
     }
 
     protected ModelLocator newModelLocator() {
@@ -235,11 +90,17 @@ public class DefaultModelBuilderFactory {
     }
 
     protected ModelReader newModelReader() {
-        return new DefaultModelReader(newModelSourceTransformer());
+        return new DefaultModelReader();
     }
 
     protected ProfileSelector newProfileSelector() {
-        return new DefaultProfileSelector(Arrays.asList(newProfileActivators()));
+        DefaultProfileSelector profileSelector = new DefaultProfileSelector();
+
+        for (ProfileActivator activator : newProfileActivators()) {
+            profileSelector.addProfileActivator(activator);
+        }
+
+        return profileSelector;
     }
 
     protected ProfileActivator[] newProfileActivators() {
@@ -247,12 +108,13 @@ public class DefaultModelBuilderFactory {
             new JdkVersionProfileActivator(),
             new OperatingSystemProfileActivator(),
             new PropertyProfileActivator(),
-            new FileProfileActivator(newProfileActivationFilePathInterpolator())
+            new FileProfileActivator()
+                    .setProfileActivationFilePathInterpolator(newProfileActivationFilePathInterpolator())
         };
     }
 
     protected ProfileActivationFilePathInterpolator newProfileActivationFilePathInterpolator() {
-        return new ProfileActivationFilePathInterpolator(newPathTranslator(), newRootLocator());
+        return new ProfileActivationFilePathInterpolator().setPathTranslator(newPathTranslator());
     }
 
     protected UrlNormalizer newUrlNormalizer() {
@@ -263,15 +125,13 @@ public class DefaultModelBuilderFactory {
         return new DefaultPathTranslator();
     }
 
-    protected RootLocator newRootLocator() {
-        return new DefaultRootLocator();
-    }
-
     protected ModelInterpolator newModelInterpolator() {
         UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
-        RootLocator rootLocator = newRootLocator();
-        return new StringVisitorModelInterpolator(pathTranslator, normalizer, rootLocator);
+        return new StringVisitorModelInterpolator()
+                .setPathTranslator(pathTranslator)
+                .setUrlNormalizer(normalizer)
+                .setVersionPropertiesProcessor(newModelVersionPropertiesProcessor());
     }
 
     protected ModelVersionProcessor newModelVersionPropertiesProcessor() {
@@ -279,8 +139,7 @@ public class DefaultModelBuilderFactory {
     }
 
     protected ModelValidator newModelValidator() {
-        ModelVersionProcessor processor = newModelVersionPropertiesProcessor();
-        return new DefaultModelValidator(processor);
+        return new DefaultModelValidator(newModelVersionPropertiesProcessor());
     }
 
     protected ModelNormalizer newModelNormalizer() {
@@ -288,11 +147,11 @@ public class DefaultModelBuilderFactory {
     }
 
     protected ModelPathTranslator newModelPathTranslator() {
-        return new DefaultModelPathTranslator(newPathTranslator());
+        return new DefaultModelPathTranslator().setPathTranslator(newPathTranslator());
     }
 
     protected ModelUrlNormalizer newModelUrlNormalizer() {
-        return new DefaultModelUrlNormalizer(newUrlNormalizer());
+        return new DefaultModelUrlNormalizer().setUrlNormalizer(newUrlNormalizer());
     }
 
     protected InheritanceAssembler newInheritanceAssembler() {
@@ -304,7 +163,7 @@ public class DefaultModelBuilderFactory {
     }
 
     protected SuperPomProvider newSuperPomProvider() {
-        return new DefaultSuperPomProvider(newModelProcessor());
+        return new DefaultSuperPomProvider().setModelProcessor(newModelProcessor());
     }
 
     protected DependencyManagementImporter newDependencyManagementImporter() {
@@ -331,51 +190,8 @@ public class DefaultModelBuilderFactory {
         return new DefaultReportConfigurationExpander();
     }
 
-    @Deprecated
     protected ReportingConverter newReportingConverter() {
         return new DefaultReportingConverter();
-    }
-
-    private ModelSourceTransformer newModelSourceTransformer() {
-        return new BuildModelSourceTransformer();
-    }
-
-    private ModelVersionParser newModelVersionParser() {
-        // This is a limited parser that does not support ranges and compares versions as strings
-        // in real-life this parser should not be used, but replaced with a proper one
-        return new ModelVersionParser() {
-            @Override
-            public Version parseVersion(String version) {
-                requireNonNull(version, "version");
-                return new Version() {
-                    @Override
-                    public String asString() {
-                        return version;
-                    }
-
-                    @Override
-                    public int compareTo(Version o) {
-                        return version.compareTo(o.asString());
-                    }
-                };
-            }
-
-            @Override
-            public VersionRange parseVersionRange(String range) {
-                throw new IllegalArgumentException("ranges not supported by this parser");
-            }
-
-            @Override
-            public VersionConstraint parseVersionConstraint(String constraint) {
-                throw new IllegalArgumentException("constraint not supported by this parser");
-            }
-
-            @Override
-            public boolean isSnapshot(String version) {
-                requireNonNull(version, "version");
-                return version.endsWith("SNAPSHOT");
-            }
-        };
     }
 
     /**
@@ -384,29 +200,28 @@ public class DefaultModelBuilderFactory {
      * @return The new model builder instance, never {@code null}.
      */
     public DefaultModelBuilder newInstance() {
-        return new DefaultModelBuilder(
-                modelProcessor != null ? modelProcessor : newModelProcessor(),
-                modelValidator != null ? modelValidator : newModelValidator(),
-                modelNormalizer != null ? modelNormalizer : newModelNormalizer(),
-                modelInterpolator != null ? modelInterpolator : newModelInterpolator(),
-                modelPathTranslator != null ? modelPathTranslator : newModelPathTranslator(),
-                modelUrlNormalizer != null ? modelUrlNormalizer : newModelUrlNormalizer(),
-                superPomProvider != null ? superPomProvider : newSuperPomProvider(),
-                inheritanceAssembler != null ? inheritanceAssembler : newInheritanceAssembler(),
-                profileSelector != null ? profileSelector : newProfileSelector(),
-                profileInjector != null ? profileInjector : newProfileInjector(),
-                pluginManagementInjector != null ? pluginManagementInjector : newPluginManagementInjector(),
-                dependencyManagementInjector != null ? dependencyManagementInjector : newDependencyManagementInjector(),
-                dependencyManagementImporter != null ? dependencyManagementImporter : newDependencyManagementImporter(),
-                lifecycleBindingsInjector != null ? lifecycleBindingsInjector : newLifecycleBindingsInjector(),
-                pluginConfigurationExpander != null ? pluginConfigurationExpander : newPluginConfigurationExpander(),
-                reportConfigurationExpander != null ? reportConfigurationExpander : newReportConfigurationExpander(),
-                profileActivationFilePathInterpolator != null
-                        ? profileActivationFilePathInterpolator
-                        : newProfileActivationFilePathInterpolator(),
-                versionProcessor != null ? versionProcessor : newModelVersionPropertiesProcessor(),
-                transformer != null ? transformer : newModelSourceTransformer(),
-                versionParser != null ? versionParser : newModelVersionParser());
+        DefaultModelBuilder modelBuilder = new DefaultModelBuilder();
+
+        modelBuilder.setModelProcessor(newModelProcessor());
+        modelBuilder.setModelValidator(newModelValidator());
+        modelBuilder.setModelNormalizer(newModelNormalizer());
+        modelBuilder.setModelPathTranslator(newModelPathTranslator());
+        modelBuilder.setModelUrlNormalizer(newModelUrlNormalizer());
+        modelBuilder.setModelInterpolator(newModelInterpolator());
+        modelBuilder.setInheritanceAssembler(newInheritanceAssembler());
+        modelBuilder.setProfileInjector(newProfileInjector());
+        modelBuilder.setProfileSelector(newProfileSelector());
+        modelBuilder.setSuperPomProvider(newSuperPomProvider());
+        modelBuilder.setDependencyManagementImporter(newDependencyManagementImporter());
+        modelBuilder.setDependencyManagementInjector(newDependencyManagementInjector());
+        modelBuilder.setLifecycleBindingsInjector(newLifecycleBindingsInjector());
+        modelBuilder.setPluginManagementInjector(newPluginManagementInjector());
+        modelBuilder.setPluginConfigurationExpander(newPluginConfigurationExpander());
+        modelBuilder.setReportConfigurationExpander(newReportConfigurationExpander());
+        modelBuilder.setReportingConverter(newReportingConverter());
+        modelBuilder.setProfileActivationFilePathInterpolator(newProfileActivationFilePathInterpolator());
+
+        return modelBuilder;
     }
 
     private static class StubLifecycleBindingsInjector implements LifecycleBindingsInjector {

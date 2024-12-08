@@ -1425,10 +1425,9 @@ public class MavenCli {
         }
 
         if (modelProcessor != null) {
-            return modelProcessor.locateExistingPom(current);
-        } else {
-            return current.isFile() ? current : null;
+            current = modelProcessor.locatePom(current);
         }
+        return current.isFile() ? current : null;
     }
 
     // Visible for testing
@@ -1742,8 +1741,7 @@ public class MavenCli {
     //
 
     protected TransferListener getConsoleTransferListener(boolean printResourceNames) {
-        return new SimplexTransferListener(
-                new ConsoleMavenTransferListener(messageBuilderFactory, System.out, printResourceNames));
+        return new SimplexTransferListener(new ConsoleMavenTransferListener(System.out, printResourceNames));
     }
 
     protected TransferListener getBatchTransferListener() {

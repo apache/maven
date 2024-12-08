@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  */
+@Deprecated
 class DefaultUrlNormalizerTest {
 
     private UrlNormalizer normalizer = new DefaultUrlNormalizer();

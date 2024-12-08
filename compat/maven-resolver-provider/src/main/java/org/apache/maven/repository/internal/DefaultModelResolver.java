@@ -18,18 +18,18 @@
  */
 package org.apache.maven.repository.internal;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.maven.api.model.Dependency;
-import org.apache.maven.api.model.Parent;
-import org.apache.maven.api.model.Repository;
-import org.apache.maven.model.building.ArtifactModelSource;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Parent;
+import org.apache.maven.model.Repository;
+import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
@@ -109,7 +109,7 @@ class DefaultModelResolver implements ModelResolver {
     }
 
     @Override
-    public void addRepository(Repository repository) throws InvalidRepositoryException {
+    public void addRepository(org.apache.maven.model.Repository repository) throws InvalidRepositoryException {
         addRepository(repository, false);
     }
 
@@ -127,8 +127,8 @@ class DefaultModelResolver implements ModelResolver {
             removeMatchingRepository(repositories, repository.getId());
         }
 
-        List<RemoteRepository> newRepositories = Collections.singletonList(
-                ArtifactDescriptorUtils.toRemoteRepository(new org.apache.maven.model.Repository(repository)));
+        List<RemoteRepository> newRepositories =
+                Collections.singletonList(ArtifactDescriptorUtils.toRemoteRepository(repository));
 
         this.repositories = remoteRepositoryManager.aggregateRepositories(session, repositories, newRepositories, true);
     }
@@ -161,12 +161,13 @@ class DefaultModelResolver implements ModelResolver {
             throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
         }
 
-        return new ArtifactModelSource(pomArtifact.getPath(), groupId, artifactId, version);
+        File pomFile = pomArtifact.getFile();
+
+        return new FileModelSource(pomFile);
     }
 
     @Override
-    public ModelSource resolveModel(final Parent parent, final AtomicReference<Parent> modified)
-            throws UnresolvableModelException {
+    public ModelSource resolveModel(final Parent parent) throws UnresolvableModelException {
         try {
             final Artifact artifact =
                     new DefaultArtifact(parent.getGroupId(), parent.getArtifactId(), "", "pom", parent.getVersion());
@@ -199,12 +200,9 @@ class DefaultModelResolver implements ModelResolver {
                         parent.getVersion());
             }
 
-            String newVersion = versionRangeResult.getHighestVersion().toString();
-            if (!parent.getVersion().equals(newVersion)) {
-                modified.set(parent.withVersion(newVersion));
-            }
+            parent.setVersion(versionRangeResult.getHighestVersion().toString());
 
-            return resolveModel(parent.getGroupId(), parent.getArtifactId(), newVersion);
+            return resolveModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
         } catch (final VersionRangeResolutionException e) {
             throw new UnresolvableModelException(
                     e.getMessage(), parent.getGroupId(), parent.getArtifactId(), parent.getVersion(), e);
@@ -212,8 +210,7 @@ class DefaultModelResolver implements ModelResolver {
     }
 
     @Override
-    public ModelSource resolveModel(final Dependency dependency, AtomicReference<Dependency> modified)
-            throws UnresolvableModelException {
+    public ModelSource resolveModel(final Dependency dependency) throws UnresolvableModelException {
         try {
             final Artifact artifact = new DefaultArtifact(
                     dependency.getGroupId(), dependency.getArtifactId(), "", "pom", dependency.getVersion());
@@ -247,46 +244,12 @@ class DefaultModelResolver implements ModelResolver {
                         dependency.getVersion());
             }
 
-            String newVersion = versionRangeResult.getHighestVersion().toString();
-            if (!dependency.getVersion().equals(newVersion)) {
-                modified.set(dependency.withVersion(newVersion));
-            }
+            dependency.setVersion(versionRangeResult.getHighestVersion().toString());
 
-            return resolveModel(dependency.getGroupId(), dependency.getArtifactId(), newVersion);
+            return resolveModel(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
         } catch (VersionRangeResolutionException e) {
             throw new UnresolvableModelException(
                     e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), e);
         }
-    }
-
-    @Override
-    public ModelSource resolveModel(org.apache.maven.model.Parent parent) throws UnresolvableModelException {
-        AtomicReference<org.apache.maven.api.model.Parent> resolvedParent = new AtomicReference<>();
-        ModelSource result = resolveModel(parent.getDelegate(), resolvedParent);
-        if (resolvedParent.get() != null) {
-            parent.setVersion(resolvedParent.get().getVersion());
-        }
-        return result;
-    }
-
-    @Override
-    public ModelSource resolveModel(org.apache.maven.model.Dependency dependency) throws UnresolvableModelException {
-        AtomicReference<org.apache.maven.api.model.Dependency> resolvedDependency = new AtomicReference<>();
-        ModelSource result = resolveModel(dependency.getDelegate(), resolvedDependency);
-        if (resolvedDependency.get() != null) {
-            dependency.setVersion(resolvedDependency.get().getVersion());
-        }
-        return result;
-    }
-
-    @Override
-    public void addRepository(org.apache.maven.model.Repository repository) throws InvalidRepositoryException {
-        addRepository(repository.getDelegate());
-    }
-
-    @Override
-    public void addRepository(org.apache.maven.model.Repository repository, boolean replace)
-            throws InvalidRepositoryException {
-        addRepository(repository.getDelegate(), replace);
     }
 }

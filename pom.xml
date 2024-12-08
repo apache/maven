@@ -134,7 +134,7 @@ under the License.
     <maven.compiler.release>${javaVersion}</maven.compiler.release>
     <maven.compiler.proc>full</maven.compiler.proc>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-    <maven.baseline>3.8.8</maven.baseline>
+    <maven.baseline>3.9.8</maven.baseline>
     <!-- Control the name of the distribution and information output by mvn -->
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>

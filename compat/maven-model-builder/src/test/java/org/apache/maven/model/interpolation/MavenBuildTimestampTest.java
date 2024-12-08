@@ -19,17 +19,17 @@
 package org.apache.maven.model.interpolation;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Deprecated
 class MavenBuildTimestampTest {
     @Test
     void testMavenBuildTimestampUsesUTC() {
-        Map<String, String> interpolationProperties = new HashMap<>();
+        Properties interpolationProperties = new Properties();
         interpolationProperties.put("maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'");
         MavenBuildTimestamp timestamp = new MavenBuildTimestamp(new Date(), interpolationProperties);
         String formattedTimestamp = timestamp.formattedTimestamp();

@@ -26,10 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.api.model.InputSource;
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelProcessor;
 
@@ -43,22 +41,23 @@ import org.apache.maven.model.building.ModelProcessor;
 @Deprecated(since = "4.0.0")
 public class DefaultSuperPomProvider implements SuperPomProvider {
 
-    private final ModelProcessor modelProcessor;
-
     /**
      * The cached super POM, lazily created.
      */
-    private static final Map<String, Model> SUPER_MODELS = new ConcurrentHashMap<>();
+    private Model superModel;
 
     @Inject
-    public DefaultSuperPomProvider(ModelProcessor modelProcessor) {
+    private ModelProcessor modelProcessor;
+
+    public DefaultSuperPomProvider setModelProcessor(ModelProcessor modelProcessor) {
         this.modelProcessor = modelProcessor;
+        return this;
     }
 
     @Override
     public Model getSuperModel(String version) {
-        return SUPER_MODELS.computeIfAbsent(Objects.requireNonNull(version), v -> {
-            String resource = "/org/apache/maven/model/pom-" + v + ".xml";
+        if (superModel == null) {
+            String resource = "/org/apache/maven/model/pom-" + version + ".xml";
 
             InputStream is = getClass().getResourceAsStream(resource);
 
@@ -68,22 +67,25 @@ public class DefaultSuperPomProvider implements SuperPomProvider {
             }
 
             try {
-                Map<String, Object> options = new HashMap<>(2);
-                options.put("xml:" + version, "xml:" + version);
+                Map<String, Object> options = new HashMap<>();
+                options.put("xml:4.0.0", "xml:4.0.0");
 
-                String modelId = "org.apache.maven:maven-model-builder:" + version + "-"
+                String modelId = "org.apache.maven:maven-model-builder:"
                         + this.getClass().getPackage().getImplementationVersion() + ":super-pom";
-                InputSource inputSource = new InputSource(
-                        modelId, getClass().getResource(resource).toExternalForm());
-                options.put(ModelProcessor.INPUT_SOURCE, new org.apache.maven.model.InputSource(inputSource));
+                InputSource inputSource = new InputSource();
+                inputSource.setModelId(modelId);
+                inputSource.setLocation(getClass().getResource(resource).toExternalForm());
+                options.put(ModelProcessor.INPUT_SOURCE, inputSource);
 
-                return modelProcessor.read(is, options);
+                superModel = modelProcessor.read(is, options);
             } catch (IOException e) {
                 throw new IllegalStateException(
                         "The super POM " + resource + " is damaged"
                                 + ", please verify the integrity of your Maven installation",
                         e);
             }
-        });
+        }
+
+        return superModel;
     }
 }

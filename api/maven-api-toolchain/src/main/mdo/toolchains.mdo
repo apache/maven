@@ -102,6 +102,18 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0/1.1.0</version>
+          <code>
+          <![CDATA[
+          public void setModelEncoding(String modelEncoding) {
+              update(getDelegate().with().modelEncoding(modelEncoding).build());
+          }
+          ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>ToolchainModel</name>

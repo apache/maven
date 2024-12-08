@@ -20,26 +20,25 @@ package org.apache.maven.model.interpolation;
 
 import javax.inject.Inject;
 
-import java.net.URI;
-import java.nio.file.Path;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
-import org.apache.maven.model.root.RootLocator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.ObjectBasedValueSource;
 import org.codehaus.plexus.interpolation.PrefixAwareRecursionInterceptor;
+import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
 import org.codehaus.plexus.interpolation.ValueSource;
@@ -51,10 +50,7 @@ import org.codehaus.plexus.interpolation.ValueSource;
  */
 @Deprecated(since = "4.0.0")
 public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator {
-    private static final String PREFIX_PROJECT = "project.";
-    private static final String PREFIX_POM = "pom.";
-    private static final List<String> PROJECT_PREFIXES_3_1 = Arrays.asList(PREFIX_POM, PREFIX_PROJECT);
-    private static final List<String> PROJECT_PREFIXES_4_0 = Collections.singletonList(PREFIX_PROJECT);
+    private static final List<String> PROJECT_PREFIXES = Arrays.asList("pom.", "project.");
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
 
@@ -77,68 +73,47 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
         TRANSLATED_PATH_EXPRESSIONS = translatedPrefixes;
     }
 
-    private final PathTranslator pathTranslator;
-    private final UrlNormalizer urlNormalizer;
-
-    private final RootLocator rootLocator;
+    @Inject
+    private PathTranslator pathTranslator;
 
     @Inject
-    public AbstractStringBasedModelInterpolator(
-            PathTranslator pathTranslator, UrlNormalizer urlNormalizer, RootLocator rootLocator) {
+    private UrlNormalizer urlNormalizer;
+
+    @Inject
+    private ModelVersionProcessor versionProcessor;
+
+    public AbstractStringBasedModelInterpolator() {}
+
+    public AbstractStringBasedModelInterpolator setPathTranslator(PathTranslator pathTranslator) {
         this.pathTranslator = pathTranslator;
+        return this;
+    }
+
+    public AbstractStringBasedModelInterpolator setUrlNormalizer(UrlNormalizer urlNormalizer) {
         this.urlNormalizer = urlNormalizer;
-        this.rootLocator = rootLocator;
+        return this;
     }
 
-    @Override
-    public org.apache.maven.model.Model interpolateModel(
-            org.apache.maven.model.Model model,
-            java.io.File projectDir,
-            ModelBuildingRequest request,
-            ModelProblemCollector problems) {
-        return new org.apache.maven.model.Model(interpolateModel(
-                model.getDelegate(), projectDir != null ? projectDir.toPath() : null, request, problems));
-    }
-
-    @Override
-    public org.apache.maven.model.Model interpolateModel(
-            org.apache.maven.model.Model model,
-            Path projectDir,
-            ModelBuildingRequest request,
-            ModelProblemCollector problems) {
-        return new org.apache.maven.model.Model(interpolateModel(model.getDelegate(), projectDir, request, problems));
-    }
-
-    protected List<String> getProjectPrefixes(ModelBuildingRequest config) {
-        return config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_4_0
-                ? PROJECT_PREFIXES_4_0
-                : PROJECT_PREFIXES_3_1;
+    public AbstractStringBasedModelInterpolator setVersionPropertiesProcessor(ModelVersionProcessor processor) {
+        this.versionProcessor = processor;
+        return this;
     }
 
     protected List<ValueSource> createValueSources(
             final Model model,
-            final Path projectDir,
+            final File projectDir,
             final ModelBuildingRequest config,
-            ModelProblemCollector problems) {
-        Map<String, String> modelProperties = model.getProperties();
+            final ModelProblemCollector problems) {
+        Properties modelProperties = model.getProperties();
 
-        ValueSource projectPrefixValueSource;
-        ValueSource prefixlessObjectBasedValueSource;
-        if (config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_4_0) {
-            projectPrefixValueSource = new PrefixedObjectValueSource(PROJECT_PREFIXES_4_0, model, false);
-            prefixlessObjectBasedValueSource = new ObjectBasedValueSource(model);
-        } else {
-            projectPrefixValueSource = new PrefixedObjectValueSource(PROJECT_PREFIXES_3_1, model, false);
-            if (config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
-                projectPrefixValueSource =
-                        new ProblemDetectingValueSource(projectPrefixValueSource, PREFIX_POM, PREFIX_PROJECT, problems);
-            }
+        ValueSource modelValueSource1 = new PrefixedObjectValueSource(PROJECT_PREFIXES, model, false);
+        if (config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
+            modelValueSource1 = new ProblemDetectingValueSource(modelValueSource1, "pom.", "project.", problems);
+        }
 
-            prefixlessObjectBasedValueSource = new ObjectBasedValueSource(model);
-            if (config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
-                prefixlessObjectBasedValueSource =
-                        new ProblemDetectingValueSource(prefixlessObjectBasedValueSource, "", PREFIX_PROJECT, problems);
-            }
+        ValueSource modelValueSource2 = new ObjectBasedValueSource(model);
+        if (config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
+            modelValueSource2 = new ProblemDetectingValueSource(modelValueSource2, "", "project.", problems);
         }
 
         // NOTE: Order counts here!
@@ -150,16 +125,12 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                         @Override
                         public Object getValue(String expression) {
                             if ("basedir".equals(expression)) {
-                                return projectDir.toAbsolutePath().toString();
-                            } else if (expression.startsWith("basedir.")) {
-                                Path basedir = projectDir.toAbsolutePath();
-                                return new ObjectBasedValueSource(basedir)
-                                        .getValue(expression.substring("basedir.".length()));
+                                return projectDir.getAbsolutePath();
                             }
                             return null;
                         }
                     },
-                    getProjectPrefixes(config),
+                    PROJECT_PREFIXES,
                     true);
             valueSources.add(basedirValueSource);
 
@@ -168,42 +139,28 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                         @Override
                         public Object getValue(String expression) {
                             if ("baseUri".equals(expression)) {
-                                return projectDir.toAbsolutePath().toUri().toASCIIString();
-                            } else if (expression.startsWith("baseUri.")) {
-                                URI baseUri = projectDir.toAbsolutePath().toUri();
-                                return new ObjectBasedValueSource(baseUri)
-                                        .getValue(expression.substring("baseUri.".length()));
+                                return projectDir
+                                        .getAbsoluteFile()
+                                        .toPath()
+                                        .toUri()
+                                        .toASCIIString();
                             }
                             return null;
                         }
                     },
-                    getProjectPrefixes(config),
+                    PROJECT_PREFIXES,
                     false);
             valueSources.add(baseUriValueSource);
             valueSources.add(new BuildTimestampValueSource(config.getBuildStartTime(), modelProperties));
         }
 
-        valueSources.add(new PrefixedValueSourceWrapper(
-                new AbstractValueSource(false) {
-                    @Override
-                    public Object getValue(String expression) {
-                        if ("rootDirectory".equals(expression)) {
-                            Path root = rootLocator.findMandatoryRoot(projectDir);
-                            return root.toFile().getPath();
-                        } else if (expression.startsWith("rootDirectory.")) {
-                            Path root = rootLocator.findMandatoryRoot(projectDir);
-                            return new ObjectBasedValueSource(root)
-                                    .getValue(expression.substring("rootDirectory.".length()));
-                        }
-                        return null;
-                    }
-                },
-                getProjectPrefixes(config)));
-
-        valueSources.add(projectPrefixValueSource);
+        valueSources.add(modelValueSource1);
 
         valueSources.add(new MapBasedValueSource(config.getUserProperties()));
 
+        // Overwrite existing values in model properties. Otherwise it's not possible
+        // to define them via command line e.g.: mvn -Drevision=6.5.7 ...
+        versionProcessor.overwriteModelProperties(modelProperties, config);
         valueSources.add(new MapBasedValueSource(modelProperties));
 
         valueSources.add(new MapBasedValueSource(config.getSystemProperties()));
@@ -215,23 +172,24 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
             }
         });
 
-        valueSources.add(prefixlessObjectBasedValueSource);
+        valueSources.add(modelValueSource2);
 
         return valueSources;
     }
 
     protected List<? extends InterpolationPostProcessor> createPostProcessors(
-            final Model model, final Path projectDir, final ModelBuildingRequest config) {
+            final Model model, final File projectDir, final ModelBuildingRequest config) {
         List<InterpolationPostProcessor> processors = new ArrayList<>(2);
         if (projectDir != null) {
             processors.add(new PathTranslatingPostProcessor(
-                    getProjectPrefixes(config), TRANSLATED_PATH_EXPRESSIONS, projectDir, pathTranslator));
+                    PROJECT_PREFIXES, TRANSLATED_PATH_EXPRESSIONS,
+                    projectDir, pathTranslator));
         }
         processors.add(new UrlNormalizingPostProcessor(urlNormalizer));
         return processors;
     }
 
-    protected RecursionInterceptor createRecursionInterceptor(ModelBuildingRequest config) {
-        return new PrefixAwareRecursionInterceptor(getProjectPrefixes(config));
+    protected RecursionInterceptor createRecursionInterceptor() {
+        return new PrefixAwareRecursionInterceptor(PROJECT_PREFIXES);
     }
 }

@@ -46,14 +46,14 @@ public interface ModelProblem {
         V20,
         V30,
         V31,
-        V40,
-        V41
+        V40
     }
 
     /**
-     * Gets the identifier of the model from which the problem originated. The identifier is derived from the
-     * information that is available at the point the problem occurs and as such merely serves as best effort
-     * to provide information to the user to track the problem back to its origin.
+     * Gets the hint about the source of the problem. While the syntax of this hint is unspecified and depends on the
+     * creator of the problem, the general expectation is that the hint provides sufficient information to the user to
+     * track the problem back to its origin. A concrete example for such a source hint can be the file path or URL from
+     * which a POM was read.
      *
      * @return The hint about the source of the problem or an empty string if unknown, never {@code null}.
      */

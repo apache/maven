@@ -26,10 +26,12 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.InvalidPropertiesFormatException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -136,7 +138,45 @@ class WrapperProperties extends Properties {
 
     @Override
     public Set<Map.Entry<Object, Object>> entrySet() {
-        return (Set) getter.get().entrySet();
+        Set<Map.Entry<String, String>> set = getter.get().entrySet();
+        return new AbstractSet<Map.Entry<Object, Object>>() {
+            @Override
+            public Iterator<Map.Entry<Object, Object>> iterator() {
+                Iterator<Map.Entry<String, String>> it = set.iterator();
+                return new Iterator<Map.Entry<Object, Object>>() {
+                    @Override
+                    public boolean hasNext() {
+                        return it.hasNext();
+                    }
+
+                    @Override
+                    public Map.Entry<Object, Object> next() {
+                        Map.Entry<String, String> entry = it.next();
+                        return new Map.Entry<Object, Object>() {
+                            @Override
+                            public Object getKey() {
+                                return entry.getKey();
+                            }
+
+                            @Override
+                            public Object getValue() {
+                                return entry.getValue();
+                            }
+
+                            @Override
+                            public Object setValue(Object value) {
+                                return writeOperation(p -> p.put(entry.getKey(), value));
+                            }
+                        };
+                    }
+                };
+            }
+
+            @Override
+            public int size() {
+                return set.size();
+            }
+        };
     }
 
     @Override

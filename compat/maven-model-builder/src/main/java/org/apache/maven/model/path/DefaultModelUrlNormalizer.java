@@ -39,11 +39,12 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 @Deprecated(since = "4.0.0")
 public class DefaultModelUrlNormalizer implements ModelUrlNormalizer {
 
-    private final UrlNormalizer urlNormalizer;
-
     @Inject
-    public DefaultModelUrlNormalizer(UrlNormalizer urlNormalizer) {
+    private UrlNormalizer urlNormalizer;
+
+    public DefaultModelUrlNormalizer setUrlNormalizer(UrlNormalizer urlNormalizer) {
         this.urlNormalizer = urlNormalizer;
+        return this;
     }
 
     @Override

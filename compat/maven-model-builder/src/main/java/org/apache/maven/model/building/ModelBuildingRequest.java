@@ -19,7 +19,6 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -55,48 +54,27 @@ public interface ModelBuildingRequest {
     int VALIDATION_LEVEL_MAVEN_3_0 = 30;
 
     /**
-     * Denotes validation as performed by Maven 3.1. This validation level is meant for existing projects.
+     * Denotes validation as performed by Maven 3.1. This validation level is meant for new projects.
      */
     int VALIDATION_LEVEL_MAVEN_3_1 = 31;
 
     /**
-     * Denotes validation as performed by Maven 4.0. This validation level is meant for new projects.
-     */
-    int VALIDATION_LEVEL_MAVEN_4_0 = 40;
-
-    /**
      * Denotes strict validation as recommended by the current Maven version.
      */
-    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_4_0;
+    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
 
     /**
-     * Gets the file model to build (with profile activation).
-     * If not set, model source will be used to load file model.
+     * Gets the raw model to build. If not set, model source will be used to load raw model.
      *
-     * @return The file model to build or {@code null} if not set.
-     * @since 4.0.0
+     * @return The raw model to build or {@code null} if not set.
      */
-    Model getFileModel();
-
-    /**
-     * Set the file model with profile activation
-     *
-     * @param fileModel
-     * @return This request, never {@code null}.
-     * @since 4.0.0
-     */
-    ModelBuildingRequest setFileModel(Model fileModel);
-
-    /**
-     * @deprecated rawModel is never set, instead the fileModel is set
-     */
-    @Deprecated
     Model getRawModel();
 
     /**
-     * @deprecated setting the rawModel has no effect, instead the fileModel of phase one will be set
+     * Set raw model.
+     *
+     * @param rawModel
      */
-    @Deprecated
     ModelBuildingRequest setRawModel(Model rawModel);
 
     /**
@@ -108,7 +86,7 @@ public interface ModelBuildingRequest {
 
     /**
      * Sets the source of the POM to process. Eventually, either {@link #setModelSource(ModelSource)} or
-     * {@link #setPomPath(Path)} must be set.
+     * {@link #setPomFile(File)} must be set.
      *
      * @param modelSource The source of the POM to process, may be {@code null}.
      * @return This request, never {@code null}.
@@ -120,19 +98,8 @@ public interface ModelBuildingRequest {
      *
      * @return The POM file of the project or {@code null} if not applicable (i.e. when processing a POM from the
      *         repository).
-     * @deprecated Use {@link #getPomPath()} instead.
      */
-    @Deprecated
     File getPomFile();
-
-    /**
-     * Gets the POM file of the project to build.
-     *
-     * @return The POM file of the project or {@code null} if not applicable (i.e. when processing a POM from the
-     *         repository).
-     * @since 4.0.0
-     */
-    Path getPomPath();
 
     /**
      * Sets the POM file of the project to build. Note that providing the path to a POM file via this method will make
@@ -144,24 +111,8 @@ public interface ModelBuildingRequest {
      * @param pomFile The POM file of the project to build the effective model for, may be {@code null} to build the
      *            model of some POM from the repository.
      * @return This request, never {@code null}.
-     * @deprecated Use {@link #setPomPath(Path)} instead.
      */
-    @Deprecated
     ModelBuildingRequest setPomFile(File pomFile);
-
-    /**
-     * Sets the POM file of the project to build. Note that providing the path to a POM file via this method will make
-     * the model builder operate in project mode. This mode is meant for effective models that are employed during the
-     * build process of a local project. Hence the effective model will support the notion of a project directory. To
-     * build the model for a POM from the repository, use {@link #setModelSource(ModelSource)} in combination with a
-     * {@link FileModelSource} instead.
-     *
-     * @param pomPath The POM file of the project to build the effective model for, may be {@code null} to build the
-     *            model of some POM from the repository.
-     * @return This request, never {@code null}.
-     * @since 4.0.0
-     */
-    ModelBuildingRequest setPomPath(Path pomPath);
 
     /**
      * Gets the level of validation to perform on processed models.
@@ -382,12 +333,4 @@ public interface ModelBuildingRequest {
     WorkspaceModelResolver getWorkspaceModelResolver();
 
     ModelBuildingRequest setWorkspaceModelResolver(WorkspaceModelResolver workspaceResolver);
-
-    TransformerContextBuilder getTransformerContextBuilder();
-
-    ModelBuildingRequest setTransformerContextBuilder(TransformerContextBuilder contextBuilder);
-
-    Path getRootDirectory();
-
-    ModelBuildingRequest setRootDirectory(Path rootDirectory);
 }

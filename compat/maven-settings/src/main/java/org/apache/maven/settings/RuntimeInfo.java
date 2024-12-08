@@ -16,11 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.model.interpolation;
+package org.apache.maven.settings;
 
+import java.io.File;
+
+/**
+ * To handle runtime informations like local repository or profiles.
+ *
+ */
 @Deprecated
-public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolatorTest {
-    protected ModelInterpolator createInterpolator() {
-        return new StringVisitorModelInterpolator().setVersionPropertiesProcessor(new DefaultModelVersionProcessor());
+public class RuntimeInfo {
+    @SuppressWarnings("checkstyle:constantname")
+    public static final String userHome = System.getProperty("user.home");
+
+    @SuppressWarnings("checkstyle:constantname")
+    public static final File userMavenConfigurationHome = new File(userHome, ".m2");
+
+    public static final File DEFAULT_USER_SETTINGS_FILE = new File(userMavenConfigurationHome, "settings.xml");
+
+    private File settings;
+
+    public RuntimeInfo() {
+        this.settings = DEFAULT_USER_SETTINGS_FILE;
+    }
+
+    public RuntimeInfo(File settings) {
+        this.settings = settings;
+    }
+
+    public File getFile() {
+        return settings;
     }
 }

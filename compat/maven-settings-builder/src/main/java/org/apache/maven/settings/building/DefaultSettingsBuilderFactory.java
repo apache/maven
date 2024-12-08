@@ -45,7 +45,7 @@ public class DefaultSettingsBuilderFactory {
     }
 
     protected SettingsValidator newSettingsValidator() {
-        return new DefaultSettingsValidator(new org.apache.maven.internal.impl.DefaultSettingsBuilder());
+        return new DefaultSettingsValidator();
     }
 
     /**
@@ -55,7 +55,6 @@ public class DefaultSettingsBuilderFactory {
      */
     public DefaultSettingsBuilder newInstance() {
         return new DefaultSettingsBuilder(
-                new org.apache.maven.internal.impl.DefaultSettingsBuilder(),
-                new org.apache.maven.internal.impl.DefaultSettingsXmlFactory());
+                new DefaultSettingsReader(), new DefaultSettingsWriter(), new DefaultSettingsValidator());
     }
 }

@@ -29,6 +29,7 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.profile.ProfileActivationContext;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Determines profile activation based on the existence or value of some execution property.
@@ -63,7 +64,7 @@ public class PropertyProfileActivator implements ProfileActivator {
             name = name.substring(1);
         }
 
-        if (name == null || name.isEmpty()) {
+        if (name == null || name.length() <= 0) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
                     .setMessage("The property name is required to activate the profile " + profile.getId())
                     .setLocation(property.getLocation("")));
@@ -76,7 +77,7 @@ public class PropertyProfileActivator implements ProfileActivator {
         }
 
         String propValue = property.getValue();
-        if (propValue != null && !propValue.isEmpty()) {
+        if (StringUtils.isNotEmpty(propValue)) {
             boolean reverseValue = false;
             if (propValue.startsWith("!")) {
                 reverseValue = true;
@@ -84,9 +85,13 @@ public class PropertyProfileActivator implements ProfileActivator {
             }
 
             // we have a value, so it has to match the system value...
-            return reverseValue != propValue.equals(sysValue);
+            boolean result = propValue.equals(sysValue);
+
+            return reverseValue ? !result : result;
         } else {
-            return reverseName != (sysValue != null && !sysValue.isEmpty());
+            boolean result = StringUtils.isNotEmpty(sysValue);
+
+            return reverseName ? !result : result;
         }
     }
 
@@ -100,6 +105,9 @@ public class PropertyProfileActivator implements ProfileActivator {
 
         ActivationProperty property = activation.getProperty();
 
-        return property != null;
+        if (property == null) {
+            return false;
+        }
+        return true;
     }
 }

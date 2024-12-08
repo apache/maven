@@ -42,7 +42,7 @@ public class ModelBuildingException extends Exception {
      *
      * @param model The model that could not be built, may be {@code null}.
      * @param modelId The identifier of the model that could not be built, may be {@code null}.
-     * @param problems The problems that cause this exception, may be {@code null}.
+     * @param problems The problems that causes this exception, may be {@code null}.
      * @deprecated Use {@link #ModelBuildingException(ModelBuildingResult)} instead.
      */
     @Deprecated
@@ -130,7 +130,6 @@ public class ModelBuildingException extends Exception {
         return null;
     }
 
-    // Package protected for test
     static String toMessage(String modelId, List<ModelProblem> problems) {
         StringWriter buffer = new StringWriter(1024);
 
@@ -139,22 +138,19 @@ public class ModelBuildingException extends Exception {
         writer.print(problems.size());
         writer.print((problems.size() == 1) ? " problem was " : " problems were ");
         writer.print("encountered while building the effective model");
-        if (modelId != null && !modelId.isEmpty()) {
+        if (modelId != null && modelId.length() > 0) {
             writer.print(" for ");
             writer.print(modelId);
         }
+        writer.println();
 
         for (ModelProblem problem : problems) {
-            writer.println();
-            writer.print("    - [");
+            writer.print("[");
             writer.print(problem.getSeverity());
             writer.print("] ");
             writer.print(problem.getMessage());
-            String location = ModelProblemUtils.formatLocation(problem, modelId);
-            if (!location.isEmpty()) {
-                writer.print(" @ ");
-                writer.print(location);
-            }
+            writer.print(" @ ");
+            writer.println(ModelProblemUtils.formatLocation(problem, modelId));
         }
 
         return buffer.toString();
