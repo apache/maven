@@ -18,18 +18,13 @@
  */
 package org.apache.maven.internal.impl.secdispatcher;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
-import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
 import org.codehaus.plexus.components.secdispatcher.Cipher;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
 import org.codehaus.plexus.components.secdispatcher.MasterSource;
-import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
-import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatcher;
 import org.codehaus.plexus.components.secdispatcher.internal.cipher.AESGCMNoPadding;
 import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyDispatcher;
 import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.MasterDispatcher;
@@ -44,11 +39,6 @@ import org.codehaus.plexus.components.secdispatcher.internal.sources.SystemPrope
 @SuppressWarnings("unused")
 @Named
 public class SecDispatcherProvider {
-
-    @Provides
-    public static SecDispatcher secDispatcher(Map<String, Dispatcher> dispatchers) {
-        return new DefaultSecDispatcher(dispatchers, configurationFile());
-    }
 
     @Provides
     @Named(LegacyDispatcher.NAME)
@@ -91,17 +81,5 @@ public class SecDispatcherProvider {
     @Named(SystemPropertyMasterSource.NAME)
     public static MasterSource systemPropertyMasterSource() {
         return new SystemPropertyMasterSource();
-    }
-
-    private static Path configurationFile() {
-        String settingsSecurity = System.getProperty(Constants.MAVEN_SETTINGS_SECURITY);
-        if (settingsSecurity != null) {
-            return Paths.get(settingsSecurity);
-        }
-        String mavenUserConf = System.getProperty(Constants.MAVEN_USER_CONF);
-        if (mavenUserConf != null) {
-            return Paths.get(mavenUserConf, Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
-        }
-        return Paths.get(System.getProperty("user.home"), ".m2", Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
     }
 }
