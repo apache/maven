@@ -42,7 +42,7 @@ under the License.
       <item name="Javadocs" href="apidocs/index.html"/>
       <item name="Source Xref" href="xref/index.html"/>
       <!--item name="FAQ" href="faq.html"/-->
-      <item name="License" href="http://www.apache.org/licenses/"/>
+      <item name="License" href="https://www.apache.org/licenses/"/>
       <item name="Download" href="/download.html"/>
     </menu>
 
