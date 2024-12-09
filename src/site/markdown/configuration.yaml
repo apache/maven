@@ -166,6 +166,11 @@ props:
       defaultValue: 
       since: 4.0.0
       configurationSource: User properties
+    - key: maven.settings.security
+      configurationType: String
+      description: ""
+      defaultValue: ${maven.user.conf}/settings-security4.xml
+      configurationSource: User properties
     - key: maven.style.color
       configurationType: String
       description: "Maven output color mode. Allowed values are <code>auto</code>, <code>always</code>, <code>never</code>."
@@ -259,7 +264,7 @@ props:
     - key: maven.user.toolchains
       configurationType: String
       description: "Maven user toolchains."
-      defaultValue: ${maven.user.home}/toolchains.xml
+      defaultValue: ${maven.user.conf}/toolchains.xml
       since: 4.0.0
       configurationSource: User properties
     - key: maven.versionResolver.noCache
