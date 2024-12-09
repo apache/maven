@@ -270,7 +270,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return settings;
         }
         Function<String, String> decryptFunction = str -> {
-            if (secDispatcher.isAnyEncryptedString(str)) {
+            if (str != null && !str.isEmpty() && !str.contains("${") && secDispatcher.isAnyEncryptedString(str)) {
                 if (secDispatcher.isLegacyEncryptedString(str)) {
                     // add a problem
                     problems.add(new DefaultBuilderProblem(
