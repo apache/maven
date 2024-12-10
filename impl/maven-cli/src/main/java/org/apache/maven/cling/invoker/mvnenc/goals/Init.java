@@ -54,7 +54,7 @@ import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.OK;
  */
 @Singleton
 @Named("init")
-public class Init extends GoalSupport {
+public class Init extends InteractiveGoalSupport {
     private static final String NONE = "__none__";
 
     @Inject
@@ -63,7 +63,7 @@ public class Init extends GoalSupport {
     }
 
     @Override
-    public int execute(EncryptContext context) throws Exception {
+    public int doExecute(EncryptContext context) throws Exception {
         context.addInHeader(context.style.italic().bold().foreground(Colors.rgbColor("yellow")), "goal: init");
         context.addInHeader("");
 
