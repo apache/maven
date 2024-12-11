@@ -45,6 +45,7 @@ import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 import org.jline.utils.Colors;
+import org.jline.utils.OSUtils;
 
 import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.BAD_OPERATION;
 import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.OK;
@@ -67,7 +68,14 @@ public class Init extends InteractiveGoalSupport {
         context.addInHeader(context.style.italic().bold().foreground(Colors.rgbColor("yellow")), "goal: init");
         context.addInHeader("");
 
-        ConsolePrompt prompt = context.prompt;
+        ConsolePrompt.UiConfig promptConfig;
+        if (OSUtils.IS_WINDOWS) {
+            promptConfig = new ConsolePrompt.UiConfig(">", "( )", "(x)", "( )");
+        } else {
+            promptConfig = new ConsolePrompt.UiConfig("❯", "◯ ", "◉ ", "◯ ");
+        }
+        promptConfig.setCancellableFirstPrompt(true);
+        ConsolePrompt prompt = new ConsolePrompt(context.reader, context.terminal, promptConfig);
 
         EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
         boolean force = options.force().orElse(false);

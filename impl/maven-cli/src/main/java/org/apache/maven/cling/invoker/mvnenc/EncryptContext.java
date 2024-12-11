@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.cling.invoker.LookupContext;
-import org.jline.consoleui.prompt.ConsolePrompt;
 import org.jline.reader.LineReader;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
@@ -40,7 +39,6 @@ public class EncryptContext extends LookupContext {
     public List<AttributedString> header;
     public AttributedStyle style;
     public LineReader reader;
-    public ConsolePrompt prompt;
 
     public void addInHeader(String text) {
         addInHeader(AttributedStyle.DEFAULT, text);

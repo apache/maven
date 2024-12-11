@@ -26,13 +26,11 @@ import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.utils.CLIReportingUtils;
-import org.jline.consoleui.prompt.ConsolePrompt;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.Colors;
-import org.jline.utils.OSUtils;
 
 /**
  * mvnenc invoker implementation.
@@ -76,17 +74,9 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
 
             Thread executeThread = Thread.currentThread();
             context.terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
-            ConsolePrompt.UiConfig config;
-            if (OSUtils.IS_WINDOWS) {
-                config = new ConsolePrompt.UiConfig(">", "( )", "(x)", "( )");
-            } else {
-                config = new ConsolePrompt.UiConfig("❯", "◯ ", "◉ ", "◯ ");
-            }
-            config.setCancellableFirstPrompt(true);
 
             context.reader =
                     LineReaderBuilder.builder().terminal(context.terminal).build();
-            context.prompt = new ConsolePrompt(context.reader, context.terminal, config);
 
             EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
             if (options.goals().isEmpty() || options.goals().get().size() != 1) {
