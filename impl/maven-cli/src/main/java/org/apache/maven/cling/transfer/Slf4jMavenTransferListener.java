@@ -89,7 +89,7 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
 
         Duration duration =
                 Duration.between(Instant.ofEpochMilli(resource.getTransferStartTime()), MonotonicClock.now());
-        if (!duration.isNegative()) {
+        if ((duration.getSeconds() | duration.getNano()) > 0) { // duration.isPositive()
             long bytesPerSecond = Math.round(contentLength / (double) duration.toSeconds());
             message.append(" at ");
             format.format(message, bytesPerSecond);
