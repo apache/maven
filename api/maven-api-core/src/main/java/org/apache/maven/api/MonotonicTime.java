@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Represents a point in time using both monotonic and wall clock measurements.
  * This class combines the monotonic precision of {@link System#nanoTime()} with
- * wall clock time from {@link Instant#now()}, providing accurate duration measurements
+ * wall clock time from {@link Clock#systemUTC()#instant()}, providing accurate duration measurements
  * while maintaining human-readable timestamps.
  * <p>
  * This class implements {@link Temporal} by delegating to its computed wall time,
@@ -48,7 +49,7 @@ public final class MonotonicTime implements Temporal {
      * Reference point representing the time when this class was first loaded.
      * Can be used as a global start time for duration measurements.
      */
-    public static final MonotonicTime START = new MonotonicTime(System.nanoTime(), Instant.now());
+    public static final MonotonicTime START = new MonotonicTime(System.nanoTime(), Clock.systemUTC().instant());
 
     private final long nanoTime;
     private volatile Instant wallTime;
@@ -187,13 +188,13 @@ public final class MonotonicTime implements Temporal {
     @SuppressWarnings("unchecked")
     public <R> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.zoneId()) {
-            return (R) ZoneId.systemDefault();
+            return (R) ZoneId.of("UTC");
         }
         if (query == TemporalQueries.precision()) {
             return (R) ChronoUnit.NANOS;
         }
         if (query == TemporalQueries.zone()) {
-            return (R) ZoneId.systemDefault(); // Be consistent with zoneId query
+            return (R) ZoneId.of("UTC");  // Consistent with zoneId query
         }
         if (query == TemporalQueries.chronology()) {
             return null;

@@ -113,10 +113,10 @@ class MonotonicTimeTest {
             assertEquals(expectedInstant, time.query(Instant::from));
 
             ZoneId zoneId = time.query(TemporalQueries.zoneId());
-            assertEquals(ZoneId.systemDefault(), zoneId); // Changed expectation to UTC
+            assertEquals(ZoneId.of("UTC"), zoneId); // Changed expectation to UTC
 
             ZonedDateTime zdt = ZonedDateTime.from(time);
-            assertEquals(expectedInstant.atZone(ZoneId.systemDefault()), zdt);
+            assertEquals(expectedInstant.atZone(ZoneId.of("UTC")), zdt);
         }
     }
 
