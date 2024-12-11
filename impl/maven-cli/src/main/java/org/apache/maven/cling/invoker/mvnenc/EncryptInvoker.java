@@ -65,18 +65,6 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
 
     protected int doExecute(EncryptContext context) throws Exception {
         try {
-            if (!context.interactive) {
-                context.terminal.writer().println("This tool works only in interactive mode!");
-                context.terminal
-                        .writer()
-                        .println("Tool purpose is to configure password management on developer workstations.");
-                context.terminal
-                        .writer()
-                        .println(
-                                "Note: Generated configuration can be moved/copied to headless environments, if configured as such.");
-                return BAD_OPERATION;
-            }
-
             context.header = new ArrayList<>();
             context.style = new AttributedStyle();
             context.addInHeader(
@@ -89,12 +77,7 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
             Thread executeThread = Thread.currentThread();
             context.terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
             ConsolePrompt.UiConfig config;
-            if (context.terminal.getType().equals(Terminal.TYPE_DUMB)
-                    || context.terminal.getType().equals(Terminal.TYPE_DUMB_COLOR)) {
-                context.terminal.writer().println(context.terminal.getName() + ": " + context.terminal.getType());
-                throw new IllegalStateException("Dumb terminal detected.\nThis tool requires real terminal to work!\n"
-                        + "Note: On Windows Jansi or JNA library must be included in classpath.");
-            } else if (OSUtils.IS_WINDOWS) {
+            if (OSUtils.IS_WINDOWS) {
                 config = new ConsolePrompt.UiConfig(">", "( )", "(x)", "( )");
             } else {
                 config = new ConsolePrompt.UiConfig("❯", "◯ ", "◉ ", "◯ ");

@@ -274,7 +274,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
         SecDispatcher secDispatcher = new DefaultSecDispatcher(dispatchers, getSecuritySettings(request.getSession()));
         Function<String, String> decryptFunction = str -> {
-            if (secDispatcher.isAnyEncryptedString(str)) {
+            if (str != null && !str.isEmpty() && !str.contains("${") && secDispatcher.isAnyEncryptedString(str)) {
                 if (secDispatcher.isLegacyEncryptedString(str)) {
                     // add a problem
                     problems.add(new DefaultBuilderProblem(
