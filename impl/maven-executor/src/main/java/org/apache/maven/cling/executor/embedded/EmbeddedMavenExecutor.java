@@ -203,7 +203,7 @@ public class EmbeddedMavenExecutor implements Executor {
 
     protected Context doCreate(Path mavenHome, ExecutorRequest executorRequest) {
         if (!Files.isDirectory(mavenHome)) {
-            throw new IllegalArgumentException("Installation directory must point to existing directory");
+            throw new IllegalArgumentException("Installation directory must point to existing directory: " + mavenHome);
         }
         if (!MAIN_CLASSES.containsKey(executorRequest.command())) {
             throw new IllegalArgumentException(
