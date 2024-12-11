@@ -43,14 +43,12 @@ class MonotonicTimeTest {
     @Nested
     class DurationMeasurements {
         @Test
-        void shouldMeasurePositiveDurations() throws InterruptedException {
+        void shouldMeasurePositiveDurations() {
             MonotonicTime start = MonotonicTime.now();
-            Thread.sleep(100); // Sleep for 100ms
-            MonotonicTime end = MonotonicTime.now();
+            MonotonicTime end = new MonotonicTime(start.getNanoTime() + TimeUnit.MILLISECONDS.toNanos(100), null);
 
             Duration duration = end.durationSince(start);
-            assertTrue(duration.toMillis() >= 100);
-            assertTrue(duration.toMillis() < 150); // Allow some overhead
+            assertEquals(100, duration.toMillis());
         }
 
         @Test
