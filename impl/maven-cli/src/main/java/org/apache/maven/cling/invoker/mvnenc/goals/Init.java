@@ -70,13 +70,10 @@ public class Init extends InteractiveGoalSupport {
         boolean yes = options.yes().orElse(false);
 
         if (configExists() && !force) {
-            context.terminal
-                    .writer()
-                    .println(
-                            messageBuilderFactory
-                                    .builder()
-                                    .error(
-                                            "Error: configuration exist. Use --force if you want to reset existing configuration."));
+            context.logger.error(messageBuilderFactory
+                    .builder()
+                    .error("Error: configuration exist. Use --force if you want to reset existing configuration.")
+                    .build());
             return BAD_OPERATION;
         }
 

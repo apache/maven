@@ -715,7 +715,7 @@ under the License.
                     <unzip dest="${mavenHome}" src="${project.build.directory}/maven-bin.zip">
                       <globmapper from="apache-maven-${mavenVersion}/*" handledirsep="true" to="*" />
                     </unzip>
-                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug" perm="ugo+rx" />
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc" perm="ugo+rx" />
                   </target>
                 </configuration>
               </execution>
@@ -758,7 +758,7 @@ under the License.
                     <unzip dest="${mavenHome}" src="${mavenDistro}">
                       <regexpmapper from="^([^/]+)/(.*)$" handledirsep="true" to="\2" />
                     </unzip>
-                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug" perm="ugo+rx" />
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc" perm="ugo+rx" />
                   </target>
                 </configuration>
               </execution>

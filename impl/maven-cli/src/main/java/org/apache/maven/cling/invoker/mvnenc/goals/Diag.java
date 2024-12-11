@@ -29,7 +29,7 @@ import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.OK;
 
 /**
- * The "diag" goal.
+ * The "diag" goal. It should always run, despite it overrides configured goal support.
  */
 @Singleton
 @Named("diag")
@@ -40,8 +40,13 @@ public class Diag extends ConfiguredGoalSupport {
     }
 
     @Override
-    protected int doExecute(EncryptContext context) {
+    public int execute(EncryptContext context) {
         dumpResponse(context, "", secDispatcher.validateConfiguration());
         return OK;
+    }
+
+    @Override
+    protected int doExecute(EncryptContext context) throws Exception {
+        throw new IllegalStateException("Cannot reach here");
     }
 }

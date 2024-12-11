@@ -35,6 +35,7 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
+import org.apache.maven.logging.BuildEventListener;
 import org.jline.terminal.Terminal;
 import org.slf4j.ILoggerFactory;
 
@@ -85,6 +86,8 @@ public class LookupContext implements AutoCloseable {
     public Consumer<String> writer;
     public ContainerCapsule containerCapsule;
     public Lookup lookup;
+
+    public BuildEventListener buildEventListener;
 
     // paths user can override from CLI, and we need to set on MavenExReq
     public Path installationSettingsPath;

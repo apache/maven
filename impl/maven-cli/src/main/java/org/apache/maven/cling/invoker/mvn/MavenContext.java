@@ -22,7 +22,6 @@ import org.apache.maven.Maven;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
-import org.apache.maven.logging.BuildEventListener;
 
 @SuppressWarnings("VisibilityModifier")
 public class MavenContext extends LookupContext {
@@ -30,7 +29,6 @@ public class MavenContext extends LookupContext {
         super(invokerRequest);
     }
 
-    public BuildEventListener buildEventListener;
     public EventSpyDispatcher eventSpyDispatcher;
     public Maven maven;
 

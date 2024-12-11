@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -54,6 +55,9 @@ import static java.util.Objects.requireNonNull;
  * long as instance of this class is not closed. Subsequent execution requests over same installation home are cached.
  */
 public class EmbeddedMavenExecutor implements Executor {
+    protected static final Map<String, String> MAIN_CLASSES =
+            Map.of("mvn", "org.apache.maven.cling.MavenCling", "mvnenc", "org.apache.maven.cling.MavenEncCling");
+
     protected static final class Context {
         private final URLClassLoader bootClassLoader;
         private final String version;
@@ -62,7 +66,7 @@ public class EmbeddedMavenExecutor implements Executor {
         private final ClassLoader tccl;
         private final Function<ExecutorRequest, Integer> exec;
 
-        public Context(
+        private Context(
                 URLClassLoader bootClassLoader,
                 String version,
                 Object classWorld,
@@ -78,13 +82,38 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
+    protected static class Key {
+        private final Path installationDirectory;
+        private final String command;
+
+        private Key(Path installationDirectory, String command) {
+            this.installationDirectory = installationDirectory;
+            this.command = command;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Key key = (Key) o;
+            return Objects.equals(installationDirectory, key.installationDirectory)
+                    && Objects.equals(command, key.command);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(installationDirectory, command);
+        }
+    }
+
     protected final boolean cacheContexts;
     protected final AtomicBoolean closed;
     protected final PrintStream originalStdout;
     protected final PrintStream originalStderr;
     protected final Properties originalProperties;
     protected final ClassLoader originalClassLoader;
-    protected final ConcurrentHashMap<Path, Context> contexts;
+    protected final ConcurrentHashMap<Key, Context> contexts;
 
     public EmbeddedMavenExecutor() {
         this(true);
@@ -163,8 +192,10 @@ public class EmbeddedMavenExecutor implements Executor {
 
     protected Context mayCreate(ExecutorRequest executorRequest) {
         Path mavenHome = ExecutorRequest.getCanonicalPath(executorRequest.installationDirectory());
+        String command = executorRequest.command();
+        Key key = new Key(mavenHome, command);
         if (cacheContexts) {
-            return contexts.computeIfAbsent(mavenHome, k -> doCreate(mavenHome, executorRequest));
+            return contexts.computeIfAbsent(key, k -> doCreate(mavenHome, executorRequest));
         } else {
             return doCreate(mavenHome, executorRequest);
         }
@@ -174,7 +205,7 @@ public class EmbeddedMavenExecutor implements Executor {
         if (!Files.isDirectory(mavenHome)) {
             throw new IllegalArgumentException("Installation directory must point to existing directory");
         }
-        if (!Objects.equals(executorRequest.command(), ExecutorRequest.MVN)) {
+        if (!MAIN_CLASSES.containsKey(executorRequest.command())) {
             throw new IllegalArgumentException(
                     getClass().getSimpleName() + " does not support command " + executorRequest.command());
         }
@@ -220,6 +251,10 @@ public class EmbeddedMavenExecutor implements Executor {
 
             if (version.startsWith("3.")) {
                 // 3.x
+                if (!ExecutorRequest.MVN.equals(executorRequest.command())) {
+                    throw new IllegalArgumentException(getClass().getSimpleName() + "w/ mvn3 does not support command "
+                            + executorRequest.command());
+                }
                 Constructor<?> newMavenCli = cliClass.getConstructor(classWorld.getClass());
                 Object mavenCli = newMavenCli.newInstance(classWorld);
                 Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
@@ -284,7 +319,8 @@ public class EmbeddedMavenExecutor implements Executor {
         properties.setProperty("maven.home", mavenHome.toString());
         properties.setProperty(
                 "maven.multiModuleProjectDirectory", request.cwd().toString());
-        properties.setProperty("maven.mainClass", "org.apache.maven.cling.MavenCling");
+        String mainClass = requireNonNull(MAIN_CLASSES.get(request.command()), "mainClass");
+        properties.setProperty("maven.mainClass", mainClass);
         properties.setProperty(
                 "library.jline.path", mavenHome.resolve("lib/jline-native").toString());
         // TODO: is this needed?

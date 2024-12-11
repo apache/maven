@@ -92,14 +92,13 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
 
             return goal.execute(context);
         } catch (InterruptedException | InterruptedIOException | UserInterruptException e) {
-            context.terminal.writer().println("Goal canceled by user.");
+            context.logger.error("Goal canceled by user.");
             return CANCELED;
         } catch (Exception e) {
             if (context.invokerRequest.options().showErrors().orElse(false)) {
-                context.terminal.writer().println(e.getMessage());
-                e.printStackTrace(context.terminal.writer());
+                context.logger.error(e.getMessage(), e);
             } else {
-                context.terminal.writer().println(e.getMessage());
+                context.logger.error(e.getMessage());
             }
             return ERROR;
         } finally {
@@ -108,9 +107,9 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
     }
 
     protected int badGoalsErrorMessage(String message, EncryptContext context) {
-        context.terminal.writer().println(message);
-        context.terminal.writer().println("Supported goals are: " + String.join(", ", context.goals.keySet()));
-        context.terminal.writer().println("Use -h to display help.");
+        context.logger.error(message);
+        context.logger.error("Supported goals are: " + String.join(", ", context.goals.keySet()));
+        context.logger.error("Use -h to display help.");
         return BAD_OPERATION;
     }
 }

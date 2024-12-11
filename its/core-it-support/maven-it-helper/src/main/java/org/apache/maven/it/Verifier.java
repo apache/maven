@@ -92,7 +92,7 @@ public class Verifier {
 
     private final Path tempBasedir; // empty basedir for queries
 
-    private final Path userHomeDirectory;
+    private Path userHomeDirectory;
 
     private final List<String> defaultCliArguments;
 
@@ -101,6 +101,8 @@ public class Verifier {
     private final Map<String, String> environmentVariables = new HashMap<>();
 
     private final List<String> cliArguments = new ArrayList<>();
+
+    private String executable = ExecutorRequest.MVN;
 
     private boolean autoClean = true;
 
@@ -144,8 +146,16 @@ public class Verifier {
         }
     }
 
+    public void setUserHomeDirectory(Path userHomeDirectory) {
+        this.userHomeDirectory = requireNonNull(userHomeDirectory);
+    }
+
     public String getExecutable() {
-        return ExecutorRequest.MVN;
+        return executable;
+    }
+
+    public void setExecutable(String executable) {
+        this.executable = requireNonNull(executable);
     }
 
     public void execute() throws VerificationException {
@@ -221,6 +231,7 @@ public class Verifier {
         try {
             ExecutorRequest.Builder builder = executorHelper
                     .executorRequest()
+                    .command(executable)
                     .cwd(basedir)
                     .userHomeDirectory(userHomeDirectory)
                     .arguments(args);

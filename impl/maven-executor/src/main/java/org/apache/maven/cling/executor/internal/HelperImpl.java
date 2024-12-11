@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.annotations.Nullable;
@@ -112,8 +111,7 @@ public class HelperImpl implements ExecutorHelper {
     }
 
     private Executor getExecutorByRequest(ExecutorRequest request) {
-        if (Objects.equals(request.command(), ExecutorRequest.MVN)
-                && request.environmentVariables().orElse(Collections.emptyMap()).isEmpty()
+        if (request.environmentVariables().orElse(Collections.emptyMap()).isEmpty()
                 && request.jvmArguments().orElse(Collections.emptyList()).isEmpty()) {
             return getExecutor(Mode.EMBEDDED, request);
         } else {

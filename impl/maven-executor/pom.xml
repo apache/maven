@@ -35,7 +35,7 @@ under the License.
 
   <properties>
     <maven3version>3.9.9</maven3version>
-    <maven4version>4.0.0-rc-1</maven4version>
+    <maven4version>${project.version}</maven4version>
   </properties>
 
   <dependencies>
@@ -53,6 +53,14 @@ under the License.
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>apache-maven</artifactId>
+      <version>${project.version}</version>
+      <classifier>bin</classifier>
+      <type>zip</type>
       <scope>test</scope>
     </dependency>
   </dependencies>
