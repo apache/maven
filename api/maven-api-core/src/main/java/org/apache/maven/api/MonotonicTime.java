@@ -31,25 +31,33 @@ import java.time.temporal.TemporalQuery;
 import java.time.temporal.TemporalUnit;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.time.temporal.ValueRange;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Represents a point in time using both monotonic and wall clock measurements.
- * This class combines the monotonic precision of {@link System#nanoTime()} with
- * wall clock time from {@link Clock#systemUTC()#instant()}, providing accurate duration measurements
- * while maintaining human-readable timestamps.
+ * A time measurement class that combines monotonic timing with wall-clock time.
  * <p>
- * This class implements {@link Temporal} by delegating to its computed wall time,
- * allowing it to be used with standard Java time formatting and querying operations.
+ * This class provides precise duration measurements using {@link System#nanoTime()}
+ * while also maintaining wall-clock time information in UTC. The wall-clock time
+ * is computed from the monotonic duration since system start to ensure consistency
+ * between time measurements.
+ * <p>
+ * All wall-clock times are handled in UTC to maintain consistency and avoid
+ * timezone/DST complexities. Users needing local time representation should
+ * convert the result of {@link #getWallTime()} to their desired timezone:
+ * <pre>{@code
+ * MonotonicTime time = MonotonicTime.now();
+ * // Get local time with DST handling:
+ * ZonedDateTime local = time.getWallTime().atZone(ZoneId.systemDefault());
+ * }</pre>
  */
 public final class MonotonicTime implements Temporal {
 
     /**
      * Reference point representing the time when this class was first loaded.
-     * Can be used as a global start time for duration measurements.
+     * Uses UTC for wall-clock time representation.
      */
-    public static final MonotonicTime START = new MonotonicTime(System.nanoTime(), Clock.systemUTC().instant());
+    public static final MonotonicTime START =
+            new MonotonicTime(System.nanoTime(), Clock.systemUTC().instant());
 
     private final long nanoTime;
     private volatile Instant wallTime;
@@ -61,13 +69,34 @@ public final class MonotonicTime implements Temporal {
     }
 
     /**
-     * Creates a new {@code MonotonicTime} instance capturing the current time
-     * using both monotonic and wall clock measurements.
+     * Creates a new {@code MonotonicTime} instance capturing the current time.
+     * Wall-clock time will be computed in UTC when needed.
      *
      * @return a new {@code MonotonicTime} instance
      */
     public static MonotonicTime now() {
         return new MonotonicTime(System.nanoTime(), null);
+    }
+
+    /**
+     * Returns the raw monotonic time value from System.nanoTime().
+     * <p>
+     * This value represents a monotonic time measurement that can only be compared
+     * with other MonotonicTime instances obtained within the same JVM session.
+     * The absolute value has no meaning on its own and is not related to any epoch
+     * or wall clock time.
+     * <p>
+     * This value has nanosecond precision but not necessarily nanosecond accuracy -
+     * the actual precision depends on the underlying system.
+     * <p>
+     * For timing intervals, prefer using {@link #durationSince(MonotonicTime)} instead
+     * of manually calculating differences between nanoTime values.
+     *
+     * @return the raw nanosecond value from System.nanoTime()
+     * @see System#nanoTime()
+     */
+    public long getNanoTime() {
+        return nanoTime;
     }
 
     /**
@@ -92,35 +121,19 @@ public final class MonotonicTime implements Temporal {
     }
 
     /**
-     * Returns the raw monotonic time value from System.nanoTime().
+     * Returns the wall clock time for this instant, computed from START's wall time
+     * and the monotonic duration since START. The time is always in UTC.
      * <p>
-     * This value represents a monotonic time measurement that can only be compared
-     * with other MonotonicTime instances obtained within the same JVM session.
-     * The absolute value has no meaning on its own and is not related to any epoch or wall clock time.
-     * <p>
-     * This value has nanosecond precision but not necessarily nanosecond accuracy -
-     * the actual precision depends on the underlying system.
-     * <p>
-     * For timing intervals, prefer using {@link #durationSince(MonotonicTime)} instead of
-     * manually calculating differences between nanoTime values.
+     * For local time representation, convert the result using {@link Instant#atZone(ZoneId)}:
+     * <pre>{@code
+     * ZonedDateTime localTime = time.getWallTime().atZone(ZoneId.systemDefault());
+     * }</pre>
      *
-     * @return the raw nanosecond value from System.nanoTime()
-     * @see System#nanoTime()
-     */
-    public long getNanoTime() {
-        return nanoTime;
-    }
-
-    /**
-     * Returns the wall clock time for this instant.
-     * The time is computed lazily based on START's wall time and the monotonic duration since START.
-     *
-     * @return the {@link Instant} representing the wall clock time
+     * @return the {@link Instant} representing the UTC wall clock time
      */
     public Instant getWallTime() {
         Instant local = wallTime;
         if (local == null) {
-            // Double-checked locking pattern
             synchronized (this) {
                 local = wallTime;
                 if (local == null) {
@@ -167,49 +180,24 @@ public final class MonotonicTime implements Temporal {
     }
 
     @Override
-    public boolean isSupported(TemporalUnit unit) {
-        return unit instanceof ChronoUnit chronoUnit && chronoUnit.isTimeBased(); // This includes DAYS and below
-    }
-
-    @Override
     public long getLong(TemporalField field) {
         if (field == ChronoField.OFFSET_SECONDS) {
-            return 0; // We use UTC/Zero offset
+            return 0; // UTC has zero offset
         }
         return getWallTime().getLong(field);
     }
 
     @Override
+    public boolean isSupported(TemporalUnit unit) {
+        if (!(unit instanceof ChronoUnit chronoUnit)) {
+            return false;
+        }
+        return chronoUnit.isTimeBased() && !chronoUnit.isDurationEstimated();
+    }
+
+    @Override
     public Temporal with(TemporalField field, long newValue) {
         throw new UnsupportedTemporalTypeException("MonotonicTime does not support field adjustments");
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <R> R query(TemporalQuery<R> query) {
-        if (query == TemporalQueries.zoneId()) {
-            return (R) ZoneId.of("UTC");
-        }
-        if (query == TemporalQueries.precision()) {
-            return (R) ChronoUnit.NANOS;
-        }
-        if (query == TemporalQueries.zone()) {
-            return (R) ZoneId.of("UTC");  // Consistent with zoneId query
-        }
-        if (query == TemporalQueries.chronology()) {
-            return null;
-        }
-        return getWallTime().query(query);
-    }
-
-    @Override
-    public ValueRange range(TemporalField field) {
-        return getWallTime().range(field);
-    }
-
-    @Override
-    public Temporal plus(long amountToAdd, TemporalUnit unit) {
-        throw new UnsupportedTemporalTypeException("MonotonicTime does not support plus operations");
     }
 
     @Override
@@ -235,30 +223,49 @@ public final class MonotonicTime implements Temporal {
     }
 
     @Override
-    public int get(TemporalField field) {
-        return getWallTime().get(field);
+    public Temporal plus(long amountToAdd, TemporalUnit unit) {
+        throw new UnsupportedTemporalTypeException("MonotonicTime does not support plus operations");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <R> R query(TemporalQuery<R> query) {
+        if (query == TemporalQueries.zoneId()) {
+            return (R) ZoneId.of("UTC");
+        }
+        if (query == TemporalQueries.precision()) {
+            return (R) ChronoUnit.NANOS;
+        }
+        if (query == TemporalQueries.zone()) {
+            return (R) ZoneId.of("UTC");
+        }
+        if (query == TemporalQueries.chronology()) {
+            return null;
+        }
+        return getWallTime().query(query);
+    }
+
+    @Override
+    public ValueRange range(TemporalField field) {
+        if (field == ChronoField.OFFSET_SECONDS) {
+            return field.range();
+        }
+        return getWallTime().range(field);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof MonotonicTime)) {
+        if (!(obj instanceof MonotonicTime other)) {
             return false;
         }
-        MonotonicTime other = (MonotonicTime) obj;
         return other.nanoTime == this.nanoTime;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nanoTime);
+        return Long.hashCode(nanoTime);
     }
 
-    /**
-     * Returns a string representation of this time, including both the wall clock time
-     * and the duration since the Unix epoch.
-     *
-     * @return a string representation of this time
-     */
     @Override
     public String toString() {
         return String.format("MonotonicTime[wall=%s, duration=%s]", getWallTime(), Duration.ofNanos(nanoTime));
