@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl.resolver;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -78,7 +79,7 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
 
             snapshot = Snapshot.newBuilder()
                     .buildNumber(buildNumber != null ? buildNumber : getBuildNumber(recessive) + 1)
-                    .timestamp(utcDateFormatter.format(this.timestamp))
+                    .timestamp(utcDateFormatter.format(this.timestamp.atZone(ZoneOffset.UTC)))
                     .build();
 
             lastUpdated = fmt.format(timestamp);
