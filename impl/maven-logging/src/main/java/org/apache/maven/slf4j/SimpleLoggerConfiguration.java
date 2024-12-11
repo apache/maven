@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
@@ -116,7 +115,7 @@ public class SimpleLoggerConfiguration {
 
         if (dateTimeFormatStr != null) {
             try {
-                dateFormatter = DateTimeFormatter.ofPattern(dateTimeFormatStr).withZone(ZoneId.systemDefault());
+                dateFormatter = DateTimeFormatter.ofPattern(dateTimeFormatStr);
             } catch (IllegalArgumentException e) {
                 Reporter.error("Bad date format in " + CONFIGURATION_FILE + "; will output relative time", e);
             }

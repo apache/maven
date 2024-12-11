@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Map;
@@ -48,7 +47,7 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
     static DateTimeFormatter fmt;
 
     static {
-        fmt = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault());
+        fmt = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     }
 
     protected Metadata metadata;

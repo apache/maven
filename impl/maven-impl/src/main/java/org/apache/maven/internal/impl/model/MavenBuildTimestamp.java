@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl.model;
 
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
@@ -67,8 +66,7 @@ public class MavenBuildTimestamp {
         if (time == null) {
             time = MonotonicTime.now();
         }
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern(timestampFormat).withZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timestampFormat);
         formattedTimestamp = formatter.format(time);
     }
 

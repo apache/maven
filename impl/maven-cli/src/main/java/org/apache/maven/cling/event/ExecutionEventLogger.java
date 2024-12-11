@@ -21,6 +21,7 @@ package org.apache.maven.cling.event;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -276,7 +277,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
         logger.info("Total time:  {}{}", formatDuration(time), wallClock);
 
-        logger.info("Finished at: {}", formatTimestamp(finish));
+        logger.info("Finished at: {}", formatTimestamp(finish.getWallTime().atZone(ZoneId.systemDefault())));
     }
 
     @Override

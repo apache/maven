@@ -21,7 +21,6 @@ package org.apache.maven.cling.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
@@ -162,9 +161,7 @@ public final class CLIReportingUtils {
     }
 
     public static String formatTimestamp(TemporalAccessor instant) {
-        return DateTimeFormatter.ISO_OFFSET_DATE_TIME
-                .withZone(ZoneId.systemDefault())
-                .format(instant);
+        return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(instant);
     }
 
     public static String formatDuration(Duration duration) {

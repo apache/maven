@@ -263,4 +263,37 @@ class MonotonicTimeTest {
             assertThrows(UnsupportedTemporalTypeException.class, () -> time.plus(1, ChronoUnit.SECONDS));
         }
     }
+
+    @Nested
+    class CalendarFields {
+        @Test
+        void shouldSupportCalendarFields() {
+            MonotonicTime time = MonotonicTime.now();
+
+            // These fields are not supported by Instant but should work through ZonedDateTime conversion
+            assertDoesNotThrow(() -> time.getLong(ChronoField.YEAR_OF_ERA));
+            assertDoesNotThrow(() -> time.getLong(ChronoField.MONTH_OF_YEAR));
+            assertDoesNotThrow(() -> time.getLong(ChronoField.DAY_OF_MONTH));
+
+            // Verify actual values
+            ZonedDateTime expected = time.getWallTime().atZone(ZoneId.of("UTC"));
+            assertEquals(expected.getLong(ChronoField.YEAR_OF_ERA), time.getLong(ChronoField.YEAR_OF_ERA));
+            assertEquals(expected.getLong(ChronoField.MONTH_OF_YEAR), time.getLong(ChronoField.MONTH_OF_YEAR));
+            assertEquals(expected.getLong(ChronoField.DAY_OF_MONTH), time.getLong(ChronoField.DAY_OF_MONTH));
+        }
+
+        @Test
+        void shouldWorkWithDateTimeFormatter() {
+            MonotonicTime time = MonotonicTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+
+            // Should not throw
+            assertDoesNotThrow(() -> formatter.format(time));
+
+            // Should match UTC ZonedDateTime formatting
+            String expected = formatter.format(time.getWallTime().atZone(ZoneId.of("UTC")));
+            String actual = formatter.format(time);
+            assertEquals(expected, actual);
+        }
+    }
 }

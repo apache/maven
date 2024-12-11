@@ -184,6 +184,10 @@ public final class MonotonicTime implements Temporal {
         if (field == ChronoField.OFFSET_SECONDS) {
             return 0; // UTC has zero offset
         }
+        // Handle calendar fields by converting to ZonedDateTime
+        if (field instanceof ChronoField && !getWallTime().isSupported(field)) {
+            return getWallTime().atZone(ZoneId.of("UTC")).getLong(field);
+        }
         return getWallTime().getLong(field);
     }
 
