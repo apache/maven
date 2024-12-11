@@ -133,9 +133,13 @@ jobs:
             maven-${{ runner.os }}-full-
             maven-${{ runner.os }}-
 
+      - name: Build with downloaded Maven
+        shell: bash
+        run: mvn verify -e -B -V -Dmaven.repo.local=$HOME/.m2/repository/cached
+
       - name: Build site with downloaded Maven
         shell: bash
-        run: mvn verify site -e -B -V -Preporting -Dmaven.repo.local=$HOME/.m2/repository/cached
+        run: mvn site -e -B -V -Preporting -Dmaven.repo.local=$HOME/.m2/repository/cached
 
   integration-tests:
     needs: initial-build
