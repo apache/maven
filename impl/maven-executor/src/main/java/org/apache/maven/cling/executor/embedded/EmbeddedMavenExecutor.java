@@ -218,7 +218,8 @@ public class EmbeddedMavenExecutor implements Executor {
         Path boot = mavenHome.resolve("boot");
         Path m2conf = mavenHome.resolve("bin/m2.conf");
         if (!Files.isDirectory(boot) || !Files.isRegularFile(m2conf)) {
-            throw new IllegalArgumentException("Installation directory does not point to Maven installation");
+            throw new IllegalArgumentException(
+                    "Installation directory does not point to Maven installation: " + mavenHome);
         }
 
         Properties properties = prepareProperties(executorRequest);
