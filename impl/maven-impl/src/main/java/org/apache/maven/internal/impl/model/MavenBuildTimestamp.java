@@ -18,13 +18,14 @@
  */
 package org.apache.maven.internal.impl.model;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.MonotonicTime;
+import org.apache.maven.api.MonotonicClock;
 
 /**
  * MavenBuildTimestamp
@@ -36,33 +37,33 @@ public class MavenBuildTimestamp {
     private final String formattedTimestamp;
 
     public MavenBuildTimestamp() {
-        this(MonotonicTime.now());
+        this(MonotonicClock.now());
     }
 
-    public MavenBuildTimestamp(MonotonicTime time) {
+    public MavenBuildTimestamp(Instant time) {
         this(time, DEFAULT_BUILD_TIMESTAMP_FORMAT);
     }
 
-    public MavenBuildTimestamp(MonotonicTime time, Map<String, String> properties) {
+    public MavenBuildTimestamp(Instant time, Map<String, String> properties) {
         this(time, properties != null ? properties.get(Constants.MAVEN_BUILD_TIMESTAMP_FORMAT) : null);
     }
 
     /**
      *
-     * @deprecated Use {@link #MavenBuildTimestamp(MonotonicTime, Map)} or extract the format and pass it
-     *             to {@link #MavenBuildTimestamp(MonotonicTime, String)} instead.
+     * @deprecated Use {@link #MavenBuildTimestamp(Instant, Map)} or extract the format and pass it
+     *             to {@link #MavenBuildTimestamp(Instant, String)} instead.
      */
     @Deprecated
-    public MavenBuildTimestamp(MonotonicTime time, Properties properties) {
+    public MavenBuildTimestamp(Instant time, Properties properties) {
         this(time, properties != null ? properties.getProperty(Constants.MAVEN_BUILD_TIMESTAMP_FORMAT) : null);
     }
 
-    public MavenBuildTimestamp(MonotonicTime time, String timestampFormat) {
+    public MavenBuildTimestamp(Instant time, String timestampFormat) {
         if (timestampFormat == null) {
             timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
         }
         if (time == null) {
-            time = MonotonicTime.now();
+            time = MonotonicClock.now();
         }
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern(timestampFormat).withZone(ZoneId.of("UTC"));

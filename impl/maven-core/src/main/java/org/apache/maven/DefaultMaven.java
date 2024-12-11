@@ -38,7 +38,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.MonotonicTime;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Prerequisites;
@@ -194,7 +194,7 @@ public class DefaultMaven implements Maven {
     //
     @SuppressWarnings("checkstyle:methodlength")
     private MavenExecutionResult doExecute(MavenExecutionRequest request) {
-        request.setStartInstant(MonotonicTime.now());
+        request.setStartInstant(MonotonicClock.now());
 
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 

@@ -22,10 +22,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.api.MonotonicTime;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.ExecutionEvent;
@@ -165,13 +167,13 @@ public class BuilderCommon {
             final MavenSession currentSession,
             final MavenProject mavenProject,
             Throwable t,
-            final MonotonicTime buildStartTime) {
+            final Instant buildStartTime) {
         // record the error and mark the project as failed
-        MonotonicTime buildEndTime = MonotonicTime.now();
+        Instant buildEndTime = MonotonicClock.now();
         buildContext.getResult().addException(t);
         buildContext
                 .getResult()
-                .addBuildSummary(new BuildFailure(mavenProject, buildEndTime.durationSince(buildStartTime), t));
+                .addBuildSummary(new BuildFailure(mavenProject, Duration.between(buildStartTime, buildEndTime), t));
 
         // notify listeners about "soft" project build failures only
         if (t instanceof Exception && !(t instanceof RuntimeException)) {

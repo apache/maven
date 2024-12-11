@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.MonotonicTime;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -109,7 +109,7 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
         mavenExecutionRequest.setIgnoreMissingArtifactDescriptor(true);
         mavenExecutionRequest.setRecursive(true);
         mavenExecutionRequest.setReactorFailureBehavior(MavenExecutionRequest.REACTOR_FAIL_FAST);
-        mavenExecutionRequest.setStartInstant(MonotonicTime.now());
+        mavenExecutionRequest.setStartInstant(MonotonicClock.now());
         mavenExecutionRequest.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_INFO);
         mavenExecutionRequest.setDegreeOfConcurrency(1);
         mavenExecutionRequest.setBuilderId("singlethreaded");

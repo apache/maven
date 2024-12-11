@@ -22,10 +22,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.maven.api.MonotonicTime;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -82,7 +84,7 @@ public class LifecycleModuleBuilder {
             TaskSegment taskSegment) {
         session.setCurrentProject(currentProject);
 
-        MonotonicTime buildStartTime = MonotonicTime.now();
+        Instant buildStartTime = MonotonicClock.now();
 
         try {
 
@@ -107,14 +109,14 @@ public class LifecycleModuleBuilder {
                     new ProjectExecutionEvent(session, currentProject, mojoExecutions));
             mojoExecutor.execute(session, mojoExecutions);
 
-            MonotonicTime buildEndTime = MonotonicTime.now();
+            Instant buildEndTime = MonotonicClock.now();
 
             projectExecutionListener.afterProjectExecutionSuccess(
                     new ProjectExecutionEvent(session, currentProject, mojoExecutions));
 
             reactorContext
                     .getResult()
-                    .addBuildSummary(new BuildSuccess(currentProject, buildEndTime.durationSince(buildStartTime)));
+                    .addBuildSummary(new BuildSuccess(currentProject, Duration.between(buildStartTime, buildEndTime)));
 
             eventCatapult.fire(ExecutionEvent.Type.ProjectSucceeded, session, null);
         } catch (Throwable t) {

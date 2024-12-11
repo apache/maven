@@ -20,10 +20,10 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.metadata.Metadata;
@@ -56,12 +56,12 @@ final class PluginsMetadata extends MavenMetadata {
 
     private final PluginInfo pluginInfo;
 
-    PluginsMetadata(PluginInfo pluginInfo, MonotonicTime timestamp) {
+    PluginsMetadata(PluginInfo pluginInfo, Instant timestamp) {
         super(createRepositoryMetadata(pluginInfo), (Path) null, timestamp);
         this.pluginInfo = pluginInfo;
     }
 
-    PluginsMetadata(PluginInfo pluginInfo, Path path, MonotonicTime timestamp) {
+    PluginsMetadata(PluginInfo pluginInfo, Path path, Instant timestamp) {
         super(createRepositoryMetadata(pluginInfo), path, timestamp);
         this.pluginInfo = pluginInfo;
     }

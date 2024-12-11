@@ -26,11 +26,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.metadata.Metadata;
 import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.apache.maven.metadata.v4.MetadataStaxWriter;
@@ -47,23 +48,23 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
     static DateTimeFormatter fmt;
 
     static {
-        fmt = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        fmt = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneOffset.UTC);
     }
 
     protected Metadata metadata;
 
     private final Path path;
 
-    protected final MonotonicTime timestamp;
+    protected final Instant timestamp;
 
     private boolean merged;
 
     @Deprecated
-    protected MavenMetadata(Metadata metadata, File file, MonotonicTime timestamp) {
+    protected MavenMetadata(Metadata metadata, File file, Instant timestamp) {
         this(metadata, file != null ? file.toPath() : null, timestamp);
     }
 
-    protected MavenMetadata(Metadata metadata, Path path, MonotonicTime timestamp) {
+    protected MavenMetadata(Metadata metadata, Path path, Instant timestamp) {
         this.metadata = metadata;
         this.path = path;
         this.timestamp = timestamp;

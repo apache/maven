@@ -18,11 +18,11 @@
  */
 package org.apache.maven.project;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.eclipse.aether.RepositorySystemSession;
@@ -155,14 +155,14 @@ public interface ProjectBuildingRequest {
      *
      * @return The start time of the build or {@code null} if unknown.
      */
-    MonotonicTime getBuildStartInstant();
+    Instant getBuildStartInstant();
 
     /**
      * Sets the start time of the build.
      *
      * @param buildStartInstant The start time of the build, may be {@code null}.
      */
-    void setBuildStartInstant(MonotonicTime buildStartInstant);
+    void setBuildStartInstant(Instant buildStartInstant);
 
     RepositorySystemSession getRepositorySession();
 

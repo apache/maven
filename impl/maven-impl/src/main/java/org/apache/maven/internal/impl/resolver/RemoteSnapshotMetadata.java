@@ -20,12 +20,12 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.metadata.Metadata;
 import org.apache.maven.api.metadata.Snapshot;
 import org.apache.maven.api.metadata.SnapshotVersion;
@@ -42,12 +42,12 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
 
     private final Integer buildNumber;
 
-    RemoteSnapshotMetadata(Artifact artifact, MonotonicTime timestamp, Integer buildNumber) {
+    RemoteSnapshotMetadata(Artifact artifact, Instant timestamp, Integer buildNumber) {
         super(createRepositoryMetadata(artifact), null, timestamp);
         this.buildNumber = buildNumber;
     }
 
-    private RemoteSnapshotMetadata(Metadata metadata, Path path, MonotonicTime timestamp, Integer buildNumber) {
+    private RemoteSnapshotMetadata(Metadata metadata, Path path, Instant timestamp, Integer buildNumber) {
         super(metadata, path, timestamp);
         this.buildNumber = buildNumber;
     }

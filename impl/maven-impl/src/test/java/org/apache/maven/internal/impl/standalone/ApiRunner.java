@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl.standalone;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Lifecycle;
-import org.apache.maven.api.MonotonicTime;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
@@ -101,7 +102,7 @@ public class ApiRunner {
     static class DefaultSession extends AbstractSession {
 
         private final Map<String, String> systemProperties;
-        private final MonotonicTime startTime = MonotonicTime.now();
+        private final Instant startTime = MonotonicClock.now();
 
         DefaultSession(RepositorySystemSession session, RepositorySystem repositorySystem, Lookup lookup) {
             this(session, repositorySystem, Collections.emptyList(), null, lookup);
@@ -160,7 +161,7 @@ public class ApiRunner {
         }
 
         @Override
-        public MonotonicTime getStartTime() {
+        public Instant getStartTime() {
             return startTime;
         }
 

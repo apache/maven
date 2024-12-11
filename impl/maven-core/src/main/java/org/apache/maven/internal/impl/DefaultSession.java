@@ -19,6 +19,7 @@
 package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -145,7 +145,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
 
     @Nonnull
     @Override
-    public MonotonicTime getStartTime() {
+    public Instant getStartTime() {
         return getMavenSession().getRequest().getStartInstant();
     }
 

@@ -21,11 +21,12 @@ package org.apache.maven.cling.event;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.maven.api.MonotonicTime;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.execution.AbstractExecutionListener;
@@ -269,15 +270,15 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     private void logStats(MavenSession session) {
         infoLine('-');
 
-        MonotonicTime finish = MonotonicTime.now();
+        Instant finish = MonotonicClock.now();
 
-        Duration time = finish.durationSince(session.getRequest().getStartInstant());
+        Duration time = Duration.between(session.getRequest().getStartInstant(), finish);
 
         String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
 
         logger.info("Total time:  {}{}", formatDuration(time), wallClock);
 
-        logger.info("Finished at: {}", formatTimestamp(finish.getWallTime().atZone(ZoneId.systemDefault())));
+        logger.info("Finished at: {}", formatTimestamp(finish.atZone(ZoneId.systemDefault())));
     }
 
     @Override

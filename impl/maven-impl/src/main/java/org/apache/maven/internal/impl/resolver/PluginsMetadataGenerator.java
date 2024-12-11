@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl.resolver;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -30,7 +31,7 @@ import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import org.apache.maven.api.MonotonicTime;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.impl.resolver.PluginsMetadata.PluginInfo;
 import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
@@ -56,7 +57,7 @@ class PluginsMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, PluginsMetadata> processedPlugins;
 
-    private final MonotonicTime timestamp;
+    private final Instant timestamp;
 
     PluginsMetadataGenerator(RepositorySystemSession session, InstallRequest request) {
         this(session, request.getMetadata());
@@ -68,8 +69,7 @@ class PluginsMetadataGenerator implements MetadataGenerator {
 
     private PluginsMetadataGenerator(RepositorySystemSession session, Collection<? extends Metadata> metadatas) {
         this.processedPlugins = new LinkedHashMap<>();
-        this.timestamp =
-                (MonotonicTime) ConfigUtils.getObject(session, MonotonicTime.now(), "maven.startMonotonicTime");
+        this.timestamp = (Instant) ConfigUtils.getObject(session, MonotonicClock.now(), "mven.startInstant");
 
         /*
          * NOTE: This should be considered a quirk to support interop with Maven's legacy ArtifactDeployer which

@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl.model;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -35,7 +36,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
-import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
@@ -121,7 +121,7 @@ class DefaultModelInterpolatorTest {
         cal.set(Calendar.MONTH, Calendar.NOVEMBER);
         cal.set(Calendar.DATE, 11);
 
-        MonotonicTime firstTestDate = MonotonicTime.ofEpochMillis(cal.getTime().getTime());
+        Instant firstTestDate = Instant.ofEpochMilli(cal.getTime().getTime());
 
         cal.set(Calendar.HOUR, 11);
         cal.set(Calendar.AM_PM, Calendar.PM);
@@ -129,7 +129,7 @@ class DefaultModelInterpolatorTest {
         // just to make sure all the bases are covered...
         cal.set(Calendar.HOUR_OF_DAY, 23);
 
-        MonotonicTime secondTestDate = MonotonicTime.ofEpochMillis(cal.getTime().getTime());
+        Instant secondTestDate = Instant.ofEpochMilli(cal.getTime().getTime());
 
         DateTimeFormatter format = DateTimeFormatter.ofPattern(MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT)
                 .withZone(ZoneId.of("UTC"));
@@ -150,11 +150,11 @@ class DefaultModelInterpolatorTest {
         cal.set(Calendar.MONTH, Calendar.JUNE);
         cal.set(Calendar.DATE, 16);
 
-        MonotonicTime firstTestDate = MonotonicTime.ofEpochMillis(cal.getTime().getTime());
+        Instant firstTestDate = Instant.ofEpochMilli(cal.getTime().getTime());
 
         cal.set(Calendar.MONTH, Calendar.NOVEMBER);
 
-        MonotonicTime secondTestDate = MonotonicTime.ofEpochMillis(cal.getTime().getTime());
+        Instant secondTestDate = Instant.ofEpochMilli(cal.getTime().getTime());
 
         DateTimeFormatter format = DateTimeFormatter.ofPattern(MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT)
                 .withZone(ZoneId.of("UTC"));

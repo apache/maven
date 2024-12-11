@@ -19,6 +19,7 @@
 package org.apache.maven.api;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public interface ProtoSession {
      * @return the start time as an Instant object, never {@code null}
      */
     @Nonnull
-    MonotonicTime getStartTime();
+    Instant getStartTime();
 
     /**
      * Gets the directory of the topmost project being built, usually the current directory or the
@@ -105,13 +106,13 @@ public interface ProtoSession {
      * Returns new builder from scratch.
      */
     static Builder newBuilder() {
-        return new Builder().withStartTime(MonotonicTime.now());
+        return new Builder().withStartTime(MonotonicClock.now());
     }
 
     class Builder {
         private Map<String, String> userProperties;
         private Map<String, String> systemProperties;
-        private MonotonicTime startTime;
+        private Instant startTime;
         private Path topDirectory;
         private Path rootDirectory;
 
@@ -120,7 +121,7 @@ public interface ProtoSession {
         private Builder(
                 Map<String, String> userProperties,
                 Map<String, String> systemProperties,
-                MonotonicTime startTime,
+                Instant startTime,
                 Path topDirectory,
                 Path rootDirectory) {
             this.userProperties = userProperties;
@@ -140,7 +141,7 @@ public interface ProtoSession {
             return this;
         }
 
-        public Builder withStartTime(@Nonnull MonotonicTime startTime) {
+        public Builder withStartTime(@Nonnull Instant startTime) {
             this.startTime = requireNonNull(startTime, "startTime");
             return this;
         }
@@ -162,14 +163,14 @@ public interface ProtoSession {
         private static class Impl implements ProtoSession {
             private final Map<String, String> userProperties;
             private final Map<String, String> systemProperties;
-            private final MonotonicTime startTime;
+            private final Instant startTime;
             private final Path topDirectory;
             private final Path rootDirectory;
 
             private Impl(
                     Map<String, String> userProperties,
                     Map<String, String> systemProperties,
-                    MonotonicTime startTime,
+                    Instant startTime,
                     Path topDirectory,
                     Path rootDirectory) {
                 this.userProperties = requireNonNull(userProperties);
@@ -190,7 +191,7 @@ public interface ProtoSession {
             }
 
             @Override
-            public MonotonicTime getStartTime() {
+            public Instant getStartTime() {
                 return startTime;
             }
 

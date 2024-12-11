@@ -20,12 +20,12 @@ package org.apache.maven.execution;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -112,9 +112,9 @@ public interface MavenExecutionRequest {
     @Deprecated
     Date getStartTime();
 
-    MavenExecutionRequest setStartInstant(MonotonicTime start);
+    MavenExecutionRequest setStartInstant(Instant start);
 
-    MonotonicTime getStartInstant();
+    Instant getStartInstant();
 
     // Goals
     MavenExecutionRequest setGoals(List<String> goals);

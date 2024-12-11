@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
-import org.apache.maven.api.MonotonicTime;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.xml.XmlNode;
@@ -906,27 +907,27 @@ public class BuildPlanExecutor {
     }
 
     protected static class Clock {
-        MonotonicTime start;
-        MonotonicTime end;
-        MonotonicTime resumed;
+        Instant start;
+        Instant end;
+        Instant resumed;
         Duration exec = Duration.ZERO;
 
         protected void start() {
             if (start == null) {
-                start = MonotonicTime.now();
+                start = MonotonicClock.now();
                 resumed = start;
             } else {
-                resumed = MonotonicTime.now();
+                resumed = MonotonicClock.now();
             }
         }
 
         protected void stop() {
-            end = MonotonicTime.now();
-            exec = exec.plus(end.durationSince(resumed));
+            end = MonotonicClock.now();
+            exec = exec.plus(Duration.between(resumed, end));
         }
 
         protected Duration wallTime() {
-            return end.durationSince(start);
+            return Duration.between(start, end);
         }
 
         protected Duration execTime() {

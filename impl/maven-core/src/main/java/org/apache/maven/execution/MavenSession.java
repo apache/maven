@@ -20,6 +20,7 @@ package org.apache.maven.execution;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
@@ -251,7 +251,7 @@ public class MavenSession implements Cloneable {
         return request.getStartTime();
     }
 
-    public MonotonicTime getStartInstant() {
+    public Instant getStartInstant() {
         return request.getStartInstant();
     }
 
