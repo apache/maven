@@ -36,6 +36,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
 import org.apache.maven.model.v4.MavenStaxWriter;
@@ -57,10 +58,6 @@ import org.eclipse.sisu.PreDestroy;
 @Named("consumer-pom")
 class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransformer {
 
-    private static final String CONSUMER_POM_CLASSIFIER = "consumer";
-
-    private static final String BUILD_POM_CLASSIFIER = "build";
-
     private static final String NAMESPACE_FORMAT = "http://maven.apache.org/POM/%s";
 
     private static final String SCHEMA_LOCATION_FORMAT = "https://maven.apache.org/xsd/maven-%s.xsd";
@@ -80,7 +77,8 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
             // If there is no build POM there is no reason to inject artifacts for the consumer POM.
             return;
         }
-        if (Features.consumerPom(session.getUserProperties())) {
+        boolean isModel40 = ModelBuilder.MODEL_VERSION_4_0_0.equals(project.getModelVersion());
+        if (Features.consumerPom(session.getUserProperties(), !isModel40)) {
             Path buildDir =
                     project.getBuild() != null ? Paths.get(project.getBuild().getDirectory()) : null;
             if (buildDir != null) {
@@ -133,14 +131,14 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
     }
 
     public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
-        if (Features.consumerPom(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
+        if (consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
         }
         return request;
     }
 
     public DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
-        if (Features.consumerPom(session.getUserProperties()) && consumerPomPresent(request.getArtifacts())) {
+        if (consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
         }
         return request;

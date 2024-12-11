@@ -43,7 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.eventspy.EventSpy;
@@ -415,15 +414,6 @@ class ReactorReader implements MavenWorkspaceReader {
     private void installIntoProjectLocalRepository(Artifact artifact) {
         String extension = artifact.getExtension();
         String classifier = artifact.getClassifier();
-        if (Features.consumerPom(session.getUserProperties())) {
-            if ("pom".equals(extension)) {
-                if (classifier == null || classifier.isEmpty()) {
-                    classifier = "build";
-                } else if (classifier.equals("consumer")) {
-                    classifier = null;
-                }
-            }
-        }
 
         Path target = getArtifactPath(
                 artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), classifier, extension);
