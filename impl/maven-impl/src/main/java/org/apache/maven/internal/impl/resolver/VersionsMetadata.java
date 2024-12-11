@@ -22,10 +22,10 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.metadata.Metadata;
 import org.apache.maven.api.metadata.Versioning;
 import org.eclipse.aether.artifact.Artifact;
@@ -38,12 +38,12 @@ final class VersionsMetadata extends MavenMetadata {
 
     private final Artifact artifact;
 
-    VersionsMetadata(Artifact artifact, Date timestamp) {
+    VersionsMetadata(Artifact artifact, MonotonicTime timestamp) {
         super(createRepositoryMetadata(artifact), (Path) null, timestamp);
         this.artifact = artifact;
     }
 
-    VersionsMetadata(Artifact artifact, Path path, Date timestamp) {
+    VersionsMetadata(Artifact artifact, Path path, MonotonicTime timestamp) {
         super(createRepositoryMetadata(artifact), path, timestamp);
         this.artifact = artifact;
     }

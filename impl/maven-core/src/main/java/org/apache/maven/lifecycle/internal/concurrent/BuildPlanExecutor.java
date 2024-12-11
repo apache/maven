@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,13 +35,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.xml.XmlNode;
@@ -905,31 +906,31 @@ public class BuildPlanExecutor {
     }
 
     protected static class Clock {
-        long start;
-        long end;
-        long resumed;
-        long exec;
+        MonotonicTime start;
+        MonotonicTime end;
+        MonotonicTime resumed;
+        Duration exec = Duration.ZERO;
 
         protected void start() {
-            if (start == 0) {
-                start = System.nanoTime();
+            if (start == null) {
+                start = MonotonicTime.now();
                 resumed = start;
             } else {
-                resumed = System.nanoTime();
+                resumed = MonotonicTime.now();
             }
         }
 
         protected void stop() {
-            end = System.nanoTime();
-            exec += end - resumed;
+            end = MonotonicTime.now();
+            exec = exec.plus(end.durationSince(resumed));
         }
 
-        protected long wallTime() {
-            return TimeUnit.NANOSECONDS.toMillis(end - start);
+        protected Duration wallTime() {
+            return end.durationSince(start);
         }
 
-        protected long execTime() {
-            return TimeUnit.NANOSECONDS.toMillis(exec);
+        protected Duration execTime() {
+            return exec;
         }
     }
 }

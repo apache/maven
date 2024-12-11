@@ -18,10 +18,10 @@
  */
 package org.apache.maven.internal.impl.model;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.api.MonotonicTime;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,7 +31,7 @@ class MavenBuildTimestampTest {
     void testMavenBuildTimestampUsesUTC() {
         Map<String, String> interpolationProperties = new HashMap<>();
         interpolationProperties.put("maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'");
-        MavenBuildTimestamp timestamp = new MavenBuildTimestamp(Instant.now(), interpolationProperties);
+        MavenBuildTimestamp timestamp = new MavenBuildTimestamp(MonotonicTime.now(), interpolationProperties);
         String formattedTimestamp = timestamp.formattedTimestamp();
         assertTrue(formattedTimestamp.endsWith("Z"), "We expect the UTC marker at the end of the timestamp.");
     }

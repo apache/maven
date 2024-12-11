@@ -22,8 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 import org.apache.maven.slf4j.OutputChoice.OutputChoiceType;
@@ -56,7 +56,7 @@ public class SimpleLoggerConfiguration {
     private static final String DATE_TIME_FORMAT_STR_DEFAULT = null;
     private static String dateTimeFormatStr = DATE_TIME_FORMAT_STR_DEFAULT;
 
-    DateFormat dateFormatter = null;
+    DateTimeFormatter dateFormatter = null;
 
     private static final boolean SHOW_THREAD_NAME_DEFAULT = true;
     boolean showThreadName = SHOW_THREAD_NAME_DEFAULT;
@@ -116,7 +116,7 @@ public class SimpleLoggerConfiguration {
 
         if (dateTimeFormatStr != null) {
             try {
-                dateFormatter = new SimpleDateFormat(dateTimeFormatStr);
+                dateFormatter = DateTimeFormatter.ofPattern(dateTimeFormatStr).withZone(ZoneId.systemDefault());
             } catch (IllegalArgumentException e) {
                 Reporter.error("Bad date format in " + CONFIGURATION_FILE + "; will output relative time", e);
             }

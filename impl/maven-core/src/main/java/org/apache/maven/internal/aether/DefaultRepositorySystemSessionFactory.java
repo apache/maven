@@ -168,6 +168,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         configProps.put(ConfigurationProperties.USER_AGENT, getUserAgent());
         configProps.put(ConfigurationProperties.INTERACTIVE, request.isInteractiveMode());
         configProps.put("maven.startTime", request.getStartTime());
+        configProps.put("maven.startMonotonicTime", request.getStartInstant());
 
         sessionBuilder.setOffline(request.isOffline());
         sessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());

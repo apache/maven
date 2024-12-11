@@ -21,8 +21,8 @@ package org.apache.maven.internal.impl.resolver;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
+import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.metadata.Metadata;
 import org.eclipse.aether.artifact.Artifact;
 
@@ -33,7 +33,7 @@ abstract class MavenSnapshotMetadata extends MavenMetadata {
 
     protected final Collection<Artifact> artifacts = new ArrayList<>();
 
-    protected MavenSnapshotMetadata(Metadata metadata, Path path, Date timestamp) {
+    protected MavenSnapshotMetadata(Metadata metadata, Path path, MonotonicTime timestamp) {
         super(metadata, path, timestamp);
     }
 

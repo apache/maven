@@ -22,10 +22,10 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.metadata.Metadata;
 import org.apache.maven.api.metadata.Snapshot;
 import org.apache.maven.api.metadata.SnapshotVersion;
@@ -39,11 +39,11 @@ final class LocalSnapshotMetadata extends MavenMetadata {
 
     private final Collection<Artifact> artifacts = new ArrayList<>();
 
-    LocalSnapshotMetadata(Artifact artifact, Date timestamp) {
+    LocalSnapshotMetadata(Artifact artifact, MonotonicTime timestamp) {
         super(createMetadata(artifact), (Path) null, timestamp);
     }
 
-    LocalSnapshotMetadata(Metadata metadata, Path path, Date timestamp) {
+    LocalSnapshotMetadata(Metadata metadata, Path path, MonotonicTime timestamp) {
         super(metadata, path, timestamp);
     }
 

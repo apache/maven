@@ -20,11 +20,11 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.MonotonicTime;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.deployment.DeployRequest;
@@ -41,12 +41,12 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, RemoteSnapshotMetadata> snapshots;
 
-    private final Date timestamp;
+    private final MonotonicTime timestamp;
 
     private final Integer buildNumber;
 
     RemoteSnapshotMetadataGenerator(RepositorySystemSession session, DeployRequest request) {
-        timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
+        timestamp = (MonotonicTime) ConfigUtils.getObject(session, MonotonicTime.now(), "maven.startMonotonicTime");
         Object bn = ConfigUtils.getObject(session, null, Constants.MAVEN_DEPLOY_SNAPSHOT_BUILD_NUMBER);
         if (bn instanceof Integer) {
             this.buildNumber = (Integer) bn;

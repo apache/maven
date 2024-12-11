@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -39,6 +38,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Prerequisites;
@@ -194,7 +194,7 @@ public class DefaultMaven implements Maven {
     //
     @SuppressWarnings("checkstyle:methodlength")
     private MavenExecutionResult doExecute(MavenExecutionRequest request) {
-        request.setStartTime(new Date());
+        request.setStartInstant(MonotonicTime.now());
 
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 

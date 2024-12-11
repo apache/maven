@@ -20,11 +20,11 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.maven.api.MonotonicTime;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.deployment.DeployRequest;
@@ -44,7 +44,7 @@ class VersionsMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, VersionsMetadata> processedVersions;
 
-    private final Date timestamp;
+    private final MonotonicTime timestamp;
 
     VersionsMetadataGenerator(RepositorySystemSession session, InstallRequest request) {
         this(session, request.getMetadata());
@@ -57,7 +57,7 @@ class VersionsMetadataGenerator implements MetadataGenerator {
     private VersionsMetadataGenerator(RepositorySystemSession session, Collection<? extends Metadata> metadatas) {
         versions = new LinkedHashMap<>();
         processedVersions = new LinkedHashMap<>();
-        timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
+        timestamp = (MonotonicTime) ConfigUtils.getObject(session, MonotonicTime.now(), "maven.startMonotonicTime");
 
         /*
          * NOTE: This should be considered a quirk to support interop with Maven's legacy ArtifactDeployer which

@@ -20,8 +20,10 @@ package org.apache.maven.cling.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -105,23 +107,13 @@ public final class CLIReportingUtils {
      * @return Readable build info
      */
     public static String createMavenVersionString(Properties buildProperties) {
-        String timestamp = reduce(buildProperties.getProperty("timestamp"));
         String version = reduce(buildProperties.getProperty(BUILD_VERSION_PROPERTY));
         String rev = reduce(buildProperties.getProperty("buildNumber"));
         String distributionName = reduce(buildProperties.getProperty("distributionName"));
 
-        String msg = distributionName + " ";
-        msg += (version != null ? version : "<version unknown>");
-        if (rev != null || timestamp != null) {
-            msg += " (";
-            msg += (rev != null ? rev : "");
-            if (timestamp != null && !timestamp.isEmpty()) {
-                String ts = formatTimestamp(Long.parseLong(timestamp));
-                msg += (rev != null ? "; " : "") + ts;
-            }
-            msg += ")";
-        }
-        return msg;
+        return distributionName + " "
+                + (version != null ? version : "<version unknown>")
+                + (rev != null ? " (" + rev + ")" : "");
     }
 
     private static String reduce(String s) {
@@ -169,35 +161,27 @@ public final class CLIReportingUtils {
         }
     }
 
-    public static String formatTimestamp(long timestamp) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-        return sdf.format(new Date(timestamp));
+    public static String formatTimestamp(TemporalAccessor instant) {
+        return DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                .withZone(ZoneId.systemDefault())
+                .format(instant);
     }
 
-    public static String formatDuration(long duration) {
-        // CHECKSTYLE_OFF: MagicNumber
-        long ms = duration % 1000;
-        long s = (duration / ONE_SECOND) % 60;
-        long m = (duration / ONE_MINUTE) % 60;
-        long h = (duration / ONE_HOUR) % 24;
-        long d = duration / ONE_DAY;
-        // CHECKSTYLE_ON: MagicNumber
+    public static String formatDuration(Duration duration) {
+        long days = duration.toDays();
+        long hours = duration.toHoursPart();
+        long minutes = duration.toMinutesPart();
+        long seconds = duration.toSecondsPart();
+        long millis = duration.toMillisPart();
 
-        String format;
-        if (d > 0) {
-            // Length 11+ chars
-            format = "%d d %02d:%02d h";
-        } else if (h > 0) {
-            // Length 7 chars
-            format = "%2$02d:%3$02d h";
-        } else if (m > 0) {
-            // Length 9 chars
-            format = "%3$02d:%4$02d min";
+        if (days > 0) {
+            return String.format("%d d %02d:%02d h", days, hours, minutes);
+        } else if (hours > 0) {
+            return String.format("%02d:%02d h", hours, minutes);
+        } else if (minutes > 0) {
+            return String.format("%02d:%02d min", minutes, seconds);
         } else {
-            // Length 7-8 chars
-            format = "%4$d.%5$03d s";
+            return String.format("%d.%03d s", seconds, millis);
         }
-
-        return String.format(format, d, h, m, s, ms);
     }
 }

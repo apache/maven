@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
+import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -59,7 +60,7 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
 
     private Properties userProperties;
 
-    private Date buildStartTime;
+    private MonotonicTime buildStartTime;
 
     private boolean resolveDependencies;
 
@@ -261,11 +262,21 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         return profiles;
     }
 
+    @Deprecated
     public Date getBuildStartTime() {
-        return buildStartTime;
+        return buildStartTime != null ? new Date(buildStartTime.getWallTime().toEpochMilli()) : null;
     }
 
+    @Deprecated
     public void setBuildStartTime(Date buildStartTime) {
+        setBuildStartInstant(buildStartTime != null ? MonotonicTime.ofEpochMillis(buildStartTime.getTime()) : null);
+    }
+
+    public MonotonicTime getBuildStartInstant() {
+        return this.buildStartTime;
+    }
+
+    public void setBuildStartInstant(MonotonicTime buildStartTime) {
         this.buildStartTime = buildStartTime;
     }
 

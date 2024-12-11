@@ -18,6 +18,8 @@
  */
 package org.apache.maven.execution;
 
+import java.time.Duration;
+
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -33,7 +35,17 @@ public class BuildSuccess extends BuildSummary {
      * @param time The build time of the project in milliseconds.
      */
     public BuildSuccess(MavenProject project, long time) {
-        super(project, time, time);
+        this(project, Duration.ofMillis(time));
+    }
+
+    /**
+     * Creates a new build summary for the specified project.
+     *
+     * @param project The project being summarized, must not be {@code null}.
+     * @param time The build time of the project in milliseconds.
+     */
+    public BuildSuccess(MavenProject project, Duration time) {
+        this(project, time, time);
     }
 
     /**
@@ -43,7 +55,7 @@ public class BuildSuccess extends BuildSummary {
      * @param wallTime The wall time of the project in milliseconds.
      * @param execTime The exec time of the project in milliseconds.
      */
-    public BuildSuccess(MavenProject project, long wallTime, long execTime) {
+    public BuildSuccess(MavenProject project, Duration wallTime, Duration execTime) {
         super(project, wallTime, execTime);
     }
 }

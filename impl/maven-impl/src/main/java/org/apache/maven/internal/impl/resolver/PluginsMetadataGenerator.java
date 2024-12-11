@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,6 +30,7 @@ import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.impl.resolver.PluginsMetadata.PluginInfo;
 import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
@@ -56,7 +56,7 @@ class PluginsMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, PluginsMetadata> processedPlugins;
 
-    private final Date timestamp;
+    private final MonotonicTime timestamp;
 
     PluginsMetadataGenerator(RepositorySystemSession session, InstallRequest request) {
         this(session, request.getMetadata());
@@ -68,7 +68,8 @@ class PluginsMetadataGenerator implements MetadataGenerator {
 
     private PluginsMetadataGenerator(RepositorySystemSession session, Collection<? extends Metadata> metadatas) {
         this.processedPlugins = new LinkedHashMap<>();
-        this.timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
+        this.timestamp =
+                (MonotonicTime) ConfigUtils.getObject(session, MonotonicTime.now(), "maven.startMonotonicTime");
 
         /*
          * NOTE: This should be considered a quirk to support interop with Maven's legacy ArtifactDeployer which

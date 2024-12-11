@@ -18,15 +18,14 @@
  */
 package org.apache.maven.internal.impl.model;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.MonotonicTime;
 
 /**
  * MavenBuildTimestamp
@@ -40,38 +39,37 @@ public class MavenBuildTimestamp {
     private final String formattedTimestamp;
 
     public MavenBuildTimestamp() {
-        this(Instant.now());
+        this(MonotonicTime.now());
     }
 
-    public MavenBuildTimestamp(Instant time) {
+    public MavenBuildTimestamp(MonotonicTime time) {
         this(time, DEFAULT_BUILD_TIMESTAMP_FORMAT);
     }
 
-    public MavenBuildTimestamp(Instant time, Map<String, String> properties) {
+    public MavenBuildTimestamp(MonotonicTime time, Map<String, String> properties) {
         this(time, properties != null ? properties.get(Constants.MAVEN_BUILD_TIMESTAMP_FORMAT) : null);
     }
 
     /**
      *
-     * @deprecated Use {@link #MavenBuildTimestamp(Instant, Map)} or extract the format and pass it
-     *             to {@link #MavenBuildTimestamp(Instant, String)} instead.
+     * @deprecated Use {@link #MavenBuildTimestamp(MonotonicTime, Map)} or extract the format and pass it
+     *             to {@link #MavenBuildTimestamp(MonotonicTime, String)} instead.
      */
     @Deprecated
-    public MavenBuildTimestamp(Instant time, Properties properties) {
+    public MavenBuildTimestamp(MonotonicTime time, Properties properties) {
         this(time, properties != null ? properties.getProperty(Constants.MAVEN_BUILD_TIMESTAMP_FORMAT) : null);
     }
 
-    public MavenBuildTimestamp(Instant time, String timestampFormat) {
+    public MavenBuildTimestamp(MonotonicTime time, String timestampFormat) {
         if (timestampFormat == null) {
             timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
         }
         if (time == null) {
-            time = Instant.now();
+            time = MonotonicTime.now();
         }
-        SimpleDateFormat dateFormat = new SimpleDateFormat(timestampFormat);
-        dateFormat.setCalendar(new GregorianCalendar());
-        dateFormat.setTimeZone(DEFAULT_BUILD_TIME_ZONE);
-        formattedTimestamp = dateFormat.format(new Date(time.toEpochMilli()));
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern(timestampFormat).withZone(ZoneId.systemDefault());
+        formattedTimestamp = formatter.format(time);
     }
 
     public String formattedTimestamp() {
