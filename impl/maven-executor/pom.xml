@@ -72,7 +72,17 @@ under the License.
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>prepare-maven-distros</id>
+            <id>prepare-maven4-distro</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <phase>generate-test-resources</phase>
+            <configuration>
+              <includeArtifactIds>apache-maven</includeArtifactIds>
+            </configuration>
+          </execution>
+          <execution>
+            <id>prepare-maven3-distro</id>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -86,13 +96,7 @@ under the License.
                   <classifier>bin</classifier>
                   <type>zip</type>
                 </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.maven</groupId>
-                  <artifactId>apache-maven</artifactId>
-                  <version>${maven4version}</version>
-                  <classifier>bin</classifier>
-                  <type>zip</type>
-                </artifactItem>
+
               </artifactItems>
             </configuration>
           </execution>
