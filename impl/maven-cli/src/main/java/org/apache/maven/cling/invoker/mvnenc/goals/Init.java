@@ -65,18 +65,6 @@ public class Init extends InteractiveGoalSupport {
 
     @Override
     public int doExecute(EncryptContext context) throws Exception {
-        context.addInHeader(context.style.italic().bold().foreground(Colors.rgbColor("yellow")), "goal: init");
-        context.addInHeader("");
-
-        ConsolePrompt.UiConfig promptConfig;
-        if (OSUtils.IS_WINDOWS) {
-            promptConfig = new ConsolePrompt.UiConfig(">", "( )", "(x)", "( )");
-        } else {
-            promptConfig = new ConsolePrompt.UiConfig("❯", "◯ ", "◉ ", "◯ ");
-        }
-        promptConfig.setCancellableFirstPrompt(true);
-        ConsolePrompt prompt = new ConsolePrompt(context.reader, context.terminal, promptConfig);
-
         EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
         boolean force = options.force().orElse(false);
         boolean yes = options.yes().orElse(false);
@@ -91,6 +79,18 @@ public class Init extends InteractiveGoalSupport {
                                             "Error: configuration exist. Use --force if you want to reset existing configuration."));
             return BAD_OPERATION;
         }
+
+        context.addInHeader(context.style.italic().bold().foreground(Colors.rgbColor("yellow")), "goal: init");
+        context.addInHeader("");
+
+        ConsolePrompt.UiConfig promptConfig;
+        if (OSUtils.IS_WINDOWS) {
+            promptConfig = new ConsolePrompt.UiConfig(">", "( )", "(x)", "( )");
+        } else {
+            promptConfig = new ConsolePrompt.UiConfig("❯", "◯ ", "◉ ", "◯ ");
+        }
+        promptConfig.setCancellableFirstPrompt(true);
+        ConsolePrompt prompt = new ConsolePrompt(context.reader, context.terminal, promptConfig);
 
         SettingsSecurity config = secDispatcher.readConfiguration(true);
 
