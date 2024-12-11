@@ -118,6 +118,11 @@ jobs:
           mkdir -p maven-local
           if [ "${{ runner.os }}" = "Windows" ]; then
             unzip maven-dist/apache-maven-*-bin.zip -d maven-local
+            # Get the name of the extracted directory
+            MAVEN_DIR=$(ls maven-local)
+            # Move contents up one level
+            mv "maven-local/$MAVEN_DIR"/* maven-local/
+            rm -r "maven-local/$MAVEN_DIR"
           else
             tar xzf maven-dist/apache-maven-*-bin.tar.gz -C maven-local --strip-components 1
           fi
