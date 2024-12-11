@@ -20,13 +20,10 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.maven.api.MonotonicTime;
 import org.apache.maven.api.metadata.Metadata;
@@ -40,8 +37,6 @@ import org.eclipse.aether.artifact.Artifact;
  */
 final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
     public static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
-
-    public static final TimeZone DEFAULT_SNAPSHOT_TIME_ZONE = TimeZone.getTimeZone("Etc/UTC");
 
     private final Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
@@ -79,9 +74,7 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
         String lastUpdated;
 
         if (metadata.getVersioning() == null) {
-            DateFormat utcDateFormatter = new SimpleDateFormat(DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT);
-            utcDateFormatter.setCalendar(new GregorianCalendar());
-            utcDateFormatter.setTimeZone(DEFAULT_SNAPSHOT_TIME_ZONE);
+            DateTimeFormatter utcDateFormatter = DateTimeFormatter.ofPattern(DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT);
 
             snapshot = Snapshot.newBuilder()
                     .buildNumber(buildNumber != null ? buildNumber : getBuildNumber(recessive) + 1)

@@ -18,10 +18,10 @@
  */
 package org.apache.maven.internal.impl.model;
 
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicTime;
@@ -32,8 +32,6 @@ import org.apache.maven.api.MonotonicTime;
 public class MavenBuildTimestamp {
     // ISO 8601-compliant timestamp for machine readability
     public static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
-
-    public static final TimeZone DEFAULT_BUILD_TIME_ZONE = TimeZone.getTimeZone("Etc/UTC");
 
     private final String formattedTimestamp;
 
@@ -66,7 +64,8 @@ public class MavenBuildTimestamp {
         if (time == null) {
             time = MonotonicTime.now();
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timestampFormat);
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern(timestampFormat).withZone(ZoneId.of("UTC"));
         formattedTimestamp = formatter.format(time);
     }
 
