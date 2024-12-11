@@ -96,7 +96,6 @@ under the License.
                   <classifier>bin</classifier>
                   <type>zip</type>
                 </artifactItem>
-
               </artifactItems>
             </configuration>
           </execution>
