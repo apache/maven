@@ -20,7 +20,7 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -56,12 +56,12 @@ final class PluginsMetadata extends MavenMetadata {
 
     private final PluginInfo pluginInfo;
 
-    PluginsMetadata(PluginInfo pluginInfo, Date timestamp) {
+    PluginsMetadata(PluginInfo pluginInfo, Instant timestamp) {
         super(createRepositoryMetadata(pluginInfo), (Path) null, timestamp);
         this.pluginInfo = pluginInfo;
     }
 
-    PluginsMetadata(PluginInfo pluginInfo, Path path, Date timestamp) {
+    PluginsMetadata(PluginInfo pluginInfo, Path path, Instant timestamp) {
         super(createRepositoryMetadata(pluginInfo), path, timestamp);
         this.pluginInfo = pluginInfo;
     }

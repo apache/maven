@@ -20,14 +20,12 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.maven.api.metadata.Metadata;
 import org.apache.maven.api.metadata.Snapshot;
@@ -41,18 +39,16 @@ import org.eclipse.aether.artifact.Artifact;
 final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
     public static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
 
-    public static final TimeZone DEFAULT_SNAPSHOT_TIME_ZONE = TimeZone.getTimeZone("Etc/UTC");
-
     private final Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
     private final Integer buildNumber;
 
-    RemoteSnapshotMetadata(Artifact artifact, Date timestamp, Integer buildNumber) {
+    RemoteSnapshotMetadata(Artifact artifact, Instant timestamp, Integer buildNumber) {
         super(createRepositoryMetadata(artifact), null, timestamp);
         this.buildNumber = buildNumber;
     }
 
-    private RemoteSnapshotMetadata(Metadata metadata, Path path, Date timestamp, Integer buildNumber) {
+    private RemoteSnapshotMetadata(Metadata metadata, Path path, Instant timestamp, Integer buildNumber) {
         super(metadata, path, timestamp);
         this.buildNumber = buildNumber;
     }
@@ -79,13 +75,11 @@ final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
         String lastUpdated;
 
         if (metadata.getVersioning() == null) {
-            DateFormat utcDateFormatter = new SimpleDateFormat(DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT);
-            utcDateFormatter.setCalendar(new GregorianCalendar());
-            utcDateFormatter.setTimeZone(DEFAULT_SNAPSHOT_TIME_ZONE);
+            DateTimeFormatter utcDateFormatter = DateTimeFormatter.ofPattern(DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT);
 
             snapshot = Snapshot.newBuilder()
                     .buildNumber(buildNumber != null ? buildNumber : getBuildNumber(recessive) + 1)
-                    .timestamp(utcDateFormatter.format(this.timestamp))
+                    .timestamp(utcDateFormatter.format(this.timestamp.atZone(ZoneOffset.UTC)))
                     .build();
 
             lastUpdated = fmt.format(timestamp);

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.execution;
 
+import java.time.Duration;
+
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -39,6 +41,17 @@ public class BuildFailure extends BuildSummary {
      * @param cause The cause of the build failure, may be {@code null}.
      */
     public BuildFailure(MavenProject project, long time, Throwable cause) {
+        this(project, Duration.ofMillis(time), cause);
+    }
+
+    /**
+     * Creates a new build summary for the specified project.
+     *
+     * @param project The project being summarized, must not be {@code null}.
+     * @param time The build time of the project in milliseconds.
+     * @param cause The cause of the build failure, may be {@code null}.
+     */
+    public BuildFailure(MavenProject project, Duration time, Throwable cause) {
         this(project, time, time, cause);
     }
 
@@ -50,7 +63,7 @@ public class BuildFailure extends BuildSummary {
      * @param wallTime The wall time of the project in milliseconds.
      * @param cause The cause of the build failure, may be {@code null}.
      */
-    public BuildFailure(MavenProject project, long execTime, long wallTime, Throwable cause) {
+    public BuildFailure(MavenProject project, Duration execTime, Duration wallTime, Throwable cause) {
         super(project, execTime, wallTime);
         this.cause = cause;
     }

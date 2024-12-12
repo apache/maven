@@ -18,6 +18,7 @@
  */
 package org.apache.maven.project;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -138,6 +139,7 @@ public interface ProjectBuildingRequest {
      *
      * @return The start time of the build or {@code null} if unknown.
      */
+    @Deprecated
     Date getBuildStartTime();
 
     /**
@@ -145,7 +147,22 @@ public interface ProjectBuildingRequest {
      *
      * @param buildStartTime The start time of the build, may be {@code null}.
      */
+    @Deprecated
     void setBuildStartTime(Date buildStartTime);
+
+    /**
+     * Gets the start time of the build.
+     *
+     * @return The start time of the build or {@code null} if unknown.
+     */
+    Instant getBuildStartInstant();
+
+    /**
+     * Sets the start time of the build.
+     *
+     * @param buildStartInstant The start time of the build, may be {@code null}.
+     */
+    void setBuildStartInstant(Instant buildStartInstant);
 
     RepositorySystemSession getRepositorySession();
 

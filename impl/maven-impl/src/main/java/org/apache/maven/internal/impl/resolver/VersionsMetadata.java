@@ -20,9 +20,9 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -38,12 +38,12 @@ final class VersionsMetadata extends MavenMetadata {
 
     private final Artifact artifact;
 
-    VersionsMetadata(Artifact artifact, Date timestamp) {
+    VersionsMetadata(Artifact artifact, Instant timestamp) {
         super(createRepositoryMetadata(artifact), (Path) null, timestamp);
         this.artifact = artifact;
     }
 
-    VersionsMetadata(Artifact artifact, Path path, Date timestamp) {
+    VersionsMetadata(Artifact artifact, Path path, Instant timestamp) {
         super(createRepositoryMetadata(artifact), path, timestamp);
         this.artifact = artifact;
     }

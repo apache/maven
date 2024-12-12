@@ -20,6 +20,7 @@ package org.apache.maven.execution;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -105,9 +106,15 @@ public interface MavenExecutionRequest {
     String getBaseDirectory();
 
     // Timing (remove this)
+    @Deprecated
     MavenExecutionRequest setStartTime(Date start);
 
+    @Deprecated
     Date getStartTime();
+
+    MavenExecutionRequest setStartInstant(Instant start);
+
+    Instant getStartInstant();
 
     // Goals
     MavenExecutionRequest setGoals(List<String> goals);

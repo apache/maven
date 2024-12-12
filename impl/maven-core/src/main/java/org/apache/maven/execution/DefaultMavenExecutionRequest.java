@@ -20,6 +20,7 @@ package org.apache.maven.execution;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.model.Profile;
@@ -135,7 +137,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private Properties userProperties;
 
-    private Date startTime = new Date();
+    private Instant startTime = MonotonicClock.now();
 
     private boolean showErrors = false;
 
@@ -214,7 +216,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setExecutionListener(original.getExecutionListener());
         copy.setUseLegacyLocalRepository(original.isUseLegacyLocalRepository());
         copy.setBuilderId(original.getBuilderId());
-        copy.setStartTime(original.getStartTime());
+        copy.setStartInstant(original.getStartInstant());
         return copy;
     }
 
@@ -299,8 +301,20 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     }
 
     @Override
+    @Deprecated
     public Date getStartTime() {
+        return new Date(startTime.toEpochMilli());
+    }
+
+    @Override
+    public Instant getStartInstant() {
         return startTime;
+    }
+
+    @Override
+    public MavenExecutionRequest setStartInstant(Instant startTime) {
+        this.startTime = startTime;
+        return this;
     }
 
     @Override
@@ -423,9 +437,10 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         return this;
     }
 
+    @Deprecated
     @Override
     public MavenExecutionRequest setStartTime(Date startTime) {
-        this.startTime = startTime;
+        this.startTime = Instant.ofEpochMilli(startTime.getTime());
 
         return this;
     }
@@ -981,7 +996,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
             projectBuildingRequest.setInactiveProfileIds(getInactiveProfiles());
             projectBuildingRequest.setProfiles(getProfiles());
             projectBuildingRequest.setProcessPlugins(true);
-            projectBuildingRequest.setBuildStartTime(getStartTime());
+            projectBuildingRequest.setBuildStartInstant(getStartInstant());
         }
 
         return projectBuildingRequest;

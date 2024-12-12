@@ -18,6 +18,7 @@
  */
 package org.apache.maven.execution;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -123,6 +124,10 @@ public class ReactorManager {
         buildFailuresByProject.put(getProjectKey(project), new BuildFailure(project, time, error));
     }
 
+    public void registerBuildFailure(MavenProject project, Exception error, String task, Duration time) {
+        buildFailuresByProject.put(getProjectKey(project), new BuildFailure(project, time, error));
+    }
+
     public boolean hasBuildFailures() {
         return !buildFailuresByProject.isEmpty();
     }
@@ -144,6 +149,10 @@ public class ReactorManager {
     }
 
     public void registerBuildSuccess(MavenProject project, long time) {
+        buildSuccessesByProject.put(getProjectKey(project), new BuildSuccess(project, time));
+    }
+
+    public void registerBuildSuccess(MavenProject project, Duration time) {
         buildSuccessesByProject.put(getProjectKey(project), new BuildSuccess(project, time));
     }
 

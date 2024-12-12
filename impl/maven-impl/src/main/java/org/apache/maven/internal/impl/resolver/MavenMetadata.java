@@ -26,12 +26,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.maven.api.metadata.Metadata;
 import org.apache.maven.metadata.v4.MetadataStaxReader;
@@ -46,28 +45,26 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
 
     static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
-    static DateFormat fmt;
+    static DateTimeFormatter fmt;
 
     static {
-        TimeZone timezone = TimeZone.getTimeZone("UTC");
-        fmt = new SimpleDateFormat("yyyyMMddHHmmss");
-        fmt.setTimeZone(timezone);
+        fmt = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneOffset.UTC);
     }
 
     protected Metadata metadata;
 
     private final Path path;
 
-    protected final Date timestamp;
+    protected final Instant timestamp;
 
     private boolean merged;
 
     @Deprecated
-    protected MavenMetadata(Metadata metadata, File file, Date timestamp) {
+    protected MavenMetadata(Metadata metadata, File file, Instant timestamp) {
         this(metadata, file != null ? file.toPath() : null, timestamp);
     }
 
-    protected MavenMetadata(Metadata metadata, Path path, Date timestamp) {
+    protected MavenMetadata(Metadata metadata, Path path, Instant timestamp) {
         this.metadata = metadata;
         this.path = path;
         this.timestamp = timestamp;

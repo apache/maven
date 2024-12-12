@@ -18,6 +18,7 @@
  */
 package org.apache.maven.execution;
 
+import java.time.Duration;
 import java.util.Objects;
 
 import org.apache.maven.project.MavenProject;
@@ -36,12 +37,12 @@ public abstract class BuildSummary {
     /**
      * The build time of the project in milliseconds.
      */
-    private final long wallTime;
+    private final Duration wallTime;
 
     /**
      * The total amount of time spent for to run mojos in milliseconds.
      */
-    private final long execTime;
+    private final Duration execTime;
 
     /**
      * Creates a new build summary for the specified project.
@@ -50,7 +51,7 @@ public abstract class BuildSummary {
      * @param time The build time of the project in milliseconds.
      */
     protected BuildSummary(MavenProject project, long time) {
-        this(project, time, time);
+        this(project, Duration.ofMillis(time), Duration.ofMillis(time));
     }
 
     /**
@@ -60,7 +61,7 @@ public abstract class BuildSummary {
      * @param execTime The exec time of the project in milliseconds.
      * @param wallTime The wall time of the project in milliseconds.
      */
-    protected BuildSummary(MavenProject project, long execTime, long wallTime) {
+    protected BuildSummary(MavenProject project, Duration execTime, Duration wallTime) {
         this.project = Objects.requireNonNull(project, "project cannot be null");
         // TODO Validate for < 0?
         this.execTime = execTime;
@@ -82,15 +83,24 @@ public abstract class BuildSummary {
      * @return The wall time of the project in milliseconds.
      */
     public long getTime() {
-        return execTime;
+        return execTime.toMillis();
     }
 
     /**
-     * Gets the exec time of the project in milliseconds.
+     * Gets the wall time of the project.
      *
-     * @return The exec time of the project in milliseconds.
+     * @return The wall time of the project.
      */
-    public long getWallTime() {
+    public Duration getWallTime() {
         return wallTime;
+    }
+
+    /**
+     * Gets the exec time of the project.
+     *
+     * @return The exec time of the project.
+     */
+    public Duration getExecTime() {
+        return execTime;
     }
 }

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.project;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +60,7 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
 
     private Properties userProperties;
 
-    private Date buildStartTime;
+    private Instant buildStartTime;
 
     private boolean resolveDependencies;
 
@@ -261,11 +262,21 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         return profiles;
     }
 
+    @Deprecated
     public Date getBuildStartTime() {
-        return buildStartTime;
+        return buildStartTime != null ? new Date(buildStartTime.toEpochMilli()) : null;
     }
 
+    @Deprecated
     public void setBuildStartTime(Date buildStartTime) {
+        setBuildStartInstant(buildStartTime != null ? Instant.ofEpochMilli(buildStartTime.getTime()) : null);
+    }
+
+    public Instant getBuildStartInstant() {
+        return this.buildStartTime;
+    }
+
+    public void setBuildStartInstant(Instant buildStartTime) {
         this.buildStartTime = buildStartTime;
     }
 

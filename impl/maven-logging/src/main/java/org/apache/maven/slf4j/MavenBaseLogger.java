@@ -19,10 +19,13 @@
 package org.apache.maven.slf4j;
 
 import java.io.PrintStream;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import org.apache.maven.api.MonotonicClock;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.event.Level;
@@ -145,7 +148,8 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
 
     private static final long serialVersionUID = -632788891211436180L;
 
-    private static final long START_TIME = System.currentTimeMillis();
+    private static final Clock MONOTONIC_CLOCK = Clock.tick(Clock.systemUTC(), Duration.ofMillis(1));
+    private static final Instant START_TIME = MonotonicClock.now();
 
     protected static final int LOG_LEVEL_TRACE = LocationAwareLogger.TRACE_INT;
     protected static final int LOG_LEVEL_DEBUG = LocationAwareLogger.DEBUG_INT;
@@ -265,7 +269,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     }
 
     protected String getFormattedDate() {
-        Date now = new Date();
+        Instant now = MonotonicClock.now();
         String dateText;
         synchronized (CONFIG_PARAMS.dateFormatter) {
             dateText = CONFIG_PARAMS.dateFormatter.format(now);
@@ -382,7 +386,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
                 buf.append(getFormattedDate());
                 buf.append(SP);
             } else {
-                buf.append(System.currentTimeMillis() - START_TIME);
+                buf.append(Duration.between(START_TIME, MonotonicClock.now()).toMillis());
                 buf.append(SP);
             }
         }

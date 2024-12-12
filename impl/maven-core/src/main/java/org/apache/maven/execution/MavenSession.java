@@ -20,6 +20,7 @@ package org.apache.maven.execution;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -245,8 +246,13 @@ public class MavenSession implements Cloneable {
         }
     }
 
+    @Deprecated
     public Date getStartTime() {
         return request.getStartTime();
+    }
+
+    public Instant getStartInstant() {
+        return request.getStartInstant();
     }
 
     public boolean isParallel() {

@@ -20,9 +20,9 @@ package org.apache.maven.internal.impl.resolver;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -39,11 +39,11 @@ final class LocalSnapshotMetadata extends MavenMetadata {
 
     private final Collection<Artifact> artifacts = new ArrayList<>();
 
-    LocalSnapshotMetadata(Artifact artifact, Date timestamp) {
+    LocalSnapshotMetadata(Artifact artifact, Instant timestamp) {
         super(createMetadata(artifact), (Path) null, timestamp);
     }
 
-    LocalSnapshotMetadata(Metadata metadata, Path path, Date timestamp) {
+    LocalSnapshotMetadata(Metadata metadata, Path path, Instant timestamp) {
         super(metadata, path, timestamp);
     }
 

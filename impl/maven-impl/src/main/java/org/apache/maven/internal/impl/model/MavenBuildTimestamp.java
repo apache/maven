@@ -18,15 +18,14 @@
  */
 package org.apache.maven.internal.impl.model;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.MonotonicClock;
 
 /**
  * MavenBuildTimestamp
@@ -35,12 +34,10 @@ public class MavenBuildTimestamp {
     // ISO 8601-compliant timestamp for machine readability
     public static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
-    public static final TimeZone DEFAULT_BUILD_TIME_ZONE = TimeZone.getTimeZone("Etc/UTC");
-
     private final String formattedTimestamp;
 
     public MavenBuildTimestamp() {
-        this(Instant.now());
+        this(MonotonicClock.now());
     }
 
     public MavenBuildTimestamp(Instant time) {
@@ -66,12 +63,11 @@ public class MavenBuildTimestamp {
             timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
         }
         if (time == null) {
-            time = Instant.now();
+            time = MonotonicClock.now();
         }
-        SimpleDateFormat dateFormat = new SimpleDateFormat(timestampFormat);
-        dateFormat.setCalendar(new GregorianCalendar());
-        dateFormat.setTimeZone(DEFAULT_BUILD_TIME_ZONE);
-        formattedTimestamp = dateFormat.format(new Date(time.toEpochMilli()));
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern(timestampFormat).withZone(ZoneId.of("UTC"));
+        formattedTimestamp = formatter.format(time);
     }
 
     public String formattedTimestamp() {

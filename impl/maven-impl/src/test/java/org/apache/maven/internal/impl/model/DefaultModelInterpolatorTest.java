@@ -21,10 +21,11 @@ package org.apache.maven.internal.impl.model;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -108,7 +109,7 @@ class DefaultModelInterpolatorTest {
     @Test
     public void testDefaultBuildTimestampFormatShouldFormatTimeIn24HourFormat() {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeZone(MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE);
+        cal.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
         cal.set(Calendar.HOUR, 12);
         cal.set(Calendar.AM_PM, Calendar.AM);
 
@@ -120,7 +121,7 @@ class DefaultModelInterpolatorTest {
         cal.set(Calendar.MONTH, Calendar.NOVEMBER);
         cal.set(Calendar.DATE, 11);
 
-        Date firstTestDate = cal.getTime();
+        Instant firstTestDate = Instant.ofEpochMilli(cal.getTime().getTime());
 
         cal.set(Calendar.HOUR, 11);
         cal.set(Calendar.AM_PM, Calendar.PM);
@@ -128,10 +129,11 @@ class DefaultModelInterpolatorTest {
         // just to make sure all the bases are covered...
         cal.set(Calendar.HOUR_OF_DAY, 23);
 
-        Date secondTestDate = cal.getTime();
+        Instant secondTestDate = Instant.ofEpochMilli(cal.getTime().getTime());
 
-        SimpleDateFormat format = new SimpleDateFormat(MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT);
-        format.setTimeZone(MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE);
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT)
+                .withZone(ZoneId.of("UTC"));
+
         assertEquals("1976-11-11T00:16:00Z", format.format(firstTestDate));
         assertEquals("1976-11-11T23:16:00Z", format.format(secondTestDate));
     }
@@ -148,14 +150,14 @@ class DefaultModelInterpolatorTest {
         cal.set(Calendar.MONTH, Calendar.JUNE);
         cal.set(Calendar.DATE, 16);
 
-        Date firstTestDate = cal.getTime();
+        Instant firstTestDate = Instant.ofEpochMilli(cal.getTime().getTime());
 
         cal.set(Calendar.MONTH, Calendar.NOVEMBER);
 
-        Date secondTestDate = cal.getTime();
+        Instant secondTestDate = Instant.ofEpochMilli(cal.getTime().getTime());
 
-        SimpleDateFormat format = new SimpleDateFormat(MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT);
-        format.setTimeZone(MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE);
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT)
+                .withZone(ZoneId.of("UTC"));
         assertEquals("2014-06-15T23:16:00Z", format.format(firstTestDate));
         assertEquals("2014-11-16T00:16:00Z", format.format(secondTestDate));
     }

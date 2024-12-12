@@ -23,6 +23,8 @@ import javax.inject.Named;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,13 +36,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.xml.XmlNode;
@@ -905,31 +907,31 @@ public class BuildPlanExecutor {
     }
 
     protected static class Clock {
-        long start;
-        long end;
-        long resumed;
-        long exec;
+        Instant start;
+        Instant end;
+        Instant resumed;
+        Duration exec = Duration.ZERO;
 
         protected void start() {
-            if (start == 0) {
-                start = System.nanoTime();
+            if (start == null) {
+                start = MonotonicClock.now();
                 resumed = start;
             } else {
-                resumed = System.nanoTime();
+                resumed = MonotonicClock.now();
             }
         }
 
         protected void stop() {
-            end = System.nanoTime();
-            exec += end - resumed;
+            end = MonotonicClock.now();
+            exec = exec.plus(Duration.between(resumed, end));
         }
 
-        protected long wallTime() {
-            return TimeUnit.NANOSECONDS.toMillis(end - start);
+        protected Duration wallTime() {
+            return Duration.between(start, end);
         }
 
-        protected long execTime() {
-            return TimeUnit.NANOSECONDS.toMillis(exec);
+        protected Duration execTime() {
+            return exec;
         }
     }
 }

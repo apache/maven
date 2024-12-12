@@ -171,6 +171,12 @@ props:
       description: ""
       defaultValue: ${maven.user.conf}/settings-security4.xml
       configurationSource: User properties
+    - key: maven.startInstant
+      configurationType: String
+      description: "User property used to store the build timestamp."
+      defaultValue: 
+      since: 4.1.0
+      configurationSource: User properties
     - key: maven.style.color
       configurationType: String
       description: "Maven output color mode. Allowed values are <code>auto</code>, <code>always</code>, <code>never</code>."

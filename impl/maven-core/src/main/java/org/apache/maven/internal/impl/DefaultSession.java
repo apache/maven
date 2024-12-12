@@ -146,7 +146,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     @Nonnull
     @Override
     public Instant getStartTime() {
-        return getMavenSession().getRequest().getStartTime().toInstant();
+        return getMavenSession().getRequest().getStartInstant();
     }
 
     @Override

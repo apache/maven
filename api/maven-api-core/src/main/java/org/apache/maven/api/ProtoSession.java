@@ -106,7 +106,7 @@ public interface ProtoSession {
      * Returns new builder from scratch.
      */
     static Builder newBuilder() {
-        return new Builder().withStartTime(Instant.now());
+        return new Builder().withStartTime(MonotonicClock.now());
     }
 
     class Builder {

@@ -18,12 +18,14 @@
  */
 package org.apache.maven.internal.impl.resolver;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.maven.api.Constants;
+import org.apache.maven.api.MonotonicClock;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.impl.MetadataGenerator;
@@ -40,10 +42,10 @@ class LocalSnapshotMetadataGenerator implements MetadataGenerator {
 
     private final Map<Object, LocalSnapshotMetadata> snapshots;
 
-    private final Date timestamp;
+    private final Instant timestamp;
 
     LocalSnapshotMetadataGenerator(RepositorySystemSession session, InstallRequest request) {
-        timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
+        timestamp = (Instant) ConfigUtils.getObject(session, MonotonicClock.now(), Constants.MAVEN_START_INSTANT);
 
         snapshots = new LinkedHashMap<>();
     }
