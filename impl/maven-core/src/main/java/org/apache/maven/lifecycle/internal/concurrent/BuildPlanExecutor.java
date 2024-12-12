@@ -927,7 +927,7 @@ public class BuildPlanExecutor {
         }
 
         protected Duration wallTime() {
-            return Duration.between(start, end);
+            return start != null && end != null ? Duration.between(start, end) : Duration.ZERO;
         }
 
         protected Duration execTime() {
