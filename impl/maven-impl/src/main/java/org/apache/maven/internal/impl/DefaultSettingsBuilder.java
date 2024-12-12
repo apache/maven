@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -273,18 +274,12 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return settings;
         }
         SecDispatcher secDispatcher = new DefaultSecDispatcher(dispatchers, getSecuritySettings(request.getSession()));
+        final AtomicInteger preMaven4Passwords = new AtomicInteger(0);
         Function<String, String> decryptFunction = str -> {
             if (str != null && !str.isEmpty() && !str.contains("${") && secDispatcher.isAnyEncryptedString(str)) {
                 if (secDispatcher.isLegacyEncryptedString(str)) {
                     // add a problem
-                    problems.add(new DefaultBuilderProblem(
-                            settingsSource.getLocation(),
-                            -1,
-                            -1,
-                            null,
-                            "Pre-Maven 4 legacy encrypted password detected "
-                                    + " - configure password encryption with the help of mvnenc to be compatible with Maven 4.",
-                            BuilderProblem.Severity.WARNING));
+                    preMaven4Passwords.incrementAndGet();
                 }
                 try {
                     return secDispatcher.decrypt(str);
@@ -295,12 +290,23 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                             -1,
                             e,
                             "Could not decrypt password (fix the corrupted password or remove it, if unused) " + str,
-                            BuilderProblem.Severity.ERROR));
+                            BuilderProblem.Severity.FATAL));
                 }
             }
             return str;
         };
-        return new SettingsTransformer(decryptFunction).visit(settings);
+        Settings result = new SettingsTransformer(decryptFunction).visit(settings);
+        if (preMaven4Passwords.get() > 0) {
+            problems.add(new DefaultBuilderProblem(
+                    settingsSource.getLocation(),
+                    -1,
+                    -1,
+                    null,
+                    "Detected " + preMaven4Passwords.get() + " pre-Maven 4 legacy encrypted password(s) "
+                            + "- configure password encryption with the help of mvnenc for increased security.",
+                    BuilderProblem.Severity.WARNING));
+        }
+        return result;
     }
 
     private Path getSecuritySettings(ProtoSession session) {

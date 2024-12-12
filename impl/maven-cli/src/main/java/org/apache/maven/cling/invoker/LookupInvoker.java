@@ -558,13 +558,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.localRepositoryPath = localRepositoryPath(context);
 
         if (!settingsResult.getProblems().isEmpty()) {
-            context.logger.warn("");
-            context.logger.warn("Some problems were encountered while building the effective settings");
+            context.logger.info("");
+            context.logger.info(
+                    "Some problems were encountered while building the effective settings (use -X to see details)");
 
-            for (BuilderProblem problem : settingsResult.getProblems()) {
-                context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
+            if (context.invokerRequest.options().verbose().orElse(false)) {
+                for (BuilderProblem problem : settingsResult.getProblems()) {
+                    context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
+                }
             }
-            context.logger.warn("");
+            context.logger.info("");
         }
     }
 

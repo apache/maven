@@ -20,7 +20,6 @@ package org.apache.maven.api.services;
 
 import java.io.Serial;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Experimental;
 
@@ -30,12 +29,10 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0.0
  */
 @Experimental
-public class SettingsBuilderException extends MavenException {
+public class SettingsBuilderException extends MavenBuilderException {
 
     @Serial
     private static final long serialVersionUID = 4714858598345418083L;
-
-    private final List<BuilderProblem> problems;
 
     /**
      * @param message the message to give
@@ -43,15 +40,9 @@ public class SettingsBuilderException extends MavenException {
      */
     public SettingsBuilderException(String message, Exception e) {
         super(message, e);
-        this.problems = List.of();
     }
 
     public SettingsBuilderException(String message, List<BuilderProblem> problems) {
-        super(message + ": " + problems.stream().map(BuilderProblem::toString).collect(Collectors.joining(", ")), null);
-        this.problems = List.copyOf(problems);
-    }
-
-    public List<BuilderProblem> getProblems() {
-        return problems;
+        super(message, problems);
     }
 }
