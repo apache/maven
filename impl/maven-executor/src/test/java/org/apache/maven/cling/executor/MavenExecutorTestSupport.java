@@ -35,6 +35,25 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class MavenExecutorTestSupport {
+    @Test
+    void mvnenc(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String logfile = "m4.log";
+        execute(
+                cwd.resolve(logfile),
+                List.of(mvn4ExecutorRequestBuilder()
+                        .command("mvnenc")
+                        .cwd(cwd)
+                        .userHomeDirectory(userHome)
+                        .argument("diag")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
+        System.out.println(Files.readString(cwd.resolve(logfile)));
+    }
+
     @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
     @Test
     void dump3(

@@ -39,12 +39,10 @@ public abstract class ConfiguredGoalSupport extends GoalSupport {
     @Override
     public int execute(EncryptContext context) throws Exception {
         if (!validateConfiguration(context)) {
-            context.terminal
-                    .writer()
-                    .println(messageBuilderFactory
-                            .builder()
-                            .error("Maven Encryption is not configured, run `mvnenc init` first.")
-                            .build());
+            context.logger.error(messageBuilderFactory
+                    .builder()
+                    .error("Maven Encryption is not configured, run `mvnenc init` first.")
+                    .build());
             return ERROR;
         }
         return doExecute(context);
@@ -59,36 +57,32 @@ public abstract class ConfiguredGoalSupport extends GoalSupport {
     }
 
     protected void dumpResponse(EncryptContext context, String indent, SecDispatcher.ValidationResponse response) {
-        context.terminal
-                .writer()
-                .println(messageBuilderFactory
-                        .builder()
-                        .format(
-                                response.isValid()
-                                        ? messageBuilderFactory
-                                                .builder()
-                                                .success("%sConfiguration validation of %s: %s")
-                                                .build()
-                                        : messageBuilderFactory
-                                                .builder()
-                                                .failure("%sConfiguration validation of %s: %s")
-                                                .build(),
-                                indent,
-                                response.getSource(),
-                                response.isValid() ? "VALID" : "INVALID"));
+        context.logger.info(messageBuilderFactory
+                .builder()
+                .format(
+                        response.isValid()
+                                ? messageBuilderFactory
+                                        .builder()
+                                        .success("%sConfiguration validation of %s: %s")
+                                        .build()
+                                : messageBuilderFactory
+                                        .builder()
+                                        .failure("%sConfiguration validation of %s: %s")
+                                        .build(),
+                        indent,
+                        response.getSource(),
+                        response.isValid() ? "VALID" : "INVALID")
+                .build());
         for (Map.Entry<SecDispatcher.ValidationResponse.Level, List<String>> entry :
                 response.getReport().entrySet()) {
-            Consumer<String> consumer = s -> context.terminal
-                    .writer()
-                    .println(messageBuilderFactory.builder().info(s).build());
+            Consumer<String> consumer = s ->
+                    context.logger.info(messageBuilderFactory.builder().info(s).build());
             if (entry.getKey() == SecDispatcher.ValidationResponse.Level.ERROR) {
-                consumer = s -> context.terminal
-                        .writer()
-                        .println(messageBuilderFactory.builder().error(s).build());
+                consumer = s -> context.logger.error(
+                        messageBuilderFactory.builder().error(s).build());
             } else if (entry.getKey() == SecDispatcher.ValidationResponse.Level.WARNING) {
-                consumer = s -> context.terminal
-                        .writer()
-                        .println(messageBuilderFactory.builder().warning(s).build());
+                consumer = s -> context.logger.warn(
+                        messageBuilderFactory.builder().warning(s).build());
             }
             for (String line : entry.getValue()) {
                 consumer.accept(indent + "  " + line);

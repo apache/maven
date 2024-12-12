@@ -35,7 +35,7 @@ under the License.
 
   <properties>
     <maven3version>3.9.9</maven3version>
-    <maven4version>4.0.0-rc-1</maven4version>
+    <maven4version>${project.version}</maven4version>
   </properties>
 
   <dependencies>
@@ -55,6 +55,14 @@ under the License.
       <artifactId>junit-jupiter-params</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>apache-maven</artifactId>
+      <version>${project.version}</version>
+      <classifier>bin</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -64,7 +72,17 @@ under the License.
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>prepare-maven-distros</id>
+            <id>prepare-maven4-distro</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <phase>generate-test-resources</phase>
+            <configuration>
+              <includeArtifactIds>apache-maven</includeArtifactIds>
+            </configuration>
+          </execution>
+          <execution>
+            <id>prepare-maven3-distro</id>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -75,13 +93,6 @@ under the License.
                   <groupId>org.apache.maven</groupId>
                   <artifactId>apache-maven</artifactId>
                   <version>${maven3version}</version>
-                  <classifier>bin</classifier>
-                  <type>zip</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.maven</groupId>
-                  <artifactId>apache-maven</artifactId>
-                  <version>${maven4version}</version>
                   <classifier>bin</classifier>
                   <type>zip</type>
                 </artifactItem>

@@ -26,13 +26,11 @@ import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.utils.CLIReportingUtils;
-import org.jline.consoleui.prompt.ConsolePrompt;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.Colors;
-import org.jline.utils.OSUtils;
 
 /**
  * mvnenc invoker implementation.
@@ -76,17 +74,9 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
 
             Thread executeThread = Thread.currentThread();
             context.terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
-            ConsolePrompt.UiConfig config;
-            if (OSUtils.IS_WINDOWS) {
-                config = new ConsolePrompt.UiConfig(">", "( )", "(x)", "( )");
-            } else {
-                config = new ConsolePrompt.UiConfig("❯", "◯ ", "◉ ", "◯ ");
-            }
-            config.setCancellableFirstPrompt(true);
 
             context.reader =
                     LineReaderBuilder.builder().terminal(context.terminal).build();
-            context.prompt = new ConsolePrompt(context.reader, context.terminal, config);
 
             EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
             if (options.goals().isEmpty() || options.goals().get().size() != 1) {
@@ -102,14 +92,13 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
 
             return goal.execute(context);
         } catch (InterruptedException | InterruptedIOException | UserInterruptException e) {
-            context.terminal.writer().println("Goal canceled by user.");
+            context.logger.error("Goal canceled by user.");
             return CANCELED;
         } catch (Exception e) {
             if (context.invokerRequest.options().showErrors().orElse(false)) {
-                context.terminal.writer().println(e.getMessage());
-                e.printStackTrace(context.terminal.writer());
+                context.logger.error(e.getMessage(), e);
             } else {
-                context.terminal.writer().println(e.getMessage());
+                context.logger.error(e.getMessage());
             }
             return ERROR;
         } finally {
@@ -118,9 +107,9 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
     }
 
     protected int badGoalsErrorMessage(String message, EncryptContext context) {
-        context.terminal.writer().println(message);
-        context.terminal.writer().println("Supported goals are: " + String.join(", ", context.goals.keySet()));
-        context.terminal.writer().println("Use -h to display help.");
+        context.logger.error(message);
+        context.logger.error("Supported goals are: " + String.join(", ", context.goals.keySet()));
+        context.logger.error("Use -h to display help.");
         return BAD_OPERATION;
     }
 }

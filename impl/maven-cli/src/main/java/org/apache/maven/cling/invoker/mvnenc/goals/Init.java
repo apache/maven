@@ -45,6 +45,7 @@ import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 import org.jline.utils.Colors;
+import org.jline.utils.OSUtils;
 
 import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.BAD_OPERATION;
 import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.OK;
@@ -64,25 +65,29 @@ public class Init extends InteractiveGoalSupport {
 
     @Override
     public int doExecute(EncryptContext context) throws Exception {
-        context.addInHeader(context.style.italic().bold().foreground(Colors.rgbColor("yellow")), "goal: init");
-        context.addInHeader("");
-
-        ConsolePrompt prompt = context.prompt;
-
         EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
         boolean force = options.force().orElse(false);
         boolean yes = options.yes().orElse(false);
 
         if (configExists() && !force) {
-            context.terminal
-                    .writer()
-                    .println(
-                            messageBuilderFactory
-                                    .builder()
-                                    .error(
-                                            "Error: configuration exist. Use --force if you want to reset existing configuration."));
+            context.logger.error(messageBuilderFactory
+                    .builder()
+                    .error("Error: configuration exist. Use --force if you want to reset existing configuration.")
+                    .build());
             return BAD_OPERATION;
         }
+
+        context.addInHeader(context.style.italic().bold().foreground(Colors.rgbColor("yellow")), "goal: init");
+        context.addInHeader("");
+
+        ConsolePrompt.UiConfig promptConfig;
+        if (OSUtils.IS_WINDOWS) {
+            promptConfig = new ConsolePrompt.UiConfig(">", "( )", "(x)", "( )");
+        } else {
+            promptConfig = new ConsolePrompt.UiConfig("❯", "◯ ", "◉ ", "◯ ");
+        }
+        promptConfig.setCancellableFirstPrompt(true);
+        ConsolePrompt prompt = new ConsolePrompt(context.reader, context.terminal, promptConfig);
 
         SettingsSecurity config = secDispatcher.readConfiguration(true);
 
