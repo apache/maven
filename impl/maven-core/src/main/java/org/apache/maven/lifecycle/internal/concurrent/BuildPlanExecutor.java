@@ -410,6 +410,9 @@ public class BuildPlanExecutor {
                                 MojoDescriptor mojoDescriptor = getMojoDescriptor(project, plugin, goal);
                                 String phase =
                                         execution.getPhase() != null ? execution.getPhase() : mojoDescriptor.getPhase();
+                                if (phase == null) {
+                                    continue;
+                                }
                                 String tmpResolvedPhase = plan.aliases().getOrDefault(phase, phase);
                                 String resolvedPhase = tmpResolvedPhase.startsWith(AT)
                                         ? tmpResolvedPhase.substring(AT.length())
