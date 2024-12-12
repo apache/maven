@@ -32,6 +32,10 @@ import org.eclipse.aether.installation.InstallRequest;
  */
 public interface ConsumerPomArtifactTransformer {
 
+    String CONSUMER_POM_CLASSIFIER = "consumer";
+
+    String BUILD_POM_CLASSIFIER = "build";
+
     InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request);
 
     DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request);

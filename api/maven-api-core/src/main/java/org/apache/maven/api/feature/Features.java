@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
@@ -45,15 +44,8 @@ public final class Features {
     /**
      * Check if the consumer POM feature is active.
      */
-    public static boolean consumerPom(@Nullable Map<String, String> userProperties) {
-        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM, true);
-    }
-
-    /**
-     * Check if the consumer POM feature is active.
-     */
-    public static boolean consumerPom(@Nullable Session session) {
-        return consumerPom(session != null ? session.getUserProperties() : null);
+    public static boolean consumerPom(@Nullable Map<String, String> userProperties, boolean def) {
+        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM, def);
     }
 
     private static boolean doGet(Properties userProperties, String key, boolean def) {
