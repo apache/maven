@@ -62,16 +62,17 @@ class ItUtils {
     }
 
     /**
-     * @see ItUtils#setUserHome(Verifier, Path)
+     * @deprecated Use {@link Verifier#setUserHomeDirectory(Path)} instead.
      */
+    @Deprecated
     public static void setUserHome(Verifier verifier, File file) {
         setUserHome(verifier, file.toPath());
     }
 
     /**
-     * Note that this only has effect when fork mode is set to true.
-     * Please make sure to call {@link Verifier#setForkJvm(boolean)} and set it to true
+     * @deprecated Use {@link Verifier#setUserHomeDirectory(Path)} instead.
      */
+    @Deprecated
     public static void setUserHome(Verifier verifier, Path home) {
         verifier.setUserHomeDirectory(home);
     }

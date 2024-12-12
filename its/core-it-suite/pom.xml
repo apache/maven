@@ -518,6 +518,8 @@ under the License.
           <useSystemClassLoader>false</useSystemClassLoader>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
+            <maven.test.user.home>${project.build.directory}/user-home</maven.test.user.home>
+            <maven.test.repo.local>${settings.localRepository}</maven.test.repo.local>
             <maven.test.tmpdir>${project.build.testOutputDirectory}</maven.test.tmpdir>
             <maven.version>${maven.version}</maven.version>
             <maven.home>${preparedMavenHome}</maven.home>
@@ -590,28 +592,6 @@ under the License.
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skip>false</skip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>maven-repo-local</id>
-      <activation>
-        <property>
-          <name>maven.repo.local</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <!-- Pass this through to the tests (if set!) to have them
-                  pick the right repository -->
-                <maven.repo.local>${maven.repo.local}</maven.repo.local>
-              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>

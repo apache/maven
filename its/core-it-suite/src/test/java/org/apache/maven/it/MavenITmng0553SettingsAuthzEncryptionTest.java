@@ -122,7 +122,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         verifier.deleteArtifacts("org.apache.maven.its.mng0553");
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
-        ItUtils.setUserHome(verifier, new File(testDir, "userhome"));
+        verifier.setUserHomeDirectory(new File(testDir, "userhome").toPath());
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -185,7 +185,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        ItUtils.setUserHome(verifier, new File(testDir, "userhome"));
+        verifier.setUserHomeDirectory(new File(testDir, "userhome").toPath());
         verifier.addCliArgument("--encrypt-master-password");
         verifier.addCliArgument("test");
         verifier.setLogFileName("log-emp.txt");
@@ -198,7 +198,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
 
         verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        ItUtils.setUserHome(verifier, new File(testDir, "userhome"));
+        verifier.setUserHomeDirectory(new File(testDir, "userhome").toPath());
         verifier.addCliArgument("--encrypt-password");
         verifier.addCliArgument("testpass");
         verifier.setLogFileName("log-ep.txt");
