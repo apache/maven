@@ -465,10 +465,18 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void settings(C context) throws Exception {
-        settings(context, context.lookup.lookup(SettingsBuilder.class));
+        settings(context, true, context.lookup.lookup(SettingsBuilder.class));
     }
 
-    protected void settings(C context, SettingsBuilder settingsBuilder) throws Exception {
+    /**
+     * This method is invoked twice during "normal" LookupInvoker level startup: once when (if present) extensions
+     * are loaded up during Plexus DI creation, and once afterward as "normal" boot procedure.
+     * <p>
+     * If there are Maven3 passwords presents in settings, this results in doubled warnings emitted. So Plexus DI
+     * creation call keeps "emitSettingsWarnings" false. If there are fatal issues, it will anyway "die" at that
+     * spot before warnings would be emitted.
+     */
+    protected void settings(C context, boolean emitSettingsWarnings, SettingsBuilder settingsBuilder) throws Exception {
         Options mavenOptions = context.invokerRequest.options();
 
         Path userSettingsFile = null;
@@ -557,14 +565,17 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.interactive = mayDisableInteractiveMode(context, context.effectiveSettings.isInteractiveMode());
         context.localRepositoryPath = localRepositoryPath(context);
 
-        if (!settingsResult.getProblems().isEmpty()) {
-            context.logger.warn("");
-            context.logger.warn("Some problems were encountered while building the effective settings");
+        if (emitSettingsWarnings && !settingsResult.getProblems().isEmpty()) {
+            context.logger.info("");
+            context.logger.info(
+                    "Some problems were encountered while building the effective settings (use -X to see details)");
 
-            for (BuilderProblem problem : settingsResult.getProblems()) {
-                context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
+            if (context.invokerRequest.options().verbose().orElse(false)) {
+                for (BuilderProblem problem : settingsResult.getProblems()) {
+                    context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
+                }
             }
-            context.logger.warn("");
+            context.logger.info("");
         }
     }
 

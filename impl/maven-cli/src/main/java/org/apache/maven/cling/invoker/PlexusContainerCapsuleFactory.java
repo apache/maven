@@ -75,7 +75,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             return new PlexusContainerCapsule(
                     context, Thread.currentThread().getContextClassLoader(), container(invoker, context));
         } catch (Exception e) {
-            throw new InvokerException("Failed to create plexus container capsule", e);
+            throw new InvokerException("Failed to create Plexus DI Container", e);
         }
     }
 
@@ -279,7 +279,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
             Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
-            invoker.settings(context, container.lookup(SettingsBuilder.class));
+            invoker.settings(context, false, container.lookup(SettingsBuilder.class));
 
             MavenExecutionRequest mer = new DefaultMavenExecutionRequest();
             invoker.populateRequest(context, new DefaultLookup(container), mer);
