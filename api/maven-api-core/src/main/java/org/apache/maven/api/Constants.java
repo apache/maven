@@ -442,7 +442,7 @@ public final class Constants {
      *
      * @since 4.1.0
      */
-    @Config
+    @Config(type = "java.time.Instant")
     public static final String MAVEN_START_INSTANT = "maven.startInstant";
 
     private Constants() {}
