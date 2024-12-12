@@ -40,7 +40,7 @@ class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setLogFileName("log-legacy.txt");
-        ItUtils.setUserHome(verifier, new File(testDir, "legacyhome"));
+        verifier.setUserHomeDirectory(new File(testDir, "legacyhome").toPath());
         verifier.addCliArgument("org.apache.maven.plugins:maven-help-plugin:3.3.0:effective-settings");
         verifier.addCliArgument("-DshowPasswords");
         verifier.execute();
@@ -62,7 +62,7 @@ class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setLogFileName("log-modern.txt");
         verifier.setEnvironmentVariable("MAVEN_MASTER_PASSWORD", "master");
-        ItUtils.setUserHome(verifier, new File(testDir, "home"));
+        verifier.setUserHomeDirectory(new File(testDir, "home").toPath());
         verifier.addCliArgument("org.apache.maven.plugins:maven-help-plugin:3.3.0:effective-settings");
         verifier.addCliArgument("-DshowPasswords");
         verifier.execute();

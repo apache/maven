@@ -92,7 +92,7 @@ public class Verifier {
 
     private final Path tempBasedir; // empty basedir for queries
 
-    private Path userHomeDirectory;
+    private final Path outerLocalRepository; // this is the "outer" build effective local repo
 
     private final List<String> defaultCliArguments;
 
@@ -102,13 +102,15 @@ public class Verifier {
 
     private final List<String> cliArguments = new ArrayList<>();
 
+    private Path userHomeDirectory; // the user home
+
     private String executable = ExecutorRequest.MVN;
 
     private boolean autoClean = true;
 
     private boolean forkJvm = false;
 
-    private boolean handleLocalRepoTail = true;
+    private boolean handleLocalRepoTail = true; // if false: IT will become fully isolated
 
     private String logFileName = "log.txt";
 
@@ -132,7 +134,9 @@ public class Verifier {
         try {
             this.basedir = Paths.get(basedir).toAbsolutePath();
             this.tempBasedir = Files.createTempDirectory("verifier");
-            this.userHomeDirectory = Paths.get(System.getProperty("user.home"));
+            this.userHomeDirectory = Paths.get(System.getProperty("maven.test.user.home", "user.home"));
+            Files.createDirectories(this.userHomeDirectory);
+            this.outerLocalRepository = Paths.get(System.getProperty("maven.test.repo.local", ".m2/repository"));
             this.executorHelper = new HelperImpl(
                     VERIFIER_FORK_MODE,
                     Paths.get(System.getProperty("maven.home")),
@@ -147,7 +151,7 @@ public class Verifier {
     }
 
     public void setUserHomeDirectory(Path userHomeDirectory) {
-        this.userHomeDirectory = requireNonNull(userHomeDirectory);
+        this.userHomeDirectory = requireNonNull(userHomeDirectory, "userHomeDirectory");
     }
 
     public String getExecutable() {
@@ -167,55 +171,29 @@ public class Verifier {
         if (handleLocalRepoTail) {
             // note: all used Strings are non-null/empty if "not present" for simpler handling
             // "outer" build pass these in, check are they present or not
+            // Important: here we do "string ops" only, and no path ops, as it will be Maven
+            // (based on user.home and other) that will unravel these strings to paths!
             String outerTail = System.getProperty("maven.repo.local.tail", "").trim();
-            String outerHead = System.getProperty("maven.repo.local", "").trim();
+            String outerHead = outerLocalRepository.toString();
 
-            // if none of the outer thing is set, we have nothing to do
-            if (!outerTail.isEmpty() || !outerHead.isEmpty()) {
-                String itTail = args.stream()
-                        .filter(s -> s.startsWith("-Dmaven.repo.local.tail="))
-                        .map(s -> s.substring(24).trim())
-                        .findFirst()
-                        .orElse("");
-                if (!itTail.isEmpty()) {
-                    // remove it
-                    args = args.stream()
-                            .filter(s -> !s.startsWith("-Dmaven.repo.local.tail="))
-                            .collect(Collectors.toList());
-                }
-                String itHead = args.stream()
-                        .filter(s -> s.startsWith("-Dmaven.repo.local="))
-                        .map(s -> s.substring(19).trim())
-                        .findFirst()
-                        .orElse("");
-                if (!itHead.isEmpty()) {
-                    // remove it
-                    args = args.stream()
-                            .filter(s -> !s.startsWith("-Dmaven.repo.local="))
-                            .collect(Collectors.toList());
-                }
+            String itTail = args.stream()
+                    .filter(s -> s.startsWith("-Dmaven.repo.local.tail="))
+                    .map(s -> s.substring(24).trim())
+                    .findFirst()
+                    .orElse("");
+            if (!itTail.isEmpty()) {
+                // remove it
+                args = args.stream()
+                        .filter(s -> !s.startsWith("-Dmaven.repo.local.tail="))
+                        .collect(Collectors.toList());
+            }
 
-                if (!itHead.isEmpty()) {
-                    // itHead present: itHead left as is, push all to itTail
-                    args.add("-Dmaven.repo.local=" + itHead);
-                    itTail = Stream.of(itTail, outerHead, outerTail)
-                            .filter(s -> !s.isEmpty())
-                            .collect(Collectors.joining(","));
-                    if (!itTail.isEmpty()) {
-                        args.add("-Dmaven.repo.local.tail=" + itTail);
-                    }
-                } else {
-                    // itHead not present: if outerHead present, make it itHead; join itTail and outerTail as tail
-                    if (!outerHead.isEmpty()) {
-                        args.add("-Dmaven.repo.local=" + outerHead);
-                    }
-                    itTail = Stream.of(itTail, outerTail)
-                            .filter(s -> !s.isEmpty())
-                            .collect(Collectors.joining(","));
-                    if (!itTail.isEmpty()) {
-                        args.add("-Dmaven.repo.local.tail=" + itTail);
-                    }
-                }
+            // push things to tail
+            itTail = Stream.of(itTail, outerHead, outerTail)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.joining(","));
+            if (!itTail.isEmpty()) {
+                args.add("-Dmaven.repo.local.tail=" + itTail);
             }
         }
 
@@ -655,6 +633,67 @@ public class Verifier {
         return getLocalRepository()
                 + File.separator
                 + executorHelper.artifactPath(executorHelper.executorRequest(), gav, null);
+    }
+
+    private String getSupportArtifactPath(String artifact) {
+        StringTokenizer tok = new StringTokenizer(artifact, ":");
+        if (tok.countTokens() != 4) {
+            throw new IllegalArgumentException("Artifact must have 4 tokens: '" + artifact + "'");
+        }
+
+        String[] a = new String[4];
+        for (int i = 0; i < 4; i++) {
+            a[i] = tok.nextToken();
+        }
+
+        String groupId = a[0];
+        String artifactId = a[1];
+        String version = a[2];
+        String ext = a[3];
+        return getSupportArtifactPath(groupId, artifactId, version, ext);
+    }
+
+    public String getSupportArtifactPath(String groupId, String artifactId, String version, String ext) {
+        return getSupportArtifactPath(groupId, artifactId, version, ext, null);
+    }
+
+    /**
+     * Returns the absolute path to the artifact denoted by groupId, artifactId, version, extension and classifier.
+     *
+     * @param gid        The groupId, must not be null.
+     * @param aid        The artifactId, must not be null.
+     * @param version    The version, must not be null.
+     * @param ext        The extension, must not be null.
+     * @param classifier The classifier, may be null to be omitted.
+     * @return the absolute path to the artifact denoted by groupId, artifactId, version, extension and classifier,
+     *         never null.
+     */
+    public String getSupportArtifactPath(String gid, String aid, String version, String ext, String classifier) {
+        if (classifier != null && classifier.isEmpty()) {
+            classifier = null;
+        }
+        if ("maven-plugin".equals(ext)) {
+            ext = "jar";
+        } else if ("coreit-artifact".equals(ext)) {
+            ext = "jar";
+            classifier = "it";
+        } else if ("test-jar".equals(ext)) {
+            ext = "jar";
+            classifier = "tests";
+        }
+
+        String gav;
+        if (classifier != null) {
+            gav = gid + ":" + aid + ":" + ext + ":" + classifier + ":" + version;
+        } else {
+            gav = gid + ":" + aid + ":" + ext + ":" + version;
+        }
+        return outerLocalRepository
+                .resolve(executorHelper.artifactPath(
+                        executorHelper.executorRequest().argument("-Dmaven.repo.local=" + outerLocalRepository),
+                        gav,
+                        null))
+                .toString();
     }
 
     public List<String> getArtifactFileNameList(String org, String name, String version, String ext) {

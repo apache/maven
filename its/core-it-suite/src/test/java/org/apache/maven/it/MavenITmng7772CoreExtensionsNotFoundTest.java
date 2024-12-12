@@ -38,7 +38,7 @@ public class MavenITmng7772CoreExtensionsNotFoundTest extends AbstractMavenInteg
         File testDir = extractResources("/mng-7772-core-extensions-not-found");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        ItUtils.setUserHome(verifier, Paths.get(testDir.toPath().toString(), "home"));
+        verifier.setUserHomeDirectory(Paths.get(testDir.toPath().toString(), "home"));
 
         try {
             verifier.addCliArgument("validate");
