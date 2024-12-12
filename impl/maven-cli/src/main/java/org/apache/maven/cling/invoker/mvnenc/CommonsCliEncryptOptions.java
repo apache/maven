@@ -111,10 +111,10 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
         printStream.accept("");
         // we have no DI here (to discover)
         printStream.accept("Goals:");
-        printStream.accept("  diag - display diagnostic for encryption");
-        printStream.accept("  init - wizard to set-up encryption (interactive only)");
+        printStream.accept("  diag - display encryption configuration diagnostic");
+        printStream.accept("  init - wizard to configure encryption (interactive only)");
         printStream.accept("  encrypt - encrypts input");
-        printStream.accept("  decrypt - decrypt encrypted input");
+        printStream.accept("  decrypt - decrypts encrypted input");
         printStream.accept("");
     }
 
