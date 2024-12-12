@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Base class for all maven exceptions.
+ * Base class for all maven exceptions carrying {@link BuilderProblem}s.
  *
  * @since 4.0.0
  */
@@ -44,12 +44,17 @@ public abstract class MavenBuilderException extends MavenException {
         this.problems = problems;
     }
 
+    /**
+     * Formats message out of problems: problems are sorted (in natural order of {@link BuilderProblem.Severity})
+     * and then a list is built. These exceptions are usually thrown in "fatal" cases (and usually prevent Maven
+     * from starting), and these exceptions may end up very early on output.
+     */
     protected static String buildMessage(String message, List<BuilderProblem> problems) {
         StringBuilder msg = new StringBuilder(message);
         ArrayList<BuilderProblem> sorted = new ArrayList<>(problems);
         sorted.sort(Comparator.comparing(BuilderProblem::getSeverity));
         for (BuilderProblem problem : sorted) {
-            msg.append("\n * ").append(problem.getSeverity().name()).append(" ").append(problem.getMessage());
+            msg.append("\n * ").append(problem.getSeverity().name()).append(": ").append(problem.getMessage());
         }
         return msg.toString();
     }
