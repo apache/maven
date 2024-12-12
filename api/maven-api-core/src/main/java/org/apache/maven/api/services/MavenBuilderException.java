@@ -54,7 +54,10 @@ public abstract class MavenBuilderException extends MavenException {
         ArrayList<BuilderProblem> sorted = new ArrayList<>(problems);
         sorted.sort(Comparator.comparing(BuilderProblem::getSeverity));
         for (BuilderProblem problem : sorted) {
-            msg.append("\n * ").append(problem.getSeverity().name()).append(": ").append(problem.getMessage());
+            msg.append("\n * ")
+                    .append(problem.getSeverity().name())
+                    .append(": ")
+                    .append(problem.getMessage());
         }
         return msg.toString();
     }
