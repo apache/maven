@@ -73,13 +73,7 @@ class ItUtils {
      * Please make sure to call {@link Verifier#setForkJvm(boolean)} and set it to true
      */
     public static void setUserHome(Verifier verifier, Path home) {
-        // NOTE: We set the user.home directory instead of say settings.security to reflect Maven's normal behavior
-        String path = home.toAbsolutePath().toString();
-        if (path.indexOf(' ') < 0) {
-            verifier.setEnvironmentVariable("MAVEN_OPTS", "-Duser.home=" + path);
-        } else {
-            verifier.setEnvironmentVariable("MAVEN_OPTS", "\"-Duser.home=" + path + "\"");
-        }
+        verifier.setUserHomeDirectory(home);
     }
 
     public static void assertCanonicalFileEquals(File expected, File actual) throws IOException {

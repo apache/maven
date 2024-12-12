@@ -92,8 +92,6 @@ public class Verifier {
 
     private final Path tempBasedir; // empty basedir for queries
 
-    private Path userHomeDirectory;
-
     private final List<String> defaultCliArguments;
 
     private final Properties systemProperties = new Properties();
@@ -101,6 +99,8 @@ public class Verifier {
     private final Map<String, String> environmentVariables = new HashMap<>();
 
     private final List<String> cliArguments = new ArrayList<>();
+
+    private Path userHomeDirectory;
 
     private String executable = ExecutorRequest.MVN;
 
