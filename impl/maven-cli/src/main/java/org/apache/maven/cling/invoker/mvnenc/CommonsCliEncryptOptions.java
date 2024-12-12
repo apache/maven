@@ -23,11 +23,13 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.CommonsCliOptions;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
@@ -103,6 +105,19 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
         return interpolate(this, properties);
     }
 
+    @Override
+    public void displayHelp(ParserRequest request, Consumer<String> printStream) {
+        super.displayHelp(request, printStream);
+        printStream.accept("");
+        // we have no DI here (to discover)
+        printStream.accept("Goals:");
+        printStream.accept("  diag - display diagnostic for encryption");
+        printStream.accept("  init - wizard to set-up encryption (interactive only)");
+        printStream.accept("  encrypt - encrypts input");
+        printStream.accept("  decrypt - decrypt encrypted input");
+        printStream.accept("");
+    }
+
     protected static class CLIManager extends CommonsCliOptions.CLIManager {
         public static final String FORCE = "f";
         public static final String YES = "y";
@@ -118,11 +133,6 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
                     .longOpt("yes")
                     .desc("Should imply user answered \"yes\" to all incoming questions?")
                     .build());
-        }
-
-        @Override
-        protected String commandLineSyntax(String command) {
-            return command + " [options] [goal]";
         }
     }
 }
