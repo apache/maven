@@ -75,7 +75,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             return new PlexusContainerCapsule(
                     context, Thread.currentThread().getContextClassLoader(), container(invoker, context));
         } catch (Exception e) {
-            throw new InvokerException("Failed to create plexus container capsule", e);
+            throw new InvokerException("Failed to create Plexus DI Container", e);
         }
     }
 
