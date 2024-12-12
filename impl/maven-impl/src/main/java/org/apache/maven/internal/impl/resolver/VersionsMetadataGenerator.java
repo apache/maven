@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicClock;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -58,7 +59,7 @@ class VersionsMetadataGenerator implements MetadataGenerator {
     private VersionsMetadataGenerator(RepositorySystemSession session, Collection<? extends Metadata> metadatas) {
         versions = new LinkedHashMap<>();
         processedVersions = new LinkedHashMap<>();
-        timestamp = (Instant) ConfigUtils.getObject(session, MonotonicClock.now(), "mven.startInstant");
+        timestamp = (Instant) ConfigUtils.getObject(session, MonotonicClock.now(), Constants.MAVEN_START_INSTANT);
 
         /*
          * NOTE: This should be considered a quirk to support interop with Maven's legacy ArtifactDeployer which

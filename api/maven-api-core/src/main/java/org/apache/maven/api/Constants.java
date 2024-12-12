@@ -437,5 +437,13 @@ public final class Constants {
     @Config(type = "java.lang.Integer")
     public static final String MAVEN_DEPLOY_SNAPSHOT_BUILD_NUMBER = "maven.deploy.snapshot.buildNumber";
 
+    /**
+     * User property used to store the build timestamp.
+     *
+     * @since 4.1.0
+     */
+    @Config
+    public static final String MAVEN_START_INSTANT = "maven.startInstant";
+
     private Constants() {}
 }

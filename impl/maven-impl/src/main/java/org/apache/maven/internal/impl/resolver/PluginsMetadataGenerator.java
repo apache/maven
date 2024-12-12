@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.impl.resolver.PluginsMetadata.PluginInfo;
@@ -69,7 +70,7 @@ class PluginsMetadataGenerator implements MetadataGenerator {
 
     private PluginsMetadataGenerator(RepositorySystemSession session, Collection<? extends Metadata> metadatas) {
         this.processedPlugins = new LinkedHashMap<>();
-        this.timestamp = (Instant) ConfigUtils.getObject(session, MonotonicClock.now(), "mven.startInstant");
+        this.timestamp = (Instant) ConfigUtils.getObject(session, MonotonicClock.now(), Constants.MAVEN_START_INSTANT);
 
         /*
          * NOTE: This should be considered a quirk to support interop with Maven's legacy ArtifactDeployer which

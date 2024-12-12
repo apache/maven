@@ -47,7 +47,7 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
     private final Integer buildNumber;
 
     RemoteSnapshotMetadataGenerator(RepositorySystemSession session, DeployRequest request) {
-        timestamp = (Instant) ConfigUtils.getObject(session, MonotonicClock.now(), "mven.startInstant");
+        timestamp = (Instant) ConfigUtils.getObject(session, MonotonicClock.now(), Constants.MAVEN_START_INSTANT);
         Object bn = ConfigUtils.getObject(session, null, Constants.MAVEN_DEPLOY_SNAPSHOT_BUILD_NUMBER);
         if (bn instanceof Integer) {
             this.buildNumber = (Integer) bn;

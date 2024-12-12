@@ -19,7 +19,7 @@
 package org.apache.maven.internal.impl.model;
 
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
@@ -66,7 +66,7 @@ public class MavenBuildTimestamp {
             time = MonotonicClock.now();
         }
         DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern(timestampFormat).withZone(ZoneOffset.UTC);
+                DateTimeFormatter.ofPattern(timestampFormat).withZone(ZoneId.of("UTC"));
         formattedTimestamp = formatter.format(time);
     }
 

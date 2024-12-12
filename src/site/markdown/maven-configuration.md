@@ -51,21 +51,22 @@ under the License.
 | 24. | `maven.resolver.transport` | `String` | Resolver transport to use. Can be <code>default</code>, <code>wagon</code>, <code>apache</code>, <code>jdk</code> or <code>auto</code>. |  `default`  | 4.0.0 | User properties |
 | 25. | `maven.session.versionFilter` | `String` | User property for version filter expression used in session, applied to resolving ranges: a semicolon separated list of filters to apply. By default, no version filter is applied (like in Maven 3). <br/> Supported filters: <ul> <li>"h" or "h(num)" - highest version or top list of highest ones filter</li> <li>"l" or "l(num)" - lowest version or bottom list of lowest ones filter</li> <li>"s" - contextual snapshot filter</li> <li>"e(G:A:V)" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li> </ul> Example filter expression: <code>"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for "top 5" (instead full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is being processed, version 1 is omitted. Value in this property builds <code>org.eclipse.aether.collection.VersionFilter</code> instance. |  -  | 4.0.0 | User properties |
 | 26. | `maven.settings.security` | `String` |  |  `${maven.user.conf}/settings-security4.xml`  |  | User properties |
-| 27. | `maven.style.color` | `String` | Maven output color mode. Allowed values are <code>auto</code>, <code>always</code>, <code>never</code>. |  `auto`  | 4.0.0 | User properties |
-| 28. | `maven.style.debug` | `String` | Color style for debug messages. |  `bold,f:cyan`  | 4.0.0 | User properties |
-| 29. | `maven.style.error` | `String` | Color style for error messages. |  `bold,f:red`  | 4.0.0 | User properties |
-| 30. | `maven.style.failure` | `String` | Color style for failure messages. |  `bold,f:red`  | 4.0.0 | User properties |
-| 31. | `maven.style.info` | `String` | Color style for info messages. |  `bold,f:blue`  | 4.0.0 | User properties |
-| 32. | `maven.style.mojo` | `String` | Color style for mojo messages. |  `f:green`  | 4.0.0 | User properties |
-| 33. | `maven.style.project` | `String` | Color style for project messages. |  `f:cyan`  | 4.0.0 | User properties |
-| 34. | `maven.style.strong` | `String` | Color style for strong messages. |  `bold`  | 4.0.0 | User properties |
-| 35. | `maven.style.success` | `String` | Color style for success messages. |  `bold,f:green`  | 4.0.0 | User properties |
-| 36. | `maven.style.trace` | `String` | Color style for trace messages. |  `bold,f:magenta`  | 4.0.0 | User properties |
-| 37. | `maven.style.transfer` | `String` | Color style for transfer messages. |  `f:bright-black`  | 4.0.0 | User properties |
-| 38. | `maven.style.warning` | `String` | Color style for warning messages. |  `bold,f:yellow`  | 4.0.0 | User properties |
-| 39. | `maven.user.conf` | `String` | Maven user configuration directory. |  `${user.home}/.m2`  | 4.0.0 | User properties |
-| 40. | `maven.user.extensions` | `String` | Maven user extensions. |  `${maven.user.conf}/extensions.xml`  | 4.0.0 | User properties |
-| 41. | `maven.user.settings` | `String` | Maven user settings. |  `${maven.user.conf}/settings.xml`  | 4.0.0 | User properties |
-| 42. | `maven.user.toolchains` | `String` | Maven user toolchains. |  `${maven.user.conf}/toolchains.xml`  | 4.0.0 | User properties |
-| 43. | `maven.versionResolver.noCache` | `Boolean` | User property for disabling version resolver cache. |  `false`  | 3.0.0 | User properties |
+| 27. | `maven.startInstant` | `String` | User property used to store the build timestamp. |  -  | 4.1.0 | User properties |
+| 28. | `maven.style.color` | `String` | Maven output color mode. Allowed values are <code>auto</code>, <code>always</code>, <code>never</code>. |  `auto`  | 4.0.0 | User properties |
+| 29. | `maven.style.debug` | `String` | Color style for debug messages. |  `bold,f:cyan`  | 4.0.0 | User properties |
+| 30. | `maven.style.error` | `String` | Color style for error messages. |  `bold,f:red`  | 4.0.0 | User properties |
+| 31. | `maven.style.failure` | `String` | Color style for failure messages. |  `bold,f:red`  | 4.0.0 | User properties |
+| 32. | `maven.style.info` | `String` | Color style for info messages. |  `bold,f:blue`  | 4.0.0 | User properties |
+| 33. | `maven.style.mojo` | `String` | Color style for mojo messages. |  `f:green`  | 4.0.0 | User properties |
+| 34. | `maven.style.project` | `String` | Color style for project messages. |  `f:cyan`  | 4.0.0 | User properties |
+| 35. | `maven.style.strong` | `String` | Color style for strong messages. |  `bold`  | 4.0.0 | User properties |
+| 36. | `maven.style.success` | `String` | Color style for success messages. |  `bold,f:green`  | 4.0.0 | User properties |
+| 37. | `maven.style.trace` | `String` | Color style for trace messages. |  `bold,f:magenta`  | 4.0.0 | User properties |
+| 38. | `maven.style.transfer` | `String` | Color style for transfer messages. |  `f:bright-black`  | 4.0.0 | User properties |
+| 39. | `maven.style.warning` | `String` | Color style for warning messages. |  `bold,f:yellow`  | 4.0.0 | User properties |
+| 40. | `maven.user.conf` | `String` | Maven user configuration directory. |  `${user.home}/.m2`  | 4.0.0 | User properties |
+| 41. | `maven.user.extensions` | `String` | Maven user extensions. |  `${maven.user.conf}/extensions.xml`  | 4.0.0 | User properties |
+| 42. | `maven.user.settings` | `String` | Maven user settings. |  `${maven.user.conf}/settings.xml`  | 4.0.0 | User properties |
+| 43. | `maven.user.toolchains` | `String` | Maven user toolchains. |  `${maven.user.conf}/toolchains.xml`  | 4.0.0 | User properties |
+| 44. | `maven.versionResolver.noCache` | `Boolean` | User property for disabling version resolver cache. |  `false`  | 3.0.0 | User properties |
 
