@@ -279,7 +279,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
             Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
-            invoker.settings(context, container.lookup(SettingsBuilder.class));
+            invoker.settings(context, false, container.lookup(SettingsBuilder.class));
 
             MavenExecutionRequest mer = new DefaultMavenExecutionRequest();
             invoker.populateRequest(context, new DefaultLookup(container), mer);
