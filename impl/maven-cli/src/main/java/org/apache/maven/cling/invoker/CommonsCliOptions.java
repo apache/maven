@@ -272,6 +272,7 @@ public abstract class CommonsCliOptions implements Options {
         // parameters handled by script
         public static final String DEBUG = "debug";
         public static final String ENC = "enc";
+        public static final String SHELL = "shell";
         public static final String YJP = "yjp";
 
         // deprecated ones
@@ -387,6 +388,10 @@ public abstract class CommonsCliOptions implements Options {
             options.addOption(Option.builder()
                     .longOpt(ENC)
                     .desc("Launch the Maven Encryption tool (script option).")
+                    .build());
+            options.addOption(Option.builder()
+                    .longOpt(SHELL)
+                    .desc("Launch the Maven Shell tool (script option).")
                     .build());
             options.addOption(Option.builder()
                     .longOpt(YJP)

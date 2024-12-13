@@ -16,27 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
+package org.apache.maven.cling.invoker.mvnsh;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.cling.invoker.LookupContext;
 
-/**
- * Represents most common tools supported by CLIng.
- *
- * @since 4.0.0
- */
-@Immutable
-@Experimental
-public final class Tools {
-    private Tools() {}
-
-    public static final String MVN_CMD = "mvn";
-    public static final String MVN_NAME = "Maven";
-
-    public static final String MVNENC_CMD = "mvnenc";
-    public static final String MVNENC_NAME = "Maven Password Encrypting Tool";
-
-    public static final String MVNSHELL_CMD = "mvnsh";
-    public static final String MVNSHELL_NAME = "Maven Shell Tool";
+@SuppressWarnings("VisibilityModifier")
+public class ShellContext extends LookupContext {
+    protected ShellContext(InvokerRequest invokerRequest) {
+        super(invokerRequest);
+    }
 }

@@ -126,7 +126,8 @@ public class EmbeddedMavenExecutor implements Executor {
         this.originalStderr = System.err;
         this.originalClassLoader = Thread.currentThread().getContextClassLoader();
         this.contexts = new ConcurrentHashMap<>();
-        this.originalProperties = System.getProperties();
+        this.originalProperties = new Properties();
+        this.originalProperties.putAll(System.getProperties());
     }
 
     @Override
@@ -311,7 +312,7 @@ public class EmbeddedMavenExecutor implements Executor {
 
     protected Properties prepareProperties(ExecutorRequest request) {
         Properties properties = new Properties();
-        properties.putAll(System.getProperties());
+        properties.putAll(originalProperties);
 
         properties.setProperty("user.dir", request.cwd().toString());
         properties.setProperty("user.home", request.userHomeDirectory().toString());

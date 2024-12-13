@@ -102,7 +102,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     public int invoke(InvokerRequest invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
 
-        Properties oldProps = (Properties) System.getProperties().clone();
+        Properties oldProps = new Properties();
+        oldProps.putAll(System.getProperties());
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try (C context = createContext(invokerRequest)) {
             try {

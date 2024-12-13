@@ -206,6 +206,34 @@ public interface ParserRequest {
     }
 
     /**
+     * Creates a new Builder instance for constructing a Maven Shell Tool ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param logger the logger to be used during parsing
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvnsh(
+            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvnsh(Arrays.asList(args), logger, messageBuilderFactory);
+    }
+
+    /**
+     * Creates a new Builder instance for constructing a Maven Shell Tool ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param logger the logger to be used during parsing
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvnsh(
+            @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(Tools.MVNSHELL_CMD, Tools.MVNSHELL_NAME, args, logger, messageBuilderFactory);
+    }
+
+    /**
      * Creates a new Builder instance for constructing a ParserRequest.
      *
      * @param command the Maven command to be executed

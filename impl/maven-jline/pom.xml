@@ -54,6 +54,10 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.jline</groupId>
+      <artifactId>jline-console</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
       <artifactId>jline-console-ui</artifactId>
     </dependency>
     <dependency>

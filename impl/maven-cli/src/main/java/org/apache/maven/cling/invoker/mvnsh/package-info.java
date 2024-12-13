@@ -16,27 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
 
 /**
- * Represents most common tools supported by CLIng.
- *
- * @since 4.0.0
+ * This package contains the {@code mvnsh} tool implementation.
  */
-@Immutable
-@Experimental
-public final class Tools {
-    private Tools() {}
-
-    public static final String MVN_CMD = "mvn";
-    public static final String MVN_NAME = "Maven";
-
-    public static final String MVNENC_CMD = "mvnenc";
-    public static final String MVNENC_NAME = "Maven Password Encrypting Tool";
-
-    public static final String MVNSHELL_CMD = "mvnsh";
-    public static final String MVNSHELL_NAME = "Maven Shell Tool";
-}
+package org.apache.maven.cling.invoker.mvnsh;

@@ -200,6 +200,8 @@ if "%~1"=="--debug" (
     set "MAVEN_OPTS=-agentpath:%YJPLIB%=onexit=snapshot,onexit=memory,tracing,onlylocal %MAVEN_OPTS%"
 ) else if "%~1"=="--enc" (
     set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenEncCling"
+) else if "%~1"=="--shell" (
+      set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenShellCling"
 )
 exit /b 0
 
