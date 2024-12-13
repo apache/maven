@@ -410,6 +410,9 @@ public class BuildPlanExecutor {
                                 MojoDescriptor mojoDescriptor = getMojoDescriptor(project, plugin, goal);
                                 String phase =
                                         execution.getPhase() != null ? execution.getPhase() : mojoDescriptor.getPhase();
+                                if (phase == null) {
+                                    continue;
+                                }
                                 String tmpResolvedPhase = plan.aliases().getOrDefault(phase, phase);
                                 String resolvedPhase = tmpResolvedPhase.startsWith(AT)
                                         ? tmpResolvedPhase.substring(AT.length())
@@ -680,9 +683,7 @@ public class BuildPlanExecutor {
                                 + " or a goal in the format <plugin-prefix>:<goal> or"
                                 + " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: "
                                 + lifecycles.stream()
-                                        .flatMap(l -> l.orderedPhases()
-                                                .map(List::stream)
-                                                .orElseGet(() -> l.allPhases().map(Lifecycle.Phase::name)))
+                                        .flatMap(l -> l.allPhases().map(Lifecycle.Phase::name))
                                         .collect(Collectors.joining(", "))
                                 + ".",
                         lifecyclePhase));
@@ -735,6 +736,10 @@ public class BuildPlanExecutor {
                                 ? lifecyclePhase.substring(AT.length())
                                 : AFTER + lifecyclePhase;
                 Set<BuildStep> toKeep = steps.get(endPhase).allPredecessors().collect(Collectors.toSet());
+                toKeep.addAll(toKeep.stream()
+                        .filter(s -> s.name.startsWith(BEFORE))
+                        .map(s -> steps.get(AFTER + s.name.substring(BEFORE.length())))
+                        .toList());
                 steps.values().stream().filter(n -> !toKeep.contains(n)).forEach(BuildStep::skip);
 
                 plan.addProject(project, steps);

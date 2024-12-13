@@ -172,10 +172,10 @@ props:
       defaultValue: ${maven.user.conf}/settings-security4.xml
       configurationSource: User properties
     - key: maven.startInstant
-      configurationType: String
+      configurationType: java.time.Instant
       description: "User property used to store the build timestamp."
       defaultValue: 
-      since: 4.1.0
+      since: 4.0.0
       configurationSource: User properties
     - key: maven.style.color
       configurationType: String

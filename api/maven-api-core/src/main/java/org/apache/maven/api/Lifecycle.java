@@ -20,7 +20,6 @@ package org.apache.maven.api;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -66,9 +65,18 @@ public interface Lifecycle extends ExtensibleEnum {
     String id();
 
     /**
-     * Collection of phases for this lifecycle
+     * Collection of main phases for this lifecycle
      */
     Collection<Phase> phases();
+
+    /**
+     * Collection of main phases for this lifecycle used with the Maven 3 builders.
+     * Those builders does not operate on a graph, but on the list and expect a slightly
+     * different ordering (mainly unit test being executed before packaging).
+     */
+    default Collection<Phase> v3phases() {
+        return phases();
+    }
 
     /**
      * Stream of phases containing all child phases recursively.
@@ -83,14 +91,6 @@ public interface Lifecycle extends ExtensibleEnum {
     Collection<Alias> aliases();
 
     /**
-     * Pre-ordered list of phases.
-     * If not provided, a default order will be computed.
-     */
-    default Optional<List<String>> orderedPhases() {
-        return Optional.empty();
-    }
-
-    /**
      * A phase in the lifecycle.
      *
      * A phase is identified by its name. It also contains a list of plugins bound to that phase,
@@ -101,6 +101,7 @@ public interface Lifecycle extends ExtensibleEnum {
         // ======================
         // Maven defined phases
         // ======================
+        String ALL = "all";
         String BUILD = "build";
         String INITIALIZE = "initialize";
         String VALIDATE = "validate";

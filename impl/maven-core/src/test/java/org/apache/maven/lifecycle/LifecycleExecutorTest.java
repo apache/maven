@@ -173,26 +173,21 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         // [09] jar:jar
         // [10] install:install
         //
-        assertEquals(10, executionPlan.size());
-
-        assertEquals("clean:clean", executionPlan.get(0).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "resources:resources", executionPlan.get(1).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "compiler:compile", executionPlan.get(2).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "it:generate-metadata", executionPlan.get(3).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "resources:testResources",
-                executionPlan.get(4).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "compiler:testCompile", executionPlan.get(5).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "it:generate-test-metadata",
-                executionPlan.get(6).getMojoDescriptor().getFullGoalName());
-        assertEquals("surefire:test", executionPlan.get(7).getMojoDescriptor().getFullGoalName());
-        assertEquals("jar:jar", executionPlan.get(8).getMojoDescriptor().getFullGoalName());
-        assertEquals("install:install", executionPlan.get(9).getMojoDescriptor().getFullGoalName());
+        assertListEquals(
+                List.of(
+                        "clean:clean",
+                        "resources:resources",
+                        "compiler:compile",
+                        "it:generate-metadata",
+                        "resources:testResources",
+                        "compiler:testCompile",
+                        "it:generate-test-metadata",
+                        "surefire:test",
+                        "jar:jar",
+                        "install:install"),
+                executionPlan.stream()
+                        .map(plan -> plan.getMojoDescriptor().getFullGoalName())
+                        .toList());
     }
 
     // We need to take in multiple lifecycles
@@ -226,31 +221,29 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         // [16] install:install
         //
 
-        assertEquals(16, executions.size());
+        assertListEquals(
+                List.of(
+                        "clean:clean",
+                        "it:xpp3-writer",
+                        "it:java",
+                        "it:xpp3-reader",
+                        "it:xpp3-writer",
+                        "it:java",
+                        "it:xpp3-reader",
+                        "resources:resources",
+                        "compiler:compile",
+                        "plugin:descriptor",
+                        "resources:testResources",
+                        "compiler:testCompile",
+                        "surefire:test",
+                        "jar:jar",
+                        "plugin:addPluginArtifactMetadata",
+                        "install:install"),
+                executions.stream()
+                        .map(execution -> execution.getMojoDescriptor().getFullGoalName())
+                        .toList());
 
-        assertEquals("clean:clean", executions.get(0).getMojoDescriptor().getFullGoalName());
-        assertEquals("it:xpp3-writer", executions.get(1).getMojoDescriptor().getFullGoalName());
-        assertEquals("it:java", executions.get(2).getMojoDescriptor().getFullGoalName());
-        assertEquals("it:xpp3-reader", executions.get(3).getMojoDescriptor().getFullGoalName());
-        assertEquals("it:xpp3-writer", executions.get(4).getMojoDescriptor().getFullGoalName());
-        assertEquals("it:java", executions.get(5).getMojoDescriptor().getFullGoalName());
-        assertEquals("it:xpp3-reader", executions.get(6).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "resources:resources", executions.get(7).getMojoDescriptor().getFullGoalName());
-        assertEquals("compiler:compile", executions.get(8).getMojoDescriptor().getFullGoalName());
-        assertEquals("plugin:descriptor", executions.get(9).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "resources:testResources",
-                executions.get(10).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "compiler:testCompile", executions.get(11).getMojoDescriptor().getFullGoalName());
-        assertEquals("surefire:test", executions.get(12).getMojoDescriptor().getFullGoalName());
-        assertEquals("jar:jar", executions.get(13).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "plugin:addPluginArtifactMetadata",
-                executions.get(14).getMojoDescriptor().getFullGoalName());
-        assertEquals("install:install", executions.get(15).getMojoDescriptor().getFullGoalName());
-
+        // Keep the separate configuration checks
         assertEquals(
                 "src/main/mdo/remote-resources.mdo",
                 new MojoExecutionXPathContainer(executions.get(1)).getValue("configuration/models[1]/model"));
@@ -278,24 +271,19 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         // [07] surefire:test
         // [08] jar:jar
         //
-        assertEquals(8, executionPlan.size());
-
-        assertEquals(
-                "resources:resources", executionPlan.get(0).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "compiler:compile", executionPlan.get(1).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "it:generate-metadata", executionPlan.get(2).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "resources:testResources",
-                executionPlan.get(3).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "compiler:testCompile", executionPlan.get(4).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "it:generate-test-metadata",
-                executionPlan.get(5).getMojoDescriptor().getFullGoalName());
-        assertEquals("surefire:test", executionPlan.get(6).getMojoDescriptor().getFullGoalName());
-        assertEquals("jar:jar", executionPlan.get(7).getMojoDescriptor().getFullGoalName());
+        assertListEquals(
+                List.of(
+                        "resources:resources",
+                        "compiler:compile",
+                        "it:generate-metadata",
+                        "resources:testResources",
+                        "compiler:testCompile",
+                        "it:generate-test-metadata",
+                        "surefire:test",
+                        "jar:jar"),
+                executionPlan.stream()
+                        .map(plan -> plan.getMojoDescriptor().getFullGoalName())
+                        .toList());
     }
 
     @Test
@@ -516,18 +504,14 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
                 "afterProjectExecutionSuccess project-basic" //
                 );
 
-        assertEventLog(expectedLog, log);
+        assertListEquals(expectedLog, log);
     }
 
-    private static void assertEventLog(List<String> expectedList, List<String> actualList) {
+    private static void assertListEquals(List<String> expectedList, List<String> actualList) {
         assertEquals(toString(expectedList), toString(actualList));
     }
 
     private static String toString(List<String> lines) {
-        StringBuilder sb = new StringBuilder();
-        for (String line : lines) {
-            sb.append(line).append('\n');
-        }
-        return sb.toString();
+        return String.join("\n", lines);
     }
 }

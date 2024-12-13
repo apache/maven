@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Lifecycle;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
@@ -38,6 +39,7 @@ import org.apache.maven.lifecycle.internal.LifecyclePluginResolver;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
+import org.apache.maven.lifecycle.internal.PhaseId;
 import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
@@ -138,6 +140,11 @@ public class ConcurrentLifecycleStarter implements LifecycleStarter {
         TaskSegment currentSegment = null;
 
         for (String task : tasks) {
+            if (isBeforeOrAfterPhase(task)) {
+                String prevTask = task;
+                task = PhaseId.of(task).phase();
+                logger.warn("Illegal call to phase '{}'. The main phase '{}' will be used instead.", prevTask, task);
+            }
             if (isGoalSpecification(task)) {
                 // "pluginPrefix[:version]:goal" or "groupId:artifactId[:version]:goal"
 
@@ -183,6 +190,10 @@ public class ConcurrentLifecycleStarter implements LifecycleStarter {
             }
         }
         return false;
+    }
+
+    private boolean isBeforeOrAfterPhase(String task) {
+        return task.startsWith(Lifecycle.BEFORE) || task.startsWith(Lifecycle.AFTER);
     }
 
     private boolean isGoalSpecification(String task) {

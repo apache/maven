@@ -82,14 +82,23 @@ public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate
             lifecyclePhase = PhaseId.of(aliases.get(lifecyclePhase)).phase();
         }
 
+        boolean passed = false;
         for (String phase : lifecycle.getPhases()) {
-            Map<PhaseId, List<MojoExecution>> phaseBindings =
-                    new TreeMap<>(Comparator.comparing(PhaseId::toString, new PhaseComparator(lifecycle.getPhases())));
-
-            mappings.put(phase, phaseBindings);
-
+            boolean include = true;
             if (phase.equals(lifecyclePhase)) {
-                break;
+                passed = true;
+            } else if (passed) {
+                if (phase.startsWith(org.apache.maven.api.Lifecycle.AFTER)) {
+                    String realPhase = phase.substring(org.apache.maven.api.Lifecycle.AFTER.length());
+                    include = mappings.containsKey(org.apache.maven.api.Lifecycle.BEFORE + realPhase);
+                } else {
+                    include = false;
+                }
+            }
+            if (include) {
+                Map<PhaseId, List<MojoExecution>> phaseBindings = new TreeMap<>(
+                        Comparator.comparing(PhaseId::toString, new PhaseComparator(lifecycle.getPhases())));
+                mappings.put(phase, phaseBindings);
             }
         }
 
@@ -163,7 +172,7 @@ public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate
             Map<String, Map<PhaseId, List<MojoExecution>>> mappings, String phase) {
         if (phase != null) {
             PhaseId id = PhaseId.of(phase);
-            return mappings.get(id.phase());
+            return mappings.get(id.executionPoint().prefix() + id.phase());
         }
         return null;
     }
