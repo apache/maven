@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" root="true" xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>mng-8414</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <profiles>
+    <profile>
+      <id>my-profile</id>
+      <activation>
+        <condition>true</condition>
+      </activation>
+    </profile>
+  </profiles>
+</project>
