@@ -440,7 +440,7 @@ public final class Constants {
     /**
      * User property used to store the build timestamp.
      *
-     * @since 4.1.0
+     * @since 4.0.0
      */
     @Config(type = "java.time.Instant")
     public static final String MAVEN_START_INSTANT = "maven.startInstant";
