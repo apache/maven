@@ -44,6 +44,7 @@ import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.PathScope;
@@ -92,6 +93,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.transfer.TransferResource;
 
 import static org.apache.maven.internal.impl.Utils.map;
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -112,6 +114,10 @@ public abstract class AbstractSession implements InternalSession {
             Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
             Collections.synchronizedMap(new WeakHashMap<>());
+
+    static {
+        TransferResource.setClock(MonotonicClock.get());
+    }
 
     public AbstractSession(
             RepositorySystemSession session,
