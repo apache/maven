@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Lifecycle;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -39,6 +40,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,6 +56,8 @@ import static java.util.Objects.requireNonNull;
 @Named
 @Singleton
 public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegmentCalculator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLifecycleTaskSegmentCalculator.class);
+
     private final MojoDescriptorCreator mojoDescriptorCreator;
 
     private final LifecyclePluginResolver lifecyclePluginResolver;
@@ -95,6 +100,11 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
         TaskSegment currentSegment = null;
 
         for (String task : tasks) {
+            if (isBeforeOrAfterPhase(task)) {
+                String prevTask = task;
+                task = PhaseId.of(task).phase();
+                LOGGER.warn("Illegal call to phase '{}'. The main phase '{}' will be used instead.", prevTask, task);
+            }
             if (isGoalSpecification(task)) {
                 // "pluginPrefix[:version]:goal" or "groupId:artifactId[:version]:goal"
 
@@ -137,6 +147,10 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
             }
         }
         return false;
+    }
+
+    private boolean isBeforeOrAfterPhase(String task) {
+        return task.startsWith(Lifecycle.BEFORE) || task.startsWith(Lifecycle.AFTER);
     }
 
     private boolean isGoalSpecification(String task) {
