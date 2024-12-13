@@ -23,6 +23,8 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
@@ -278,7 +280,8 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
         logger.info("Total time:  {}{}", formatDuration(time), wallClock);
 
-        logger.info("Finished at: {}", formatTimestamp(finish.atZone(ZoneId.systemDefault())));
+        ZonedDateTime rounded = finish.truncatedTo(ChronoUnit.SECONDS).atZone(ZoneId.systemDefault());
+        logger.info("Finished at: {}", formatTimestamp(rounded));
     }
 
     @Override
