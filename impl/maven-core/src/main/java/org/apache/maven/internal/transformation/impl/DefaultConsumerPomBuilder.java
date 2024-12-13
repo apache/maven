@@ -44,12 +44,16 @@ import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private static final String BOM_PACKAGING = "bom";
 
     public static final String POM_PACKAGING = "pom";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConsumerPomBuilder.class);
 
     private final LifecycleBindingsInjector lifecycleBindingsInjector;
 
@@ -103,6 +107,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
     static Model transform(Model model, MavenProject project) {
         String packaging = model.getPackaging();
+        boolean preserveModelVersion = model.isPreserveModelVersion();
         if (POM_PACKAGING.equals(packaging)) {
             // raw to consumer transform
             model = model.withRoot(false).withModules(null).withSubprojects(null);
@@ -110,7 +115,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 model = model.withParent(model.getParent().withRelativePath(null));
             }
 
-            if (!model.isPreserveModelVersion()) {
+            if (!preserveModelVersion) {
                 model = model.withPreserveModelVersion(false);
                 String modelVersion = new MavenModelVersion().getModelVersion(model);
                 model = model.withModelVersion(modelVersion);
@@ -137,6 +142,9 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
             model = builder.build();
             String modelVersion = new MavenModelVersion().getModelVersion(model);
+            if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
+                warnNotDowngraded(project);
+            }
             model = model.withModelVersion(modelVersion);
         } else {
             Model.Builder builder = prune(
@@ -150,9 +158,20 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
 
             model = builder.build();
             String modelVersion = new MavenModelVersion().getModelVersion(model);
+            if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
+                warnNotDowngraded(project);
+            }
             model = model.withModelVersion(modelVersion);
         }
         return model;
+    }
+
+    static void warnNotDowngraded(MavenProject project) {
+        LOGGER.warn("The consumer POM for " + project.getId() + " cannot be downgraded to 4.0.0. "
+                + "If you intent your build to be consumed with Maven 3 projects, you need to remove "
+                + "the features that request a newer model version.  If you're fine with having the "
+                + "consumer POM not consumable with Maven 3, add the `preserve.model.version='true'` "
+                + "attribute on the <project> element of your POM.");
     }
 
     private static List<Profile> prune(List<Profile> profiles) {
