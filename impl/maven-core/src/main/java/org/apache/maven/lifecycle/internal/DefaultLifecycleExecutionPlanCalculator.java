@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -264,13 +263,10 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         }
 
         LifecycleMappingDelegate delegate;
-        if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {
+        if (List.of(DefaultLifecycles.STANDARD_LIFECYCLES).contains(lifecycle.getId())) {
             delegate = standardDelegate;
         } else {
-            delegate = delegates.get(lifecycle.getId());
-            if (delegate == null) {
-                delegate = standardDelegate;
-            }
+            delegate = delegates.getOrDefault(lifecycle.getId(), standardDelegate);
         }
 
         return delegate.calculateLifecycleMappings(session, project, lifecycle, lifecyclePhase);
