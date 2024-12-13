@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,6 +49,9 @@ import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+import static org.apache.maven.api.Lifecycle.AFTER;
+import static org.apache.maven.api.Lifecycle.BEFORE;
+import static org.apache.maven.api.Lifecycle.Phase.ALL;
 import static org.apache.maven.api.Lifecycle.Phase.BUILD;
 import static org.apache.maven.api.Lifecycle.Phase.COMPILE;
 import static org.apache.maven.api.Lifecycle.Phase.DEPLOY;
@@ -129,34 +131,20 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     public List<String> computePhases(Lifecycle lifecycle) {
         Graph graph = new Graph();
-        lifecycle.phases().forEach(phase -> addPhase(graph, null, null, phase));
+        addPhases(graph, null, null, lifecycle.v3phases());
         List<String> allPhases = graph.visitAll();
         Collections.reverse(allPhases);
         List<String> computed =
                 allPhases.stream().filter(s -> !s.startsWith("$")).collect(Collectors.toList());
-        List<String> given = lifecycle.orderedPhases().orElse(null);
-        if (given != null) {
-            if (given.size() != computed.size()) {
-                Set<String> s1 =
-                        given.stream().filter(s -> !computed.contains(s)).collect(Collectors.toSet());
-                Set<String> s2 =
-                        computed.stream().filter(s -> !given.contains(s)).collect(Collectors.toSet());
-                throw new IllegalStateException(
-                        "List of phases differ in size: expected " + computed.size() + ", but received " + given.size()
-                                + (s1.isEmpty() ? "" : ", missing " + s1)
-                                + (s2.isEmpty() ? "" : ", unexpected " + s2));
-            }
-            return given;
-        }
         return computed;
     }
 
     private static void addPhase(
             Graph graph, Graph.Vertex before, Graph.Vertex after, org.apache.maven.api.Lifecycle.Phase phase) {
-        Graph.Vertex ep0 = graph.addVertex("$" + phase.name());
+        Graph.Vertex ep0 = graph.addVertex(BEFORE + phase.name());
         Graph.Vertex ep1 = graph.addVertex("$$" + phase.name());
         Graph.Vertex ep2 = graph.addVertex(phase.name());
-        Graph.Vertex ep3 = graph.addVertex("$$$" + phase.name());
+        Graph.Vertex ep3 = graph.addVertex(AFTER + phase.name());
         graph.addEdge(ep0, ep1);
         graph.addEdge(ep1, ep2);
         graph.addEdge(ep2, ep3);
@@ -171,11 +159,28 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                 if (link.kind() == Lifecycle.Link.Kind.AFTER) {
                     graph.addEdge(graph.addVertex(link.pointer().phase()), ep0);
                 } else {
-                    graph.addEdge(ep3, graph.addVertex("$" + link.pointer().phase()));
+                    graph.addEdge(ep3, graph.addVertex(BEFORE + link.pointer().phase()));
                 }
             }
         });
-        phase.phases().forEach(child -> addPhase(graph, ep1, ep2, child));
+        addPhases(graph, ep1, ep2, phase.phases());
+    }
+
+    private static void addPhases(
+            Graph graph, Graph.Vertex before, Graph.Vertex after, Collection<Lifecycle.Phase> phases) {
+        // We add ordering between internal phases.
+        // This would be wrong at execution time, but we are here computing a list and not a graph,
+        // so in order to obtain the expected order, we add these links between phases.
+        Lifecycle.Phase prev = null;
+        for (Lifecycle.Phase child : phases) {
+            // add phase
+            addPhase(graph, before, after, child);
+            if (prev != null) {
+                // add link between end of previous phase and beginning of this one
+                graph.addEdge(graph.addVertex(AFTER + prev.name()), graph.addVertex(BEFORE + child.name()));
+            }
+            prev = child;
+        }
     }
 
     @Named
@@ -375,8 +380,8 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         @Override
         public Collection<Phase> phases() {
             return List.of(phase(
-                    "all",
-                    phase(INITIALIZE, phase(VALIDATE)),
+                    ALL,
+                    phase(VALIDATE, phase(INITIALIZE)),
                     phase(
                             BUILD,
                             after(VALIDATE),
@@ -408,6 +413,28 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        public Collection<Phase> v3phases() {
+            return List.of(phase(
+                    ALL,
+                    phase(INITIALIZE, phase(VALIDATE)),
+                    phase(
+                            BUILD,
+                            phase(SOURCES),
+                            phase(RESOURCES),
+                            phase(COMPILE),
+                            phase(READY),
+                            phase(TEST_SOURCES),
+                            phase(TEST_RESOURCES),
+                            phase(TEST_COMPILE),
+                            phase(TEST),
+                            phase(UNIT_TEST),
+                            phase(PACKAGE)),
+                    phase(VERIFY, phase(INTEGRATION_TEST)),
+                    phase(INSTALL),
+                    phase(DEPLOY)));
+        }
+
+        @Override
         public Collection<Alias> aliases() {
             return List.of(
                     alias("generate-sources", SOURCES),
@@ -423,42 +450,6 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                     alias("prepare-package", BEFORE + PACKAGE),
                     alias("pre-integration-test", BEFORE + INTEGRATION_TEST),
                     alias("post-integration-test", AFTER + INTEGRATION_TEST));
-        }
-
-        @Override
-        public Optional<List<String>> orderedPhases() {
-            return Optional.of(Arrays.asList(
-                    VALIDATE,
-                    INITIALIZE,
-                    // "generate-sources",
-                    SOURCES,
-                    // "process-sources",
-                    // "generate-resources",
-                    RESOURCES,
-                    // "process-resources",
-                    COMPILE,
-                    // "process-classes",
-                    READY,
-                    // "generate-test-sources",
-                    TEST_SOURCES,
-                    // "process-test-sources",
-                    // "generate-test-resources",
-                    TEST_RESOURCES,
-                    // "process-test-resources",
-                    TEST_COMPILE,
-                    // "process-test-classes",
-                    TEST,
-                    UNIT_TEST,
-                    // "prepare-package",
-                    PACKAGE,
-                    BUILD,
-                    // "pre-integration-test",
-                    INTEGRATION_TEST,
-                    // "post-integration-test",
-                    VERIFY,
-                    INSTALL,
-                    DEPLOY,
-                    "all"));
         }
     }
 

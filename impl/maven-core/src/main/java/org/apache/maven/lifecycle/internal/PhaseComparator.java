@@ -43,8 +43,8 @@ public class PhaseComparator implements Comparator<String> {
     public int compare(String o1, String o2) {
         PhaseId p1 = PhaseId.of(o1);
         PhaseId p2 = PhaseId.of(o2);
-        int i1 = lifecyclePhases.indexOf(p1.phase());
-        int i2 = lifecyclePhases.indexOf(p2.phase());
+        int i1 = lifecyclePhases.indexOf(p1.executionPoint().prefix() + p1.phase());
+        int i2 = lifecyclePhases.indexOf(p2.executionPoint().prefix() + p2.phase());
         if (i1 == -1 && i2 == -1) {
             // unknown phases, leave in existing order
             return 0;
@@ -58,13 +58,6 @@ public class PhaseComparator implements Comparator<String> {
             return -1;
         }
         int rv = Integer.compare(i1, i2);
-        if (rv != 0) {
-            return rv;
-        }
-        // same phase, now compare execution points
-        i1 = p1.executionPoint().ordinal();
-        i2 = p2.executionPoint().ordinal();
-        rv = Integer.compare(i1, i2);
         if (rv != 0) {
             return rv;
         }
