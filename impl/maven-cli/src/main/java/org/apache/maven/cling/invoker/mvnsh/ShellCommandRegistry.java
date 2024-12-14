@@ -129,7 +129,7 @@ public class ShellCommandRegistry extends AbstractCommandRegistry implements Aut
 
     private void mvnenc(CommandInput input) {
         try {
-            shellEncryptInvoker.invoke(encryptParser.parseInvocation(ParserRequest.mvn(
+            shellEncryptInvoker.invoke(encryptParser.parseInvocation(ParserRequest.mvnenc(
                             input.args(),
                             shellContext.invokerRequest.logger(),
                             shellContext.invokerRequest.messageBuilderFactory())
