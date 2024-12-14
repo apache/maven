@@ -69,7 +69,7 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
     }
 
     /**
-     * The mandatory Encrypt options.
+     * The mandatory Shell options.
      */
     @Nonnull
     public ShellOptions options() {

@@ -20,6 +20,7 @@ package org.apache.maven.cling.invoker.mvnsh;
 
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.mvnenc.EncryptContext;
 import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
 
@@ -27,9 +28,9 @@ import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
  * Shell Encrypt invoker: passes over relevant context bits.
  */
 public class ShellEncryptInvoker extends EncryptInvoker {
-    private final ShellContext shellContext;
+    private final LookupContext shellContext;
 
-    public ShellEncryptInvoker(ShellContext shellContext) {
+    public ShellEncryptInvoker(LookupContext shellContext) {
         super(shellContext.invokerRequest.lookup());
         this.shellContext = shellContext;
     }

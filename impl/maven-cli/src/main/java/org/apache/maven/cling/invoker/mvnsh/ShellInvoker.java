@@ -22,6 +22,7 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.jline.builtins.ConfigurationPath;
 import org.jline.console.impl.Builtins;
@@ -47,22 +48,22 @@ import org.jline.widget.TailTipWidgets;
 /**
  * mvnsh invoker implementation.
  */
-public class ShellInvoker extends LookupInvoker<ShellContext> {
+public class ShellInvoker extends LookupInvoker<LookupContext> {
 
     public ShellInvoker(Lookup protoLookup) {
         super(protoLookup);
     }
 
     @Override
-    protected ShellContext createContext(InvokerRequest invokerRequest) {
-        return new ShellContext(invokerRequest);
+    protected LookupContext createContext(InvokerRequest invokerRequest) {
+        return new LookupContext(invokerRequest);
     }
 
     public static final int OK = 0; // OK
     public static final int ERROR = 1; // "generic" error
 
     @Override
-    protected int execute(ShellContext context) throws Exception {
+    protected int execute(LookupContext context) throws Exception {
         // set up JLine built-in commands
         ConfigurationPath configPath =
                 new ConfigurationPath(context.invokerRequest.cwd(), context.invokerRequest.cwd());

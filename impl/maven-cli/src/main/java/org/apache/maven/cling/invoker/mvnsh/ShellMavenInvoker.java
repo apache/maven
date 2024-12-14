@@ -20,6 +20,7 @@ package org.apache.maven.cling.invoker.mvnsh;
 
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
@@ -27,9 +28,9 @@ import org.apache.maven.cling.invoker.mvn.MavenInvoker;
  * Shell Maven invoker: passes over relevant context bits.
  */
 public class ShellMavenInvoker extends MavenInvoker<MavenContext> {
-    private final ShellContext shellContext;
+    private final LookupContext shellContext;
 
-    public ShellMavenInvoker(ShellContext shellContext) {
+    public ShellMavenInvoker(LookupContext shellContext) {
         super(shellContext.invokerRequest.lookup());
         this.shellContext = shellContext;
     }

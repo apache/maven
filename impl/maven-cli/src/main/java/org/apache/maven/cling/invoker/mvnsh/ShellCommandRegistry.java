@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.cli.ParserRequest;
+import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
 import org.jline.builtins.Completers;
@@ -44,6 +45,7 @@ import org.jline.reader.impl.completer.NullCompleter;
 import static java.util.Objects.requireNonNull;
 import static org.jline.console.impl.JlineCommandRegistry.compileCommandOptions;
 
+// TODO: this should be a component dynamically discovered (and maybe even come thru extensions)
 public class ShellCommandRegistry extends AbstractCommandRegistry implements AutoCloseable {
     public enum Command {
         MVN,
@@ -51,13 +53,13 @@ public class ShellCommandRegistry extends AbstractCommandRegistry implements Aut
     }
 
     private final Supplier<Path> cwd;
-    private final ShellContext shellContext;
+    private final LookupContext shellContext;
     private final ShellMavenInvoker shellMavenInvoker;
     private final MavenParser mavenParser;
     private final ShellEncryptInvoker shellEncryptInvoker;
     private final EncryptParser encryptParser;
 
-    public ShellCommandRegistry(ShellContext shellContext, Supplier<Path> cwd) {
+    public ShellCommandRegistry(LookupContext shellContext, Supplier<Path> cwd) {
         this.cwd = requireNonNull(cwd, "cwd");
         this.shellContext = requireNonNull(shellContext, "shellContext");
         this.shellMavenInvoker = new ShellMavenInvoker(shellContext);
