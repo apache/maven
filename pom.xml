@@ -1014,5 +1014,19 @@ under the License.</licenseText>
         <module>its</module>
       </modules>
     </profile>
+    <profile>
+      <id>resolver-rc-2-staging</id>
+      <activation>
+        <property>
+          <name>os.name</name>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>apache-2255-staging</id>
+          <url>https://repository.apache.org/content/repositories/maven-2255/</url>
+        </repository>
+      </repositories>
+    </profile>
   </profiles>
 </project>
