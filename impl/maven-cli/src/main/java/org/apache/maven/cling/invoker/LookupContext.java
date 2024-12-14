@@ -102,7 +102,6 @@ public class LookupContext implements AutoCloseable {
     public Path installationSettingsPath;
     public Path projectSettingsPath;
     public Path userSettingsPath;
-
     public boolean interactive;
     public Path localRepositoryPath;
     public Settings effectiveSettings;

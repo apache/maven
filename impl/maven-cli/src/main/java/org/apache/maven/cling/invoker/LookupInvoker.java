@@ -481,7 +481,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void settings(C context) throws Exception {
-        settings(context, true, context.lookup.lookup(SettingsBuilder.class));
+        if (context.effectiveSettings == null) {
+            settings(context, true, context.lookup.lookup(SettingsBuilder.class));
+        }
     }
 
     /**

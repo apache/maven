@@ -46,6 +46,13 @@ public class ShellMavenInvoker extends MavenInvoker<MavenContext> {
         result.terminal = shellContext.terminal;
         result.writer = shellContext.writer;
 
+        result.installationSettingsPath = shellContext.installationSettingsPath;
+        result.projectSettingsPath = shellContext.projectSettingsPath;
+        result.userSettingsPath = shellContext.userSettingsPath;
+        result.interactive = shellContext.interactive;
+        result.localRepositoryPath = shellContext.localRepositoryPath;
+        result.effectiveSettings = shellContext.effectiveSettings;
+
         result.containerCapsule = shellContext.containerCapsule;
         result.lookup = shellContext.lookup;
         result.eventSpyDispatcher = shellContext.eventSpyDispatcher;
