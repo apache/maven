@@ -133,6 +133,11 @@ public abstract class LayeredOptions<O extends Options> implements Options {
     }
 
     @Override
+    public Optional<Boolean> offline() {
+        return returnFirstPresentOrEmpty(Options::offline);
+    }
+
+    @Override
     public Optional<Boolean> help() {
         return returnFirstPresentOrEmpty(Options::help);
     }

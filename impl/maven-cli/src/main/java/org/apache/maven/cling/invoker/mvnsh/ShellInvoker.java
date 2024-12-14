@@ -60,8 +60,6 @@ public class ShellInvoker extends LookupInvoker<ShellContext> {
 
     public static final int OK = 0; // OK
     public static final int ERROR = 1; // "generic" error
-    public static final int BAD_OPERATION = 2; // bad user input or alike
-    public static final int CANCELED = 3; // user canceled
 
     @Override
     protected int execute(ShellContext context) throws Exception {

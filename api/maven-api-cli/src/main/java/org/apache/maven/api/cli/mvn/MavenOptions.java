@@ -49,14 +49,6 @@ public interface MavenOptions extends Options {
     Optional<String> alternatePomFile();
 
     /**
-     * Indicates whether Maven should operate in offline mode.
-     *
-     * @return an {@link Optional} containing true if offline mode is enabled, false if disabled, or empty if not specified
-     */
-    @Nonnull
-    Optional<Boolean> offline();
-
-    /**
      * Indicates whether Maven should operate in non-recursive mode (i.e., not build child modules).
      *
      * @return an {@link Optional} containing true if non-recursive mode is enabled, false if disabled, or empty if not specified

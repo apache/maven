@@ -203,6 +203,14 @@ public abstract class CommonsCliOptions implements Options {
     }
 
     @Override
+    public Optional<Boolean> offline() {
+        if (commandLine.hasOption(CLIManager.OFFLINE)) {
+            return Optional.of(Boolean.TRUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<Boolean> help() {
         if (commandLine.hasOption(CLIManager.HELP)) {
             return Optional.of(Boolean.TRUE);
@@ -267,6 +275,7 @@ public abstract class CommonsCliOptions implements Options {
         public static final String LOG_FILE = "l";
         public static final String RAW_STREAMS = "raw-streams";
         public static final String COLOR = "color";
+        public static final String OFFLINE = "o";
         public static final String HELP = "h";
 
         // parameters handled by script
@@ -378,6 +387,10 @@ public abstract class CommonsCliOptions implements Options {
                     .hasArg()
                     .optionalArg(true)
                     .desc("Defines the color mode of the output. Supported are 'auto', 'always', 'never'.")
+                    .build());
+            options.addOption(Option.builder(OFFLINE)
+                    .longOpt("offline")
+                    .desc("Work offline")
                     .build());
 
             // Parameters handled by script
