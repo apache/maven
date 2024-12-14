@@ -47,9 +47,9 @@ under the License.
 #if ($val) `$val` #else - #end
 #end
 
-| No | Key | Type | Description | Default Value | Since | Source |
-| --- | --- | --- | --- | --- | --- | --- |
+| Key | Type | Description | Default Value | Since | Source |
+| --- | --- | --- | --- | --- | --- |
 #foreach($key in $keys)
-| $foreach.count. | `$key.key` | `$key.configurationType` | $key.description | #value( $key.defaultValue ) | $key.since | $key.configurationSource |
+| `$key.key` | `$key.configurationType` | $key.description | #value( $key.defaultValue ) | $key.since | $key.configurationSource |
 #end
 

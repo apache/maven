@@ -25,34 +25,31 @@ import javax.inject.Singleton;
 import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.deployment.DeployRequest;
-import org.eclipse.aether.deployment.DeployResult;
-import org.eclipse.aether.deployment.DeploymentException;
-import org.eclipse.aether.impl.Deployer;
-import org.eclipse.aether.internal.impl.DefaultDeployer;
-import org.eclipse.sisu.Priority;
+import org.eclipse.aether.installation.InstallRequest;
+import org.eclipse.aether.spi.artifact.transformer.ArtifactTransformer;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Maven specific deployer.
+ * Maven specific transformer.
  */
 @Singleton
 @Named
-@Priority(100)
-final class MavenDeployer implements Deployer {
-
-    private final DefaultDeployer deployer;
-
+final class MavenTransformer implements ArtifactTransformer {
     private final ConsumerPomArtifactTransformer consumerPomArtifactTransformer;
 
     @Inject
-    MavenDeployer(DefaultDeployer deployer, ConsumerPomArtifactTransformer consumerPomArtifactTransformer) {
-        this.deployer = requireNonNull(deployer);
+    MavenTransformer(ConsumerPomArtifactTransformer consumerPomArtifactTransformer) {
         this.consumerPomArtifactTransformer = requireNonNull(consumerPomArtifactTransformer);
     }
 
     @Override
-    public DeployResult deploy(RepositorySystemSession session, DeployRequest request) throws DeploymentException {
-        return deployer.deploy(session, consumerPomArtifactTransformer.remapDeployArtifacts(session, request));
+    public InstallRequest transformInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
+        return consumerPomArtifactTransformer.remapInstallArtifacts(session, request);
+    }
+
+    @Override
+    public DeployRequest transformDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
+        return consumerPomArtifactTransformer.remapDeployArtifacts(session, request);
     }
 }

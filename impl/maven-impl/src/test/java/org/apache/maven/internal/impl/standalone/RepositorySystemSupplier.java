@@ -99,6 +99,8 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 
 /**
  * DI Bridge for Maven Resolver
+ *
+ * TODO: reuse mvn4 Supplier here
  */
 @SuppressWarnings("unused")
 public class RepositorySystemSupplier {
@@ -397,6 +399,7 @@ public class RepositorySystemSupplier {
                 repositoryEventDispatcher,
                 artifactFactories != null ? artifactFactories : Map.of(),
                 metadataFactories,
+                Map.of(),
                 syncContextFactory);
     }
 
@@ -419,6 +422,7 @@ public class RepositorySystemSupplier {
                 updateCheckManager,
                 artifactFactories != null ? artifactFactories : Map.of(),
                 metadataFactories,
+                Map.of(),
                 syncContextFactory,
                 offlineController);
     }

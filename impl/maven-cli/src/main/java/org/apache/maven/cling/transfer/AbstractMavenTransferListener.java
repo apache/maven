@@ -20,7 +20,6 @@ package org.apache.maven.cling.transfer;
 
 import java.io.PrintWriter;
 import java.time.Duration;
-import java.time.Instant;
 
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.services.MessageBuilder;
@@ -83,13 +82,11 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         message.resetStyle().append(resource.getResourceName());
         message.style(STYLE).append(" (").append(format.format(contentLength));
 
-        Duration duration =
-                Duration.between(Instant.ofEpochMilli(resource.getTransferStartTime()), MonotonicClock.now());
+        Duration duration = Duration.between(resource.getStartTime(), MonotonicClock.now());
         if ((duration.getSeconds() | duration.getNano()) > 0) { // duration.isPositive()
-            long bytesPerSecond = Math.round(contentLength / (double) duration.toSeconds());
+            double bytesPerSecond = contentLength / (double) duration.toSeconds();
             message.append(" at ");
-            format.format(message, bytesPerSecond);
-            message.append("/s");
+            format.formatRate(message, bytesPerSecond);
         }
 
         message.append(')').resetStyle();

@@ -23,12 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
-
-import static org.apache.maven.api.Lifecycle.AFTER;
-import static org.apache.maven.api.Lifecycle.BEFORE;
 
 /**
  * Lifecycle definition, with eventual plugin bindings (when they are not packaging-specific).
@@ -46,9 +42,7 @@ public class Lifecycle {
             org.apache.maven.api.services.LifecycleRegistry registry, org.apache.maven.api.Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
         this.id = lifecycle.id();
-        this.phases = registry.computePhases(lifecycle).stream()
-                .flatMap(p -> Stream.of(BEFORE + p, p, AFTER + p))
-                .toList();
+        this.phases = registry.computePhases(lifecycle);
         this.defaultPhases = getDefaultPhases(lifecycle);
     }
 
