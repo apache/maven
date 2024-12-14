@@ -262,7 +262,6 @@ public class EmbeddedMavenExecutor implements Executor {
                 Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
                 Method doMain = cliClass.getMethod("doMain", parameterTypes);
                 exec = r -> {
-                    System.setProperties(null);
                     System.setProperties(prepareProperties(r));
                     try {
                         return (int) doMain.invoke(mavenCli, new Object[] {
@@ -279,7 +278,6 @@ public class EmbeddedMavenExecutor implements Executor {
                 Field ansiConsoleInstalled = ansiConsole.getDeclaredField("installed");
                 ansiConsoleInstalled.setAccessible(true);
                 exec = r -> {
-                    System.setProperties(null);
                     System.setProperties(prepareProperties(r));
                     try {
                         try {
@@ -311,8 +309,10 @@ public class EmbeddedMavenExecutor implements Executor {
     }
 
     protected Properties prepareProperties(ExecutorRequest request) {
+        System.setProperties(null); // this "inits" them!
+
         Properties properties = new Properties();
-        properties.putAll(originalProperties);
+        properties.putAll(System.getProperties()); // get mandatory/expected init-ed above
 
         properties.setProperty("user.dir", request.cwd().toString());
         properties.setProperty("user.home", request.userHomeDirectory().toString());
