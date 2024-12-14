@@ -31,6 +31,8 @@ import org.apache.maven.cling.invoker.mvn.MavenInvoker;
  * Resident invoker implementation, similar to "local", but keeps Maven instance resident. This implies, that
  * things like environment, system properties, extensions etc. are loaded only once. It is caller duty to ensure
  * that subsequent call is right for the resident instance (ie no env change or different extension needed).
+ * This implementation "pre-populates" MavenContext with pre-existing stuff (except for very first call)
+ * and does not let DI container to be closed.
  */
 public class ResidentMavenInvoker extends MavenInvoker<MavenContext> {
 
@@ -60,8 +62,10 @@ public class ResidentMavenInvoker extends MavenInvoker<MavenContext> {
 
     @Override
     protected MavenContext createContext(InvokerRequest invokerRequest) {
+        // TODO: in a moment Maven stop pushing user properties to system properties (and maybe something more)
+        // and allow multiple instances per JVM, this may become a pool? derive key based in invokerRequest?
         MavenContext result = residentContext.computeIfAbsent(
-                getContextId(invokerRequest), k -> new MavenContext(invokerRequest, false));
+                "resident", k -> new MavenContext(invokerRequest, false));
         return copyIfDifferent(result, invokerRequest);
     }
 
@@ -78,11 +82,5 @@ public class ResidentMavenInvoker extends MavenInvoker<MavenContext> {
         shadow.maven = mavenContext.maven;
 
         return shadow;
-    }
-
-    protected String getContextId(InvokerRequest invokerRequest) {
-        // TODO: in a moment Maven stop pushing user properties to system properties (and maybe something more)
-        // and allow multiple instances per JVM, this may become a pool?
-        return "resident";
     }
 }

@@ -25,7 +25,8 @@ import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
 /**
- * Local Maven invoker implementation, that expects all the Maven to be on classpath.
+ * Local Maven invoker implementation, that expects all the Maven to be on classpath. It is "one off" by default,
+ * everything is created and everything is disposed at the end of invocation.
  */
 public class LocalMavenInvoker extends MavenInvoker<MavenContext> {
     public LocalMavenInvoker(ProtoLookup protoLookup) {
