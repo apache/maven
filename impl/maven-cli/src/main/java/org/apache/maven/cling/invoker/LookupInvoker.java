@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -65,6 +66,7 @@ import org.apache.maven.cling.invoker.spi.PropertyContributorsHolder;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cling.utils.CLIReportingUtils;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
@@ -75,6 +77,7 @@ import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.slf4j.MavenSimpleLogger;
+import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
@@ -129,8 +132,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected int doInvoke(C context) throws Exception {
         pushCoreProperties(context);
         pushUserProperties(context);
-        validate(context);
-        prepare(context);
         configureLogging(context);
         createTerminal(context);
         activateLogging(context);
@@ -192,10 +193,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
         }
     }
-
-    protected void validate(C context) throws Exception {}
-
-    protected void prepare(C context) throws Exception {}
 
     protected void configureLogging(C context) throws Exception {
         // LOG COLOR
@@ -407,15 +404,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void container(C context) throws Exception {
-        context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
-        context.closeables.add(context::closeContainer);
-        context.lookup = context.containerCapsule.getLookup();
-
-        // refresh logger in case container got customized by spy
-        org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
-        context.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
-                .setCause(error)
-                .log(message);
+        if (context.lookup == null) {
+            context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
+            context.closeables.add(context::closeContainer);
+            context.lookup = context.containerCapsule.getLookup();
+        } else {
+            context.containerCapsule.updateLogging(context);
+        }
     }
 
     protected ContainerCapsuleFactory<C> createContainerCapsuleFactory() {
@@ -435,9 +430,22 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.protoSession = protoSession;
     }
 
-    protected void lookup(C context) throws Exception {}
+    protected void lookup(C context) throws Exception {
+        if (context.eventSpyDispatcher == null) {
+            context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
+        }
+    }
 
-    protected void init(C context) throws Exception {}
+    protected void init(C context) throws Exception {
+        InvokerRequest invokerRequest = context.invokerRequest;
+        Map<String, Object> data = new HashMap<>();
+        data.put("plexus", context.lookup.lookup(PlexusContainer.class));
+        data.put("workingDirectory", invokerRequest.cwd().toString());
+        data.put("systemProperties", toProperties(context.protoSession.getSystemProperties()));
+        data.put("userProperties", toProperties(context.protoSession.getUserProperties()));
+        data.put("versionProperties", CLIReportingUtils.getBuildProperties());
+        context.eventSpyDispatcher.init(() -> data);
+    }
 
     protected void postCommands(C context) throws Exception {
         InvokerRequest invokerRequest = context.invokerRequest;
@@ -554,6 +562,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 .build();
 
         customizeSettingsRequest(context, settingsRequest);
+        if (context.eventSpyDispatcher != null) {
+            context.eventSpyDispatcher.onEvent(settingsRequest);
+        }
 
         context.logger.debug("Reading installation settings from '" + installationSettingsFile + "'");
         context.logger.debug("Reading project settings from '" + projectSettingsFile + "'");
@@ -561,6 +572,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
         SettingsBuilderResult settingsResult = settingsBuilder.build(settingsRequest);
         customizeSettingsResult(context, settingsResult);
+        if (context.eventSpyDispatcher != null) {
+            context.eventSpyDispatcher.onEvent(settingsResult);
+        }
 
         context.effectiveSettings = settingsResult.getEffectiveSettings();
         context.interactive = mayDisableInteractiveMode(context, context.effectiveSettings.isInteractiveMode());

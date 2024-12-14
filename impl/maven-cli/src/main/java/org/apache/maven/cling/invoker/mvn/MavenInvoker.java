@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +37,6 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
-import org.apache.maven.api.services.SettingsBuilderRequest;
-import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
@@ -53,8 +50,6 @@ import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
 import org.apache.maven.cling.transfer.Slf4jMavenTransferListener;
-import org.apache.maven.cling.utils.CLIReportingUtils;
-import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
@@ -70,12 +65,10 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logging.LoggingExecutionListener;
 import org.apache.maven.logging.MavenTransferListener;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
 
 import static java.util.Comparator.comparing;
-import static org.apache.maven.cling.invoker.Utils.toProperties;
 
 /**
  * The "local" Maven invoker, that expects whole Maven on classpath and invokes it.
@@ -114,21 +107,10 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
 
     @Override
     protected void lookup(C context) throws Exception {
-        context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
-        context.maven = context.lookup.lookup(Maven.class);
-    }
-
-    @Override
-    protected void init(C context) throws Exception {
-        super.init(context);
-        InvokerRequest invokerRequest = context.invokerRequest;
-        Map<String, Object> data = new HashMap<>();
-        data.put("plexus", context.lookup.lookup(PlexusContainer.class));
-        data.put("workingDirectory", invokerRequest.cwd().toString());
-        data.put("systemProperties", toProperties(context.protoSession.getSystemProperties()));
-        data.put("userProperties", toProperties(context.protoSession.getUserProperties()));
-        data.put("versionProperties", CLIReportingUtils.getBuildProperties());
-        context.eventSpyDispatcher.init(() -> data);
+        if (context.maven == null) {
+            super.lookup(context);
+            context.maven = context.lookup.lookup(Maven.class);
+        }
     }
 
     @Override
@@ -142,20 +124,6 @@ public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker
             logger.info("Disabling strict checksum verification on all artifact downloads.");
         } else if (options.strictChecksums().orElse(false)) {
             logger.info("Enabling strict checksum verification on all artifact downloads.");
-        }
-    }
-
-    @Override
-    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) throws Exception {
-        if (context.eventSpyDispatcher != null) {
-            context.eventSpyDispatcher.onEvent(settingsBuilderRequest);
-        }
-    }
-
-    @Override
-    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception {
-        if (context.eventSpyDispatcher != null) {
-            context.eventSpyDispatcher.onEvent(settingsBuilderResult);
         }
     }
 

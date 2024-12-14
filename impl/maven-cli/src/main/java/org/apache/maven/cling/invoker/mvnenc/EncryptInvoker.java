@@ -37,13 +37,13 @@ import org.jline.utils.Colors;
  */
 public class EncryptInvoker extends LookupInvoker<EncryptContext> {
 
+    public static final int OK = 0; // OK
+    public static final int ERROR = 1; // "generic" error
+    public static final int BAD_OPERATION = 2; // bad user input or alike
+    public static final int CANCELED = 3; // user canceled
+
     public EncryptInvoker(ProtoLookup protoLookup) {
         super(protoLookup);
-    }
-
-    @Override
-    protected int execute(EncryptContext context) throws Exception {
-        return doExecute(context);
     }
 
     @Override
@@ -52,16 +52,15 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
     }
 
     @Override
-    protected void lookup(EncryptContext context) {
-        context.goals = context.lookup.lookupMap(Goal.class);
+    protected void lookup(EncryptContext context) throws Exception {
+        if (context.goals == null) {
+            super.lookup(context);
+            context.goals = context.lookup.lookupMap(Goal.class);
+        }
     }
 
-    public static final int OK = 0; // OK
-    public static final int ERROR = 1; // "generic" error
-    public static final int BAD_OPERATION = 2; // bad user input or alike
-    public static final int CANCELED = 3; // user canceled
-
-    protected int doExecute(EncryptContext context) throws Exception {
+    @Override
+    protected int execute(EncryptContext context) throws Exception {
         try {
             context.header = new ArrayList<>();
             context.style = new AttributedStyle();

@@ -21,21 +21,25 @@ package org.apache.maven.cling.invoker.mvn;
 import org.apache.maven.Maven;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.cling.invoker.LookupContext;
-import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 
 @SuppressWarnings("VisibilityModifier")
 public class MavenContext extends LookupContext {
     public MavenContext(InvokerRequest invokerRequest) {
-        super(invokerRequest);
+        this(invokerRequest, true);
     }
 
-    public EventSpyDispatcher eventSpyDispatcher;
+    public MavenContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
+        super(invokerRequest, containerCapsuleManaged);
+    }
+
     public Maven maven;
 
     @Override
-    protected void closeContainer() {
-        eventSpyDispatcher = null;
-        maven = null;
-        super.closeContainer();
+    public void doCloseContainer() {
+        try {
+            super.doCloseContainer();
+        } finally {
+            maven = null;
+        }
     }
 }
