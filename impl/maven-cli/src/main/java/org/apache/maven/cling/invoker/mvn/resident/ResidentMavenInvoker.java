@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
@@ -38,7 +38,7 @@ public class ResidentMavenInvoker extends MavenInvoker<MavenContext> {
 
     private final ConcurrentHashMap<String, MavenContext> residentContext;
 
-    public ResidentMavenInvoker(ProtoLookup protoLookup) {
+    public ResidentMavenInvoker(Lookup protoLookup) {
         super(protoLookup);
         this.residentContext = new ConcurrentHashMap<>();
     }
@@ -64,8 +64,7 @@ public class ResidentMavenInvoker extends MavenInvoker<MavenContext> {
     protected MavenContext createContext(InvokerRequest invokerRequest) {
         // TODO: in a moment Maven stop pushing user properties to system properties (and maybe something more)
         // and allow multiple instances per JVM, this may become a pool? derive key based in invokerRequest?
-        MavenContext result = residentContext.computeIfAbsent(
-                "resident", k -> new MavenContext(invokerRequest, false));
+        MavenContext result = residentContext.computeIfAbsent("resident", k -> new MavenContext(invokerRequest, false));
         return copyIfDifferent(result, invokerRequest);
     }
 

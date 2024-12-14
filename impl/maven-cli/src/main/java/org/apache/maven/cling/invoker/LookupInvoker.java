@@ -95,9 +95,9 @@ import static org.apache.maven.cling.invoker.Utils.toProperties;
  * @param <C> The context type.
  */
 public abstract class LookupInvoker<C extends LookupContext> implements Invoker {
-    protected final ProtoLookup protoLookup;
+    protected final Lookup protoLookup;
 
-    public LookupInvoker(ProtoLookup protoLookup) {
+    public LookupInvoker(Lookup protoLookup) {
         this.protoLookup = requireNonNull(protoLookup);
     }
 
@@ -249,33 +249,40 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void createTerminal(C context) {
-        MessageUtils.systemInstall(
-                builder -> {
-                    builder.streams(
-                            context.invokerRequest.in().orElse(null),
-                            context.invokerRequest.out().orElse(null));
-                    builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
-                    // The exec builder suffers from https://github.com/jline/jline3/issues/1098
-                    // We could re-enable it when fixed to provide support for non-standard architectures,
-                    // for which JLine does not provide any native library.
-                    builder.exec(false);
-                    if (context.coloredOutput != null) {
-                        builder.color(context.coloredOutput);
-                    }
-                },
-                terminal -> doConfigureWithTerminal(context, terminal));
+        if (context.terminal == null) {
+            MessageUtils.systemInstall(
+                    builder -> {
+                        builder.streams(
+                                context.invokerRequest.in().orElse(null),
+                                context.invokerRequest.out().orElse(null));
+                        builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+                        // The exec builder suffers from https://github.com/jline/jline3/issues/1098
+                        // We could re-enable it when fixed to provide support for non-standard architectures,
+                        // for which JLine does not provide any native library.
+                        builder.exec(false);
+                        if (context.coloredOutput != null) {
+                            builder.color(context.coloredOutput);
+                        }
+                    },
+                    terminal -> doConfigureWithTerminal(context, terminal));
 
-        context.terminal = MessageUtils.getTerminal();
-        // JLine is quite slow to start due to the native library unpacking and loading
-        // so boot it asynchronously
-        context.closeables.add(MessageUtils::systemUninstall);
-        MessageUtils.registerShutdownHook(); // safety belt
-        if (context.coloredOutput != null) {
-            MessageUtils.setColorEnabled(context.coloredOutput);
+            context.terminal = MessageUtils.getTerminal();
+            // JLine is quite slow to start due to the native library unpacking and loading
+            // so boot it asynchronously
+            context.closeables.add(MessageUtils::systemUninstall);
+            MessageUtils.registerShutdownHook(); // safety belt
+            if (context.coloredOutput != null) {
+                MessageUtils.setColorEnabled(context.coloredOutput);
+            }
+        } else {
+            if (context.coloredOutput != null) {
+                MessageUtils.setColorEnabled(context.coloredOutput);
+            }
         }
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
+        context.terminal = terminal;
         Options options = context.invokerRequest.options();
         if (options.rawStreams().isEmpty() || !options.rawStreams().get()) {
             MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");

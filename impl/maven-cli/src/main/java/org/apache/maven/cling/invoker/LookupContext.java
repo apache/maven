@@ -50,11 +50,11 @@ public class LookupContext implements AutoCloseable {
     public final Function<String, Path> userResolver;
     public final boolean containerCapsuleManaged;
 
-    protected LookupContext(InvokerRequest invokerRequest) {
+    public LookupContext(InvokerRequest invokerRequest) {
         this(invokerRequest, true);
     }
 
-    protected LookupContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
+    public LookupContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
         this.invokerRequest = requireNonNull(invokerRequest);
         this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
         this.installationResolver = s ->

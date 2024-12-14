@@ -44,7 +44,6 @@ import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.Utils;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
@@ -76,7 +75,7 @@ import static java.util.Comparator.comparing;
  * @param <C> The context type.
  */
 public abstract class MavenInvoker<C extends MavenContext> extends LookupInvoker<C> {
-    public MavenInvoker(ProtoLookup protoLookup) {
+    public MavenInvoker(Lookup protoLookup) {
         super(protoLookup);
     }
 

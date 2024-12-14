@@ -28,6 +28,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.cli.ParserRequest;
+import org.apache.maven.cling.invoker.mvn.MavenParser;
+import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
 import org.jline.builtins.Completers;
 import org.jline.builtins.Options;
 import org.jline.console.CmdDesc;
@@ -41,16 +44,26 @@ import org.jline.reader.impl.completer.NullCompleter;
 import static java.util.Objects.requireNonNull;
 import static org.jline.console.impl.JlineCommandRegistry.compileCommandOptions;
 
-public class ShellCommandRegistry extends AbstractCommandRegistry {
+public class ShellCommandRegistry extends AbstractCommandRegistry implements AutoCloseable {
     public enum Command {
         MVN,
         MVNENC
     }
 
     private final Supplier<Path> cwd;
+    private final ShellContext shellContext;
+    private final ShellMavenInvoker shellMavenInvoker;
+    private final MavenParser mavenParser;
+    private final ShellEncryptInvoker shellEncryptInvoker;
+    private final EncryptParser encryptParser;
 
-    public ShellCommandRegistry(Supplier<Path> cwd) {
+    public ShellCommandRegistry(ShellContext shellContext, Supplier<Path> cwd) {
         this.cwd = requireNonNull(cwd, "cwd");
+        this.shellContext = requireNonNull(shellContext, "shellContext");
+        this.shellMavenInvoker = new ShellMavenInvoker(shellContext);
+        this.mavenParser = new MavenParser();
+        this.shellEncryptInvoker = new ShellEncryptInvoker(shellContext);
+        this.encryptParser = new EncryptParser();
         Set<Command> commands = new HashSet<>(EnumSet.allOf(Command.class));
         Map<Command, String> commandName = new HashMap<>();
         Map<Command, CommandMethods> commandExecute = new HashMap<>();
@@ -60,6 +73,12 @@ public class ShellCommandRegistry extends AbstractCommandRegistry {
         commandExecute.put(Command.MVN, new CommandMethods(this::mvn, this::mvnCompleter));
         commandExecute.put(Command.MVNENC, new CommandMethods(this::mvnenc, this::mvnencCompleter));
         registerCommands(commandName, commandExecute);
+    }
+
+    @Override
+    public void close() throws Exception {
+        shellMavenInvoker.close();
+        shellEncryptInvoker.close();
     }
 
     @Override
@@ -90,7 +109,11 @@ public class ShellCommandRegistry extends AbstractCommandRegistry {
 
     private void mvn(CommandInput input) {
         try {
-            input.out().println("mvn");
+            shellMavenInvoker.invoke(mavenParser.parseInvocation(ParserRequest.mvn(
+                            input.args(),
+                            shellContext.invokerRequest.logger(),
+                            shellContext.invokerRequest.messageBuilderFactory())
+                    .build()));
         } catch (Exception e) {
             saveException(e);
         }
@@ -106,7 +129,11 @@ public class ShellCommandRegistry extends AbstractCommandRegistry {
 
     private void mvnenc(CommandInput input) {
         try {
-            input.out().println("mvnenc");
+            shellEncryptInvoker.invoke(encryptParser.parseInvocation(ParserRequest.mvn(
+                            input.args(),
+                            shellContext.invokerRequest.logger(),
+                            shellContext.invokerRequest.messageBuilderFactory())
+                    .build()));
         } catch (Exception e) {
             saveException(e);
         }

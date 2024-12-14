@@ -23,8 +23,8 @@ import java.util.ArrayList;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
@@ -42,7 +42,7 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
     public static final int BAD_OPERATION = 2; // bad user input or alike
     public static final int CANCELED = 3; // user canceled
 
-    public EncryptInvoker(ProtoLookup protoLookup) {
+    public EncryptInvoker(Lookup protoLookup) {
         super(protoLookup);
     }
 

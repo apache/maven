@@ -21,8 +21,8 @@ package org.apache.maven.cling.invoker.mvnsh;
 import java.nio.file.Path;
 
 import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.ProtoLookup;
 import org.jline.builtins.ConfigurationPath;
 import org.jline.console.impl.Builtins;
 import org.jline.console.impl.SimpleSystemRegistryImpl;
@@ -39,8 +39,6 @@ import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.DefaultHighlighter;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.reader.impl.history.DefaultHistory;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.InfoCmp;
@@ -51,7 +49,7 @@ import org.jline.widget.TailTipWidgets;
  */
 public class ShellInvoker extends LookupInvoker<ShellContext> {
 
-    public ShellInvoker(ProtoLookup protoLookup) {
+    public ShellInvoker(Lookup protoLookup) {
         super(protoLookup);
     }
 
@@ -74,16 +72,15 @@ public class ShellInvoker extends LookupInvoker<ShellContext> {
         builtins.rename(Builtins.Command.TTOP, "top");
         builtins.alias("zle", "widget");
         builtins.alias("bindkey", "keymap");
-        // set up commands
-        ShellCommandRegistry shellCommandRegistry = new ShellCommandRegistry(context.invokerRequest::cwd);
         Parser parser = new DefaultParser();
 
-        try (Terminal ter = TerminalBuilder.builder().name("Toolbox").build()) {
+        try (ShellCommandRegistry shellCommandRegistry =
+                new ShellCommandRegistry(context, context.invokerRequest::cwd)) {
             SimpleSystemRegistryImpl systemRegistry =
                     new SimpleSystemRegistryImpl(parser, context.terminal, context.invokerRequest::cwd, configPath);
             systemRegistry.setCommandRegistries(builtins, shellCommandRegistry);
 
-            Path history = context.userResolver.apply(".mima_history");
+            Path history = context.userResolver.apply(".mvnsh_history");
             LineReader reader = LineReaderBuilder.builder()
                     .terminal(context.terminal)
                     .history(new DefaultHistory())
@@ -103,7 +100,7 @@ public class ShellInvoker extends LookupInvoker<ShellContext> {
             KeyMap<Binding> keyMap = reader.getKeyMaps().get("main");
             keyMap.bind(new Reference("tailtip-toggle"), KeyMap.alt("s"));
 
-            String prompt = "prompt> ";
+            String prompt = "mvnsh> ";
             String rightPrompt = null;
 
             // start the shell and process input until the user quits with Ctrl-D
@@ -119,7 +116,7 @@ public class ShellInvoker extends LookupInvoker<ShellContext> {
                 } catch (EndOfFileException e) {
                     return OK;
                 } catch (SystemRegistryImpl.UnknownCommandException e) {
-                    context.logger.error("REPL: ", e);
+                    context.logger.error(e.getMessage());
                 } catch (Exception e) {
                     systemRegistry.trace(e);
                     context.logger.error("Exception: ", e);
@@ -129,7 +126,7 @@ public class ShellInvoker extends LookupInvoker<ShellContext> {
         }
     }
 
-    static class ReplHighlighter extends DefaultHighlighter {
+    private static class ReplHighlighter extends DefaultHighlighter {
         @Override
         protected void commandStyle(LineReader reader, AttributedStringBuilder sb, boolean enable) {
             if (enable) {

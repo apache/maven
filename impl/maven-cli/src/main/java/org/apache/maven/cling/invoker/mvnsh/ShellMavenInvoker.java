@@ -16,25 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.local;
+package org.apache.maven.cling.invoker.mvnsh;
 
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.services.Lookup;
 import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
 /**
- * Local Maven invoker implementation, that expects all the Maven to be on classpath. It is "one off" by default,
- * everything is created and everything is disposed at the end of invocation.
+ * Shell Maven invoker: passes over relevant context bits.
  */
-public class LocalMavenInvoker extends MavenInvoker<MavenContext> {
-    public LocalMavenInvoker(Lookup protoLookup) {
-        super(protoLookup);
+public class ShellMavenInvoker extends MavenInvoker<MavenContext> {
+    private final ShellContext shellContext;
+
+    public ShellMavenInvoker(ShellContext shellContext) {
+        super(shellContext.invokerRequest.lookup());
+        this.shellContext = shellContext;
     }
 
     @Override
     protected MavenContext createContext(InvokerRequest invokerRequest) throws InvokerException {
-        return new MavenContext(invokerRequest);
+        MavenContext result = new MavenContext(invokerRequest, false);
+
+        result.logger = shellContext.logger;
+        result.loggerFactory = shellContext.loggerFactory;
+        result.slf4jConfiguration = shellContext.slf4jConfiguration;
+        result.loggerLevel = shellContext.loggerLevel;
+        result.coloredOutput = shellContext.coloredOutput;
+        result.terminal = shellContext.terminal;
+        result.writer = shellContext.writer;
+
+        result.containerCapsule = shellContext.containerCapsule;
+        result.lookup = shellContext.lookup;
+        result.eventSpyDispatcher = shellContext.eventSpyDispatcher;
+        return result;
     }
 }
