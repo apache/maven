@@ -30,8 +30,6 @@ import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
-import org.apache.maven.cling.invoker.mvnsh.ShellEncryptInvoker;
-import org.apache.maven.cling.invoker.mvnsh.ShellMavenInvoker;
 import org.jline.builtins.Completers;
 import org.jline.builtins.Options;
 import org.jline.console.CmdDesc;

@@ -25,6 +25,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
+import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.jline.builtins.ConfigurationPath;
 import org.jline.console.impl.Builtins;
 import org.jline.console.impl.SimpleSystemRegistryImpl;
@@ -85,6 +86,22 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
 
         Parser parser = new DefaultParser();
 
+        String banner =
+                """
+
+                ░▒▓██████████████▓▒░ ░▒▓█▓▒░░▒▓█▓▒░░▒▓███████▓▒░  ░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░\s
+                ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░       ░▒▓█▓▒░░▒▓█▓▒░\s
+                ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░       ░▒▓█▓▒░░▒▓█▓▒░\s
+                ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓██████▓▒░ ░▒▓████████▓▒░\s
+                ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░       ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░\s
+                ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░       ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░\s
+                ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░   ░▒▓██▓▒░   ░▒▓█▓▒░░▒▓█▓▒░░▒▓███████▓▒░ ░▒▓█▓▒░░▒▓█▓▒░""";
+        context.writer.accept(banner);
+        if (!context.invokerRequest.options().showVersion().orElse(false)) {
+            context.writer.accept(CLIReportingUtils.showVersionMinimal());
+        }
+        context.writer.accept("");
+
         try (holder) {
             SimpleSystemRegistryImpl systemRegistry =
                     new SimpleSystemRegistryImpl(parser, context.terminal, context.invokerRequest::cwd, configPath);
@@ -126,10 +143,21 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
                 } catch (EndOfFileException e) {
                     return OK;
                 } catch (SystemRegistryImpl.UnknownCommandException e) {
-                    context.logger.error(e.getMessage());
+                    context.writer.accept(context.invokerRequest
+                            .messageBuilderFactory()
+                            .builder()
+                            .error(e.getMessage())
+                            .build());
                 } catch (Exception e) {
                     systemRegistry.trace(e);
-                    context.logger.error("Exception: ", e);
+                    context.writer.accept(context.invokerRequest
+                            .messageBuilderFactory()
+                            .builder()
+                            .error("Error:" + e.getMessage())
+                            .build());
+                    if (context.invokerRequest.options().showErrors().orElse(false)) {
+                        e.printStackTrace(context.terminal.writer());
+                    }
                     return ERROR;
                 }
             }

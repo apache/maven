@@ -16,28 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvnsh;
+package org.apache.maven.cling.invoker.mvnsh.builtin;
 
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.cling.invoker.LookupContext;
-import org.apache.maven.cling.invoker.mvn.MavenContext;
-import org.apache.maven.cling.invoker.mvn.MavenInvoker;
+import org.apache.maven.cling.invoker.mvnenc.EncryptContext;
+import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
 
 /**
- * Shell Maven invoker: passes over relevant context bits.
+ * Shell Encrypt invoker: passes over relevant context bits.
  */
-public class ShellMavenInvoker extends MavenInvoker<MavenContext> {
+public class ShellEncryptInvoker extends EncryptInvoker {
     private final LookupContext shellContext;
 
-    public ShellMavenInvoker(LookupContext shellContext) {
+    public ShellEncryptInvoker(LookupContext shellContext) {
         super(shellContext.invokerRequest.lookup());
         this.shellContext = shellContext;
     }
 
     @Override
-    protected MavenContext createContext(InvokerRequest invokerRequest) throws InvokerException {
-        MavenContext result = new MavenContext(invokerRequest, false);
+    protected EncryptContext createContext(InvokerRequest invokerRequest) throws InvokerException {
+        EncryptContext result = new EncryptContext(invokerRequest, false);
 
         result.logger = shellContext.logger;
         result.loggerFactory = shellContext.loggerFactory;
