@@ -58,19 +58,13 @@ public class MavenSimpleLogger extends MavenBaseLogger {
             warnRenderedLevel = builder().warning("WARNING").build();
             errorRenderedLevel = builder().error("ERROR").build();
         }
-        switch (level) {
-            case LOG_LEVEL_TRACE:
-                return traceRenderedLevel;
-            case LOG_LEVEL_DEBUG:
-                return debugRenderedLevel;
-            case LOG_LEVEL_INFO:
-                return infoRenderedLevel;
-            case LOG_LEVEL_WARN:
-                return warnRenderedLevel;
-            case LOG_LEVEL_ERROR:
-            default:
-                return errorRenderedLevel;
-        }
+        return switch (level) {
+            case LOG_LEVEL_TRACE -> traceRenderedLevel;
+            case LOG_LEVEL_DEBUG -> debugRenderedLevel;
+            case LOG_LEVEL_INFO -> infoRenderedLevel;
+            case LOG_LEVEL_WARN -> warnRenderedLevel;
+            default -> errorRenderedLevel;
+        };
     }
 
     protected void write(StringBuilder buf, Throwable t) {

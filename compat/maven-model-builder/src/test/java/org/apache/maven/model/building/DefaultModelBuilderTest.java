@@ -95,13 +95,11 @@ class DefaultModelBuilderTest {
         @Override
         public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
                 throws UnresolvableModelException {
-            switch (dependency.getManagementKey()) {
-                case BASE1_ID:
-                    return new StringModelSource(BASE1);
-                case BASE2_ID:
-                    return new StringModelSource(BASE2);
-            }
-            return null;
+            return switch (dependency.getManagementKey()) {
+                case BASE1_ID -> new StringModelSource(BASE1);
+                case BASE2_ID -> new StringModelSource(BASE2);
+                default -> null;
+            };
         }
     }
 
@@ -183,18 +181,12 @@ class DefaultModelBuilderTest {
         request.setModelResolver(new BaseModelResolver() {
             public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
                     throws UnresolvableModelException {
-                switch (dependency.getManagementKey()) {
-                    case "test:import:pom":
-                        return new FileModelSource(new File(getClass()
-                                .getResource("/poms/depmgmt/import.xml")
-                                .getFile()));
-                    default:
-                        throw new UnresolvableModelException(
-                                "Cannot resolve",
-                                dependency.getGroupId(),
-                                dependency.getArtifactId(),
-                                dependency.getVersion());
+                if (dependency.getManagementKey().equals("test:import:pom")) {
+                    return new FileModelSource(new File(
+                            getClass().getResource("/poms/depmgmt/import.xml").getFile()));
                 }
+                throw new UnresolvableModelException(
+                        "Cannot resolve", dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
             }
         });
 
@@ -224,18 +216,12 @@ class DefaultModelBuilderTest {
         request.setModelResolver(new BaseModelResolver() {
             public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
                     throws UnresolvableModelException {
-                switch (dependency.getManagementKey()) {
-                    case "test:import:pom":
-                        return new FileModelSource(new File(getClass()
-                                .getResource("/poms/depmgmt/import.xml")
-                                .getFile()));
-                    default:
-                        throw new UnresolvableModelException(
-                                "Cannot resolve",
-                                dependency.getGroupId(),
-                                dependency.getArtifactId(),
-                                dependency.getVersion());
+                if (dependency.getManagementKey().equals("test:import:pom")) {
+                    return new FileModelSource(new File(
+                            getClass().getResource("/poms/depmgmt/import.xml").getFile()));
                 }
+                throw new UnresolvableModelException(
+                        "Cannot resolve", dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
             }
         });
 
@@ -265,22 +251,18 @@ class DefaultModelBuilderTest {
         request.setModelResolver(new BaseModelResolver() {
             public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
                     throws UnresolvableModelException {
-                switch (dependency.getManagementKey()) {
-                    case "test:import:pom":
-                        return new FileModelSource(new File(getClass()
-                                .getResource("/poms/depmgmt/import.xml")
-                                .getFile()));
-                    case "test:other:pom":
-                        return new FileModelSource(new File(getClass()
-                                .getResource("/poms/depmgmt/other-import.xml")
-                                .getFile()));
-                    default:
-                        throw new UnresolvableModelException(
-                                "Cannot resolve",
-                                dependency.getGroupId(),
-                                dependency.getArtifactId(),
-                                dependency.getVersion());
-                }
+                return switch (dependency.getManagementKey()) {
+                    case "test:import:pom" -> new FileModelSource(new File(
+                            getClass().getResource("/poms/depmgmt/import.xml").getFile()));
+                    case "test:other:pom" -> new FileModelSource(new File(getClass()
+                            .getResource("/poms/depmgmt/other-import.xml")
+                            .getFile()));
+                    default -> throw new UnresolvableModelException(
+                            "Cannot resolve",
+                            dependency.getGroupId(),
+                            dependency.getArtifactId(),
+                            dependency.getVersion());
+                };
             }
         });
 
@@ -313,22 +295,19 @@ class DefaultModelBuilderTest {
         request.setModelResolver(new BaseModelResolver() {
             public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
                     throws UnresolvableModelException {
-                switch (dependency.getManagementKey()) {
-                    case "org.junit:bom:pom":
-                        return new FileModelSource(new File(getClass()
-                                .getResource("/poms/depmgmt/junit-" + dependency.getVersion() + ".xml")
-                                .getFile()));
-                    case "test:other:pom":
-                        return new FileModelSource(new File(getClass()
-                                .getResource("/poms/depmgmt/distant-import.xml")
-                                .getFile()));
-                    default:
-                        throw new UnresolvableModelException(
-                                "Cannot resolve",
-                                dependency.getGroupId(),
-                                dependency.getArtifactId(),
-                                dependency.getVersion());
-                }
+                return switch (dependency.getManagementKey()) {
+                    case "org.junit:bom:pom" -> new FileModelSource(new File(getClass()
+                            .getResource("/poms/depmgmt/junit-" + dependency.getVersion() + ".xml")
+                            .getFile()));
+                    case "test:other:pom" -> new FileModelSource(new File(getClass()
+                            .getResource("/poms/depmgmt/distant-import.xml")
+                            .getFile()));
+                    default -> throw new UnresolvableModelException(
+                            "Cannot resolve",
+                            dependency.getGroupId(),
+                            dependency.getArtifactId(),
+                            dependency.getVersion());
+                };
             }
         });
 
@@ -363,22 +342,19 @@ class DefaultModelBuilderTest {
         request.setModelResolver(new BaseModelResolver() {
             public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
                     throws UnresolvableModelException {
-                switch (dependency.getManagementKey()) {
-                    case "org.junit:bom:pom":
-                        return new FileModelSource(new File(getClass()
-                                .getResource("/poms/depmgmt/junit-" + dependency.getVersion() + ".xml")
-                                .getFile()));
-                    case "test:other:pom":
-                        return new FileModelSource(new File(getClass()
-                                .getResource("/poms/depmgmt/distant-import.xml")
-                                .getFile()));
-                    default:
-                        throw new UnresolvableModelException(
-                                "Cannot resolve",
-                                dependency.getGroupId(),
-                                dependency.getArtifactId(),
-                                dependency.getVersion());
-                }
+                return switch (dependency.getManagementKey()) {
+                    case "org.junit:bom:pom" -> new FileModelSource(new File(getClass()
+                            .getResource("/poms/depmgmt/junit-" + dependency.getVersion() + ".xml")
+                            .getFile()));
+                    case "test:other:pom" -> new FileModelSource(new File(getClass()
+                            .getResource("/poms/depmgmt/distant-import.xml")
+                            .getFile()));
+                    default -> throw new UnresolvableModelException(
+                            "Cannot resolve",
+                            dependency.getGroupId(),
+                            dependency.getArtifactId(),
+                            dependency.getVersion());
+                };
             }
         });
 

@@ -82,15 +82,12 @@ public class ArtifactDescriptorUtils {
     }
 
     public static String toRepositoryChecksumPolicy(final String artifactRepositoryPolicy) {
-        switch (artifactRepositoryPolicy) {
-            case RepositoryPolicy.CHECKSUM_POLICY_FAIL:
-                return RepositoryPolicy.CHECKSUM_POLICY_FAIL;
-            case RepositoryPolicy.CHECKSUM_POLICY_IGNORE:
-                return RepositoryPolicy.CHECKSUM_POLICY_IGNORE;
-            case RepositoryPolicy.CHECKSUM_POLICY_WARN:
-                return RepositoryPolicy.CHECKSUM_POLICY_WARN;
-            default:
-                throw new IllegalArgumentException("unknown repository checksum policy: " + artifactRepositoryPolicy);
-        }
+        return switch (artifactRepositoryPolicy) {
+            case RepositoryPolicy.CHECKSUM_POLICY_FAIL -> RepositoryPolicy.CHECKSUM_POLICY_FAIL;
+            case RepositoryPolicy.CHECKSUM_POLICY_IGNORE -> RepositoryPolicy.CHECKSUM_POLICY_IGNORE;
+            case RepositoryPolicy.CHECKSUM_POLICY_WARN -> RepositoryPolicy.CHECKSUM_POLICY_WARN;
+            default -> throw new IllegalArgumentException(
+                    "unknown repository checksum policy: " + artifactRepositoryPolicy);
+        };
     }
 }
