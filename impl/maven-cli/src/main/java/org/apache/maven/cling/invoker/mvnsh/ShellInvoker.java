@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker.mvnsh;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.services.Lookup;
@@ -71,13 +72,23 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
         builtins.rename(Builtins.Command.TTOP, "top");
         builtins.alias("zle", "widget");
         builtins.alias("bindkey", "keymap");
+
+        ShellCommandRegistryHolder holder = new ShellCommandRegistryHolder();
+        holder.addCommandRegistry(builtins);
+
+        // gather commands
+        Map<String, ShellCommandRegistryFactory> factories =
+                context.lookup.lookupMap(ShellCommandRegistryFactory.class);
+        for (Map.Entry<String, ShellCommandRegistryFactory> entry : factories.entrySet()) {
+            holder.addCommandRegistry(entry.getValue().createShellCommandRegistry(context));
+        }
+
         Parser parser = new DefaultParser();
 
-        try (ShellCommandRegistry shellCommandRegistry =
-                new ShellCommandRegistry(context, context.invokerRequest::cwd)) {
+        try (holder) {
             SimpleSystemRegistryImpl systemRegistry =
                     new SimpleSystemRegistryImpl(parser, context.terminal, context.invokerRequest::cwd, configPath);
-            systemRegistry.setCommandRegistries(builtins, shellCommandRegistry);
+            systemRegistry.setCommandRegistries(holder.getCommandRegistries());
 
             Path history = context.userResolver.apply(".mvnsh_history");
             LineReader reader = LineReaderBuilder.builder()

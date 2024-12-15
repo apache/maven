@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvnsh;
+package org.apache.maven.cling.invoker.mvnsh.builtin;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -26,12 +25,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
+import org.apache.maven.cling.invoker.mvnsh.ShellEncryptInvoker;
+import org.apache.maven.cling.invoker.mvnsh.ShellMavenInvoker;
 import org.jline.builtins.Completers;
 import org.jline.builtins.Options;
 import org.jline.console.CmdDesc;
@@ -45,22 +45,19 @@ import org.jline.reader.impl.completer.NullCompleter;
 import static java.util.Objects.requireNonNull;
 import static org.jline.console.impl.JlineCommandRegistry.compileCommandOptions;
 
-// TODO: this should be a component dynamically discovered (and maybe even come thru extensions)
-public class ShellCommandRegistry extends AbstractCommandRegistry implements AutoCloseable {
+public class BuiltinShellCommandRegistry extends AbstractCommandRegistry implements AutoCloseable {
     public enum Command {
         MVN,
         MVNENC
     }
 
-    private final Supplier<Path> cwd;
     private final LookupContext shellContext;
     private final ShellMavenInvoker shellMavenInvoker;
     private final MavenParser mavenParser;
     private final ShellEncryptInvoker shellEncryptInvoker;
     private final EncryptParser encryptParser;
 
-    public ShellCommandRegistry(LookupContext shellContext, Supplier<Path> cwd) {
-        this.cwd = requireNonNull(cwd, "cwd");
+    public BuiltinShellCommandRegistry(LookupContext shellContext) {
         this.shellContext = requireNonNull(shellContext, "shellContext");
         this.shellMavenInvoker = new ShellMavenInvoker(shellContext);
         this.mavenParser = new MavenParser();
@@ -95,7 +92,7 @@ public class ShellCommandRegistry extends AbstractCommandRegistry implements Aut
 
     @Override
     public String name() {
-        return "Maven Shell commands";
+        return "Builtin Maven Shell commands";
     }
 
     private List<Completers.OptDesc> commandOptions(String command) {
@@ -125,7 +122,8 @@ public class ShellCommandRegistry extends AbstractCommandRegistry implements Aut
         List<Completer> completers = new ArrayList<>();
         completers.add(new ArgumentCompleter(
                 NullCompleter.INSTANCE,
-                new Completers.OptionCompleter(new Completers.FilesCompleter(cwd), this::commandOptions, 1)));
+                new Completers.OptionCompleter(
+                        new Completers.FilesCompleter(shellContext.invokerRequest::cwd), this::commandOptions, 1)));
         return completers;
     }
 
@@ -145,7 +143,8 @@ public class ShellCommandRegistry extends AbstractCommandRegistry implements Aut
         List<Completer> completers = new ArrayList<>();
         completers.add(new ArgumentCompleter(
                 NullCompleter.INSTANCE,
-                new Completers.OptionCompleter(new Completers.FilesCompleter(cwd), this::commandOptions, 1)));
+                new Completers.OptionCompleter(
+                        new Completers.FilesCompleter(shellContext.invokerRequest::cwd), this::commandOptions, 1)));
         return completers;
     }
 }
