@@ -18,9 +18,6 @@
  */
 package org.apache.maven.cling.extensions;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +31,8 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.ArtifactManager;

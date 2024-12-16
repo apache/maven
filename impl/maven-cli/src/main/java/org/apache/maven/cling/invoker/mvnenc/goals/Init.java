@@ -18,10 +18,6 @@
  */
 package org.apache.maven.cling.invoker.mvnenc.goals;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.io.IOError;
 import java.io.InterruptedIOException;
 import java.util.HashMap;
@@ -30,6 +26,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.mvnenc.EncryptContext;
 import org.codehaus.plexus.components.secdispatcher.DispatcherMeta;
