@@ -1,0 +1,147 @@
+name: Maven 4 Compatibility Testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      maven_version:
+        description: 'Maven 4 version to test (e.g., 4.0.0-rc-1)'
+        required: true
+        default: '4.0.0-rc-1'
+      maven_url:
+        description: 'Maven binary URL (optional)'
+        required: false
+        default: ''
+
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sundays
+
+jobs:
+  discover-projects:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get Apache repositories
+        id: get-repos
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repos = await github.paginate(github.rest.repos.listForOrg, {
+              org: 'apache',
+              per_page: 100,
+              type: 'public'
+            });
+            
+            // Filter for Java repositories that might use Maven
+            const mavenCandidates = repos.filter(repo => 
+              repo.language === 'Java' || 
+              repo.language === 'Kotlin' ||
+              repo.language === 'Scala'
+            ).map(repo => ({
+              name: repo.name,
+              clone_url: repo.clone_url
+            }));
+            
+            core.setOutput('matrix', JSON.stringify(mavenCandidates));
+
+  test-maven4:
+    needs: discover-projects
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        repo: ${{fromJson(needs.discover-projects.outputs.matrix)}}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: apache/${{ matrix.repo.name }}
+
+      - name: Check for Maven build
+        id: check-maven
+        run: |
+          if [ -f "pom.xml" ]; then
+            echo "is_maven=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_maven=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up JDK 17
+        if: steps.check-maven.outputs.is_maven == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set Maven URL
+        if: steps.check-maven.outputs.is_maven == 'true'
+        id: maven-url
+        run: |
+          if [ -n "${{ github.event.inputs.maven_url }}" ]; then
+            echo "download_url=${{ github.event.inputs.maven_url }}" >> $GITHUB_OUTPUT
+          else
+            echo "download_url=https://dlcdn.apache.org/maven/maven-4/${{ github.event.inputs.maven_version }}/binaries/apache-maven-${{ github.event.inputs.maven_version }}-bin.tar.gz" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download and Install Maven 4
+        if: steps.check-maven.outputs.is_maven == 'true'
+        run: |
+          MAVEN_URL="${{ steps.maven-url.outputs.download_url }}"
+          echo "Downloading Maven from: $MAVEN_URL"
+          wget "$MAVEN_URL" -O maven.tar.gz || {
+            echo "Failed to download from primary URL, trying alternative location..."
+            wget "https://archive.apache.org/dist/maven/maven-4/${{ github.event.inputs.maven_version }}/binaries/apache-maven-${{ github.event.inputs.maven_version }}-bin.tar.gz" -O maven.tar.gz
+          }
+          tar xzf maven.tar.gz
+          echo "M2_HOME=$GITHUB_WORKSPACE/apache-maven-${{ github.event.inputs.maven_version }}" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/apache-maven-${{ github.event.inputs.maven_version }}/bin" >> $GITHUB_PATH
+
+      - name: Build with Maven 4
+        if: steps.check-maven.outputs.is_maven == 'true'
+        id: build
+        continue-on-error: true
+        run: |
+          mvn -V -B clean package -DskipTests
+          echo "build_exit_code=$?" >> $GITHUB_OUTPUT
+          mvn -version > maven_version.txt
+          echo "BUILD_LOG<<EOF" >> $GITHUB_ENV
+          cat maven_version.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Report Results
+        if: steps.check-maven.outputs.is_maven == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const buildSuccess = ${{ steps.build.outputs.build_exit_code }} === 0;
+            const status = buildSuccess ? '✅ Success' : '❌ Failed';
+            
+            const issue_body = `
+            # Maven 4 Compatibility Test Report for ${{ matrix.repo.name }}
+            
+            - **Status**: ${status}
+            - **Repository**: ${{ matrix.repo.name }}
+            - **Maven Version**: ${{ github.event.inputs.maven_version }}
+            - **Test Date**: ${new Date().toISOString()}
+            
+            ${buildSuccess ? '### Build Successful' : '### Build Failed'}
+            
+            <details>
+            <summary>Maven Version Info</summary>
+            
+            \`\`\`
+            ${process.env.BUILD_LOG}
+            \`\`\`
+            </details>
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Maven 4 Test Results: ${{ matrix.repo.name }} (${{ github.event.inputs.maven_version }})`,
+              body: issue_body,
+              labels: ['maven4-testing', buildSuccess ? 'success' : 'failed']
+            });
