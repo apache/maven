@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -79,7 +80,6 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.eclipse.aether.util.version.GenericVersionScheme;
-import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
