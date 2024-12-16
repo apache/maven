@@ -296,7 +296,7 @@ class FileSizeFormatTest {
         // Test bytes per second
         MessageBuilder builder = new DefaultMessageBuilder();
         format.formatRate(builder, 5.0);
-        assertEquals("5 B/s", builder.build());
+        assertEquals("5.0 B/s", builder.build());
 
         // Test kilobytes per second
         builder = new DefaultMessageBuilder();
@@ -319,19 +319,33 @@ class FileSizeFormatTest {
         FileSizeFormat format = new FileSizeFormat();
 
         // Test value less than 0.05
+        // Test exact unit thresholds
         MessageBuilder builder = new DefaultMessageBuilder();
         format.formatRate(builder, 45.0); // 45 B/s
-        assertEquals("45 B/s", builder.build());
+        assertEquals("45.0 B/s", builder.build());
 
         // Test value greater than or equal to 10
         builder = new DefaultMessageBuilder();
         format.formatRate(builder, 15000.0); // 15 kB/s
-        assertEquals("15 kB/s", builder.build());
+        assertEquals("15.0 kB/s", builder.build());
 
         // Test value between 0.05 and 10
         builder = new DefaultMessageBuilder();
         format.formatRate(builder, 5500.0); // 5.5 kB/s
         assertEquals("5.5 kB/s", builder.build());
+
+        // Test exact unit thresholds
+        builder = new DefaultMessageBuilder();
+        format.formatRate(builder, 1000.0); // 1 kB/s
+        assertEquals("1.0 kB/s", builder.build());
+
+        builder = new DefaultMessageBuilder();
+        format.formatRate(builder, 1000000.0); // 1 MB/s
+        assertEquals("1.0 MB/s", builder.build());
+
+        builder = new DefaultMessageBuilder();
+        format.formatRate(builder, 1000000000.0); // 1 GB/s
+        assertEquals("1.0 GB/s", builder.build());
     }
 
     @Test
@@ -341,7 +355,7 @@ class FileSizeFormatTest {
         // Test zero rate
         MessageBuilder builder = new DefaultMessageBuilder();
         format.formatRate(builder, 0.0);
-        assertEquals("0 B/s", builder.build());
+        assertEquals("0.0 B/s", builder.build());
 
         // Test rate at exactly 1000 (1 kB/s)
         builder = new DefaultMessageBuilder();
@@ -352,5 +366,44 @@ class FileSizeFormatTest {
         builder = new DefaultMessageBuilder();
         format.formatRate(builder, 1000000.0);
         assertEquals("1.0 MB/s", builder.build());
+    }
+
+    @Test
+    void testFormatRateLargeValues() {
+        FileSizeFormat format = new FileSizeFormat();
+
+        // Test large but valid rates
+        MessageBuilder builder = new DefaultMessageBuilder();
+        format.formatRate(builder, 5e12); // 5 TB/s
+        assertEquals("5000.0 GB/s", builder.build());
+
+        // Test very large rate
+        builder = new DefaultMessageBuilder();
+        format.formatRate(builder, 1e15); // 1 PB/s
+        assertEquals("1000000.0 GB/s", builder.build());
+    }
+
+    @Test
+    void testFormatRateInvalidValues() {
+        FileSizeFormat format = new FileSizeFormat();
+
+        // Test negative rate
+        MessageBuilder builder = new DefaultMessageBuilder();
+        format.formatRate(builder, -1.0);
+        assertEquals("? B/s", builder.build());
+
+        // Test NaN
+        builder = new DefaultMessageBuilder();
+        format.formatRate(builder, Double.NaN);
+        assertEquals("? B/s", builder.build());
+
+        // Test Infinity
+        builder = new DefaultMessageBuilder();
+        format.formatRate(builder, Double.POSITIVE_INFINITY);
+        assertEquals("? B/s", builder.build());
+
+        builder = new DefaultMessageBuilder();
+        format.formatRate(builder, Double.NEGATIVE_INFINITY);
+        assertEquals("? B/s", builder.build());
     }
 }
