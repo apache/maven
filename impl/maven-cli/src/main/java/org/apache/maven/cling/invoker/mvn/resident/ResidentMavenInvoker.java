@@ -28,18 +28,18 @@ import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
 /**
- * Resident invoker implementation, similar to "local", but keeps Maven instance resident. This implies, that
+ * Resident invoker implementation, specialization of Maven Invoker, but keeps Maven instance resident. This implies, that
  * things like environment, system properties, extensions etc. are loaded only once. It is caller duty to ensure
  * that subsequent call is right for the resident instance (ie no env change or different extension needed).
  * This implementation "pre-populates" MavenContext with pre-existing stuff (except for very first call)
  * and does not let DI container to be closed.
  */
-public class ResidentMavenInvoker extends MavenInvoker<MavenContext> {
+public class ResidentMavenInvoker extends MavenInvoker {
 
     private final ConcurrentHashMap<String, MavenContext> residentContext;
 
     public ResidentMavenInvoker(Lookup protoLookup) {
-        super(protoLookup);
+        super(protoLookup, null);
         this.residentContext = new ConcurrentHashMap<>();
     }
 

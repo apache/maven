@@ -35,6 +35,7 @@ import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
@@ -97,8 +98,12 @@ import static org.apache.maven.cling.invoker.Utils.toProperties;
 public abstract class LookupInvoker<C extends LookupContext> implements Invoker {
     protected final Lookup protoLookup;
 
-    public LookupInvoker(Lookup protoLookup) {
+    @Nullable
+    protected final Consumer<LookupContext> contextConsumer;
+
+    public LookupInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
         this.protoLookup = requireNonNull(protoLookup);
+        this.contextConsumer = contextConsumer;
     }
 
     @Override
@@ -109,6 +114,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         oldProps.putAll(System.getProperties());
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try (C context = createContext(invokerRequest)) {
+            if (contextConsumer != null) {
+                contextConsumer.accept(context);
+            }
             try {
                 if (context.containerCapsule != null
                         && context.containerCapsule.currentThreadClassLoader().isPresent()) {

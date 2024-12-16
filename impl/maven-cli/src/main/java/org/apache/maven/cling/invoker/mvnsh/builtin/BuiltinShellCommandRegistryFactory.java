@@ -27,17 +27,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.apache.maven.api.cli.InvokerException;
-import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.services.Lookup;
 import org.apache.maven.cling.invoker.LookupContext;
-import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
-import org.apache.maven.cling.invoker.mvnenc.EncryptContext;
 import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
 import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
 import org.apache.maven.cling.invoker.mvnsh.ShellCommandRegistryFactory;
@@ -69,16 +64,16 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         }
 
         private final LookupContext shellContext;
-        private final ShellMavenInvoker shellMavenInvoker;
+        private final MavenInvoker shellMavenInvoker;
         private final MavenParser mavenParser;
-        private final ShellEncryptInvoker shellEncryptInvoker;
+        private final EncryptInvoker shellEncryptInvoker;
         private final EncryptParser encryptParser;
 
         private BuiltinShellCommandRegistry(LookupContext shellContext) {
             this.shellContext = requireNonNull(shellContext, "shellContext");
-            this.shellMavenInvoker = new ShellMavenInvoker(shellContext.invokerRequest.lookup(), contextCopier());
+            this.shellMavenInvoker = new MavenInvoker(shellContext.invokerRequest.lookup(), contextCopier());
             this.mavenParser = new MavenParser();
-            this.shellEncryptInvoker = new ShellEncryptInvoker(shellContext.invokerRequest.lookup(), contextCopier());
+            this.shellEncryptInvoker = new EncryptInvoker(shellContext.invokerRequest.lookup(), contextCopier());
             this.encryptParser = new EncryptParser();
             Set<Command> commands = new HashSet<>(EnumSet.allOf(Command.class));
             Map<Command, String> commandName = new HashMap<>();
@@ -186,44 +181,6 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                     new Completers.OptionCompleter(
                             new Completers.FilesCompleter(shellContext.invokerRequest::cwd), this::commandOptions, 1)));
             return completers;
-        }
-    }
-
-    /**
-     * Shell Encrypt invoker: passes over relevant context bits.
-     */
-    private static class ShellEncryptInvoker extends EncryptInvoker {
-        private final Consumer<LookupContext> contextCopier;
-
-        private ShellEncryptInvoker(Lookup lookup, Consumer<LookupContext> contextCopier) {
-            super(lookup);
-            this.contextCopier = contextCopier;
-        }
-
-        @Override
-        protected EncryptContext createContext(InvokerRequest invokerRequest) throws InvokerException {
-            EncryptContext result = new EncryptContext(invokerRequest, false);
-            contextCopier.accept(result);
-            return result;
-        }
-    }
-
-    /**
-     * Shell Maven invoker: passes over relevant context bits.
-     */
-    private static class ShellMavenInvoker extends MavenInvoker<MavenContext> {
-        private final Consumer<LookupContext> contextCopier;
-
-        private ShellMavenInvoker(Lookup lookup, Consumer<LookupContext> contextCopier) {
-            super(lookup);
-            this.contextCopier = contextCopier;
-        }
-
-        @Override
-        protected MavenContext createContext(InvokerRequest invokerRequest) throws InvokerException {
-            MavenContext result = new MavenContext(invokerRequest, false);
-            contextCopier.accept(result);
-            return result;
         }
     }
 }

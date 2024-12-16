@@ -53,7 +53,7 @@ import org.jline.widget.TailTipWidgets;
 public class ShellInvoker extends LookupInvoker<LookupContext> {
 
     public ShellInvoker(Lookup protoLookup) {
-        super(protoLookup);
+        super(protoLookup, null);
     }
 
     @Override

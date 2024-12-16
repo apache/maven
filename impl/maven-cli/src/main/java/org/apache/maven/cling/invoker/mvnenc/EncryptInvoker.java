@@ -20,10 +20,13 @@ package org.apache.maven.cling.invoker.mvnenc;
 
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.jline.reader.LineReaderBuilder;
@@ -43,7 +46,11 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
     public static final int CANCELED = 3; // user canceled
 
     public EncryptInvoker(Lookup protoLookup) {
-        super(protoLookup);
+        this(protoLookup, null);
+    }
+
+    public EncryptInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
+        super(protoLookup, contextConsumer);
     }
 
     @Override
