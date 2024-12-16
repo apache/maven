@@ -22,10 +22,12 @@
  * In packages below you find actual implementations.
  *
  * Hierarchy:
- * <ul>{@link org.apache.maven.cling.invoker.LookupInvoker} is the "basis", the common ground of all Maven Tools</ul>
- * <ul>extended by {@link org.apache.maven.cling.invoker.mvn.MavenInvoker} is the "mvn Tool"</ul>
- * <ul>extended by {@link org.apache.maven.cling.invoker.mvnenc.EncryptInvoker} is the "mvnenc Tool"</ul>
- * <ul>extended by {@link org.apache.maven.cling.invoker.mvnsh.ShellInvoker} is the "mvnsh Tool"</ul>
+ * <ul>
+ * <li>{@link org.apache.maven.cling.invoker.LookupInvoker} is the "basis", the common ground of all Maven Tools</li>
+ * <li>extended by {@link org.apache.maven.cling.invoker.mvn.MavenInvoker} is the "mvn Tool"</li>
+ * <li>extended by {@link org.apache.maven.cling.invoker.mvnenc.EncryptInvoker} is the "mvnenc Tool"</li>
+ * <li>extended by {@link org.apache.maven.cling.invoker.mvnsh.ShellInvoker} is the "mvnsh Tool"</li>
+ * </ul>
  *
  * There is one specialization of {@link org.apache.maven.cling.invoker.mvn.MavenInvoker}, the "resident"
  * {@link org.apache.maven.cling.invoker.mvn.resident.ResidentMavenInvoker}. The difference is that this invoker
