@@ -110,6 +110,16 @@ under the License.
       <artifactId>jline-terminal-ffm</artifactId>
     </dependency>
 
+    <!-- (legacy) DI annotations -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+    </dependency>
+
     <!-- DI Runtime -->
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
