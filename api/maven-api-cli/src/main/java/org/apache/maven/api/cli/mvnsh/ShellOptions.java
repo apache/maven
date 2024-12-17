@@ -16,27 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
+package org.apache.maven.api.cli.mvnsh;
+
+import java.util.Collection;
+import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cli.Options;
 
 /**
- * Represents most common tools supported by CLIng.
+ * Defines the options specific to the Maven Shell tool.
+ * This interface extends the general {@link Options} interface, adding shell-specific configuration options.
  *
  * @since 4.0.0
  */
-@Immutable
 @Experimental
-public final class Tools {
-    private Tools() {}
-
-    public static final String MVN_CMD = "mvn";
-    public static final String MVN_NAME = "Maven";
-
-    public static final String MVNENC_CMD = "mvnenc";
-    public static final String MVNENC_NAME = "Maven Password Encrypting Tool";
-
-    public static final String MVNSHELL_CMD = "mvnsh";
-    public static final String MVNSHELL_NAME = "Maven Shell Tool";
+public interface ShellOptions extends Options {
+    /**
+     * Returns a new instance of ShellOptions with values interpolated using the given properties.
+     *
+     * @param properties a collection of property maps to use for interpolation
+     * @return a new EncryptOptions instance with interpolated values
+     */
+    @Nonnull
+    ShellOptions interpolate(Collection<Map<String, String>> properties);
 }

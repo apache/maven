@@ -80,14 +80,6 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
-    public Optional<Boolean> offline() {
-        if (commandLine.hasOption(CLIManager.OFFLINE)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<Boolean> nonRecursive() {
         if (commandLine.hasOption(CLIManager.NON_RECURSIVE)) {
             return Optional.of(Boolean.TRUE);
@@ -263,7 +255,6 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
 
     protected static class CLIManager extends CommonsCliOptions.CLIManager {
         public static final String ALTERNATE_POM_FILE = "f";
-        public static final String OFFLINE = "o";
         public static final String NON_RECURSIVE = "N";
         public static final String UPDATE_SNAPSHOTS = "U";
         public static final String ACTIVATE_PROFILES = "P";
@@ -292,10 +283,6 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
                     .longOpt("file")
                     .hasArg()
                     .desc("Force the use of an alternate POM file (or directory with pom.xml)")
-                    .build());
-            options.addOption(Option.builder(OFFLINE)
-                    .longOpt("offline")
-                    .desc("Work offline")
                     .build());
             options.addOption(Option.builder(NON_RECURSIVE)
                     .longOpt("non-recursive")

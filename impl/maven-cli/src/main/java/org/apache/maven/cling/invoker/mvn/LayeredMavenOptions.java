@@ -55,11 +55,6 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     }
 
     @Override
-    public Optional<Boolean> offline() {
-        return returnFirstPresentOrEmpty(MavenOptions::offline);
-    }
-
-    @Override
     public Optional<Boolean> nonRecursive() {
         return returnFirstPresentOrEmpty(MavenOptions::nonRecursive);
     }

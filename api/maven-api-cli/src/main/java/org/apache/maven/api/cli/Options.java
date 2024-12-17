@@ -183,6 +183,14 @@ public interface Options {
     Optional<String> color();
 
     /**
+     * Indicates whether Maven should operate in offline mode.
+     *
+     * @return an {@link Optional} containing true if offline mode is enabled, false if disabled, or empty if not specified
+     */
+    @Nonnull
+    Optional<Boolean> offline();
+
+    /**
      * Indicates whether to show help information.
      *
      * @return an {@link Optional} containing the boolean flag, or empty if not set

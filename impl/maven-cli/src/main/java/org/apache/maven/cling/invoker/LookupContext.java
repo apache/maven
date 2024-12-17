@@ -35,6 +35,7 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.logging.BuildEventListener;
 import org.jline.terminal.Terminal;
 import org.slf4j.ILoggerFactory;
@@ -47,14 +48,20 @@ public class LookupContext implements AutoCloseable {
     public final Function<String, Path> cwdResolver;
     public final Function<String, Path> installationResolver;
     public final Function<String, Path> userResolver;
+    public final boolean containerCapsuleManaged;
 
-    protected LookupContext(InvokerRequest invokerRequest) {
+    public LookupContext(InvokerRequest invokerRequest) {
+        this(invokerRequest, true);
+    }
+
+    public LookupContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
         this.invokerRequest = requireNonNull(invokerRequest);
         this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
         this.installationResolver = s ->
                 invokerRequest.installationDirectory().resolve(s).normalize().toAbsolutePath();
         this.userResolver =
                 s -> invokerRequest.userHomeDirectory().resolve(s).normalize().toAbsolutePath();
+        this.containerCapsuleManaged = containerCapsuleManaged;
         this.logger = invokerRequest.parserRequest().logger();
 
         Map<String, String> user = new HashMap<>(invokerRequest.userProperties());
@@ -84,8 +91,10 @@ public class LookupContext implements AutoCloseable {
     public Boolean coloredOutput;
     public Terminal terminal;
     public Consumer<String> writer;
+
     public ContainerCapsule containerCapsule;
     public Lookup lookup;
+    public EventSpyDispatcher eventSpyDispatcher;
 
     public BuildEventListener buildEventListener;
 
@@ -93,7 +102,6 @@ public class LookupContext implements AutoCloseable {
     public Path installationSettingsPath;
     public Path projectSettingsPath;
     public Path userSettingsPath;
-
     public boolean interactive;
     public Path localRepositoryPath;
     public Settings effectiveSettings;
@@ -124,11 +132,18 @@ public class LookupContext implements AutoCloseable {
         }
     }
 
-    protected void closeContainer() {
+    public final void closeContainer() {
+        if (containerCapsuleManaged) {
+            doCloseContainer();
+        }
+    }
+
+    public void doCloseContainer() {
         if (containerCapsule != null) {
             try {
                 containerCapsule.close();
             } finally {
+                eventSpyDispatcher = null;
                 lookup = null;
                 containerCapsule = null;
             }

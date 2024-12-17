@@ -26,21 +26,21 @@ import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.mvn.MavenInvoker;
-import org.apache.maven.cling.invoker.mvn.MavenParser;
+import org.apache.maven.cling.invoker.mvnsh.ShellInvoker;
+import org.apache.maven.cling.invoker.mvnsh.ShellParser;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
- * Maven CLI "new-gen".
+ * Maven shell.
  */
-public class MavenCling extends ClingSupport {
+public class MavenShellCling extends ClingSupport {
     /**
      * "Normal" Java entry point. Note: Maven uses ClassWorld Launcher and this entry point is NOT used under normal
      * circumstances.
      */
     public static void main(String[] args) throws IOException {
-        int exitCode = new MavenCling().run(args);
+        int exitCode = new MavenShellCling().run(args);
         System.exit(exitCode);
     }
 
@@ -48,27 +48,27 @@ public class MavenCling extends ClingSupport {
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
     public static int main(String[] args, ClassWorld world) throws IOException {
-        return new MavenCling(world).run(args);
+        return new MavenShellCling(world).run(args);
     }
 
-    public MavenCling() {
+    public MavenShellCling() {
         super();
     }
 
-    public MavenCling(ClassWorld classWorld) {
+    public MavenShellCling(ClassWorld classWorld) {
         super(classWorld);
     }
 
     @Override
     protected Invoker createInvoker() {
-        return new MavenInvoker(
+        return new ShellInvoker(
                 ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
     }
 
     @Override
     protected InvokerRequest parseArguments(String[] args) throws ParserException, IOException {
-        return new MavenParser()
-                .parseInvocation(ParserRequest.mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory())
+        return new ShellParser()
+                .parseInvocation(ParserRequest.mvnsh(args, new ProtoLogger(), new JLineMessageBuilderFactory())
                         .build());
     }
 }

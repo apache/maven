@@ -30,8 +30,12 @@ import org.jline.utils.AttributedStyle;
 
 @SuppressWarnings("VisibilityModifier")
 public class EncryptContext extends LookupContext {
-    protected EncryptContext(InvokerRequest invokerRequest) {
-        super(invokerRequest);
+    public EncryptContext(InvokerRequest invokerRequest) {
+        this(invokerRequest, true);
+    }
+
+    public EncryptContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
+        super(invokerRequest, containerCapsuleManaged);
     }
 
     public Map<String, Goal> goals;

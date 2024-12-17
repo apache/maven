@@ -18,15 +18,17 @@
  */
 package org.apache.maven.cling.invoker.mvnenc.goals;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import java.io.IOError;
+import java.io.InterruptedIOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.mvnenc.EncryptContext;
 import org.codehaus.plexus.components.secdispatcher.DispatcherMeta;
@@ -40,14 +42,12 @@ import org.jline.consoleui.prompt.ConsolePrompt;
 import org.jline.consoleui.prompt.PromptResultItemIF;
 import org.jline.consoleui.prompt.builder.ListPromptBuilder;
 import org.jline.consoleui.prompt.builder.PromptBuilder;
-import org.jline.reader.Candidate;
-import org.jline.reader.Completer;
-import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
+import org.jline.reader.UserInterruptException;
 import org.jline.utils.Colors;
 import org.jline.utils.OSUtils;
 
 import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.BAD_OPERATION;
+import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.CANCELED;
 import static org.apache.maven.cling.invoker.mvnenc.EncryptInvoker.OK;
 
 /**
@@ -63,6 +63,7 @@ public class Init extends InteractiveGoalSupport {
         super(messageBuilderFactory, secDispatcher);
     }
 
+    @SuppressWarnings("MethodLength")
     @Override
     public int doExecute(EncryptContext context) throws Exception {
         EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
@@ -87,125 +88,128 @@ public class Init extends InteractiveGoalSupport {
             promptConfig = new ConsolePrompt.UiConfig("❯", "◯ ", "◉ ", "◯ ");
         }
         promptConfig.setCancellableFirstPrompt(true);
-        ConsolePrompt prompt = new ConsolePrompt(context.reader, context.terminal, promptConfig);
 
         SettingsSecurity config = secDispatcher.readConfiguration(true);
-
         // reset config
         config.setDefaultDispatcher(null);
         config.getConfigurations().clear();
 
-        Map<String, PromptResultItemIF> result = prompt.prompt(
-                context.header, dispatcherPrompt(prompt.getPromptBuilder()).build());
-        if (result == null) {
-            throw new InterruptedException();
-        }
-        if (NONE.equals(result.get("defaultDispatcher").getResult())) {
-            context.terminal
-                    .writer()
-                    .println(messageBuilderFactory
-                            .builder()
-                            .warning(
-                                    "Maven4 SecDispatcher disabled; Maven3 fallback may still work, use `mvnenc diag` to check")
-                            .build());
-            secDispatcher.writeConfiguration(config);
-            return OK;
-        }
-        config.setDefaultDispatcher(result.get("defaultDispatcher").getResult());
+        try (ConsolePrompt prompt = new ConsolePrompt(context.reader, context.terminal, promptConfig)) {
+            Map<String, PromptResultItemIF> dispatcherResult = new HashMap<>();
+            Map<String, PromptResultItemIF> dispatcherConfigResult = new HashMap<>();
+            Map<String, PromptResultItemIF> confirmChoice = new HashMap<>();
 
-        DispatcherMeta meta = secDispatcher.availableDispatchers().stream()
-                .filter(d -> Objects.equals(config.getDefaultDispatcher(), d.name()))
-                .findFirst()
-                .orElseThrow();
-        if (!meta.fields().isEmpty()) {
-            result = prompt.prompt(
-                    context.header,
-                    configureDispatcher(context, meta, prompt.getPromptBuilder())
-                            .build());
-            if (result == null) {
+            prompt.prompt(
+                    context.header, dispatcherPrompt(prompt.getPromptBuilder()).build(), dispatcherResult);
+            if (dispatcherResult.isEmpty()) {
                 throw new InterruptedException();
             }
+            if (NONE.equals(dispatcherResult.get("defaultDispatcher").getResult())) {
+                context.terminal
+                        .writer()
+                        .println(messageBuilderFactory
+                                .builder()
+                                .warning(
+                                        "Maven4 SecDispatcher disabled; Maven3 fallback may still work, use `mvnenc diag` to check")
+                                .build());
+            } else {
+                config.setDefaultDispatcher(
+                        dispatcherResult.get("defaultDispatcher").getResult());
 
-            List<Map.Entry<String, PromptResultItemIF>> editables = result.entrySet().stream()
-                    .filter(e -> e.getValue().getResult().contains("$"))
-                    .toList();
-            if (!editables.isEmpty()) {
-                context.addInHeader("");
-                context.addInHeader("Please customize the editable value:");
-                Map<String, PromptResultItemIF> editMap;
-                for (Map.Entry<String, PromptResultItemIF> editable : editables) {
-                    String template = editable.getValue().getResult();
-                    String prefix = template.substring(0, template.indexOf("$"));
-                    editMap = prompt.prompt(
+                DispatcherMeta meta = secDispatcher.availableDispatchers().stream()
+                        .filter(d -> Objects.equals(config.getDefaultDispatcher(), d.name()))
+                        .findFirst()
+                        .orElseThrow();
+                if (!meta.fields().isEmpty()) {
+                    prompt.prompt(
                             context.header,
-                            prompt.getPromptBuilder()
-                                    .createInputPrompt()
-                                    .name("edit")
-                                    .message(template)
-                                    .addCompleter(new Completer() {
-                                        @Override
-                                        public void complete(
-                                                LineReader reader, ParsedLine line, List<Candidate> candidates) {
-                                            if (!line.line().startsWith(prefix)) {
-                                                candidates.add(
-                                                        new Candidate(prefix, prefix, null, null, null, null, false));
-                                            }
-                                        }
-                                    })
-                                    .addPrompt()
-                                    .build());
-                    if (editMap == null) {
+                            configureDispatcher(context, meta, prompt.getPromptBuilder())
+                                    .build(),
+                            dispatcherConfigResult);
+                    if (dispatcherConfigResult.isEmpty()) {
                         throw new InterruptedException();
                     }
-                    result.put(editable.getKey(), editMap.get("edit"));
+
+                    List<Map.Entry<String, PromptResultItemIF>> editables = dispatcherConfigResult.entrySet().stream()
+                            .filter(e -> e.getValue().getResult().contains("$"))
+                            .toList();
+                    if (!editables.isEmpty()) {
+                        context.addInHeader("");
+                        context.addInHeader("Please customize the editable value:");
+                        Map<String, PromptResultItemIF> editMap = new HashMap<>(editables.size());
+                        for (Map.Entry<String, PromptResultItemIF> editable : editables) {
+                            String template = editable.getValue().getResult();
+                            prompt.prompt(
+                                    context.header,
+                                    prompt.getPromptBuilder()
+                                            .createInputPrompt()
+                                            .name("edit")
+                                            .message(template)
+                                            .addPrompt()
+                                            .build(),
+                                    editMap);
+                            if (editMap.isEmpty()) {
+                                throw new InterruptedException();
+                            }
+                            dispatcherConfigResult.put(editable.getKey(), editMap.get("edit"));
+                        }
+                    }
+
+                    Config dispatcherConfig = new Config();
+                    dispatcherConfig.setName(meta.name());
+                    for (DispatcherMeta.Field field : meta.fields()) {
+                        ConfigProperty property = new ConfigProperty();
+                        property.setName(field.getKey());
+                        property.setValue(
+                                dispatcherConfigResult.get(field.getKey()).getResult());
+                        dispatcherConfig.addProperty(property);
+                    }
+                    if (!dispatcherConfig.getProperties().isEmpty()) {
+                        config.addConfiguration(dispatcherConfig);
+                    }
                 }
             }
 
-            Config dispatcherConfig = new Config();
-            dispatcherConfig.setName(meta.name());
-            for (DispatcherMeta.Field field : meta.fields()) {
-                ConfigProperty property = new ConfigProperty();
-                property.setName(field.getKey());
-                property.setValue(result.get(field.getKey()).getResult());
-                dispatcherConfig.addProperty(property);
-            }
-            if (!dispatcherConfig.getProperties().isEmpty()) {
-                config.addConfiguration(dispatcherConfig);
-            }
-        }
-
-        if (yes) {
-            secDispatcher.writeConfiguration(config);
-        } else {
-            context.addInHeader("");
-            context.addInHeader("Values set:");
-            context.addInHeader("defaultDispatcher=" + config.getDefaultDispatcher());
-            for (Config c : config.getConfigurations()) {
-                context.addInHeader("  dispatcherName=" + c.getName());
-                for (ConfigProperty cp : c.getProperties()) {
-                    context.addInHeader("    " + cp.getName() + "=" + cp.getValue());
-                }
-            }
-
-            result = prompt.prompt(
-                    context.header, confirmPrompt(prompt.getPromptBuilder()).build());
-            ConfirmResult confirm = (ConfirmResult) result.get("confirm");
-            if (confirm.getConfirmed() == ConfirmChoice.ConfirmationValue.YES) {
-                context.terminal
-                        .writer()
-                        .println(messageBuilderFactory
-                                .builder()
-                                .info("Writing out the configuration...")
-                                .build());
+            if (yes) {
                 secDispatcher.writeConfiguration(config);
             } else {
-                context.terminal
-                        .writer()
-                        .println(messageBuilderFactory
-                                .builder()
-                                .warning("Values not accepted; not saving configuration.")
-                                .build());
-                return BAD_OPERATION;
+                context.addInHeader("");
+                context.addInHeader("Values set:");
+                context.addInHeader("defaultDispatcher=" + config.getDefaultDispatcher());
+                for (Config c : config.getConfigurations()) {
+                    context.addInHeader("  dispatcherName=" + c.getName());
+                    for (ConfigProperty cp : c.getProperties()) {
+                        context.addInHeader("    " + cp.getName() + "=" + cp.getValue());
+                    }
+                }
+
+                prompt.prompt(
+                        context.header, confirmPrompt(prompt.getPromptBuilder()).build(), confirmChoice);
+                ConfirmResult confirm = (ConfirmResult) confirmChoice.get("confirm");
+                if (confirm.getConfirmed() == ConfirmChoice.ConfirmationValue.YES) {
+                    context.terminal
+                            .writer()
+                            .println(messageBuilderFactory
+                                    .builder()
+                                    .info("Writing out the configuration...")
+                                    .build());
+                    secDispatcher.writeConfiguration(config);
+                } else {
+                    context.terminal
+                            .writer()
+                            .println(messageBuilderFactory
+                                    .builder()
+                                    .warning("Values not accepted; not saving configuration.")
+                                    .build());
+                    return CANCELED;
+                }
+            }
+        } catch (IOError e) {
+            // TODO: this should be handled properly in jline3!
+            if (e.getCause() instanceof InterruptedIOException) {
+                throw new UserInterruptException(e.getCause());
+            } else {
+                throw e;
             }
         }
 

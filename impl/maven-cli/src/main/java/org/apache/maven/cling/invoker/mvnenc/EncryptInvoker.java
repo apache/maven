@@ -20,11 +20,14 @@ package org.apache.maven.cling.invoker.mvnenc;
 
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
@@ -37,13 +40,17 @@ import org.jline.utils.Colors;
  */
 public class EncryptInvoker extends LookupInvoker<EncryptContext> {
 
-    public EncryptInvoker(ProtoLookup protoLookup) {
-        super(protoLookup);
+    public static final int OK = 0; // OK
+    public static final int ERROR = 1; // "generic" error
+    public static final int BAD_OPERATION = 2; // bad user input or alike
+    public static final int CANCELED = 3; // user canceled
+
+    public EncryptInvoker(Lookup protoLookup) {
+        this(protoLookup, null);
     }
 
-    @Override
-    protected int execute(EncryptContext context) throws Exception {
-        return doExecute(context);
+    public EncryptInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
+        super(protoLookup, contextConsumer);
     }
 
     @Override
@@ -52,16 +59,15 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
     }
 
     @Override
-    protected void lookup(EncryptContext context) {
-        context.goals = context.lookup.lookupMap(Goal.class);
+    protected void lookup(EncryptContext context) throws Exception {
+        if (context.goals == null) {
+            super.lookup(context);
+            context.goals = context.lookup.lookupMap(Goal.class);
+        }
     }
 
-    public static final int OK = 0; // OK
-    public static final int ERROR = 1; // "generic" error
-    public static final int BAD_OPERATION = 2; // bad user input or alike
-    public static final int CANCELED = 3; // user canceled
-
-    protected int doExecute(EncryptContext context) throws Exception {
+    @Override
+    protected int execute(EncryptContext context) throws Exception {
         try {
             context.header = new ArrayList<>();
             context.style = new AttributedStyle();

@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -34,6 +35,7 @@ import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
@@ -65,6 +67,7 @@ import org.apache.maven.cling.invoker.spi.PropertyContributorsHolder;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cling.utils.CLIReportingUtils;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
@@ -75,6 +78,7 @@ import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.slf4j.MavenSimpleLogger;
+import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
@@ -92,19 +96,27 @@ import static org.apache.maven.cling.invoker.Utils.toProperties;
  * @param <C> The context type.
  */
 public abstract class LookupInvoker<C extends LookupContext> implements Invoker {
-    protected final ProtoLookup protoLookup;
+    protected final Lookup protoLookup;
 
-    public LookupInvoker(ProtoLookup protoLookup) {
+    @Nullable
+    protected final Consumer<LookupContext> contextConsumer;
+
+    public LookupInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
         this.protoLookup = requireNonNull(protoLookup);
+        this.contextConsumer = contextConsumer;
     }
 
     @Override
     public int invoke(InvokerRequest invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
 
-        Properties oldProps = (Properties) System.getProperties().clone();
+        Properties oldProps = new Properties();
+        oldProps.putAll(System.getProperties());
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try (C context = createContext(invokerRequest)) {
+            if (contextConsumer != null) {
+                contextConsumer.accept(context);
+            }
             try {
                 if (context.containerCapsule != null
                         && context.containerCapsule.currentThreadClassLoader().isPresent()) {
@@ -128,8 +140,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected int doInvoke(C context) throws Exception {
         pushCoreProperties(context);
         pushUserProperties(context);
-        validate(context);
-        prepare(context);
         configureLogging(context);
         createTerminal(context);
         activateLogging(context);
@@ -192,10 +202,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
     }
 
-    protected void validate(C context) throws Exception {}
-
-    protected void prepare(C context) throws Exception {}
-
     protected void configureLogging(C context) throws Exception {
         // LOG COLOR
         Options mavenOptions = context.invokerRequest.options();
@@ -251,33 +257,40 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void createTerminal(C context) {
-        MessageUtils.systemInstall(
-                builder -> {
-                    builder.streams(
-                            context.invokerRequest.in().orElse(null),
-                            context.invokerRequest.out().orElse(null));
-                    builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
-                    // The exec builder suffers from https://github.com/jline/jline3/issues/1098
-                    // We could re-enable it when fixed to provide support for non-standard architectures,
-                    // for which JLine does not provide any native library.
-                    builder.exec(false);
-                    if (context.coloredOutput != null) {
-                        builder.color(context.coloredOutput);
-                    }
-                },
-                terminal -> doConfigureWithTerminal(context, terminal));
+        if (context.terminal == null) {
+            MessageUtils.systemInstall(
+                    builder -> {
+                        builder.streams(
+                                context.invokerRequest.in().orElse(null),
+                                context.invokerRequest.out().orElse(null));
+                        builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+                        // The exec builder suffers from https://github.com/jline/jline3/issues/1098
+                        // We could re-enable it when fixed to provide support for non-standard architectures,
+                        // for which JLine does not provide any native library.
+                        builder.exec(false);
+                        if (context.coloredOutput != null) {
+                            builder.color(context.coloredOutput);
+                        }
+                    },
+                    terminal -> doConfigureWithTerminal(context, terminal));
 
-        context.terminal = MessageUtils.getTerminal();
-        // JLine is quite slow to start due to the native library unpacking and loading
-        // so boot it asynchronously
-        context.closeables.add(MessageUtils::systemUninstall);
-        MessageUtils.registerShutdownHook(); // safety belt
-        if (context.coloredOutput != null) {
-            MessageUtils.setColorEnabled(context.coloredOutput);
+            context.terminal = MessageUtils.getTerminal();
+            // JLine is quite slow to start due to the native library unpacking and loading
+            // so boot it asynchronously
+            context.closeables.add(MessageUtils::systemUninstall);
+            MessageUtils.registerShutdownHook(); // safety belt
+            if (context.coloredOutput != null) {
+                MessageUtils.setColorEnabled(context.coloredOutput);
+            }
+        } else {
+            if (context.coloredOutput != null) {
+                MessageUtils.setColorEnabled(context.coloredOutput);
+            }
         }
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
+        context.terminal = terminal;
         Options options = context.invokerRequest.options();
         if (options.rawStreams().isEmpty() || !options.rawStreams().get()) {
             MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
@@ -406,15 +419,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void container(C context) throws Exception {
-        context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
-        context.closeables.add(context::closeContainer);
-        context.lookup = context.containerCapsule.getLookup();
-
-        // refresh logger in case container got customized by spy
-        org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
-        context.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
-                .setCause(error)
-                .log(message);
+        if (context.lookup == null) {
+            context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
+            context.closeables.add(context::closeContainer);
+            context.lookup = context.containerCapsule.getLookup();
+        } else {
+            context.containerCapsule.updateLogging(context);
+        }
     }
 
     protected ContainerCapsuleFactory<C> createContainerCapsuleFactory() {
@@ -434,9 +445,22 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.protoSession = protoSession;
     }
 
-    protected void lookup(C context) throws Exception {}
+    protected void lookup(C context) throws Exception {
+        if (context.eventSpyDispatcher == null) {
+            context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
+        }
+    }
 
-    protected void init(C context) throws Exception {}
+    protected void init(C context) throws Exception {
+        InvokerRequest invokerRequest = context.invokerRequest;
+        Map<String, Object> data = new HashMap<>();
+        data.put("plexus", context.lookup.lookup(PlexusContainer.class));
+        data.put("workingDirectory", invokerRequest.cwd().toString());
+        data.put("systemProperties", toProperties(context.protoSession.getSystemProperties()));
+        data.put("userProperties", toProperties(context.protoSession.getUserProperties()));
+        data.put("versionProperties", CLIReportingUtils.getBuildProperties());
+        context.eventSpyDispatcher.init(() -> data);
+    }
 
     protected void postCommands(C context) throws Exception {
         InvokerRequest invokerRequest = context.invokerRequest;
@@ -465,7 +489,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void settings(C context) throws Exception {
-        settings(context, true, context.lookup.lookup(SettingsBuilder.class));
+        if (context.effectiveSettings == null) {
+            settings(context, true, context.lookup.lookup(SettingsBuilder.class));
+        }
     }
 
     /**
@@ -553,6 +579,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 .build();
 
         customizeSettingsRequest(context, settingsRequest);
+        if (context.eventSpyDispatcher != null) {
+            context.eventSpyDispatcher.onEvent(settingsRequest);
+        }
 
         context.logger.debug("Reading installation settings from '" + installationSettingsFile + "'");
         context.logger.debug("Reading project settings from '" + projectSettingsFile + "'");
@@ -560,6 +589,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
         SettingsBuilderResult settingsResult = settingsBuilder.build(settingsRequest);
         customizeSettingsResult(context, settingsResult);
+        if (context.eventSpyDispatcher != null) {
+            context.eventSpyDispatcher.onEvent(settingsResult);
+        }
 
         context.effectiveSettings = settingsResult.getEffectiveSettings();
         context.interactive = mayDisableInteractiveMode(context, context.effectiveSettings.isInteractiveMode());

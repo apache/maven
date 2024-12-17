@@ -23,29 +23,32 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
 /**
- * Resident invoker implementation, similar to "local", but keeps Maven instance resident. This implies, that
+ * Resident invoker implementation, specialization of Maven Invoker, but keeps Maven instance resident. This implies, that
  * things like environment, system properties, extensions etc. are loaded only once. It is caller duty to ensure
  * that subsequent call is right for the resident instance (ie no env change or different extension needed).
+ * This implementation "pre-populates" MavenContext with pre-existing stuff (except for very first call)
+ * and does not let DI container to be closed.
  */
-public class ResidentMavenInvoker extends MavenInvoker<ResidentMavenContext> {
+public class ResidentMavenInvoker extends MavenInvoker {
 
-    private final ConcurrentHashMap<String, ResidentMavenContext> residentContext;
+    private final ConcurrentHashMap<String, MavenContext> residentContext;
 
-    public ResidentMavenInvoker(ProtoLookup protoLookup) {
-        super(protoLookup);
+    public ResidentMavenInvoker(Lookup protoLookup) {
+        super(protoLookup, null);
         this.residentContext = new ConcurrentHashMap<>();
     }
 
     @Override
     public void close() throws InvokerException {
         ArrayList<InvokerException> exceptions = new ArrayList<>();
-        for (ResidentMavenContext context : residentContext.values()) {
+        for (MavenContext context : residentContext.values()) {
             try {
-                context.shutDown();
+                context.doCloseContainer();
             } catch (InvokerException e) {
                 exceptions.add(e);
             }
@@ -58,31 +61,25 @@ public class ResidentMavenInvoker extends MavenInvoker<ResidentMavenContext> {
     }
 
     @Override
-    protected ResidentMavenContext createContext(InvokerRequest invokerRequest) {
-        return residentContext
-                .computeIfAbsent(getContextId(invokerRequest), k -> new ResidentMavenContext(invokerRequest))
-                .copy(invokerRequest);
-    }
-
-    protected String getContextId(InvokerRequest invokerRequest) {
+    protected MavenContext createContext(InvokerRequest invokerRequest) {
         // TODO: in a moment Maven stop pushing user properties to system properties (and maybe something more)
-        // and allow multiple instances per JVM, this may become a pool?
-        return "resident";
+        // and allow multiple instances per JVM, this may become a pool? derive key based in invokerRequest?
+        MavenContext result = residentContext.computeIfAbsent("resident", k -> new MavenContext(invokerRequest, false));
+        return copyIfDifferent(result, invokerRequest);
     }
 
-    @Override
-    protected void container(ResidentMavenContext context) throws Exception {
-        if (context.containerCapsule == null) {
-            super.container(context);
-        } else {
-            context.containerCapsule.updateLogging(context);
+    protected MavenContext copyIfDifferent(MavenContext mavenContext, InvokerRequest invokerRequest) {
+        if (invokerRequest == mavenContext.invokerRequest) {
+            return mavenContext;
         }
-    }
+        MavenContext shadow = new MavenContext(invokerRequest, false);
 
-    @Override
-    protected void lookup(ResidentMavenContext context) throws Exception {
-        if (context.maven == null) {
-            super.lookup(context);
-        }
+        // we carry over only "resident" things
+        shadow.containerCapsule = mavenContext.containerCapsule;
+        shadow.lookup = mavenContext.lookup;
+        shadow.eventSpyDispatcher = mavenContext.eventSpyDispatcher;
+        shadow.maven = mavenContext.maven;
+
+        return shadow;
     }
 }

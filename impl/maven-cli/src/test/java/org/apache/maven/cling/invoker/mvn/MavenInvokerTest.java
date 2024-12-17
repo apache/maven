@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.local;
+package org.apache.maven.cling.invoker.mvn;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -27,8 +27,6 @@ import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
-import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
@@ -40,10 +38,10 @@ import org.junit.jupiter.api.io.TempDir;
  * Local UT.
  */
 @Order(200)
-public class LocalMavenInvokerTest extends MavenInvokerTestSupport {
+public class MavenInvokerTest extends MavenInvokerTestSupport {
     @Override
     protected Invoker createInvoker() {
-        return new LocalMavenInvoker(ProtoLookup.builder()
+        return new MavenInvoker(ProtoLookup.builder()
                 .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
                 .build());
     }

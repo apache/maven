@@ -16,30 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn;
 
-import org.apache.maven.Maven;
-import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.cling.invoker.LookupContext;
-
-@SuppressWarnings("VisibilityModifier")
-public class MavenContext extends LookupContext {
-    public MavenContext(InvokerRequest invokerRequest) {
-        this(invokerRequest, true);
-    }
-
-    public MavenContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
-        super(invokerRequest, containerCapsuleManaged);
-    }
-
-    public Maven maven;
-
-    @Override
-    public void doCloseContainer() {
-        try {
-            super.doCloseContainer();
-        } finally {
-            maven = null;
-        }
-    }
-}
+/**
+ * This package contains the {@code mvnsh} tool implementation.
+ */
+package org.apache.maven.cling.invoker.mvnsh;

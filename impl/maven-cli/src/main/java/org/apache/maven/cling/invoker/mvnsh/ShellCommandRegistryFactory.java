@@ -16,24 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.mvn.local;
+package org.apache.maven.cling.invoker.mvnsh;
 
-import org.apache.maven.api.cli.InvokerException;
-import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.mvn.MavenContext;
-import org.apache.maven.cling.invoker.mvn.MavenInvoker;
+import org.apache.maven.cling.invoker.LookupContext;
+import org.jline.console.CommandRegistry;
 
-/**
- * Local Maven invoker implementation, that expects all the Maven to be on classpath.
- */
-public class LocalMavenInvoker extends MavenInvoker<MavenContext> {
-    public LocalMavenInvoker(ProtoLookup protoLookup) {
-        super(protoLookup);
-    }
-
-    @Override
-    protected MavenContext createContext(InvokerRequest invokerRequest) throws InvokerException {
-        return new MavenContext(invokerRequest);
-    }
+public interface ShellCommandRegistryFactory {
+    CommandRegistry createShellCommandRegistry(LookupContext context);
 }
