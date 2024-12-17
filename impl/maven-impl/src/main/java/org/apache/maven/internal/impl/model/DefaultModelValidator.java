@@ -1534,15 +1534,13 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidProfileId(String id) {
-        switch (id.charAt(0)) { // avoid first character that has special CLI meaning in "mvn -P xxx"
-            case '+': // activate
-            case '-': // deactivate
-            case '!': // deactivate
-            case '?': // optional
-                return false;
-            default:
-        }
-        return true;
+        return switch (id.charAt(0)) { // avoid first character that has special CLI meaning in "mvn -P xxx"
+                // +: activate
+                // -, !: deactivate
+                // ?: optional
+            case '+', '-', '!', '?' -> false;
+            default -> true;
+        };
     }
 
     @SuppressWarnings("checkstyle:parameternumber")

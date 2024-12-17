@@ -198,20 +198,12 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
     private static Artifact parseArtifact(String coords) {
         Artifact s;
         String[] parts = coords.split(":");
-        switch (parts.length) {
-            case 3:
-                s = new DefaultArtifact(parts[0], parts[1], "*", "*", parts[2]);
-                break;
-            case 4:
-                s = new DefaultArtifact(parts[0], parts[1], "*", parts[2], parts[3]);
-                break;
-            case 5:
-                s = new DefaultArtifact(parts[0], parts[1], parts[2], parts[3], parts[4]);
-                break;
-            default:
-                throw new IllegalArgumentException("Bad artifact coordinates " + coords
-                        + ", expected format is <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>");
-        }
+        s = switch (parts.length) {
+            case 3 -> new DefaultArtifact(parts[0], parts[1], "*", "*", parts[2]);
+            case 4 -> new DefaultArtifact(parts[0], parts[1], "*", parts[2], parts[3]);
+            case 5 -> new DefaultArtifact(parts[0], parts[1], parts[2], parts[3], parts[4]);
+            default -> throw new IllegalArgumentException("Bad artifact coordinates " + coords
+                    + ", expected format is <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>");};
         return s;
     }
 }

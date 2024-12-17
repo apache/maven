@@ -442,20 +442,14 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     }
 
     protected String renderLevel(int levelInt) {
-        switch (levelInt) {
-            case LOG_LEVEL_TRACE:
-                return "TRACE";
-            case LOG_LEVEL_DEBUG:
-                return ("DEBUG");
-            case LOG_LEVEL_INFO:
-                return "INFO";
-            case LOG_LEVEL_WARN:
-                return "WARN";
-            case LOG_LEVEL_ERROR:
-                return "ERROR";
-            default:
-                throw new IllegalStateException("Unrecognized level [" + levelInt + "]");
-        }
+        return switch (levelInt) {
+            case LOG_LEVEL_TRACE -> "TRACE";
+            case LOG_LEVEL_DEBUG -> ("DEBUG");
+            case LOG_LEVEL_INFO -> "INFO";
+            case LOG_LEVEL_WARN -> "WARN";
+            case LOG_LEVEL_ERROR -> "ERROR";
+            default -> throw new IllegalStateException("Unrecognized level [" + levelInt + "]");
+        };
     }
 
     public void log(LoggingEvent event) {

@@ -175,36 +175,23 @@ public class Os {
                     || actualOsName.contains("ce"));
             isNT = !is9x;
         }
-        switch (family) {
-            case FAMILY_WINDOWS:
-                return isWindows;
-            case FAMILY_WIN9X:
-                return isWindows && is9x;
-            case FAMILY_NT:
-                return isWindows && isNT;
-            case FAMILY_OS2:
-                return actualOsName.contains(FAMILY_OS2);
-            case FAMILY_NETWARE:
-                return actualOsName.contains(FAMILY_NETWARE);
-            case FAMILY_DOS:
-                return PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE, actualOsName) && !isWindows;
-            case FAMILY_MAC:
-                return actualOsName.contains(FAMILY_MAC) || actualOsName.contains(DARWIN);
-            case FAMILY_TANDEM:
-                return actualOsName.contains("nonstop_kernel");
-            case FAMILY_UNIX:
-                return PATH_SEP.equals(":")
-                        && !isFamily(FAMILY_OPENVMS, actualOsName)
-                        && (!isFamily(FAMILY_MAC, actualOsName) || actualOsName.endsWith("x"));
-            case FAMILY_ZOS:
-                return actualOsName.contains(FAMILY_ZOS) || actualOsName.contains(FAMILY_OS390);
-            case FAMILY_OS400:
-                return actualOsName.contains(FAMILY_OS400);
-            case FAMILY_OPENVMS:
-                return actualOsName.contains(FAMILY_OPENVMS);
-            default:
-                return actualOsName.contains(family.toLowerCase(Locale.US));
-        }
+        return switch (family) {
+            case FAMILY_WINDOWS -> isWindows;
+            case FAMILY_WIN9X -> isWindows && is9x;
+            case FAMILY_NT -> isWindows && isNT;
+            case FAMILY_OS2 -> actualOsName.contains(FAMILY_OS2);
+            case FAMILY_NETWARE -> actualOsName.contains(FAMILY_NETWARE);
+            case FAMILY_DOS -> PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE, actualOsName) && !isWindows;
+            case FAMILY_MAC -> actualOsName.contains(FAMILY_MAC) || actualOsName.contains(DARWIN);
+            case FAMILY_TANDEM -> actualOsName.contains("nonstop_kernel");
+            case FAMILY_UNIX -> PATH_SEP.equals(":")
+                    && !isFamily(FAMILY_OPENVMS, actualOsName)
+                    && (!isFamily(FAMILY_MAC, actualOsName) || actualOsName.endsWith("x"));
+            case FAMILY_ZOS -> actualOsName.contains(FAMILY_ZOS) || actualOsName.contains(FAMILY_OS390);
+            case FAMILY_OS400 -> actualOsName.contains(FAMILY_OS400);
+            case FAMILY_OPENVMS -> actualOsName.contains(FAMILY_OPENVMS);
+            default -> actualOsName.contains(family.toLowerCase(Locale.US));
+        };
     }
 
     /**

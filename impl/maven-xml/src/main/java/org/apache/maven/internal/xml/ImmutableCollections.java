@@ -84,17 +84,15 @@ class ImmutableCollections {
         } else if (collection instanceof AbstractImmutableList) {
             return (List<E>) collection;
         } else {
-            switch (collection.size()) {
-                case 0:
-                    return emptyList();
-                case 1:
-                    return singletonList(collection.iterator().next());
-                case 2:
+            return switch (collection.size()) {
+                case 0 -> emptyList();
+                case 1 -> singletonList(collection.iterator().next());
+                case 2 -> {
                     Iterator<E> it = collection.iterator();
-                    return new List2<>(it.next(), it.next());
-                default:
-                    return new ListN<>(collection);
-            }
+                    yield new List2<>(it.next(), it.next());
+                }
+                default -> new ListN<>(collection);
+            };
         }
     }
 
@@ -113,15 +111,14 @@ class ImmutableCollections {
         } else if (map instanceof AbstractImmutableMap) {
             return map;
         } else {
-            switch (map.size()) {
-                case 0:
-                    return emptyMap();
-                case 1:
+            return switch (map.size()) {
+                case 0 -> emptyMap();
+                case 1 -> {
                     Map.Entry<K, V> entry = map.entrySet().iterator().next();
-                    return singletonMap(entry.getKey(), entry.getValue());
-                default:
-                    return new MapN<>(map);
-            }
+                    yield singletonMap(entry.getKey(), entry.getValue());
+                }
+                default -> new MapN<>(map);
+            };
         }
     }
 

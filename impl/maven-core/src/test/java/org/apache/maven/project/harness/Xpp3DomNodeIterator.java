@@ -122,14 +122,11 @@ class Xpp3DomNodeIterator implements NodeIterator {
             return false;
         }
         if (test instanceof NodeTypeTest) {
-            switch (((NodeTypeTest) test).getNodeType()) {
-                case Compiler.NODE_TYPE_NODE:
-                    return true;
-                case Compiler.NODE_TYPE_TEXT:
-                    return node.getValue() != null;
-                default:
-                    return false;
-            }
+            return switch (((NodeTypeTest) test).getNodeType()) {
+                case Compiler.NODE_TYPE_NODE -> true;
+                case Compiler.NODE_TYPE_TEXT -> node.getValue() != null;
+                default -> false;
+            };
         }
         return false;
     }
