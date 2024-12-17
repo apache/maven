@@ -206,8 +206,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                                 toolchainsResult.getEffectiveToolchains()));
 
         if (!toolchainsResult.getProblems().hasProblemsFor(BuilderProblem.Severity.WARNING)) {
-            context.logger.warn("");
-            context.logger.warn(
+            context.logger.info("");
+            context.logger.info(
                     "Some problems were encountered while building the effective toolchains (use -X to see details)");
 
             if (context.invokerRequest.options().verbose().orElse(false)) {
@@ -217,7 +217,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                 }
             }
 
-            context.logger.warn("");
+            context.logger.info("");
         }
     }
 
