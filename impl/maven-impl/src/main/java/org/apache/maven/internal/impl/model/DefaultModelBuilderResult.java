@@ -19,9 +19,9 @@
 package org.apache.maven.internal.impl.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,7 +42,7 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     private Model effectiveModel;
     private List<Profile> activePomProfiles;
     private List<Profile> activeExternalProfiles;
-    private final List<ModelProblem> problems = new CopyOnWriteArrayList<>();
+    private final Queue<ModelProblem> problems = new ConcurrentLinkedQueue<>();
     private final DefaultModelBuilderResult problemHolder;
 
     private final List<DefaultModelBuilderResult> children = new ArrayList<>();
@@ -125,7 +125,7 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
      */
     @Override
     public List<ModelProblem> getProblems() {
-        return Collections.unmodifiableList(problems);
+        return List.copyOf(problems);
     }
 
     /**
