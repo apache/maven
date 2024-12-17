@@ -153,19 +153,16 @@ public class FileSizeFormat {
     }
 
     public void formatRate(MessageBuilder builder, double rate) {
+        // Handle invalid rates gracefully (including negative values)
+        if (Double.isNaN(rate) || Double.isInfinite(rate) || rate < 0) {
+            builder.append("? B/s");
+            return;
+        }
+
         ScaleUnit unit = ScaleUnit.getScaleUnit(Math.round(rate));
         double scaledRate = rate / unit.bytes();
-        if (unit == ScaleUnit.BYTE || scaledRate < 0.05d || scaledRate >= 10.0d) {
-            builder.append(Long.toString(Math.round(scaledRate)));
-        } else {
-            builder.append(Double.toString(Math.round(scaledRate * 10d) / 10d));
-        }
-        if (unit == ScaleUnit.BYTE) {
-            builder.append(" B");
-        } else {
-            builder.append(" ").append(unit.symbol());
-        }
-        builder.append("/s");
+        builder.append(String.format("%.1f", scaledRate));
+        builder.append(" ").append(unit.symbol()).append("/s");
     }
 
     private void format(MessageBuilder builder, long size, ScaleUnit unit, boolean omitSymbol) {
