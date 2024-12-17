@@ -69,8 +69,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
     @Override
     public ToolchainsBuilderResult build(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
-        // TODO: config
-        ProblemCollector<BuilderProblem> problems = new DefaultProblemCollector<>(100);
+        ProblemCollector<BuilderProblem> problems = DefaultProblemCollector.create(request.getSession());
 
         Source installationSource = request.getInstallationToolchainsSource().orElse(null);
         PersistedToolchains installation = readToolchains(installationSource, request, problems);

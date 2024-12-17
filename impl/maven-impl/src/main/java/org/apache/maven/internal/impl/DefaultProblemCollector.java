@@ -30,6 +30,9 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Constants;
+import org.apache.maven.api.ProtoSession;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ProblemCollector;
 
@@ -41,6 +44,26 @@ import org.apache.maven.api.services.ProblemCollector;
  * @param <P> The type of the problem.
  */
 public class DefaultProblemCollector<P extends BuilderProblem> implements ProblemCollector<P> {
+    /**
+     * Creates new instance of pre-configured problem collector.
+     */
+    public static <P extends BuilderProblem> ProblemCollector<P> create(@Nullable ProtoSession protoSession) {
+        if (protoSession != null
+                && protoSession.getUserProperties().containsKey(Constants.MAVEN_BUILDER_MAX_PROBLEMS)) {
+            return new DefaultProblemCollector<>(
+                    Integer.parseInt(protoSession.getUserProperties().get(Constants.MAVEN_BUILDER_MAX_PROBLEMS)));
+        } else {
+            return new DefaultProblemCollector<>();
+        }
+    }
+
+    /**
+     * Visible for testing only.
+     */
+    public static <P extends BuilderProblem> ProblemCollector<P> create(int maxCountLimit) {
+        return new DefaultProblemCollector<>(maxCountLimit);
+    }
+
     private final int maxCountLimit;
     private final AtomicInteger totalCount;
     private final ConcurrentMap<BuilderProblem.Severity, LongAdder> counters;
@@ -50,7 +73,17 @@ public class DefaultProblemCollector<P extends BuilderProblem> implements Proble
             .sorted(Comparator.reverseOrder())
             .toList();
 
-    public DefaultProblemCollector(int maxCountLimit) {
+    /**
+     * Creates collector collecting up to 100 problems. Do not use this constructor, only when in need.
+     */
+    private DefaultProblemCollector() {
+        this(100);
+    }
+
+    private DefaultProblemCollector(int maxCountLimit) {
+        if (maxCountLimit <= 0) {
+            throw new IllegalArgumentException("maxCountLimit must be greater than 0");
+        }
         this.maxCountLimit = maxCountLimit;
         this.totalCount = new AtomicInteger();
         this.counters = new ConcurrentHashMap<>();
