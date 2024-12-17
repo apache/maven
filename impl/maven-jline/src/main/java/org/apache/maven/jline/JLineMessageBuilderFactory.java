@@ -18,10 +18,6 @@
  */
 package org.apache.maven.jline;
 
-import javax.annotation.Priority;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,6 +27,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Priority;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.codehaus.plexus.components.interactivity.InputHandler;
