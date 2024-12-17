@@ -18,10 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -32,14 +28,14 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public abstract class MavenBuilderException extends MavenException {
 
-    private final List<BuilderProblem> problems;
+    private final ProblemCollector<BuilderProblem> problems;
 
     public MavenBuilderException(String message, Throwable cause) {
         super(message, cause);
-        problems = List.of();
+        problems = ProblemCollector.empty();
     }
 
-    public MavenBuilderException(String message, List<BuilderProblem> problems) {
+    public MavenBuilderException(String message, ProblemCollector<BuilderProblem> problems) {
         super(buildMessage(message, problems), null);
         this.problems = problems;
     }
@@ -49,20 +45,16 @@ public abstract class MavenBuilderException extends MavenException {
      * and then a list is built. These exceptions are usually thrown in "fatal" cases (and usually prevent Maven
      * from starting), and these exceptions may end up very early on output.
      */
-    protected static String buildMessage(String message, List<BuilderProblem> problems) {
+    protected static String buildMessage(String message, ProblemCollector<BuilderProblem> problems) {
         StringBuilder msg = new StringBuilder(message);
-        ArrayList<BuilderProblem> sorted = new ArrayList<>(problems);
-        sorted.sort(Comparator.comparing(BuilderProblem::getSeverity));
-        for (BuilderProblem problem : sorted) {
-            msg.append("\n * ")
-                    .append(problem.getSeverity().name())
-                    .append(": ")
-                    .append(problem.getMessage());
-        }
+        problems.problems().forEach(problem -> msg.append("\n * ")
+                .append(problem.getSeverity().name())
+                .append(": ")
+                .append(problem.getMessage()));
         return msg.toString();
     }
 
-    public List<BuilderProblem> getProblems() {
+    public ProblemCollector<BuilderProblem> getProblemCollector() {
         return problems;
     }
 }

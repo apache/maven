@@ -23,8 +23,6 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -32,6 +30,7 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderException;
@@ -70,7 +69,8 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
     @Override
     public ToolchainsBuilderResult build(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
-        List<BuilderProblem> problems = new ArrayList<>();
+        // TODO: config
+        ProblemCollector<BuilderProblem> problems = new DefaultProblemCollector<>(100);
 
         Source installationSource = request.getInstallationToolchainsSource().orElse(null);
         PersistedToolchains installation = readToolchains(installationSource, request, problems);
@@ -80,27 +80,15 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
         PersistedToolchains effective = toolchainsMerger.merge(user, installation, false, null);
 
-        if (hasErrors(problems)) {
+        if (problems.hasErrors()) {
             throw new ToolchainsBuilderException("Error building toolchains", problems);
         }
 
         return new DefaultToolchainsBuilderResult(effective, problems);
     }
 
-    private boolean hasErrors(List<BuilderProblem> problems) {
-        if (problems != null) {
-            for (BuilderProblem problem : problems) {
-                if (BuilderProblem.Severity.ERROR.compareTo(problem.getSeverity()) >= 0) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     private PersistedToolchains readToolchains(
-            Source toolchainsSource, ToolchainsBuilderRequest request, List<BuilderProblem> problems) {
+            Source toolchainsSource, ToolchainsBuilderRequest request, ProblemCollector<BuilderProblem> problems) {
         if (toolchainsSource == null) {
             return PersistedToolchains.newInstance();
         }
@@ -129,7 +117,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
                         .strict(false)
                         .build());
                 Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
-                problems.add(new DefaultBuilderProblem(
+                problems.reportProblem(new DefaultBuilderProblem(
                         toolchainsSource.getLocation(),
                         loc != null ? loc.getLineNumber() : -1,
                         loc != null ? loc.getColumnNumber() : -1,
@@ -139,7 +127,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
             }
         } catch (XmlReaderException e) {
             Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
-            problems.add(new DefaultBuilderProblem(
+            problems.reportProblem(new DefaultBuilderProblem(
                     toolchainsSource.getLocation(),
                     loc != null ? loc.getLineNumber() : -1,
                     loc != null ? loc.getColumnNumber() : -1,
@@ -148,7 +136,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
                     BuilderProblem.Severity.FATAL));
             return PersistedToolchains.newInstance();
         } catch (IOException e) {
-            problems.add(new DefaultBuilderProblem(
+            problems.reportProblem(new DefaultBuilderProblem(
                     toolchainsSource.getLocation(),
                     -1,
                     -1,
@@ -164,7 +152,9 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     }
 
     private PersistedToolchains interpolate(
-            PersistedToolchains toolchains, ToolchainsBuilderRequest request, List<BuilderProblem> problems) {
+            PersistedToolchains toolchains,
+            ToolchainsBuilderRequest request,
+            ProblemCollector<BuilderProblem> problems) {
         Map<String, String> userProperties = request.getSession().getUserProperties();
         Map<String, String> systemProperties = request.getSession().getSystemProperties();
         Function<String, String> src = Interpolator.chain(userProperties::get, systemProperties::get);
@@ -180,11 +170,12 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
         private final PersistedToolchains effectiveToolchains;
 
-        private final List<BuilderProblem> problems;
+        private final ProblemCollector<BuilderProblem> problems;
 
-        DefaultToolchainsBuilderResult(PersistedToolchains effectiveToolchains, List<BuilderProblem> problems) {
+        DefaultToolchainsBuilderResult(
+                PersistedToolchains effectiveToolchains, ProblemCollector<BuilderProblem> problems) {
             this.effectiveToolchains = effectiveToolchains;
-            this.problems = (problems != null) ? problems : new ArrayList<>();
+            this.problems = (problems != null) ? problems : ProblemCollector.empty();
         }
 
         @Override
@@ -193,7 +184,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
         }
 
         @Override
-        public List<BuilderProblem> getProblems() {
+        public ProblemCollector<BuilderProblem> getProblems() {
             return problems;
         }
     }

@@ -19,7 +19,6 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
-import java.util.List;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
@@ -108,7 +107,7 @@ public interface SettingsBuilder extends Service {
      * @return The list of problems that were encountered, must not be {@code null}.
      */
     @Nonnull
-    default List<BuilderProblem> validate(@Nonnull Settings settings) {
+    default ProblemCollector<BuilderProblem> validate(@Nonnull Settings settings) {
         return validate(settings, false);
     }
 
@@ -120,7 +119,7 @@ public interface SettingsBuilder extends Service {
      * @return The list of problems that were encountered, must not be {@code null}.
      */
     @Nonnull
-    List<BuilderProblem> validate(@Nonnull Settings settings, boolean isProjectSettings);
+    ProblemCollector<BuilderProblem> validate(@Nonnull Settings settings, boolean isProjectSettings);
 
     /**
      * Convert a model profile to a settings profile.

@@ -32,6 +32,28 @@ import org.apache.maven.api.annotations.Experimental;
 public interface ProblemCollector<P extends BuilderProblem> {
 
     /**
+     * Creates "empty" problem collector.
+     */
+    static <P extends BuilderProblem> ProblemCollector<P> empty() {
+        return new ProblemCollector<P>() {
+            @Override
+            public int problemsReported(BuilderProblem.Severity... severities) {
+                return 0;
+            }
+
+            @Override
+            public void reportProblem(P problem) {
+                throw new IllegalStateException("empty problem collector");
+            }
+
+            @Override
+            public Stream<P> problems() {
+                return Stream.empty();
+            }
+        };
+    }
+
+    /**
      * Returns {@code true} if there is at least one problem collected with severity equal or more severe than
      * {@link org.apache.maven.api.services.BuilderProblem.Severity#ERROR}.
      */

@@ -40,7 +40,7 @@ import org.apache.maven.api.services.ProblemCollector;
  *
  * @param <P> The type of the problem.
  */
-class DefaultProblemCollector<P extends BuilderProblem> implements ProblemCollector<P> {
+public class DefaultProblemCollector<P extends BuilderProblem> implements ProblemCollector<P> {
     private final int maxCountLimit;
     private final AtomicInteger totalCount;
     private final ConcurrentMap<BuilderProblem.Severity, LongAdder> counters;
