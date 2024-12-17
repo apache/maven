@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.services.BuilderProblem;
@@ -36,6 +37,8 @@ import org.apache.maven.api.services.ProblemCollector;
  * Describes a problem that was encountered during settings building. A problem can either be an exception that was
  * thrown or a simple string message. In addition, a problem carries a hint about its source, e.g. the settings file
  * that exhibits the problem.
+ *
+ * @param <P> The type of the problem.
  */
 class DefaultProblemCollector<P extends BuilderProblem> implements ProblemCollector<P> {
     private final int maxCountLimit;
@@ -65,9 +68,10 @@ class DefaultProblemCollector<P extends BuilderProblem> implements ProblemCollec
     private boolean dropProblemWithLowerSeverity(BuilderProblem.Severity severity) {
         for (BuilderProblem.Severity s : REVERSED_ORDER) {
             if (s.ordinal() > severity.ordinal()) {
-                Collection<P> problems = getProblems(s);
-                while (!problems.isEmpty()) {
-                    if (problems.remove(problems.iterator().next())) {
+                Supplier<Collection<P>> problems = () -> getProblems(s);
+                while (!problems.get().isEmpty()) {
+                    Collection<P> problemList = problems.get();
+                    if (problemList.remove(problemList.iterator().next())) {
                         return true; // try as long you can; due concurrency
                     }
                 }

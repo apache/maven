@@ -25,6 +25,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Collects problems that were encountered during project building.
  *
+ * @param <P> The type of the problem.
  * @since 4.0.0
  */
 @Experimental
