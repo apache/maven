@@ -445,5 +445,13 @@ public final class Constants {
     @Config(type = "java.time.Instant")
     public static final String MAVEN_START_INSTANT = "maven.startInstant";
 
+    /**
+     * Max number of problems for each severity level retained by the model builder.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Integer", defaultValue = "100")
+    public static final String MAVEN_BUILDER_MAX_PROBLEMS = "maven.builder.maxProblems";
+
     private Constants() {}
 }

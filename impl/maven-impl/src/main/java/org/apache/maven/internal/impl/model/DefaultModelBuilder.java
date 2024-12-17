@@ -205,6 +205,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         return new ModelBuilderSessionImpl();
     }
 
+    static int getMaxProblems(Session session) {
+        return Integer.parseInt(session.getUserProperties().getOrDefault(Constants.MAVEN_BUILDER_MAX_PROBLEMS, "100"));
+    }
+
     protected class ModelBuilderSessionImpl implements ModelBuilderSession {
         ModelBuilderSessionState mainSession;
 
@@ -223,7 +227,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 mainSession = new ModelBuilderSessionState(request);
                 session = mainSession;
             } else {
-                session = mainSession.derive(request, new DefaultModelBuilderResult());
+                session =
+                        mainSession.derive(request, new DefaultModelBuilderResult(getMaxProblems(mainSession.session)));
             }
             // Build the request
             if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
@@ -259,7 +264,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             this(
                     request.getSession(),
                     request,
-                    new DefaultModelBuilderResult(),
+                    new DefaultModelBuilderResult(DefaultModelBuilder.getMaxProblems(request.getSession())),
                     request.getSession()
                             .getData()
                             .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance),
@@ -300,8 +305,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.result.setSource(this.request.getSource());
         }
 
+        int getMaxProblems() {
+            return DefaultModelBuilder.getMaxProblems(session);
+        }
+
         ModelBuilderSessionState derive(ModelSource source) {
-            return derive(source, new DefaultModelBuilderResult(result));
+            return derive(source, new DefaultModelBuilderResult(result, getMaxProblems()));
         }
 
         ModelBuilderSessionState derive(ModelSource source, DefaultModelBuilderResult result) {
@@ -312,7 +321,7 @@ public class DefaultModelBuilder implements ModelBuilder {
          * Creates a new session, sharing cached datas and propagating errors.
          */
         ModelBuilderSessionState derive(ModelBuilderRequest request) {
-            return derive(request, new DefaultModelBuilderResult(result));
+            return derive(request, new DefaultModelBuilderResult(result, getMaxProblems()));
         }
 
         ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
@@ -711,7 +720,8 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private void loadFromRoot(Path root, Path top) {
             try (PhasingExecutor executor = createExecutor()) {
-                DefaultModelBuilderResult r = Objects.equals(top, root) ? result : new DefaultModelBuilderResult();
+                DefaultModelBuilderResult r =
+                        Objects.equals(top, root) ? result : new DefaultModelBuilderResult(getMaxProblems());
                 loadFilePom(executor, top, root, Set.of(), r);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {
@@ -783,8 +793,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                         continue;
                     }
 
-                    DefaultModelBuilderResult cr =
-                            Objects.equals(top, subprojectFile) ? result : new DefaultModelBuilderResult(r);
+                    DefaultModelBuilderResult cr = Objects.equals(top, subprojectFile)
+                            ? result
+                            : new DefaultModelBuilderResult(r, getMaxProblems());
                     if (request.isRecursive()) {
                         r.getChildren().add(cr);
                     }

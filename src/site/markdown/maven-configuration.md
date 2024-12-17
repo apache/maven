@@ -26,6 +26,7 @@ under the License.
 | Key | Type | Description | Default Value | Since | Source |
 | --- | --- | --- | --- | --- | --- |
 | `maven.build.timestamp.format` | `String` | Build timestamp format. |  `yyyy-MM-dd'T'HH:mm:ssXXX`  | 3.0.0 | Model properties |
+| `maven.builder.maxProblems` | `Integer` | Max number of problems for each severity level retained by the model builder. |  `100`  | 4.0.0 | User properties |
 | `maven.consumer.pom` | `Boolean` | User property for enabling/disabling the consumer POM feature. |  `true`  | 4.0.0 | User properties |
 | `maven.deploy.snapshot.buildNumber` | `Integer` | User property for overriding calculated "build number" for snapshot deploys. Caution: this property should be RARELY used (if used at all). It may help in special cases like "aligning" a reactor build subprojects build numbers to perform a "snapshot lock down". Value given here must be <code>maxRemoteBuildNumber + 1</code> or greater, otherwise build will fail. How the number to be obtained is left to user (ie by inspecting snapshot repository metadata or alike). Note: this feature is present in Maven 3.9.7 but with different key: <code>maven.buildNumber</code>. In Maven 4 as part of cleanup effort this key was renamed to properly reflect its purpose. |  -  | 4.0.0 | User properties |
 | `maven.ext.class.path` | `String` | Extensions class path. |  -  |  | User properties |

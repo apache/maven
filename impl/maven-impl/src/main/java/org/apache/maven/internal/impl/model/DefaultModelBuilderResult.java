@@ -19,14 +19,18 @@
 package org.apache.maven.internal.impl.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
@@ -42,17 +46,21 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     private Model effectiveModel;
     private List<Profile> activePomProfiles;
     private List<Profile> activeExternalProfiles;
-    private final List<ModelProblem> problems = new CopyOnWriteArrayList<>();
+    private final Queue<ModelProblem> problems = new ConcurrentLinkedQueue<>();
     private final DefaultModelBuilderResult problemHolder;
 
     private final List<DefaultModelBuilderResult> children = new ArrayList<>();
 
-    DefaultModelBuilderResult() {
-        this(null);
+    private int maxProblems;
+    private Map<BuilderProblem.Severity, AtomicInteger> problemCount = new ConcurrentHashMap<>();
+
+    DefaultModelBuilderResult(int maxProblems) {
+        this(null, maxProblems);
     }
 
-    DefaultModelBuilderResult(DefaultModelBuilderResult problemHolder) {
+    DefaultModelBuilderResult(DefaultModelBuilderResult problemHolder, int maxProblems) {
         this.problemHolder = problemHolder;
+        this.maxProblems = maxProblems;
     }
 
     public ModelSource getSource() {
@@ -125,7 +133,21 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
      */
     @Override
     public List<ModelProblem> getProblems() {
-        return Collections.unmodifiableList(problems);
+        List<ModelProblem> additionalProblems = new ArrayList<>();
+        problemCount.forEach((s, i) -> {
+            if (i.get() > maxProblems) {
+                additionalProblems.add(new DefaultModelProblem(
+                        String.format("Too many problems %d of severity %s", i.get(), s.name()),
+                        s,
+                        ModelProblem.Version.BASE,
+                        null,
+                        -1,
+                        -1,
+                        null,
+                        null));
+            }
+        });
+        return Stream.concat(problems.stream(), additionalProblems.stream()).toList();
     }
 
     /**
@@ -134,7 +156,12 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
      * @param problem The problem to be added. It must be an instance of ModelProblem.
      */
     public void addProblem(ModelProblem problem) {
-        problems.add(problem);
+        int problemCount = this.problemCount
+                .computeIfAbsent(problem.getSeverity(), s -> new AtomicInteger())
+                .incrementAndGet();
+        if (problemCount < maxProblems) {
+            problems.add(problem);
+        }
         if (problemHolder != null) {
             problemHolder.addProblem(problem);
         }
