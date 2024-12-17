@@ -114,7 +114,7 @@ public class DefaultProblemCollector<P extends BuilderProblem> implements Proble
     }
 
     @Override
-    public int problemsReported(BuilderProblem.Severity... severity) {
+    public int problemsReportedFor(BuilderProblem.Severity... severity) {
         int result = 0;
         for (BuilderProblem.Severity s : severity) {
             result += getCounter(s).intValue();

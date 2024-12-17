@@ -46,30 +46,30 @@ class DefaultProblemCollectorTest {
 
     @Test
     void moreSeverPushOutLeastSevere() {
-        assertEquals(0, collector.problemsReported());
+        assertEquals(0, collector.totalProblemsReported());
         assertEquals(0, collector.problems().count());
 
         IntStream.range(0, 5)
                 .forEach(i -> collector.reportProblem(new DefaultBuilderProblem(
                         "source", 0, 0, null, "message " + i, BuilderProblem.Severity.WARNING)));
-        assertEquals(5, collector.problemsReported());
+        assertEquals(5, collector.totalProblemsReported());
         assertEquals(5, collector.problems().count());
 
         IntStream.range(0, 5)
                 .forEach(i -> collector.reportProblem(new DefaultBuilderProblem(
                         "source", 0, 0, null, "message " + i, BuilderProblem.Severity.ERROR)));
-        assertEquals(10, collector.problemsReported());
+        assertEquals(10, collector.totalProblemsReported());
         assertEquals(5, collector.problems().count());
 
         IntStream.range(0, 5)
                 .forEach(i -> collector.reportProblem(new DefaultBuilderProblem(
                         "source", 0, 0, null, "message " + i, BuilderProblem.Severity.FATAL)));
-        assertEquals(15, collector.problemsReported());
+        assertEquals(15, collector.totalProblemsReported());
         assertEquals(5, collector.problems().count());
 
-        assertEquals(5, collector.problemsReported(BuilderProblem.Severity.WARNING));
-        assertEquals(5, collector.problemsReported(BuilderProblem.Severity.ERROR));
-        assertEquals(5, collector.problemsReported(BuilderProblem.Severity.FATAL));
+        assertEquals(5, collector.problemsReportedFor(BuilderProblem.Severity.WARNING));
+        assertEquals(5, collector.problemsReportedFor(BuilderProblem.Severity.ERROR));
+        assertEquals(5, collector.problemsReportedFor(BuilderProblem.Severity.FATAL));
 
         assertEquals(
                 0,

@@ -58,28 +58,28 @@ class DefaultSettingsValidatorTest {
         Profile prof = Profile.newBuilder().id("xxx").build();
         Settings model = Settings.newBuilder().profiles(List.of(prof)).build();
         ProblemCollector<BuilderProblem> problems = validator.validate(model);
-        assertEquals(0, problems.problemsReported());
+        assertEquals(0, problems.totalProblemsReported());
 
         Repository repo = org.apache.maven.api.settings.Repository.newInstance(false);
         Settings model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();
         problems = validator.validate(model2);
-        assertEquals(2, problems.problemsReported());
+        assertEquals(2, problems.totalProblemsReported());
 
         repo = repo.withUrl("http://xxx.xxx.com");
         model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();
         problems = validator.validate(model2);
-        assertEquals(1, problems.problemsReported());
+        assertEquals(1, problems.totalProblemsReported());
 
         repo = repo.withId("xxx");
         model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();
         problems = validator.validate(model2);
-        assertEquals(0, problems.problemsReported());
+        assertEquals(0, problems.totalProblemsReported());
     }
 
     /*

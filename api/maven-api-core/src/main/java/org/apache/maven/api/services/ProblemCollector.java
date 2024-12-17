@@ -37,7 +37,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
     static <P extends BuilderProblem> ProblemCollector<P> empty() {
         return new ProblemCollector<P>() {
             @Override
-            public int problemsReported(BuilderProblem.Severity... severities) {
+            public int problemsReportedFor(BuilderProblem.Severity... severities) {
                 return 0;
             }
 
@@ -58,16 +58,16 @@ public interface ProblemCollector<P extends BuilderProblem> {
      * {@link org.apache.maven.api.services.BuilderProblem.Severity#ERROR}.
      */
     default boolean hasErrors() {
-        return hasProblems(BuilderProblem.Severity.ERROR);
+        return hasProblemsFor(BuilderProblem.Severity.ERROR);
     }
 
     /**
      * Returns {@code true} if there is at least one problem collected with severity equal or more severe than
      * passed in severity.
      */
-    default boolean hasProblems(BuilderProblem.Severity severity) {
+    default boolean hasProblemsFor(BuilderProblem.Severity severity) {
         for (BuilderProblem.Severity s : BuilderProblem.Severity.values()) {
-            if (s.ordinal() <= severity.ordinal() && problemsReported(s) > 0) {
+            if (s.ordinal() <= severity.ordinal() && problemsReportedFor(s) > 0) {
                 return true;
             }
         }
@@ -77,14 +77,14 @@ public interface ProblemCollector<P extends BuilderProblem> {
     /**
      * Returns total count of problems reported.
      */
-    default int problemsReported() {
-        return problemsReported(BuilderProblem.Severity.values());
+    default int totalProblemsReported() {
+        return problemsReportedFor(BuilderProblem.Severity.values());
     }
 
     /**
      * Returns count of problems reported for given severities.
      */
-    int problemsReported(BuilderProblem.Severity... severities);
+    int problemsReportedFor(BuilderProblem.Severity... severities);
 
     /**
      * Reports a problem: always maintains the counters, but whether problem is preserved in memory, depends on

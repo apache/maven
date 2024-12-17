@@ -99,9 +99,10 @@ class DefaultSettingsValidatorTest {
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
         assertEquals(4, problems.messages.size());
-        assertContains(problems.messages.get(0), "'mirrors.mirror.id' must not be 'local'");
-        assertContains(problems.messages.get(1), "'mirrors.mirror.url' for local is missing");
-        assertContains(problems.messages.get(2), "'mirrors.mirror.mirrorOf' for local is missing");
+        // errors are now by severity descending
+        assertContains(problems.messages.get(0), "'mirrors.mirror.url' for local is missing");
+        assertContains(problems.messages.get(1), "'mirrors.mirror.mirrorOf' for local is missing");
+        assertContains(problems.messages.get(2), "'mirrors.mirror.id' must not be 'local'");
         assertContains(problems.messages.get(3), "'mirrors.mirror.id' must not contain any of these characters");
     }
 
@@ -121,11 +122,12 @@ class DefaultSettingsValidatorTest {
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
         assertEquals(3, problems.messages.size());
+        // errors are now by severity descending
         assertContains(
-                problems.messages.get(0), "'profiles.profile[default].repositories.repository.id' must not be 'local'");
-        assertContains(
-                problems.messages.get(1),
+                problems.messages.get(0),
                 "'profiles.profile[default].repositories.repository.url' for local is missing");
+        assertContains(
+                problems.messages.get(1), "'profiles.profile[default].repositories.repository.id' must not be 'local'");
         assertContains(
                 problems.messages.get(2),
                 "'profiles.profile[default].repositories.repository.id' must not contain any of these characters");
