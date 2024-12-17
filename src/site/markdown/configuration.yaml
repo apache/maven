@@ -23,6 +23,12 @@ props:
       defaultValue: yyyy-MM-dd'T'HH:mm:ssXXX
       since: 3.0.0
       configurationSource: Model properties
+    - key: maven.builder.maxProblems
+      configurationType: Integer
+      description: "Max number of problems for each severity level retained by the model builder."
+      defaultValue: 100
+      since: 4.0.0
+      configurationSource: User properties
     - key: maven.consumer.pom
       configurationType: Boolean
       description: "User property for enabling/disabling the consumer POM feature."
