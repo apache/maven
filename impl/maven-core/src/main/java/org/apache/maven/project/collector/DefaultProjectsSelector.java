@@ -62,11 +62,12 @@ public class DefaultProjectsSelector implements ProjectsSelector {
 
         List<MavenProject> projects = new ArrayList<>(results.size());
 
-        boolean problems = false;
+        long problems = 0;
 
         for (ProjectBuildingResult result : results) {
             projects.add(result.getProject());
 
+            problems += result.getProblems().size();
             if (!result.getProblems().isEmpty() && LOGGER.isWarnEnabled()) {
                 LOGGER.warn("");
                 LOGGER.warn(
@@ -77,12 +78,12 @@ public class DefaultProjectsSelector implements ProjectsSelector {
                     String loc = ModelProblemUtils.formatLocation(problem, result.getProjectId());
                     LOGGER.warn("{}{}", problem.getMessage(), ((loc != null && !loc.isEmpty()) ? " @ " + loc : ""));
                 }
-
-                problems = true;
             }
         }
 
-        if (problems) {
+        if (problems > 0) {
+            LOGGER.warn("");
+            LOGGER.warn("Total model problems reported: {}", problems);
             LOGGER.warn("");
             LOGGER.warn("It is highly recommended to fix these problems"
                     + " because they threaten the stability of your build.");
