@@ -562,13 +562,15 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                 -1,
                                 null,
                                 null));
+                return new ArrayList<>(problems) {
+                    @Override
+                    public int size() {
+                        return problemCollector.totalProblemsReported();
+                    }
+                };
+            } else {
+                return problems;
             }
-            return new ArrayList<>(problems) {
-                @Override
-                public int size() {
-                    return problemCollector.totalProblemsReported();
-                }
-            };
         }
 
         private static org.apache.maven.model.building.ModelProblem convert(ModelProblem p) {
