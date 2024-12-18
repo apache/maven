@@ -140,11 +140,6 @@ public interface ProblemCollector<P extends BuilderProblem> {
             }
 
             @Override
-            public Stream<P> problems() {
-                return Stream.empty();
-            }
-
-            @Override
             public Stream<P> problems(BuilderProblem.Severity severity) {
                 return Stream.empty();
             }
