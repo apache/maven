@@ -96,7 +96,7 @@ public interface ModelBuilderResult {
      * @return the problems that were encountered during the project building, can be empty but never {@code null}
      */
     @Nonnull
-    List<ModelProblem> getProblems();
+    ProblemCollector<ModelProblem> getProblems();
 
     /**
      * Gets the children of this result.

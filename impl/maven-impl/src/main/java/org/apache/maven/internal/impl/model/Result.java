@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ProblemCollector;
 
 /**
  * There are various forms of results that are represented by this class:
@@ -208,15 +209,15 @@ public class Result<T> {
 
     private final T value;
 
-    private final Iterable<? extends ModelProblem> problems;
+    private final ProblemCollector<ModelProblem> problems;
 
-    private Result(boolean errors, T model, Iterable<? extends ModelProblem> problems) {
+    private Result(boolean errors, T model, ProblemCollector<ModelProblem> problems) {
         this.errors = errors;
         this.value = model;
         this.problems = problems;
     }
 
-    public Iterable<? extends ModelProblem> getProblems() {
+    public ProblemCollector<ModelProblem> getProblems() {
         return problems;
     }
 

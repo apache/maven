@@ -36,7 +36,7 @@ class DefaultProblemCollectorTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        collector = DefaultProblemCollector.create(5);
+        collector = ProblemCollector.create(5);
     }
 
     @AfterEach

@@ -97,7 +97,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     @Override
     public SettingsBuilderResult build(SettingsBuilderRequest request) throws SettingsBuilderException {
-        ProblemCollector<BuilderProblem> problems = DefaultProblemCollector.create(request.getSession());
+        ProblemCollector<BuilderProblem> problems = ProblemCollector.create(request.getSession());
 
         Source installationSource = request.getInstallationSettingsSource().orElse(null);
         Settings installation = readSettings(installationSource, false, request, problems);
@@ -317,7 +317,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     @Override
     public ProblemCollector<BuilderProblem> validate(Settings settings, boolean isProjectSettings) {
         // TODO: any way to get ProtoSession here?
-        ProblemCollector<BuilderProblem> problems = DefaultProblemCollector.create(null);
+        ProblemCollector<BuilderProblem> problems = ProblemCollector.create(null);
         settingsValidator.validate(settings, isProjectSettings, problems);
         return problems;
     }

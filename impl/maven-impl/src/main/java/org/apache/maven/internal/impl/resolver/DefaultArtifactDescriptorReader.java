@@ -207,8 +207,9 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 ModelBuilderResult modelResult = modelBuilder.newSession().build(modelRequest);
                 // ModelBuildingEx is thrown only on FATAL and ERROR severities, but we still can have WARNs
                 // that may lead to unexpected build failure, log them
-                if (!modelResult.getProblems().isEmpty()) {
-                    List<ModelProblem> problems = modelResult.getProblems();
+                if (modelResult.getProblems().totalProblemsReported() > 0) {
+                    List<ModelProblem> problems =
+                            modelResult.getProblems().problems().toList();
                     if (logger.isDebugEnabled()) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(problems.size())
@@ -238,7 +239,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 }
                 model = modelResult.getEffectiveModel();
             } catch (ModelBuilderException e) {
-                for (ModelProblem problem : e.getResult().getProblems()) {
+                for (ModelProblem problem :
+                        e.getResult().getProblems().problems().toList()) {
                     if (problem.getException() instanceof ModelResolverException) {
                         result.addException(problem.getException());
                         throw new ArtifactDescriptorException(result);

@@ -34,6 +34,7 @@ import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.ProblemCollector;
 
 /**
  * Collects the output of the model builder.
@@ -47,7 +48,7 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     private List<Profile> activePomProfiles;
     private List<Profile> activeExternalProfiles;
     private final Queue<ModelProblem> problems = new ConcurrentLinkedQueue<>();
-    private final DefaultModelBuilderResult problemHolder;
+    private final ProblemCollector<ModelProblem> problemHolder;
 
     private final List<DefaultModelBuilderResult> children = new ArrayList<>();
 
@@ -132,7 +133,7 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
      *         guaranteed to be non-null but possibly empty.
      */
     @Override
-    public List<ModelProblem> getProblems() {
+    public ProblemCollector<ModelProblem> getProblems() {
         List<ModelProblem> additionalProblems = new ArrayList<>();
         problemCount.forEach((s, i) -> {
             if (i.get() > maxProblems) {
@@ -156,15 +157,7 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
      * @param problem The problem to be added. It must be an instance of ModelProblem.
      */
     public void addProblem(ModelProblem problem) {
-        int problemCount = this.problemCount
-                .computeIfAbsent(problem.getSeverity(), s -> new AtomicInteger())
-                .incrementAndGet();
-        if (problemCount < maxProblems) {
-            problems.add(problem);
-        }
-        if (problemHolder != null) {
-            problemHolder.addProblem(problem);
-        }
+        problemHolder.reportProblem(problem);
     }
 
     @Override
