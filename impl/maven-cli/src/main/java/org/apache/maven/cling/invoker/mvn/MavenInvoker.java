@@ -205,7 +205,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         new org.apache.maven.toolchain.model.PersistedToolchains(
                                 toolchainsResult.getEffectiveToolchains()));
 
-        if (!toolchainsResult.getProblems().hasProblemsFor(BuilderProblem.Severity.WARNING)) {
+        if (toolchainsResult.getProblems().hasWarningProblems()) {
             context.logger.info("");
             context.logger.info(
                     "Some problems were encountered while building the effective toolchains (use -X to see details)");

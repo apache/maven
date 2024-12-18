@@ -597,7 +597,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.interactive = mayDisableInteractiveMode(context, context.effectiveSettings.isInteractiveMode());
         context.localRepositoryPath = localRepositoryPath(context);
 
-        if (emitSettingsWarnings && !settingsResult.getProblems().hasProblemsFor(BuilderProblem.Severity.WARNING)) {
+        if (emitSettingsWarnings && settingsResult.getProblems().hasWarningProblems()) {
             context.logger.info("");
             context.logger.info(
                     "Some problems were encountered while building the effective settings (use -X to see details)");
