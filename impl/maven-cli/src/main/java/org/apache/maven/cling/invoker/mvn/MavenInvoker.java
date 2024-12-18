@@ -209,10 +209,10 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             int totalProblems = toolchainsResult.getProblems().totalProblemsReported();
             context.logger.info("");
             context.logger.info(String.format(
-                    "%s %s encountered while building the effective toolchains (use -X to see details)",
+                    "%s %s encountered while building the effective toolchains (use -e to see details)",
                     totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
 
-            if (context.invokerRequest.options().verbose().orElse(false)) {
+            if (context.invokerRequest.options().showErrors().orElse(false)) {
                 for (BuilderProblem problem :
                         toolchainsResult.getProblems().problems().toList()) {
                     context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());

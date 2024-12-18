@@ -72,7 +72,7 @@ public class DefaultProjectsSelector implements ProjectsSelector {
             if (problemsCount != 0 && LOGGER.isWarnEnabled()) {
                 LOGGER.warn("");
                 LOGGER.warn(
-                        "{} {} encountered while building the effective model for '{}' (use -X to see details)",
+                        "{} {} encountered while building the effective model for '{}' (use -e to see details)",
                         problemsCount,
                         (problemsCount == 1) ? "problem was" : "problems were",
                         result.getProject().getId());
