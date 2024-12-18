@@ -62,14 +62,14 @@ public class DefaultProjectsSelector implements ProjectsSelector {
 
         List<MavenProject> projects = new ArrayList<>(results.size());
 
-        int totalProblemsCount = 0;
+        long totalProblemsCount = 0;
 
         for (ProjectBuildingResult result : results) {
             projects.add(result.getProject());
 
-            if (!result.getProblems().isEmpty() && LOGGER.isWarnEnabled()) {
-                int problemsCount = result.getProblems().size();
-                totalProblemsCount += problemsCount;
+            int problemsCount = result.getProblems().size();
+            totalProblemsCount += problemsCount;
+            if (problemsCount != 0 && LOGGER.isWarnEnabled()) {
                 LOGGER.warn("");
                 LOGGER.warn(
                         "{} {} encountered while building the effective model for '{}' (use -X to see details)",
@@ -88,7 +88,7 @@ public class DefaultProjectsSelector implements ProjectsSelector {
 
         if (totalProblemsCount > 0) {
             LOGGER.warn("");
-            LOGGER.warn("Total problems: {}", totalProblemsCount);
+            LOGGER.warn("Total model problems reported: {}", totalProblemsCount);
             LOGGER.warn("");
             LOGGER.warn("It is highly recommended to fix these problems"
                     + " because they threaten the stability of your build.");
