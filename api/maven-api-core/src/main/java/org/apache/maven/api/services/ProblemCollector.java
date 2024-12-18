@@ -96,6 +96,13 @@ public interface ProblemCollector<P extends BuilderProblem> {
     int problemsReportedFor(BuilderProblem.Severity... severities);
 
     /**
+     * Returns {@code true} if reported problem count exceeded allowed count, and issues were lost. When this
+     * method returns {@code true}, it means that element count of stream returned by method {@link #problems()}
+     * and the counter returned by {@link #totalProblemsReported()} are not equal (latter is bigger than former).
+     */
+    boolean problemsOverflow();
+
+    /**
      * Reports a problem: always maintains the counters, but whether problem is preserved in memory, depends on
      * implementation and its configuration.
      *
@@ -124,11 +131,22 @@ public interface ProblemCollector<P extends BuilderProblem> {
     Stream<P> problems(BuilderProblem.Severity severity);
 
     /**
+     * Attaches a problem collector instance to this instance. After attach, this instance will report from both,
+     * itself and also attached instance(s) providing "cumulative" view.
+     */
+    void attach(ProblemCollector<P> problemCollector);
+
+    /**
      * Creates "empty" problem collector.
      */
     @Nonnull
     static <P extends BuilderProblem> ProblemCollector<P> empty() {
         return new ProblemCollector<P>() {
+            @Override
+            public boolean problemsOverflow() {
+                return false;
+            }
+
             @Override
             public int problemsReportedFor(BuilderProblem.Severity... severities) {
                 return 0;
@@ -142,6 +160,11 @@ public interface ProblemCollector<P extends BuilderProblem> {
             @Override
             public Stream<P> problems(BuilderProblem.Severity severity) {
                 return Stream.empty();
+            }
+
+            @Override
+            public void attach(ProblemCollector<P> problemCollector) {
+                throw new IllegalStateException("empty problem collector");
             }
         };
     }
@@ -174,6 +197,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
         private final AtomicInteger totalCount;
         private final ConcurrentMap<BuilderProblem.Severity, LongAdder> counters;
         private final ConcurrentMap<BuilderProblem.Severity, List<P>> problems;
+        private final CopyOnWriteArrayList<ProblemCollector<P>> attachedProblemCollectors;
 
         private static final List<BuilderProblem.Severity> REVERSED_ORDER = Arrays.stream(
                         BuilderProblem.Severity.values())
@@ -188,6 +212,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
             this.totalCount = new AtomicInteger();
             this.counters = new ConcurrentHashMap<>();
             this.problems = new ConcurrentHashMap<>();
+            this.attachedProblemCollectors = new CopyOnWriteArrayList<>();
         }
 
         @Override
@@ -195,8 +220,24 @@ public interface ProblemCollector<P extends BuilderProblem> {
             int result = 0;
             for (BuilderProblem.Severity s : severity) {
                 result += getCounter(s).intValue();
+                for (ProblemCollector<P> a : attachedProblemCollectors) {
+                    result += a.problemsReportedFor(s);
+                }
             }
             return result;
+        }
+
+        @Override
+        public boolean problemsOverflow() {
+            if (totalCount.get() > maxCountLimit) {
+                return true;
+            }
+            for (ProblemCollector<P> a : attachedProblemCollectors) {
+                if (a.problemsOverflow()) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -214,7 +255,20 @@ public interface ProblemCollector<P extends BuilderProblem> {
         @Override
         public Stream<P> problems(BuilderProblem.Severity severity) {
             requireNonNull(severity, "severity");
-            return getProblems(severity).stream();
+            Stream<P> result = getProblems(severity).stream();
+            for (ProblemCollector<P> a : attachedProblemCollectors) {
+                result = Stream.concat(result, a.problems(severity));
+            }
+            return result;
+        }
+
+        @Override
+        public void attach(ProblemCollector<P> problemCollector) {
+            requireNonNull(problemCollector, "problemCollector");
+            if (problemCollector == this) {
+                throw new IllegalArgumentException("cannot attach onto itself");
+            }
+            attachedProblemCollectors.add(problemCollector);
         }
 
         private LongAdder getCounter(BuilderProblem.Severity severity) {

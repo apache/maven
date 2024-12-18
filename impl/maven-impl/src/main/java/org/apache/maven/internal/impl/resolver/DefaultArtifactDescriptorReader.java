@@ -216,9 +216,9 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         sb.append(totalProblems)
                                 .append(" ")
                                 .append((totalProblems == 1) ? "problem was" : "problems were")
-                                .append(" encountered while building the effective model for ")
+                                .append(" encountered while building the effective model for '")
                                 .append(request.getArtifact())
-                                .append(" during ")
+                                .append("' during ")
                                 .append(RequestTraceHelper.interpretTrace(true, request.getTrace()))
                                 .append("\n")
                                 .append((totalProblems == 1) ? "Problem" : "Problems");
@@ -232,7 +232,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         logger.warn(sb.toString());
                     } else {
                         logger.warn(
-                                "{} {} encountered while building the effective model for {} during {} (use -X to see details)",
+                                "{} {} encountered while building the effective model for '{}' during {} (use -X to see details)",
                                 totalProblems,
                                 (totalProblems == 1) ? "problem was" : "problems were",
                                 request.getArtifact(),

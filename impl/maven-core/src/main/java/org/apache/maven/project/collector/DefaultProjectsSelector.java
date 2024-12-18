@@ -68,14 +68,19 @@ public class DefaultProjectsSelector implements ProjectsSelector {
             projects.add(result.getProject());
 
             if (!result.getProblems().isEmpty() && LOGGER.isWarnEnabled()) {
+                int totalProblems = result.getProblems().size();
                 LOGGER.warn("");
                 LOGGER.warn(
-                        "Some problems were encountered while building the effective model for '{}'",
+                        "{} {} encountered while building the effective model for '{}' (use -X to see details)",
+                        totalProblems,
+                        (totalProblems == 1) ? "problem was" : "problems were",
                         result.getProject().getId());
 
-                for (ModelProblem problem : result.getProblems()) {
-                    String loc = ModelProblemUtils.formatLocation(problem, result.getProjectId());
-                    LOGGER.warn("{}{}", problem.getMessage(), ((loc != null && !loc.isEmpty()) ? " @ " + loc : ""));
+                if (LOGGER.isDebugEnabled()) {
+                    for (ModelProblem problem : result.getProblems()) {
+                        String loc = ModelProblemUtils.formatLocation(problem, result.getProjectId());
+                        LOGGER.warn("{}{}", problem.getMessage(), ((loc != null && !loc.isEmpty()) ? " @ " + loc : ""));
+                    }
                 }
 
                 problems = true;

@@ -66,6 +66,7 @@ import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ModelTransformer;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.artifact.Artifact;
@@ -340,7 +341,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             try {
                 MavenProject project = request.getProject();
 
-                List<ModelProblem> modelProblems = null;
+                ProblemCollector<ModelProblem> problemCollector = null;
                 Throwable error = null;
 
                 if (project == null) {
@@ -378,7 +379,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         error = e;
                     }
 
-                    modelProblems = result.getProblemCollector().problems().toList();
+                    problemCollector = result.getProblemCollector();
 
                     initProject(project, result);
                 }
@@ -391,7 +392,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 }
 
                 ProjectBuildingResult result =
-                        new DefaultProjectBuildingResult(project, convert(modelProblems), resolutionResult);
+                        new DefaultProjectBuildingResult(project, convert(problemCollector), resolutionResult);
 
                 if (error != null) {
                     ProjectBuildingException e = new ProjectBuildingException(List.of(result));
@@ -499,21 +500,18 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 result = e.getResult();
                 if (result == null || result.getEffectiveModel() == null) {
                     return List.of(new DefaultProjectBuildingResult(
-                            e.getModelId(),
-                            pomFile,
-                            convert(e.getProblemCollector().problems().toList())));
+                            e.getModelId(), pomFile, convert(e.getProblemCollector())));
                 }
             }
 
             List<ProjectBuildingResult> results = new ArrayList<>();
             List<ModelBuilderResult> allModels = results(result).toList();
             for (ModelBuilderResult r : allModels) {
-                List<ModelProblem> problems =
-                        new ArrayList<>(r.getProblemCollector().problems().toList());
+                ProblemCollector<ModelProblem> problemCollector = r.getProblemCollector();
                 results(r)
-                        .filter(c -> c != r)
-                        .flatMap(c -> c.getProblemCollector().problems())
-                        .forEach(problems::remove);
+                        .map(ModelBuilderResult::getProblemCollector)
+                        .filter(collector -> collector != problemCollector)
+                        .forEach(problemCollector::attach);
                 if (r.getEffectiveModel() != null) {
                     File pom = r.getSource().getPath().toFile();
                     MavenProject project =
@@ -533,9 +531,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     if (request.isResolveDependencies()) {
                         resolutionResult = resolveDependencies(project);
                     }
-                    results.add(new DefaultProjectBuildingResult(project, convert(problems), resolutionResult));
+                    results.add(new DefaultProjectBuildingResult(project, convert(problemCollector), resolutionResult));
                 } else {
-                    results.add(new DefaultProjectBuildingResult(null, convert(problems), null));
+                    results.add(new DefaultProjectBuildingResult(null, convert(problemCollector), null));
                 }
             }
             return results;
@@ -545,11 +543,32 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             return Stream.concat(result.getChildren().stream().flatMap(this::results), Stream.of(result));
         }
 
-        private List<org.apache.maven.model.building.ModelProblem> convert(List<ModelProblem> problems) {
-            if (problems == null) {
+        private List<org.apache.maven.model.building.ModelProblem> convert(
+                ProblemCollector<ModelProblem> problemCollector) {
+            if (problemCollector == null) {
                 return null;
             }
-            return problems.stream().map(p -> convert(p)).toList();
+            ArrayList<org.apache.maven.model.building.ModelProblem> problems = new ArrayList<>();
+            problemCollector.problems().map(p -> convert(p)).forEach(problems::add);
+            if (problemCollector.problemsOverflow()) {
+                problems.add(
+                        0,
+                        new DefaultModelProblem(
+                                "Too many model problems reported",
+                                org.apache.maven.model.building.ModelProblem.Severity.WARNING,
+                                null,
+                                null,
+                                -1,
+                                -1,
+                                null,
+                                null));
+            }
+            return new ArrayList<>(problems) {
+                @Override
+                public int size() {
+                    return problemCollector.totalProblemsReported();
+                }
+            };
         }
 
         private static org.apache.maven.model.building.ModelProblem convert(ModelProblem p) {
