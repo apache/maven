@@ -545,7 +545,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 return null;
             }
             ArrayList<org.apache.maven.model.building.ModelProblem> problems = new ArrayList<>();
-            problemCollector.problems().map(p -> convert(p)).forEach(problems::add);
+            problemCollector.problems().map(BuildSession::convert).forEach(problems::add);
             if (problemCollector.problemsOverflow()) {
                 problems.add(
                         0,
