@@ -21,7 +21,6 @@ package org.apache.maven.api.services;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -45,78 +44,13 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 public interface ProblemCollector<P extends BuilderProblem> {
-
     /**
-     * Creates "empty" problem collector.
+     * Returns {@code true} if there is at least one problem collected with severity equal or more severe than
+     * {@link org.apache.maven.api.services.BuilderProblem.Severity#WARNING}. This check is logically equivalent
+     * to "is there any problem reported?", given warning is the lowest severity.
      */
-    @Nonnull
-    static <P extends BuilderProblem> ProblemCollector<P> empty() {
-        return new ProblemCollector<P>() {
-            @Override
-            public int problemsReportedFor(BuilderProblem.Severity... severities) {
-                return 0;
-            }
-
-            @Override
-            public boolean reportProblem(P problem) {
-                throw new IllegalStateException("empty problem collector");
-            }
-
-            @Override
-            public Stream<P> problems() {
-                return Stream.empty();
-            }
-
-            @Override
-            public Stream<P> problems(BuilderProblem.Severity severity) {
-                return Stream.empty();
-            }
-        };
-    }
-
-    /**
-     * Creates new instance of problem collector.
-     */
-    @Nonnull
-    static <P extends BuilderProblem> ProblemCollector<P> create(@Nullable ProtoSession protoSession) {
-        if (protoSession != null
-                && protoSession.getUserProperties().containsKey(Constants.MAVEN_BUILDER_MAX_PROBLEMS)) {
-            return new Impl<>(
-                    Integer.parseInt(protoSession.getUserProperties().get(Constants.MAVEN_BUILDER_MAX_PROBLEMS)));
-        } else {
-            return create(100);
-        }
-    }
-
-    /**
-     * Creates new instance of problem collector. Visible for testing only.
-     */
-    @Nonnull
-    static <P extends BuilderProblem> ProblemCollector<P> create(int maxCountLimit) {
-        return new Impl<>(maxCountLimit);
-    }
-
-    /**
-     * Concatenates problem collectors by preserving concatenated instances of collectors and offering "unified" view.
-     */
-    @SafeVarargs
-    @Nonnull
-    static <P extends BuilderProblem> ProblemCollector<P> concat(ProblemCollector<P>... collectors) {
-        List<ProblemCollector<P>> reduced = Arrays.stream(collectors)
-                .filter(Objects::nonNull)
-                .filter(c -> c.totalProblemsReported() > 0)
-                .toList();
-        if (reduced.isEmpty()) {
-            return empty();
-        } else if (reduced.size() == 1) {
-            return reduced.get(0);
-        } else {
-            ProblemCollector<P> result = create(null);
-            for (ProblemCollector<P> p : collectors) {
-                p.problems().forEach(result::reportProblem);
-            }
-            return result;
-        }
+    default boolean hasWarningProblems() {
+        return hasProblemsFor(BuilderProblem.Severity.WARNING);
     }
 
     /**
@@ -188,6 +122,56 @@ public interface ProblemCollector<P extends BuilderProblem> {
      */
     @Nonnull
     Stream<P> problems(BuilderProblem.Severity severity);
+
+    /**
+     * Creates "empty" problem collector.
+     */
+    @Nonnull
+    static <P extends BuilderProblem> ProblemCollector<P> empty() {
+        return new ProblemCollector<P>() {
+            @Override
+            public int problemsReportedFor(BuilderProblem.Severity... severities) {
+                return 0;
+            }
+
+            @Override
+            public boolean reportProblem(P problem) {
+                throw new IllegalStateException("empty problem collector");
+            }
+
+            @Override
+            public Stream<P> problems() {
+                return Stream.empty();
+            }
+
+            @Override
+            public Stream<P> problems(BuilderProblem.Severity severity) {
+                return Stream.empty();
+            }
+        };
+    }
+
+    /**
+     * Creates new instance of problem collector.
+     */
+    @Nonnull
+    static <P extends BuilderProblem> ProblemCollector<P> create(@Nullable ProtoSession protoSession) {
+        if (protoSession != null
+                && protoSession.getUserProperties().containsKey(Constants.MAVEN_BUILDER_MAX_PROBLEMS)) {
+            return new Impl<>(
+                    Integer.parseInt(protoSession.getUserProperties().get(Constants.MAVEN_BUILDER_MAX_PROBLEMS)));
+        } else {
+            return create(100);
+        }
+    }
+
+    /**
+     * Creates new instance of problem collector. Visible for testing only.
+     */
+    @Nonnull
+    static <P extends BuilderProblem> ProblemCollector<P> create(int maxCountLimit) {
+        return new Impl<>(maxCountLimit);
+    }
 
     class Impl<P extends BuilderProblem> implements ProblemCollector<P> {
 

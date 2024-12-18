@@ -22,30 +22,71 @@ import java.util.stream.IntStream;
 
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ProblemCollector;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
+ * This UT is for {@link ProblemCollector} but here we have implementations for problems.
  */
 class DefaultProblemCollectorTest {
+    @Test
+    void severityFatalDetection() {
+        ProblemCollector<BuilderProblem> collector = ProblemCollector.create(5);
 
-    private ProblemCollector<BuilderProblem> collector;
+        assertFalse(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
+        assertFalse(collector.hasErrorProblems());
+        assertFalse(collector.hasFatalProblems());
 
-    @BeforeEach
-    void setUp() throws Exception {
-        collector = ProblemCollector.create(5);
-    }
+        collector.reportProblem(
+                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.FATAL));
 
-    @AfterEach
-    void tearDown() throws Exception {
-        collector = null;
+        // fatal triggers all
+        assertTrue(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
+        assertTrue(collector.hasErrorProblems());
+        assertTrue(collector.hasFatalProblems());
     }
 
     @Test
-    void moreSeverPushOutLeastSevere() {
+    void severityErrorDetection() {
+        ProblemCollector<BuilderProblem> collector = ProblemCollector.create(5);
+
+        assertFalse(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
+        assertFalse(collector.hasErrorProblems());
+        assertFalse(collector.hasFatalProblems());
+
+        collector.reportProblem(
+                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.ERROR));
+
+        // error triggers error + warning
+        assertTrue(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
+        assertTrue(collector.hasErrorProblems());
+        assertFalse(collector.hasFatalProblems());
+    }
+
+    @Test
+    void severityWarningDetection() {
+        ProblemCollector<BuilderProblem> collector = ProblemCollector.create(5);
+
+        assertFalse(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
+        assertFalse(collector.hasErrorProblems());
+        assertFalse(collector.hasFatalProblems());
+
+        collector.reportProblem(
+                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.WARNING));
+
+        // warning triggers warning only
+        assertTrue(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
+        assertFalse(collector.hasErrorProblems());
+        assertFalse(collector.hasFatalProblems());
+    }
+
+    @Test
+    void moreSeverePushOutLeastSevere() {
+        ProblemCollector<BuilderProblem> collector = ProblemCollector.create(5);
+
         assertEquals(0, collector.totalProblemsReported());
         assertEquals(0, collector.problems().count());
 
@@ -61,33 +102,18 @@ class DefaultProblemCollectorTest {
         assertEquals(10, collector.totalProblemsReported());
         assertEquals(5, collector.problems().count());
 
-        IntStream.range(0, 5)
+        IntStream.range(0, 4)
                 .forEach(i -> collector.reportProblem(new DefaultBuilderProblem(
                         "source", 0, 0, null, "message " + i, BuilderProblem.Severity.FATAL)));
-        assertEquals(15, collector.totalProblemsReported());
+        assertEquals(14, collector.totalProblemsReported());
         assertEquals(5, collector.problems().count());
 
         assertEquals(5, collector.problemsReportedFor(BuilderProblem.Severity.WARNING));
         assertEquals(5, collector.problemsReportedFor(BuilderProblem.Severity.ERROR));
-        assertEquals(5, collector.problemsReportedFor(BuilderProblem.Severity.FATAL));
+        assertEquals(4, collector.problemsReportedFor(BuilderProblem.Severity.FATAL));
 
-        assertEquals(
-                0,
-                collector
-                        .problems()
-                        .filter(p -> p.getSeverity() == BuilderProblem.Severity.WARNING)
-                        .count());
-        assertEquals(
-                0,
-                collector
-                        .problems()
-                        .filter(p -> p.getSeverity() == BuilderProblem.Severity.ERROR)
-                        .count());
-        assertEquals(
-                5,
-                collector
-                        .problems()
-                        .filter(p -> p.getSeverity() == BuilderProblem.Severity.FATAL)
-                        .count());
+        assertEquals(0, collector.problems(BuilderProblem.Severity.WARNING).count());
+        assertEquals(1, collector.problems(BuilderProblem.Severity.ERROR).count());
+        assertEquals(4, collector.problems(BuilderProblem.Severity.FATAL).count());
     }
 }

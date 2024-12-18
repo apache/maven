@@ -147,8 +147,8 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         } else {
             modelId = null;
         }
-        int totalProblems = problemCollector.totalProblemsReported();
-        if (totalProblems != 0) {
+        if (problemCollector.hasWarningProblems()) {
+            int totalProblems = problemCollector.totalProblemsReported();
             StringBuilder sb = new StringBuilder();
             sb.append(totalProblems)
                     .append(
