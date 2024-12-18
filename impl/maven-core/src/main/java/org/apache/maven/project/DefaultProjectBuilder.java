@@ -526,7 +526,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     if (request.isResolveDependencies()) {
                         resolutionResult = resolveDependencies(project);
                     }
-                    results.add(new DefaultProjectBuildingResult(project, convert(r.getProblemCollector()), resolutionResult));
+                    results.add(new DefaultProjectBuildingResult(
+                            project, convert(r.getProblemCollector()), resolutionResult));
                 } else {
                     results.add(new DefaultProjectBuildingResult(null, convert(r.getProblemCollector()), null));
                 }
