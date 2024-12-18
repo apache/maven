@@ -257,7 +257,9 @@ public interface ProblemCollector<P extends BuilderProblem> {
             requireNonNull(severity, "severity");
             Stream<P> result = getProblems(severity).stream();
             for (ProblemCollector<P> a : attachedProblemCollectors) {
-                result = Stream.concat(result, a.problems(severity));
+                if (a.hasProblemsFor(severity)) {
+                    result = Stream.concat(result, a.problems(severity));
+                }
             }
             return result;
         }
@@ -265,8 +267,8 @@ public interface ProblemCollector<P extends BuilderProblem> {
         @Override
         public void attach(ProblemCollector<P> problemCollector) {
             requireNonNull(problemCollector, "problemCollector");
-            if (problemCollector == this) {
-                throw new IllegalArgumentException("cannot attach onto itself");
+            if (problemCollector == this || attachedProblemCollectors.contains(problemCollector)) {
+                throw new IllegalArgumentException("cannot attach self or re-attach");
             }
             attachedProblemCollectors.add(problemCollector);
         }

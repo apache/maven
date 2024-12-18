@@ -507,11 +507,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             List<ProjectBuildingResult> results = new ArrayList<>();
             List<ModelBuilderResult> allModels = results(result).toList();
             for (ModelBuilderResult r : allModels) {
-                ProblemCollector<ModelProblem> problemCollector = r.getProblemCollector();
-                results(r)
-                        .map(ModelBuilderResult::getProblemCollector)
-                        .filter(collector -> collector != problemCollector)
-                        .forEach(problemCollector::attach);
                 if (r.getEffectiveModel() != null) {
                     File pom = r.getSource().getPath().toFile();
                     MavenProject project =
@@ -531,9 +526,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     if (request.isResolveDependencies()) {
                         resolutionResult = resolveDependencies(project);
                     }
-                    results.add(new DefaultProjectBuildingResult(project, convert(problemCollector), resolutionResult));
+                    results.add(new DefaultProjectBuildingResult(project, convert(r.getProblemCollector()), resolutionResult));
                 } else {
-                    results.add(new DefaultProjectBuildingResult(null, convert(problemCollector), null));
+                    results.add(new DefaultProjectBuildingResult(null, convert(r.getProblemCollector()), null));
                 }
             }
             return results;
