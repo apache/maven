@@ -79,7 +79,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
         PersistedToolchains effective = toolchainsMerger.merge(user, installation, false, null);
 
-        if (problems.hasErrors()) {
+        if (problems.hasErrorProblems()) {
             throw new ToolchainsBuilderException("Error building toolchains", problems);
         }
 

@@ -91,12 +91,12 @@ public interface ModelBuilderResult {
     List<Profile> getActiveExternalProfiles();
 
     /**
-     * Gets the problems that were encountered during the project building.
+     * Gets the problem collector that collected problems encountered during the project building.
      *
-     * @return the problems that were encountered during the project building, can be empty but never {@code null}
+     * @return the problem collector that collected problems encountered during the project building
      */
     @Nonnull
-    ProblemCollector<ModelProblem> getProblems();
+    ProblemCollector<ModelProblem> getProblemCollector();
 
     /**
      * Gets the children of this result.

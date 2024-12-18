@@ -80,10 +80,10 @@ public class ModelBuilderException extends MavenException {
      *
      * @return The problems that caused this exception, never {@code null}.
      */
-    public ProblemCollector<ModelProblem> getProblems() {
+    public ProblemCollector<ModelProblem> getProblemCollector() {
         if (result == null) {
             return ProblemCollector.empty();
         }
-        return result.getProblems();
+        return result.getProblemCollector();
     }
 }

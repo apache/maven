@@ -378,7 +378,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         error = e;
                     }
 
-                    modelProblems = result.getProblems();
+                    modelProblems = result.getProblemCollector().problems().toList();
 
                     initProject(project, result);
                 }
@@ -498,17 +498,21 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             } catch (ModelBuilderException e) {
                 result = e.getResult();
                 if (result == null || result.getEffectiveModel() == null) {
-                    return List.of(new DefaultProjectBuildingResult(e.getModelId(), pomFile, convert(e.getProblems())));
+                    return List.of(new DefaultProjectBuildingResult(
+                            e.getModelId(),
+                            pomFile,
+                            convert(e.getProblemCollector().problems().toList())));
                 }
             }
 
             List<ProjectBuildingResult> results = new ArrayList<>();
             List<ModelBuilderResult> allModels = results(result).toList();
             for (ModelBuilderResult r : allModels) {
-                List<ModelProblem> problems = new ArrayList<>(r.getProblems());
+                List<ModelProblem> problems =
+                        new ArrayList<>(r.getProblemCollector().problems().toList());
                 results(r)
                         .filter(c -> c != r)
-                        .flatMap(c -> c.getProblems().stream())
+                        .flatMap(c -> c.getProblemCollector().problems())
                         .forEach(problems::remove);
                 if (r.getEffectiveModel() != null) {
                     File pom = r.getSource().getPath().toFile();

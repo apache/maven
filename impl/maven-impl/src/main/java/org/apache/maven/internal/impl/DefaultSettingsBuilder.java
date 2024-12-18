@@ -139,7 +139,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             }
         }
 
-        if (problems.hasErrors()) {
+        if (problems.hasErrorProblems()) {
             throw new SettingsBuilderException("Error building settings", problems);
         }
 

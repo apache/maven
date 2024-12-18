@@ -35,6 +35,7 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.ModelProblemUtils;
@@ -207,21 +208,22 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 ModelBuilderResult modelResult = modelBuilder.newSession().build(modelRequest);
                 // ModelBuildingEx is thrown only on FATAL and ERROR severities, but we still can have WARNs
                 // that may lead to unexpected build failure, log them
-                if (modelResult.getProblems().totalProblemsReported() > 0) {
-                    List<ModelProblem> problems =
-                            modelResult.getProblems().problems().toList();
+                if (modelResult.getProblemCollector().totalProblemsReported() > 0) {
+                    ProblemCollector<ModelProblem> problemCollector = modelResult.getProblemCollector();
+                    int totalProblems = problemCollector.totalProblemsReported();
                     if (logger.isDebugEnabled()) {
                         StringBuilder sb = new StringBuilder();
-                        sb.append(problems.size())
+                        sb.append(totalProblems)
                                 .append(" ")
-                                .append((problems.size() == 1) ? "problem was" : "problems were")
+                                .append((totalProblems == 1) ? "problem was" : "problems were")
                                 .append(" encountered while building the effective model for ")
                                 .append(request.getArtifact())
                                 .append(" during ")
                                 .append(RequestTraceHelper.interpretTrace(true, request.getTrace()))
                                 .append("\n")
-                                .append((problems.size() == 1) ? "Problem" : "Problems");
-                        for (ModelProblem modelProblem : problems) {
+                                .append((totalProblems == 1) ? "Problem" : "Problems");
+                        for (ModelProblem modelProblem :
+                                problemCollector.problems().toList()) {
                             sb.append("\n* ")
                                     .append(modelProblem.getMessage())
                                     .append(" @ ")
@@ -231,8 +233,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     } else {
                         logger.warn(
                                 "{} {} encountered while building the effective model for {} during {} (use -X to see details)",
-                                problems.size(),
-                                (problems.size() == 1) ? "problem was" : "problems were",
+                                totalProblems,
+                                (totalProblems == 1) ? "problem was" : "problems were",
                                 request.getArtifact(),
                                 RequestTraceHelper.interpretTrace(false, request.getTrace()));
                     }
@@ -240,7 +242,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 model = modelResult.getEffectiveModel();
             } catch (ModelBuilderException e) {
                 for (ModelProblem problem :
-                        e.getResult().getProblems().problems().toList()) {
+                        e.getResult().getProblemCollector().problems().toList()) {
                     if (problem.getException() instanceof ModelResolverException) {
                         result.addException(problem.getException());
                         throw new ArtifactDescriptorException(result);

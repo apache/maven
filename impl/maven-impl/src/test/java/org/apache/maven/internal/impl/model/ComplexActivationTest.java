@@ -76,7 +76,8 @@ class ComplexActivationTest {
                 .build();
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);
-        assertTrue(result.getProblems().stream()
+        assertTrue(result.getProblemCollector()
+                .problems()
                 .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.WARNING
                         && p.getMessage().contains("The 'missing' assertion will be ignored.")));
     }
