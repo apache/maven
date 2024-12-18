@@ -303,7 +303,9 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         ModelBuilderSessionState derive(ModelSource source) {
-            return derive(source, new DefaultModelBuilderResult(result.getProblemCollector()));
+            return derive(
+                    source,
+                    new DefaultModelBuilderResult(result.getProblemCollector().createChild()));
         }
 
         ModelBuilderSessionState derive(ModelSource source, DefaultModelBuilderResult result) {
@@ -314,7 +316,9 @@ public class DefaultModelBuilder implements ModelBuilder {
          * Creates a new session, sharing cached datas and propagating errors.
          */
         ModelBuilderSessionState derive(ModelBuilderRequest request) {
-            return derive(request, new DefaultModelBuilderResult(result.getProblemCollector()));
+            return derive(
+                    request,
+                    new DefaultModelBuilderResult(result.getProblemCollector().createChild()));
         }
 
         ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
@@ -780,7 +784,8 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                     DefaultModelBuilderResult cr = Objects.equals(top, subprojectFile)
                             ? result
-                            : new DefaultModelBuilderResult(ProblemCollector.create(session));
+                            : new DefaultModelBuilderResult(
+                                    r.getProblemCollector().createChild());
                     if (request.isRecursive()) {
                         r.getChildren().add(cr);
                     }
@@ -790,6 +795,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
                 add(Severity.ERROR, Version.V40, "Failed to load project " + pom, e);
+            }
+            if (!result.getProblemCollector().presentCollector(r.getProblemCollector())) {
+                result.getProblemCollector().addChild(r.getProblemCollector());
             }
         }
 
@@ -1713,6 +1721,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                 modelBuilderSession.buildEffectiveModel(importIds);
                 importResult = modelBuilderSession.result;
             } catch (ModelBuilderException e) {
+                if (!result.getProblemCollector().presentCollector(e.getProblemCollector())) {
+                    result.getProblemCollector().addChild(e.getProblemCollector());
+                }
                 return null;
             }
 
