@@ -554,7 +554,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 problems.add(
                         0,
                         new DefaultModelProblem(
-                                "Too many model problems reported",
+                                "Too many model problems reported (listed problems are just a subset of reported problems)",
                                 org.apache.maven.model.building.ModelProblem.Severity.WARNING,
                                 null,
                                 null,
