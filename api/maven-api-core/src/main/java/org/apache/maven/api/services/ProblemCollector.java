@@ -131,30 +131,11 @@ public interface ProblemCollector<P extends BuilderProblem> {
     Stream<P> problems(BuilderProblem.Severity severity);
 
     /**
-     * Creates a new child collector. Parent (this) instance will accumulate values for itself and all of its children.
-     */
-    @Nonnull
-    ProblemCollector<P> createChild();
-
-    /**
-     * May attach a child collector (if not present already). Parent (this) instance will accumulate values for
-     * itself and all of its children.
-     *
-     * @return {@code true} if child attached, or {@code false} if child already present.
-     */
-    boolean mayAddChild(ProblemCollector<P> child);
-
-    /**
-     * Returns true if collector is present in passed in collector or its children.
-     */
-    boolean presentCollector(ProblemCollector<P> collector);
-
-    /**
      * Creates "empty" problem collector.
      */
     @Nonnull
     static <P extends BuilderProblem> ProblemCollector<P> empty() {
-        return new ProblemCollector<P>() {
+        return new ProblemCollector<>() {
             @Override
             public boolean problemsOverflow() {
                 return false;
@@ -173,21 +154,6 @@ public interface ProblemCollector<P extends BuilderProblem> {
             @Override
             public Stream<P> problems(BuilderProblem.Severity severity) {
                 return Stream.empty();
-            }
-
-            @Override
-            public ProblemCollector<P> createChild() {
-                throw new IllegalStateException("empty problem collector");
-            }
-
-            @Override
-            public boolean mayAddChild(ProblemCollector<P> child) {
-                return false;
-            }
-
-            @Override
-            public boolean presentCollector(ProblemCollector<P> collector) {
-                return false;
             }
         };
     }
@@ -220,7 +186,6 @@ public interface ProblemCollector<P extends BuilderProblem> {
         private final AtomicInteger totalCount;
         private final ConcurrentMap<BuilderProblem.Severity, LongAdder> counters;
         private final ConcurrentMap<BuilderProblem.Severity, List<P>> problems;
-        private final CopyOnWriteArrayList<ProblemCollector<P>> childCollectors;
 
         private static final List<BuilderProblem.Severity> REVERSED_ORDER = Arrays.stream(
                         BuilderProblem.Severity.values())
@@ -235,7 +200,6 @@ public interface ProblemCollector<P extends BuilderProblem> {
             this.totalCount = new AtomicInteger();
             this.counters = new ConcurrentHashMap<>();
             this.problems = new ConcurrentHashMap<>();
-            this.childCollectors = new CopyOnWriteArrayList<>();
         }
 
         @Override
@@ -243,26 +207,13 @@ public interface ProblemCollector<P extends BuilderProblem> {
             int result = 0;
             for (BuilderProblem.Severity s : severity) {
                 result += getCounter(s).intValue();
-                for (ProblemCollector<P> childCollector : childCollectors) {
-                    if (childCollector.hasProblemsFor(s)) {
-                        result += childCollector.problemsReportedFor(s);
-                    }
-                }
             }
             return result;
         }
 
         @Override
         public boolean problemsOverflow() {
-            if (totalCount.get() > maxCountLimit) {
-                return true;
-            }
-            for (ProblemCollector<P> childCollector : childCollectors) {
-                if (childCollector.problemsOverflow()) {
-                    return true;
-                }
-            }
-            return false;
+            return totalCount.get() > maxCountLimit;
         }
 
         @Override
@@ -280,43 +231,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
         @Override
         public Stream<P> problems(BuilderProblem.Severity severity) {
             requireNonNull(severity, "severity");
-            Stream<P> result = getProblems(severity).stream();
-            for (ProblemCollector<P> childCollector : childCollectors) {
-                if (childCollector.hasProblemsFor(severity)) {
-                    result = Stream.concat(result, childCollector.problems(severity));
-                }
-            }
-            return result;
-        }
-
-        @Override
-        public ProblemCollector<P> createChild() {
-            ProblemCollector<P> result = new Impl<>(maxCountLimit);
-            childCollectors.add(result);
-            return result;
-        }
-
-        @Override
-        public boolean mayAddChild(ProblemCollector<P> child) {
-            requireNonNull(child, "child");
-            if (!presentCollector(child)) {
-                childCollectors.add(child);
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean presentCollector(ProblemCollector<P> collector) {
-            if (collector == this) {
-                return true;
-            }
-            for (ProblemCollector<P> childCollector : childCollectors) {
-                if (childCollector.presentCollector(collector)) {
-                    return true;
-                }
-            }
-            return false;
+            return getProblems(severity).stream();
         }
 
         private LongAdder getCounter(BuilderProblem.Severity severity) {

@@ -303,9 +303,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         ModelBuilderSessionState derive(ModelSource source) {
-            return derive(
-                    source,
-                    new DefaultModelBuilderResult(result.getProblemCollector().createChild()));
+            return derive(source, new DefaultModelBuilderResult(ProblemCollector.create(session)));
         }
 
         ModelBuilderSessionState derive(ModelSource source, DefaultModelBuilderResult result) {
@@ -316,9 +314,7 @@ public class DefaultModelBuilder implements ModelBuilder {
          * Creates a new session, sharing cached datas and propagating errors.
          */
         ModelBuilderSessionState derive(ModelBuilderRequest request) {
-            return derive(
-                    request,
-                    new DefaultModelBuilderResult(result.getProblemCollector().createChild()));
+            return derive(request, new DefaultModelBuilderResult(ProblemCollector.create(session)));
         }
 
         ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
@@ -760,8 +756,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                     DefaultModelBuilderResult cr = Objects.equals(top, subprojectFile)
                             ? result
-                            : new DefaultModelBuilderResult(
-                                    r.getProblemCollector().createChild());
+                            : new DefaultModelBuilderResult(ProblemCollector.create(session));
                     if (request.isRecursive()) {
                         r.getChildren().add(cr);
                     }
@@ -772,7 +767,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 // gathered with problem collector
                 add(Severity.ERROR, Version.V40, "Failed to load project " + pom, e);
             }
-            result.getProblemCollector().mayAddChild(r.getProblemCollector());
         }
 
         static <T> Set<T> concat(Set<T> a, T b) {
@@ -1695,11 +1689,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 modelBuilderSession.buildEffectiveModel(importIds);
                 importResult = modelBuilderSession.result;
             } catch (ModelBuilderException e) {
-                result.getProblemCollector().mayAddChild(e.getProblemCollector());
                 return null;
             }
-
-            result.getProblemCollector().mayAddChild(importResult.getProblemCollector());
 
             importModel = importResult.getEffectiveModel();
 
