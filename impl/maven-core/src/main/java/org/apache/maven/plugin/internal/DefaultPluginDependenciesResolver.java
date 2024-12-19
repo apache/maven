@@ -22,14 +22,23 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -77,11 +86,16 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
     private final List<MavenPluginDependenciesValidator> dependenciesValidators;
 
+    private final CoreExports coreExports;
+
     @Inject
     public DefaultPluginDependenciesResolver(
-            RepositorySystem repoSystem, List<MavenPluginDependenciesValidator> dependenciesValidators) {
+            RepositorySystem repoSystem,
+            List<MavenPluginDependenciesValidator> dependenciesValidators,
+            CoreExports coreExports) {
         this.repoSystem = repoSystem;
         this.dependenciesValidators = dependenciesValidators;
+        this.coreExports = coreExports;
     }
 
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {
@@ -216,6 +230,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 }
                 request.addDependency(pluginDep);
             }
+            request.setManagedDependencies(getCoreExportsAsDependencies());
 
             DependencyRequest depRequest = new DependencyRequest(request, resolutionFilter);
             depRequest.setTrace(trace);
@@ -241,5 +256,50 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                     .collect(Collectors.toList());
             throw new PluginResolutionException(plugin, exceptions, e);
         }
+    }
+
+    private final ConcurrentMap<String, List<org.eclipse.aether.graph.Dependency>> depMgtCache =
+            new ConcurrentHashMap<>();
+
+    private List<org.eclipse.aether.graph.Dependency> getCoreExportsAsDependencies() {
+        return depMgtCache.computeIfAbsent("core", k -> {
+            ArrayList<org.eclipse.aether.graph.Dependency> core = new ArrayList<>();
+            ClassLoader classLoader = coreExports.getExportedPackages().get("org.apache.maven.*");
+            for (String coreArtifact : coreExports.getExportedArtifacts()) {
+                String[] split = coreArtifact.split(":");
+                if (split.length == 2) {
+                    String groupId = split[0];
+                    String artifactId = split[1];
+                    String version = discoverArtifactVersion(classLoader, groupId, artifactId, null);
+                    if (version != null) {
+                        core.add(new org.eclipse.aether.graph.Dependency(
+                                new DefaultArtifact(groupId + ":" + artifactId + ":" + version), "provided"));
+                    }
+                }
+            }
+            return Collections.unmodifiableList(core);
+        });
+    }
+
+    private static String discoverArtifactVersion(
+            ClassLoader classLoader, String groupId, String artifactId, @Nullable String defVal) {
+        String version = defVal;
+        String resource = "META-INF/maven/" + groupId + "/" + artifactId + "/pom.properties";
+        final Properties props = new Properties();
+        try (InputStream is = classLoader.getResourceAsStream(resource)) {
+            if (is != null) {
+                props.load(is);
+            }
+            version = props.getProperty("version");
+        } catch (IOException e) {
+            // fall through
+        }
+        if (version != null) {
+            version = version.trim();
+            if (version.startsWith("${")) {
+                version = defVal;
+            }
+        }
+        return version;
     }
 }
