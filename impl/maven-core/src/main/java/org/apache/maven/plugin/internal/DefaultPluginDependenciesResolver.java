@@ -24,11 +24,12 @@ import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -220,15 +221,28 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             request.setRequestContext(REPOSITORY_CONTEXT);
             request.setRepositories(repositories);
             request.setRoot(new org.eclipse.aether.graph.Dependency(pluginArtifact, null));
+            Map<String, org.eclipse.aether.graph.Dependency> core = getCoreExportsAsDependencies(session);
+            request.setManagedDependencies(core.values().stream().toList());
             for (Dependency dependency : plugin.getDependencies()) {
                 org.eclipse.aether.graph.Dependency pluginDep =
                         RepositoryUtils.toDependency(dependency, session.getArtifactTypeRegistry());
                 if (!DependencyScope.SYSTEM.is(pluginDep.getScope())) {
                     pluginDep = pluginDep.setScope(DependencyScope.RUNTIME.id());
                 }
+                org.eclipse.aether.graph.Dependency managedDep =
+                        core.get(pluginDep.getArtifact().getGroupId() + ":"
+                                + pluginDep.getArtifact().getArtifactId());
+                if (managedDep != null
+                        && !Objects.equals(
+                                pluginDep.getArtifact().getVersion(),
+                                managedDep.getArtifact().getVersion())) {
+                    pluginDep = pluginDep.setArtifact(pluginDep
+                            .getArtifact()
+                            .setVersion(managedDep.getArtifact().getVersion()));
+                    pluginDep = pluginDep.setScope(DependencyScope.PROVIDED.id());
+                }
                 request.addDependency(pluginDep);
             }
-            request.setManagedDependencies(getCoreExportsAsDependencies(session));
 
             DependencyRequest depRequest = new DependencyRequest(request, resolutionFilter);
             depRequest.setTrace(trace);
@@ -260,25 +274,29 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             DefaultPluginDependenciesResolver.class.getName() + "#getCoreExportsAsDependencies";
 
     @SuppressWarnings("unchecked")
-    private List<org.eclipse.aether.graph.Dependency> getCoreExportsAsDependencies(RepositorySystemSession session) {
-        return (List<org.eclipse.aether.graph.Dependency>) session.getData().computeIfAbsent(CACHE_KEY, () -> {
-            ArrayList<org.eclipse.aether.graph.Dependency> core = new ArrayList<>();
-            ClassLoader classLoader = coreExports.getExportedPackages().get("org.apache.maven.*");
-            for (String coreArtifact : coreExports.getExportedArtifacts()) {
-                String[] split = coreArtifact.split(":");
-                if (split.length == 2) {
-                    String groupId = split[0];
-                    String artifactId = split[1];
-                    String version = discoverArtifactVersion(classLoader, groupId, artifactId, null);
-                    if (version != null) {
-                        core.add(new org.eclipse.aether.graph.Dependency(
-                                new DefaultArtifact(groupId + ":" + artifactId + ":" + version),
-                                DependencyScope.PROVIDED.id()));
+    private Map<String, org.eclipse.aether.graph.Dependency> getCoreExportsAsDependencies(
+            RepositorySystemSession session) {
+        return (Map<String, org.eclipse.aether.graph.Dependency>)
+                session.getData().computeIfAbsent(CACHE_KEY, () -> {
+                    HashMap<String, org.eclipse.aether.graph.Dependency> core = new HashMap<>();
+                    ClassLoader classLoader = coreExports.getExportedPackages().get("org.apache.maven.*");
+                    for (String coreArtifact : coreExports.getExportedArtifacts()) {
+                        String[] split = coreArtifact.split(":");
+                        if (split.length == 2) {
+                            String groupId = split[0];
+                            String artifactId = split[1];
+                            String version = discoverArtifactVersion(classLoader, groupId, artifactId, null);
+                            if (version != null) {
+                                core.put(
+                                        groupId + ":" + artifactId,
+                                        new org.eclipse.aether.graph.Dependency(
+                                                new DefaultArtifact(groupId + ":" + artifactId + ":" + version),
+                                                DependencyScope.PROVIDED.id()));
+                            }
+                        }
                     }
-                }
-            }
-            return Collections.unmodifiableList(core);
-        });
+                    return Collections.unmodifiableMap(core);
+                });
     }
 
     private static String discoverArtifactVersion(
