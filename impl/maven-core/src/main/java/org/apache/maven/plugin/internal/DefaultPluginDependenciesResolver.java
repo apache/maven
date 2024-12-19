@@ -232,14 +232,17 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 org.eclipse.aether.graph.Dependency managedDep =
                         core.get(pluginDep.getArtifact().getGroupId() + ":"
                                 + pluginDep.getArtifact().getArtifactId());
-                if (managedDep != null
-                        && !Objects.equals(
-                                pluginDep.getArtifact().getVersion(),
-                                managedDep.getArtifact().getVersion())) {
-                    pluginDep = pluginDep.setArtifact(pluginDep
-                            .getArtifact()
-                            .setVersion(managedDep.getArtifact().getVersion()));
-                    pluginDep = pluginDep.setScope(DependencyScope.PROVIDED.id());
+                if (managedDep != null) {
+                    // align version if needed
+                    if (!Objects.equals(
+                            pluginDep.getArtifact().getVersion(),
+                            managedDep.getArtifact().getVersion())) {
+                        pluginDep = pluginDep.setArtifact(pluginDep
+                                .getArtifact()
+                                .setVersion(managedDep.getArtifact().getVersion()));
+                    }
+                    // align scope
+                    pluginDep = pluginDep.setScope(managedDep.getScope());
                 }
                 request.addDependency(pluginDep);
             }
