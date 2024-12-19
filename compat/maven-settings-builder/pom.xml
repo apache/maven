@@ -93,6 +93,7 @@ under the License.
         <artifactId>japicmp-maven-plugin</artifactId>
         <configuration>
           <parameter>
+            <ignoreMissingClasses>true</ignoreMissingClasses>
             <excludes>
               <!--              <exclude>org.apache.maven.settings.validation.SettingsValidator#validate(org.apache.maven.settings.Settings,boolean,org.apache.maven.settings.building.SettingsProblemCollector):METHOD_NEW_DEFAULT</exclude>-->
               <!--              <exclude>org.apache.maven.settings.building.DefaultSettingsBuilder#setSettingsReader(org.apache.maven.settings.io.SettingsReader):METHOD_REMOVED</exclude>-->
