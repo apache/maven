@@ -205,15 +205,21 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         new org.apache.maven.toolchain.model.PersistedToolchains(
                                 toolchainsResult.getEffectiveToolchains()));
 
-        if (!toolchainsResult.getProblems().isEmpty()) {
-            context.logger.warn("");
-            context.logger.warn("Some problems were encountered while building the effective toolchains");
+        if (toolchainsResult.getProblems().hasWarningProblems()) {
+            int totalProblems = toolchainsResult.getProblems().totalProblemsReported();
+            context.logger.info("");
+            context.logger.info(String.format(
+                    "%s %s encountered while building the effective toolchains (use -e to see details)",
+                    totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
 
-            for (BuilderProblem problem : toolchainsResult.getProblems()) {
-                context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
+            if (context.invokerRequest.options().showErrors().orElse(false)) {
+                for (BuilderProblem problem :
+                        toolchainsResult.getProblems().problems().toList()) {
+                    context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
+                }
             }
 
-            context.logger.warn("");
+            context.logger.info("");
         }
     }
 

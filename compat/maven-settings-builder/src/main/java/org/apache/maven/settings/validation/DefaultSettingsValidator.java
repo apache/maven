@@ -22,10 +22,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
@@ -56,8 +56,8 @@ public class DefaultSettingsValidator implements SettingsValidator {
 
     @Override
     public void validate(Settings settings, boolean isProjectSettings, SettingsProblemCollector problems) {
-        List<BuilderProblem> list = settingsBuilder.validate(settings.getDelegate(), isProjectSettings);
-        for (BuilderProblem problem : list) {
+        ProblemCollector<BuilderProblem> list = settingsBuilder.validate(settings.getDelegate(), isProjectSettings);
+        for (BuilderProblem problem : list.problems().toList()) {
             addViolation(problems, Severity.valueOf(problem.getSeverity().name()), problem.getMessage());
         }
     }

@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 import java.util.List;
 
 import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
@@ -56,32 +57,29 @@ class DefaultSettingsValidatorTest {
     void testValidate() {
         Profile prof = Profile.newBuilder().id("xxx").build();
         Settings model = Settings.newBuilder().profiles(List.of(prof)).build();
-        List<BuilderProblem> problems = validator.validate(model);
-        assertEquals(0, problems.size());
+        ProblemCollector<BuilderProblem> problems = validator.validate(model);
+        assertEquals(0, problems.totalProblemsReported());
 
         Repository repo = org.apache.maven.api.settings.Repository.newInstance(false);
         Settings model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();
-        problems.clear();
         problems = validator.validate(model2);
-        assertEquals(2, problems.size());
+        assertEquals(2, problems.totalProblemsReported());
 
         repo = repo.withUrl("http://xxx.xxx.com");
         model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();
-        problems.clear();
         problems = validator.validate(model2);
-        assertEquals(1, problems.size());
+        assertEquals(1, problems.totalProblemsReported());
 
         repo = repo.withId("xxx");
         model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();
-        problems.clear();
         problems = validator.validate(model2);
-        assertEquals(0, problems.size());
+        assertEquals(0, problems.totalProblemsReported());
     }
 
     /*

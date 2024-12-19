@@ -19,7 +19,6 @@
 package org.apache.maven.api.services;
 
 import java.io.Serial;
-import java.util.List;
 
 import org.apache.maven.api.annotations.Experimental;
 
@@ -42,7 +41,7 @@ public class ToolchainsBuilderException extends MavenBuilderException {
         super(message, e);
     }
 
-    public ToolchainsBuilderException(String message, List<BuilderProblem> problems) {
+    public ToolchainsBuilderException(String message, ProblemCollector<BuilderProblem> problems) {
         super(message, problems);
     }
 }

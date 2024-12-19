@@ -62,27 +62,33 @@ public class DefaultProjectsSelector implements ProjectsSelector {
 
         List<MavenProject> projects = new ArrayList<>(results.size());
 
-        boolean problems = false;
+        long totalProblemsCount = 0;
 
         for (ProjectBuildingResult result : results) {
             projects.add(result.getProject());
 
-            if (!result.getProblems().isEmpty() && LOGGER.isWarnEnabled()) {
+            int problemsCount = result.getProblems().size();
+            totalProblemsCount += problemsCount;
+            if (problemsCount != 0 && LOGGER.isWarnEnabled()) {
                 LOGGER.warn("");
                 LOGGER.warn(
-                        "Some problems were encountered while building the effective model for '{}'",
+                        "{} {} encountered while building the effective model for '{}' (use -e to see details)",
+                        problemsCount,
+                        (problemsCount == 1) ? "problem was" : "problems were",
                         result.getProject().getId());
 
-                for (ModelProblem problem : result.getProblems()) {
-                    String loc = ModelProblemUtils.formatLocation(problem, result.getProjectId());
-                    LOGGER.warn("{}{}", problem.getMessage(), ((loc != null && !loc.isEmpty()) ? " @ " + loc : ""));
+                if (request.isShowErrors()) { // this means -e or -X (as -X enables -e as well)
+                    for (ModelProblem problem : result.getProblems()) {
+                        String loc = ModelProblemUtils.formatLocation(problem, result.getProjectId());
+                        LOGGER.warn("{}{}", problem.getMessage(), ((loc != null && !loc.isEmpty()) ? " @ " + loc : ""));
+                    }
                 }
-
-                problems = true;
             }
         }
 
-        if (problems) {
+        if (totalProblemsCount > 0) {
+            LOGGER.warn("");
+            LOGGER.warn("Total model problems reported: {}", totalProblemsCount);
             LOGGER.warn("");
             LOGGER.warn("It is highly recommended to fix these problems"
                     + " because they threaten the stability of your build.");

@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Proxy;
@@ -41,7 +42,7 @@ public class DefaultSettingsValidator {
     private static final String ILLEGAL_REPO_ID_CHARS = "\\/:\"<>|?*"; // ILLEGAL_FS_CHARS
 
     @SuppressWarnings("checkstyle:MethodLength")
-    public void validate(Settings settings, boolean isProjectSettings, List<BuilderProblem> problems) {
+    public void validate(Settings settings, boolean isProjectSettings, ProblemCollector<BuilderProblem> problems) {
         if (isProjectSettings) {
             String msgS = "is not supported on project settings.";
             String msgP = "are not supported on project settings.";
@@ -208,7 +209,8 @@ public class DefaultSettingsValidator {
         }
     }
 
-    private void validateRepositories(List<BuilderProblem> problems, List<Repository> repositories, String prefix) {
+    private void validateRepositories(
+            ProblemCollector<BuilderProblem> problems, List<Repository> repositories, String prefix) {
         Set<String> repoIds = new HashSet<>();
 
         for (Repository repository : repositories) {
@@ -268,7 +270,7 @@ public class DefaultSettingsValidator {
      * </ul>
      */
     private static boolean validateStringEmpty(
-            List<BuilderProblem> problems, String fieldName, String string, String message) {
+            ProblemCollector<BuilderProblem> problems, String fieldName, String string, String message) {
         if (string == null || string.length() == 0) {
             return true;
         }
@@ -287,7 +289,7 @@ public class DefaultSettingsValidator {
      * </ul>
      */
     private static boolean validateStringNotEmpty(
-            List<BuilderProblem> problems, String fieldName, String string, String sourceHint) {
+            ProblemCollector<BuilderProblem> problems, String fieldName, String string, String sourceHint) {
         if (!validateNotNull(problems, fieldName, string, sourceHint)) {
             return false;
         }
@@ -309,7 +311,7 @@ public class DefaultSettingsValidator {
      * </ul>
      */
     private static boolean validateNotNull(
-            List<BuilderProblem> problems, String fieldName, Object object, String sourceHint) {
+            ProblemCollector<BuilderProblem> problems, String fieldName, Object object, String sourceHint) {
         if (object != null) {
             return true;
         }
@@ -320,7 +322,7 @@ public class DefaultSettingsValidator {
     }
 
     private static boolean validateBannedCharacters(
-            List<BuilderProblem> problems,
+            ProblemCollector<BuilderProblem> problems,
             String fieldName,
             BuilderProblem.Severity severity,
             String string,
@@ -344,7 +346,7 @@ public class DefaultSettingsValidator {
     }
 
     private static void addViolation(
-            List<BuilderProblem> problems,
+            ProblemCollector<BuilderProblem> problems,
             BuilderProblem.Severity severity,
             String fieldName,
             String sourceHint,
@@ -358,6 +360,6 @@ public class DefaultSettingsValidator {
 
         buffer.append(' ').append(message);
 
-        problems.add(new DefaultBuilderProblem(null, -1, -1, null, buffer.toString(), severity));
+        problems.reportProblem(new DefaultBuilderProblem(null, -1, -1, null, buffer.toString(), severity));
     }
 }

@@ -92,9 +92,11 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
                     .build());
 
             return new DefaultToolchainsBuildingResult(
-                    new PersistedToolchains(result.getEffectiveToolchains()), convert(result.getProblems()));
+                    new PersistedToolchains(result.getEffectiveToolchains()),
+                    convert(result.getProblems().problems().toList()));
         } catch (ToolchainsBuilderException e) {
-            throw new ToolchainsBuildingException(convert(e.getProblems()));
+            throw new ToolchainsBuildingException(
+                    convert(e.getProblemCollector().problems().toList()));
         }
     }
 

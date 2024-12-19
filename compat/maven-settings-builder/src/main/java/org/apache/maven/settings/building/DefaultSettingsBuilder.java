@@ -95,9 +95,11 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     .build());
 
             return new DefaultSettingsBuildingResult(
-                    new Settings(result.getEffectiveSettings()), convert(result.getProblems()));
+                    new Settings(result.getEffectiveSettings()),
+                    convert(result.getProblems().problems().toList()));
         } catch (SettingsBuilderException e) {
-            throw new SettingsBuildingException(convert(e.getProblems()));
+            throw new SettingsBuildingException(
+                    convert(e.getProblemCollector().problems().toList()));
         }
     }
 
