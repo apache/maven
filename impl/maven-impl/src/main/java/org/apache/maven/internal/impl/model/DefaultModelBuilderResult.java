@@ -122,15 +122,6 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         return problemCollector;
     }
 
-    /**
-     * Adds a given problem to the list of problems and propagates it to the parent result if present.
-     *
-     * @param problem The problem to be added. It must be an instance of ModelProblem.
-     */
-    public void addProblem(ModelProblem problem) {
-        problemCollector.reportProblem(problem);
-    }
-
     @Override
     public List<DefaultModelBuilderResult> getChildren() {
         return children;

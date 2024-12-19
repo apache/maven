@@ -728,7 +728,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 -1,
                                 -1,
                                 null);
-                        r.addProblem(problem);
+                        r.getProblemCollector().reportProblem(problem);
                         continue;
                     }
 
@@ -750,7 +750,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 -1,
                                 -1,
                                 null);
-                        r.addProblem(problem);
+                        r.getProblemCollector().reportProblem(problem);
                         continue;
                     }
 
