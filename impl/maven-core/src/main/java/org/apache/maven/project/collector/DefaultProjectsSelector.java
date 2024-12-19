@@ -77,7 +77,7 @@ public class DefaultProjectsSelector implements ProjectsSelector {
                         (problemsCount == 1) ? "problem was" : "problems were",
                         result.getProject().getId());
 
-                if (request.isShowErrors()) { // this means -e or -X (as -X turns on this one)
+                if (request.isShowErrors()) { // this means -e or -X (as -X enables -e as well)
                     for (ModelProblem problem : result.getProblems()) {
                         String loc = ModelProblemUtils.formatLocation(problem, result.getProjectId());
                         LOGGER.warn("{}{}", problem.getMessage(), ((loc != null && !loc.isEmpty()) ? " @ " + loc : ""));

@@ -137,9 +137,12 @@ public interface ProblemCollector<P extends BuilderProblem> {
     ProblemCollector<P> createChild();
 
     /**
-     * Attaches a child collector. Parent (this) instance will accumulate values for itself and all of its children.
+     * May attach a child collector (if not present already). Parent (this) instance will accumulate values for
+     * itself and all of its children.
+     *
+     * @return {@code true} if child attached, or {@code false} if child already present.
      */
-    void addChild(ProblemCollector<P> child);
+    boolean mayAddChild(ProblemCollector<P> child);
 
     /**
      * Returns true if collector is present in passed in collector or its children.
@@ -178,8 +181,8 @@ public interface ProblemCollector<P extends BuilderProblem> {
             }
 
             @Override
-            public void addChild(ProblemCollector<P> child) {
-                throw new IllegalStateException("empty problem collector");
+            public boolean mayAddChild(ProblemCollector<P> child) {
+                return false;
             }
 
             @Override
@@ -294,15 +297,13 @@ public interface ProblemCollector<P extends BuilderProblem> {
         }
 
         @Override
-        public void addChild(ProblemCollector<P> child) {
+        public boolean mayAddChild(ProblemCollector<P> child) {
             requireNonNull(child, "child");
-            if (child == this) {
-                throw new IllegalArgumentException("child cannot be attached to itself");
+            if (!presentCollector(child)) {
+                childCollectors.add(child);
+                return true;
             }
-            if (presentCollector(child)) {
-                throw new IllegalArgumentException("child already present");
-            }
-            childCollectors.add(child);
+            return false;
         }
 
         @Override

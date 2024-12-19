@@ -796,9 +796,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 // gathered with problem collector
                 add(Severity.ERROR, Version.V40, "Failed to load project " + pom, e);
             }
-            if (!result.getProblemCollector().presentCollector(r.getProblemCollector())) {
-                result.getProblemCollector().addChild(r.getProblemCollector());
-            }
+            result.getProblemCollector().mayAddChild(r.getProblemCollector());
         }
 
         static <T> Set<T> concat(Set<T> a, T b) {
@@ -1721,11 +1719,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 modelBuilderSession.buildEffectiveModel(importIds);
                 importResult = modelBuilderSession.result;
             } catch (ModelBuilderException e) {
-                if (!result.getProblemCollector().presentCollector(e.getProblemCollector())) {
-                    result.getProblemCollector().addChild(e.getProblemCollector());
-                }
+                result.getProblemCollector().mayAddChild(e.getProblemCollector());
                 return null;
             }
+
+            result.getProblemCollector().mayAddChild(importResult.getProblemCollector());
 
             importModel = importResult.getEffectiveModel();
 
