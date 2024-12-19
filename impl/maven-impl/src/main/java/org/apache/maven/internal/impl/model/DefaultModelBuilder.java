@@ -469,30 +469,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         @Override
-        public void add(ModelProblem problem) {
-            result.addProblem(problem);
-        }
-
-        @Override
-        public void add(BuilderProblem.Severity severity, ModelProblem.Version version, String message) {
-            add(severity, version, message, null, null);
-        }
-
-        @Override
-        public void add(
-                BuilderProblem.Severity severity,
-                ModelProblem.Version version,
-                String message,
-                InputLocation location) {
-            add(severity, version, message, location, null);
-        }
-
-        @Override
-        public void add(
-                BuilderProblem.Severity severity, ModelProblem.Version version, String message, Exception exception) {
-            add(severity, version, message, null, exception);
-        }
-
         public void add(
                 BuilderProblem.Severity severity,
                 ModelProblem.Version version,
@@ -1846,6 +1822,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         return subprojects;
     }
 
+    @Override
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
         ModelBuilderSessionState build = new ModelBuilderSessionState(request);
         Model model = build.readRawModel();
