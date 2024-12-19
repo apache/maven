@@ -273,7 +273,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                     String version = discoverArtifactVersion(classLoader, groupId, artifactId, null);
                     if (version != null) {
                         core.add(new org.eclipse.aether.graph.Dependency(
-                                new DefaultArtifact(groupId + ":" + artifactId + ":" + version), "provided"));
+                                new DefaultArtifact(groupId + ":" + artifactId + ":" + version), DependencyScope.PROVIDED.id()));
                     }
                 }
             }
