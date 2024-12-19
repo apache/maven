@@ -20,20 +20,15 @@ package org.apache.maven.internal.impl.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
-import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.ProblemCollector;
 
 /**
  * Collects the output of the model builder.
@@ -46,23 +41,14 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     private Model effectiveModel;
     private List<Profile> activePomProfiles;
     private List<Profile> activeExternalProfiles;
-    private final Queue<ModelProblem> problems = new ConcurrentLinkedQueue<>();
-    private final DefaultModelBuilderResult problemHolder;
-
+    private final ProblemCollector<ModelProblem> problemCollector;
     private final List<DefaultModelBuilderResult> children = new ArrayList<>();
 
-    private int maxProblems;
-    private Map<BuilderProblem.Severity, AtomicInteger> problemCount = new ConcurrentHashMap<>();
-
-    DefaultModelBuilderResult(int maxProblems) {
-        this(null, maxProblems);
+    DefaultModelBuilderResult(ProblemCollector<ModelProblem> problemCollector) {
+        this.problemCollector = problemCollector;
     }
 
-    DefaultModelBuilderResult(DefaultModelBuilderResult problemHolder, int maxProblems) {
-        this.problemHolder = problemHolder;
-        this.maxProblems = maxProblems;
-    }
-
+    @Override
     public ModelSource getSource() {
         return source;
     }
@@ -132,39 +118,8 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
      *         guaranteed to be non-null but possibly empty.
      */
     @Override
-    public List<ModelProblem> getProblems() {
-        List<ModelProblem> additionalProblems = new ArrayList<>();
-        problemCount.forEach((s, i) -> {
-            if (i.get() > maxProblems) {
-                additionalProblems.add(new DefaultModelProblem(
-                        String.format("Too many problems %d of severity %s", i.get(), s.name()),
-                        s,
-                        ModelProblem.Version.BASE,
-                        null,
-                        -1,
-                        -1,
-                        null,
-                        null));
-            }
-        });
-        return Stream.concat(problems.stream(), additionalProblems.stream()).toList();
-    }
-
-    /**
-     * Adds a given problem to the list of problems and propagates it to the parent result if present.
-     *
-     * @param problem The problem to be added. It must be an instance of ModelProblem.
-     */
-    public void addProblem(ModelProblem problem) {
-        int problemCount = this.problemCount
-                .computeIfAbsent(problem.getSeverity(), s -> new AtomicInteger())
-                .incrementAndGet();
-        if (problemCount < maxProblems) {
-            problems.add(problem);
-        }
-        if (problemHolder != null) {
-            problemHolder.addProblem(problem);
-        }
+    public ProblemCollector<ModelProblem> getProblemCollector() {
+        return problemCollector;
     }
 
     @Override
@@ -183,18 +138,19 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         } else {
             modelId = null;
         }
-        if (!problems.isEmpty()) {
+        if (problemCollector.hasWarningProblems()) {
+            int totalProblems = problemCollector.totalProblemsReported();
             StringBuilder sb = new StringBuilder();
-            sb.append(problems.size())
+            sb.append(totalProblems)
                     .append(
-                            (problems.size() == 1)
+                            (totalProblems == 1)
                                     ? " problem was "
                                     : " problems were encountered while building the effective model");
             if (modelId != null && !modelId.isEmpty()) {
                 sb.append(" for ");
                 sb.append(modelId);
             }
-            for (ModelProblem problem : problems) {
+            for (ModelProblem problem : problemCollector.problems().toList()) {
                 sb.append(System.lineSeparator());
                 sb.append("    - [");
                 sb.append(problem.getSeverity());

@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,6 +38,7 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderException;
 import org.apache.maven.api.services.SettingsBuilderRequest;
@@ -97,7 +97,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     @Override
     public SettingsBuilderResult build(SettingsBuilderRequest request) throws SettingsBuilderException {
-        List<BuilderProblem> problems = new ArrayList<>();
+        ProblemCollector<BuilderProblem> problems = ProblemCollector.create(request.getSession());
 
         Source installationSource = request.getInstallationSettingsSource().orElse(null);
         Settings installation = readSettings(installationSource, false, request, problems);
@@ -139,30 +139,18 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             }
         }
 
-        if (hasErrors(problems)) {
+        if (problems.hasErrorProblems()) {
             throw new SettingsBuilderException("Error building settings", problems);
         }
 
         return new DefaultSettingsBuilderResult(effective, problems);
     }
 
-    private boolean hasErrors(List<BuilderProblem> problems) {
-        if (problems != null) {
-            for (BuilderProblem problem : problems) {
-                if (BuilderProblem.Severity.ERROR.compareTo(problem.getSeverity()) >= 0) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     private Settings readSettings(
             Source settingsSource,
             boolean isProjectSettings,
             SettingsBuilderRequest request,
-            List<BuilderProblem> problems) {
+            ProblemCollector<BuilderProblem> problems) {
         if (settingsSource == null) {
             return Settings.newInstance();
         }
@@ -184,7 +172,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                             .strict(false)
                             .build());
                     Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
-                    problems.add(new DefaultBuilderProblem(
+                    problems.reportProblem(new DefaultBuilderProblem(
                             settingsSource.getLocation(),
                             loc != null ? loc.getLineNumber() : -1,
                             loc != null ? loc.getColumnNumber() : -1,
@@ -195,7 +183,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             }
         } catch (XmlReaderException e) {
             Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
-            problems.add(new DefaultBuilderProblem(
+            problems.reportProblem(new DefaultBuilderProblem(
                     settingsSource.getLocation(),
                     loc != null ? loc.getLineNumber() : -1,
                     loc != null ? loc.getColumnNumber() : -1,
@@ -204,7 +192,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     BuilderProblem.Severity.FATAL));
             return Settings.newInstance();
         } catch (IOException e) {
-            problems.add(new DefaultBuilderProblem(
+            problems.reportProblem(new DefaultBuilderProblem(
                     settingsSource.getLocation(),
                     -1,
                     -1,
@@ -242,7 +230,8 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         return settings;
     }
 
-    private Settings interpolate(Settings settings, SettingsBuilderRequest request, List<BuilderProblem> problems) {
+    private Settings interpolate(
+            Settings settings, SettingsBuilderRequest request, ProblemCollector<BuilderProblem> problems) {
         Function<String, String> src;
         if (request.getInterpolationSource().isPresent()) {
             src = request.getInterpolationSource().get();
@@ -269,7 +258,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     private Settings decrypt(
-            Source settingsSource, Settings settings, SettingsBuilderRequest request, List<BuilderProblem> problems) {
+            Source settingsSource,
+            Settings settings,
+            SettingsBuilderRequest request,
+            ProblemCollector<BuilderProblem> problems) {
         if (dispatchers.isEmpty()) {
             return settings;
         }
@@ -284,7 +276,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                 try {
                     return secDispatcher.decrypt(str);
                 } catch (Exception e) {
-                    problems.add(new DefaultBuilderProblem(
+                    problems.reportProblem(new DefaultBuilderProblem(
                             settingsSource.getLocation(),
                             -1,
                             -1,
@@ -297,7 +289,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         };
         Settings result = new SettingsTransformer(decryptFunction).visit(settings);
         if (preMaven4Passwords.get() > 0) {
-            problems.add(new DefaultBuilderProblem(
+            problems.reportProblem(new DefaultBuilderProblem(
                     settingsSource.getLocation(),
                     -1,
                     -1,
@@ -323,8 +315,9 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     @Override
-    public List<BuilderProblem> validate(Settings settings, boolean isProjectSettings) {
-        ArrayList<BuilderProblem> problems = new ArrayList<>();
+    public ProblemCollector<BuilderProblem> validate(Settings settings, boolean isProjectSettings) {
+        // TODO: any way to get ProtoSession here?
+        ProblemCollector<BuilderProblem> problems = ProblemCollector.create(null);
         settingsValidator.validate(settings, isProjectSettings, problems);
         return problems;
     }
@@ -347,11 +340,11 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         private final Settings effectiveSettings;
 
-        private final List<BuilderProblem> problems;
+        private final ProblemCollector<BuilderProblem> problems;
 
-        DefaultSettingsBuilderResult(Settings effectiveSettings, List<BuilderProblem> problems) {
+        DefaultSettingsBuilderResult(Settings effectiveSettings, ProblemCollector<BuilderProblem> problems) {
             this.effectiveSettings = effectiveSettings;
-            this.problems = (problems != null) ? problems : new ArrayList<>();
+            this.problems = (problems != null) ? problems : ProblemCollector.empty();
         }
 
         @Override
@@ -360,7 +353,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         @Override
-        public List<BuilderProblem> getProblems() {
+        public ProblemCollector<BuilderProblem> getProblems() {
             return problems;
         }
     }

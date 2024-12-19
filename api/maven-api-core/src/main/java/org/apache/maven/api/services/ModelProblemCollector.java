@@ -18,8 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.util.List;
-
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
 
@@ -33,15 +31,15 @@ import org.apache.maven.api.model.Model;
  */
 public interface ModelProblemCollector {
 
-    /**
-     * The collected problems.
-     * @return a list of model problems encountered, never {@code null}
-     */
-    List<ModelProblem> getProblems();
+    ProblemCollector<ModelProblem> getProblemCollector();
 
-    boolean hasErrors();
+    default boolean hasErrors() {
+        return getProblemCollector().hasErrorProblems();
+    }
 
-    boolean hasFatalErrors();
+    default boolean hasFatalErrors() {
+        return getProblemCollector().hasFatalProblems();
+    }
 
     default void add(BuilderProblem.Severity severity, ModelProblem.Version version, String message) {
         add(severity, version, message, null, null);
@@ -64,7 +62,9 @@ public interface ModelProblemCollector {
             InputLocation location,
             Exception exception);
 
-    void add(ModelProblem problem);
+    default void add(ModelProblem problem) {
+        getProblemCollector().reportProblem(problem);
+    }
 
     ModelBuilderException newModelBuilderException();
 

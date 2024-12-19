@@ -81,6 +81,7 @@ import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.SuperPomProvider;
@@ -205,10 +206,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         return new ModelBuilderSessionImpl();
     }
 
-    static int getMaxProblems(Session session) {
-        return Integer.parseInt(session.getUserProperties().getOrDefault(Constants.MAVEN_BUILDER_MAX_PROBLEMS, "100"));
-    }
-
     protected class ModelBuilderSessionImpl implements ModelBuilderSession {
         ModelBuilderSessionState mainSession;
 
@@ -227,8 +224,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 mainSession = new ModelBuilderSessionState(request);
                 session = mainSession;
             } else {
-                session =
-                        mainSession.derive(request, new DefaultModelBuilderResult(getMaxProblems(mainSession.session)));
+                session = mainSession.derive(
+                        request, new DefaultModelBuilderResult(ProblemCollector.create(mainSession.session)));
             }
             // Build the request
             if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
@@ -264,7 +261,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             this(
                     request.getSession(),
                     request,
-                    new DefaultModelBuilderResult(DefaultModelBuilder.getMaxProblems(request.getSession())),
+                    new DefaultModelBuilderResult(ProblemCollector.create(request.getSession())),
                     request.getSession()
                             .getData()
                             .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance),
@@ -305,12 +302,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.result.setSource(this.request.getSource());
         }
 
-        int getMaxProblems() {
-            return DefaultModelBuilder.getMaxProblems(session);
-        }
-
         ModelBuilderSessionState derive(ModelSource source) {
-            return derive(source, new DefaultModelBuilderResult(result, getMaxProblems()));
+            return derive(source, new DefaultModelBuilderResult(ProblemCollector.create(session)));
         }
 
         ModelBuilderSessionState derive(ModelSource source, DefaultModelBuilderResult result) {
@@ -321,7 +314,7 @@ public class DefaultModelBuilder implements ModelBuilder {
          * Creates a new session, sharing cached datas and propagating errors.
          */
         ModelBuilderSessionState derive(ModelBuilderRequest request) {
-            return derive(request, new DefaultModelBuilderResult(result, getMaxProblems()));
+            return derive(request, new DefaultModelBuilderResult(ProblemCollector.create(session)));
         }
 
         ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
@@ -433,18 +426,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        public boolean hasFatalErrors() {
-            return result.getProblems().stream().anyMatch(p -> p.getSeverity() == Severity.FATAL);
-        }
-
-        public boolean hasErrors() {
-            return result.getProblems().stream()
-                    .anyMatch(p -> p.getSeverity() == Severity.FATAL || p.getSeverity() == Severity.ERROR);
-        }
-
         @Override
-        public List<ModelProblem> getProblems() {
-            return result.getProblems();
+        public ProblemCollector<ModelProblem> getProblemCollector() {
+            return result.getProblemCollector();
         }
 
         public void setSource(String source) {
@@ -481,30 +465,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         @Override
-        public void add(ModelProblem problem) {
-            result.addProblem(problem);
-        }
-
-        @Override
-        public void add(BuilderProblem.Severity severity, ModelProblem.Version version, String message) {
-            add(severity, version, message, null, null);
-        }
-
-        @Override
-        public void add(
-                BuilderProblem.Severity severity,
-                ModelProblem.Version version,
-                String message,
-                InputLocation location) {
-            add(severity, version, message, location, null);
-        }
-
-        @Override
-        public void add(
-                BuilderProblem.Severity severity, ModelProblem.Version version, String message, Exception exception) {
-            add(severity, version, message, null, exception);
-        }
-
         public void add(
                 BuilderProblem.Severity severity,
                 ModelProblem.Version version,
@@ -720,8 +680,9 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private void loadFromRoot(Path root, Path top) {
             try (PhasingExecutor executor = createExecutor()) {
-                DefaultModelBuilderResult r =
-                        Objects.equals(top, root) ? result : new DefaultModelBuilderResult(getMaxProblems());
+                DefaultModelBuilderResult r = Objects.equals(top, root)
+                        ? result
+                        : new DefaultModelBuilderResult(ProblemCollector.create(session));
                 loadFilePom(executor, top, root, Set.of(), r);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {
@@ -767,7 +728,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 -1,
                                 -1,
                                 null);
-                        r.addProblem(problem);
+                        r.getProblemCollector().reportProblem(problem);
                         continue;
                     }
 
@@ -789,13 +750,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 -1,
                                 -1,
                                 null);
-                        r.addProblem(problem);
+                        r.getProblemCollector().reportProblem(problem);
                         continue;
                     }
 
                     DefaultModelBuilderResult cr = Objects.equals(top, subprojectFile)
                             ? result
-                            : new DefaultModelBuilderResult(r, getMaxProblems());
+                            : new DefaultModelBuilderResult(ProblemCollector.create(session));
                     if (request.isRecursive()) {
                         r.getChildren().add(cr);
                     }
@@ -805,9 +766,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
                 add(Severity.ERROR, Version.V40, "Failed to load project " + pom, e);
-            }
-            if (r != result) {
-                r.getProblems().forEach(result::addProblem);
             }
         }
 
@@ -1731,11 +1689,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 modelBuilderSession.buildEffectiveModel(importIds);
                 importResult = modelBuilderSession.result;
             } catch (ModelBuilderException e) {
-                e.getResult().getProblems().forEach(this::add);
                 return null;
             }
-
-            importResult.getProblems().forEach(this::add);
 
             importModel = importResult.getEffectiveModel();
 
@@ -1858,6 +1813,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         return subprojects;
     }
 
+    @Override
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
         ModelBuilderSessionState build = new ModelBuilderSessionState(request);
         Model model = build.readRawModel();

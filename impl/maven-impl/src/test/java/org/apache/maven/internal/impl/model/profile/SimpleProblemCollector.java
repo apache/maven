@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl.model.profile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.api.model.InputLocation;
@@ -27,6 +26,7 @@ import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.internal.impl.model.DefaultModelProblem;
 
 /**
@@ -34,23 +34,11 @@ import org.apache.maven.internal.impl.model.DefaultModelProblem;
  */
 public class SimpleProblemCollector implements ModelProblemCollector {
 
-    final List<ModelProblem> problems = new ArrayList<>();
+    final ProblemCollector<ModelProblem> problemCollector = ProblemCollector.create(100);
 
     @Override
-    public List<ModelProblem> getProblems() {
-        return problems;
-    }
-
-    @Override
-    public boolean hasErrors() {
-        return problems.stream()
-                .anyMatch(p -> p.getSeverity() == ModelProblem.Severity.FATAL
-                        || p.getSeverity() == ModelProblem.Severity.ERROR);
-    }
-
-    @Override
-    public boolean hasFatalErrors() {
-        return problems.stream().anyMatch(p -> p.getSeverity() == ModelProblem.Severity.FATAL);
+    public ProblemCollector<ModelProblem> getProblemCollector() {
+        return problemCollector;
     }
 
     @Override
@@ -68,11 +56,6 @@ public class SimpleProblemCollector implements ModelProblemCollector {
                 location != null ? location.getLineNumber() : -1,
                 location != null ? location.getColumnNumber() : -1,
                 exception));
-    }
-
-    @Override
-    public void add(ModelProblem problem) {
-        this.problems.add(problem);
     }
 
     @Override
@@ -118,8 +101,8 @@ public class SimpleProblemCollector implements ModelProblemCollector {
     }
 
     private List<String> getForLevel(BuilderProblem.Severity severity) {
-        return problems.stream()
-                .filter(p -> p.getSeverity() == severity)
+        return problemCollector
+                .problems(severity)
                 .map(BuilderProblem::getMessage)
                 .toList();
     }

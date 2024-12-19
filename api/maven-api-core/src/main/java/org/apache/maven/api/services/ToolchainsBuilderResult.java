@@ -18,8 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.util.List;
-
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.toolchain.PersistedToolchains;
@@ -46,5 +44,5 @@ public interface ToolchainsBuilderResult {
      * @return the problems that were encountered during the settings building, can be empty but never {@code null}
      */
     @Nonnull
-    List<BuilderProblem> getProblems();
+    ProblemCollector<BuilderProblem> getProblems();
 }
