@@ -30,8 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -230,7 +228,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 }
                 request.addDependency(pluginDep);
             }
-            request.setManagedDependencies(getCoreExportsAsDependencies());
+            request.setManagedDependencies(getCoreExportsAsDependencies(session));
 
             DependencyRequest depRequest = new DependencyRequest(request, resolutionFilter);
             depRequest.setTrace(trace);
@@ -258,11 +256,12 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         }
     }
 
-    private final ConcurrentMap<String, List<org.eclipse.aether.graph.Dependency>> depMgtCache =
-            new ConcurrentHashMap<>();
+    private static final String CACHE_KEY =
+            DefaultPluginDependenciesResolver.class.getName() + "#getCoreExportsAsDependencies";
 
-    private List<org.eclipse.aether.graph.Dependency> getCoreExportsAsDependencies() {
-        return depMgtCache.computeIfAbsent("core", k -> {
+    @SuppressWarnings("unchecked")
+    private List<org.eclipse.aether.graph.Dependency> getCoreExportsAsDependencies(RepositorySystemSession session) {
+        return (List<org.eclipse.aether.graph.Dependency>) session.getData().computeIfAbsent(CACHE_KEY, () -> {
             ArrayList<org.eclipse.aether.graph.Dependency> core = new ArrayList<>();
             ClassLoader classLoader = coreExports.getExportedPackages().get("org.apache.maven.*");
             for (String coreArtifact : coreExports.getExportedArtifacts()) {
@@ -273,7 +272,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                     String version = discoverArtifactVersion(classLoader, groupId, artifactId, null);
                     if (version != null) {
                         core.add(new org.eclipse.aether.graph.Dependency(
-                                new DefaultArtifact(groupId + ":" + artifactId + ":" + version), DependencyScope.PROVIDED.id()));
+                                new DefaultArtifact(groupId + ":" + artifactId + ":" + version),
+                                DependencyScope.PROVIDED.id()));
                     }
                 }
             }
