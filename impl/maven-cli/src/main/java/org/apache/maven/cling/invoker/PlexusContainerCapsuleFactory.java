@@ -273,13 +273,14 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         });
 
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+        Runnable settingsCleaner = null;
         try {
             container.setLookupRealm(null);
             container.setLoggerManager(createLoggerManager());
             container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
             Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
-            invoker.settings(context, false, container.lookup(SettingsBuilder.class));
+            settingsCleaner = invoker.settings(context, false, container.lookup(SettingsBuilder.class));
 
             MavenExecutionRequest mer = new DefaultMavenExecutionRequest();
             invoker.populateRequest(context, new DefaultLookup(container), mer);
@@ -288,6 +289,9 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                     .lookup(BootstrapCoreExtensionManager.class)
                     .loadCoreExtensions(mer, providedArtifacts, extensions));
         } finally {
+            if (settingsCleaner != null) {
+                settingsCleaner.run();
+            }
             try {
                 container.dispose();
             } finally {
