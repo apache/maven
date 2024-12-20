@@ -18,15 +18,33 @@
  */
 package org.apache.maven.cling.transfer;
 
+import java.util.Locale;
+
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.cling.transfer.FileSizeFormat.ScaleUnit;
 import org.apache.maven.internal.impl.DefaultMessageBuilder;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FileSizeFormatTest {
+    // Locale like DE uses "," and not "."
+    // For simplicity’s sake let test in US
+    static Locale original;
+
+    @BeforeAll
+    static void beforeAll() {
+        original = Locale.getDefault();
+        Locale.setDefault(Locale.US);
+    }
+
+    @AfterAll
+    static void afterAll() {
+        Locale.setDefault(original);
+    }
 
     @Test
     void testNegativeSize() {
