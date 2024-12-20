@@ -501,8 +501,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
      * If there are Maven3 passwords presents in settings, this results in doubled warnings emitted. So Plexus DI
      * creation call keeps "emitSettingsWarnings" false. If there are fatal issues, it will anyway "die" at that
      * spot before warnings would be emitted.
+     * <p>
+     * The method returns a "cleaner" runnable, as during extension loading the context needs to be "cleaned", restored
+     * to previous state (as it was before extension loading).
      */
-    protected void settings(C context, boolean emitSettingsWarnings, SettingsBuilder settingsBuilder) throws Exception {
+    protected Runnable settings(C context, boolean emitSettingsWarnings, SettingsBuilder settingsBuilder)
+            throws Exception {
         Options mavenOptions = context.invokerRequest.options();
 
         Path userSettingsFile = null;
@@ -612,6 +616,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
             context.logger.info("");
         }
+        return () -> {
+            context.installationSettingsPath = null;
+            context.projectSettingsPath = null;
+            context.userSettingsPath = null;
+            context.effectiveSettings = null;
+            context.interactive = true;
+            context.localRepositoryPath = null;
+        };
     }
 
     protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest)
