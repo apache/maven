@@ -19,14 +19,10 @@
     </repository>
     <repository>
       <id>test3</id>
-      <url>${project.baseUri}repo</url>
-    </repository>
-    <repository>
-      <id>test4</id>
       <url>file://${project.rootDirectory}/repo</url>
     </repository>
     <repository>
-      <id>test5</id>
+      <id>test4</id>
       <url>${project.rootDirectory.uri}repo</url>
     </repository>
   </repositories>

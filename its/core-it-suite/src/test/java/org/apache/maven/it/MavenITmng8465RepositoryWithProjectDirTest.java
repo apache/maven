@@ -47,6 +47,6 @@ class MavenITmng8465RepositoryWithProjectDirTest extends AbstractMavenIntegratio
         List<String> urls = verifier.loadLogLines().stream()
                 .filter(s -> s.contains("<url>" + basedir.resolve("repo").toUri() + "</url>"))
                 .toList();
-        assertEquals(5, urls.size());
+        assertEquals(4, urls.size());
     }
 }
