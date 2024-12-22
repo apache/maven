@@ -1343,13 +1343,19 @@ public class DefaultModelValidator implements ModelValidator {
                 // only allow ${basedir} and ${project.basedir}
                 Matcher m = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
                 while (m.find()) {
-                    if (!("basedir".equals(m.group(1)) || "project.basedir".equals(m.group(1)))) {
-                        validateStringNoExpression(
-                                prefix + prefix2 + "[" + repository.getId() + "].url",
+                    String expr = m.group(1);
+                    if (!("basedir".equals(expr)
+                            || "project.basedir".equals(expr)
+                            || expr.startsWith("project.basedir.")
+                            || "project.rootDirectory".equals(expr)
+                            || expr.startsWith("project.rootDirectory."))) {
+                        addViolation(
                                 problems,
                                 Severity.ERROR,
                                 Version.V40,
-                                repository.getUrl(),
+                                prefix + prefix2 + "[" + repository.getId() + "].url",
+                                null,
+                                "contains an unsupported expression (only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported).",
                                 repository);
                         break;
                     }
