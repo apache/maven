@@ -51,8 +51,8 @@ class MavenITmng8465RepositoryWithProjectDirTest extends AbstractMavenIntegratio
         assertEquals(4, urls.size());
         for (String url : urls) {
             Path repo = basedir.resolve("repo");
-            assertTrue(url.contains("file://" + repo)
-                || url.contains(repo.toUri().toString()));
+            assertTrue(
+                    url.contains("file://" + repo) || url.contains(repo.toUri().toString()));
         }
     }
 }
