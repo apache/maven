@@ -56,6 +56,11 @@ public class LoggingOutputStream extends FilterOutputStream {
         }
     }
 
+    @Override
+    public void flush() throws IOException {
+        forceFlush();
+    }
+
     public void forceFlush() {
         if (buf.size() > 0) {
             String line = new String(buf.toByteArray(), 0, buf.size());
