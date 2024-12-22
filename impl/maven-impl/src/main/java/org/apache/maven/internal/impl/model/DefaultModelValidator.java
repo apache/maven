@@ -1347,16 +1347,15 @@ public class DefaultModelValidator implements ModelValidator {
                     if (!("basedir".equals(expr)
                             || "project.basedir".equals(expr)
                             || expr.startsWith("project.basedir.")
-                            || "project.baseUri".equals(expr)
-                            || expr.startsWith("project.baseUri.")
                             || "project.rootDirectory".equals(expr)
                             || expr.startsWith("project.rootDirectory."))) {
-                        validateStringNoExpression(
-                                prefix + prefix2 + "[" + repository.getId() + "].url",
+                        addViolation(
                                 problems,
                                 Severity.ERROR,
                                 Version.V40,
-                                repository.getUrl(),
+                                prefix + prefix2 + "[" + repository.getId() + "].url",
+                                null,
+                                "only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported.",
                                 repository);
                         break;
                     }
