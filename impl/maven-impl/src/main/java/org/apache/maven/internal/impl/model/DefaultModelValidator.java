@@ -1343,7 +1343,14 @@ public class DefaultModelValidator implements ModelValidator {
                 // only allow ${basedir} and ${project.basedir}
                 Matcher m = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
                 while (m.find()) {
-                    if (!("basedir".equals(m.group(1)) || "project.basedir".equals(m.group(1)))) {
+                    String expr = m.group(1);
+                    if (!("basedir".equals(expr)
+                            || "project.basedir".equals(expr)
+                            || expr.startsWith("project.basedir.")
+                            || "project.baseUri".equals(expr)
+                            || expr.startsWith("project.baseUri.")
+                            || "project.rootDirectory".equals(expr)
+                            || expr.startsWith("project.rootDirectory."))) {
                         validateStringNoExpression(
                                 prefix + prefix2 + "[" + repository.getId() + "].url",
                                 problems,

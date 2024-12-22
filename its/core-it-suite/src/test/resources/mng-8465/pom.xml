@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+  <groupId>org.apache.maven.its.mng8465</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: MNG-8465</name>
+  <description>Test repositories can be defined using ${project.basedir} and ${project.rootDirectory}.</description>
+
+  <repositories>
+    <repository>
+      <id>test</id>
+      <url>file://${project.basedir}/repo</url>
+    </repository>
+    <repository>
+      <id>test2</id>
+      <url>${project.basedir.uri}repo</url>
+    </repository>
+    <repository>
+      <id>test3</id>
+      <url>${project.baseUri}repo</url>
+    </repository>
+    <repository>
+      <id>test4</id>
+      <url>file://${project.rootDirectory}/repo</url>
+    </repository>
+    <repository>
+      <id>test5</id>
+      <url>${project.rootDirectory.uri}repo</url>
+    </repository>
+  </repositories>
+</project>

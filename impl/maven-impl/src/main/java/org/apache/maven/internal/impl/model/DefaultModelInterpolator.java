@@ -211,7 +211,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 return projectDir.toAbsolutePath().toString();
             } else if (subExpr.startsWith("basedir.")) {
                 try {
-                    Object value = ReflectionValueExtractor.evaluate(subExpr, projectDir.toAbsolutePath(), false);
+                    Object value = ReflectionValueExtractor.evaluate(subExpr, projectDir.toAbsolutePath(), true);
                     if (value != null) {
                         return value.toString();
                     }
