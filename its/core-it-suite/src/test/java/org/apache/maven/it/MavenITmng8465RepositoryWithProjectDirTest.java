@@ -24,6 +24,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8465">MNG-8465</a>.
@@ -45,8 +46,13 @@ class MavenITmng8465RepositoryWithProjectDirTest extends AbstractMavenIntegratio
         verifier.addCliArgument("help:effective-pom");
         verifier.execute();
         List<String> urls = verifier.loadLogLines().stream()
-                .filter(s -> s.contains("<url>" + basedir.resolve("repo").toUri() + "</url>"))
+                .filter(s -> s.trim().startsWith("<url>"))
                 .toList();
         assertEquals(4, urls.size());
+        for (String url : urls) {
+            Path repo = basedir.resolve("repo");
+            assertTrue(url.contains("file://" + repo)
+                || url.contains(repo.toUri().toString()));
+        }
     }
 }
