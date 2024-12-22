@@ -1355,7 +1355,7 @@ public class DefaultModelValidator implements ModelValidator {
                                 Version.V40,
                                 prefix + prefix2 + "[" + repository.getId() + "].url",
                                 null,
-                                "only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported.",
+                                "contains an unsupported expression (only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported).",
                                 repository);
                         break;
                     }

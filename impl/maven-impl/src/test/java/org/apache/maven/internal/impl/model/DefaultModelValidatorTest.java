@@ -805,7 +805,7 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateFile("raw-model/repository-with-expression.xml");
         assertViolations(result, 0, 1, 0);
         assertEquals(
-                "'repositories.repository.[repo].url' contains an expression but should be a constant.",
+                "'repositories.repository.[repo].url' contains an unsupported expression (only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported).",
                 result.getErrors().get(0));
     }
 
