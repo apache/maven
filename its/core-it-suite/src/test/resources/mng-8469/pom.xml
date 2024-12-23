@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+  <groupId>org.apache.maven.its.mng8469</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: MNG-8469</name>
+  <description>Test interpolation considers prefix-less model last</description>
+
+  <scm>
+    <!-- Maven 4.0.0-rc-2 (MNG-8469) would fail on this POM -->
+    <connection>${scm.connection}</connection>
+  </scm>
+
+  <properties>
+    <scm.connection>foobar</scm.connection>
+  </properties>
+</project>

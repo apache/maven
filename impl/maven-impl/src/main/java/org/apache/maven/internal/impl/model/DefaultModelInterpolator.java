@@ -169,6 +169,10 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             ModelBuilderRequest request,
             ModelProblemCollector problems,
             String expression) {
+        // basedir (the prefixed combos are handled below)
+        if ("basedir".equals(expression)) {
+            return projectProperty(model, projectDir, expression, false);
+        }
         // timestamp
         if ("build.timestamp".equals(expression) || "maven.build.timestamp".equals(expression)) {
             return new MavenBuildTimestamp(request.getSession().getStartTime(), model.getProperties())
@@ -184,12 +188,8 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 }
             }
         }
-        // un-prefixed model reflection
-        String value = projectProperty(model, projectDir, expression, false);
         // user properties
-        if (value == null) {
-            value = request.getUserProperties().get(expression);
-        }
+        String value = request.getUserProperties().get(expression);
         // model properties
         if (value == null) {
             value = model.getProperties().get(expression);
@@ -201,6 +201,10 @@ public class DefaultModelInterpolator implements ModelInterpolator {
         // environment variables
         if (value == null) {
             value = request.getSystemProperties().get("env." + expression);
+        }
+        // un-prefixed model reflection
+        if (value == null) {
+            value = projectProperty(model, projectDir, expression, false);
         }
         return value;
     }

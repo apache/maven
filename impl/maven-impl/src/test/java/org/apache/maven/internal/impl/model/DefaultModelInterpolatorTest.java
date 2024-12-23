@@ -53,6 +53,7 @@ import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.internal.impl.model.profile.SimpleProblemCollector;
 import org.apache.maven.internal.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -549,6 +550,7 @@ class DefaultModelInterpolatorTest {
         assertTrue(collector.getErrors().get(0).contains("recursive variable reference"));
     }
 
+    @Disabled("per def cannot be recursive: ${basedir} is immediately going for project.basedir")
     @Test
     public void testRecursiveExpressionCycleBaseDir() throws Exception {
         Map<String, String> props = new HashMap<>();
