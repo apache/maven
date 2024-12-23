@@ -50,11 +50,15 @@ class MavenITmng8461SpySettingsEventTest extends AbstractMavenIntegrationTestCas
         verifier = newVerifier(project.toString());
         verifier.setAutoclean(false);
         verifier.setForkJvm(true);
+        verifier.addCliArgument("-X");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog("Initializing Simple Event Spy");
+        verifier.verifyTextInLog("SettingsBuilderRequest event is present");
         verifier.verifyTextInLog("SettingsBuilderResult event is present");
+        verifier.verifyTextInLog("ToolchainsBuilderRequest event is present");
+        verifier.verifyTextInLog("ToolchainsBuilderResult event is present");
     }
 }

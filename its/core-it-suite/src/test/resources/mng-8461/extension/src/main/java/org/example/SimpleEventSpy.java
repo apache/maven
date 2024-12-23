@@ -25,6 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.api.services.SettingsBuilderRequest;
+import org.apache.maven.api.services.SettingsBuilderResult;
+import org.apache.maven.api.services.ToolchainsBuilderRequest;
+import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.eventspy.EventSpy;
 
 @Named("simple")
@@ -45,11 +48,18 @@ public class SimpleEventSpy implements EventSpy {
 
     @Override
     public void close() throws Exception {
-        System.out.println("Closing Simple Event Spy, checking SettingsBuilderResult event");
-        if (!events.stream().anyMatch(e -> e instanceof SettingsBuilderRequest)) {
-            System.out.println("SettingsBuilderResult event is absent");
+        System.out.println("Closing Simple Event Spy, checking events");
+        checkEvent(SettingsBuilderRequest.class);
+        checkEvent(SettingsBuilderResult.class);
+        checkEvent(ToolchainsBuilderRequest.class);
+        checkEvent(ToolchainsBuilderResult.class);
+    }
+
+    private void checkEvent(Class<?> clazz) {
+        if (!events.stream().anyMatch(e -> clazz.isAssignableFrom(e.getClass()))) {
+            System.out.println(clazz.getSimpleName() + " event is absent");
         } else {
-            System.out.println("SettingsBuilderResult event is present");
+            System.out.println(clazz.getSimpleName() + " event is present");
         }
     }
 }
