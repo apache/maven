@@ -48,8 +48,8 @@ under the License.
 
     <menu inherit="bottom" name="Descriptors Reference">
       <item name="POM" href="./maven-model/maven.html"/>
-      <item name="Settings" href="./maven-settings/settings.html"/>
-      <item name="Toolchains" href="./maven-core/toolchains.html"/>
+      <item name="Settings" href="./api/maven-api-settings/settings.html"/>
+      <item name="Toolchains" href="./maven-toolchain-model/toolchains.html"/>
     </menu>
 
     <menu inherit="bottom" name="Reference">
