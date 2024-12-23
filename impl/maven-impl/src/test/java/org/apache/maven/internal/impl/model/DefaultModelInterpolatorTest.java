@@ -565,7 +565,7 @@ class DefaultModelInterpolatorTest {
 
         assertCollectorState(0, 1, 0, collector);
         assertEquals(
-                "recursive variable reference: someBasedir",
+                "recursive variable reference: basedir",
                 collector.getErrors().get(0));
     }
 
