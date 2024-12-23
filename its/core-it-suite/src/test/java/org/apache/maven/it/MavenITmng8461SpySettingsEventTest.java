@@ -49,6 +49,7 @@ class MavenITmng8461SpySettingsEventTest extends AbstractMavenIntegrationTestCas
         Path project = basedir.resolve("project");
         verifier = newVerifier(project.toString());
         verifier.setAutoclean(false);
+        verifier.setForkJvm(true);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
