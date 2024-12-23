@@ -43,7 +43,6 @@ public class SimpleEventSpy implements EventSpy {
     @Override
     public void onEvent(Object o) throws Exception {
         events.add(o);
-        // System.out.println("Event: " + o);
     }
 
     @Override
