@@ -28,16 +28,18 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates a text file in the project base directory.
  *
- *
  * @author Benjamin Bentmann
- *
  */
 @Mojo(name = "war", defaultPhase = LifecyclePhase.PACKAGE)
 public class WarMojo extends AbstractMojo {
+
+    private final Logger logger = LoggerFactory.getLogger( WarMojo.class );
 
     /**
      * The current Maven project.
@@ -58,8 +60,9 @@ public class WarMojo extends AbstractMojo {
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException If the output file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        getLog().info("[MAVEN-CORE-IT-LOG] Using output file path: " + pathname);
+        logger.info("[MAVEN-CORE-IT-LOG] Using output file path: " + pathname);
 
         if (pathname == null || pathname.length() <= 0) {
             throw new MojoFailureException("Path name for output file has not been specified");
@@ -70,7 +73,7 @@ public class WarMojo extends AbstractMojo {
             outputFile = new File(project.getBasedir(), pathname).getAbsoluteFile();
         }
 
-        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
+        logger.info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 
         try {
             outputFile.getParentFile().mkdirs();
@@ -79,6 +82,6 @@ public class WarMojo extends AbstractMojo {
             throw new MojoExecutionException("Output file could not be created: " + pathname, e);
         }
 
-        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + outputFile);
+        logger.info("[MAVEN-CORE-IT-LOG] Created output file: " + outputFile);
     }
 }
