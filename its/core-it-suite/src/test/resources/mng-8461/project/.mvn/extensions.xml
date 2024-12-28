@@ -1,0 +1,7 @@
+<extensions>
+    <extension>
+        <groupId>org.apache.maven.its.mng8461</groupId>
+        <artifactId>reproducer</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </extension>
+</extensions>
