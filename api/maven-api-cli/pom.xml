@@ -65,8 +65,8 @@
             <id>modello</id>
             <goals>
               <goal>velocity</goal>
-              <goal>xsd</goal>
               <goal>xdoc</goal>
+              <goal>xsd</goal>
             </goals>
             <phase>generate-sources</phase>
           </execution>
