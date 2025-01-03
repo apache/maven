@@ -26,10 +26,10 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * The option of a command-line tool where to place the paths to some dependencies.
- * A {@code PathType} can identify the Java class-path, the Java module-path,
+ * A {@code PathType} can identify the Java class-path, the Java module path,
  * or another kind of path for another programming language for example.
  * Path types are often exclusive. For example, a dependency should not be
- * both on the Java class-path and on the Java module-path.
+ * both on the Java class path and on the Java module path.
  *
  * @see org.apache.maven.api.services.DependencyResolverResult#getDispatchedPaths()
  *

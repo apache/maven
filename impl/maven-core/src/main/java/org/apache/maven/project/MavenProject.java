@@ -340,12 +340,12 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * Returns a filtered list of classpath elements. This method is invoked when the caller
-     * requested that all dependencies are placed on the classpath, with no module-path element.
+     * Returns a filtered list of class path elements. This method is invoked when the caller
+     * requested that all dependencies are placed on the class path, with no module path element.
      *
-     * @param scopeFilter a filter returning {@code true} for the artifact scopes to accept.
-     * @param includeTestDir whether to include the test directory in the classpath elements.
-     * @return paths of all artifacts placed on the classpath.
+     * @param scopeFilter a filter returning {@code true} for the artifact scopes to accept
+     * @param includeTestDir whether to include the test directory in the classpath elements
+     * @return paths of all artifacts placed on the classpath
      * @throws DependencyResolutionRequiredException if an artifact file is used, but has not been resolved
      */
     private List<String> getClasspathElements(final Predicate<String> scopeFilter, final boolean includeTestDir)

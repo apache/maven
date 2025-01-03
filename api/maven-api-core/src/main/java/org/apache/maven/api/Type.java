@@ -32,7 +32,7 @@ import org.apache.maven.api.model.Dependency;
  * <p>
  * It provides information about the file type (or extension) of the associated artifact,
  * its default classifier, and how the artifact will be used in the build when creating
- * class-paths or module-paths.
+ * class paths or module paths.
  * <p>
  * For example, the type {@code java-source} has a {@code jar} extension and a
  * {@code sources} classifier. The artifact and its dependencies should be added
@@ -54,7 +54,7 @@ public interface Type extends ExtensibleEnum {
     String BOM = "bom";
 
     /**
-     * Artifact type name for a JAR file that can be placed either on the class-path or on the module-path.
+     * Artifact type name for a JAR file that can be placed either on the class-path or on the module path.
      * The path (classes or modules) is chosen by the plugin, possibly using heuristic rules.
      * This is the behavior of Maven 3.
      */
@@ -75,7 +75,7 @@ public interface Type extends ExtensibleEnum {
     String CLASSPATH_JAR = "classpath-jar";
 
     /**
-     * Artifact type name for a JAR file to unconditionally place on the module-path.
+     * Artifact type name for a JAR file to unconditionally place on the module path.
      * If the JAR is not modular, then it is loaded by Java as an unnamed module.
      * This type is new in Maven 4.
      */
@@ -83,18 +83,18 @@ public interface Type extends ExtensibleEnum {
 
     /**
      * Artifact type name for a JAR file that can be placed either on the annotation processor class-path
-     * or module-path. The path (classes or modules) is chosen by the plugin, possibly using heuristic rules.
+     * or module path. The path (classes or modules) is chosen by the plugin, possibly using heuristic rules.
      */
     String PROCESSOR = "processor";
 
     /**
-     * Artifact type name for a JAR file to unconditionally place on the annotation processor class-path.
+     * Artifact type name for a JAR file to unconditionally place on the annotation processor class path.
      * If the JAR is modular, its module information are ignored.
      */
     String CLASSPATH_PROCESSOR = "classpath-processor";
 
     /**
-     * Artifact type name for a JAR file to unconditionally place on the annotation processor module-path.
+     * Artifact type name for a JAR file to unconditionally place on the annotation processor module path.
      * If the JAR is not modular, then it is loaded by Java as an unnamed module.
      */
     String MODULAR_PROCESSOR = "modular-processor";
@@ -117,7 +117,7 @@ public interface Type extends ExtensibleEnum {
     /**
      * Artifact type name for a JAR file containing test classes. If the main artifact is placed on the class-path
      * ({@value #JAR} or {@value #CLASSPATH_JAR} types), then the test artifact will also be placed on the class-path.
-     * Otherwise, if the main artifact is placed on the module-path ({@value #JAR} or {@value #MODULAR_JAR} types),
+     * Otherwise, if the main artifact is placed on the module path ({@value #JAR} or {@value #MODULAR_JAR} types),
      * then the test artifact will be added using {@code --patch-module} option.
      */
     String TEST_JAR = "test-jar";
