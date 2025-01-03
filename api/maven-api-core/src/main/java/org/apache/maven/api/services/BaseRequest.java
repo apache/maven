@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Experimental;
@@ -37,23 +38,12 @@ abstract class BaseRequest<S extends ProtoSession> {
     private final S session;
 
     protected BaseRequest(@Nonnull S session) {
-        this.session = nonNull(session, "session cannot be null");
+        this.session = Objects.requireNonNull( session, "session cannot be null" );
     }
 
     @Nonnull
     public S getSession() {
         return session;
-    }
-
-    /**
-     * Use Objects.nonNull instead
-     */
-    @Deprecated
-    public static <T> T nonNull(T obj, String message) {
-        if (obj == null) {
-            throw new NullPointerException(message);
-        }
-        return obj;
     }
 
     protected static <T> Collection<T> unmodifiable(Collection<T> obj) {

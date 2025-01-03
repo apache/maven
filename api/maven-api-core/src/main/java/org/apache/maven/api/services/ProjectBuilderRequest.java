@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.RemoteRepository;
@@ -29,8 +30,6 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
-
-import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * Request used to build a {@link org.apache.maven.api.Project} using
@@ -65,16 +64,16 @@ public interface ProjectBuilderRequest {
     @Nonnull
     static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Source source) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .source(nonNull(source, "source cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .source( Objects.requireNonNull( source, "source cannot be null" ) )
                 .build();
     }
 
     @Nonnull
     static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Path path) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .path(nonNull(path, "path cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .path( Objects.requireNonNull( path, "path cannot be null" ) )
                 .build();
     }
 

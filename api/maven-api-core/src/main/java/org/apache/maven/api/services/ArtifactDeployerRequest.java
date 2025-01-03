@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.RemoteRepository;
@@ -26,8 +27,6 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-
-import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * A request for deploying one or more artifacts to a remote repository.
@@ -60,9 +59,9 @@ public interface ArtifactDeployerRequest {
             @Nonnull RemoteRepository repository,
             @Nonnull Collection<ProducedArtifact> artifacts) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .repository(nonNull(repository, "repository cannot be null"))
-                .artifacts(nonNull(artifacts, "artifacts cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .repository( Objects.requireNonNull( repository, "repository cannot be null" ) )
+                .artifacts( Objects.requireNonNull( artifacts, "artifacts cannot be null" ) )
                 .build();
     }
 
@@ -114,8 +113,8 @@ public interface ArtifactDeployerRequest {
                     @Nonnull Collection<ProducedArtifact> artifacts,
                     int retryFailedDeploymentCount) {
                 super(session);
-                this.repository = nonNull(repository, "repository cannot be null");
-                this.artifacts = unmodifiable(nonNull(artifacts, "artifacts cannot be null"));
+                this.repository = Objects.requireNonNull( repository, "repository cannot be null" );
+                this.artifacts = unmodifiable( Objects.requireNonNull( artifacts, "artifacts cannot be null" ) );
                 this.retryFailedDeploymentCount = retryFailedDeploymentCount;
             }
 

@@ -19,11 +19,10 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-
-import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * A Source specific to load POMs.  The {@link #resolve(ModelLocator, String)} method
@@ -54,6 +53,6 @@ public interface ModelSource extends Source {
 
     @Nonnull
     static ModelSource fromPath(@Nonnull Path path, @Nullable String location) {
-        return new PathSource(nonNull(path, "path cannot be null"), location);
+        return new PathSource( Objects.requireNonNull( path, "path cannot be null" ), location);
     }
 }

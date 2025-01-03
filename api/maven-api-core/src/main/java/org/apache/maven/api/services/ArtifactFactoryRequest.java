@@ -24,7 +24,7 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import java.util.Objects;
 
 /**
  *
@@ -53,7 +53,7 @@ public interface ArtifactFactoryRequest {
     static ArtifactFactoryRequest build(
             Session session, String groupId, String artifactId, String version, String extension) {
         return ArtifactFactoryRequest.builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -70,7 +70,7 @@ public interface ArtifactFactoryRequest {
             String extension,
             String type) {
         return ArtifactFactoryRequest.builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)

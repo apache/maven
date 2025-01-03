@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -394,15 +395,17 @@ public interface DependencyResolverRequest {
                     @Nullable Predicate<PathType> pathTypeFilter,
                     @Nullable List<RemoteRepository> repositories) {
                 super(session);
-                this.requestType = nonNull(requestType, "requestType cannot be null");
+                this.requestType = Objects.requireNonNull( requestType, "requestType cannot be null" );
                 this.project = project;
                 this.rootArtifact = rootArtifact;
                 this.root = root;
-                this.dependencies = unmodifiable(nonNull(dependencies, "dependencies cannot be null"));
+                this.dependencies = unmodifiable(
+                        Objects.requireNonNull( dependencies, "dependencies cannot be null" ) );
                 this.managedDependencies =
-                        unmodifiable(nonNull(managedDependencies, "managedDependencies cannot be null"));
+                        unmodifiable(
+                                Objects.requireNonNull( managedDependencies, "managedDependencies cannot be null" ) );
                 this.verbose = verbose;
-                this.pathScope = nonNull(pathScope, "pathScope cannot be null");
+                this.pathScope = Objects.requireNonNull( pathScope, "pathScope cannot be null" );
                 this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;
                 this.repositories = repositories;
                 if (verbose && requestType != RequestType.COLLECT) {

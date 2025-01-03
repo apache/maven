@@ -21,13 +21,12 @@ package org.apache.maven.api.services;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-
-import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * Provides access to the contents of a source independently of the
@@ -95,6 +94,6 @@ public interface Source {
      */
     @Nonnull
     static Source fromPath(@Nonnull Path path) {
-        return new PathSource(nonNull(path, "path cannot be null"));
+        return new PathSource( Objects.requireNonNull( path, "path cannot be null" ) );
     }
 }

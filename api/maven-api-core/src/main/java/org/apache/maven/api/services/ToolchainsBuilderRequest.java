@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.ProtoSession;
@@ -27,8 +28,6 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
-
-import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  *
@@ -61,7 +60,7 @@ public interface ToolchainsBuilderRequest {
             @Nullable Source installationToolchainsFile,
             @Nullable Source userToolchainsSource) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
                 .installationToolchainsSource(installationToolchainsFile)
                 .userToolchainsSource(userToolchainsSource)
                 .build();
@@ -73,7 +72,7 @@ public interface ToolchainsBuilderRequest {
             @Nullable Path installationToolchainsFile,
             @Nullable Path userToolchainsPath) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
                 .installationToolchainsSource(
                         installationToolchainsFile != null && Files.exists(installationToolchainsFile)
                                 ? Source.fromPath(installationToolchainsFile)

@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Dependency;
@@ -30,8 +31,6 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
-
-import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  *
@@ -58,7 +57,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             String extension,
             String type) {
         return DependencyCoordinatesFactoryRequest.builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -72,8 +71,8 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     static DependencyCoordinatesFactoryRequest build(
             @Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .groupId(nonNull(coordinates, "coordinates cannot be null").getGroupId())
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .groupId( Objects.requireNonNull( coordinates, "coordinates cannot be null" ).getGroupId())
                 .artifactId(coordinates.getArtifactId())
                 .version(coordinates.getVersionConstraint().asString())
                 .classifier(coordinates.getClassifier())
@@ -84,8 +83,8 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull Dependency dependency) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .groupId(nonNull(dependency, "dependency").getGroupId())
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .groupId( Objects.requireNonNull( dependency, "dependency" ).getGroupId())
                 .artifactId(dependency.getArtifactId())
                 .version(dependency.getVersion().asString())
                 .classifier(dependency.getClassifier())

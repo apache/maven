@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.RemoteRepository;
@@ -27,8 +28,6 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
-
-import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  *
@@ -49,8 +48,9 @@ public interface VersionResolverRequest {
     @Nonnull
     static VersionResolverRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinates artifactCoordinates) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .artifactCoordinates(nonNull(artifactCoordinates, "artifactCoordinates cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .artifactCoordinates(
+                        Objects.requireNonNull( artifactCoordinates, "artifactCoordinates cannot be null" ) )
                 .build();
     }
 
@@ -60,8 +60,9 @@ public interface VersionResolverRequest {
             @Nonnull ArtifactCoordinates artifactCoordinates,
             @Nullable List<RemoteRepository> repositories) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .artifactCoordinates(nonNull(artifactCoordinates, "artifactCoordinates cannot be null"))
+                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .artifactCoordinates(
+                        Objects.requireNonNull( artifactCoordinates, "artifactCoordinates cannot be null" ) )
                 .repositories(repositories)
                 .build();
     }
