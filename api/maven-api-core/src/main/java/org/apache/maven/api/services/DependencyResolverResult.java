@@ -69,8 +69,8 @@ public interface DependencyResolverResult {
 
     /**
      * Returns the file paths of all dependencies, regardless on which tool option those paths should be placed.
-     * The returned list may contain a mix of Java class-path, Java module-path, and other types of path elements.
-     * This collection has the same content than {@code getDependencies.values()} except that it does not contain
+     * The returned list may contain a mix of Java class path, Java module path, and other types of path elements.
+     * This collection has the same content as {@code getDependencies.values()} except that it does not contain
      * null elements.
      *
      * @return the paths of all dependencies
@@ -136,8 +136,8 @@ public interface DependencyResolverResult {
     Optional<ModuleDescriptor> getModuleDescriptor(@Nonnull Path dependency) throws IOException;
 
     /**
-     * If the module-path contains at least one filename-based auto-module, prepares a warning message.
-     * The module path is the collection of dependencies associated to {@link JavaPathType#MODULES}.
+     * If the module path contains at least one filename-based auto-module, prepares a warning message.
+     * The module path is the collection of dependencies associated with {@link JavaPathType#MODULES}.
      * It is caller's responsibility to send the message to a logger.
      *
      * @return warning message if at least one filename-based auto-module was found
