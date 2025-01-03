@@ -141,20 +141,20 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
             if (o == this) {
                 return true;
             }
-            if (!(o instanceof CacheKey)) {
+            if (o instanceof CacheKey that) {
+                return Objects.equals(groupId, that.groupId)
+                        && Objects.equals(artifactId, that.artifactId)
+                        && Objects.equals(version, that.version)
+                        && Objects.equals(dependencyArtifacts, that.dependencyArtifacts)
+                        && Objects.equals(workspace, that.workspace)
+                        && Objects.equals(localRepo, that.localRepo)
+                        && RepositoryUtils.repositoriesEquals(repositories, that.repositories)
+                        && Objects.equals(collect, that.collect)
+                        && Objects.equals(resolve, that.resolve)
+                        && aggregating == that.aggregating;
+            } else {
                 return false;
             }
-            CacheKey that = (CacheKey) o;
-            return Objects.equals(groupId, that.groupId)
-                    && Objects.equals(artifactId, that.artifactId)
-                    && Objects.equals(version, that.version)
-                    && Objects.equals(dependencyArtifacts, that.dependencyArtifacts)
-                    && Objects.equals(workspace, that.workspace)
-                    && Objects.equals(localRepo, that.localRepo)
-                    && RepositoryUtils.repositoriesEquals(repositories, that.repositories)
-                    && Objects.equals(collect, that.collect)
-                    && Objects.equals(resolve, that.resolve)
-                    && aggregating == that.aggregating;
         }
     }
 
@@ -193,11 +193,10 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
         assertUniqueKey(key);
 
         SetWithResolutionResult artifacts;
-        if (projectArtifacts instanceof SetWithResolutionResult) {
-            artifacts = (SetWithResolutionResult) projectArtifacts;
-        } else if (projectArtifacts instanceof ArtifactsSetWithResult) {
-            artifacts = new SetWithResolutionResult(
-                    ((ArtifactsSetWithResult) projectArtifacts).getResult(), projectArtifacts);
+        if (projectArtifacts instanceof SetWithResolutionResult setWithResolutionResult) {
+            artifacts = setWithResolutionResult;
+        } else if (projectArtifacts instanceof ArtifactsSetWithResult artifactsSetWithResult) {
+            artifacts = new SetWithResolutionResult(artifactsSetWithResult.getResult(), projectArtifacts);
         } else {
             throw new IllegalArgumentException("projectArtifacts must implement ArtifactsSetWithResult");
         }

@@ -371,8 +371,8 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                 }
             }
         } finally {
-            if (metadata instanceof RepositoryMetadata) {
-                updateCheckManager.touch((RepositoryMetadata) metadata, remoteRepository, file);
+            if (metadata instanceof RepositoryMetadata repositoryMetadata) {
+                updateCheckManager.touch(repositoryMetadata, remoteRepository, file);
             }
         }
         return file;
@@ -382,7 +382,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
             ArtifactMetadata metadata, ArtifactRepository localRepository, ArtifactRepository deploymentRepository)
             throws RepositoryMetadataDeploymentException {
         File file;
-        if (metadata instanceof RepositoryMetadata) {
+        if (metadata instanceof RepositoryMetadata repositoryMetadata) {
             getLogger().info("Retrieving previous metadata from " + deploymentRepository.getId());
             try {
                 file = getArtifactMetadataFromDeploymentRepository(metadata, localRepository, deploymentRepository);
@@ -395,7 +395,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
 
             if (file.isFile()) {
                 try {
-                    fixTimestamp(file, readMetadata(file), ((RepositoryMetadata) metadata).getMetadata());
+                    fixTimestamp(file, readMetadata(file), repositoryMetadata.getMetadata());
                 } catch (RepositoryMetadataReadException e) {
                     // will be reported via storeInlocalRepository
                 }

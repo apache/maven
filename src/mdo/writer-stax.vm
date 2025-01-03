@@ -384,8 +384,8 @@ public class ${className} {
             }
             serializer.writeEndElement();
 #if ( $locationTracking )
-            if (addLocationInformation && dom.getInputLocation() instanceof InputLocation && dom.getChildren().isEmpty()) {
-                serializer.writeComment(toString((InputLocation) dom.getInputLocation()));
+            if (addLocationInformation && dom.getInputLocation() instanceof InputLocation inputLocation && dom.getChildren().isEmpty()) {
+                serializer.writeComment(toString(inputLocation));
             }
 #end
         }

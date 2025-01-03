@@ -111,8 +111,7 @@ public class DefaultVersionResolver implements VersionResolver {
             cacheKey = new Key(session, request);
 
             Object obj = cache.get(session, cacheKey);
-            if (obj instanceof Record) {
-                Record record = (Record) obj;
+            if (obj instanceof Record record) {
                 result.setVersion(record.version);
                 result.setRepository(
                         getRepository(session, request.getRepositories(), record.repoClass, record.repoId));
@@ -191,9 +190,8 @@ public class DefaultVersionResolver implements VersionResolver {
                 if (result.getVersion() != null && result.getVersion().endsWith(SNAPSHOT)) {
                     VersionRequest subRequest = new VersionRequest();
                     subRequest.setArtifact(artifact.setVersion(result.getVersion()));
-                    if (result.getRepository() instanceof RemoteRepository) {
-                        RemoteRepository r = (RemoteRepository) result.getRepository();
-                        subRequest.setRepositories(Collections.singletonList(r));
+                    if (result.getRepository() instanceof RemoteRepository remoteRepository) {
+                        subRequest.setRepositories(Collections.singletonList(remoteRepository));
                     } else {
                         subRequest.setRepositories(request.getRepositories());
                     }

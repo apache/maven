@@ -52,10 +52,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UT for {@link DefaultRepositorySystemSessionFactory}.
@@ -409,43 +409,43 @@ public class DefaultRepositorySystemSessionFactoryTest {
         request.getUserProperties().put("maven.session.versionFilter", "s");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
-        assertTrue(versionFilter instanceof ContextualSnapshotVersionFilter);
+        assertInstanceOf(ContextualSnapshotVersionFilter.class, versionFilter);
 
         request.getUserProperties().put("maven.session.versionFilter", "h");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
-        assertTrue(versionFilter instanceof HighestVersionFilter);
+        assertInstanceOf(HighestVersionFilter.class, versionFilter);
 
         request.getUserProperties().put("maven.session.versionFilter", "h(5)");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
-        assertTrue(versionFilter instanceof HighestVersionFilter);
+        assertInstanceOf(HighestVersionFilter.class, versionFilter);
 
         request.getUserProperties().put("maven.session.versionFilter", "l");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
-        assertTrue(versionFilter instanceof LowestVersionFilter);
+        assertInstanceOf(LowestVersionFilter.class, versionFilter);
 
         request.getUserProperties().put("maven.session.versionFilter", "l(5)");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
-        assertTrue(versionFilter instanceof LowestVersionFilter);
+        assertInstanceOf(LowestVersionFilter.class, versionFilter);
 
         request.getUserProperties().put("maven.session.versionFilter", "e(g:a:v)");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
-        assertTrue(versionFilter instanceof PredicateVersionFilter);
+        assertInstanceOf(PredicateVersionFilter.class, versionFilter);
 
         request.getUserProperties().put("maven.session.versionFilter", "e(g:a:[1,2])");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
-        assertTrue(versionFilter instanceof PredicateVersionFilter);
+        assertInstanceOf(PredicateVersionFilter.class, versionFilter);
 
         // chained
         request.getUserProperties().put("maven.session.versionFilter", "h(5);s;e(org.foo:bar:1)");
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
-        assertTrue(versionFilter instanceof ChainedVersionFilter);
+        assertInstanceOf(ChainedVersionFilter.class, versionFilter);
     }
 
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {

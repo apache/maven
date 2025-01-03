@@ -67,8 +67,7 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
 
     @Override
     public void onEvent(Object event) {
-        if (event instanceof ExecutionEvent) {
-            ExecutionEvent executionEvent = (ExecutionEvent) event;
+        if (event instanceof ExecutionEvent executionEvent) {
             if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
                 usedTypes.clear();
             }

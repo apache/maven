@@ -203,8 +203,8 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
     private ManagedVersionMap getManagedVersionsMap(
             Artifact originatingArtifact, Map<String, Artifact> managedVersions) {
         ManagedVersionMap versionMap;
-        if (managedVersions instanceof ManagedVersionMap) {
-            versionMap = (ManagedVersionMap) managedVersions;
+        if (managedVersions instanceof ManagedVersionMap managedVersionMap) {
+            versionMap = managedVersionMap;
         } else {
             versionMap = new ManagedVersionMap(managedVersions);
         }
@@ -679,24 +679,21 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
                     listener.updateScopeCurrentPom(node.getArtifact(), replacement.getScope());
                     break;
                 case ResolutionListener.MANAGE_ARTIFACT_VERSION:
-                    if (listener instanceof ResolutionListenerForDepMgmt) {
-                        ResolutionListenerForDepMgmt asImpl = (ResolutionListenerForDepMgmt) listener;
+                    if (listener instanceof ResolutionListenerForDepMgmt asImpl) {
                         asImpl.manageArtifactVersion(node.getArtifact(), replacement);
                     } else {
                         listener.manageArtifact(node.getArtifact(), replacement);
                     }
                     break;
                 case ResolutionListener.MANAGE_ARTIFACT_SCOPE:
-                    if (listener instanceof ResolutionListenerForDepMgmt) {
-                        ResolutionListenerForDepMgmt asImpl = (ResolutionListenerForDepMgmt) listener;
+                    if (listener instanceof ResolutionListenerForDepMgmt asImpl) {
                         asImpl.manageArtifactScope(node.getArtifact(), replacement);
                     } else {
                         listener.manageArtifact(node.getArtifact(), replacement);
                     }
                     break;
                 case ResolutionListener.MANAGE_ARTIFACT_SYSTEM_PATH:
-                    if (listener instanceof ResolutionListenerForDepMgmt) {
-                        ResolutionListenerForDepMgmt asImpl = (ResolutionListenerForDepMgmt) listener;
+                    if (listener instanceof ResolutionListenerForDepMgmt asImpl) {
                         asImpl.manageArtifactSystemPath(node.getArtifact(), replacement);
                     } else {
                         listener.manageArtifact(node.getArtifact(), replacement);

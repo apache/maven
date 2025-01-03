@@ -133,12 +133,11 @@ class DefaultTransformerContext implements TransformerContext {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof GAKey)) {
+            if (obj instanceof GAKey other) {
+                return Objects.equals(artifactId, other.artifactId) && Objects.equals(groupId, other.groupId);
+            } else {
                 return false;
             }
-
-            GAKey other = (GAKey) obj;
-            return Objects.equals(artifactId, other.artifactId) && Objects.equals(groupId, other.groupId);
         }
     }
 }

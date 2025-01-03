@@ -37,8 +37,8 @@ class TypeRegistryAdapter implements ArtifactTypeRegistry {
     @Override
     public ArtifactType get(String typeId) {
         Type type = typeRegistry.require(typeId);
-        if (type instanceof ArtifactType) {
-            return (ArtifactType) type;
+        if (type instanceof ArtifactType artifactType) {
+            return artifactType;
         }
         if (type != null) {
             return new DefaultType(

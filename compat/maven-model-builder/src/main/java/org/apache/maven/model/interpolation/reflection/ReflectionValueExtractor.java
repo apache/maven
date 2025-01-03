@@ -217,8 +217,8 @@ public class ReflectionValueExtractor {
             }
         }
 
-        if (value instanceof Optional) {
-            value = ((Optional<?>) value).orElse(null);
+        if (value instanceof Optional<?> optional) {
+            value = optional.orElse(null);
         }
         return value;
     }
@@ -230,8 +230,8 @@ public class ReflectionValueExtractor {
             return null;
         }
 
-        if (value instanceof Map) {
-            return ((Map) value).get(key);
+        if (value instanceof Map map) {
+            return map.get(key);
         }
 
         final String message = String.format(
@@ -252,8 +252,8 @@ public class ReflectionValueExtractor {
                 return Array.get(value, index);
             }
 
-            if (value instanceof List) {
-                return ((List) value).get(index);
+            if (value instanceof List list) {
+                return list.get(index);
             }
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             return null;

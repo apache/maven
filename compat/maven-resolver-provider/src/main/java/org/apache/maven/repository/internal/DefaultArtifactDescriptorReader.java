@@ -182,8 +182,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 pomArtifact = resolveResult.getArtifact();
                 result.setRepository(resolveResult.getRepository());
             } catch (ArtifactResolutionException e) {
-                if (e.getCause() instanceof ArtifactNotFoundException) {
-                    missingDescriptor(session, trace, a, (Exception) e.getCause());
+                if (e.getCause() instanceof ArtifactNotFoundException artifactNotFoundException) {
+                    missingDescriptor(session, trace, a, artifactNotFoundException);
                     if ((getPolicy(session, a, request) & ArtifactDescriptorPolicy.IGNORE_MISSING) != 0) {
                         return null;
                     }
@@ -196,8 +196,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
             // TODO hack: don't rebuild model if it was already loaded during reactor resolution
             final WorkspaceReader workspace = session.getWorkspaceReader();
-            if (workspace instanceof MavenWorkspaceReader) {
-                model = ((MavenWorkspaceReader) workspace).findModel(pomArtifact);
+            if (workspace instanceof MavenWorkspaceReader mavenWorkspaceReader) {
+                model = mavenWorkspaceReader.findModel(pomArtifact);
                 if (model != null) {
                     return model;
                 }
@@ -265,8 +265,8 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 model = modelResult.getEffectiveModel();
             } catch (ModelBuildingException e) {
                 for (ModelProblem problem : e.getProblems()) {
-                    if (problem.getException() instanceof UnresolvableModelException) {
-                        result.addException(problem.getException());
+                    if (problem.getException() instanceof UnresolvableModelException unresolvableModelException) {
+                        result.addException(unresolvableModelException);
                         throw new ArtifactDescriptorException(result);
                     }
                 }

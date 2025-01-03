@@ -176,8 +176,8 @@ public class BuilderCommon {
                 .addBuildSummary(new BuildFailure(mavenProject, Duration.between(buildStartTime, buildEndTime), t));
 
         // notify listeners about "soft" project build failures only
-        if (t instanceof Exception && !(t instanceof RuntimeException)) {
-            eventCatapult.fire(ExecutionEvent.Type.ProjectFailed, currentSession, null, (Exception) t);
+        if (t instanceof Exception exception && !(t instanceof RuntimeException)) {
+            eventCatapult.fire(ExecutionEvent.Type.ProjectFailed, currentSession, null, exception);
         }
 
         // reactor failure modes

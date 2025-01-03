@@ -691,8 +691,8 @@ class MavenCliTest {
         cli.logging(request);
 
         TransferListener transferListener = cli.populateRequest(request).getTransferListener();
-        if (transferListener instanceof SimplexTransferListener) {
-            transferListener = ((SimplexTransferListener) transferListener).getDelegate();
+        if (transferListener instanceof SimplexTransferListener simplexTransferListener) {
+            transferListener = simplexTransferListener.getDelegate();
         }
 
         assertThat(transferListener.getClass(), is(expectedSubClass));

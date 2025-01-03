@@ -112,32 +112,31 @@ public class Restriction {
             return true;
         }
 
-        if (!(other instanceof Restriction)) {
-            return false;
-        }
-
-        Restriction restriction = (Restriction) other;
-        if (lowerBound != null) {
-            if (!lowerBound.equals(restriction.lowerBound)) {
+        if (other instanceof Restriction restriction) {
+            if (lowerBound != null) {
+                if (!lowerBound.equals(restriction.lowerBound)) {
+                    return false;
+                }
+            } else if (restriction.lowerBound != null) {
                 return false;
             }
-        } else if (restriction.lowerBound != null) {
-            return false;
-        }
 
-        if (lowerBoundInclusive != restriction.lowerBoundInclusive) {
-            return false;
-        }
-
-        if (upperBound != null) {
-            if (!upperBound.equals(restriction.upperBound)) {
+            if (lowerBoundInclusive != restriction.lowerBoundInclusive) {
                 return false;
             }
-        } else if (restriction.upperBound != null) {
+
+            if (upperBound != null) {
+                if (!upperBound.equals(restriction.upperBound)) {
+                    return false;
+                }
+            } else if (restriction.upperBound != null) {
+                return false;
+            }
+
+            return upperBoundInclusive == restriction.upperBoundInclusive;
+        } else {
             return false;
         }
-
-        return upperBoundInclusive == restriction.upperBoundInclusive;
     }
 
     public String toString() {

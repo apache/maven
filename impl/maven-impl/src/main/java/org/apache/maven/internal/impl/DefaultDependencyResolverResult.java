@@ -291,8 +291,8 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
      */
     private boolean containsPatches(Set<PathType> types) {
         for (PathType type : types) {
-            if (type instanceof JavaPathType.Modular) {
-                type = ((JavaPathType.Modular) type).rawType();
+            if (type instanceof JavaPathType.Modular modular) {
+                type = modular.rawType();
             }
             if (JavaPathType.PATCH_MODULE.equals(type)) {
                 return true;
@@ -365,7 +365,7 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
     @Override
     public Optional<ModuleDescriptor> getModuleDescriptor(Path dependency) throws IOException {
         Object value = cache.getModuleInfo(dependency).descriptors.get(dependency);
-        return (value instanceof ModuleDescriptor) ? Optional.of((ModuleDescriptor) value) : Optional.empty();
+        return (value instanceof ModuleDescriptor moduleDescriptor) ? Optional.of(moduleDescriptor) : Optional.empty();
     }
 
     @Override
@@ -378,10 +378,10 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
      * Returns the module name for the given value of the {@link PathModularization#descriptors} map.
      */
     private static String name(final Object value) {
-        if (value instanceof String) {
-            return (String) value;
-        } else if (value instanceof ModuleDescriptor) {
-            return ((ModuleDescriptor) value).name();
+        if (value instanceof String string) {
+            return string;
+        } else if (value instanceof ModuleDescriptor moduleDescriptor) {
+            return moduleDescriptor.name();
         } else {
             return null;
         }

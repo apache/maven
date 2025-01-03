@@ -121,9 +121,9 @@ public abstract class AbstractMavenProjectTestCase {
             return projectBuilder.build(pom, configuration).getProject();
         } catch (Exception e) {
             Throwable cause = e.getCause();
-            if (cause instanceof ModelBuildingException) {
+            if (cause instanceof ModelBuildingException modelBuildingException) {
                 String message = "In: " + pom + "\n\n";
-                for (ModelProblem problem : ((ModelBuildingException) cause).getProblems()) {
+                for (ModelProblem problem : modelBuildingException.getProblems()) {
                     message += problem + "\n";
                 }
                 System.out.println(message);

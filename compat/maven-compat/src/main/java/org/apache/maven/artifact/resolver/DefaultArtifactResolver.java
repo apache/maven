@@ -605,8 +605,8 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
 
     @Override
     public void dispose() {
-        if (executor instanceof ExecutorService) {
-            ((ExecutorService) executor).shutdownNow();
+        if (executor instanceof ExecutorService executorService) {
+            executorService.shutdownNow();
         }
     }
 }

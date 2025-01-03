@@ -68,12 +68,10 @@ public class OrArtifactFilter implements ArtifactFilter {
             return true;
         }
 
-        if (!(obj instanceof OrArtifactFilter)) {
+        if (obj instanceof OrArtifactFilter other) {
+            return filters.equals(other.filters);
+        } else {
             return false;
         }
-
-        OrArtifactFilter other = (OrArtifactFilter) obj;
-
-        return filters.equals(other.filters);
     }
 }

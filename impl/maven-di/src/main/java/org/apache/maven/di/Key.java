@@ -113,8 +113,8 @@ public abstract class Key<T> {
      * @throws IllegalStateException when underlying type is not a parameterized one.
      */
     public <U> Key<U> getTypeParameter(int index) {
-        if (type instanceof ParameterizedType) {
-            return new KeyImpl<>(((ParameterizedType) type).getActualTypeArguments()[index], null);
+        if (type instanceof ParameterizedType parameterizedType) {
+            return new KeyImpl<>(parameterizedType.getActualTypeArguments()[index], null);
         }
         throw new IllegalStateException("Expected type from key " + getDisplayString() + " to be parameterized");
     }
@@ -144,11 +144,11 @@ public abstract class Key<T> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Key<?>)) {
+        if (o instanceof Key<?> that) {
+            return type.equals(that.type) && Objects.equals(qualifier, that.qualifier);
+        } else {
             return false;
         }
-        Key<?> that = (Key<?>) o;
-        return type.equals(that.type) && Objects.equals(qualifier, that.qualifier);
     }
 
     @Override

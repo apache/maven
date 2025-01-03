@@ -117,19 +117,17 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
                 return true;
             }
 
-            if (!(o instanceof CacheKey)) {
+            if (o instanceof CacheKey that) {
+                return parentRealm == that.parentRealm
+                        && CacheUtils.pluginEquals(plugin, that.plugin)
+                        && Objects.equals(workspace, that.workspace)
+                        && Objects.equals(localRepo, that.localRepo)
+                        && RepositoryUtils.repositoriesEquals(this.repositories, that.repositories)
+                        && Objects.equals(filter, that.filter)
+                        && Objects.equals(foreignImports, that.foreignImports);
+            } else {
                 return false;
             }
-
-            CacheKey that = (CacheKey) o;
-
-            return parentRealm == that.parentRealm
-                    && CacheUtils.pluginEquals(plugin, that.plugin)
-                    && Objects.equals(workspace, that.workspace)
-                    && Objects.equals(localRepo, that.localRepo)
-                    && RepositoryUtils.repositoriesEquals(this.repositories, that.repositories)
-                    && Objects.equals(filter, that.filter)
-                    && Objects.equals(foreignImports, that.foreignImports);
         }
     }
 
@@ -161,11 +159,11 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
                 }
             });
         } catch (RuntimeException e) {
-            if (e.getCause() instanceof PluginResolutionException) {
-                throw (PluginResolutionException) e.getCause();
+            if (e.getCause() instanceof PluginResolutionException pluginResolutionException) {
+                throw pluginResolutionException;
             }
-            if (e.getCause() instanceof PluginContainerException) {
-                throw (PluginContainerException) e.getCause();
+            if (e.getCause() instanceof PluginContainerException pluginContainerException) {
+                throw pluginContainerException;
             }
             throw e;
         }

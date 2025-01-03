@@ -48,12 +48,10 @@ public class InversionArtifactFilter implements ArtifactFilter {
             return true;
         }
 
-        if (!(obj instanceof InversionArtifactFilter)) {
+        if (obj instanceof InversionArtifactFilter other) {
+            return toInvert.equals(other.toInvert);
+        } else {
             return false;
         }
-
-        InversionArtifactFilter other = (InversionArtifactFilter) obj;
-
-        return toInvert.equals(other.toInvert);
     }
 }

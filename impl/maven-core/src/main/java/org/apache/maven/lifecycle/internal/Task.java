@@ -44,11 +44,11 @@ public abstract class Task {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Task)) {
+        if (o instanceof Task task) {
+            return Objects.equals(getClass(), task.getClass()) && Objects.equals(value, task.value);
+        } else {
             return false;
         }
-        Task task = (Task) o;
-        return Objects.equals(getClass(), task.getClass()) && Objects.equals(value, task.value);
     }
 
     @Override

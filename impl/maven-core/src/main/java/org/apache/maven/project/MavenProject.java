@@ -940,15 +940,15 @@ public class MavenProject implements Cloneable {
     public boolean equals(Object other) {
         if (other == this) {
             return true;
-        } else if (!(other instanceof MavenProject)) {
-            return false;
+        } else {
+            if (other instanceof MavenProject that) {
+                return Objects.equals(getArtifactId(), that.getArtifactId())
+                        && Objects.equals(getGroupId(), that.getGroupId())
+                        && Objects.equals(getVersion(), that.getVersion());
+            } else {
+                return false;
+            }
         }
-
-        MavenProject that = (MavenProject) other;
-
-        return Objects.equals(getArtifactId(), that.getArtifactId())
-                && Objects.equals(getGroupId(), that.getGroupId())
-                && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override

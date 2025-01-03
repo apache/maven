@@ -311,24 +311,22 @@ public class ActiveProjectArtifact implements Artifact {
             return true;
         }
 
-        if (!(o instanceof Artifact)) {
-            return false;
-        }
-
-        Artifact a = (Artifact) o;
-
-        if (!a.getGroupId().equals(getGroupId())) {
-            return false;
-        } else if (!a.getArtifactId().equals(getArtifactId())) {
-            return false;
-        } else if (!a.getVersion().equals(getVersion())) {
-            return false;
-        } else if (!a.getType().equals(getType())) {
-            return false;
+        if (o instanceof Artifact a) {
+            if (!a.getGroupId().equals(getGroupId())) {
+                return false;
+            } else if (!a.getArtifactId().equals(getArtifactId())) {
+                return false;
+            } else if (!a.getVersion().equals(getVersion())) {
+                return false;
+            } else if (!a.getType().equals(getType())) {
+                return false;
+            } else {
+                return a.getClassifier() == null
+                        ? getClassifier() == null
+                        : a.getClassifier().equals(getClassifier());
+            }
         } else {
-            return a.getClassifier() == null
-                    ? getClassifier() == null
-                    : a.getClassifier().equals(getClassifier());
+            return false;
         }
     }
 }

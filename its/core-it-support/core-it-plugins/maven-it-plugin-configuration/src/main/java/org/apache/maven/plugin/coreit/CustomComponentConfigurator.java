@@ -49,8 +49,8 @@ public class CustomComponentConfigurator extends AbstractComponentConfigurator {
         converter.processConfiguration(
                 converterLookup, component, containerRealm, configuration, expressionEvaluator, listener);
 
-        if (component instanceof CustomConfigMojo) {
-            ((CustomConfigMojo) component).customParam = "configured";
+        if (component instanceof CustomConfigMojo customConfigMojo) {
+            customConfigMojo.customParam = "configured";
         }
     }
 }

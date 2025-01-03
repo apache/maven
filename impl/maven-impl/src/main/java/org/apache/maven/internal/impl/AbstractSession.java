@@ -185,8 +185,8 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public org.eclipse.aether.repository.RemoteRepository toRepository(RemoteRepository repository) {
-        if (repository instanceof DefaultRemoteRepository) {
-            return ((DefaultRemoteRepository) repository).getRepository();
+        if (repository instanceof DefaultRemoteRepository defaultRemoteRepository) {
+            return defaultRemoteRepository.getRepository();
         } else {
             // TODO
             throw new UnsupportedOperationException("Not implemented yet");
@@ -195,8 +195,8 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public org.eclipse.aether.repository.LocalRepository toRepository(LocalRepository repository) {
-        if (repository instanceof DefaultLocalRepository) {
-            return ((DefaultLocalRepository) repository).getRepository();
+        if (repository instanceof DefaultLocalRepository defaultLocalRepository) {
+            return defaultLocalRepository.getRepository();
         } else {
             // TODO
             throw new UnsupportedOperationException("Not implemented yet");
@@ -358,8 +358,8 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public org.eclipse.aether.artifact.Artifact toArtifact(Artifact artifact) {
         Path path = getService(ArtifactManager.class).getPath(artifact).orElse(null);
-        if (artifact instanceof DefaultArtifact) {
-            org.eclipse.aether.artifact.Artifact a = ((DefaultArtifact) artifact).getArtifact();
+        if (artifact instanceof DefaultArtifact defaultArtifact) {
+            org.eclipse.aether.artifact.Artifact a = defaultArtifact.getArtifact();
             if (Objects.equals(path, a.getPath())) {
                 return a;
             }
@@ -376,8 +376,8 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public org.eclipse.aether.artifact.Artifact toArtifact(ArtifactCoordinates coords) {
-        if (coords instanceof DefaultArtifactCoordinates) {
-            return ((DefaultArtifactCoordinates) coords).getCoordinates();
+        if (coords instanceof DefaultArtifactCoordinates defaultArtifactCoordinates) {
+            return defaultArtifactCoordinates.getCoordinates();
         }
         return new org.eclipse.aether.artifact.DefaultArtifact(
                 coords.getGroupId(),

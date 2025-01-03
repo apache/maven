@@ -713,7 +713,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     e);
         }
 
-        if (mojo instanceof ContextEnabled) {
+        if (mojo instanceof ContextEnabled contextEnabledMojo) {
             MavenProject project = session.getCurrentProject();
 
             Map<String, Object> pluginContext = session.getPluginContext(pluginDescriptor, project);
@@ -723,13 +723,13 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
                 pluginContext.put("pluginDescriptor", pluginDescriptor);
 
-                ((ContextEnabled) mojo).setPluginContext(pluginContext);
+                contextEnabledMojo.setPluginContext(pluginContext);
             }
         }
 
-        if (mojo instanceof Mojo) {
+        if (mojo instanceof Mojo mojoInstance) {
             Logger mojoLogger = LoggerFactory.getLogger(mojoDescriptor.getImplementation());
-            ((Mojo) mojo).setLog(new MojoLogWrapper(mojoLogger));
+            mojoInstance.setLog(new MojoLogWrapper(mojoLogger));
         }
 
         if (mojo instanceof Contextualizable) {
@@ -1041,7 +1041,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         }
 
         public boolean equals(Object o) {
-            return o instanceof Named && this.value.equals(((Named) o).value());
+            return o instanceof Named named && this.value.equals(named.value());
         }
 
         public Class<? extends Annotation> annotationType() {

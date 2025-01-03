@@ -85,16 +85,14 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
                 return true;
             }
 
-            if (!(o instanceof CacheKey)) {
+            if (o instanceof CacheKey other) {
+                return ids.equals(other.ids)
+                        && files.equals(other.files)
+                        && timestamps.equals(other.timestamps)
+                        && sizes.equals(other.sizes);
+            } else {
                 return false;
             }
-
-            CacheKey other = (CacheKey) o;
-
-            return ids.equals(other.ids)
-                    && files.equals(other.files)
-                    && timestamps.equals(other.timestamps)
-                    && sizes.equals(other.sizes);
         }
 
         @Override

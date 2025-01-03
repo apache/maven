@@ -37,13 +37,11 @@ class ProjectBuildingResultWithProblemMessageMatcher extends BaseMatcher<Project
 
     @Override
     public boolean matches(Object o) {
-        if (!(o instanceof ProjectBuildingResult)) {
+        if (o instanceof ProjectBuildingResult r) {
+            return r.getProblems().stream().anyMatch(p -> p.getMessage().contains(problemMessage));
+        } else {
             return false;
         }
-
-        final ProjectBuildingResult r = (ProjectBuildingResult) o;
-
-        return r.getProblems().stream().anyMatch(p -> p.getMessage().contains(problemMessage));
     }
 
     @Override
@@ -53,16 +51,15 @@ class ProjectBuildingResultWithProblemMessageMatcher extends BaseMatcher<Project
 
     @Override
     public void describeMismatch(final Object o, final Description description) {
-        if (!(o instanceof ProjectBuildingResult)) {
-            super.describeMismatch(o, description);
-        } else {
-            final ProjectBuildingResult r = (ProjectBuildingResult) o;
+        if (o instanceof ProjectBuildingResult r) {
             description.appendText("was a ProjectBuildingResult with messages ");
             String messages = r.getProblems().stream()
                     .map(ModelProblem::getMessage)
                     .map(m -> "\"" + m + "\"" + System.lineSeparator())
                     .collect(joining(", "));
             description.appendText(messages);
+        } else {
+            super.describeMismatch(o, description);
         }
     }
 

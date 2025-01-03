@@ -50,10 +50,10 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
     RemoteSnapshotMetadataGenerator(RepositorySystemSession session, DeployRequest request) {
         timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
         Object bn = ConfigUtils.getObject(session, null, "maven.buildNumber");
-        if (bn instanceof Integer) {
-            this.buildNumber = (Integer) bn;
-        } else if (bn instanceof String) {
-            this.buildNumber = Integer.valueOf((String) bn);
+        if (bn instanceof Integer integer) {
+            this.buildNumber = integer;
+        } else if (bn instanceof String string) {
+            this.buildNumber = Integer.valueOf(string);
         } else {
             this.buildNumber = null;
         }
@@ -67,8 +67,7 @@ class RemoteSnapshotMetadataGenerator implements MetadataGenerator {
          * deployment allows to re-establish the association between the artifacts of the same project.
          */
         for (Metadata metadata : request.getMetadata()) {
-            if (metadata instanceof RemoteSnapshotMetadata) {
-                RemoteSnapshotMetadata snapshotMetadata = (RemoteSnapshotMetadata) metadata;
+            if (metadata instanceof RemoteSnapshotMetadata snapshotMetadata) {
                 snapshots.put(snapshotMetadata.getKey(), snapshotMetadata);
             }
         }

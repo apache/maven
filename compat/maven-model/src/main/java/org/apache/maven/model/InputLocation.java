@@ -143,8 +143,8 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      * @return InputLocation
      */
     public InputLocation getLocation(Object key) {
-        if (key instanceof String) {
-            switch ((String) key) {
+        if (key instanceof String string) {
+            switch (string) {
                 case "": {
                     return this.location;
                 }
@@ -173,8 +173,8 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      * @param location
      */
     public void setLocation(Object key, InputLocation location) {
-        if (key instanceof String) {
-            switch ((String) key) {
+        if (key instanceof String string) {
+            switch (string) {
                 case "": {
                     this.location = location;
                     return;

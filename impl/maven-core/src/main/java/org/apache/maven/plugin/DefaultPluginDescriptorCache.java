@@ -145,18 +145,16 @@ public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
                 return true;
             }
 
-            if (!(obj instanceof CacheKey)) {
+            if (obj instanceof CacheKey that) {
+                return Objects.equals(this.artifactId, that.artifactId)
+                        && Objects.equals(this.groupId, that.groupId)
+                        && Objects.equals(this.version, that.version)
+                        && Objects.equals(this.localRepo, that.localRepo)
+                        && Objects.equals(this.workspace, that.workspace)
+                        && RepositoryUtils.repositoriesEquals(this.repositories, that.repositories);
+            } else {
                 return false;
             }
-
-            CacheKey that = (CacheKey) obj;
-
-            return Objects.equals(this.artifactId, that.artifactId)
-                    && Objects.equals(this.groupId, that.groupId)
-                    && Objects.equals(this.version, that.version)
-                    && Objects.equals(this.localRepo, that.localRepo)
-                    && Objects.equals(this.workspace, that.workspace)
-                    && RepositoryUtils.repositoriesEquals(this.repositories, that.repositories);
         }
 
         @Override

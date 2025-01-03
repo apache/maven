@@ -281,7 +281,7 @@ public class ${className} {
                 list = null;
             }
 
-            if (vs instanceof MergingList && ((MergingList<V>) vs).map != null) {
+            if (vs instanceof MergingList mergingList && ((MergingList<V>) vs).map != null) {
                 for (Map.Entry<Object, V> e : ((MergingList<V>) vs).map.entrySet()) {
                     Object key = e.getKey();
                     V v = e.getValue();

@@ -81,10 +81,9 @@ class PluginsMetadataGenerator implements MetadataGenerator {
          */
         for (Iterator<? extends Metadata> it = metadatas.iterator(); it.hasNext(); ) {
             Metadata metadata = it.next();
-            if (metadata instanceof PluginsMetadata) {
+            if (metadata instanceof PluginsMetadata pluginsMetadata) {
                 it.remove();
-                PluginsMetadata pluginMetadata = (PluginsMetadata) metadata;
-                processedPlugins.put(pluginMetadata.getGroupId(), pluginMetadata);
+                processedPlugins.put(pluginsMetadata.getGroupId(), pluginsMetadata);
             }
         }
     }

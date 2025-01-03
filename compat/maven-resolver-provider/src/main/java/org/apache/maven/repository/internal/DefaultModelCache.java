@@ -190,8 +190,8 @@ public class DefaultModelCache implements ModelCache {
                     }
                 }
             }
-            if (v instanceof AltRes) {
-                uncheckedThrow(((AltRes) v).t);
+            if (v instanceof AltRes altRes) {
+                uncheckedThrow(altRes.t);
             }
             return (T) v;
         }

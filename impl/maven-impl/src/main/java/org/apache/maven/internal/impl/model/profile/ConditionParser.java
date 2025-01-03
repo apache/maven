@@ -409,8 +409,8 @@ public class ConditionParser {
     private static Object add(Object left, Object right) {
         if (left instanceof String || right instanceof String) {
             return toString(left) + toString(right);
-        } else if (left instanceof Number && right instanceof Number) {
-            return ((Number) left).doubleValue() + ((Number) right).doubleValue();
+        } else if (left instanceof Number leftNumber && right instanceof Number rightNumber) {
+            return leftNumber.doubleValue() + rightNumber.doubleValue();
         } else {
             throw new RuntimeException("Cannot add " + left + " and " + right);
         }
@@ -424,8 +424,8 @@ public class ConditionParser {
      * @throws RuntimeException if the value cannot be negated
      */
     private Object negate(Object value) {
-        if (value instanceof Number) {
-            return -((Number) value).doubleValue();
+        if (value instanceof Number number) {
+            return -number.doubleValue();
         }
         throw new RuntimeException("Cannot negate non-numeric value: " + value);
     }
@@ -439,8 +439,8 @@ public class ConditionParser {
      * @throws RuntimeException if the operands cannot be subtracted
      */
     private static Object subtract(Object left, Object right) {
-        if (left instanceof Number && right instanceof Number) {
-            return ((Number) left).doubleValue() - ((Number) right).doubleValue();
+        if (left instanceof Number leftNumber && right instanceof Number rightNumber) {
+            return leftNumber.doubleValue() - rightNumber.doubleValue();
         } else {
             throw new RuntimeException("Cannot subtract " + right + " from " + left);
         }
@@ -455,8 +455,8 @@ public class ConditionParser {
      * @throws RuntimeException if the operands cannot be multiplied
      */
     private static Object multiply(Object left, Object right) {
-        if (left instanceof Number && right instanceof Number) {
-            return ((Number) left).doubleValue() * ((Number) right).doubleValue();
+        if (left instanceof Number leftNumber && right instanceof Number rightNumber) {
+            return leftNumber.doubleValue() * rightNumber.doubleValue();
         } else {
             throw new RuntimeException("Cannot multiply " + left + " and " + right);
         }
@@ -472,12 +472,12 @@ public class ConditionParser {
      * @throws ArithmeticException if attempting to divide by zero
      */
     private static Object divide(Object left, Object right) {
-        if (left instanceof Number && right instanceof Number) {
-            double divisor = ((Number) right).doubleValue();
+        if (left instanceof Number leftNumber && right instanceof Number rightNumber) {
+            double divisor = rightNumber.doubleValue();
             if (divisor == 0) {
                 throw new ArithmeticException("Division by zero");
             }
-            return ((Number) left).doubleValue() / divisor;
+            return leftNumber.doubleValue() / divisor;
         } else {
             throw new RuntimeException("Cannot divide " + left + " by " + right);
         }
@@ -505,9 +505,9 @@ public class ConditionParser {
                 return true;
             }
         }
-        if (left instanceof Number && right instanceof Number) {
-            double leftVal = ((Number) left).doubleValue();
-            double rightVal = ((Number) right).doubleValue();
+        if (left instanceof Number leftNumber && right instanceof Number rightNumber) {
+            double leftVal = leftNumber.doubleValue();
+            double rightVal = rightNumber.doubleValue();
             return switch (operator) {
                 case ">" -> leftVal > rightVal;
                 case "<" -> leftVal < rightVal;
@@ -517,8 +517,8 @@ public class ConditionParser {
                 case "!=" -> Math.abs(leftVal - rightVal) >= 1e-9;
                 default -> throw new IllegalStateException("Unknown operator: " + operator);
             };
-        } else if (left instanceof String && right instanceof String) {
-            int comparison = ((String) left).compareTo((String) right);
+        } else if (left instanceof String leftString && right instanceof String rightString) {
+            int comparison = leftString.compareTo(rightString);
             return switch (operator) {
                 case ">" -> comparison > 0;
                 case "<" -> comparison < 0;
@@ -586,16 +586,16 @@ public class ConditionParser {
      * @throws RuntimeException if the object cannot be converted to a double
      */
     public static double toDouble(Object value) {
-        if (value instanceof Number) {
-            return ((Number) value).doubleValue(); // Converts number to double
-        } else if (value instanceof String) {
+        if (value instanceof Number number) {
+            return number.doubleValue(); // Converts number to double
+        } else if (value instanceof String string) {
             try {
-                return Double.parseDouble((String) value); // Tries to parse string as double
+                return Double.parseDouble(string); // Tries to parse string as double
             } catch (NumberFormatException e) {
                 throw new RuntimeException("Cannot convert string to number: " + value);
             }
-        } else if (value instanceof Boolean) {
-            return ((Boolean) value) ? 1.0 : 0.0; // True = 1.0, False = 0.0
+        } else if (value instanceof Boolean bool) {
+            return bool ? 1.0 : 0.0; // True = 1.0, False = 0.0
         } else {
             throw new RuntimeException("Cannot convert to number: " + value);
         }
@@ -614,11 +614,11 @@ public class ConditionParser {
      * @throws RuntimeException if the object cannot be converted to an integer
      */
     public static int toInt(Object value) {
-        if (value instanceof Number) {
-            return ((Number) value).intValue(); // Converts number to int
-        } else if (value instanceof String) {
+        if (value instanceof Number number) {
+            return number.intValue(); // Converts number to int
+        } else if (value instanceof String string) {
             try {
-                return Integer.parseInt((String) value); // Tries to parse string as int
+                return Integer.parseInt(string); // Tries to parse string as int
             } catch (NumberFormatException e) {
                 // If string is not an int, tries parsing as double and converting to int
                 try {
@@ -627,8 +627,8 @@ public class ConditionParser {
                     throw new RuntimeException("Cannot convert string to integer: " + value);
                 }
             }
-        } else if (value instanceof Boolean) {
-            return ((Boolean) value) ? 1 : 0; // True = 1, False = 0
+        } else if (value instanceof Boolean bool) {
+            return bool ? 1 : 0; // True = 1, False = 0
         } else {
             throw new RuntimeException("Cannot convert to integer: " + value);
         }

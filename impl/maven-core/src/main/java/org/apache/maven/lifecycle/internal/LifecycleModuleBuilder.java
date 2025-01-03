@@ -126,11 +126,11 @@ public class LifecycleModuleBuilder {
                     new ProjectExecutionEvent(session, currentProject, t));
 
             // rethrow original errors and runtime exceptions
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
+            if (t instanceof RuntimeException runtimeException) {
+                throw runtimeException;
             }
-            if (t instanceof Error) {
-                throw (Error) t;
+            if (t instanceof Error error) {
+                throw error;
             }
         } finally {
             session.setCurrentProject(null);

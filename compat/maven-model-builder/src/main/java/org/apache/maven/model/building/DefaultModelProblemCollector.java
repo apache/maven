@@ -143,8 +143,7 @@ class DefaultModelProblemCollector implements ModelProblemCollectorExt {
             source = getSource();
         }
 
-        if (line <= 0 && column <= 0 && req.getException() instanceof ModelParseException) {
-            ModelParseException e = (ModelParseException) req.getException();
+        if (line <= 0 && column <= 0 && req.getException() instanceof ModelParseException e) {
             line = e.getLineNumber();
             column = e.getColumnNumber();
         }

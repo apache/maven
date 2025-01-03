@@ -189,10 +189,10 @@ public class ${class.name}
 
     public void set${cap}(${type} ${field.name}) {
       #if ($field.type == "DOM")
-        if (${field.name} instanceof Xpp3Dom) {
-            if (!Objects.equals(((Xpp3Dom) ${field.name}).getDom(), getDelegate().${pfx}${cap}())) {
-                update(getDelegate().with${cap}(((Xpp3Dom) ${field.name}).getDom()));
-                ((Xpp3Dom) ${field.name}).setChildrenTracking(this::replace);
+        if (${field.name} instanceof Xpp3Dom xpp3DomFieldName) {
+            if (!Objects.equals(xpp3DomFieldName.getDom(), getDelegate().${pfx}${cap}())) {
+                update(getDelegate().with${cap}(xpp3DomFieldName.getDom()));
+                xpp3DomFieldName.setChildrenTracking(this::replace);
             }
         } else if (${field.name} == null) {
             if (getDelegate().${pfx}${cap}() != null) {
