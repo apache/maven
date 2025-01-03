@@ -47,9 +47,13 @@ under the License.
     </menu>
 
     <menu inherit="bottom" name="Descriptors Reference">
-      <item name="POM" href="./maven-model/maven.html"/>
-      <item name="Settings" href="./maven-settings/settings.html"/>
-      <item name="Toolchains" href="./maven-core/toolchains.html"/>
+      <item name="POM" href="./api/maven-api-model/maven.html"/>
+      <item name="Settings" href="./api/maven-api-settings/settings.html"/>
+      <item name="Toolchains" href="./api/maven-api-toolchain/toolchains.html"/>
+      <item name="Core Extensions" href="./api/maven-api-cli/core-extensions.html"/>
+      <item name="Repository Metadata" href="./api/maven-api-metadata/repository-metadata.html"/>
+      <item name="Plugin Descriptor" href="./api/maven-api-plugin/plugin.html"/>
+      <item name="Lifecycle Descriptor" href="./api/maven-api-plugin/lifecycle.html"/>
     </menu>
 
     <menu inherit="bottom" name="Reference">

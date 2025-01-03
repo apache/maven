@@ -25,7 +25,7 @@
 
 Lifecycles Reference
 
-  Maven defines 4 lifecycles in {{{./apidocs/org/apache/maven/lifecycle/providers/package-summary.html}<<<org.apache.maven.lifecycle.providers>>>}} package:
+  Maven defines 3 lifecycles in {{{./apidocs/org/apache/maven/lifecycle/providers/package-summary.html}<<<org.apache.maven.lifecycle.providers>>>}} package:
 
 %{toc|fromDepth=2}
 
@@ -34,22 +34,82 @@ Lifecycles Reference
   <<<default>>> lifecycle is defined only with phases, <<without>> any associated plugin binding:
   plugins bindings for this lifecycle are {{{./default-bindings.html}defined separately for each packaging}}:
 
-%{snippet|id=default|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/DefaultLifecycleProvider.java}
+*-------------------------------+---------------------------------------------------------------------------------------+
+|| Phase                        || Description
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<validate>>>                | validate the project is correct and all necessary information is available.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<initialize>>>              | initialize build state, e.g. set properties or create directories.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-sources>>>        | generate any source code for inclusion in compilation.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-sources>>>         | process the source code, for example to filter any values.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-resources>>>      | generate resources for inclusion in the package.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-resources>>>       | copy and process the resources into the destination directory, ready for packaging.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<compile>>>                 | compile the source code of the project.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-classes>>>         | post-process the generated files from compilation, for example to do bytecode enhancement on Java classes.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-test-sources>>>   | generate any test source code for inclusion in compilation.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-test-sources>>>    | process the test source code, for example to filter any values.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<generate-test-resources>>> | create resources for testing.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-test-resources>>>  | copy and process the resources into the test destination directory.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<test-compile>>>            | compile the test source code into the test destination directory
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<process-test-classes>>>    | post-process the generated files from test compilation, for example to do bytecode enhancement on Java classes.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<test>>>                    | run tests using a suitable unit testing framework. These tests should not require the code be packaged or deployed.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<prepare-package>>>         | perform any operations necessary to prepare a package before the actual packaging. This often results in an unpacked, processed version of the package.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<package>>>                 | take the compiled code and package it in its distributable format, such as a JAR.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<pre-integration-test>>>    | perform actions required before integration tests are executed. This may involve things such as setting up the required environment.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<integration-test>>>        | process and deploy the package if necessary into an environment where integration tests can be run.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<post-integration-test>>>   | perform actions required after integration tests have been executed. This may including cleaning up the environment.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<verify>>>                  | run any checks to verify the package is valid and meets quality criteria.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<install>>>                 | install the package into the local repository, for use as a dependency in other projects locally.
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<deploy>>>                  | done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.
+*-------------------------------+--------------------------------------------------------------------------------------+
 
 * <<<clean>>> Lifecycle
 
   <<<clean>>> lifecycle phases are defined with their plugins bindings:
 
-%{snippet|id=clean|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/CleanLifecycleProvider.java}
+*-------------------------------+---------------------------------------------------------------------------------------+
+|| Phase                        || Description
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<pre-clean>>>               | execute processes needed prior to the actual project cleaning
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<clean>>>                   | remove all files generated by the previous build
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<post-clean>>>              | execute processes needed to finalize the project cleaning
+*-------------------------------+--------------------------------------------------------------------------------------+
 
 * <<<site>>> Lifecycle
 
   <<<site>>> lifecycle phases are defined with their plugins bindings:
 
-%{snippet|id=site|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/SiteLifecycleProvider.java}
-
-* <<<wrapper>>> Lifecycle
-
-  <<<wrapper>>> lifecycle phases are defined with their plugins bindings:
-
-%{snippet|id=wrapper|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/WrapperLifecycleProvider.java}
+*-------------------------------+---------------------------------------------------------------------------------------+
+|| Phase                        || Description
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<pre-site>>>                | execute processes needed prior to the actual project site generation
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<site>>>                    | generate the project's site documentation
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<post-site>>>               | execute processes needed to finalize the site generation, and to prepare for site deployment
+*-------------------------------+--------------------------------------------------------------------------------------+
+| <<<site-deploy>>>             | deploy the generated site documentation to the specified web server
+*-------------------------------+--------------------------------------------------------------------------------------+
