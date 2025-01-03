@@ -60,7 +60,7 @@ public interface ModelBuildingRequest {
     /**
      * Denotes strict validation as recommended by the current Maven version.
      */
-    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
+    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_1;
 
     /**
      * Gets the raw model to build. If not set, model source will be used to load raw model.
