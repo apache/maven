@@ -221,6 +221,7 @@ public class MavenProperties extends AbstractMap<String, String> {
                         };
                     }
 
+                    @Override
                     public void remove() {
                         keyIterator.remove();
                     }

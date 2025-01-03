@@ -402,7 +402,7 @@ public interface DependencyResolverRequest {
                         unmodifiable(nonNull(managedDependencies, "managedDependencies cannot be null"));
                 this.verbose = verbose;
                 this.pathScope = nonNull(pathScope, "pathScope cannot be null");
-                this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;
+                this.pathTypeFilter = pathTypeFilter != null ? pathTypeFilter :t -> true;
                 this.repositories = repositories;
                 if (verbose && requestType != RequestType.COLLECT) {
                     throw new IllegalArgumentException("verbose cannot only be true when collecting dependencies");
