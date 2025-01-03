@@ -92,16 +92,14 @@ public class DefaultMavenMetadataCache implements MavenMetadataCache {
                 return true;
             }
 
-            if (!(o instanceof CacheKey)) {
+            if (o instanceof CacheKey other) {
+                return pomHash == other.pomHash
+                        && artifactEquals(artifact, other.artifact)
+                        && resolveManagedVersions == other.resolveManagedVersions
+                        && repositoriesEquals(repositories, other.repositories);
+            } else {
                 return false;
             }
-
-            CacheKey other = (CacheKey) o;
-
-            return pomHash == other.pomHash
-                    && artifactEquals(artifact, other.artifact)
-                    && resolveManagedVersions == other.resolveManagedVersions
-                    && repositoriesEquals(repositories, other.repositories);
         }
     }
 

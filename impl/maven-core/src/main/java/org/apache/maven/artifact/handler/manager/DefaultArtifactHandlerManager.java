@@ -53,8 +53,7 @@ public class DefaultArtifactHandlerManager extends AbstractEventSpy implements A
 
     @Override
     public void onEvent(Object event) {
-        if (event instanceof ExecutionEvent) {
-            ExecutionEvent executionEvent = (ExecutionEvent) event;
+        if (event instanceof ExecutionEvent executionEvent) {
             if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
                 allHandlers.clear();
             }

@@ -38,14 +38,12 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
 
     @Override
     public boolean matches(Object o) {
-        if (!(o instanceof ProjectBuildingResult)) {
+        if (o instanceof ProjectBuildingResult r) {
+            return r.getProblems().stream()
+                    .anyMatch(p -> p.getLineNumber() == lineNumber && p.getColumnNumber() == columnNumber);
+        } else {
             return false;
         }
-
-        final ProjectBuildingResult r = (ProjectBuildingResult) o;
-
-        return r.getProblems().stream()
-                .anyMatch(p -> p.getLineNumber() == lineNumber && p.getColumnNumber() == columnNumber);
     }
 
     @Override
@@ -61,15 +59,14 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
 
     @Override
     public void describeMismatch(final Object o, final Description description) {
-        if (!(o instanceof ProjectBuildingResult)) {
-            super.describeMismatch(o, description);
-        } else {
-            final ProjectBuildingResult r = (ProjectBuildingResult) o;
+        if (o instanceof ProjectBuildingResult r) {
             description.appendText("was a ProjectBuildingResult with locations ");
             String messages = r.getProblems().stream()
                     .map(p -> formatLocation(p.getColumnNumber(), p.getLineNumber()))
                     .collect(joining(", "));
             description.appendText(messages);
+        } else {
+            super.describeMismatch(o, description);
         }
     }
 

@@ -139,9 +139,9 @@ public class DefaultMavenProjectBuilder implements MavenProjectBuilder {
             List<ArtifactRepository> repos = new ArrayList<>(repositories.size());
 
             for (Object repository : repositories) {
-                if (repository instanceof Repository) {
+                if (repository instanceof Repository repositoryInstance) {
                     try {
-                        ArtifactRepository repo = repositorySystem.buildArtifactRepository((Repository) repository);
+                        ArtifactRepository repo = repositorySystem.buildArtifactRepository(repositoryInstance);
                         repositorySystem.injectMirror(request.getRepositorySession(), Arrays.asList(repo));
                         repositorySystem.injectProxy(request.getRepositorySession(), Arrays.asList(repo));
                         repositorySystem.injectAuthentication(request.getRepositorySession(), Arrays.asList(repo));

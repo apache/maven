@@ -275,11 +275,11 @@ public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEn
 
                         Object last = null;
                         for (Object next : feedback) {
-                            if (next instanceof Throwable) {
+                            if (next instanceof Throwable throwable) {
                                 if (last == null) {
-                                    logger.debug("", ((Throwable) next));
+                                    logger.debug("", throwable);
                                 } else {
-                                    logger.debug(String.valueOf(last), ((Throwable) next));
+                                    logger.debug(String.valueOf(last), throwable);
                                 }
                             } else {
                                 if (last != null) {

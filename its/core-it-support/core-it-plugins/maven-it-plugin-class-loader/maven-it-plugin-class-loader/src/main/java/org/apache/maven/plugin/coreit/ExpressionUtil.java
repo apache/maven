@@ -94,17 +94,17 @@ class ExpressionUtil {
                 } catch (RuntimeException e) {
                     // invalid index, just ignore
                 }
-            } else if ((context instanceof List) && Character.isDigit(segment.charAt(0))) {
+            } else if ((context instanceof List list) && Character.isDigit(segment.charAt(0))) {
                 try {
                     int index = Integer.parseInt(segment);
-                    targets = Collections.singletonMap(segment, ((List) context).get(index));
+                    targets = Collections.singletonMap(segment, list.get(index));
                 } catch (RuntimeException e) {
                     // invalid index, just ignore
                 }
-            } else if ((context instanceof Collection) && "*".equals(segment)) {
+            } else if ((context instanceof Collection collection) && "*".equals(segment)) {
                 targets = new LinkedHashMap();
                 int index = 0;
-                for (Iterator it = ((Collection) context).iterator(); it.hasNext(); index++) {
+                for (Iterator it = collection.iterator(); it.hasNext(); index++) {
                     targets.put(Integer.toString(index), it.next());
                 }
             } else if (context.getClass().isArray() && "*".equals(segment)) {

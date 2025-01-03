@@ -180,8 +180,8 @@ public class LifecycleDependencyResolver {
 
         Set<Artifact> resolvedArtifacts = resolveProjectArtifacts(
                 project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
-        if (resolvedArtifacts instanceof ProjectArtifactsCache.ArtifactsSetWithResult) {
-            return ((ProjectArtifactsCache.ArtifactsSetWithResult) resolvedArtifacts).getResult();
+        if (resolvedArtifacts instanceof ProjectArtifactsCache.ArtifactsSetWithResult artifactsSetWithResult) {
+            return artifactsSetWithResult.getResult();
         } else {
             throw new IllegalStateException();
         }

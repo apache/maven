@@ -102,9 +102,9 @@ public class DefaultArtifactDeployer extends AbstractLogEnabled implements Artif
         request.addMetadata(relatedMetadata.get(versionKey));
 
         for (ArtifactMetadata metadata : artifact.getMetadataList()) {
-            if (metadata instanceof ProjectArtifactMetadata) {
+            if (metadata instanceof ProjectArtifactMetadata projectArtifactMetadata) {
                 org.eclipse.aether.artifact.Artifact pomArtifact = new SubArtifact(mainArtifact, "", "pom");
-                pomArtifact = pomArtifact.setFile(((ProjectArtifactMetadata) metadata).getFile());
+                pomArtifact = pomArtifact.setFile(projectArtifactMetadata.getFile());
                 request.addArtifact(pomArtifact);
             } else if (metadata instanceof SnapshotArtifactRepositoryMetadata
                     || metadata instanceof ArtifactRepositoryMetadata) {

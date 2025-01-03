@@ -102,8 +102,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 
         List<ExceptionSummary> children = null;
 
-        if (exception instanceof ProjectBuildingException) {
-            List<ProjectBuildingResult> results = ((ProjectBuildingException) exception).getResults();
+        if (exception instanceof ProjectBuildingException projectBuildingException) {
+            List<ProjectBuildingResult> results = projectBuildingException.getResults();
 
             children = new ArrayList<>();
 
@@ -235,10 +235,10 @@ public class DefaultExceptionHandler implements ExceptionHandler {
             String exceptionMessage = t.getMessage();
             String longMessage = null;
 
-            if (t instanceof AbstractMojoExecutionException) {
-                longMessage = ((AbstractMojoExecutionException) t).getLongMessage();
-            } else if (t instanceof MojoException) {
-                longMessage = ((MojoException) t).getLongMessage();
+            if (t instanceof AbstractMojoExecutionException abstractMojoExecutionException) {
+                longMessage = abstractMojoExecutionException.getLongMessage();
+            } else if (t instanceof MojoException mojoException) {
+                longMessage = mojoException.getLongMessage();
             }
 
             if (longMessage != null && !longMessage.isEmpty()) {

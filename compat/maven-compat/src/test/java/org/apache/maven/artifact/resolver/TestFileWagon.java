@@ -68,8 +68,8 @@ public class TestFileWagon extends FileWagon {
     }
 
     public void addTransferListener(TransferListener listener) {
-        if (listener instanceof TestTransferListener) {
-            testTransferListener = (TestTransferListener) listener;
+        if (listener instanceof TestTransferListener t) {
+            testTransferListener = t;
         }
         super.addTransferListener(listener);
     }

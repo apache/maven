@@ -234,8 +234,8 @@ public class TestRepositorySystem implements RepositorySystem {
             }
 
             List<Dependency> dependencies = new ArrayList<>();
-            if (request.getArtifact() instanceof ArtifactWithDependencies) {
-                dependencies = ((ArtifactWithDependencies) request.getArtifact()).getDependencies();
+            if (request.getArtifact() instanceof ArtifactWithDependencies artifactWithDependencies) {
+                dependencies = artifactWithDependencies.getDependencies();
             } else {
                 Artifact pomArtifact = createProjectArtifact(
                         request.getArtifact().getGroupId(),

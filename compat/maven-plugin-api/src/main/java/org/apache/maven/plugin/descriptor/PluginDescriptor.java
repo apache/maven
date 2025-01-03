@@ -313,7 +313,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
             return true;
         }
 
-        return object instanceof PluginDescriptor && getId().equals(((PluginDescriptor) object).getId());
+        return object instanceof PluginDescriptor pluginDescriptor && getId().equals(pluginDescriptor.getId());
     }
 
     public int hashCode() {

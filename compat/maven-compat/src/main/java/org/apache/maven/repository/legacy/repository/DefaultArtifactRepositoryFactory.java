@@ -109,9 +109,8 @@ public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFacto
         }
 
         ArtifactRepository repository;
-        if (repositoryLayout instanceof ArtifactRepositoryLayout2) {
-            repository = ((ArtifactRepositoryLayout2) repositoryLayout)
-                    .newMavenArtifactRepository(id, url, snapshots, releases);
+        if (repositoryLayout instanceof ArtifactRepositoryLayout2 artifactRepositoryLayout2) {
+            repository = artifactRepositoryLayout2.newMavenArtifactRepository(id, url, snapshots, releases);
         } else {
             repository = new MavenArtifactRepository(id, url, repositoryLayout, snapshots, releases);
         }

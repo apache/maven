@@ -177,8 +177,8 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                     String pathExpression = expression.substring(0, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, session);
                     if (pathSeparator < expression.length() - 1) {
-                        if (value instanceof Path) {
-                            value = ((Path) value).resolve(expression.substring(pathSeparator + 1));
+                        if (value instanceof Path path) {
+                            value = path.resolve(expression.substring(pathSeparator + 1));
                         } else {
                             value = value + expression.substring(pathSeparator);
                         }
@@ -309,10 +309,8 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
             }
         }
 
-        if (value instanceof String) {
+        if (value instanceof String val) {
             // TODO without #, this could just be an evaluate call...
-
-            String val = (String) value;
 
             int exprStartDelimiter = val.indexOf("${");
 

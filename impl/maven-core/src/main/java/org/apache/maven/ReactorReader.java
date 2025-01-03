@@ -533,9 +533,9 @@ class ReactorReader implements MavenWorkspaceReader {
 
         @Override
         public void onEvent(Object event) throws Exception {
-            if (event instanceof ExecutionEvent) {
+            if (event instanceof ExecutionEvent executionEvent) {
                 ReactorReader reactorReader = lookup.lookup(ReactorReader.class);
-                reactorReader.processEvent((ExecutionEvent) event);
+                reactorReader.processEvent(executionEvent);
             }
         }
 

@@ -97,8 +97,8 @@ public class DefaultModelVersionParser implements ModelVersionParser {
 
         @Override
         public int compareTo(Version o) {
-            if (o instanceof DefaultVersion) {
-                return delegate.compareTo(((DefaultVersion) o).delegate);
+            if (o instanceof DefaultVersion defaultVersion) {
+                return delegate.compareTo(defaultVersion.delegate);
             } else {
                 return compareTo(new DefaultVersion(versionScheme, o.asString()));
             }
@@ -152,8 +152,8 @@ public class DefaultModelVersionParser implements ModelVersionParser {
 
         @Override
         public boolean contains(Version version) {
-            if (version instanceof DefaultVersion) {
-                return delegate.containsVersion(((DefaultVersion) version).delegate);
+            if (version instanceof DefaultVersion defaultVersion) {
+                return delegate.containsVersion(defaultVersion.delegate);
             } else {
                 return contains(new DefaultVersion(versionScheme, version.asString()));
             }
@@ -240,8 +240,8 @@ public class DefaultModelVersionParser implements ModelVersionParser {
 
         @Override
         public boolean contains(Version version) {
-            if (version instanceof DefaultVersion) {
-                return delegate.containsVersion(((DefaultVersion) version).delegate);
+            if (version instanceof DefaultVersion defaultVersion) {
+                return delegate.containsVersion(defaultVersion.delegate);
             } else {
                 return contains(new DefaultVersion(versionScheme, version.asString()));
             }

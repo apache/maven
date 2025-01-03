@@ -46,12 +46,10 @@ public class TypeArtifactFilter implements ArtifactFilter {
             return true;
         }
 
-        if (!(obj instanceof TypeArtifactFilter)) {
+        if (obj instanceof TypeArtifactFilter other) {
+            return type.equals(other.type);
+        } else {
             return false;
         }
-
-        TypeArtifactFilter other = (TypeArtifactFilter) obj;
-
-        return type.equals(other.type);
     }
 }

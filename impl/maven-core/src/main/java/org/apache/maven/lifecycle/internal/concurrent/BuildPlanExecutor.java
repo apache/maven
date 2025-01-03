@@ -574,8 +574,8 @@ public class BuildPlanExecutor {
                     .addBuildSummary(new BuildFailure(mavenProject, clock.execTime(), clock.wallTime(), t));
 
             // notify listeners about "soft" project build failures only
-            if (t instanceof Exception && !(t instanceof RuntimeException)) {
-                eventCatapult.fire(ExecutionEvent.Type.ProjectFailed, session, null, (Exception) t);
+            if (t instanceof Exception exception && !(t instanceof RuntimeException)) {
+                eventCatapult.fire(ExecutionEvent.Type.ProjectFailed, session, null, exception);
             }
 
             // reactor failure modes

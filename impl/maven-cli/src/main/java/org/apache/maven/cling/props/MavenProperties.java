@@ -316,8 +316,8 @@ public class MavenProperties extends AbstractMap<String, String> {
 
     public boolean update(Map<String, String> props) {
         MavenProperties properties;
-        if (props instanceof MavenProperties) {
-            properties = (MavenProperties) props;
+        if (props instanceof MavenProperties mavenProperties) {
+            properties = mavenProperties;
         } else {
             properties = new MavenProperties();
             properties.putAll(props);
