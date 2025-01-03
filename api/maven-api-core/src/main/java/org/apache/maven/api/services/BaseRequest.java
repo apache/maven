@@ -45,9 +45,13 @@ abstract class BaseRequest<S extends ProtoSession> {
         return session;
     }
 
+    /**
+     * Use Objects.nonNull instead
+     */
+    @Deprecated
     public static <T> T nonNull(T obj, String message) {
         if (obj == null) {
-            throw new IllegalArgumentException(message);
+            throw new NullPointerException(message);
         }
         return obj;
     }
