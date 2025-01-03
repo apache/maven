@@ -435,19 +435,19 @@ public class ${className} {
      * @return ${root.name}
      */
 #if ( $locationTracking )
-    public ${root.name} read(Reader reader, boolean strict, InputSource source) throws XMLStreamException {
+    public ${root.name} read(Reader reader, boolean strict, InputSource inputSrc) throws XMLStreamException {
 #else
     public ${root.name} read(Reader reader, boolean strict) throws XMLStreamException {
 #end
 #if ( $locationTracking )
-        StreamSource streamSource = new StreamSource(reader, source != null ? source.getLocation() : null);
+        StreamSource streamSource = new StreamSource(reader, inputSrc != null ? inputSrc.getLocation() : null);
 #else
         StreamSource streamSource = new StreamSource(reader);
 #end
         XMLInputFactory factory = getXMLInputFactory();
         XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
 #if ( $locationTracking )
-        return read(parser, strict, source);
+        return read(parser, strict, inputSrc);
 #else
     return read(parser, strict);
 #end
@@ -471,19 +471,19 @@ public class ${className} {
      * @return ${root.name}
      */
 #if ( $locationTracking )
-    public ${root.name} read(InputStream in, boolean strict, InputSource source) throws XMLStreamException {
+    public ${root.name} read(InputStream in, boolean strict, InputSource inputSrc) throws XMLStreamException {
 #else
     public ${root.name} read(InputStream in, boolean strict) throws XMLStreamException {
 #end
 #if ( $locationTracking )
-        StreamSource streamSource = new StreamSource(in, source != null ? source.getLocation() : null);
+        StreamSource streamSource = new StreamSource(in, inputSrc != null ? inputSrc.getLocation() : null);
 #else
         StreamSource streamSource = new StreamSource(in);
 #end
         XMLInputFactory factory = getXMLInputFactory();
         XMLStreamReader parser = factory.createXMLStreamReader(streamSource);
 #if ( $locationTracking )
-        return read(parser, strict, source);
+        return read(parser, strict, inputSrc);
 #else
         return read(parser, strict);
 #end
@@ -499,7 +499,7 @@ public class ${className} {
      * @return ${root.name}
      */
 #if ( $locationTracking )
-    public ${root.name} read(XMLStreamReader parser, boolean strict, InputSource source) throws XMLStreamException {
+    public ${root.name} read(XMLStreamReader parser, boolean strict, InputSource inputSrc) throws XMLStreamException {
 #else
     public ${root.name} read(XMLStreamReader parser, boolean strict) throws XMLStreamException {
 #end
@@ -518,7 +518,7 @@ public class ${className} {
                     throw new XMLStreamException("Duplicated tag: '${rootTag}'", parser.getLocation(), null);
                 }
 #if ( $locationTracking )
-                $rootLcapName = parse${rootUcapName}(parser, strict, source);
+                $rootLcapName = parse${rootUcapName}(parser, strict, inputSrc);
 #elseif ( $needXmlContext )
                 $rootLcapName = parse${rootUcapName}(parser, strict, context);
 #else
@@ -541,7 +541,7 @@ public class ${className} {
   #set ( $ancestors = $Helper.ancestors( $class ) )
   #set ( $allFields = $Helper.xmlFields( $class ) )
   #if ( $locationTracking )
-    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, InputSource source) throws XMLStreamException {
+    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, InputSource inputSrc) throws XMLStreamException {
   #elseif ( $needXmlContext )
     private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, Deque<Object> context) throws XMLStreamException {
   #else
@@ -551,7 +551,7 @@ public class ${className} {
         ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder(true);
   #if ( $locationTracking )
         if (addLocationInformation) {
-            ${classLcapName}.location("", new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source));
+            ${classLcapName}.location("", new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
         }
   #end
         for (int i = parser.getAttributeCount() - 1; i >= 0; i--) {
@@ -574,7 +574,7 @@ public class ${className} {
             } else if ("$fieldTagName".equals(name)) {
       #if ( $locationTracking )
                 if (addLocationInformation) {
-                    ${classLcapName}.location(name, new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source));
+                    ${classLcapName}.location(name, new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
                 }
       #end
       #if ( $field.type == "String" )
@@ -632,7 +632,7 @@ public class ${className} {
                     break;
       #elseif ( $field.type == "DOM" )
         #if ( $locationTracking )
-                    ${classLcapName}.${field.name}(buildXmlNode(parser, source));
+                    ${classLcapName}.${field.name}(buildXmlNode(parser, inputSrc));
         #else
                     ${classLcapName}.${field.name}(buildXmlNode(parser));
         #end
@@ -646,7 +646,7 @@ public class ${className} {
                         if ("${Helper.singular($fieldTagName)}".equals(parser.getLocalName())) {
         #if ( $locationTracking )
                             if (addLocationInformation) {
-                                locations.put(Integer.valueOf(locations.size()), new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source));
+                                locations.put(Integer.valueOf(locations.size()), new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
                             }
         #end
                             ${field.name}.add(interpolatedTrimmed(nextText(parser, strict), "${fieldTagName}"));
@@ -666,7 +666,7 @@ public class ${className} {
                         String value = nextText(parser, strict).trim();
         #if ( $locationTracking )
                         if (addLocationInformation) {
-                            locations.put(key, new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source));
+                            locations.put(key, new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
                         }
         #end
                         ${field.name}.put(key, value);
@@ -675,7 +675,7 @@ public class ${className} {
                     break;
       #elseif ( $field.to && $field.multiplicity == "1" )
         #if ( $locationTracking )
-                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, source));
+                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, inputSrc));
         #elseif ( $needXmlContext )
                     ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, context));
         #else
@@ -684,7 +684,7 @@ public class ${className} {
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) )
         #if ( $locationTracking )
-                    ${field.name}.add(parse${field.toClass.name}(parser, strict, source));
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, inputSrc));
         #elseif ( $needXmlContext )
                     ${field.name}.add(parse${field.toClass.name}(parser, strict, context));
         #else
@@ -696,7 +696,7 @@ public class ${className} {
                     while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
                         if ("${Helper.singular($fieldTagName)}".equals(parser.getLocalName())) {
         #if ( $locationTracking )
-                            ${field.name}.add(parse${field.toClass.name}(parser, strict, source));
+                            ${field.name}.add(parse${field.toClass.name}(parser, strict, inputSrc));
         #elseif ( $needXmlContext )
                             ${field.name}.add(parse${field.toClass.name}(parser, strict, context));
         #else
@@ -723,7 +723,7 @@ public class ${className} {
             }
   #if ( $locationTracking )
             if (addLocationInformation) {
-                ${classLcapName}.location(childName, new InputLocation(line, column, source, locations));
+                ${classLcapName}.location(childName, new InputLocation(line, column, inputSrc, locations));
             }
   #end
         }
@@ -923,10 +923,10 @@ public class ${className} {
     }
 
 #if ( $locationTracking )
-    private XmlNode buildXmlNode(XMLStreamReader parser, InputSource source) throws XMLStreamException {
+    private XmlNode buildXmlNode(XMLStreamReader parser, InputSource inputSrc) throws XMLStreamException {
         return XmlNodeStaxBuilder.build(parser,
                 addLocationInformation
-                        ? p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), source)
+                        ? p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc)
                         : null);
     }
 #else
@@ -993,12 +993,12 @@ public class ${className} {
     public static interface ContentTransformer {
         /**
          * Interpolate the value read from the xpp3 document
-         * @param source The source value
+         * @param inputSrc The input source value
          * @param fieldName A description of the field being interpolated. The implementation may use this to
          *                           log stuff.
          * @return The interpolated value.
          */
-        String transform(String source, String fieldName);
+        String transform(String inputSrc, String fieldName);
     }
 
 }
