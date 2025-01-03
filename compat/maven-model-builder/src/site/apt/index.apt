@@ -132,7 +132,7 @@ Maven Model Builder
   ({{{./xref/org/apache/maven/model/inheritance/DefaultInheritanceAssembler.html}source}}).
 
   By default, every model field is inherited as-is from parent, with a few exceptions that are intentionally not inherited:
-  <<<modelVersion>>>, <<<artifactId>>>, <<<profiles>>> (injected in phase 1) and <<<prerequisites>>>.
+  <<<modelVersion>>>, <<<artifactId>>>, <<<packaging>>>, <<<profiles>>> (injected in phase 1) and <<<prerequisites>>>.
 
   Notice that the 5 URLs from the model (<<<project.url>>>, <<<project.scm.connection>>>, <<<project.scm.developerConnection>>>,
   <<<project.scm.url>>> and <<<project.distributionManagement.site.url>>>) have a special inheritance handling:
