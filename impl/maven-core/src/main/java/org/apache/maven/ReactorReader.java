@@ -70,7 +70,7 @@ class ReactorReader implements MavenWorkspaceReader {
     public static final String PROJECT_LOCAL_REPO = "project-local-repo";
 
     private static final Collection<String> COMPILE_PHASE_TYPES = new HashSet<>(
-            Arrays.asList("jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client"));
+            Arrays.asList("jar", "ejb-client", "war", "rar", "ejb", "par", "sar", "wsr", "har", "app-client"));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactorReader.class);
 
