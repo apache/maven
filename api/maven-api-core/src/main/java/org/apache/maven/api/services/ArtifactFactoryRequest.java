@@ -18,13 +18,13 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.Objects;
+
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
-
-import java.util.Objects;
 
 /**
  *
@@ -53,7 +53,7 @@ public interface ArtifactFactoryRequest {
     static ArtifactFactoryRequest build(
             Session session, String groupId, String artifactId, String version, String extension) {
         return ArtifactFactoryRequest.builder()
-                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .session(Objects.requireNonNull(session, "session cannot be null"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -70,7 +70,7 @@ public interface ArtifactFactoryRequest {
             String extension,
             String type) {
         return ArtifactFactoryRequest.builder()
-                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .session(Objects.requireNonNull(session, "session cannot be null"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)

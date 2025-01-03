@@ -53,6 +53,6 @@ public interface ModelSource extends Source {
 
     @Nonnull
     static ModelSource fromPath(@Nonnull Path path, @Nullable String location) {
-        return new PathSource( Objects.requireNonNull( path, "path cannot be null" ), location);
+        return new PathSource(Objects.requireNonNull(path, "path cannot be null"), location);
     }
 }

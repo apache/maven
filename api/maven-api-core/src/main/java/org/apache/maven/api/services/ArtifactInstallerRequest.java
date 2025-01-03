@@ -53,8 +53,8 @@ public interface ArtifactInstallerRequest {
     @Nonnull
     static ArtifactInstallerRequest build(Session session, Collection<ProducedArtifact> artifacts) {
         return builder()
-                .session( Objects.requireNonNull( session, "session cannot be null" ) )
-                .artifacts( Objects.requireNonNull( artifacts, "artifacts cannot be null" ) )
+                .session(Objects.requireNonNull(session, "session cannot be null"))
+                .artifacts(Objects.requireNonNull(artifacts, "artifacts cannot be null"))
                 .build();
     }
 
@@ -88,7 +88,7 @@ public interface ArtifactInstallerRequest {
 
             DefaultArtifactInstallerRequest(@Nonnull Session session, @Nonnull Collection<ProducedArtifact> artifacts) {
                 super(session);
-                this.artifacts = unmodifiable( Objects.requireNonNull( artifacts, "artifacts cannot be null" ) );
+                this.artifacts = unmodifiable(Objects.requireNonNull(artifacts, "artifacts cannot be null"));
             }
 
             @Nonnull

@@ -395,17 +395,15 @@ public interface DependencyResolverRequest {
                     @Nullable Predicate<PathType> pathTypeFilter,
                     @Nullable List<RemoteRepository> repositories) {
                 super(session);
-                this.requestType = Objects.requireNonNull( requestType, "requestType cannot be null" );
+                this.requestType = Objects.requireNonNull(requestType, "requestType cannot be null");
                 this.project = project;
                 this.rootArtifact = rootArtifact;
                 this.root = root;
-                this.dependencies = unmodifiable(
-                        Objects.requireNonNull( dependencies, "dependencies cannot be null" ) );
+                this.dependencies = unmodifiable(Objects.requireNonNull(dependencies, "dependencies cannot be null"));
                 this.managedDependencies =
-                        unmodifiable(
-                                Objects.requireNonNull( managedDependencies, "managedDependencies cannot be null" ) );
+                        unmodifiable(Objects.requireNonNull(managedDependencies, "managedDependencies cannot be null"));
                 this.verbose = verbose;
-                this.pathScope = Objects.requireNonNull( pathScope, "pathScope cannot be null" );
+                this.pathScope = Objects.requireNonNull(pathScope, "pathScope cannot be null");
                 this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;
                 this.repositories = repositories;
                 if (verbose && requestType != RequestType.COLLECT) {

@@ -142,23 +142,23 @@ public interface ModelBuilderRequest {
 
     @Nonnull
     static ModelBuilderRequest build(@Nonnull ModelBuilderRequest request, @Nonnull ModelSource source) {
-        return builder( Objects.requireNonNull( request, "request cannot be null" ) )
-                .source( Objects.requireNonNull( source, "source cannot be null" ) )
+        return builder(Objects.requireNonNull(request, "request cannot be null"))
+                .source(Objects.requireNonNull(source, "source cannot be null"))
                 .build();
     }
 
     @Nonnull
     static ModelBuilderRequest build(@Nonnull Session session, @Nonnull ModelSource source) {
         return builder()
-                .session( Objects.requireNonNull( session, "session cannot be null" ) )
-                .source( Objects.requireNonNull( source, "source cannot be null" ) )
+                .session(Objects.requireNonNull(session, "session cannot be null"))
+                .source(Objects.requireNonNull(source, "source cannot be null"))
                 .build();
     }
 
     @Nonnull
     static ModelBuilderRequest build(@Nonnull Session session, @Nonnull Path path) {
         return builder()
-                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .session(Objects.requireNonNull(session, "session cannot be null"))
                 .source(ModelSource.fromPath(path))
                 .build();
     }
@@ -319,7 +319,7 @@ public interface ModelBuilderRequest {
                     List<RemoteRepository> repositories,
                     ModelTransformer lifecycleBindingsInjector) {
                 super(session);
-                this.requestType = Objects.requireNonNull( requestType, "requestType cannot be null" );
+                this.requestType = Objects.requireNonNull(requestType, "requestType cannot be null");
                 this.locationTracking = locationTracking;
                 this.recursive = recursive;
                 this.source = source;

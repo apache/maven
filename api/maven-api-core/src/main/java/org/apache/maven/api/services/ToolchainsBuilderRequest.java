@@ -60,7 +60,7 @@ public interface ToolchainsBuilderRequest {
             @Nullable Source installationToolchainsFile,
             @Nullable Source userToolchainsSource) {
         return builder()
-                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .session(Objects.requireNonNull(session, "session cannot be null"))
                 .installationToolchainsSource(installationToolchainsFile)
                 .userToolchainsSource(userToolchainsSource)
                 .build();
@@ -72,7 +72,7 @@ public interface ToolchainsBuilderRequest {
             @Nullable Path installationToolchainsFile,
             @Nullable Path userToolchainsPath) {
         return builder()
-                .session( Objects.requireNonNull( session, "session cannot be null" ) )
+                .session(Objects.requireNonNull(session, "session cannot be null"))
                 .installationToolchainsSource(
                         installationToolchainsFile != null && Files.exists(installationToolchainsFile)
                                 ? Source.fromPath(installationToolchainsFile)
