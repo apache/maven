@@ -43,13 +43,6 @@ public interface XmlNode {
 
     String CHILDREN_COMBINATION_APPEND = "append";
 
-    /**
-     * This default mode for combining children DOMs during merge means that where element names match, the process will
-     * try to merge the element data, rather than putting the dominant and recessive elements (which share the same
-     * element name) as siblings in the resulting DOM.
-     */
-    String DEFAULT_CHILDREN_COMBINATION_MODE = CHILDREN_COMBINATION_MERGE;
-
     String SELF_COMBINATION_MODE_ATTRIBUTE = "combine.self";
 
     String SELF_COMBINATION_OVERRIDE = "override";
@@ -68,14 +61,6 @@ public interface XmlNode {
      * This is a comma separated list of attribute names.
      */
     String KEYS_COMBINATION_MODE_ATTRIBUTE = "combine.keys";
-
-    /**
-     * This default mode for combining a DOM node during merge means that where element names match, the process will
-     * try to merge the element attributes and values, rather than overriding the recessive element completely with the
-     * dominant one. This means that wherever the dominant element doesn't provide the value or a particular attribute,
-     * that value or attribute will be set from the recessive DOM node.
-     */
-    String DEFAULT_SELF_COMBINATION_MODE = SELF_COMBINATION_MERGE;
 
     @Nonnull
     String getName();
