@@ -80,7 +80,7 @@ public abstract class MavenInvokerTestSupport {
             }
             """;
 
-    protected void invoke(Path cwd, Collection<String> goals) throws Exception {
+    protected void invoke(Path cwd, Path userHome, Collection<String> goals) throws Exception {
         // works only in recent Maven4
         Assumptions.assumeTrue(
                 Files.isRegularFile(Paths.get(System.getProperty("maven.home"))
@@ -104,6 +104,7 @@ public abstract class MavenInvokerTestSupport {
                                 new ProtoLogger(),
                                 new JLineMessageBuilderFactory())
                         .cwd(cwd)
+                        .userHome(userHome)
                         .build()));
                 String log = Files.readString(logFile);
                 System.out.println(log);

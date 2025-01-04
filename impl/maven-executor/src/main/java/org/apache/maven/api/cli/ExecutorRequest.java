@@ -163,7 +163,9 @@ public interface ExecutorRequest {
                 MVN,
                 null,
                 getCanonicalPath(Paths.get(System.getProperty("user.dir"))),
-                installationDirectory != null ? getCanonicalPath(installationDirectory) : discoverMavenHome(),
+                installationDirectory != null
+                        ? getCanonicalPath(installationDirectory)
+                        : discoverInstallationDirectory(),
                 getCanonicalPath(Paths.get(System.getProperty("user.home"))),
                 null,
                 null,
@@ -430,12 +432,21 @@ public interface ExecutorRequest {
     }
 
     @Nonnull
-    static Path discoverMavenHome() {
+    static Path discoverInstallationDirectory() {
         String mavenHome = System.getProperty("maven.home");
         if (mavenHome == null) {
             throw new ExecutorException("requires maven.home Java System Property set");
         }
         return getCanonicalPath(Paths.get(mavenHome));
+    }
+
+    @Nonnull
+    static Path discoverUserHomeDirectory() {
+        String userHome = System.getProperty("user.home");
+        if (userHome == null) {
+            throw new ExecutorException("requires user.home Java System Property set");
+        }
+        return getCanonicalPath(Paths.get(userHome));
     }
 
     @Nonnull
