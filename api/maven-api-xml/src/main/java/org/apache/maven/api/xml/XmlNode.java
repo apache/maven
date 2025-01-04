@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 
 /**
- * An immutable xml node.
+ * An immutable XML node.
  *
  * @since 4.0.0
  */
@@ -38,8 +38,6 @@ import org.apache.maven.api.annotations.ThreadSafe;
 public interface XmlNode {
 
     String CHILDREN_COMBINATION_MODE_ATTRIBUTE = "combine.children";
-
-    String CHILDREN_COMBINATION_MERGE = "merge";
 
     String CHILDREN_COMBINATION_APPEND = "append";
 
@@ -53,8 +51,6 @@ public interface XmlNode {
     String SELF_COMBINATION_MODE_ATTRIBUTE = "combine.self";
 
     String SELF_COMBINATION_OVERRIDE = "override";
-
-    String SELF_COMBINATION_MERGE = "merge";
 
     String SELF_COMBINATION_REMOVE = "remove";
 

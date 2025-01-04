@@ -93,7 +93,7 @@
           <name>modelVersion</name>
           <version>4.0.0+</version>
           <required>true</required>
-          <description>Declares to which version of project descriptor this POM conforms.</description>
+          <description>Declares which version of project descriptor this POM conforms to.</description>
           <type>String</type>
         </field>
 
@@ -104,9 +104,9 @@
         <field xdoc.separator="blank">
           <name>parent</name>
           <version>4.0.0+</version>
-          <description>The location of the parent project, if one exists. Values from the parent
+          <description>Returns the coordinates of the parent project, if one exists. Values from the parent
             project will be the default for this project if they are left unspecified. The location
-            is given as a group ID, artifact ID and version.</description>
+            is given as a group ID, artifact ID, and version.</description>
           <association>
             <type>Parent</type>
           </association>
@@ -121,9 +121,12 @@
           <version>3.0.0+</version>
           <required>true</required>
           <description>
-            A universally unique identifier for a project. It is normal to
+            Returns a string that defines a collection of related projects. It is recommended to
             use a fully-qualified package name to distinguish it from other
-            projects with a similar name (eg. {@code org.apache.maven}).
+            projects with a similar name (for example, {@code org.apache.maven}).
+            This form is now required to create a new group ID in Maven Central.
+            However, older projects did not always follow this convention,
+            and often use a single word such as jaxen or jdom as the group ID.
           </description>
           <type>String</type>
         </field>
@@ -131,24 +134,26 @@
           <name>artifactId</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description>The identifier for this artifact that is unique within the group given by the
+          <description>Returns a string that defines a collection of versions within the group given by the
             group ID. An artifact is something that is either produced or used by a project.
             Examples of artifacts produced by Maven for a project include: JARs, source and binary
-            distributions, and WARs.</description>
+            distributions, and WARs. Only one version of an artifact with the same groupId and
+            artifactId will be added to the classpath.
+          </description>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
           <version>4.0.0+</version>
           <required>true</required>
-          <description>The current version of the artifact produced by this project.</description>
+          <description>Returns the current version of the artifact produced by this project.</description>
           <type>String</type>
         </field>
         <field>
           <name>packaging</name>
           <version>4.0.0+</version>
           <description>
-            The type of artifact this project produces, for example {@code jar},
+            Returns the type of artifact this project produces, for example {@code jar},
               {@code war},
               {@code ear},
               {@code pom}.
@@ -168,17 +173,17 @@
           <name>name</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description>The full name of the project.</description>
+          <description>Returns the full name of the project.</description>
           <type>String</type>
         </field>
         <field>
           <name>description</name>
           <version>3.0.0+</version>
-          <description>A detailed description of the project, used by Maven whenever it needs to
+          <description>Returns a detailed description of the project, used by Maven whenever it needs to
             describe the project, such as on the website. While this element can be specified as
-            CDATA to enable the use of HTML tags within the description, it is discouraged to allow
-            plain text representation. If you need to modify the index page of the generated website,
-            you are able to specify your own instead of adjusting this text.</description>
+            CDATA to enable the use of HTML tags within the description,
+            plain text is preferable. If you need to modify the index page of the generated website,
+            you can specify your own instead of adjusting this text.</description>
           <type>String</type>
         </field>
         <field>
@@ -198,7 +203,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When children inherit from project's url, append path or not? Note: While the type
+            When children inherit from project's URL, append path or not? Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}
             <p><b>Default value is</b>: {@code true}</p>
@@ -234,14 +239,14 @@
           <name>inceptionYear</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description>The year of the project's inception, specified with 4 digits. This value is
-            used when generating copyright notices as well as being informational.</description>
+          <description>Returns the year the project started, specified with 4 digits. This value is
+            used when generating copyright notices.</description>
           <type>String</type>
         </field>
         <field>
           <name>organization</name>
           <version>3.0.0+</version>
-          <description>This element describes various attributes of the organization to which the
+          <description>Returns the organization to which the
             project belongs. These attributes are utilized when documentation is created (for
             copyright notices and links).</description>
           <alias>organisation</alias>
@@ -606,7 +611,7 @@
         <field xdoc.separator="blank">
           <name>repositories</name>
           <version>4.0.0+</version>
-          <description>The lists of the remote repositories for discovering dependencies and
+          <description>Returns a list of the remote repositories for discovering dependencies and
             extensions.</description>
           <association>
             <type>Repository</type>
@@ -616,7 +621,7 @@
         <field>
           <name>pluginRepositories</name>
           <version>4.0.0+</version>
-          <description>The lists of the remote repositories for discovering plugins for builds and
+          <description>Returns a list of the remote repositories for discovering plugins for builds and
             reports.</description>
           <association>
             <type>Repository</type>
@@ -635,7 +640,7 @@
           <name>reporting</name>
           <version>4.0.0+</version>
           <description>
-            This element includes the specification of report plugins to use
+            Returns the specification of report plugins to use
             to generate the reports on the Maven-generated site.
             These reports will be run when a user executes {@code mvn site}.
             All the reports will be included in the navigation bar for browsing.
@@ -649,7 +654,7 @@
     <class>
       <name>PluginContainer</name>
       <version>3.0.0+</version>
-      <description>Contains the plugins information for the project.</description>
+      <description>Returns the plugins information for the project.</description>
       <fields>
         <field>
           <name>plugins</name>
@@ -768,10 +773,10 @@
         <field>
           <name>defaultGoal</name>
           <version>3.0.0+</version>
-          <description>The default goal (or phase in Maven 2) to execute when none is specified for
+          <description>The default goal to execute when none is specified for
             the project. Note that in case of a build with subprojects, only the default goal of the top-level
-            project is relevant, i.e. the default goals of subprojects are ignored. Since Maven 3,
-            multiple goals/phases can be separated by whitespace.</description>
+            project is relevant, i.e. the default goals of subprojects are ignored.
+            Multiple goals can be separated by whitespace.</description>
           <type>String</type>
         </field>
         <field>
@@ -2063,7 +2068,7 @@
           <name>layout</name>
           <version>4.0.0+</version>
           <description>
-            The type of layout this repository uses for locating and storing artifacts -
+            The type of layout this repository uses for locating and storing artifacts —
             can be {@code legacy} or {@code default}.
           </description>
           <type>String</type>
@@ -2207,8 +2212,8 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            The url of the location where website is deployed, in the form {@code protocol://hostname/path}.
-            <p><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
+            The URL where the website is deployed, in the form {@code protocol://hostname/path}.
+            <p>The <b>default value is</b>: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
             site's {@code child.site.url.inherit.append.path="false"}.</p>
             ]]>
           </description>
@@ -2219,7 +2224,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            When children inherit from distribution management site url, append path or not? Note: While the type
+            When children inherit a distribution management site URL, append path or not? Note: While the type
             of this field is {@code String} for technical reasons, the semantic type is actually
             {@code Boolean}
             <p><b>Default value is</b>: {@code true}</p>
@@ -2264,7 +2269,7 @@
           <description>
             <![CDATA[
             <p>The configuration as DOM object.</p>
-            <p>By default, every element content is trimmed, but starting with Maven 3.1.0, you can add
+            <p>By default, every element's content is trimmed. You can add
             {@code xml:space="preserve"} to elements you want to preserve whitespace.</p>
             <p>You can control how child POMs inherit configuration from parent POMs by adding {@code combine.children}
             or {@code combine.self} attributes to the children of the configuration element:</p>
@@ -2365,7 +2370,7 @@
         </field>
         <field>
           <name>dependencies</name>
-          <description>Additional dependencies that this project needs to introduce to the plugin's
+          <description>Additional dependencies that this project needs to add to the plugin's
             classloader.</description>
           <version>4.0.0+</version>
           <association>
@@ -2495,7 +2500,7 @@
           <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>default</defaultValue>
-          <description>The identifier of this execution for labelling the goals during the build,
+          <description>Returns the identifier of this execution for labelling the goals during the build,
             and for matching executions to merge during inheritance and profile injection.</description>
         </field>
         <field>
@@ -2511,9 +2516,9 @@
           <type>int</type>
           <description>
             <![CDATA[
-            The priority of this execution compared to other executions which are bound to the same phase.
-            <p><strong>Warning:</strong> This is an internal utility property that is only public for technical reasons,
-            it is not part of the public API. In particular, this property can be changed or deleted without prior
+            Returns the priority of this execution compared to other executions which are bound to the same phase.
+            <p><strong>Warning:</strong> This is an internal utility property that is only public for technical reasons.
+            It is not part of the public API. This property can be changed or deleted without prior
             notice.</p>
             ]]>
           </description>
@@ -2521,7 +2526,7 @@
         <field>
           <name>goals</name>
           <version>4.0.0+</version>
-          <description>The goals to execute with the given configuration.</description>
+          <description>Returns the goals to execute with the given configuration.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -2890,29 +2895,29 @@
     <class>
       <name>ActivationProperty</name>
       <version>4.0.0+</version>
-      <description>This is the property specification used to activate a profile. If the value field
-        is empty, then the existence of the named property will activate the profile, otherwise it
-        does a case-sensitive match against the property value as well.</description>
+      <description>Returns the property specification used to activate a profile. If the value field
+        is empty, then the existence of the named property will activate the profile. Otherwise it
+        does a case-sensitive match against the property value.</description>
       <fields>
         <field>
           <name>name</name>
           <version>4.0.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The name of the property to be used to activate a profile.</description>
+          <description>Returns the name of the property to be used to activate a profile.</description>
         </field>
         <field>
           <name>value</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <description>The value of the property required to activate a profile.</description>
+          <description>Returns the value of the property required to activate a profile.</description>
         </field>
       </fields>
     </class>
     <class>
       <name>ActivationOS</name>
       <version>4.0.0+</version>
-      <description>This is an activator which will detect an operating system's attributes in order
+      <description>Returns an activator which will detect an operating system's attributes in order
         to activate its profile.</description>
       <fields>
         <field>
@@ -2920,7 +2925,7 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            The name of the operating system to be used to activate the profile. This must be an exact match
+            Returns the name of the operating system to be used to activate the profile. This must be an exact match
             of the {@code ${os.name}} Java property, such as {@code Windows XP}.
           </description>
         </field>
@@ -2929,7 +2934,7 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            The general family of the OS to be used to activate the profile, such as
+            Returns the general family of the OS to be used to activate the profile, such as
             {@code windows} or {@code unix}.
           </description>
         </field>
@@ -2937,14 +2942,14 @@
           <name>arch</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <description>The architecture of the operating system to be used to activate the
+          <description>Returns the architecture of the operating system to be used to activate the
           profile.</description>
         </field>
         <field>
           <name>version</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <description>The version of the operating system to be used to activate the
+          <description>Returns the version of the operating system to be used to activate the
           profile.</description>
         </field>
       </fields>
@@ -2952,7 +2957,7 @@
     <class>
       <name>ActivationFile</name>
       <version>4.0.0+</version>
-      <description>This is the file specification used to activate the profile. The {@code missing} value
+      <description>Returns the file specification used to activate the profile. The {@code missing} value
         is the location of a file that needs to exist, and if it doesn't, the profile will be
         activated. On the other hand, {@code exists} will test for the existence of the file and if it is
         there, the profile will be activated.
@@ -2963,14 +2968,14 @@
           <name>missing</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <description>The name of the file that must be missing to activate the profile. Please note, that missing and exists
+          <description>Returns the name of the file that must be missing to activate the profile. Please note, that missing and exists
           fields cannot be used together. Only one of them should be used at any one time.</description>
         </field>
         <field>
           <name>exists</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <description>The name of the file that must exist to activate the profile. Please note, that missing and exists
+          <description>Returns the name of the file that must exist to activate the profile. Please note, that missing and exists
           fields cannot be used together. Only one of them should be used at any one time.</description>
         </field>
       </fields>
@@ -2986,14 +2991,14 @@
           <name>configuration</name>
           <version>4.1.0+</version>
           <type>DOM</type>
-          <description>The specification for triggering the profile according to the rules of the
+          <description>Returns the specification for triggering the profile according to the rules of the
             custom activation type.</description>
         </field>
         <field>
           <name>type</name>
           <version>4.1.0+</version>
           <type>String</type>
-          <description>The type (role-hint) of activation which is to be used to activate the
+          <description>Returns the type (role-hint) of activation which is to be used to activate the
             profile.</description>
         </field>
       </fields>
@@ -3016,20 +3021,20 @@
           <type>String</type>
           <required>true</required>
           <defaultValue>org.apache.maven.plugins</defaultValue>
-          <description>The group ID of the reporting plugin in the repository.</description>
+          <description>Returns the group ID of the reporting plugin.</description>
         </field>
         <field>
           <name>artifactId</name>
           <version>4.0.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The artifact ID of the reporting plugin in the repository.</description>
+          <description>Returns the artifact ID of the reporting plugin.</description>
         </field>
         <field>
           <name>version</name>
           <version>4.0.0+</version>
           <description>
-            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitly,
+            Returns the version of the reporting plugin to be used. If no version is defined explicitly,
             version is searched in {@code build/plugins} then in {@code build/pluginManagement}.
           </description>
           <type>String</type>
@@ -3038,7 +3043,7 @@
           <name>reportSets</name>
           <version>4.0.0+</version>
           <description>
-            Multiple specifications of a set of reports, each having (possibly) different
+            Returns multiple specifications of a set of reports, each having (possibly) different
             configuration. This is the reporting parallel to an {@code execution} in the build.
           </description>
           <association>
@@ -3087,8 +3092,8 @@
     }
 
     /**
-     * @param groupId The group ID of the plugin in the repository
-     * @param artifactId The artifact ID of the reporting plugin in the repository
+     * @param groupId the group ID of the plugin in the repository
+     * @param artifactId the artifact ID of the reporting plugin in the repository
      * @return the key of the report plugin, ie {@code groupId:artifactId}
      */
     public static String constructKey(String groupId, String artifactId) {
@@ -3109,7 +3114,7 @@
           <name>id</name>
           <type>String</type>
           <required>true</required>
-          <description>The unique id for this report set, to be used during POM inheritance and profile injection
+          <description>Returns the unique id for this report set, to be used during POM inheritance and profile injection
             for merging of report sets.
           </description>
           <defaultValue>default</defaultValue>
@@ -3118,7 +3123,7 @@
           <name>reports</name>
           <version>4.0.0+</version>
           <required>true</required>
-          <description>The list of reports from this plugin which should be generated from this set.</description>
+          <description>Returns the list of reports from this plugin which should be generated from this set.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -3149,14 +3154,9 @@
           <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>2.0</defaultValue>
-          <description><![CDATA[
+          <description>
             For a plugin project (packaging is {@code maven-plugin}), the minimum version of
-            Maven required to use the resulting plugin.<br>
-            In Maven 2, this was also specifying the minimum version of Maven required to build a
-            project, but this usage is <b>deprecated</b> in Maven 3 and not checked any more: use
-            the <a href="https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html">Maven Enforcer Plugin's
-            {@code requireMavenVersion} rule</a> instead.
-            ]]>
+            Maven required to use the resulting plugin.
           </description>
           <required>false</required>
         </field>
@@ -3171,25 +3171,25 @@
         <field>
           <name>groupId</name>
           <version>4.0.0+</version>
-          <description>The group ID the artifact has moved to.</description>
+          <description>Returns the group ID the artifact has moved to.</description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
           <version>4.0.0+</version>
-          <description>The new artifact ID of the artifact.</description>
+          <description>Returns the new artifact ID of the artifact.</description>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
           <version>4.0.0+</version>
-          <description>The new version of the artifact.</description>
+          <description>Returns the new version of the artifact.</description>
           <type>String</type>
         </field>
         <field>
           <name>message</name>
           <version>4.0.0+</version>
-          <description>An additional message to show the user about the move, such as the reason.</description>
+          <description>Returns an additional message to show the user about the move, such as the reason.</description>
           <type>String</type>
         </field>
       </fields>
@@ -3202,28 +3202,28 @@
         <field>
           <name>groupId</name>
           <version>4.0.0+</version>
-          <description>The group ID of the extension's artifact.</description>
+          <description>Returns the group ID of the extension's artifact.</description>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
           <version>4.0.0+</version>
-          <description>The artifact ID of the extension.</description>
+          <description>Returns the artifact ID of the extension.</description>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
           <version>4.0.0+</version>
-          <description>The version of the extension.</description>
+          <description>Returns the version of the extension.</description>
           <type>String</type>
         </field>
         <field>
           <name>configuration</name>
           <version>4.1.0+</version>
           <description>
-            The configuration of the extension.
+            Returns the configuration of the extension.
             @since Maven 4.0.0
           </description>
           <type>DOM</type>
