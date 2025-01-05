@@ -19,8 +19,6 @@
 package org.apache.maven.cling.executor.impl;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,16 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelperImplTest {
-    private static final Path FAKE_USER_HOME;
-
-    static {
-        try {
-            FAKE_USER_HOME = Files.createTempDirectory("fake");
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     private static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
     private static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
 
@@ -62,7 +50,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         Map<String, String> dump = helper.dump(helper.executorRequest());
@@ -75,7 +63,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         Map<String, String> dump = helper.dump(helper.executorRequest());
@@ -88,7 +76,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         assertEquals(System.getProperty("maven3version"), helper.mavenVersion());
@@ -100,7 +88,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         assertEquals(System.getProperty("maven4version"), helper.mavenVersion());
@@ -112,7 +100,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String localRepository = helper.localRepository(helper.executorRequest());
@@ -126,7 +114,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String localRepository = helper.localRepository(helper.executorRequest());
@@ -140,7 +128,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
@@ -156,7 +144,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
@@ -172,7 +160,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
@@ -185,7 +173,7 @@ public class HelperImplTest {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                FAKE_USER_HOME,
+                userHome,
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
