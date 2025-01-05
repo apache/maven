@@ -54,21 +54,21 @@ public interface Type extends ExtensibleEnum {
     String BOM = "bom";
 
     /**
-     * Artifact type name for a JAR file that can be placed either on the class-path or on the module path.
+     * Artifact type name for a JAR file that can be placed either on the class path or on the module path.
      * The path (classes or modules) is chosen by the plugin, possibly using heuristic rules.
      * This is the behavior of Maven 3.
      */
     String JAR = "jar";
 
     /**
-     * Artifact type name for a fat-JAR file that can be only on the class-path.
+     * Artifact type name for a fat-JAR file that can be only on the class path.
      * The fat-JAR is a self-contained JAR and its transitive dependencies will not be resolved, if any.
      * This type is new in Maven 4.
      */
     String FATJAR = "fatjar";
 
     /**
-     * Artifact type name for a JAR file to unconditionally place on the class-path.
+     * Artifact type name for a JAR file to unconditionally place on the class path.
      * If the JAR is modular, its module information are ignored.
      * This type is new in Maven 4.
      */
@@ -82,7 +82,7 @@ public interface Type extends ExtensibleEnum {
     String MODULAR_JAR = "modular-jar";
 
     /**
-     * Artifact type name for a JAR file that can be placed either on the annotation processor class-path
+     * Artifact type name for a JAR file that can be placed either on the annotation processor class path
      * or module path. The path (classes or modules) is chosen by the plugin, possibly using heuristic rules.
      */
     String PROCESSOR = "processor";
@@ -115,8 +115,8 @@ public interface Type extends ExtensibleEnum {
     String MAVEN_PLUGIN = "maven-plugin";
 
     /**
-     * Artifact type name for a JAR file containing test classes. If the main artifact is placed on the class-path
-     * ({@value #JAR} or {@value #CLASSPATH_JAR} types), then the test artifact will also be placed on the class-path.
+     * Artifact type name for a JAR file containing test classes. If the main artifact is placed on the class path
+     * ({@value #JAR} or {@value #CLASSPATH_JAR} types), then the test artifact will also be placed on the class path.
      * Otherwise, if the main artifact is placed on the module path ({@value #JAR} or {@value #MODULAR_JAR} types),
      * then the test artifact will be added using {@code --patch-module} option.
      */
@@ -173,7 +173,7 @@ public interface Type extends ExtensibleEnum {
      * and no heuristic rule will be involved.
      *
      * <p>It is nevertheless common to specify two or more types of path. For example,
-     * a Java library may be compatible with either the class-path or the module-path,
+     * a Java library may be compatible with either the class path or the module path,
      * and the user may have provided no instruction about which type to use. In such
      * case, the plugin may apply rules for choosing a path. See for example
      * {@link JavaPathType#CLASSES} and {@link JavaPathType#MODULES}.</p>

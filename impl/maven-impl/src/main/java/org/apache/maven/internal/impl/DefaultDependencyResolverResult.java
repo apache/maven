@@ -124,7 +124,7 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
 
     /**
      * Adds main and test output directories to the result. This method adds the main output directory
-     * to the module path if it contains a {@code module-info.class}, or to the class-path otherwise.
+     * to the module path if it contains a {@code module-info.class}, or to the class path otherwise.
      * For the test output directory, the rules are more complex and are governed by the fact that
      * Java does not accept the placement of two modules of the same name on the module path.
      * So the modular test output directory usually needs to be placed in a {@code --path-module} option.
@@ -235,7 +235,7 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
         }
         paths.add(path);
         /*
-         * Dispatch the dependency to class-path, module-path, patch-module path, etc.
+         * Dispatch the dependency to class path, module path, patch-module path, etc.
          * according the dependency properties. We need to process patch-module first,
          * because this type depends on whether a module of the same name has already
          * been added on the module-type.
@@ -255,7 +255,7 @@ class DefaultDependencyResolverResult implements DependencyResolverResult {
                 if (!containsModule(moduleName)) {
                     /*
                      * Not patching an existing module. This case should be unusual. If it nevertheless
-                     * happens, add on class-path or module-path if allowed, or keep patching otherwise.
+                     * happens, add to class path or module path if allowed, or keep patching otherwise.
                      * The latter case (keep patching) is okay if the main module will be defined later.
                      */
                     type = cache.selectPathType(pathTypes, filter, path).orElse(type);
