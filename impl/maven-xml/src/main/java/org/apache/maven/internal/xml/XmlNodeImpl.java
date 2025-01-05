@@ -20,6 +20,7 @@ package org.apache.maven.internal.xml;
 
 import javax.xml.stream.XMLStreamException;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import org.apache.maven.api.xml.XmlNode;
  *  NOTE: remove all the util code in here when separated, this class should be pure data.
  */
 public class XmlNodeImpl implements Serializable, XmlNode {
+    @Serial
     private static final long serialVersionUID = 2567894443061173996L;
 
     protected final String prefix;
