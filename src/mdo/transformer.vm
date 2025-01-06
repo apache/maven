@@ -46,10 +46,11 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Generated;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeUtil;
+
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.apache.maven.internal.xml.XmlNodeImpl;
 
 @Generated
 public class ${className} {
@@ -180,7 +181,7 @@ public class ${className} {
             List<XmlNode> oldChildren = node.getChildren();
             List<XmlNode> newChildren = transform(oldChildren, this::transform);
             if (oldValue != newValue || oldAttrs != newAttrs || oldChildren != newChildren) {
-                return new XmlNodeImpl(node.getPrefix(), node.getNamespaceUri(), node.getName(),
+                return new XmlNode(node.getPrefix(), node.getNamespaceUri(), node.getName(),
                         newValue, newAttrs, newChildren, node.getInputLocation());
             }
         }

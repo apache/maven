@@ -39,7 +39,6 @@ import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.resolver.MavenSessionBuilderSupplier;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
@@ -233,7 +232,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                 List<XmlNode> children = dom.getChildren().stream()
                         .filter(c -> !"wagonProvider".equals(c.getName()))
                         .collect(Collectors.toList());
-                dom = new XmlNodeImpl(dom.getName(), null, null, children, null);
+                dom = new XmlNode(dom.getName(), null, null, children, null);
                 PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration(dom);
                 configProps.put("aether.transport.wagon.config." + server.getId(), config);
 

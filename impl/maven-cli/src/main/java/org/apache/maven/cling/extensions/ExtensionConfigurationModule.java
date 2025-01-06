@@ -27,7 +27,6 @@ import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -48,7 +47,7 @@ public class ExtensionConfigurationModule implements Module {
         if (extension.getKey() != null) {
             XmlNode configuration = extension.getConfiguration();
             if (configuration == null) {
-                configuration = new XmlNodeImpl("configuration");
+                configuration = new XmlNode("configuration");
             }
             Function<String, String> cb = Interpolator.memoize(callback);
             Function<String, String> it = s -> interpolator.interpolate(s, cb);

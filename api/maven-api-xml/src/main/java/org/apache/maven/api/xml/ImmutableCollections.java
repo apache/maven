@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.xml;
+package org.apache.maven.api.xml;
 
 import java.io.Serializable;
 import java.util.AbstractList;

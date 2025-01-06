@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeUtil;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
@@ -50,7 +51,7 @@ public class DefaultReportConfigurationExpander implements ReportConfigurationEx
                 if (parentDom != null) {
                     for (ReportSet execution : reportPlugin.getReportSets()) {
                         XmlNode childDom = execution.getDelegate().getConfiguration();
-                        childDom = XmlNode.merge(childDom, parentDom);
+                        childDom = XmlNodeUtil.merge(childDom, parentDom);
                         execution.update(execution.getDelegate().withConfiguration(childDom));
                     }
                 }

@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import java.util.List;
 
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeUtil;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -64,7 +65,7 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
             if (pluginConfiguration != null) {
                 for (PluginExecution execution : plugin.getExecutions()) {
                     XmlNode executionConfiguration = execution.getDelegate().getConfiguration();
-                    executionConfiguration = XmlNode.merge(executionConfiguration, pluginConfiguration);
+                    executionConfiguration = XmlNodeUtil.merge(executionConfiguration, pluginConfiguration);
                     execution.update(execution.getDelegate().withConfiguration(executionConfiguration));
                 }
             }

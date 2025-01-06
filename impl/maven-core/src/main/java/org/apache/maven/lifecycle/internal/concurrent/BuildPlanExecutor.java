@@ -58,7 +58,7 @@ import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.impl.util.PhasingExecutor;
 import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
-import org.apache.maven.internal.xml.XmlNodeImpl;
+import org.apache.maven.internal.xml.XmlNodeUtil;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -830,7 +830,7 @@ public class BuildPlanExecutor {
                 ? mojoExecution.getConfiguration().getDom()
                 : null;
         if (executionConfiguration == null) {
-            executionConfiguration = new XmlNodeImpl("configuration");
+            executionConfiguration = new XmlNode("configuration");
         }
 
         XmlNode defaultConfiguration = getMojoConfiguration(mojoDescriptor);
@@ -847,7 +847,7 @@ public class BuildPlanExecutor {
                 XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
 
                 if (parameterConfiguration != null) {
-                    parameterConfiguration = parameterConfiguration.merge(parameterDefaults, Boolean.TRUE);
+                    parameterConfiguration = XmlNodeUtil.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 } else {
                     parameterConfiguration = parameterDefaults;
                 }
@@ -862,7 +862,7 @@ public class BuildPlanExecutor {
                         attributes.put("implementation", parameter.getImplementation());
                     }
 
-                    parameterConfiguration = new XmlNodeImpl(
+                    parameterConfiguration = new XmlNode(
                             parameter.getName(),
                             parameterConfiguration.getValue(),
                             attributes,
@@ -873,7 +873,7 @@ public class BuildPlanExecutor {
                 }
             }
         }
-        XmlNode finalConfiguration = new XmlNodeImpl("configuration", null, null, children, null);
+        XmlNode finalConfiguration = new XmlNode("configuration", null, null, children, null);
 
         mojoExecution.setConfiguration(finalConfiguration);
     }

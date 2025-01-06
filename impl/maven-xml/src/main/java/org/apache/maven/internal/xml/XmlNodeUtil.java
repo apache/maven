@@ -18,160 +18,28 @@
  */
 package org.apache.maven.internal.xml;
 
-import javax.xml.stream.XMLStreamException;
-
-import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.xml.XmlNode;
 
-/**
- *  NOTE: remove all the util code in here when separated, this class should be pure data.
- */
-public class XmlNodeImpl implements Serializable, XmlNode {
-    private static final long serialVersionUID = 2567894443061173996L;
+import static org.apache.maven.api.xml.XmlNode.CHILDREN_COMBINATION_APPEND;
+import static org.apache.maven.api.xml.XmlNode.CHILDREN_COMBINATION_MODE_ATTRIBUTE;
+import static org.apache.maven.api.xml.XmlNode.ID_COMBINATION_MODE_ATTRIBUTE;
+import static org.apache.maven.api.xml.XmlNode.KEYS_COMBINATION_MODE_ATTRIBUTE;
+import static org.apache.maven.api.xml.XmlNode.SELF_COMBINATION_MODE_ATTRIBUTE;
+import static org.apache.maven.api.xml.XmlNode.SELF_COMBINATION_OVERRIDE;
+import static org.apache.maven.api.xml.XmlNode.SELF_COMBINATION_REMOVE;
 
-    protected final String prefix;
-
-    protected final String namespaceUri;
-
-    protected final String name;
-
-    protected final String value;
-
-    protected final Map<String, String> attributes;
-
-    protected final List<XmlNode> children;
-
-    protected final Object location;
-
-    public XmlNodeImpl(String name) {
-        this(name, null, null, null, null);
-    }
-
-    public XmlNodeImpl(String name, String value) {
-        this(name, value, null, null, null);
-    }
-
-    public XmlNodeImpl(XmlNode from, String name) {
-        this(name, from.getValue(), from.getAttributes(), from.getChildren(), from.getInputLocation());
-    }
-
-    public XmlNodeImpl(
-            String name, String value, Map<String, String> attributes, List<XmlNode> children, Object location) {
-        this("", "", name, value, attributes, children, location);
-    }
-
-    public XmlNodeImpl(
-            String prefix,
-            String namespaceUri,
-            String name,
-            String value,
-            Map<String, String> attributes,
-            List<XmlNode> children,
-            Object location) {
-        this.prefix = prefix == null ? "" : prefix;
-        this.namespaceUri = namespaceUri == null ? "" : namespaceUri;
-        this.name = Objects.requireNonNull(name);
-        this.value = value;
-        this.attributes = ImmutableCollections.copy(attributes);
-        this.children = ImmutableCollections.copy(children);
-        this.location = location;
-    }
-
-    @Override
-    public XmlNode merge(XmlNode source, Boolean childMergeOverride) {
-        return merge(this, source, childMergeOverride);
-    }
-
-    // ----------------------------------------------------------------------
-    // Name handling
-    // ----------------------------------------------------------------------
-
-    @Override
-    public String getPrefix() {
-        return prefix;
-    }
-
-    @Override
-    public String getNamespaceUri() {
-        return namespaceUri;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    // ----------------------------------------------------------------------
-    // Value handling
-    // ----------------------------------------------------------------------
-
-    public String getValue() {
-        return value;
-    }
-
-    // ----------------------------------------------------------------------
-    // Attribute handling
-    // ----------------------------------------------------------------------
-
-    @Override
-    public Map<String, String> getAttributes() {
-        return attributes;
-    }
-
-    public String getAttribute(String name) {
-        return attributes.get(name);
-    }
-
-    // ----------------------------------------------------------------------
-    // Child handling
-    // ----------------------------------------------------------------------
-
-    public XmlNode getChild(String name) {
-        if (name != null) {
-            ListIterator<XmlNode> it = children.listIterator(children.size());
-            while (it.hasPrevious()) {
-                XmlNode child = it.previous();
-                if (name.equals(child.getName())) {
-                    return child;
-                }
-            }
-        }
-        return null;
-    }
-
-    public List<XmlNode> getChildren() {
-        return children;
-    }
-
-    public int getChildCount() {
-        return children.size();
-    }
-
-    // ----------------------------------------------------------------------
-    // Input location handling
-    // ----------------------------------------------------------------------
-
-    /**
-     * @since 3.2.0
-     * @return input location
-     */
-    public Object getInputLocation() {
-        return location;
-    }
+public class XmlNodeUtil {
 
     // ----------------------------------------------------------------------
     // Helpers
@@ -361,7 +229,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                         || !Objects.equals(attrs, dominant.getAttributes())
                         || !Objects.equals(children, dominant.getChildren())
                         || !Objects.equals(location, dominant.getInputLocation())) {
-                    return new XmlNodeImpl(
+                    return new XmlNode(
                             dominant.getName(), value != null ? value : dominant.getValue(), attrs, children, location);
                 } else {
                     return dominant;
@@ -375,80 +243,14 @@ public class XmlNodeImpl implements Serializable, XmlNode {
      * Merge two DOMs, with one having dominance in the case of collision. Merge mechanisms (vs. override for nodes, or
      * vs. append for children) is determined by attributes of the dominant root node.
      *
-     * @see #CHILDREN_COMBINATION_MODE_ATTRIBUTE
-     * @see #SELF_COMBINATION_MODE_ATTRIBUTE
+     * @see XmlNode#CHILDREN_COMBINATION_MODE_ATTRIBUTE
+     * @see XmlNode#SELF_COMBINATION_MODE_ATTRIBUTE
      * @param dominant The dominant DOM into which the recessive value/attributes/children will be merged
      * @param recessive The recessive DOM, which will be merged into the dominant DOM
      * @return merged DOM
      */
     public static XmlNode merge(XmlNode dominant, XmlNode recessive) {
         return merge(dominant, recessive, null);
-    }
-
-    // ----------------------------------------------------------------------
-    // Standard object handling
-    // ----------------------------------------------------------------------
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        XmlNodeImpl that = (XmlNodeImpl) o;
-        return Objects.equals(this.name, that.name)
-                && Objects.equals(this.value, that.value)
-                && Objects.equals(this.attributes, that.attributes)
-                && Objects.equals(this.children, that.children);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, value, attributes, children);
-    }
-
-    @Override
-    public String toString() {
-        try {
-            return toStringXml();
-        } catch (XMLStreamException e) {
-            return toStringObject();
-        }
-    }
-
-    public String toStringXml() throws XMLStreamException {
-        StringWriter writer = new StringWriter();
-        XmlNodeWriter.write(writer, this);
-        return writer.toString();
-    }
-
-    public String toStringObject() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("XmlNode[");
-        boolean w = false;
-        w = addToStringField(sb, prefix, o -> !o.isEmpty(), "prefix", w);
-        w = addToStringField(sb, namespaceUri, o -> !o.isEmpty(), "namespaceUri", w);
-        w = addToStringField(sb, name, o -> !o.isEmpty(), "name", w);
-        w = addToStringField(sb, value, o -> !o.isEmpty(), "value", w);
-        w = addToStringField(sb, attributes, o -> !o.isEmpty(), "attributes", w);
-        w = addToStringField(sb, children, o -> !o.isEmpty(), "children", w);
-        w = addToStringField(sb, location, Objects::nonNull, "location", w);
-        sb.append("]");
-        return sb.toString();
-    }
-
-    private static <T> boolean addToStringField(StringBuilder sb, T o, Function<T, Boolean> p, String n, boolean w) {
-        if (!p.apply(o)) {
-            if (w) {
-                sb.append(", ");
-            } else {
-                w = true;
-            }
-            sb.append(n).append("='").append(o).append('\'');
-        }
-        return w;
     }
 
     private static boolean isEmpty(String str) {

@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class XmlNodeImplTest {
+class XmlNodeTest {
 
     @Test
     void testCombineChildrenAppend() throws Exception {
@@ -144,7 +144,7 @@ class XmlNodeImplTest {
         XmlNode leftDom = toXmlNode(lhs);
         XmlNode rightDom = toXmlNode(rhs);
 
-        XmlNode mergeResult = leftDom.merge(rightDom);
+        XmlNode mergeResult = XmlNodeUtil.merge(leftDom, rightDom);
 
         assertEquals(toXmlNode(result), mergeResult);
     }
@@ -178,11 +178,11 @@ class XmlNodeImplTest {
         XmlNode dom = toXmlNode(lhs);
         XmlNode res = toXmlNode(result);
 
-        XmlNode mergeResult1 = dom.merge(dom, false);
+        XmlNode mergeResult1 = XmlNodeUtil.merge(dom, dom, false);
         assertEquals(res, mergeResult1);
-        XmlNode mergeResult2 = dom.merge(dom, (Boolean) null);
+        XmlNode mergeResult2 = XmlNodeUtil.merge(dom, dom, (Boolean) null);
         assertEquals(res, mergeResult2);
-        XmlNode mergeResult3 = dom.merge(dom, true);
+        XmlNode mergeResult3 = XmlNodeUtil.merge(dom, dom, true);
         assertEquals(dom, mergeResult3);
     }
 
@@ -201,10 +201,10 @@ class XmlNodeImplTest {
                 + "<property combine.id='TOOVERWRITE'><name>TOOVERWRITE</name><value>RHS</value></property>"
                 + "</props>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
+        XmlNode mergeResult = XmlNodeUtil.merge(leftDom, rightDom, true);
         assertEquals(3, getChildren(mergeResult, "property").size());
 
         XmlNode p0 = getNthChild(mergeResult, "property", 0);
@@ -247,10 +247,10 @@ class XmlNodeImplTest {
                 + "<property key=\"RHS-ONLY\"><name>RHS-ONLY</name><value>RHS</value></property>"
                 + "<property combine.keys='name'><name>TOOVERWRITE</name><value>RHS</value></property>" + "</props>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
+        XmlNode mergeResult = XmlNodeUtil.merge(leftDom, rightDom, true);
         assertEquals(3, getChildren(mergeResult, "property").size());
 
         XmlNode p0 = getNthChild(mergeResult, "property", 0);
@@ -284,10 +284,10 @@ class XmlNodeImplTest {
 
         String rhs = "<parameter>recessive</parameter>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
+        XmlNode mergeResult = XmlNodeUtil.merge(leftDom, rightDom, true);
         assertEquals(" ", mergeResult.getValue());
     }
 
@@ -297,10 +297,10 @@ class XmlNodeImplTest {
 
         String rhs = "<parameter>recessive</parameter>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
+        XmlNode mergeResult = XmlNodeUtil.merge(leftDom, rightDom, true);
         assertEquals("", mergeResult.getValue());
     }
 
@@ -310,10 +310,10 @@ class XmlNodeImplTest {
 
         String rhs = "<parameter>recessive</parameter>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
+        XmlNode mergeResult = XmlNodeUtil.merge(leftDom, rightDom, true);
         assertNull(mergeResult.getValue());
     }
 
@@ -336,10 +336,10 @@ class XmlNodeImplTest {
                     <topsub1>t2s2Value</topsub1>
                 </top>
                 """;
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode result = XmlNode.merge(leftDom, rightDom);
+        XmlNode result = XmlNodeUtil.merge(leftDom, rightDom);
         assertEquals(4, getChildren(result, "topsub1").size());
         assertEquals("t2s1Value", getChildren(result, "topsub1").get(0).getValue());
         assertEquals("t2s2Value", getChildren(result, "topsub1").get(1).getValue());
@@ -469,11 +469,11 @@ class XmlNodeImplTest {
      */
     @Test
     void testEquals() {
-        XmlNodeImpl dom = new XmlNodeImpl("top");
+        XmlNode dom = new XmlNode("top");
 
         assertEquals(dom, dom);
         assertNotEquals(dom, null);
-        assertNotEquals(dom, new XmlNodeImpl(""));
+        assertNotEquals(dom, new XmlNode(""));
     }
 
     /**
@@ -489,7 +489,7 @@ class XmlNodeImplTest {
         attributes.put(null, "nullKey");
         List<XmlNode> childList = new ArrayList<>();
         childList.add(null);
-        Xpp3Dom dom2 = new Xpp3Dom(new XmlNodeImpl(dom.getName(), null, attributes, childList, null));
+        Xpp3Dom dom2 = new Xpp3Dom(new XmlNode(dom.getName(), null, attributes, childList, null));
 
         assertNotEquals(dom, dom2);
         assertNotEquals(dom2, dom);
@@ -506,7 +506,7 @@ class XmlNodeImplTest {
         String childConfigStr = "<configuration><items><item>three</item></items></configuration>";
         XmlNode childConfig = toXmlNode(childConfigStr, new FixedInputLocationBuilder("child"));
 
-        XmlNode result = XmlNode.merge(childConfig, parentConfig);
+        XmlNode result = XmlNodeUtil.merge(childConfig, parentConfig);
         XmlNode items = result.getChild("items");
 
         assertEquals(1, items.getChildren().size());
@@ -528,7 +528,7 @@ class XmlNodeImplTest {
                 "<configuration><items combine.children=\"append\"><item>three</item></items></configuration>";
         XmlNode childConfig = toXmlNode(childConfigStr, new FixedInputLocationBuilder("child"));
 
-        XmlNode result = XmlNode.merge(childConfig, parentConfig);
+        XmlNode result = XmlNodeUtil.merge(childConfig, parentConfig);
         XmlNode items = result.getChild("items");
 
         XmlNode[] item = items.getChildren().toArray(new XmlNode[0]);
@@ -656,7 +656,7 @@ class XmlNodeImplTest {
 
         XmlNode d = toXmlNode(dominant);
         XmlNode r = toXmlNode(recessive);
-        XmlNode m = d.merge(r);
+        XmlNode m = XmlNodeUtil.merge(d, r);
         assertEquals(expected, m.toString().replaceAll("\r\n", "\n"));
     }
 
