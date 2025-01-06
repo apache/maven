@@ -134,7 +134,7 @@
           <name>artifactId</name>
           <version>3.0.0+</version>
           <required>true</required>
-          <description>Returns a string that defines a collection of versions within the group given by the
+          <description>Returns a string that identifies a collection of versions within the group given by the
             group ID. An artifact is something that is either produced or used by a project.
             Examples of artifacts produced by Maven for a project include: JARs, source and binary
             distributions, and WARs. Only one version of an artifact with the same groupId and
