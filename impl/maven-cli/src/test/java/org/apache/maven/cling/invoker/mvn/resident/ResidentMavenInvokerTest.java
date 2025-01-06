@@ -55,15 +55,18 @@ public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
     }
 
     @Test
-    void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        invoke(tempDir, Arrays.asList("clean", "verify"));
+    void defaultFs(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        invoke(cwd, userHome, Arrays.asList("clean", "verify"));
     }
 
     @Disabled("Until we move off fully from File")
     @Test
     void jimFs() throws Exception {
         try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
-            invoke(fs.getPath("/"), Arrays.asList("clean", "verify"));
+            invoke(fs.getPath("/cwd"), fs.getPath("/home"), Arrays.asList("clean", "verify"));
         }
     }
 }

@@ -140,6 +140,7 @@ public class Verifier {
             this.executorHelper = new HelperImpl(
                     VERIFIER_FORK_MODE,
                     Paths.get(System.getProperty("maven.home")),
+                    this.userHomeDirectory,
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
             this.defaultCliArguments =
