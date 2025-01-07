@@ -23,6 +23,9 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  MAVEN_ARGS: '-Daether.lrm.enhanced.split=true -Daether.lrm.enhanced.splitRemoteRepository=true'
+
 # clear all permissions for GITHUB_TOKEN
 permissions: {}
 
@@ -44,19 +47,19 @@ jobs:
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
-          path: ~/.m2/repository/cached
-          key: maven-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}
+          path: ~/.m2/repository/cached/central
+          key: maven-cached-central-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
           restore-keys: |
-            maven-${{ runner.os }}-initial-
-            maven-${{ runner.os }}-
+            maven-cached-central-${{ hashFiles('**/pom.xml') }}-
+            maven-cached-central-
 
       - name: Set up Maven
         shell: bash
-        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-1"
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-2"
 
       - name: Build Maven distributions
         shell: bash
-        run: ./mvnw verify -e -B -V -Dmaven.repo.local=$HOME/.m2/repository/cached
+        run: ./mvnw verify -e -B -V
 
       - name: List contents of target directory
         shell: bash
@@ -132,19 +135,19 @@ jobs:
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
-          path: ~/.m2/repository/cached
-          key: maven-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}
+          path: ~/.m2/repository/cached/central
+          key: maven-cached-central-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
           restore-keys: |
-            maven-${{ runner.os }}-full-
-            maven-${{ runner.os }}-
+            maven-cached-central-${{ hashFiles('**/pom.xml') }}-
+            maven-cached-central-
 
       - name: Build with downloaded Maven
         shell: bash
-        run: mvn verify -e -B -V -Dmaven.repo.local=$HOME/.m2/repository/cached
+        run: mvn verify -e -B -V
 
       - name: Build site with downloaded Maven
         shell: bash
-        run: mvn site -e -B -V -Preporting -Dmaven.repo.local=$HOME/.m2/repository/cached
+        run: mvn site -e -B -V -Preporting
 
   integration-tests:
     needs: initial-build
@@ -196,22 +199,22 @@ jobs:
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
-          path: ~/.m2/repository/cached
-          key: maven-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}
+          path: ~/.m2/repository/cached/central
+          key: maven-cached-central-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
           restore-keys: |
-            maven-${{ runner.os }}-its
-            maven-${{ runner.os }}-
+            maven-cached-central-${{ hashFiles('**/pom.xml') }}-
+            maven-cached-central-
 
       # we use two steps so that we can cache artifacts downloaded from Maven Central repository
       # without installing any local artifacts to not pollute the cache
       - name: Build maven and ITs
         shell: bash
-        run: mvn package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.m2/repository/cached
+        run: mvn package -DskipTests -e -B -V -Prun-its
 
       # Now run tests and ITs using a separate local repo (using the previous filled repo as tail)
       - name: Run integration tests
         shell: bash
-        run: mvn install -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.m2/repository/local -Dmaven.repo.local.tail=$HOME/.m2/repository/cached
+        run: mvn install -e -B -V -Prun-its
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4

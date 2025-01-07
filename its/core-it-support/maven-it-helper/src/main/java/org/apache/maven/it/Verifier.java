@@ -164,7 +164,7 @@ public class Verifier {
     }
 
     public void execute() throws VerificationException {
-        List<String> args = new ArrayList<>(defaultCliArguments);
+        final List<String> args = new ArrayList<>(defaultCliArguments);
         for (String cliArgument : cliArguments) {
             args.add(cliArgument.replace("${basedir}", getBasedir()));
         }
@@ -184,9 +184,11 @@ public class Verifier {
                     .orElse("");
             if (!itTail.isEmpty()) {
                 // remove it
-                args = args.stream()
+                ArrayList<String> copy = new ArrayList<>(args);
+                args.clear();
+                args.addAll(copy.stream()
                         .filter(s -> !s.startsWith("-Dmaven.repo.local.tail="))
-                        .collect(Collectors.toList());
+                        .toList());
             }
 
             // push things to tail
@@ -207,6 +209,20 @@ public class Verifier {
             args.add(0, "-l");
         }
 
+        ExecutorHelper.Mode mode = executorHelper.getDefaultMode();
+        if (forkJvm) {
+            mode = ExecutorHelper.Mode.FORKED;
+        }
+        if (mode != ExecutorHelper.Mode.FORKED) {
+            // embedded mode will not pick up MAVEN_ARGS, if exists
+            String userHome = System.getenv("MAVEN_ARGS");
+            if (userHome != null && !userHome.isEmpty()) {
+                Arrays.stream(userHome.split(" "))
+                        .filter(s -> !s.trim().isEmpty())
+                        .forEach(s -> args.add(0, s));
+            }
+        }
+
         try {
             ExecutorRequest.Builder builder = executorHelper
                     .executorRequest()
@@ -221,10 +237,6 @@ public class Verifier {
                 builder.environmentVariables(environmentVariables);
             }
 
-            ExecutorHelper.Mode mode = executorHelper.getDefaultMode();
-            if (forkJvm) {
-                mode = ExecutorHelper.Mode.FORKED;
-            }
             ByteArrayOutputStream stdout = new ByteArrayOutputStream();
             ByteArrayOutputStream stderr = new ByteArrayOutputStream();
             ExecutorRequest request =
