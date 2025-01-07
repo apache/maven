@@ -132,10 +132,11 @@ public class HelperImplTest {
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
-        assertEquals(
-                "aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
-                        + "aopalliance-1.0.jar",
-                path);
+        // split repository: assert "ends with" as split may introduce prefixes
+        assertTrue(
+                path.endsWith("aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
+                        + "aopalliance-1.0.jar"),
+                "path=" + path);
     }
 
     @ParameterizedTest
@@ -148,10 +149,11 @@ public class HelperImplTest {
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
-        assertEquals(
-                "aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
-                        + "aopalliance-1.0.jar",
-                path);
+        // split repository: assert "ends with" as split may introduce prefixes
+        assertTrue(
+                path.endsWith("aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
+                        + "aopalliance-1.0.jar"),
+                "path=" + path);
     }
 
     @ParameterizedTest
@@ -164,7 +166,8 @@ public class HelperImplTest {
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
-        assertEquals("aopalliance" + File.separator + "maven-metadata-someremote.xml", path);
+        // split repository: assert "ends with" as split may introduce prefixes
+        assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
     }
 
     @ParameterizedTest
@@ -177,6 +180,7 @@ public class HelperImplTest {
                 EMBEDDED_MAVEN_EXECUTOR,
                 FORKED_MAVEN_EXECUTOR);
         String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
-        assertEquals("aopalliance" + File.separator + "maven-metadata-someremote.xml", path);
+        // split repository: assert "ends with" as split may introduce prefixes
+        assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
     }
 }
