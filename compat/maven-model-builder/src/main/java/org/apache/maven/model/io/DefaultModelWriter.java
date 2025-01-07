@@ -36,7 +36,7 @@ import org.codehaus.plexus.util.WriterFactory;
 /**
  * Handles serialization of a model into some kind of textual format like XML.
  *
- * @deprecated use {@link XmlStreamWriter} instead
+ * @deprecated use {@link org.apache.maven.model.v4.MavenStaxWriter} instead
  */
 @Named
 @Singleton

@@ -40,7 +40,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
- * @deprecated use {@link XmlStreamWriter} instead
+ * @deprecated use {@link org.apache.maven.model.v4.MavenStaxReader} instead
  */
 @Named
 @Singleton
