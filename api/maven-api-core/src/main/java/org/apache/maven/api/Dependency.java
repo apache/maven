@@ -38,7 +38,7 @@ public interface Dependency extends Artifact {
     /**
      * {@return the type of the dependency}
      * A dependency can be a <abbr>JAR</abbr> file,
-     * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module-path,
+     * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module path,
      * a <abbr>JAR</abbr> containing test classes, <i>etc.</i>
      *
      * @see DependencyCoordinates#getType()

@@ -181,7 +181,7 @@ class PathModularizationCache {
         String lineSeparator = System.lineSeparator();
         var joiner = new StringJoiner(
                 lineSeparator + "  - ",
-                "Filename-based automodules detected on the module-path: " + lineSeparator + "  - ",
+                "Filename-based automodules detected on the module path: " + lineSeparator + "  - ",
                 lineSeparator + "Please don't publish this project to a public artifact repository.");
         automodulesDetected.forEach(joiner::add);
         return Optional.of(joiner.toString());
