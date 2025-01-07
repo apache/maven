@@ -45,7 +45,7 @@ public class MavenITmng4087PercentEncodedFileUrlTest extends AbstractMavenIntegr
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4087");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4087", null);
         verifier.filterFile("pom-template.xml", "pom.xml");
         verifier.addCliArgument("validate");
         verifier.execute();

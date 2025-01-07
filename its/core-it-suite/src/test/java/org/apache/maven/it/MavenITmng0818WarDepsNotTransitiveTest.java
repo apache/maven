@@ -49,7 +49,7 @@ public class MavenITmng0818WarDepsNotTransitiveTest extends AbstractMavenIntegra
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it0080");
+        verifier.deleteArtifacts("org.apache.maven.its.it0080", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

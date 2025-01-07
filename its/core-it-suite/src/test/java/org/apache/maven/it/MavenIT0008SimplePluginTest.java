@@ -42,7 +42,7 @@ public class MavenIT0008SimplePluginTest extends AbstractMavenIntegrationTestCas
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifact("org.apache.maven.its.plugins", "maven-it-plugin-touch", "1.0", "maven-plugin");
+        verifier.deleteArtifact("org.apache.maven.its.plugins", "maven-it-plugin-touch", "1.0", "maven-plugin", null);
         verifier.addCliArgument("process-sources");
         verifier.execute();
         verifier.verifyFilePresent("target/touch.txt");

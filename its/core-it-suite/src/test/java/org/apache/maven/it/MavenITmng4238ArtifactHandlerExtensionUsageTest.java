@@ -50,7 +50,7 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest extends AbstractMav
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        verifier.deleteArtifacts(GID);
+        verifier.deleteArtifacts(GID, null);
 
         verifier.addCliArgument("install");
         verifier.execute();
@@ -60,13 +60,13 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest extends AbstractMav
         // Now, if everything worked, we have a .pom and a .jar in the local repo.
         // IF IT DIDN'T, we have a .pom and a .coreit in the local repo...
 
-        String path = verifier.getArtifactPath(GID, AID, VERSION, TYPE);
+        String path = verifier.getArtifactPath(GID, AID, VERSION, TYPE, null);
         assertTrue(new File(path).exists(), path + " should have been installed.");
 
-        path = verifier.getArtifactPath(GID, AID, VERSION, "pom");
+        path = verifier.getArtifactPath(GID, AID, VERSION, "pom", null);
         assertTrue(new File(path).exists(), path + " should have been installed.");
 
-        path = verifier.getArtifactPath(GID, AID, VERSION, BAD_TYPE);
+        path = verifier.getArtifactPath(GID, AID, VERSION, BAD_TYPE, null);
         assertFalse(new File(path).exists(), path + " should NOT have been installed.");
     }
 }

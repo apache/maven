@@ -39,14 +39,14 @@ public class MavenIT0018DependencyManagementTest extends AbstractMavenIntegratio
         File testDir = extractResources("/it0018");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.it0018");
+        verifier.deleteArtifacts("org.apache.maven.its.it0018", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument(
                 "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile");
         verifier.execute();
-        verifier.verifyArtifactPresent("org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar", "maven-core-it");
         verifier.verifyErrorFreeLog();
     }
 }

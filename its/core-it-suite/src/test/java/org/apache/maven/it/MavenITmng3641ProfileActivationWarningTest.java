@@ -46,7 +46,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         verifier.setAutoclean(false);
 
         // Delete this artifact. Just in case.
-        verifier.deleteArtifact("org.apache.maven.its.mng3641", "parent", "1.0", "pom");
+        verifier.deleteArtifact("org.apache.maven.its.mng3641", "profile-test", "1", "pom", null);
 
         // (1) make sure the profile is found. Must not contain a warning.
         verifier.addCliArgument("-P");

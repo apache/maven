@@ -46,7 +46,8 @@ public class MavenITmng3974MirrorOrderingTest extends AbstractMavenIntegrationTe
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3974");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3974", "mirror-a1");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3974", "mirror-b1");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -54,7 +55,7 @@ public class MavenITmng3974MirrorOrderingTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3974", "a", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3974", "b", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3974", "a", "0.1", "jar", "mirror-a1");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3974", "b", "0.1", "jar", "mirror-b1");
     }
 }

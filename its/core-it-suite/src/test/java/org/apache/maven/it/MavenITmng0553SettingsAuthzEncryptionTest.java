@@ -119,8 +119,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng0553");
-        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
+        verifier.deleteArtifacts("org.apache.maven.its.mng0553", "test");
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar", "test");
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setUserHomeDirectory(new File(testDir, "userhome").toPath());
         verifier.addCliArgument("--settings");
@@ -129,7 +129,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar", "test");
     }
 
     /**
@@ -151,8 +151,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng0553");
-        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
+        verifier.deleteArtifacts("org.apache.maven.its.mng0553", "test");
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar", "test");
 
         // NOTE: The tilde ~ in the file name is essential part of the test
         verifier.filterFile("security-template.xml", "settings~security.xml", filterProps);
@@ -169,7 +169,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar", "test");
     }
 
     /**

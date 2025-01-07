@@ -53,7 +53,7 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest extends AbstractM
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4293");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4293", "maven-core-it");
         verifier.filterFile("pom-template.xml", "pom.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");

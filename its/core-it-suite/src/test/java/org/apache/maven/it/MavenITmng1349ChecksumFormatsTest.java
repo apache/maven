@@ -45,7 +45,7 @@ public class MavenITmng1349ChecksumFormatsTest extends AbstractMavenIntegrationT
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng1349");
+        verifier.deleteArtifacts("org.apache.maven.its.mng1349", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -53,22 +53,22 @@ public class MavenITmng1349ChecksumFormatsTest extends AbstractMavenIntegrationT
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-a", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-a", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-a", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-a", "0.1", "pom", "maven-core-it");
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-b", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-b", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-b", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-b", "0.1", "pom", "maven-core-it");
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-c", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-c", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-c", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "md5-c", "0.1", "pom", "maven-core-it");
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-a", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-a", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-a", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-a", "0.1", "pom", "maven-core-it");
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-b", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-b", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-b", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-b", "0.1", "pom", "maven-core-it");
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-c", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-c", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-c", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng1349", "sha1-c", "0.1", "pom", "maven-core-it");
     }
 }

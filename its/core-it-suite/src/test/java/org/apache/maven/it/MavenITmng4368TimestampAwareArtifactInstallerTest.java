@@ -60,13 +60,13 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         Verifier verifier = newVerifier(aDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4368");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4368", null);
         verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File installedPom =
-                new File(verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom"));
+                new File(verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom", null));
 
         String pom = Files.readString(installedPom.toPath());
         assertTrue(pom.indexOf("Branch-A") > 0);
@@ -113,13 +113,13 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         Verifier verifier = newVerifier(aDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4368");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4368", null);
         verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File installedArtifact =
-                new File(verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "jar"));
+                new File(verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "jar", null));
 
         String data = Files.readString(installedArtifact.toPath());
         assertTrue(data.indexOf("Branch-A") > 0);

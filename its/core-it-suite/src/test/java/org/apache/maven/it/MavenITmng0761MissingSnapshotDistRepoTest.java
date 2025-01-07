@@ -47,7 +47,7 @@ public class MavenITmng0761MissingSnapshotDistRepoTest extends AbstractMavenInte
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng0761");
+        verifier.deleteArtifacts("org.apache.maven.its.mng0761", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

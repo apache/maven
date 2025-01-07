@@ -49,7 +49,7 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest extends A
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4056");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4056", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

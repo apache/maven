@@ -120,14 +120,15 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4068");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4068", "maven-core-it-mng-4068");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4068", "a", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4068", "b", "0.1-SNAPSHOT", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4068", "a", "0.1", "jar", "maven-core-it-mng-4068");
+        verifier.verifyArtifactPresent(
+                "org.apache.maven.its.mng4068", "b", "0.1-SNAPSHOT", "jar", "maven-core-it-mng-4068");
     }
 }

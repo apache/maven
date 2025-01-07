@@ -45,7 +45,7 @@ public class MavenITmng4335SettingsOfflineModeTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4335");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4335", "maven-core-it-repo");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

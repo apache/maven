@@ -53,7 +53,7 @@ public class MavenIT0142DirectDependencyScopesTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it0142");
+        verifier.deleteArtifacts("org.apache.maven.its.it0142", "maven-core-it");
         verifier.filterFile("pom-template.xml", "pom.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");

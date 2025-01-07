@@ -83,7 +83,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
 
-        verifier.deleteArtifacts("org.apache.maven.its.it0146");
+        verifier.deleteArtifacts("org.apache.maven.its.it0146", "maven-core-it");
 
         verifier.addCliArgument("-X");
 
@@ -99,7 +99,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
     @Test
     public void testitNonTimestampedNameWithInstalledSNAPSHOT() throws Exception {
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.deleteArtifacts("org.apache.maven.its.it0146");
+        verifier.deleteArtifacts("org.apache.maven.its.it0146", "maven-core-it");
         verifier.addCliArgument("-f");
         verifier.addCliArgument("project/pom.xml");
         verifier.deleteDirectory("project/target");

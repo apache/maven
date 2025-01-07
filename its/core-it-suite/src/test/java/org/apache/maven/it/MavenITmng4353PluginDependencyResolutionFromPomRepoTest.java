@@ -49,7 +49,8 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest extends Abs
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4353");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4353", "maven-core-it");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4353", "maven-core-it-dependency");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.filterFile(

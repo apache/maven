@@ -49,13 +49,13 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
         verifier.setForkJvm(true); // Don't lock up plugin files in class loader within current JVM
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3983");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3983", "maven-core-it");
         verifier.filterFile("pom.xml", "pom.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3983", "p", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3983", "p", "0.1", "jar", "maven-core-it");
     }
 
     /**
@@ -71,7 +71,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
         verifier.setForkJvm(true); // Don't lock up plugin files in class loader within current JVM
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3983");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3983", "maven-core-it");
         verifier.filterFile("settings.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -79,6 +79,6 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3983", "p", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3983", "p", "0.1", "jar", "maven-core-it");
     }
 }

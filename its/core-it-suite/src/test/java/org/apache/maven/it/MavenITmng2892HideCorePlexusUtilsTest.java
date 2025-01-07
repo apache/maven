@@ -49,8 +49,8 @@ public class MavenITmng2892HideCorePlexusUtilsTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "jar");
-        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "pom");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "jar", "maven-core-it");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "pom", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

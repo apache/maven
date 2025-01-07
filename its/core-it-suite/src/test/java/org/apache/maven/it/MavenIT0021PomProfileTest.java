@@ -39,7 +39,7 @@ public class MavenIT0021PomProfileTest extends AbstractMavenIntegrationTestCase 
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.it0021");
+        verifier.deleteArtifacts("org.apache.maven.its.it0021", "maven-core-it");
         verifier.getSystemProperties().setProperty("includeProfile", "true");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
@@ -49,7 +49,7 @@ public class MavenIT0021PomProfileTest extends AbstractMavenIntegrationTestCase 
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.it0021", "a", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.it0021", "b", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.it0021", "a", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.it0021", "b", "0.1", "jar", "maven-core-it");
     }
 }

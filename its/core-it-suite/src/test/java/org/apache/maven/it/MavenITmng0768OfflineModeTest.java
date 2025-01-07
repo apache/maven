@@ -107,7 +107,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
                 Verifier verifier = newVerifier(testDir.getAbsolutePath());
                 verifier.setAutoclean(false);
                 verifier.deleteDirectory("target");
-                verifier.deleteArtifacts("org.apache.maven.its.mng0768");
+                verifier.deleteArtifacts("org.apache.maven.its.mng0768", "maven-core-it");
                 verifier.setLogFileName("log1.txt");
                 Map<String, String> props = Map.of("@port@", Integer.toString(port));
                 verifier.filterFile("settings-template.xml", "settings.xml", props);
@@ -146,7 +146,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
                 Verifier verifier = newVerifier(testDir.getAbsolutePath());
                 verifier.setAutoclean(false);
                 verifier.deleteDirectory("target");
-                verifier.deleteArtifacts("org.apache.maven.its.mng0768");
+                verifier.deleteArtifacts("org.apache.maven.its.mng0768", "maven-core-it");
                 verifier.addCliArgument("-o");
                 verifier.addCliArgument("--settings");
                 verifier.addCliArgument("settings.xml");

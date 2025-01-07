@@ -49,7 +49,7 @@ public class MavenITmng4349RelocatedArtifactWithInvalidPomTest extends AbstractM
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4349");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4349", "maven-core-it");
         verifier.deleteDirectory("target");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");

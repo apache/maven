@@ -45,7 +45,7 @@ public class MavenITmng3814BogusProjectCycleTest extends AbstractMavenIntegratio
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3814");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3814", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

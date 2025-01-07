@@ -47,7 +47,7 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest extends AbstractM
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4347");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4347", "central");
 
         verifier.setAutoclean(false);
 

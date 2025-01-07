@@ -49,7 +49,7 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {
-            verifier.deleteArtifacts("org.apache.maven.its.mng0449");
+            verifier.deleteArtifacts("org.apache.maven.its.mng0449", "maven-core-it");
         } catch (Exception e) {
             // when we run Maven embedded, the plugin class realm locks the artifacts so we can't delete them
         }
@@ -86,7 +86,7 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {
-            verifier.deleteArtifacts("org.apache.maven.its.mng0449");
+            verifier.deleteArtifacts("org.apache.maven.its.mng0449", "maven-core-it");
         } catch (Exception e) {
             // when we run Maven embedded, the plugin class realm locks the artifacts so we can't delete them
         }

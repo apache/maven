@@ -47,13 +47,13 @@ public class MavenITmng3970DepResolutionFromProfileReposTest extends AbstractMav
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3970");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3970", "maven-core-it");
         verifier.filterFile("pom.xml", "pom.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3970", "a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3970", "a", "0.1", "jar", "maven-core-it");
     }
 
     /**
@@ -67,7 +67,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest extends AbstractMav
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3970");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3970", "maven-core-it");
         verifier.filterFile("settings.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -75,6 +75,6 @@ public class MavenITmng3970DepResolutionFromProfileReposTest extends AbstractMav
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3970", "a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3970", "a", "0.1", "jar", "maven-core-it");
     }
 }

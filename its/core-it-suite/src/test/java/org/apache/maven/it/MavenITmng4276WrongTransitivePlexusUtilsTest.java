@@ -49,9 +49,9 @@ public class MavenITmng4276WrongTransitivePlexusUtilsTest extends AbstractMavenI
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4276");
-        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "1.1.4276", "jar");
-        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "1.1.4276", "pom");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4276", "maven-core-it");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "1.1.4276", "jar", "maven-core-it");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "1.1.4276", "pom", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

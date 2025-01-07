@@ -156,15 +156,16 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("-X");
 
-        verifier.deleteArtifacts("org.apache.maven.its.mng3599");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3599", "central");
 
         verifier.setLogFileName("logHttp.txt");
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar");
-        verifier.verifyArtifactContent("org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar", CONTENT);
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar", "central");
+        verifier.verifyArtifactContent(
+                "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar", CONTENT, "central");
     }
 
     /**
@@ -198,14 +199,15 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("-X");
 
-        verifier.deleteArtifacts("org.apache.maven.its.mng3599");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3599", "central");
 
         verifier.setLogFileName("logDAV.txt");
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar");
-        verifier.verifyArtifactContent("org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar", CONTENT);
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar", "central");
+        verifier.verifyArtifactContent(
+                "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar", CONTENT, "central");
     }
 }

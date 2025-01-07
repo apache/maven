@@ -70,7 +70,8 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
         artifact.getParentFile().mkdirs();
         Files.writeString(artifact.getAbsoluteFile().toPath(), "originalArtifact");
 
-        verifier.verifyArtifactNotPresent("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar");
+        verifier.verifyArtifactNotPresent(
+                "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", "it.snapshots");
     }
 
     @Test
@@ -207,19 +208,22 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
     }
 
     private void verifyArtifactContent(String s) throws IOException, VerificationException {
-        verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar");
-        verifier.verifyArtifactContent("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", s);
+        verifier.verifyArtifactPresent(
+                "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", "it.snapshots");
+        verifier.verifyArtifactContent(
+                "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", "it.snapshots", s);
     }
 
     private static File deleteLocalArtifact(Verifier verifier, File localRepoFile) throws IOException {
-        verifier.deleteArtifact("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar");
+        verifier.deleteArtifact("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", "it.snapshots");
         // this is to delete metadata - TODO: incorporate into deleteArtifact in verifier
         FileUtils.deleteDirectory(localRepoFile.getParentFile());
         return localRepoFile;
     }
 
     private static File getLocalRepoFile(Verifier verifier) {
-        return new File(verifier.getArtifactPath("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar"));
+        return new File(verifier.getArtifactPath(
+                "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", "it.snapshots"));
     }
 
     private static void recreateRemoteRepository(File repository) throws IOException {

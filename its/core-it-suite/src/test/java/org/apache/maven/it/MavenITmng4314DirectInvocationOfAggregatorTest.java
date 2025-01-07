@@ -47,7 +47,7 @@ public class MavenITmng4314DirectInvocationOfAggregatorTest extends AbstractMave
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer/target");
         verifier.deleteDirectory("dependency/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4314");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4314", null);
         verifier.addCliArguments(
                 "validate", "org.apache.maven.its.plugins:maven-it-plugin-all:2.1-SNAPSHOT:aggregator-dependencies");
         verifier.execute();

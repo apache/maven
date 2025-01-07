@@ -83,8 +83,8 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
             verifier.setLogFileName(transport + "-transport.log");
         }
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.resolver.resolver-demo-maven-plugin");
-        verifier.deleteArtifacts("org.apache.maven.its.resolver-transport");
+        verifier.deleteArtifacts("org.apache.maven.resolver.resolver-demo-maven-plugin", "maven-core-it");
+        verifier.deleteArtifacts("org.apache.maven.its.resolver-transport", "maven-core-it");
         verifier.addCliArgument("-X");
         verifier.addCliArgument("-s");
         verifier.addCliArgument(new File(projectDir, "settings.xml").getAbsolutePath());

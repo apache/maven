@@ -47,7 +47,7 @@ public class MavenITmng4309StrictChecksumValidationForMetadataTest extends Abstr
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4309");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4309", "maven-core-it");
         FileUtils.copyDirectoryStructure(new File(testDir, "repo"), new File(testDir, "target/repo"));
         verifier.addCliArgument("--strict-checksums");
         try {

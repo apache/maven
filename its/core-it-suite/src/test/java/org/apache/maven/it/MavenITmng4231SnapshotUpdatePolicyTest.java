@@ -48,7 +48,7 @@ public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegra
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4231");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4231", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
 
@@ -86,7 +86,7 @@ public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegra
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4231");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4231", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
 

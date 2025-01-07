@@ -48,7 +48,7 @@ public class MavenITmng4048VersionRangeReactorResolutionTest extends AbstractMav
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-2/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4048");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4048", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

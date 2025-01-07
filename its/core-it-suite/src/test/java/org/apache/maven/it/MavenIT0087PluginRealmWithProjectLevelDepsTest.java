@@ -50,7 +50,7 @@ public class MavenIT0087PluginRealmWithProjectLevelDepsTest extends AbstractMave
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it0087");
+        verifier.deleteArtifacts("org.apache.maven.its.it0087", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

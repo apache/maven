@@ -64,7 +64,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
         // setup: install a local snapshot
         Verifier verifier = newVerifier(new File(testDir, "dependency").getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4326");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4326", null);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

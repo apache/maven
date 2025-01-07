@@ -48,18 +48,20 @@ public class MavenITmng0507ArtifactRelocationTest extends AbstractMavenIntegrati
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven", "maven-core-it-support", "1.1");
-        verifier.deleteArtifacts("org.apache.maven", "maven-core-it-support-old-location", "1.1");
+        verifier.deleteArtifacts("org.apache.maven", "maven-core-it-support", "1.1", "central");
+        verifier.deleteArtifacts("org.apache.maven", "maven-core-it-support-old-location", "1.1", "central");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support", "1.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support", "1.1", "pom");
-        verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom");
-        verifier.verifyArtifactNotPresent("org.apache.maven", "maven-core-it-support-old-location", "1.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support", "1.1", "jar", "central");
+        verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support", "1.1", "pom", "central");
+        verifier.verifyArtifactPresent(
+                "org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom", "central");
+        verifier.verifyArtifactNotPresent(
+                "org.apache.maven", "maven-core-it-support-old-location", "1.1", "jar", "central");
 
         List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertTrue(artifacts.contains("org.apache.maven:maven-core-it-support:jar:1.1"), artifacts.toString());

@@ -136,7 +136,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.filterFile("pom-template.xml", "pom.xml", filterProps);
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4235");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4235", null);
         verifier.deleteDirectory("repo");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

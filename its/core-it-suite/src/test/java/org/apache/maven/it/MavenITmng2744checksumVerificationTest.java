@@ -45,7 +45,7 @@ public class MavenITmng2744checksumVerificationTest extends AbstractMavenIntegra
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng2744");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2744", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -53,9 +53,9 @@ public class MavenITmng2744checksumVerificationTest extends AbstractMavenIntegra
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng2744", "a", "1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng2744", "a", "1", "pom");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng2744", "b", "1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng2744", "b", "1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2744", "a", "1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2744", "a", "1", "pom", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2744", "b", "1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2744", "b", "1", "pom", "maven-core-it");
     }
 }

@@ -51,7 +51,7 @@ public class MavenITmng3693PomFileBasedirChangeTest extends AbstractMavenIntegra
 
         verifier.verifyErrorFreeLog();
 
-        String depPath = verifier.getArtifactPath("org.apache.maven.its.mng3693", "dep", "1", "pom");
+        String depPath = verifier.getArtifactPath("org.apache.maven.its.mng3693", "dep", "1", "pom", null);
 
         File dep = new File(depPath);
         dep = dep.getParentFile().getParentFile();

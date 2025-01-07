@@ -50,8 +50,8 @@ public class MavenITmng4166HideCoreCommonsCliTest extends AbstractMavenIntegrati
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifact("commons-cli", "commons-cli", "0.1.4166", "jar");
-        verifier.deleteArtifact("commons-cli", "commons-cli", "0.1.4166", "pom");
+        verifier.deleteArtifact("commons-cli", "commons-cli", "0.1.4166", "jar", "maven-core-it");
+        verifier.deleteArtifact("commons-cli", "commons-cli", "0.1.4166", "pom", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

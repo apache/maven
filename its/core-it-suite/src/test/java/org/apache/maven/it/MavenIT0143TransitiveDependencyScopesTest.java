@@ -246,7 +246,7 @@ public class MavenIT0143TransitiveDependencyScopesTest extends AbstractMavenInte
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target-" + scope);
-        verifier.deleteArtifacts("org.apache.maven.its.it0143");
+        verifier.deleteArtifacts("org.apache.maven.its.it0143", "maven-core-it");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@scope@", scope);
         verifier.filterFile("pom-template.xml", "pom.xml", filterProps);

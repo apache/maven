@@ -49,7 +49,7 @@ public class MavenITmng4070WhitespaceTrimmingTest extends AbstractMavenIntegrati
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4070");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4070", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

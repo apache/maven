@@ -48,7 +48,7 @@ public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest extends Abstra
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4357");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4357", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

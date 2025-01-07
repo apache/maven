@@ -49,7 +49,7 @@ public class MavenITmng0666IgnoreLegacyPomTest extends AbstractMavenIntegrationT
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it0059");
+        verifier.deleteArtifacts("org.apache.maven.its.it0059", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -57,7 +57,7 @@ public class MavenITmng0666IgnoreLegacyPomTest extends AbstractMavenIntegrationT
         verifier.execute();
         // don't verify error free log
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.it0059", "test", "3.8.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.it0059", "test", "3.8.1", "jar", "maven-core-it");
 
         List<String> artifacts = verifier.loadLines("target/artifacts.txt");
         assertTrue(artifacts.contains("org.apache.maven.its.it0059:test:jar:3.8.1"), artifacts.toString());

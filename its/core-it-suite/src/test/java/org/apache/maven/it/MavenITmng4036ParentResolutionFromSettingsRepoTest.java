@@ -45,13 +45,13 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest extends Abstract
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.filterFile("settings.xml", "settings.xml");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4036");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4036", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4036", "parent", "0.2", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4036", "parent", "0.2", "pom", "maven-core-it");
     }
 }

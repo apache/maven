@@ -128,7 +128,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4343");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4343", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
 
@@ -163,8 +163,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
 
         assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.jar"), requestedUris.toString());
         assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.pom"), requestedUris.toString());
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom", "maven-core-it");
     }
 
     /**
@@ -179,7 +179,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4343");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4343", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
 
@@ -219,8 +219,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
 
         //noinspection unchecked
         assertTrue(requestedUris.isEmpty());
-        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar");
-        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom");
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom", "maven-core-it");
 
         verifier.setLogFileName("log-never-3.txt");
         verifier.addCliArgument("-U");
@@ -230,8 +230,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
 
         assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.jar"));
         assertTrue(requestedUris.contains("/dep/0.1/dep-0.1.pom"));
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4343", "dep", "0.1", "pom", "maven-core-it");
 
         requestedUris.clear();
 

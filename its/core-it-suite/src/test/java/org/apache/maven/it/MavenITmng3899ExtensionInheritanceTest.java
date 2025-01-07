@@ -49,7 +49,7 @@ public class MavenITmng3899ExtensionInheritanceTest extends AbstractMavenIntegra
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3899");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3899", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

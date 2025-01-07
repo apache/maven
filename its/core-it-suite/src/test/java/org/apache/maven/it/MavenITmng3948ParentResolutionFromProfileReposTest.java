@@ -47,12 +47,12 @@ public class MavenITmng3948ParentResolutionFromProfileReposTest extends Abstract
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3948");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3948", "maven-core-it");
         verifier.filterFile("pom.xml", "pom.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3948", "parent", "0.2", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3948", "parent", "0.2", "pom", "maven-core-it");
     }
 }

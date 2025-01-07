@@ -44,7 +44,7 @@ public class MavenIT0010DependencyClosureResolutionTest extends AbstractMavenInt
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it0010");
+        verifier.deleteArtifacts("org.apache.maven.its.it0010", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -52,9 +52,9 @@ public class MavenIT0010DependencyClosureResolutionTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.it0010", "a", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.it0010", "b", "0.2", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.it0010", "parent", "1.0", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.it0010", "a", "0.1", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.it0010", "b", "0.2", "jar", "maven-core-it");
+        verifier.verifyArtifactPresent("org.apache.maven.its.it0010", "parent", "1.0", "pom", "maven-core-it");
 
         List<String> artifacts = verifier.loadLines("target/compile.txt");
         assertTrue(artifacts.contains("org.apache.maven.its.it0010:a:jar:0.1"), artifacts.toString());

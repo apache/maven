@@ -77,7 +77,7 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest extends AbstractMa
         Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3775");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3775", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("../settings-template.xml", "settings.xml");

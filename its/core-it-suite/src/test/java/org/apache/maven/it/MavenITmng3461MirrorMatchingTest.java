@@ -56,7 +56,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3461");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3461", "test-b");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -64,7 +64,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "a", "0.1", "jar", "test-b");
     }
 
     /**
@@ -118,7 +118,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
             System.out.println("Bound server socket to the port " + port);
 
             verifier.setAutoclean(false);
-            verifier.deleteArtifacts("org.apache.maven.its.mng3461");
+            verifier.deleteArtifacts("org.apache.maven.its.mng3461", "test-a");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@test.port@", Integer.toString(port));
             verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
@@ -132,9 +132,9 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
             server.join();
         }
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "a", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "b", "0.1", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "c", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "a", "0.1", "jar", "test-a");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "b", "0.1", "jar", "test-a");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "c", "0.1", "jar", "test-a");
     }
 
     /**
@@ -149,7 +149,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3461");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3461", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -157,6 +157,6 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng3461", "a", "0.1", "jar", "maven-core-it");
     }
 }

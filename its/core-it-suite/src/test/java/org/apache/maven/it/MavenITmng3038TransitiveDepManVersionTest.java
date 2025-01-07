@@ -46,12 +46,12 @@ public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenInte
         File testProjectDir = new File(testDirBase, "test-project");
 
         Verifier verifier = newVerifier(testProjectDir.getAbsolutePath());
-        verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "pom");
-        verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "jar");
-        verifier.deleteArtifact("org.apache.maven.its.it0121", "B", "1.0", "pom");
-        verifier.deleteArtifact("org.apache.maven.its.it0121", "B", "1.0", "jar");
-        verifier.deleteArtifact("org.apache.maven.its.it0121", "C", "1.0", "pom");
-        verifier.deleteArtifact("org.apache.maven.its.it0121", "D", "1.0", "jar");
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "pom", null);
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "jar", null);
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "B", "1.0", "pom", null);
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "B", "1.0", "jar", null);
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "C", "1.0", "pom", null);
+        verifier.deleteArtifact("org.apache.maven.its.it0121", "D", "1.0", "jar", null);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -61,8 +61,8 @@ public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenInte
             throws VerificationException, IOException {
         File testOtherDepDir = new File(testDirBase, "test-other-deps/" + projectDDepDir);
         Verifier verifierOtherDep = newVerifier(testOtherDepDir.getAbsolutePath());
-        verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "jar");
-        verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "pom");
+        verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "jar", null);
+        verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "pom", null);
         verifierOtherDep.addCliArgument("install");
         verifierOtherDep.execute();
         verifierOtherDep.verifyErrorFreeLog();

@@ -50,7 +50,7 @@ public class MavenITmng3906MergedPluginClassPathOrderingTest extends AbstractMav
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3906");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3906", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

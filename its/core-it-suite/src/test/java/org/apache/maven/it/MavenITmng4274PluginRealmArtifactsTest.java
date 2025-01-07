@@ -50,10 +50,10 @@ public class MavenITmng4274PluginRealmArtifactsTest extends AbstractMavenIntegra
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifact("org.apache.maven", "maven-core", "2.0.4274", "jar");
-        verifier.deleteArtifact("org.apache.maven", "maven-core", "2.0.4274", "pom");
-        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "1.1.4274", "jar");
-        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "1.1.4274", "pom");
+        verifier.deleteArtifact("org.apache.maven", "maven-core", "2.0.4274", "jar", "maven-core-it");
+        verifier.deleteArtifact("org.apache.maven", "maven-core", "2.0.4274", "pom", "maven-core-it");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "1.1.4274", "jar", "maven-core-it");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "1.1.4274", "pom", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

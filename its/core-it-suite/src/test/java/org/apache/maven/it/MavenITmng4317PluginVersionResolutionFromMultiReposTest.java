@@ -46,7 +46,9 @@ public class MavenITmng4317PluginVersionResolutionFromMultiReposTest extends Abs
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4317");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4317", "maven-core-it-1");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4317", "maven-core-it-2");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4317", "maven-core-it-3");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

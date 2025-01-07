@@ -44,14 +44,15 @@ public class MavenIT0041ArtifactTypeFromPluginExtensionTest extends AbstractMave
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven", "maven-core-it-support", "1.2");
+        verifier.deleteArtifacts("org.apache.maven", "maven-core-it-support", "1.2", "central");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support", "1.2", "coreit-artifact");
-        verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support", "1.2", "pom");
+        verifier.verifyArtifactPresent(
+                "org.apache.maven", "maven-core-it-support", "1.2", "coreit-artifact", "central");
+        verifier.verifyArtifactPresent("org.apache.maven", "maven-core-it-support", "1.2", "pom", "central");
     }
 }

@@ -88,7 +88,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
 
         verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3415");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3415", "testing-repo");
 
         setupDummyDependency(verifier, testDir, true);
 
@@ -159,7 +159,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
 
         verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3415");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3415", "testing-repo");
 
         final Deque<String> requestUris = new ConcurrentLinkedDeque<>();
 
@@ -252,10 +252,10 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         String version = "1.0-SNAPSHOT";
 
         if (resetUpdateInterval) {
-            verifier.deleteArtifacts(gid);
+            verifier.deleteArtifacts(gid, "testing-repo");
         }
 
-        File pom = new File(verifier.getArtifactPath(gid, aid, version, "pom"));
+        File pom = new File(verifier.getArtifactPath(gid, aid, version, "pom", "testing-repo"));
 
         File pomSrc = new File(testDir, "dependency-pom.xml");
 
