@@ -42,7 +42,7 @@ public class HelperImplTest {
     private static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
 
     @TempDir
-    private Path userHome;
+    private static Path userHome;
 
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
