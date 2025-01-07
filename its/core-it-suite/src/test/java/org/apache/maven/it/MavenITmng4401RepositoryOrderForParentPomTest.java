@@ -46,7 +46,7 @@ public class MavenITmng4401RepositoryOrderForParentPomTest extends AbstractMaven
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4401");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4401", "maven-core-it-1");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

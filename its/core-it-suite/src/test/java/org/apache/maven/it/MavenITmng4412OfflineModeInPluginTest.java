@@ -46,7 +46,7 @@ public class MavenITmng4412OfflineModeInPluginTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4412");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4412", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-Presolver");
         verifier.addCliArgument("--offline");
@@ -76,7 +76,7 @@ public class MavenITmng4412OfflineModeInPluginTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4412");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4412", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-Pcollector");
         verifier.addCliArgument("--offline");
@@ -87,6 +87,6 @@ public class MavenITmng4412OfflineModeInPluginTest extends AbstractMavenIntegrat
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4412", "dep", "0.1", "pom");
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4412", "dep", "0.1", "pom", "maven-core-it");
     }
 }
