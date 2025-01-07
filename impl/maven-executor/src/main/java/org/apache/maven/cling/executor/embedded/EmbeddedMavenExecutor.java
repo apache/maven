@@ -31,6 +31,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -108,6 +109,7 @@ public class EmbeddedMavenExecutor implements Executor {
     }
 
     protected final boolean cacheContexts;
+    protected final boolean useMavenArgsEnv;
     protected final AtomicBoolean closed;
     protected final PrintStream originalStdout;
     protected final PrintStream originalStderr;
@@ -116,11 +118,12 @@ public class EmbeddedMavenExecutor implements Executor {
     protected final ConcurrentHashMap<Key, Context> contexts;
 
     public EmbeddedMavenExecutor() {
-        this(true);
+        this(true, true);
     }
 
-    public EmbeddedMavenExecutor(boolean cacheContexts) {
+    public EmbeddedMavenExecutor(boolean cacheContexts, boolean useMavenArgsEnv) {
         this.cacheContexts = cacheContexts;
+        this.useMavenArgsEnv = useMavenArgsEnv;
         this.closed = new AtomicBoolean(false);
         this.originalStdout = System.out;
         this.originalStderr = System.err;
@@ -223,6 +226,14 @@ public class EmbeddedMavenExecutor implements Executor {
                     "Installation directory does not point to Maven installation: " + mavenHome);
         }
 
+        ArrayList<String> mavenArgs = new ArrayList<>();
+        String mavenArgsEnv = System.getenv("MAVEN_ARGS");
+        if (useMavenArgsEnv && mavenArgsEnv != null && !mavenArgsEnv.isEmpty()) {
+            Arrays.stream(mavenArgsEnv.split(" "))
+                    .filter(s -> !s.trim().isEmpty())
+                    .forEach(s -> mavenArgs.add(0, s));
+        }
+
         Properties properties = prepareProperties(executorRequest);
 
         System.setProperties(properties);
@@ -264,8 +275,10 @@ public class EmbeddedMavenExecutor implements Executor {
                 exec = r -> {
                     System.setProperties(prepareProperties(r));
                     try {
+                        ArrayList<String> args = new ArrayList<>(mavenArgs);
+                        args.addAll(r.arguments());
                         return (int) doMain.invoke(mavenCli, new Object[] {
-                            r.arguments().toArray(new String[0]), r.cwd().toString(), null, null
+                            args.toArray(new String[0]), r.cwd().toString(), null, null
                         });
                     } catch (Exception e) {
                         throw new ExecutorException("Failed to execute", e);
@@ -285,7 +298,9 @@ public class EmbeddedMavenExecutor implements Executor {
                                     || r.stderrConsumer().isPresent()) {
                                 ansiConsoleInstalled.set(null, 1);
                             }
-                            return (int) mainMethod.invoke(null, r.arguments().toArray(new String[0]), classWorld);
+                            ArrayList<String> args = new ArrayList<>(mavenArgs);
+                            args.addAll(r.arguments());
+                            return (int) mainMethod.invoke(null, args.toArray(new String[0]), classWorld);
                         } finally {
                             if (r.stdoutConsumer().isPresent()
                                     || r.stderrConsumer().isPresent()) {
