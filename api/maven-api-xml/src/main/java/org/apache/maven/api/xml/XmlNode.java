@@ -19,8 +19,6 @@
 package org.apache.maven.api.xml;
 
 import javax.xml.stream.XMLStreamException;
-
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.ListIterator;
@@ -31,8 +29,7 @@ import java.util.function.Function;
 /**
  *  NOTE: remove all the util code in here when separated, this class should be pure data.
  */
-public class XmlNode implements Serializable {
-    private static final long serialVersionUID = 2567894443061173996L;
+public class XmlNode {
 
     public static final String CHILDREN_COMBINATION_MODE_ATTRIBUTE = "combine.children";
 
