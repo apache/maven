@@ -24,10 +24,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class PathSourceTest {
+class PathSourceTest {
 
     @Test
-    public void testEquals() {
+    void testEquals() {
         PathSource source = new PathSource(Paths.get("/tmp"));
         assertFalse(source.equals(null));
     }
