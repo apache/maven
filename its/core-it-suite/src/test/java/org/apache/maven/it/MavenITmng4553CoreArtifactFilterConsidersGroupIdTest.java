@@ -49,7 +49,7 @@ public class MavenITmng4553CoreArtifactFilterConsidersGroupIdTest extends Abstra
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4553");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4553", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

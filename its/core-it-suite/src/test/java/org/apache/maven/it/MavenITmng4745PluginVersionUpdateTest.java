@@ -50,7 +50,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.setForkJvm(true); // TODO: why?
-        verifier.deleteArtifacts("org.apache.maven.its.mng4745");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4745", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
@@ -85,7 +85,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.setForkJvm(true); // TODO: why?
-        verifier.deleteArtifacts("org.apache.maven.its.mng4745");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4745", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
@@ -120,7 +120,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.setForkJvm(true); // TODO: why?
-        verifier.deleteArtifacts("org.apache.maven.its.mng4745");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4745", "maven-core-it");
         verifier.addCliArgument("-U");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

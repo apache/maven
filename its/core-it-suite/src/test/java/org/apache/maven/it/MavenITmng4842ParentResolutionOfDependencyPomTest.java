@@ -50,7 +50,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
         Verifier verifier = newVerifier(new File(testDir, "core").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4842");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4842", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("../settings-template.xml", "settings.xml");
@@ -61,7 +61,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
         List<String> compile = verifier.loadLines("target/compile.txt");
 
         assertTrue(compile.contains("dep-0.1.jar"), compile.toString());
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4842", "parent", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4842", "parent", "0.1", "pom", "maven-core-it");
     }
 
     /**
@@ -78,7 +78,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
         Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4842");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4842", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("../settings-template.xml", "settings.xml");
@@ -86,6 +86,6 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4842", "parent", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4842", "parent", "0.1", "pom", "maven-core-it");
     }
 }

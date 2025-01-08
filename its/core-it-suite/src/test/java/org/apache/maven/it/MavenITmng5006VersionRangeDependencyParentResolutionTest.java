@@ -51,7 +51,8 @@ public class MavenITmng5006VersionRangeDependencyParentResolutionTest extends Ab
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng5006");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5006", "maven-core-it-1");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5006", "maven-core-it-2");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

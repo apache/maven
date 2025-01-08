@@ -49,7 +49,7 @@ public class MavenITmng1233WarDepWithProvidedScopeTest extends AbstractMavenInte
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it0083");
+        verifier.deleteArtifacts("org.apache.maven.its.it0083", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

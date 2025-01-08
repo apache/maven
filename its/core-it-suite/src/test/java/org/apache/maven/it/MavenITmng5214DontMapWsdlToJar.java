@@ -45,7 +45,7 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
         setupVerifier.setAutoclean(false);
         setupVerifier.addCliArgument("-X");
         setupVerifier.deleteDirectory("target");
-        setupVerifier.deleteArtifacts("org.apache.maven.its.mng5214");
+        setupVerifier.deleteArtifacts("org.apache.maven.its.mng5214", null);
         setupVerifier.setLogFileName("log-setup.txt");
         setupVerifier.addCliArgument("-PcreateWsdl");
         setupVerifier.addCliArgument("generate-resources");

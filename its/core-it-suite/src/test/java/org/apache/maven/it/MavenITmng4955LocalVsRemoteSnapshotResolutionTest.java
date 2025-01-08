@@ -49,7 +49,8 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest extends AbstractM
         Verifier verifier = newVerifier(new File(testDir, "dep").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4955");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4955", null);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4955", "maven-core-it");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -54,7 +54,7 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest extends AbstractMavenInt
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng1703");
+        verifier.deleteArtifacts("org.apache.maven.its.mng1703", "maven-core-it");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -52,7 +52,7 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest extends A
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4814");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4814", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

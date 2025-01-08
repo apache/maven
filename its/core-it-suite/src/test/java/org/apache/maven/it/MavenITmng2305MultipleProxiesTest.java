@@ -94,7 +94,8 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
         try {
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
-            verifier.deleteArtifacts("org.apache.maven.its.mng2305");
+            verifier.deleteArtifacts("org.apache.maven.its.mng2305", "http");
+            verifier.deleteArtifacts("org.apache.maven.its.mng2305", "https");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@proxy.http@", Integer.toString(httpPort));
             filterProps.put("@proxy.https@", Integer.toString(proxyPort));

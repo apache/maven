@@ -51,7 +51,7 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
         Verifier verifier = newVerifier(new File(testDir, "producer").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4452");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4452", null);
         verifier.addCliArgument("-Dmng4452.type=jar");
         verifier.addCliArgument("-Dmng4452.classifier=unix");
         verifier.setLogFileName("log-1.txt");
@@ -74,7 +74,8 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
         verifier = newVerifier(new File(testDir, "consumer").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4452");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4452", null);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4452", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

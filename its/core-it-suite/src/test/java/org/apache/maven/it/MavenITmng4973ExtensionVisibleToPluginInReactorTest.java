@@ -50,7 +50,7 @@ public class MavenITmng4973ExtensionVisibleToPluginInReactorTest extends Abstrac
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-b/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4973");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4973", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

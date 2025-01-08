@@ -51,7 +51,7 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest extends Abstract
         verifier.setAutoclean(false);
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng2222");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2222", null);
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();

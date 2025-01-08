@@ -51,7 +51,7 @@ public class MavenITmng4696MavenProjectDependencyArtifactsTest extends AbstractM
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4696");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4696", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

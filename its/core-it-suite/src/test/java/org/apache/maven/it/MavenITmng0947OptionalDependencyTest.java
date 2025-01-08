@@ -52,7 +52,7 @@ public class MavenITmng0947OptionalDependencyTest extends AbstractMavenIntegrati
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng0947");
+        verifier.deleteArtifacts("org.apache.maven.its.mng0947", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

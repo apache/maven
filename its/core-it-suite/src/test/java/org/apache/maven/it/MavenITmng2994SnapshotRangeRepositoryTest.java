@@ -43,7 +43,7 @@ public class MavenITmng2994SnapshotRangeRepositoryTest extends AbstractMavenInte
     public void testit() throws Exception {
         File testDir = extractResources("/mng-2994");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.deleteArtifacts("org.apache.maven.its.mng2994");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2994", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

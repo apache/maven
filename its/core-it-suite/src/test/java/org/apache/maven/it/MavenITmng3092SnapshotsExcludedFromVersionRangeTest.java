@@ -51,7 +51,7 @@ public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest extends Abstrac
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3092");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3092", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

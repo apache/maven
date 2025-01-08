@@ -40,7 +40,7 @@ public class MavenITmng2277AggregatorAndResolutionPluginsTest extends AbstractMa
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng2277");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2277", null);
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-all:aggregator-dependencies");
         verifier.execute();
         verifier.verifyErrorFreeLog();

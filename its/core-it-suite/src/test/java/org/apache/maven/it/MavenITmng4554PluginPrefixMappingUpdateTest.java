@@ -94,7 +94,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             try {
-                verifier.deleteArtifacts("org.apache.maven.its.mng4554");
+                verifier.deleteArtifacts("org.apache.maven.its.mng4554", "central");
             } catch (IOException e) {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
                 assertFalse(new File(verifier.getArtifactMetadataPath(
@@ -173,7 +173,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             try {
-                verifier.deleteArtifacts("org.apache.maven.its.mng4554");
+                verifier.deleteArtifacts("org.apache.maven.its.mng4554", "central");
             } catch (IOException e) {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
                 assertFalse(new File(verifier.getArtifactMetadataPath(
@@ -255,7 +255,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             try {
-                verifier.deleteArtifacts("org.apache.maven.its.mng4554");
+                verifier.deleteArtifacts("org.apache.maven.its.mng4554", "central");
             } catch (IOException e) {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
                 assertFalse(new File(verifier.getArtifactMetadataPath(

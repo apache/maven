@@ -46,7 +46,7 @@ public class MavenITmng2135PluginBuildInReactorTest extends AbstractMavenIntegra
         verifier.setAutoclean(false);
         verifier.deleteDirectory("plugin/target");
         verifier.deleteDirectory("project/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng2135");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2135", null);
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();

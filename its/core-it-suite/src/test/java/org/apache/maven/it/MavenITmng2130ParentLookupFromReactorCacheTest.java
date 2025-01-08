@@ -42,7 +42,7 @@ public class MavenITmng2130ParentLookupFromReactorCacheTest extends AbstractMave
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.mng2130");
+        verifier.deleteArtifacts("org.apache.maven.mng2130", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

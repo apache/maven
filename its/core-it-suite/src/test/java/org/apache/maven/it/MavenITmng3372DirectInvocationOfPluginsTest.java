@@ -44,7 +44,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
 
         Verifier verifier = newVerifier(plugin.getAbsolutePath());
 
-        verifier.deleteArtifacts("org.apache.maven.its.mng3372");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3372", null);
 
         verifier.getSystemProperties().setProperty("updateReleaseInfo", "true");
 

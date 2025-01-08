@@ -56,7 +56,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3043");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3043", null);
         verifier.setLogFileName("log-test.txt");
         verifier.addCliArgument("test");
         verifier.execute();
@@ -112,7 +112,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3043");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3043", null);
         verifier.setLogFileName("log-package.txt");
         verifier.addCliArgument("package");
         verifier.execute();
@@ -172,7 +172,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3043");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3043", null);
         verifier.setLogFileName("log-package-pre.txt");
         verifier.addCliArguments("--also-make", "--projects", ":dependency", "package");
         verifier.execute();

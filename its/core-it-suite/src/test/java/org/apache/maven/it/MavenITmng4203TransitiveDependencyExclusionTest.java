@@ -50,7 +50,7 @@ public class MavenITmng4203TransitiveDependencyExclusionTest extends AbstractMav
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4203");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4203", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
@@ -67,7 +67,7 @@ public class MavenITmng4203TransitiveDependencyExclusionTest extends AbstractMav
 
         assertEquals(expected, artifacts);
 
-        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4203", "a", "0.1", "pom");
-        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4203", "a", "0.1", "jar");
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4203", "a", "0.1", "pom", "maven-core-it");
+        verifier.verifyArtifactNotPresent("org.apache.maven.its.mng4203", "a", "0.1", "jar", "maven-core-it");
     }
 }

@@ -52,7 +52,7 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4720");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4720", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -89,7 +89,7 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4720");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4720", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

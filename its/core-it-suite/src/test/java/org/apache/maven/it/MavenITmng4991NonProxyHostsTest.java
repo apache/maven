@@ -83,7 +83,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
 
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
-            verifier.deleteArtifacts("org.apache.maven.its.mng4991");
+            verifier.deleteArtifacts("org.apache.maven.its.mng4991", "central");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             filterProps.put("@port@", Integer.toString(port));

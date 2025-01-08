@@ -48,7 +48,7 @@ public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenInteg
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4679");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4679", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
 
@@ -78,7 +78,8 @@ public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenInteg
     }
 
     private void assertChecksum(Verifier verifier, String ext, String checksum) throws Exception {
-        String path = verifier.getArtifactPath("org.apache.maven.its.mng4679", "dep", "0.1-SNAPSHOT", ext);
+        String path =
+                verifier.getArtifactPath("org.apache.maven.its.mng4679", "dep", "0.1-SNAPSHOT", ext, "maven-core-it");
         String actual = ItUtils.calcHash(new File(path), "SHA-1");
         assertEquals(checksum, actual);
     }

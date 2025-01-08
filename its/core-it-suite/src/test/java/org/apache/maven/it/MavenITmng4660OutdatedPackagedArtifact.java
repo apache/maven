@@ -58,7 +58,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         // 1. Package the whole project
         final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
         verifier1.deleteDirectory("target");
-        verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
+        verifier1.deleteArtifacts("org.apache.maven.its.mng4660", null);
 
         verifier1.addCliArgument("package");
         verifier1.execute();

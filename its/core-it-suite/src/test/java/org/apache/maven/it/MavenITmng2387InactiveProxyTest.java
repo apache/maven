@@ -116,13 +116,13 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
         verifier.filterFile("settings-template.xml", "settings.xml", properties);
 
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng2387");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2387", "maven-core-it");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng2387", "a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2387", "a", "0.1", "jar", "maven-core-it");
     }
 }

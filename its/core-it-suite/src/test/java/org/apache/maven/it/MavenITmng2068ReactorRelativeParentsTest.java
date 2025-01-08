@@ -50,7 +50,7 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
 
         Verifier verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng2068");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2068", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -68,7 +68,7 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
 
         Verifier verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng2068");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2068", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -86,7 +86,7 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
 
         Verifier verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng2068");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2068", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -45,7 +45,7 @@ public class MavenITmng4433ForceParentSnapshotUpdateTest extends AbstractMavenIn
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4433");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4433", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
 

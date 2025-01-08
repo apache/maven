@@ -51,7 +51,7 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends A
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4750");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4750", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

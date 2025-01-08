@@ -45,7 +45,7 @@ public class MavenITmng4883FailUponOverconstrainedVersionRangesTest extends Abst
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4883");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4883", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

@@ -82,7 +82,7 @@ public class MavenITmng4768NearestMatchConflictResolutionTest extends AbstractMa
         Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4768");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4768", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("../settings-template.xml", "settings.xml");

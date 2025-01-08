@@ -48,7 +48,7 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends Ab
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4590");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4590", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dtest.file=pom.xml");
         verifier.addCliArgument("-Dtest.dir=" + testDir.getAbsolutePath());

@@ -47,7 +47,7 @@ public class MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMgmtTest
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4586");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4586", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

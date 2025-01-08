@@ -47,7 +47,9 @@ public class MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest extends Abstra
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng2098");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2098", "maven-core-it-1");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2098", "maven-core-it-2");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2098", "maven-core-it-3");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -55,6 +57,6 @@ public class MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest extends Abstra
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng2098", "dep", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2098", "dep", "0.1", "jar", "maven-core-it-1");
     }
 }

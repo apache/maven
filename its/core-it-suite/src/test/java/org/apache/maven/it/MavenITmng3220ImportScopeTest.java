@@ -44,7 +44,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3220");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3220", "maven-core-it");
         verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -62,7 +62,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3220");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3220", "maven-core-it");
         verifier.filterFile("../settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

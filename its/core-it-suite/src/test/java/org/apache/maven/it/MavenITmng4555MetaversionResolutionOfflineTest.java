@@ -79,7 +79,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4555");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4555", "maven-core-it");
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");

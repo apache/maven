@@ -54,7 +54,7 @@ public class MavenITmng1323AntrunDependenciesTest extends AbstractMavenIntegrati
         verifier.deleteDirectory("a/target");
         verifier.deleteDirectory("b/target");
         verifier.deleteDirectory("c/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng1323");
+        verifier.deleteArtifacts("org.apache.maven.its.mng1323", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

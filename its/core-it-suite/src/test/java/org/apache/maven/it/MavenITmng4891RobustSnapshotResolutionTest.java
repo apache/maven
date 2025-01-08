@@ -49,7 +49,7 @@ public class MavenITmng4891RobustSnapshotResolutionTest extends AbstractMavenInt
         Verifier verifier = newVerifier(new File(testDir, "producer").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4891");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4891", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

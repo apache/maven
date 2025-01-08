@@ -49,7 +49,8 @@ public class MavenITmng3052DepRepoAggregationTest extends AbstractMavenIntegrati
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3052");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3052", "maven-core-it-repo-d");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3052", "maven-core-it-repo-t");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.filterFile(
                 "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/template.pom",
@@ -60,7 +61,9 @@ public class MavenITmng3052DepRepoAggregationTest extends AbstractMavenIntegrati
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3052", "direct", "0.1-SNAPSHOT", "jar");
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng3052", "trans", "0.1-SNAPSHOT", "jar");
+        verifier.verifyArtifactPresent(
+                "org.apache.maven.its.mng3052", "direct", "0.1-SNAPSHOT", "jar", "maven-core-it-repo-d");
+        verifier.verifyArtifactPresent(
+                "org.apache.maven.its.mng3052", "trans", "0.1-SNAPSHOT", "jar", "maven-core-it-repo-t");
     }
 }

@@ -47,7 +47,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
 
         final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
         verifier1.deleteDirectory("target");
-        verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
+        verifier1.deleteArtifacts("org.apache.maven.its.mng4660", null);
 
         try {
             verifier1.addCliArgument("test"); // The test goal will not create a packaged artifact
@@ -80,7 +80,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
 
         final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
         verifier1.deleteDirectory("target");
-        verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
+        verifier1.deleteArtifacts("org.apache.maven.its.mng4660", null);
 
         try {
             verifier1.addCliArgument("verify"); // The verify goal will create a packaged artifact

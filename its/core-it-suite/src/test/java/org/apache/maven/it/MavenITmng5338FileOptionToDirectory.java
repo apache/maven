@@ -47,7 +47,7 @@ public class MavenITmng5338FileOptionToDirectory extends AbstractMavenIntegratio
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng5338");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5338", null);
 
         verifier.addCliArgument("-f");
         verifier.addCliArgument("project");

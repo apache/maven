@@ -44,7 +44,7 @@ public class MavenITmng2196ParentResolutionTest extends AbstractMavenIntegration
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng2196");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2196", null);
 
         if (matchesVersionRange("(,3.0-alpha-1)")) {
             verifier.addCliArgument("validate");

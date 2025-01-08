@@ -47,7 +47,7 @@ public class MavenITmng4214MirroredParentSearchReposTest extends AbstractMavenIn
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4214");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4214", "maven-mirror");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
@@ -55,6 +55,6 @@ public class MavenITmng4214MirroredParentSearchReposTest extends AbstractMavenIn
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng4214", "parent", "0.1", "pom");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng4214", "parent", "0.1", "pom", "maven-mirror");
     }
 }

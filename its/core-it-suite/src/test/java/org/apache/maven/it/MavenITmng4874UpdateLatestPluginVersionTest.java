@@ -48,7 +48,7 @@ public class MavenITmng4874UpdateLatestPluginVersionTest extends AbstractMavenIn
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4874");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4874", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

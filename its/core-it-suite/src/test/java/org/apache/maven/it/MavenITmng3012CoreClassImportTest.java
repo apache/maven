@@ -48,8 +48,8 @@ public class MavenITmng3012CoreClassImportTest extends AbstractMavenIntegrationT
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "jar");
-        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "pom");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "jar", "maven-core-it");
+        verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "pom", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

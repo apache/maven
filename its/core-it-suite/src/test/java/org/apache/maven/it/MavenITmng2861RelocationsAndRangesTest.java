@@ -43,7 +43,7 @@ public class MavenITmng2861RelocationsAndRangesTest extends AbstractMavenIntegra
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("A/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng2861");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2861", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

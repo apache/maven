@@ -51,20 +51,20 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
         verifier.setAutoclean(false);
         verifier.deleteDirectory("utf-8/target");
         verifier.deleteDirectory("latin-1/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng2362");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2362", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File pomFile;
 
-        pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "utf-8", "0.1", "pom"));
+        pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "utf-8", "0.1", "pom", null));
         assertPomUtf8(pomFile);
 
         pomFile = new File(testDir, "utf-8/target/repo/org/apache/maven/its/mng2362/utf-8/0.1/utf-8-0.1.pom");
         assertPomUtf8(pomFile);
 
-        pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "latin-1", "0.1", "pom"));
+        pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "latin-1", "0.1", "pom", null));
         assertPomLatin1(pomFile);
 
         pomFile = new File(testDir, "latin-1/target/repo/org/apache/maven/its/mng2362/latin-1/0.1/latin-1-0.1.pom");

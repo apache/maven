@@ -51,7 +51,7 @@ public class MavenITmng2174PluginDepsManagedByParentProfileTest extends Abstract
         Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng2174");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2174", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

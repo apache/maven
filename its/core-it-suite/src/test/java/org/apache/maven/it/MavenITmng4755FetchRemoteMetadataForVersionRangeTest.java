@@ -49,7 +49,8 @@ public class MavenITmng4755FetchRemoteMetadataForVersionRangeTest extends Abstra
         // setup: install a local version
         Verifier verifier = newVerifier(new File(testDir, "dependency").getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng4755");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4755", null);
+        verifier.deleteArtifacts("org.apache.maven.its.mng4755", "maven-core-it<");
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();

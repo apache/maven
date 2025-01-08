@@ -52,7 +52,7 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest extends AbstractMa
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("producer/target");
         verifier.deleteDirectory("consumer/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng5137");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5137", null);
         verifier.addCliArgument(
                 "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator");
         verifier.execute();

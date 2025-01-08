@@ -41,7 +41,7 @@ public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitFileRepo() throws Exception {
-        testit("file");
+        testit("file", "test-mirror");
     }
 
     /**
@@ -51,7 +51,7 @@ public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitLocalhostRepo() throws Exception {
-        testit("localhost");
+        testit("localhost", "test-mirror");
     }
 
     /**
@@ -61,7 +61,7 @@ public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitExternalRepo() throws Exception {
-        testit("external");
+        testit("external", "test-mirror");
     }
 
     /**
@@ -71,15 +71,15 @@ public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitCentralRepo() throws Exception {
-        testit("central");
+        testit("central", "central");
     }
 
-    private void testit(String project) throws Exception {
+    private void testit(String project, String expectedRepoId) throws Exception {
         File testDir = extractResources("/mng-2865");
 
         Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng2865");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2865", expectedRepoId);
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -87,6 +87,6 @@ public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng2865", "a", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng2865", "a", "0.1", "jar", expectedRepoId);
     }
 }

@@ -49,7 +49,8 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest extends Abst
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4465");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4465", "central");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4465", "mng4465");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.setLogFileName("log1.txt");
         verifier.addCliArgument("-s");

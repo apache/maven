@@ -52,7 +52,7 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends
         verifier = newVerifier(new File(testDir, "dep-a").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng2486");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2486", null);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -75,7 +75,8 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         // enforce remote resolution
-        verifier.deleteArtifacts("org.apache.maven.its.mng2486");
+        verifier.deleteArtifacts("org.apache.maven.its.mng2486", null);
+        verifier.deleteArtifacts("org.apache.maven.its.mng2486", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

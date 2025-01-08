@@ -49,7 +49,10 @@ public class MavenITmng4987TimestampBasedSnapshotSelectionTest extends AbstractM
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4987");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4987", "maven-core-it-1");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4987", "maven-core-it-2");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4987", "maven-core-it-3");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4987", "maven-core-it-4");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

@@ -97,7 +97,8 @@ public class MavenITmng4561MirroringOfPluginRepoTest extends AbstractMavenIntegr
             System.out.println("Bound server socket to the port " + port);
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
-            verifier.deleteArtifacts("org.apache.maven.its.mng4561");
+            verifier.deleteArtifacts("org.apache.maven.its.mng4561", "it-mirror-a");
+            verifier.deleteArtifacts("org.apache.maven.its.mng4561", "it-mirror-b");
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@port@", Integer.toString(port));
             verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
@@ -107,8 +108,8 @@ public class MavenITmng4561MirroringOfPluginRepoTest extends AbstractMavenIntegr
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            verifier.verifyArtifactPresent("org.apache.maven.its.mng4561", "plugin-dep", "0.1", "jar");
-            verifier.verifyArtifactPresent("org.apache.maven.its.mng4561", "plugin-dep", "0.1", "pom");
+            verifier.verifyArtifactPresent("org.apache.maven.its.mng4561", "plugin-dep", "0.1", "jar", "it-mirror-b");
+            verifier.verifyArtifactPresent("org.apache.maven.its.mng4561", "plugin-dep", "0.1", "pom", "it-mirror-b");
             verifier.verifyFilePresent("target/touch.txt");
         } finally {
             server.stop();

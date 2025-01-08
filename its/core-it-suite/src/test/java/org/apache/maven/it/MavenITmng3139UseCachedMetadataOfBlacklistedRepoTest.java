@@ -48,7 +48,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest extends Abstra
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.deleteArtifacts("org.apache.maven.its.mng3139");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3139", "maven-core-it");
 
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.setLogFileName("log1.txt");

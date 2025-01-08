@@ -87,7 +87,10 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng5280");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5280", "repo1");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5280", "pluginRepo1");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5280", "repo2");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5280", "pluginRepo2");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@httpserver.port@", Integer.toString(httpPort));
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
@@ -122,7 +125,10 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng5280");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5280", "repo1");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5280", "pluginRepo1");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5280", "repo2");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5280", "pluginRepo2");
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@httpserver.port@", Integer.toString(httpPort));
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);

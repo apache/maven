@@ -60,7 +60,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         verifier.setLogFileName("log-a.txt");
 
         verifier.deleteDirectory("dependency/dependency-classes");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3023");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3023", null);
 
         verifier.addCliArgument("validate");
         VerificationException exception = assertThrows(
@@ -89,7 +89,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         // The IT doesn't actually run the compiler but merely mimics its effect, i.e. the creation of the output dir
         new File(testDir, "dependency/dependency-classes").mkdirs();
         verifier.deleteDirectory("consumer/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3023");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3023", null);
 
         verifier.addCliArgument("initialize");
         verifier.execute();
@@ -121,7 +121,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
-        verifier.deleteArtifacts("org.apache.maven.its.mng3023");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3023", null);
 
         verifier.deleteDirectory("consumer/target");
         verifier.setLogFileName("log-c-1.txt");

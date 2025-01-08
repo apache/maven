@@ -45,7 +45,7 @@ public class MavenITmng3482DependencyPomInterpolationTest extends AbstractMavenI
         verifier.setAutoclean(false);
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3482");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3482", "testing-repo");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

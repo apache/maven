@@ -50,7 +50,8 @@ public class MavenITmng2972OverridePluginDependencyTest extends AbstractMavenInt
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifact("org.apache.maven.its.plugins.class-loader", "dep-b", "0.2-mng-2972", "jar");
+        verifier.deleteArtifact(
+                "org.apache.maven.its.plugins.class-loader", "dep-b", "0.2-mng-2972", "jar", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -80,7 +81,8 @@ public class MavenITmng2972OverridePluginDependencyTest extends AbstractMavenInt
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifact("org.apache.maven.its.plugins.class-loader", "dep-b", "9.9-MNG-2972", "jar");
+        verifier.deleteArtifact(
+                "org.apache.maven.its.plugins.class-loader", "dep-b", "9.9-MNG-2972", "jar", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

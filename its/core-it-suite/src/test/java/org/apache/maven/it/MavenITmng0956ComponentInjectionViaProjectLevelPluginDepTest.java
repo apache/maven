@@ -47,7 +47,7 @@ public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest extend
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng0956");
+        verifier.deleteArtifacts("org.apache.maven.its.mng0956", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

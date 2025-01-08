@@ -48,7 +48,7 @@ public class MavenITmng3217InterPluginDependencyTest extends AbstractMavenIntegr
         verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-1/target");
         verifier.deleteDirectory("sub-2/target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng3217");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3217", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

@@ -49,7 +49,7 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest extend
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.mng4379");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4379", "maven-core-it");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.setEnvironmentVariable("MNG_4379_HOME", testDir.getAbsolutePath());
         verifier.addCliArgument("-s");
