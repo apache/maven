@@ -138,9 +138,9 @@ public class MojoDescriptorCreator {
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
                     PluginVersionResolutionException {
-        String goal = null;
+        StringBuilder goal = new StringBuilder();
 
-        Plugin plugin = null;
+        Plugin plugin;
 
         String[] tok = task.split(":");
 
@@ -160,11 +160,11 @@ public class MojoDescriptorCreator {
             plugin.setGroupId(tok[0]);
             plugin.setArtifactId(tok[1]);
             plugin.setVersion(tok[2]);
-            goal = tok[3];
+            goal.append(tok[3]);
 
             // This won't be valid, but it constructs something easy to read in the error message
             for (int idx = 4; idx < tok.length; idx++) {
-                goal += ":" + tok[idx];
+                goal.append(":").append(tok[idx]);
             }
         } else if (numTokens == 3) {
             // groupId:artifactId:goal or pluginPrefix:version:goal (since Maven 3.9.0)
@@ -189,7 +189,7 @@ public class MojoDescriptorCreator {
                 plugin = findPluginForPrefix(firstToken, session);
                 plugin.setVersion(tok[1]);
             }
-            goal = tok[2];
+            goal.append(tok[2]);
         } else {
             // We have a prefix and goal
             //
@@ -198,10 +198,7 @@ public class MojoDescriptorCreator {
             String prefix = tok[0];
 
             if (numTokens == 2) {
-                goal = tok[1];
-            } else {
-                // goal was missing - pass through to MojoNotFoundException
-                goal = "";
+                goal.append(tok[1]);
             }
 
             // This is the case where someone has executed a single goal from the command line
@@ -216,9 +213,9 @@ public class MojoDescriptorCreator {
             plugin = findPluginForPrefix(prefix, session);
         }
 
-        int executionIdx = goal.indexOf('@');
+        int executionIdx = goal.indexOf("@");
         if (executionIdx > 0) {
-            goal = goal.substring(0, executionIdx);
+            goal.setLength(executionIdx);
         }
 
         injectPluginDeclarationFromProject(plugin, project);
@@ -231,7 +228,7 @@ public class MojoDescriptorCreator {
         }
 
         return pluginManager.getMojoDescriptor(
-                plugin, goal, project.getRemotePluginRepositories(), session.getRepositorySession());
+                plugin, goal.toString(), project.getRemotePluginRepositories(), session.getRepositorySession());
     }
 
     // TODO take repo mans into account as one may be aggregating prefixes of many
