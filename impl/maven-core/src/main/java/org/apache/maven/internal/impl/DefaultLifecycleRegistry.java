@@ -358,11 +358,13 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
         @Override
         public Collection<Phase> phases() {
+            // START SNIPPET: clean
             return List.of(phase(
                     Phase.CLEAN,
                     plugin(
                             MAVEN_PLUGINS + "maven-clean-plugin:" + MAVEN_CLEAN_PLUGIN_VERSION + ":clean",
                             Phase.CLEAN)));
+            // END SNIPPET: clean
         }
 
         @Override
@@ -379,6 +381,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
         @Override
         public Collection<Phase> phases() {
+            // START SNIPPET: default
             return List.of(phase(
                     ALL,
                     phase(VALIDATE, phase(INITIALIZE)),
@@ -410,6 +413,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                             phase(INTEGRATION_TEST)),
                     phase(INSTALL, after(PACKAGE)),
                     phase(DEPLOY, after(PACKAGE))));
+            // END SNIPPET: default
         }
 
         @Override
@@ -468,12 +472,14 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
         @Override
         public Collection<Phase> phases() {
+            // START SNIPPET: site
             return List.of(
                     phase(PHASE_SITE, plugin(MAVEN_SITE_PLUGIN + "site", PHASE_SITE)),
                     phase(
                             PHASE_SITE_DEPLOY,
                             after(PHASE_SITE),
                             plugin(MAVEN_SITE_PLUGIN + "deploy", PHASE_SITE_DEPLOY)));
+            // END SNIPPET: site
         }
 
         @Override

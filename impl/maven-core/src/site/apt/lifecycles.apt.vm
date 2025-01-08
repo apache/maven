@@ -25,7 +25,7 @@
 
 Lifecycles Reference
 
-  Maven defines 4 lifecycles in {{{./apidocs/org/apache/maven/lifecycle/providers/package-summary.html}<<<org.apache.maven.lifecycle.providers>>>}} package:
+  Maven defines 3 lifecycles in {{{./apidocs/org/apache/maven/lifecycle/providers/package-summary.html}<<<org.apache.maven.lifecycle.providers>>>}} package:
 
 %{toc|fromDepth=2}
 
@@ -34,22 +34,16 @@ Lifecycles Reference
   <<<default>>> lifecycle is defined only with phases, <<without>> any associated plugin binding:
   plugins bindings for this lifecycle are {{{./default-bindings.html}defined separately for each packaging}}:
 
-%{snippet|id=default|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/DefaultLifecycleProvider.java}
+%{snippet|id=default|file=${project.basedir}/src/main/java/org/apache/maven/internal/impl/DefaultLifecycleRegistry.java}
 
 * <<<clean>>> Lifecycle
 
   <<<clean>>> lifecycle phases are defined with their plugins bindings:
 
-%{snippet|id=clean|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/CleanLifecycleProvider.java}
+%{snippet|id=clean|file=${project.basedir}/src/main/java/org/apache/maven/internal/impl/DefaultLifecycleRegistry.java}
 
 * <<<site>>> Lifecycle
 
   <<<site>>> lifecycle phases are defined with their plugins bindings:
 
-%{snippet|id=site|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/SiteLifecycleProvider.java}
-
-* <<<wrapper>>> Lifecycle
-
-  <<<wrapper>>> lifecycle phases are defined with their plugins bindings:
-
-%{snippet|id=wrapper|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/WrapperLifecycleProvider.java}
+%{snippet|id=site|file=${project.basedir}/src/main/java/org/apache/maven/internal/impl/DefaultLifecycleRegistry.java}

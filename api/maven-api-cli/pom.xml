@@ -65,8 +65,10 @@
             <id>modello</id>
             <goals>
               <goal>velocity</goal>
+              <goal>xdoc</goal>
               <goal>xsd</goal>
             </goals>
+            <phase>generate-sources</phase>
           </execution>
         </executions>
       </plugin>

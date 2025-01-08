@@ -709,16 +709,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.</licenseText>
           </configuration>
-          <executions>
-            <execution>
-              <id>modello-site-docs</id>
-              <goals>
-                <goal>xdoc</goal>
-                <goal>xsd</goal>
-              </goals>
-              <phase>pre-site</phase>
-            </execution>
-          </executions>
         </plugin>
         <!-- enforce backwards compatibility -->
         <plugin>
