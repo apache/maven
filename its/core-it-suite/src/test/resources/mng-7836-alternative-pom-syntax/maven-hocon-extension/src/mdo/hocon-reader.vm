@@ -69,9 +69,9 @@ public class ${className} {
     #set ( $dummy = $allFields.addAll( $cl.getFields($version) ) )
   #end
     public ${classUcapName} parse${classUcapName}(ConfigValue value) {
-        if (value instanceof ConfigObject configObject) {
+        if (value instanceof ConfigObject) {
             ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder(true);
-            configObject.forEach((k, v) -> {
+            ((ConfigObject) value).forEach((k, v) -> {
                 switch (k) {
   #foreach ( $field in $allFields )
     #if ( ! $Helper.xmlFieldMetadata( $field ).transient && $field.name != "root" )
@@ -163,8 +163,8 @@ public class ${className} {
     }
 
     protected List<String> getStringList(ConfigValue v) {
-        if (v instanceof ConfigList configList) {
-            return configList.unwrapped().stream().map(Object::toString)
+        if (v instanceof ConfigList) {
+            return ((ConfigList) v).unwrapped().stream().map(Object::toString)
                 .collect(Collectors.toList());
         }
         throw new IllegalArgumentException("Unable to convert to List<String>: '" + v + "'");
@@ -179,8 +179,8 @@ public class ${className} {
     }
 
     protected ConfigList getList(ConfigValue v) {
-        if (v instanceof ConfigList configList) {
-            return configList;
+        if (v instanceof ConfigList) {
+            return (ConfigList) v;
         }
         throw new IllegalArgumentException("Unable to convert to List<?>: '" + v + "'");
     }
@@ -190,8 +190,8 @@ public class ${className} {
     }
 
     protected Map<String, String> getStringMap(ConfigValue v) {
-        if (v instanceof ConfigObject configObject) {
-            return configObject.entrySet().stream().collect(Collectors.toMap(
+        if (v instanceof ConfigObject) {
+            return ((ConfigObject) v).entrySet().stream().collect(Collectors.toMap(
                 e -> e.getKey(),
                 e -> getStringValue(e.getValue())
             ));

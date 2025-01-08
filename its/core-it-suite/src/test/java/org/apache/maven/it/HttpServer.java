@@ -60,8 +60,8 @@ public class HttpServer {
     static {
         Log.initialized();
         Logger rootLogger = Log.getRootLogger();
-        if (rootLogger instanceof StdErrLog stdErrLog) {
-            stdErrLog.setLevel(StdErrLog.LEVEL_WARN);
+        if (rootLogger instanceof StdErrLog) {
+            ((StdErrLog) rootLogger).setLevel(StdErrLog.LEVEL_WARN);
         }
     }
 

@@ -94,13 +94,15 @@ class PropertiesUtil {
             for (int i = Array.getLength(value) - 1; i >= 0; i--) {
                 serialize(props, key + "." + i, Array.get(value, i));
             }
-        } else if (value instanceof Collection collection) {
+        } else if (value instanceof Collection) {
+            Collection collection = (Collection) value;
             props.setProperty(key, Integer.toString(collection.size()));
             int i = 0;
             for (Iterator it = collection.iterator(); it.hasNext(); i++) {
                 serialize(props, key + "." + i, it.next());
             }
-        } else if (value instanceof Map map) {
+        } else if (value instanceof Map) {
+            Map map = (Map) value;
             props.setProperty(key, Integer.toString(map.size()));
             @SuppressWarnings("checkstyle:UnusedLocalVariable")
             int i = 0;
@@ -109,7 +111,9 @@ class PropertiesUtil {
                 Object v = map.get(k);
                 serialize(props, key + "." + k, v);
             }
-        } else if (value instanceof PlexusConfiguration config) {
+        } else if (value instanceof PlexusConfiguration) {
+            PlexusConfiguration config = (PlexusConfiguration) value;
+
             String val = config.getValue(null);
             if (val != null) {
                 props.setProperty(key + ".value", val);
@@ -133,8 +137,8 @@ class PropertiesUtil {
                 serialize(props, key + ".children." + name + "." + index, child);
                 indices.put(name, index + 1);
             }
-        } else if (value instanceof Date date) {
-            props.setProperty(key, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date));
+        } else if (value instanceof Date) {
+            props.setProperty(key, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((Date) value));
         } else if (value != null) {
             props.setProperty(key, value.toString());
         }

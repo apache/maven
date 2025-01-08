@@ -76,14 +76,16 @@ class PropertyUtil {
                     || (obj instanceof File)
                     || (obj instanceof Path)) {
                 props.put(key, obj.toString());
-            } else if (obj instanceof Collection coll) {
+            } else if (obj instanceof Collection) {
+                Collection coll = (Collection) obj;
                 props.put(key, Integer.toString(coll.size()));
                 int index = 0;
                 for (Iterator it = coll.iterator(); it.hasNext(); index++) {
                     Object elem = it.next();
                     store(props, key + "." + index, elem, visited);
                 }
-            } else if (obj instanceof Map map) {
+            } else if (obj instanceof Map) {
+                Map map = (Map) obj;
                 props.put(key, Integer.toString(map.size()));
                 @SuppressWarnings("checkstyle:UnusedLocalVariable")
                 int index = 0;
