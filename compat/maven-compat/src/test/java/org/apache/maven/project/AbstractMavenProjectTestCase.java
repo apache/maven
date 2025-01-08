@@ -135,12 +135,12 @@ public abstract class AbstractMavenProjectTestCase {
         } catch (Exception e) {
             Throwable cause = e.getCause();
             if (cause instanceof ModelBuildingException modelBuildingException) {
-                String message = "In: " + pom + "\n\n";
+                StringBuilder message = new StringBuilder("In: " + pom + "\n\n");
                 for (ModelProblem problem : modelBuildingException.getProblems()) {
-                    message += problem + "\n";
+                    message.append(problem).append("\n");
                 }
                 System.out.println(message);
-                fail(message);
+                fail(message.toString());
             }
 
             throw e;

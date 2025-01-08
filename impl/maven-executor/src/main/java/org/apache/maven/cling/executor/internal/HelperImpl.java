@@ -39,16 +39,25 @@ import static java.util.Objects.requireNonNull;
 public class HelperImpl implements ExecutorHelper {
     private final Mode defaultMode;
     private final Path installationDirectory;
+    private final Path userHomeDirectory;
     private final ExecutorTool executorTool;
     private final HashMap<Mode, Executor> executors;
 
     private final ConcurrentHashMap<String, String> cache;
 
-    public HelperImpl(Mode defaultMode, @Nullable Path installationDirectory, Executor embedded, Executor forked) {
+    public HelperImpl(
+            Mode defaultMode,
+            @Nullable Path installationDirectory,
+            @Nullable Path userHomeDirectory,
+            Executor embedded,
+            Executor forked) {
         this.defaultMode = requireNonNull(defaultMode);
         this.installationDirectory = installationDirectory != null
                 ? ExecutorRequest.getCanonicalPath(installationDirectory)
-                : ExecutorRequest.discoverMavenHome();
+                : ExecutorRequest.discoverInstallationDirectory();
+        this.userHomeDirectory = userHomeDirectory != null
+                ? ExecutorRequest.getCanonicalPath(userHomeDirectory)
+                : ExecutorRequest.discoverUserHomeDirectory();
         this.executorTool = new ToolboxTool(this);
         this.executors = new HashMap<>();
 
@@ -64,7 +73,7 @@ public class HelperImpl implements ExecutorHelper {
 
     @Override
     public ExecutorRequest.Builder executorRequest() {
-        return ExecutorRequest.mavenBuilder(installationDirectory);
+        return ExecutorRequest.mavenBuilder(installationDirectory).userHomeDirectory(userHomeDirectory);
     }
 
     @Override

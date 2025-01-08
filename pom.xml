@@ -142,7 +142,7 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2024-12-13T23:22:29Z</project.build.outputTimestamp>
     <!-- various versions -->
-    <assertjVersion>3.27.0</assertjVersion>
+    <assertjVersion>3.27.2</assertjVersion>
     <asmVersion>9.7.1</asmVersion>
     <byteBuddyVersion>1.15.11</byteBuddyVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
@@ -156,8 +156,8 @@ under the License.
     <jlineVersion>3.28.0</jlineVersion>
     <junitVersion>5.11.4</junitVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <logbackClassicVersion>1.5.15</logbackClassicVersion>
-    <mockitoVersion>5.14.2</mockitoVersion>
+    <logbackClassicVersion>1.5.16</logbackClassicVersion>
+    <mockitoVersion>5.15.2</mockitoVersion>
     <plexusInteractivityVersion>1.3</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.27</plexusInterpolationVersion>
     <plexusTestingVersion>1.4.0</plexusTestingVersion>

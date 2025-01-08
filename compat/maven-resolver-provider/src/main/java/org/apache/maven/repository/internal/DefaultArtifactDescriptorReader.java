@@ -240,19 +240,19 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     if (logger.isDebugEnabled()) {
                         String problem = (problems.size() == 1) ? "problem" : "problems";
                         String problemPredicate = problem + ((problems.size() == 1) ? " was" : " were");
-                        String message = String.format(
+                        StringBuilder message = new StringBuilder(String.format(
                                 "%s %s encountered while building the effective model for %s during %s\n",
                                 problems.size(),
                                 problemPredicate,
                                 request.getArtifact(),
-                                RequestTraceHelper.interpretTrace(true, request.getTrace()));
-                        message += StringUtils.capitalizeFirstLetter(problem);
+                                RequestTraceHelper.interpretTrace(true, request.getTrace())));
+                        message.append(StringUtils.capitalizeFirstLetter(problem));
                         for (ModelProblem modelProblem : problems) {
-                            message += String.format(
+                            message.append(String.format(
                                     "\n* %s @ %s",
-                                    modelProblem.getMessage(), ModelProblemUtils.formatLocation(modelProblem, null));
+                                    modelProblem.getMessage(), ModelProblemUtils.formatLocation(modelProblem, null)));
                         }
-                        logger.warn(message);
+                        logger.warn(message.toString());
                     } else {
                         logger.warn(
                                 "{} {} encountered while building the effective model for {} during {} (use -X to see details)",

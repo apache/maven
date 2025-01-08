@@ -33,7 +33,7 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * The option of a Java command-line tool where to place the paths to some dependencies.
- * A {@code PathType} can identify the class-path, the module-path, the patches for a specific module,
+ * A {@code PathType} can identify the class path, the module path, the patches for a specific module,
  * or another kind of path.
  *
  * <p>One path type is handled in a special way: unlike other options,
@@ -41,8 +41,8 @@ import org.apache.maven.api.annotations.Nonnull;
  * This type is created by calls to {@link #patchModule(String)} and a new instance must be created for
  * every module to patch.</p>
  *
- * <p>Path types are often exclusive. For example, a dependency should not be both on the Java class-path
- * and on the Java module-path.</p>
+ * <p>Path types are often exclusive. For example, a dependency should not be both on the Java class path
+ * and on the Java module path.</p>
  *
  * <h2>Relationship with Java compiler standard location</h2>
  * This enumeration is closely related to the {@link JavaFileManager.Location} enumerations.
@@ -63,16 +63,16 @@ public enum JavaPathType implements PathType {
      * The Java tools location is {@link StandardLocation#CLASS_PATH}.
      *
      * <h4>Context-sensitive interpretation</h4>
-     * A dependency with this path type will not necessarily be placed on the class-path.
+     * A dependency with this path type will not necessarily be placed on the class path.
      * There are two circumstances where the dependency may nevertheless be placed somewhere else:
      *
      * <ul>
      *   <li>If {@link #MODULES} path type is also set, then the dependency can be placed either on the
-     *       class-path or on the module-path, but only one of those. The choice is up to the plugin,
+     *       class path or on the module path, but only one of those. The choice is up to the plugin,
      *       possibly using heuristic rules (Maven 3 behavior).</li>
-     *   <li>If a {@link #patchModule(String)} is also set and the main JAR file is placed on the module-path,
+     *   <li>If a {@link #patchModule(String)} is also set and the main JAR file is placed on the module path,
      *       then the test dependency will be placed on the Java {@code --patch-module} option instead of the
-     *       class-path.</li>
+     *       class path.</li>
      * </ul>
      */
     CLASSES(StandardLocation.CLASS_PATH, "--class-path"),
@@ -83,16 +83,16 @@ public enum JavaPathType implements PathType {
      * The Java tools location is {@link StandardLocation#MODULE_PATH}.
      *
      * <h4>Context-sensitive interpretation</h4>
-     * A dependency with this flag will not necessarily be placed on the module-path.
+     * A dependency with this flag will not necessarily be placed on the module path.
      * There are two circumstances where the dependency may nevertheless be placed somewhere else:
      *
      * <ul>
      *   <li>If {@link #CLASSES} path type is also set, then the dependency <em>should</em> be placed on the
-     *       module-path, but is also compatible with placement on the class-path. Compatibility can
+     *       module path, but is also compatible with placement on the class path. Compatibility can
      *       be achieved, for example, by repeating in the {@code META-INF/services/} directory the services
      *       that are declared in the {@code module-info.class} file. In that case, the path type can be chosen
      *       by the plugin.</li>
-     *   <li>If a {@link #patchModule(String)} is also set and the main JAR file is placed on the module-path,
+     *   <li>If a {@link #patchModule(String)} is also set and the main JAR file is placed on the module path,
      *       then the test dependency will be placed on the Java {@code --patch-module} option instead of the
      *       {@code --module-path} option.</li>
      * </ul>
@@ -151,8 +151,8 @@ public enum JavaPathType implements PathType {
      * one specific module. Used for compilation and execution among others.
      *
      * <h4>Context-sensitive interpretation</h4>
-     * This path type makes sense only when a main module is added on the module-path by another dependency.
-     * In no main module is found, the patch dependency may be added on the class-path or module-path
+     * This path type makes sense only when a main module is added on the module path by another dependency.
+     * In no main module is found, the patch dependency may be added on the class path or module path
      * depending on whether {@link #CLASSES} or {@link #MODULES} is present.
      *
      * @param moduleName name of the module on which to apply the path
