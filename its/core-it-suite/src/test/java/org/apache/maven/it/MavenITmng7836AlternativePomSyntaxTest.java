@@ -54,10 +54,10 @@ class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTes
         consumerVerifier.addCliArgument("-V");
 
         Path consumerPom = Paths.get(consumerVerifier.getArtifactPath(
-                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", ""));
+                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", "", null));
         Path buildPom = Paths.get(consumerVerifier.getArtifactPath(
-                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", "build"));
-        consumerVerifier.deleteArtifacts("org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT");
+                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", "build", null));
+        consumerVerifier.deleteArtifacts("org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", null);
 
         consumerVerifier.execute();
         consumerVerifier.verifyErrorFreeLog();

@@ -47,7 +47,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
 
         final Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
         overrideGlobalSettings(testDir, verifier);
-        verifier.deleteArtifacts("org.apache.maven.its.mng6772");
+        verifier.deleteArtifacts("org.apache.maven.its.mng6772", "central");
 
         verifier.filterFile("pom-template.xml", "pom.xml");
 
@@ -63,7 +63,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
 
         final Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
         overrideGlobalSettings(testDir, verifier);
-        verifier.deleteArtifacts("org.apache.maven.its.mng6772");
+        verifier.deleteArtifacts("org.apache.maven.its.mng6772", "central");
 
         verifier.filterFile("pom-template.xml", "pom.xml");
 

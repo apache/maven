@@ -44,7 +44,7 @@ class MavenITmng7606DependencyImportScopeTest extends AbstractMavenIntegrationTe
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(true);
-        verifier.deleteArtifacts("org.apache.maven.its.mng7606");
+        verifier.deleteArtifacts("org.apache.maven.its.mng7606", null);
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

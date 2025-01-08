@@ -75,62 +75,82 @@ public class MavenITmng6957BuildConsumer extends AbstractMavenIntegrationTestCas
         assertTextEquals(
                 new File(testDir, "expected/parent.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6957-SNAPSHOT", "pom")));
+                        "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6957-SNAPSHOT", "pom", null)));
 
         assertTextEquals(
                 new File(testDir, "expected/parent-build.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                        "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6957-SNAPSHOT", "pom", "build", null)));
 
         assertTextEquals(
                 new File(testDir, "expected/simple-parent.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-parent", "0.9-MNG6957-SNAPSHOT", "pom")));
+                        "org.sonatype.mavenbook.multi", "simple-parent", "0.9-MNG6957-SNAPSHOT", "pom", null)));
 
         assertTextEquals(
                 new File(testDir, "expected/simple-parent-build.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-parent", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                        "org.sonatype.mavenbook.multi",
+                        "simple-parent",
+                        "0.9-MNG6957-SNAPSHOT",
+                        "pom",
+                        "build",
+                        null)));
 
         assertTextEquals(
                 new File(testDir, "expected/simple-weather.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-weather", "0.9-MNG6957-SNAPSHOT", "pom")));
+                        "org.sonatype.mavenbook.multi", "simple-weather", "0.9-MNG6957-SNAPSHOT", "pom", null)));
 
         assertTextEquals(
                 new File(testDir, "expected/simple-weather-build.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-weather", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                        "org.sonatype.mavenbook.multi",
+                        "simple-weather",
+                        "0.9-MNG6957-SNAPSHOT",
+                        "pom",
+                        "build",
+                        null)));
 
         assertTextEquals(
                 new File(testDir, "expected/simple-webapp.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-webapp", "0.9-MNG6957-SNAPSHOT", "pom")));
+                        "org.sonatype.mavenbook.multi", "simple-webapp", "0.9-MNG6957-SNAPSHOT", "pom", null)));
 
         assertTextEquals(
                 new File(testDir, "expected/simple-webapp-build.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-webapp", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                        "org.sonatype.mavenbook.multi",
+                        "simple-webapp",
+                        "0.9-MNG6957-SNAPSHOT",
+                        "pom",
+                        "build",
+                        null)));
 
         assertTextEquals(
                 new File(testDir, "expected/simple-testutils.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-testutils", "0.9-MNG6957-SNAPSHOT", "pom")));
+                        "org.sonatype.mavenbook.multi", "simple-testutils", "0.9-MNG6957-SNAPSHOT", "pom", null)));
 
         assertTextEquals(
                 new File(testDir, "expected/simple-testutils-build.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-testutils", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                        "org.sonatype.mavenbook.multi",
+                        "simple-testutils",
+                        "0.9-MNG6957-SNAPSHOT",
+                        "pom",
+                        "build",
+                        null)));
 
         assertTextEquals(
                 new File(testDir, "expected/utils-parent.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "utils-parent", "0.9-MNG6957-SNAPSHOT", "pom")));
+                        "org.sonatype.mavenbook.multi", "utils-parent", "0.9-MNG6957-SNAPSHOT", "pom", null)));
 
         assertTextEquals(
                 new File(testDir, "expected/utils-parent-build.pom"),
                 new File(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "utils-parent", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                        "org.sonatype.mavenbook.multi", "utils-parent", "0.9-MNG6957-SNAPSHOT", "pom", "build", null)));
     }
 
     static void assertTextEquals(File file1, File file2) throws IOException {

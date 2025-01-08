@@ -42,7 +42,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
         verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
+        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
         verifier.addCliArgument("validate");
@@ -59,7 +59,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
         verifier = newVerifier(new File(testDir, "client-no-descriptor").getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
+        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
         verifier.addCliArgument("validate");
@@ -99,7 +99,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
         verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
+        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions", "repoman");
         verifier.addCliArgument("-s");
         verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
         verifier.addCliArgument("validate");
@@ -123,7 +123,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
         verifier = newVerifier(new File(testDir, "client-properties").getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
+        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
         verifier.addCliArgument("-Dtest-extension-version=0.1");
@@ -146,7 +146,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
         verifier = newVerifier(new File(testDir, "client-config").getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
+        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
         verifier.setForkJvm(true); // force forked JVM since we need the shell script to detect .mvn/

@@ -47,7 +47,7 @@ public class MavenITmng6084Jsr250PluginTest extends AbstractMavenIntegrationTest
         Verifier v0 = newVerifier(testDir.getAbsolutePath());
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
-        v0.deleteArtifacts("org.apache.maven.its.mng6084");
+        v0.deleteArtifacts("org.apache.maven.its.mng6084", null);
         v0.addCliArgument("install");
         v0.execute();
         v0.verifyErrorFreeLog();

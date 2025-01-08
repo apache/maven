@@ -51,7 +51,7 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
         final Path remoteRepoDir = Paths.get(verifier.getBasedir(), "repo");
 
         verifier.deleteDirectory("repo");
-        verifier.deleteArtifacts("org.apache.maven.its.mng6754");
+        verifier.deleteArtifacts("org.apache.maven.its.mng6754", null);
         verifier.addCliArgument("-Drepodir=" + remoteRepoDir);
         verifier.addCliArgument("deploy");
         verifier.execute();

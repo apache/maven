@@ -49,7 +49,7 @@ public class MavenITmng7982DependencyManagementTransitivityTest extends Abstract
         File testDir = extractResources("/mng-7982-transitive-dependency-management");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.deleteArtifacts("org.apache.maven.its.mng7982");
+        verifier.deleteArtifacts("org.apache.maven.its.mng7982", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -92,7 +92,7 @@ public class MavenITmng7982DependencyManagementTransitivityTest extends Abstract
         File testDir = extractResources("/mng-7982-transitive-dependency-management");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.deleteArtifacts("org.apache.maven.its.mng7982");
+        verifier.deleteArtifacts("org.apache.maven.its.mng7982", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.filterFile("settings-template.xml", "settings.xml");

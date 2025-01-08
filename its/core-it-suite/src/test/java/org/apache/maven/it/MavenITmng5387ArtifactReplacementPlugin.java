@@ -44,7 +44,7 @@ public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegr
         Verifier v0 = newVerifier(testDir.getAbsolutePath());
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
-        v0.deleteArtifacts("org.apache.maven.its.mng5387");
+        v0.deleteArtifacts("org.apache.maven.its.mng5387", null);
         v0.addCliArgument("install");
         v0.execute();
         v0.verifyErrorFreeLog();

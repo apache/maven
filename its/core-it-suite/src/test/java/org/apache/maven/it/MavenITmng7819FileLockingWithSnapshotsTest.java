@@ -78,7 +78,8 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
         // produce required precondition state: local repository must not have any of the org.apache.maven.its.mng7819
         // artifacts
-        String path = verifier.getArtifactPath("org.apache.maven.its.mng7819", "dependency", "1.0.0-SNAPSHOT", "pom");
+        String path = verifier.getArtifactPath(
+                "org.apache.maven.its.mng7819", "dependency", "1.0.0-SNAPSHOT", "pom", "maven-core-it");
         File groupDirectory = new File(path).getParentFile().getParentFile().getParentFile();
         FileUtils.deleteDirectory(groupDirectory);
 

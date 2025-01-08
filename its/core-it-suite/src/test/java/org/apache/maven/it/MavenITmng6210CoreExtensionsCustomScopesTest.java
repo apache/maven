@@ -42,7 +42,7 @@ public class MavenITmng6210CoreExtensionsCustomScopesTest extends AbstractMavenI
 
         verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions-custom-scopes");
+        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions-custom-scopes", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
         verifier.addCliArgument("validate");

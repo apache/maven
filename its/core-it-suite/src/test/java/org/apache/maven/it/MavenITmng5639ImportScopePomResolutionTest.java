@@ -37,7 +37,7 @@ public class MavenITmng5639ImportScopePomResolutionTest extends AbstractMavenInt
         File testDir = extractResources("/mng-5639-import-scope-pom-resolution");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.deleteArtifacts("org.apache.maven.its.mng5639");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5639", "maven-core-it");
 
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
@@ -47,6 +47,6 @@ public class MavenITmng5639ImportScopePomResolutionTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyArtifactPresent("org.apache.maven.its.mng5639", "b", "0.1", "jar");
+        verifier.verifyArtifactPresent("org.apache.maven.its.mng5639", "b", "0.1", "jar", "maven-core-it");
     }
 }

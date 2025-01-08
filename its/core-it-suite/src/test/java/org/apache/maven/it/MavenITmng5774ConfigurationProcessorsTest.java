@@ -39,7 +39,7 @@ public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenInte
 
         verifier = newVerifier(new File(testDir, "build-with-one-processor-valid").getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it-configuration-processors");
+        verifier.deleteArtifacts("org.apache.maven.its.it-configuration-processors", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
         verifier.addCliArgument("process-resources");
@@ -62,7 +62,7 @@ public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenInte
 
         verifier = newVerifier(new File(testDir, "build-with-two-processors-invalid").getAbsolutePath());
         verifier.deleteDirectory("target");
-        verifier.deleteArtifacts("org.apache.maven.its.it-configuration-processors");
+        verifier.deleteArtifacts("org.apache.maven.its.it-configuration-processors", "maven-core-it");
         verifier.addCliArgument("-s");
         verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
         try {

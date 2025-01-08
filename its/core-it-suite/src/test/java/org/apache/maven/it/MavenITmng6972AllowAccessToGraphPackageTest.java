@@ -47,8 +47,8 @@ public class MavenITmng6972AllowAccessToGraphPackageTest extends AbstractMavenIn
          * makes it easy to do this.
          */
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "build-plugin", "1.0", "jar");
-        verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "using-module", "1.0", "jar");
+        verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "build-plugin", "1.0", "jar", null);
+        verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "using-module", "1.0", "jar", null);
 
         verifier = newVerifier(new File(testDir.getAbsolutePath(), "build-plugin").getAbsolutePath());
         verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.getAbsolutePath());
