@@ -146,8 +146,6 @@ import org.slf4j.spi.LocationAwareLogger;
  */
 public class MavenBaseLogger extends LegacyAbstractLogger {
 
-    private static final long serialVersionUID = -632788891211436180L;
-
     private static final Clock MONOTONIC_CLOCK = Clock.tick(Clock.systemUTC(), Duration.ofMillis(1));
     private static final Instant START_TIME = MonotonicClock.now();
 
