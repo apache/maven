@@ -109,7 +109,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
     private void assertArtifact(
             Verifier verifier, String gid, String aid, String ver, String cls, String ext, String sha1)
             throws Exception {
-        File file = new File(verifier.getArtifactPath(gid, aid, ver, ext, cls));
+        File file = new File(verifier.getArtifactPath(gid, aid, ver, ext, cls, "maven-core-it"));
         assertTrue(file.isFile(), file.getAbsolutePath());
         assertEquals(sha1, ItUtils.calcHash(file, "SHA-1"));
     }

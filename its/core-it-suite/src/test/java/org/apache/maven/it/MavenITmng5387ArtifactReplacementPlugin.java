@@ -49,7 +49,7 @@ public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegr
         v0.execute();
         v0.verifyErrorFreeLog();
 
-        String path = v0.getArtifactPath("org.apache.maven.its.mng5387", "mng5387-it", "0.0.1-SNAPSHOT", "txt", "c");
+        String path = v0.getArtifactPath("org.apache.maven.its.mng5387", "mng5387-it", "0.0.1-SNAPSHOT", "txt", "c", null);
         String contents = Files.readString(new File(path).toPath());
         assertTrue(contents.contains("This is the second file"));
     }
