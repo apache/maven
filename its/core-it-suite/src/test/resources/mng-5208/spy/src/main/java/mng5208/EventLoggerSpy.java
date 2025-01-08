@@ -32,6 +32,7 @@ public class EventLoggerSpy extends AbstractEventSpy {
     @Override
     public void onEvent(Object event) throws Exception {
         if (event instanceof ExecutionEvent) {
+
             ExecutionEvent executionEvent = (ExecutionEvent) event;
             System.out.println("executionEvent:" + executionEvent.getType() + "/"
                     + executionEvent.getProject().getId());
