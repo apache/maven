@@ -97,7 +97,7 @@ class ExpressionUtil {
             } else if ((context instanceof List list) && Character.isDigit(segment.charAt(0))) {
                 try {
                     int index = Integer.parseInt(segment);
-                    targets = Collections.singletonMap(segment, (list.get(index));
+                    targets = Collections.singletonMap(segment, list.get(index));
                 } catch (RuntimeException e) {
                     // invalid index, just ignore
                 }
