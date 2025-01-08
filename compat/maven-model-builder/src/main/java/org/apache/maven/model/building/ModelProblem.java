@@ -46,7 +46,8 @@ public interface ModelProblem {
         V20,
         V30,
         V31,
-        V40
+        V40,
+        V41
     }
 
     /**
