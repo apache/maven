@@ -50,16 +50,16 @@ public class DefaultArtifactVersion implements ArtifactVersion {
             return true;
         }
 
-        if (!(other instanceof ArtifactVersion)) {
-            return false;
+        if (other instanceof ArtifactVersion artifactVersion) {
+            return compareTo(artifactVersion) == 0;
         }
 
-        return compareTo((ArtifactVersion) other) == 0;
+        return false;
     }
 
     public int compareTo(ArtifactVersion otherVersion) {
-        if (otherVersion instanceof DefaultArtifactVersion) {
-            return this.comparable.compareTo(((DefaultArtifactVersion) otherVersion).comparable);
+        if (otherVersion instanceof DefaultArtifactVersion defaultArtifactVersion) {
+            return this.comparable.compareTo(defaultArtifactVersion.comparable);
         } else {
             return compareTo(new DefaultArtifactVersion(otherVersion.toString()));
         }

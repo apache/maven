@@ -113,20 +113,18 @@ implements Toolchain, ToolchainPrivate {
             return true;
         }
 
-        if (!(obj instanceof DefaultToolchain)) {
+        if (obj instanceof DefaultToolchain other) {
+            if (!Objects.equals(type, other.type)) {
+                return false;
+            }
+
+            Properties thisProvides = this.getModel().getProvides();
+            Properties otherProvides = other.getModel().getProvides();
+
+            return Objects.equals(thisProvides, otherProvides);
+        } else {
             return false;
         }
-
-        DefaultToolchain other = (DefaultToolchain) obj;
-
-        if (!Objects.equals(type, other.type)) {
-            return false;
-        }
-
-        Properties thisProvides = this.getModel().getProvides();
-        Properties otherProvides = other.getModel().getProvides();
-
-        return Objects.equals(thisProvides, otherProvides);
     }
 
     @Override

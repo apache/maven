@@ -101,8 +101,8 @@ public final class ReflectionUtils {
                 if (qualifier != null) {
                     throw new DIException("More than one qualifier annotation on " + annotatedElement);
                 }
-                if (annotation instanceof Named) {
-                    qualifier = ((Named) annotation).value();
+                if (annotation instanceof Named named) {
+                    qualifier = named.value();
                 } else {
                     Class<? extends Annotation> annotationType = annotation.annotationType();
                     qualifier = Utils.isMarker(annotationType) ? annotationType : annotation;

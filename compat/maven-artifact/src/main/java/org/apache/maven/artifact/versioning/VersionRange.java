@@ -469,13 +469,12 @@ public class VersionRange {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof VersionRange)) {
+        if (obj instanceof VersionRange other) {
+            return Objects.equals(recommendedVersion, other.recommendedVersion)
+                    && Objects.equals(restrictions, other.restrictions);
+        } else {
             return false;
         }
-        VersionRange other = (VersionRange) obj;
-
-        return Objects.equals(recommendedVersion, other.recommendedVersion)
-                && Objects.equals(restrictions, other.restrictions);
     }
 
     public int hashCode() {

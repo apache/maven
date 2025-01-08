@@ -77,9 +77,7 @@ public class MetadataGraphEdge {
     @Override
     @SuppressWarnings("checkstyle:equalshashcode")
     public boolean equals(Object o) {
-        if (o instanceof MetadataGraphEdge) {
-            MetadataGraphEdge e = (MetadataGraphEdge) o;
-
+        if (o instanceof MetadataGraphEdge e) {
             return objectsEqual(version, e.version)
                     && ArtifactScopeEnum.checkScope(scope)
                             .getScope()

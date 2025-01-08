@@ -302,10 +302,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
             LocalArtifactRepository ideWorkspace =
                     plexus.lookup(LocalArtifactRepository.class, LocalArtifactRepository.IDE_WORKSPACE);
 
-            if (request.getLocalRepository() instanceof DelegatingLocalArtifactRepository) {
-                DelegatingLocalArtifactRepository delegatingLocalRepository =
-                        (DelegatingLocalArtifactRepository) request.getLocalRepository();
-
+            if (request.getLocalRepository() instanceof DelegatingLocalArtifactRepository delegatingLocalRepository) {
                 LocalArtifactRepository orig = delegatingLocalRepository.getIdeWorkspace();
 
                 delegatingLocalRepository.setIdeWorkspace(ideWorkspace);

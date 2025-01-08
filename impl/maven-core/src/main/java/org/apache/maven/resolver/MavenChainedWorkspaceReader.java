@@ -67,8 +67,8 @@ public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
         Model model = null;
 
         for (WorkspaceReader workspaceReader : readers) {
-            if (workspaceReader instanceof MavenWorkspaceReader) {
-                model = ((MavenWorkspaceReader) workspaceReader).findModel(artifact);
+            if (workspaceReader instanceof MavenWorkspaceReader mavenWorkspaceReader) {
+                model = mavenWorkspaceReader.findModel(artifact);
                 if (model != null) {
                     break;
                 }

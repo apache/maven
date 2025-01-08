@@ -77,12 +77,11 @@ public class DefaultVersionResolver implements VersionResolver {
 
                 @Override
                 public Optional<Repository> getRepository() {
-                    if (res.getRepository() instanceof org.eclipse.aether.repository.LocalRepository) {
-                        return Optional.of(new DefaultLocalRepository(
-                                (org.eclipse.aether.repository.LocalRepository) res.getRepository()));
-                    } else if (res.getRepository() instanceof org.eclipse.aether.repository.RemoteRepository) {
-                        return Optional.of(new DefaultRemoteRepository(
-                                (org.eclipse.aether.repository.RemoteRepository) res.getRepository()));
+                    if (res.getRepository() instanceof org.eclipse.aether.repository.LocalRepository localRepository) {
+                        return Optional.of(new DefaultLocalRepository(localRepository));
+                    } else if (res.getRepository()
+                            instanceof org.eclipse.aether.repository.RemoteRepository remoteRepository) {
+                        return Optional.of(new DefaultRemoteRepository(remoteRepository));
                     } else {
                         return Optional.empty();
                     }

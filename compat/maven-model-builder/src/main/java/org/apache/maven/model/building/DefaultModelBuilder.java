@@ -1066,8 +1066,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private DefaultModelBuildingResult asDefaultModelBuildingResult(ModelBuildingResult phaseOneResult) {
-        if (phaseOneResult instanceof DefaultModelBuildingResult) {
-            return (DefaultModelBuildingResult) phaseOneResult;
+        if (phaseOneResult instanceof DefaultModelBuildingResult defaultModelBuildingResult) {
+            return defaultModelBuildingResult;
         } else {
             return new DefaultModelBuildingResult(phaseOneResult);
         }
@@ -1126,11 +1126,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 ModelCacheTag.FILE,
                 () -> doReadFileModel(modelSource, request, problems));
 
-        if (modelSource instanceof FileModelSource) {
-            if (request.getTransformerContextBuilder() instanceof DefaultTransformerContextBuilder) {
-                DefaultTransformerContextBuilder contextBuilder =
-                        (DefaultTransformerContextBuilder) request.getTransformerContextBuilder();
-                contextBuilder.putSource(getGroupId(model), model.getArtifactId(), (FileModelSource) modelSource);
+        if (modelSource instanceof FileModelSource fileModelSource) {
+            if (request.getTransformerContextBuilder()
+                    instanceof DefaultTransformerContextBuilder defaultTransformerContextBuilder) {
+                DefaultTransformerContextBuilder contextBuilder = defaultTransformerContextBuilder;
+                contextBuilder.putSource(getGroupId(model), model.getArtifactId(), fileModelSource);
             }
         }
 
@@ -1220,8 +1220,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             throw problems.newModelBuildingException();
         }
 
-        if (modelSource instanceof FileModelSource) {
-            model = model.withPomFile(((FileModelSource) modelSource).getPath());
+        if (modelSource instanceof FileModelSource fileModelSource) {
+            model = model.withPomFile(fileModelSource.getPath());
         }
 
         Model retModel = new Model(model);
@@ -1254,11 +1254,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             ModelSource modelSource, ModelBuildingRequest request, DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         Model rawModel;
-        if (modelSource instanceof FileModelSource) {
+        if (modelSource instanceof FileModelSource fileModelSource) {
             rawModel = readFileModel(request, problems);
 
             if (!MODEL_VERSION_4_0_0.equals(rawModel.getModelVersion())) {
-                File pomFile = ((FileModelSource) modelSource).getFile();
+                File pomFile = fileModelSource.getFile();
 
                 try {
                     if (request.getTransformerContextBuilder() != null) {
@@ -1623,8 +1623,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
-        if (source instanceof ModelSource3) {
-            return ((ModelSource3) source).getRelatedSource(modelProcessor, parentPath);
+        if (source instanceof ModelSource3 modelSource3) {
+            return modelSource3.getRelatedSource(modelProcessor, parentPath);
         } else {
             return ((ModelSource2) source).getRelatedSource(parentPath);
         }
@@ -1902,8 +1902,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return null;
             }
 
-            if (importSource instanceof FileModelSource && request.getRootDirectory() != null) {
-                Path sourcePath = ((FileModelSource) importSource).getPath();
+            if (importSource instanceof FileModelSource fileModelSource && request.getRootDirectory() != null) {
+                Path sourcePath = fileModelSource.getPath();
                 if (sourcePath.startsWith(request.getRootDirectory())) {
                     problems.add(new ModelProblemCollectorRequest(Severity.WARNING, ModelProblem.Version.BASE)
                             .setMessage("BOM imports from within reactor should be avoided")
@@ -2003,8 +2003,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     protected boolean hasModelErrors(ModelProblemCollectorExt problems) {
-        if (problems instanceof DefaultModelProblemCollector) {
-            return ((DefaultModelProblemCollector) problems).hasErrors();
+        if (problems instanceof DefaultModelProblemCollector defaultModelProblemCollector) {
+            return defaultModelProblemCollector.hasErrors();
         } else {
             // the default execution path only knows the DefaultModelProblemCollector,
             // only reason it's not in signature is because it's package private
@@ -2013,8 +2013,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     protected boolean hasFatalErrors(ModelProblemCollectorExt problems) {
-        if (problems instanceof DefaultModelProblemCollector) {
-            return ((DefaultModelProblemCollector) problems).hasFatalErrors();
+        if (problems instanceof DefaultModelProblemCollector defaultModelProblemCollector) {
+            return defaultModelProblemCollector.hasFatalErrors();
         } else {
             // the default execution path only knows the DefaultModelProblemCollector,
             // only reason it's not in signature is because it's package private

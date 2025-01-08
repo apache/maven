@@ -54,22 +54,22 @@ public class Types {
      * {@link GenericArrayType} or {@link TypeVariable}
      */
     public static Class<?> getRawType(Type type) {
-        if (type instanceof Class) {
-            return (Class<?>) type;
-        } else if (type instanceof ParameterizedType) {
-            return (Class<?>) ((ParameterizedType) type).getRawType();
-        } else if (type instanceof WildcardType) {
-            Type[] upperBounds = ((WildcardType) type).getUpperBounds();
+        if (type instanceof Class<?> clazz) {
+            return clazz;
+        } else if (type instanceof ParameterizedType parameterizedType) {
+            return (Class<?>) parameterizedType.getRawType();
+        } else if (type instanceof WildcardType wildcardType) {
+            Type[] upperBounds = wildcardType.getUpperBounds();
             return getRawType(getUppermostType(upperBounds));
-        } else if (type instanceof GenericArrayType) {
-            Class<?> rawComponentType = getRawType(((GenericArrayType) type).getGenericComponentType());
+        } else if (type instanceof GenericArrayType genericArrayType) {
+            Class<?> rawComponentType = getRawType(genericArrayType.getGenericComponentType());
             try {
                 return Class.forName("[L" + rawComponentType.getName() + ";");
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
-        } else if (type instanceof TypeVariable) {
-            return getRawType(getUppermostType(((TypeVariable<?>) type).getBounds()));
+        } else if (type instanceof TypeVariable<?> typeVariable) {
+            return getRawType(getUppermostType(typeVariable.getBounds()));
         } else {
             throw new IllegalArgumentException("Unsupported type: " + type);
         }
@@ -100,12 +100,12 @@ public class Types {
      * @return an array of actual type arguments for a given {@link Type}
      */
     public static Type[] getActualTypeArguments(Type type) {
-        if (type instanceof Class) {
-            return ((Class<?>) type).isArray() ? new Type[] {((Class<?>) type).getComponentType()} : NO_TYPES;
-        } else if (type instanceof ParameterizedType) {
-            return ((ParameterizedType) type).getActualTypeArguments();
-        } else if (type instanceof GenericArrayType) {
-            return new Type[] {((GenericArrayType) type).getGenericComponentType()};
+        if (type instanceof Class<?> clazz) {
+            return clazz.isArray() ? new Type[] {clazz.getComponentType()} : NO_TYPES;
+        } else if (type instanceof ParameterizedType parameterizedType) {
+            return parameterizedType.getActualTypeArguments();
+        } else if (type instanceof GenericArrayType genericArrayType) {
+            return new Type[] {genericArrayType.getGenericComponentType()};
         }
         throw new IllegalArgumentException("Unsupported type: " + type);
     }
@@ -141,8 +141,8 @@ public class Types {
     private static void getAllTypeBindingsImpl(Type type, Map<TypeVariable<?>, Type> mapping) {
         Class<?> cls = getRawType(type);
 
-        if (type instanceof ParameterizedType) {
-            Type[] typeArguments = ((ParameterizedType) type).getActualTypeArguments();
+        if (type instanceof ParameterizedType parameterizedType) {
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
             if (typeArguments.length != 0) {
                 TypeVariable<? extends Class<?>>[] typeVariables = cls.getTypeParameters();
                 for (int i = 0; i < typeArguments.length; i++) {
@@ -203,8 +203,8 @@ public class Types {
             return new ParameterizedTypeImpl(
                     parameterizedType.getOwnerType(), parameterizedType.getRawType(), typeArguments2);
         }
-        if (type instanceof GenericArrayType) {
-            Type componentType = ((GenericArrayType) type).getGenericComponentType();
+        if (type instanceof GenericArrayType genericArrayType) {
+            Type componentType = genericArrayType.getGenericComponentType();
             return new GenericArrayTypeImpl(bind(componentType, bindings));
         }
         if (type instanceof WildcardType wildcardType) {
@@ -256,8 +256,8 @@ public class Types {
             if (done.add(type)) {
                 Class<?> cls = getRawType(type);
                 Function<TypeVariable<?>, Type> bindings;
-                if (type instanceof ParameterizedType) {
-                    Type[] typeArguments = ((ParameterizedType) type).getActualTypeArguments();
+                if (type instanceof ParameterizedType parameterizedType) {
+                    Type[] typeArguments = parameterizedType.getActualTypeArguments();
                     TypeVariable<? extends Class<?>>[] typeVariables = cls.getTypeParameters();
                     bindings = v -> {
                         for (int i = 0; i < typeArguments.length; i++) {
@@ -297,8 +297,8 @@ public class Types {
             return original;
         }
 
-        if (original instanceof GenericArrayType) {
-            Type componentType = ((GenericArrayType) original).getGenericComponentType();
+        if (original instanceof GenericArrayType genericArrayType) {
+            Type componentType = genericArrayType.getGenericComponentType();
             Type repackedComponentType = simplifyType(componentType);
             if (componentType != repackedComponentType) {
                 return genericArrayType(repackedComponentType);
@@ -384,8 +384,8 @@ public class Types {
      */
     public static boolean isAssignable(Type to, Type from) {
         // shortcut
-        if (to instanceof Class && from instanceof Class) {
-            return ((Class<?>) to).isAssignableFrom((Class<?>) from);
+        if (to instanceof Class<?> toClazz && from instanceof Class<?> fromClazz) {
+            return toClazz.isAssignableFrom(fromClazz);
         }
         return isAssignable(to, from, false);
     }
@@ -438,8 +438,8 @@ public class Types {
         if (from instanceof GenericArrayType) {
             from = getRawType(from);
         }
-        if (!strict && to instanceof Class) {
-            return ((Class<?>) to).isAssignableFrom(getRawType(from));
+        if (!strict && to instanceof Class<?> toClazz) {
+            return toClazz.isAssignableFrom(getRawType(from));
         }
         Class<?> toRawClazz = getRawType(to);
         Type[] toTypeArguments = getActualTypeArguments(to);
@@ -675,7 +675,7 @@ public class Types {
     }
 
     private static String toString(Type type) {
-        return type instanceof Class ? ((Class<?>) type).getName() : type.toString();
+        return type instanceof Class<?> clazz ? clazz.getName() : type.toString();
     }
 
     /**
@@ -684,10 +684,10 @@ public class Types {
      * @see Class#getSimpleName()
      */
     public static String getSimpleName(Type type) {
-        if (type instanceof Class) {
-            return ((Class<?>) type).getSimpleName();
-        } else if (type instanceof ParameterizedType) {
-            return Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
+        if (type instanceof Class<?> clazz) {
+            return clazz.getSimpleName();
+        } else if (type instanceof ParameterizedType parameterizedType) {
+            return Arrays.stream(parameterizedType.getActualTypeArguments())
                     .map(Types::getSimpleName)
                     .collect(joining(",", "<", ">"));
         } else if (type instanceof WildcardType wildcardType) {
@@ -706,8 +706,8 @@ public class Types {
                                     + Arrays.stream(lowerBounds)
                                             .map(Types::getSimpleName)
                                             .collect(joining(" & ")));
-        } else if (type instanceof GenericArrayType) {
-            return Types.getSimpleName(((GenericArrayType) type).getGenericComponentType()) + "[]";
+        } else if (type instanceof GenericArrayType genericArrayType) {
+            return Types.getSimpleName(genericArrayType.getGenericComponentType()) + "[]";
         }
 
         return type.getTypeName();

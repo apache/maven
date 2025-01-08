@@ -142,10 +142,10 @@ public class MetadataGraphVertex implements Comparable<MetadataGraphVertex> {
     // ---------------------------------------------------------------------
     @Override
     public boolean equals(Object vo) {
-        if (!(vo instanceof MetadataGraphVertex)) {
-            return false;
+        if (vo instanceof MetadataGraphVertex metadataGraphVertex) {
+            return compareTo(metadataGraphVertex) == 0;
         }
-        return compareTo((MetadataGraphVertex) vo) == 0;
+        return false;
     }
 
     // ---------------------------------------------------------------------

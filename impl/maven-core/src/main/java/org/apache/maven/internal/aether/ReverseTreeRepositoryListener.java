@@ -70,14 +70,14 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
 
         while (trace != null) {
             Object data = trace.getData();
-            if (data instanceof CollectStepData) {
-                collectStepTrace = (CollectStepData) data;
-            } else if (data instanceof ArtifactDescriptorRequest) {
-                artifactDescriptorRequest = (ArtifactDescriptorRequest) data;
-            } else if (data instanceof ArtifactRequest) {
-                artifactRequest = (ArtifactRequest) data;
-            } else if (data instanceof Plugin) {
-                plugin = (Plugin) data;
+            if (data instanceof CollectStepData collectStepData) {
+                collectStepTrace = collectStepData;
+            } else if (data instanceof ArtifactDescriptorRequest artifactDescriptorRequestData) {
+                artifactDescriptorRequest = artifactDescriptorRequestData;
+            } else if (data instanceof ArtifactRequest artifactRequestData) {
+                artifactRequest = artifactRequestData;
+            } else if (data instanceof Plugin pluginData) {
+                plugin = pluginData;
             }
             trace = trace.getParent();
         }
@@ -209,8 +209,8 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
     static CollectStepData lookupCollectStepData(RequestTrace trace) {
         CollectStepData collectStepTrace = null;
         while (trace != null) {
-            if (trace.getData() instanceof CollectStepData) {
-                collectStepTrace = (CollectStepData) trace.getData();
+            if (trace.getData() instanceof CollectStepData collectStepData) {
+                collectStepTrace = collectStepData;
                 break;
             }
             trace = trace.getParent();

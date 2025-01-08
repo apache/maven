@@ -102,11 +102,11 @@ class ReactorModelPool {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof GAKey)) {
+            if (obj instanceof GAKey that) {
+                return artifactId.equals(that.artifactId) && groupId.equals(that.groupId);
+            } else {
                 return false;
             }
-            GAKey that = (GAKey) obj;
-            return artifactId.equals(that.artifactId) && groupId.equals(that.groupId);
         }
 
         @Override
