@@ -31,7 +31,7 @@ import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.impl.DefaultMessageBuilderFactory;
-import org.apache.maven.internal.xml.XmlNodeImpl;
+import org.apache.maven.internal.xml.XmlNodeUtil;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -100,7 +100,7 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
                     ? mojoExecution.getConfiguration().getDom()
                     : null;
 
-            XmlNode mergedConfiguration = XmlNodeImpl.merge(mojoConfiguration, pomConfiguration);
+            XmlNode mergedConfiguration = XmlNodeUtil.merge(mojoConfiguration, pomConfiguration);
 
             mojoExecution.setConfiguration(mergedConfiguration);
 

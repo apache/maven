@@ -34,7 +34,6 @@ import org.apache.maven.configuration.BeanConfigurationPathTranslator;
 import org.apache.maven.configuration.BeanConfigurationRequest;
 import org.apache.maven.configuration.BeanConfigurationValuePreprocessor;
 import org.apache.maven.configuration.BeanConfigurator;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.converters.AbstractConfigurationConverter;
@@ -168,7 +167,7 @@ public class DefaultBeanConfigurator implements BeanConfigurator {
             }
             String name = config.getName();
             Object value = evaluator.evaluate(config.getValue());
-            return new XmlNodeImpl(name, value != null ? value.toString() : null, null, children, null);
+            return new XmlNode(name, value != null ? value.toString() : null, null, children, null);
         }
     }
 

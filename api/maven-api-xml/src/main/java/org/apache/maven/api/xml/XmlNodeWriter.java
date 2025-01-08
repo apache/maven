@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.xml;
+package org.apache.maven.api.xml;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 
-import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.stax2.util.StreamWriterDelegate;
 
 /**

@@ -46,6 +46,8 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Generated;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeUtil;
+
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.Name};
 #end
@@ -176,12 +178,12 @@ public class ${className} {
                 builder.location("${field.name}", source.getLocation("configuration"));
         #end
             } else if (sourceDominant) {
-                builder.configuration(src.merge(tgt));
+                builder.configuration(XmlNodeUtil.merge(src, tgt));
         #if ( $locationTracking )
                 builder.location("${field.name}", target.getLocation("configuration"));
         #end
             } else {
-                builder.configuration(tgt.merge(src));
+                builder.configuration(XmlNodeUtil.merge(tgt, src));
         #if ( $locationTracking )
                 builder.location("${field.name}", null);
         #end

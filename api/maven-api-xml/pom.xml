@@ -35,6 +35,14 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-annotations</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.woodstox</groupId>
+      <artifactId>stax2-api</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

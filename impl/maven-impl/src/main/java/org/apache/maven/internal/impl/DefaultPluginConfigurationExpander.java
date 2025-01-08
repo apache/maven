@@ -34,6 +34,7 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.PluginConfigurationExpander;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeUtil;
 
 /**
  * Handles expansion of general build plugin configuration into individual executions.
@@ -69,7 +70,7 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
                 return plugin.withExecutions(map(
                         plugin.getExecutions(),
                         execution -> execution.withConfiguration(
-                                XmlNode.merge(execution.getConfiguration(), pluginConfiguration))));
+                                XmlNodeUtil.merge(execution.getConfiguration(), pluginConfiguration))));
             } else {
                 return plugin;
             }
@@ -83,7 +84,7 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
                 return plugin.withReportSets(map(
                         plugin.getReportSets(),
                         report -> report.withConfiguration(
-                                XmlNode.merge(report.getConfiguration(), pluginConfiguration))));
+                                XmlNodeUtil.merge(report.getConfiguration(), pluginConfiguration))));
             } else {
                 return plugin;
             }
