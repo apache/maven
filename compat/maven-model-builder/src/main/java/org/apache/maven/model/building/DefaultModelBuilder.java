@@ -1003,8 +1003,11 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         String parentPath = childModel.getParent().getRelativePath();
+        if (parentPath == null) {
+            parentPath = "../pom.xml";
+        }
 
-        if (parentPath == null || parentPath.length() <= 0) {
+        if (parentPath.length() <= 0) {
             return null;
         }
 
