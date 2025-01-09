@@ -1318,12 +1318,10 @@
         <codeSegment>
           <version>4.0.0/4.0.99</version>
           <code>
-            <![CDATA[
     public void clearManagementKey() {
         managementKey = null;
     }
 
-            ]]>
           </code>
         </codeSegment>
       </codeSegments>
