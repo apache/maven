@@ -40,19 +40,5 @@ public interface VersionRangeResolverResult {
     List<Version> getVersions();
 
     @Nonnull
-    default Optional<Version> getLowerVersion() {
-        return getVersions().isEmpty()
-                ? Optional.empty()
-                : Optional.of(getVersions().get(0));
-    }
-
-    @Nonnull
-    default Optional<Version> getHigherVersion() {
-        return getVersions().isEmpty()
-                ? Optional.empty()
-                : Optional.of(getVersions().get(getVersions().size() - 1));
-    }
-
-    @Nonnull
     Optional<Repository> getRepository(Version version);
 }
