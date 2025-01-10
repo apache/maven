@@ -55,6 +55,10 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
     </dependency>
     <dependency>
@@ -63,11 +67,6 @@ under the License.
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-xml</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
@@ -103,9 +102,9 @@ under the License.
               <include>org.apache.maven.toolchain.merge</include>
             </includes>
             <excludes>
-              <exclude>org.apache.maven.toolchain.building.DefaultToolchainsBuilder#DefaultToolchainsBuilder():CONSTRUCTOR_REMOVED</exclude>
-              <exclude>org.apache.maven.toolchain.merge.MavenToolchainMerger#getToolchainModelKey(org.apache.maven.toolchain.model.ToolchainModel):METHOD_REMOVED</exclude>
-              <exclude>org.apache.maven.toolchain.merge.MavenToolchainMerger#mergeToolchainModelConfiguration(org.apache.maven.toolchain.model.ToolchainModel,org.apache.maven.toolchain.model.ToolchainModel):METHOD_REMOVED</exclude>
+              <!--              <exclude>org.apache.maven.toolchain.building.DefaultToolchainsBuilder#DefaultToolchainsBuilder():CONSTRUCTOR_REMOVED</exclude>-->
+              <!--              <exclude>org.apache.maven.toolchain.merge.MavenToolchainMerger#getToolchainModelKey(org.apache.maven.toolchain.model.ToolchainModel):METHOD_REMOVED</exclude>-->
+              <!--              <exclude>org.apache.maven.toolchain.merge.MavenToolchainMerger#mergeToolchainModelConfiguration(org.apache.maven.toolchain.model.ToolchainModel,org.apache.maven.toolchain.model.ToolchainModel):METHOD_REMOVED</exclude>-->
             </excludes>
           </parameter>
           <oldVersion>

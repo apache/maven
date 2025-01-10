@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
+@Deprecated
 class DefaultModelBuilderFactoryTest {
 
     private static final String BASE_DIR =

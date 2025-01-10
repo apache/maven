@@ -331,6 +331,10 @@
         }
         return profileMap;
     }
+
+    public void setModelEncoding(String modelEncoding) {
+        update(getDelegate().with().modelEncoding(modelEncoding).build());
+    }
             ]]>
           </code>
         </codeSegment>

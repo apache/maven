@@ -49,10 +49,4 @@ public interface ModelNormalizer {
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     void injectDefaultValues(Model model, ModelBuildingRequest request, ModelProblemCollector problems);
-
-    org.apache.maven.api.model.Model mergeDuplicates(
-            org.apache.maven.api.model.Model model, ModelBuildingRequest request, ModelProblemCollector problems);
-
-    org.apache.maven.api.model.Model injectDefaultValues(
-            org.apache.maven.api.model.Model model, ModelBuildingRequest request, ModelProblemCollector problems);
 }

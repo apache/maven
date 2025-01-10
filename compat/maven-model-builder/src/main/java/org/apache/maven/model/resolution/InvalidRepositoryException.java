@@ -18,7 +18,7 @@
  */
 package org.apache.maven.model.resolution;
 
-import org.apache.maven.api.model.Repository;
+import org.apache.maven.model.Repository;
 
 /**
  * Signals an error when adding a repository to the model resolver.

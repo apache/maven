@@ -19,7 +19,6 @@
 package org.apache.maven.repository.internal;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 
@@ -118,7 +117,6 @@ public final class RelocatedArtifact extends AbstractArtifact {
         return new RelocatedArtifact(artifact, groupId, artifactId, classifier, extension, version, message);
     }
 
-    @Deprecated
     @Override
     public Artifact setFile(File file) {
         File current = getFile();
@@ -127,16 +125,6 @@ public final class RelocatedArtifact extends AbstractArtifact {
         }
         return new RelocatedArtifact(
                 artifact.setFile(file), groupId, artifactId, classifier, extension, version, message);
-    }
-
-    @Override
-    public Artifact setPath(Path path) {
-        Path current = getPath();
-        if (Objects.equals(current, path)) {
-            return this;
-        }
-        return new RelocatedArtifact(
-                artifact.setPath(path), groupId, artifactId, classifier, extension, version, message);
     }
 
     @Override
@@ -149,15 +137,9 @@ public final class RelocatedArtifact extends AbstractArtifact {
                 artifact.setProperties(properties), groupId, artifactId, classifier, extension, version, message);
     }
 
-    @Deprecated
     @Override
     public File getFile() {
         return artifact.getFile();
-    }
-
-    @Override
-    public Path getPath() {
-        return artifact.getPath();
     }
 
     @Override

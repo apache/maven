@@ -65,30 +65,28 @@ public class JdkVersionProfileActivator implements ProfileActivator {
 
         String version = context.getSystemProperties().get("java.version");
 
-        if (version == null || version.isEmpty()) {
+        if (version == null || version.length() <= 0) {
             problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
                     .setMessage("Failed to determine Java version for profile " + profile.getId())
                     .setLocation(activation.getLocation("jdk")));
             return false;
         }
-        try {
-            return isJavaVersionCompatible(jdk, version);
-        } catch (NumberFormatException e) {
-            problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
-                    .setMessage("Failed to determine JDK activation for profile " + profile.getId()
-                            + " due invalid JDK version: '" + version + "'")
-                    .setLocation(activation.getLocation("jdk")));
-            return false;
-        }
-    }
 
-    public static boolean isJavaVersionCompatible(String requiredJdkRange, String currentJavaVersion) {
-        if (requiredJdkRange.startsWith("!")) {
-            return !currentJavaVersion.startsWith(requiredJdkRange.substring(1));
-        } else if (isRange(requiredJdkRange)) {
-            return isInRange(currentJavaVersion, getRange(requiredJdkRange));
+        if (jdk.startsWith("!")) {
+            return !version.startsWith(jdk.substring(1));
+        } else if (isRange(jdk)) {
+            try {
+                return isInRange(version, getRange(jdk));
+            } catch (NumberFormatException e) {
+                problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
+                        .setMessage("Failed to determine JDK activation for profile " + profile.getId()
+                                + " due invalid JDK version: '" + version + "'")
+                        .setLocation(profile.getLocation(""))
+                        .setException(e));
+                return false;
+            }
         } else {
-            return currentJavaVersion.startsWith(requiredJdkRange);
+            return version.startsWith(jdk);
         }
     }
 
@@ -102,7 +100,10 @@ public class JdkVersionProfileActivator implements ProfileActivator {
 
         String jdk = activation.getJdk();
 
-        return jdk != null;
+        if (jdk == null) {
+            return false;
+        }
+        return true;
     }
 
     private static boolean isInRange(String value, List<RangeValue> range) {
@@ -120,7 +121,7 @@ public class JdkVersionProfileActivator implements ProfileActivator {
     }
 
     private static int getRelationOrder(String value, RangeValue rangeValue, boolean isLeft) {
-        if (rangeValue.value.isEmpty()) {
+        if (rangeValue.value.length() <= 0) {
             return isLeft ? 1 : -1;
         }
 
@@ -169,7 +170,7 @@ public class JdkVersionProfileActivator implements ProfileActivator {
                 ranges.add(new RangeValue(token.replace("]", ""), true));
             } else if (token.endsWith(")")) {
                 ranges.add(new RangeValue(token.replace(")", ""), false));
-            } else if (token.isEmpty()) {
+            } else if (token.length() <= 0) {
                 ranges.add(new RangeValue("", false));
             }
         }

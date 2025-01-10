@@ -26,15 +26,15 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
-import org.apache.maven.api.model.Build;
-import org.apache.maven.api.model.Dependency;
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.model.Plugin;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles normalization of a model.
@@ -49,21 +49,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     private DuplicateMerger merger = new DuplicateMerger();
 
     @Override
-    public void mergeDuplicates(
-            org.apache.maven.model.Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
-        model.update(mergeDuplicates(model.getDelegate(), request, problems));
-    }
-
-    @Override
-    public void injectDefaultValues(
-            org.apache.maven.model.Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
-        model.update(injectDefaultValues(model.getDelegate(), request, problems));
-    }
-
-    @Override
-    public Model mergeDuplicates(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
-        Model.Builder builder = Model.newBuilder(model);
-
+    public void mergeDuplicates(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         Build build = model.getBuild();
         if (build != null) {
             List<Plugin> plugins = build.getPlugins();
@@ -73,14 +59,13 @@ public class DefaultModelNormalizer implements ModelNormalizer {
                 Object key = plugin.getKey();
                 Plugin first = normalized.get(key);
                 if (first != null) {
-                    plugin = merger.mergePlugin(plugin, first);
+                    merger.mergePlugin(plugin, first);
                 }
                 normalized.put(key, plugin);
             }
 
             if (plugins.size() != normalized.size()) {
-                builder.build(
-                        Build.newBuilder(build).plugins(normalized.values()).build());
+                build.setPlugins(new ArrayList<>(normalized.values()));
             }
         }
 
@@ -99,10 +84,8 @@ public class DefaultModelNormalizer implements ModelNormalizer {
         }
 
         if (dependencies.size() != normalized.size()) {
-            builder.dependencies(normalized.values());
+            model.setDependencies(new ArrayList<>(normalized.values()));
         }
-
-        return builder.build();
     }
 
     /**
@@ -110,53 +93,29 @@ public class DefaultModelNormalizer implements ModelNormalizer {
      */
     protected static class DuplicateMerger extends MavenModelMerger {
 
-        public Plugin mergePlugin(Plugin target, Plugin source) {
-            return super.mergePlugin(target, source, false, Collections.emptyMap());
+        public void mergePlugin(Plugin target, Plugin source) {
+            super.mergePlugin(target, source, false, Collections.emptyMap());
         }
     }
 
     @Override
-    public Model injectDefaultValues(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
-        Model.Builder builder = Model.newBuilder(model);
+    public void injectDefaultValues(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
+        injectDependencyDefaults(model.getDependencies());
 
-        builder.dependencies(injectList(model.getDependencies(), this::injectDependency));
         Build build = model.getBuild();
         if (build != null) {
-            Build newBuild = Build.newBuilder(build)
-                    .plugins(injectList(build.getPlugins(), this::injectPlugin))
-                    .build();
-            builder.build(newBuild != build ? newBuild : null);
-        }
-
-        return builder.build();
-    }
-
-    private Plugin injectPlugin(Plugin p) {
-        return Plugin.newBuilder(p)
-                .dependencies(injectList(p.getDependencies(), this::injectDependency))
-                .build();
-    }
-
-    private Dependency injectDependency(Dependency d) {
-        // we cannot set this directly in the MDO due to the interactions with dependency management
-        return (d.getScope() == null || d.getScope().isEmpty()) ? d.withScope("compile") : d;
-    }
-
-    /**
-     * Returns a list suited for the builders, i.e. null if not modified
-     */
-    private <T> List<T> injectList(List<T> list, Function<T, T> modifer) {
-        List<T> newList = null;
-        for (int i = 0; i < list.size(); i++) {
-            T oldT = list.get(i);
-            T newT = modifer.apply(oldT);
-            if (newT != oldT) {
-                if (newList == null) {
-                    newList = new ArrayList<>(list);
-                }
-                newList.set(i, newT);
+            for (Plugin plugin : build.getPlugins()) {
+                injectDependencyDefaults(plugin.getDependencies());
             }
         }
-        return newList;
+    }
+
+    private void injectDependencyDefaults(List<Dependency> dependencies) {
+        for (Dependency dependency : dependencies) {
+            if (StringUtils.isEmpty(dependency.getScope())) {
+                // we cannot set this directly in the MDO due to the interactions with dependency management
+                dependency.setScope("compile");
+            }
+        }
     }
 }

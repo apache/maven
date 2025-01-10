@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  */
+@Deprecated
 class ComplexActivationTest {
 
     private File getPom(String name) {

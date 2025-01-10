@@ -16,11 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.model.interpolation;
+package org.apache.maven.cli.transfer;
 
+import java.io.PrintStream;
+
+/**
+ * BatchModeMavenTransferListener
+ */
 @Deprecated
-public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolatorTest {
-    protected ModelInterpolator createInterpolator() {
-        return new StringVisitorModelInterpolator().setVersionPropertiesProcessor(new DefaultModelVersionProcessor());
+public class BatchModeMavenTransferListener extends AbstractMavenTransferListener {
+    public BatchModeMavenTransferListener(PrintStream out) {
+        super(out);
     }
 }

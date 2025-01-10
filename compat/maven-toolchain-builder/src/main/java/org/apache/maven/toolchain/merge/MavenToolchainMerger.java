@@ -18,7 +18,13 @@
  */
 package org.apache.maven.toolchain.merge;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.toolchain.model.PersistedToolchains;
+import org.apache.maven.toolchain.model.ToolchainModel;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  *
@@ -35,7 +41,46 @@ public class MavenToolchainMerger {
 
         recessive.setSourceLevel(recessiveSourceLevel);
 
-        dominant.update(new org.apache.maven.toolchain.v4.MavenToolchainsMerger()
-                .merge(dominant.getDelegate(), recessive.getDelegate(), true, null));
+        shallowMerge(dominant.getToolchains(), recessive.getToolchains(), recessiveSourceLevel);
+    }
+
+    private void shallowMerge(
+            List<ToolchainModel> dominant, List<ToolchainModel> recessive, String recessiveSourceLevel) {
+        Map<Object, ToolchainModel> merged = new LinkedHashMap<>();
+
+        for (ToolchainModel dominantModel : dominant) {
+            Object key = getToolchainModelKey(dominantModel);
+
+            merged.put(key, dominantModel);
+        }
+
+        for (ToolchainModel recessiveModel : recessive) {
+            Object key = getToolchainModelKey(recessiveModel);
+
+            ToolchainModel dominantModel = merged.get(key);
+            if (dominantModel == null) {
+                recessiveModel.setSourceLevel(recessiveSourceLevel);
+                dominant.add(recessiveModel);
+            } else {
+                mergeToolchainModelConfiguration(dominantModel, recessiveModel);
+            }
+        }
+    }
+
+    protected void mergeToolchainModelConfiguration(ToolchainModel target, ToolchainModel source) {
+        Xpp3Dom src = (Xpp3Dom) source.getConfiguration();
+        if (src != null) {
+            Xpp3Dom tgt = (Xpp3Dom) target.getConfiguration();
+            if (tgt == null) {
+                tgt = Xpp3Dom.mergeXpp3Dom(new Xpp3Dom(src), tgt);
+            } else {
+                tgt = Xpp3Dom.mergeXpp3Dom(tgt, src);
+            }
+            target.setConfiguration(tgt);
+        }
+    }
+
+    protected Object getToolchainModelKey(ToolchainModel model) {
+        return model;
     }
 }

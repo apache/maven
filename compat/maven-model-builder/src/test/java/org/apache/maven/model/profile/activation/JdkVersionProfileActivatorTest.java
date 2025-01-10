@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests {@link JdkVersionProfileActivator}.
  *
  */
+@Deprecated
 class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVersionProfileActivator> {
 
     @Override

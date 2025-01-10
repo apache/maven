@@ -223,7 +223,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         remoteRepositoryManager,
                         request.getRepositories()));
                 if (resolveResult.getRepository() instanceof WorkspaceRepository) {
-                    modelRequest.setPomPath(pomArtifact.getPath());
+                    modelRequest.setPomFile(pomArtifact.getFile());
                 } else {
                     modelRequest.setModelSource(new ArtifactModelSource(
                             pomArtifact.getPath(),

@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
 
-import org.apache.maven.api.model.ActivationFile;
+import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.root.RootLocator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -43,14 +43,20 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 @Deprecated
 public class ProfileActivationFilePathInterpolator {
 
-    private final PathTranslator pathTranslator;
-
-    private final RootLocator rootLocator;
+    @Inject
+    private PathTranslator pathTranslator;
 
     @Inject
-    public ProfileActivationFilePathInterpolator(PathTranslator pathTranslator, RootLocator rootLocator) {
+    private RootLocator rootLocator;
+
+    public ProfileActivationFilePathInterpolator setPathTranslator(PathTranslator pathTranslator) {
         this.pathTranslator = pathTranslator;
+        return this;
+    }
+
+    public ProfileActivationFilePathInterpolator setRootLocator(RootLocator rootLocator) {
         this.rootLocator = rootLocator;
+        return this;
     }
 
     /**

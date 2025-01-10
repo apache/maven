@@ -19,7 +19,6 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -44,27 +43,15 @@ class FilterModelBuildingRequest implements ModelBuildingRequest {
         this.request = request;
     }
 
-    @Deprecated
     @Override
     public File getPomFile() {
         return request.getPomFile();
     }
 
     @Override
-    public Path getPomPath() {
-        return request.getPomPath();
-    }
-
-    @Deprecated
-    @Override
-    public ModelBuildingRequest setPomFile(File pomFile) {
+    public FilterModelBuildingRequest setPomFile(File pomFile) {
         request.setPomFile(pomFile);
-        return this;
-    }
 
-    @Override
-    public FilterModelBuildingRequest setPomPath(Path pomPath) {
-        request.setPomPath(pomPath);
         return this;
     }
 
@@ -237,17 +224,6 @@ class FilterModelBuildingRequest implements ModelBuildingRequest {
     }
 
     @Override
-    public Model getFileModel() {
-        return request.getFileModel();
-    }
-
-    @Override
-    public ModelBuildingRequest setFileModel(Model fileModel) {
-        request.setFileModel(fileModel);
-        return this;
-    }
-
-    @Override
     public Model getRawModel() {
         return request.getRawModel();
     }
@@ -266,28 +242,6 @@ class FilterModelBuildingRequest implements ModelBuildingRequest {
     @Override
     public ModelBuildingRequest setWorkspaceModelResolver(WorkspaceModelResolver workspaceResolver) {
         request.setWorkspaceModelResolver(workspaceResolver);
-        return this;
-    }
-
-    @Override
-    public TransformerContextBuilder getTransformerContextBuilder() {
-        return request.getTransformerContextBuilder();
-    }
-
-    @Override
-    public ModelBuildingRequest setTransformerContextBuilder(TransformerContextBuilder contextBuilder) {
-        request.setTransformerContextBuilder(contextBuilder);
-        return this;
-    }
-
-    @Override
-    public Path getRootDirectory() {
-        return request.getRootDirectory();
-    }
-
-    @Override
-    public ModelBuildingRequest setRootDirectory(Path rootDirectory) {
-        request.setRootDirectory(rootDirectory);
         return this;
     }
 }

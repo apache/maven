@@ -18,16 +18,15 @@
  */
 package org.apache.maven.model.building;
 
-import java.nio.file.Path;
+import java.io.File;
 
 import org.apache.maven.model.Model;
 
 /**
  * Assists in the handling of model problems.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @author Benjamin Bentmann
  */
-@Deprecated(since = "4.0.0")
 public class ModelProblemUtils {
 
     /**
@@ -45,9 +44,9 @@ public class ModelProblemUtils {
 
         buffer.append(toId(model));
 
-        Path pomPath = model.getPomPath();
-        if (pomPath != null) {
-            buffer.append(" (").append(pomPath).append(')');
+        File pomFile = model.getPomFile();
+        if (pomFile != null) {
+            buffer.append(" (").append(pomFile).append(')');
         }
 
         return buffer.toString();
@@ -57,10 +56,10 @@ public class ModelProblemUtils {
         String path = "";
 
         if (model != null) {
-            Path pomPath = model.getPomPath();
+            File pomFile = model.getPomFile();
 
-            if (pomPath != null) {
-                path = pomPath.toAbsolutePath().toString();
+            if (pomFile != null) {
+                path = pomFile.getAbsolutePath();
             }
         }
 
@@ -71,10 +70,7 @@ public class ModelProblemUtils {
         if (model == null) {
             return "";
         }
-        return toId(model.getDelegate());
-    }
 
-    static String toId(org.apache.maven.api.model.Model model) {
         String groupId = model.getGroupId();
         if (groupId == null && model.getParent() != null) {
             groupId = model.getParent().getGroupId();
@@ -104,11 +100,11 @@ public class ModelProblemUtils {
     static String toId(String groupId, String artifactId, String version) {
         StringBuilder buffer = new StringBuilder(128);
 
-        buffer.append((groupId != null && !groupId.isEmpty()) ? groupId : "[unknown-group-id]");
+        buffer.append((groupId != null && groupId.length() > 0) ? groupId : "[unknown-group-id]");
         buffer.append(':');
-        buffer.append((artifactId != null && !artifactId.isEmpty()) ? artifactId : "[unknown-artifact-id]");
+        buffer.append((artifactId != null && artifactId.length() > 0) ? artifactId : "[unknown-artifact-id]");
         buffer.append(':');
-        buffer.append((version != null && !version.isEmpty()) ? version : "[unknown-version]");
+        buffer.append((version != null && version.length() > 0) ? version : "[unknown-version]");
 
         return buffer.toString();
     }
@@ -129,7 +125,7 @@ public class ModelProblemUtils {
         if (!problem.getModelId().equals(projectId)) {
             buffer.append(problem.getModelId());
 
-            if (!problem.getSource().isEmpty()) {
+            if (problem.getSource().length() > 0) {
                 if (buffer.length() > 0) {
                     buffer.append(", ");
                 }

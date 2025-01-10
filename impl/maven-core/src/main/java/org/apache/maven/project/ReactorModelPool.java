@@ -18,83 +18,46 @@
  */
 package org.apache.maven.project;
 
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashSet;
+import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.maven.api.model.Model;
 
 /**
- * Holds all Models that are known to the reactor. This allows the project builder to resolve imported Models from the
+ * Holds all POM files that are known to the reactor. This allows the project builder to resolve imported POMs from the
  * reactor when building another project's effective model.
- *
  */
 class ReactorModelPool {
-    private final Map<GAKey, Set<Model>> modelsByGa = new ConcurrentHashMap<>();
 
-    private final Map<Path, Model> modelsByPath = new ConcurrentHashMap<>();
+    private final Map<CacheKey, File> pomFiles = new HashMap<>();
 
-    /**
-     * Get the model by its GAV or (since 4.0.0) by its GA if there is only one.
-     *
-     * @param groupId never {@code null}
-     * @param artifactId never {@code null}
-     * @param version can be {@code null}
-     * @return the matching model or {@code null}
-     * @throws IllegalStateException if version was null and multiple modules share the same groupId + artifactId
-     */
-    public Model get(String groupId, String artifactId, String version) {
-        return modelsByGa.getOrDefault(new GAKey(groupId, artifactId), Collections.emptySet()).stream()
-                .filter(m -> version == null || version.equals(getVersion(m)))
-                .reduce((a, b) -> {
-                    throw new IllegalStateException(
-                            "Multiple modules with key " + a.getGroupId() + ':' + a.getArtifactId());
-                })
-                .orElse(null);
+    public File get(String groupId, String artifactId, String version) {
+        return pomFiles.get(new CacheKey(groupId, artifactId, version));
     }
 
-    private String getVersion(Model model) {
-        String version = model.getVersion();
-        if (version == null && model.getParent() != null) {
-            version = model.getParent().getVersion();
-        }
-        return version;
+    public void put(String groupId, String artifactId, String version, File pomFile) {
+        pomFiles.put(new CacheKey(groupId, artifactId, version), pomFile);
     }
 
-    void put(Path pomFile, Model model) {
-        if (pomFile != null) {
-            modelsByPath.put(pomFile, model);
-        }
-        modelsByGa
-                .computeIfAbsent(new GAKey(getGroupId(model), model.getArtifactId()), k -> new HashSet<>())
-                .add(model);
-    }
-
-    private static String getGroupId(Model model) {
-        String groupId = model.getGroupId();
-        if (groupId == null && model.getParent() != null) {
-            groupId = model.getParent().getGroupId();
-        }
-        return groupId;
-    }
-
-    private static final class GAKey {
+    private static final class CacheKey {
 
         private final String groupId;
 
         private final String artifactId;
 
+        private final String version;
+
         private final int hashCode;
 
-        GAKey(String groupId, String artifactId) {
+        CacheKey(String groupId, String artifactId, String version) {
             this.groupId = (groupId != null) ? groupId : "";
             this.artifactId = (artifactId != null) ? artifactId : "";
+            this.version = (version != null) ? version : "";
 
-            hashCode = Objects.hash(this.groupId, this.artifactId);
+            int hash = 17;
+            hash = hash * 31 + this.groupId.hashCode();
+            hash = hash * 31 + this.artifactId.hashCode();
+            hash = hash * 31 + this.version.hashCode();
+            hashCode = hash;
         }
 
         @Override
@@ -102,11 +65,14 @@ class ReactorModelPool {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof GAKey)) {
+
+            if (!(obj instanceof CacheKey)) {
                 return false;
             }
-            GAKey that = (GAKey) obj;
-            return artifactId.equals(that.artifactId) && groupId.equals(that.groupId);
+
+            CacheKey that = (CacheKey) obj;
+
+            return artifactId.equals(that.artifactId) && groupId.equals(that.groupId) && version.equals(that.version);
         }
 
         @Override
@@ -116,7 +82,9 @@ class ReactorModelPool {
 
         @Override
         public String toString() {
-            return groupId + ':' + artifactId;
+            StringBuilder buffer = new StringBuilder(128);
+            buffer.append(groupId).append(':').append(artifactId).append(':').append(version);
+            return buffer.toString();
         }
     }
 }

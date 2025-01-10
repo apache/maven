@@ -23,7 +23,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.
@@ -57,7 +59,12 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      * @return This context, never {@code null}.
      */
     public DefaultProfileActivationContext setActiveProfileIds(List<String> activeProfileIds) {
-        this.activeProfileIds = unmodifiable(activeProfileIds);
+        if (activeProfileIds != null) {
+            this.activeProfileIds = Collections.unmodifiableList(activeProfileIds);
+        } else {
+            this.activeProfileIds = Collections.emptyList();
+        }
+
         return this;
     }
 
@@ -73,7 +80,12 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      * @return This context, never {@code null}.
      */
     public DefaultProfileActivationContext setInactiveProfileIds(List<String> inactiveProfileIds) {
-        this.inactiveProfileIds = unmodifiable(inactiveProfileIds);
+        if (inactiveProfileIds != null) {
+            this.inactiveProfileIds = Collections.unmodifiableList(inactiveProfileIds);
+        } else {
+            this.inactiveProfileIds = Collections.emptyList();
+        }
+
         return this;
     }
 
@@ -91,7 +103,13 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      */
     @SuppressWarnings("unchecked")
     public DefaultProfileActivationContext setSystemProperties(Properties systemProperties) {
-        return setSystemProperties(toMap(systemProperties));
+        if (systemProperties != null) {
+            this.systemProperties = Collections.unmodifiableMap((Map) systemProperties);
+        } else {
+            this.systemProperties = Collections.emptyMap();
+        }
+
+        return this;
     }
 
     /**
@@ -102,7 +120,12 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      * @return This context, never {@code null}.
      */
     public DefaultProfileActivationContext setSystemProperties(Map<String, String> systemProperties) {
-        this.systemProperties = unmodifiable(systemProperties);
+        if (systemProperties != null) {
+            this.systemProperties = Collections.unmodifiableMap(systemProperties);
+        } else {
+            this.systemProperties = Collections.emptyMap();
+        }
+
         return this;
     }
 
@@ -121,7 +144,13 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      */
     @SuppressWarnings("unchecked")
     public DefaultProfileActivationContext setUserProperties(Properties userProperties) {
-        return setUserProperties(toMap(userProperties));
+        if (userProperties != null) {
+            this.userProperties = Collections.unmodifiableMap((Map) userProperties);
+        } else {
+            this.userProperties = Collections.emptyMap();
+        }
+
+        return this;
     }
 
     /**
@@ -133,7 +162,12 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      * @return This context, never {@code null}.
      */
     public DefaultProfileActivationContext setUserProperties(Map<String, String> userProperties) {
-        this.userProperties = unmodifiable(userProperties);
+        if (userProperties != null) {
+            this.userProperties = Collections.unmodifiableMap(userProperties);
+        } else {
+            this.userProperties = Collections.emptyMap();
+        }
+
         return this;
     }
 
@@ -161,30 +195,15 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     public DefaultProfileActivationContext setProjectProperties(Properties projectProperties) {
-        return setProjectProperties(toMap(projectProperties));
-    }
-
-    public DefaultProfileActivationContext setProjectProperties(Map<String, String> projectProperties) {
-        this.projectProperties = unmodifiable(projectProperties);
+        if (projectProperties != null) {
+            this.projectProperties = projectProperties.entrySet().stream()
+                    .collect(collectingAndThen(
+                            toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue())),
+                            Collections::unmodifiableMap));
+        } else {
+            this.projectProperties = Collections.emptyMap();
+        }
 
         return this;
-    }
-
-    private static List<String> unmodifiable(List<String> list) {
-        return list != null ? Collections.unmodifiableList(list) : Collections.emptyList();
-    }
-
-    private static Map<String, String> unmodifiable(Map<String, String> map) {
-        return map != null ? Collections.unmodifiableMap(map) : Collections.emptyMap();
-    }
-
-    private static Map<String, String> toMap(Properties properties) {
-        if (properties != null && !properties.isEmpty()) {
-            return properties.entrySet().stream()
-                    .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue())));
-
-        } else {
-            return null;
-        }
     }
 }
