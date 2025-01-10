@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl.model.reflection;
 
+import java.io.Serial;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -118,6 +119,7 @@ class MethodMap {
      */
     static class AmbiguousException extends Exception {
 
+        @Serial
         private static final long serialVersionUID = 751688436639650618L;
     }
 

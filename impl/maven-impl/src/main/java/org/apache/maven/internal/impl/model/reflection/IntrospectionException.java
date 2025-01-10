@@ -18,11 +18,14 @@
  */
 package org.apache.maven.internal.impl.model.reflection;
 
+import java.io.Serial;
+
 public class IntrospectionException extends Exception {
 
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = -6090771282553728784L;
 
     IntrospectionException(String message) {
