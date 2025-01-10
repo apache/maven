@@ -19,7 +19,6 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
-import java.util.Objects;
 
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.RemoteRepository;
@@ -27,6 +26,8 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A request for deploying one or more artifacts to a remote repository.

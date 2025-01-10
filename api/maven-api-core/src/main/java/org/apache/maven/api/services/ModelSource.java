@@ -19,10 +19,11 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
-import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A Source specific to load POMs.  The {@link #resolve(ModelLocator, String)} method

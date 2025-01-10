@@ -21,12 +21,13 @@ package org.apache.maven.api.services;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.Objects;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Provides access to the contents of a source independently of the

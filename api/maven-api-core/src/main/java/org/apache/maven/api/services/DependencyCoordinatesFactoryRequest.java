@@ -21,7 +21,6 @@ package org.apache.maven.api.services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Dependency;
@@ -31,6 +30,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  *

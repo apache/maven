@@ -20,7 +20,6 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.RemoteRepository;
@@ -30,6 +29,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Request used to build a {@link org.apache.maven.api.Project} using

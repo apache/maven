@@ -20,7 +20,6 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.ProtoSession;
@@ -28,6 +27,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  *

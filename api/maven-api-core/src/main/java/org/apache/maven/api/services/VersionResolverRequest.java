@@ -19,7 +19,6 @@
 package org.apache.maven.api.services;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.RemoteRepository;
@@ -28,6 +27,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  *

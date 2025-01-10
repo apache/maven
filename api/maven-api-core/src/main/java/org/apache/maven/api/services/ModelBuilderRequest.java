@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -32,6 +31,8 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Profile;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Request used to build a {@link org.apache.maven.api.Project} using

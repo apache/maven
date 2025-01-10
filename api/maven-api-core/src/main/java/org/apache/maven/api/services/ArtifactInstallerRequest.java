@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
-import static java.util.requireNonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A request for installing one or more artifacts in the local repository.
