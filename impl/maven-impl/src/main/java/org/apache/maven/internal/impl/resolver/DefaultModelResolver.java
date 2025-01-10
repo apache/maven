@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -135,8 +136,8 @@ public class DefaultModelResolver implements ModelResolver {
                         artifactId,
                         version);
             }
-            List<Version> versions = session.resolveVersionRange(coords, repositories);
-            if (versions.isEmpty()) {
+            Optional<Version> result = session.resolveHighestVersion(coords, repositories);
+            if (result.isEmpty()) {
                 throw new ModelResolverException(
                         "No versions matched the requested " + (type != null ? type + " " : "") + "version range '"
                                 + version + "'",
@@ -144,7 +145,7 @@ public class DefaultModelResolver implements ModelResolver {
                         artifactId,
                         version);
             }
-            String newVersion = versions.get(versions.size() - 1).asString();
+            String newVersion = result.get().asString();
             if (!version.equals(newVersion)) {
                 resolvedVersion.accept(newVersion);
             }
