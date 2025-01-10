@@ -19,6 +19,7 @@
 package org.apache.maven.graph;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,16 +29,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.MavenExecutionException;
+import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.internal.impl.model.DefaultModelProcessor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.building.Result;
-import org.apache.maven.model.locator.DefaultModelLocator;
-import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -103,10 +104,10 @@ class DefaultGraphBuilderTest {
 
     // Not using mocks for these strategies - a mock would just copy the actual implementation.
 
-    private final ModelLocator modelLocator = new DefaultModelLocator();
+    private final ModelProcessor modelProcessor = new DefaultModelProcessor(null, List.of());
     private final PomlessCollectionStrategy pomlessCollectionStrategy = new PomlessCollectionStrategy(projectBuilder);
     private final MultiModuleCollectionStrategy multiModuleCollectionStrategy =
-            new MultiModuleCollectionStrategy(modelLocator, projectsSelector);
+            new MultiModuleCollectionStrategy(modelProcessor, projectsSelector);
     private final RequestPomCollectionStrategy requestPomCollectionStrategy =
             new RequestPomCollectionStrategy(projectsSelector);
 
@@ -298,6 +299,7 @@ class DefaultGraphBuilderTest {
         parameterInactiveRequiredProjects.forEach(projectActivation::deactivateRequiredProject);
         parameterInactiveOptionalProjects.forEach(projectActivation::deactivateOptionalProject);
 
+        when(mavenExecutionRequest.getRootDirectory()).thenReturn(Paths.get("."));
         when(mavenExecutionRequest.getProjectActivation()).thenReturn(projectActivation);
         when(mavenExecutionRequest.getMakeBehavior()).thenReturn(parameterMakeBehavior);
         when(mavenExecutionRequest.getPom()).thenReturn(parameterRequestedPom);

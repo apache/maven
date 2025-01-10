@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
@@ -46,33 +45,14 @@ import org.apache.maven.model.profile.activation.ProfileActivator;
 @Deprecated(since = "4.0.0")
 public class DefaultProfileSelector implements ProfileSelector {
 
-    private final List<ProfileActivator> activators;
-
-    public DefaultProfileSelector() {
-        this.activators = new ArrayList<>();
-    }
-
     @Inject
-    public DefaultProfileSelector(List<ProfileActivator> activators) {
-        this.activators = new ArrayList<>(activators);
-    }
+    private List<ProfileActivator> activators = new ArrayList<>();
 
     public DefaultProfileSelector addProfileActivator(ProfileActivator profileActivator) {
         if (profileActivator != null) {
             activators.add(profileActivator);
         }
         return this;
-    }
-
-    @Override
-    public List<org.apache.maven.api.model.Profile> getActiveProfilesV4(
-            Collection<org.apache.maven.api.model.Profile> profiles,
-            ProfileActivationContext context,
-            ModelProblemCollector problems) {
-        return getActiveProfiles(profiles.stream().map(Profile::new).collect(Collectors.toList()), context, problems)
-                .stream()
-                .map(Profile::getDelegate)
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -115,18 +95,20 @@ public class DefaultProfileSelector implements ProfileSelector {
         for (ProfileActivator activator : activators) {
             if (activator.presentInConfig(profile, context, problems)) {
                 isActive = true;
-                try {
-                    if (!activator.isActive(profile, context, problems)) {
-                        return false;
-                    }
-                } catch (RuntimeException e) {
-                    problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                            .setMessage("Failed to determine activation for profile " + profile.getId() + ": "
-                                    + e.getMessage())
-                            .setLocation(profile.getLocation(""))
-                            .setException(e));
-                    return false;
+            }
+        }
+        for (ProfileActivator activator : activators) {
+            try {
+                if (activator.presentInConfig(profile, context, problems)) {
+                    isActive &= activator.isActive(profile, context, problems);
                 }
+            } catch (RuntimeException e) {
+                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                        .setMessage(
+                                "Failed to determine activation for profile " + profile.getId() + ": " + e.getMessage())
+                        .setLocation(profile.getLocation(""))
+                        .setException(e));
+                return false;
             }
         }
         return isActive;

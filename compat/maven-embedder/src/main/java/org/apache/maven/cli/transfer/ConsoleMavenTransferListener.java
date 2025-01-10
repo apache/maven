@@ -19,12 +19,12 @@
 package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
-import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
@@ -37,21 +37,14 @@ import org.eclipse.aether.transfer.TransferResource;
 @Deprecated
 public class ConsoleMavenTransferListener extends AbstractMavenTransferListener {
 
-    private final Map<TransferResourceIdentifier, TransferResourceAndSize> transfers = new LinkedHashMap<>();
-    private final FileSizeFormat format = new FileSizeFormat(); // use in a synchronized fashion
-    private final StringBuilder buffer = new StringBuilder(128); // use in a synchronized fashion
+    private final Map<TransferResourceIdentifier, TransferResourceAndSize> transfers =
+            Collections.synchronizedMap(new LinkedHashMap<TransferResourceIdentifier, TransferResourceAndSize>());
 
     private final boolean printResourceNames;
     private int lastLength;
 
-    public ConsoleMavenTransferListener(
-            MessageBuilderFactory messageBuilderFactory, PrintStream out, boolean printResourceNames) {
-        this(messageBuilderFactory, new PrintWriter(out), printResourceNames);
-    }
-
-    public ConsoleMavenTransferListener(
-            MessageBuilderFactory messageBuilderFactory, PrintWriter out, boolean printResourceNames) {
-        super(messageBuilderFactory, out);
+    public ConsoleMavenTransferListener(PrintStream out, boolean printResourceNames) {
+        super(out);
         this.printResourceNames = printResourceNames;
     }
 
@@ -76,36 +69,19 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
                 new TransferResourceIdentifier(resource),
                 new TransferResourceAndSize(resource, event.getTransferredBytes()));
 
+        StringBuilder buffer = new StringBuilder(128);
         buffer.append("Progress (").append(transfers.size()).append("): ");
 
-        Iterator<TransferResourceAndSize> entries = transfers.values().iterator();
-        while (entries.hasNext()) {
-            TransferResourceAndSize entry = entries.next();
-            // just in case, make sure 0 <= complete <= total
-            long complete = Math.max(0, entry.transferredBytes);
-            long total = Math.max(complete, entry.resource.getContentLength());
-
-            String resourceName = entry.resource.getResourceName();
-
-            if (printResourceNames) {
-                int idx = resourceName.lastIndexOf('/');
-
-                if (idx < 0) {
-                    buffer.append(resourceName);
-                } else {
-                    buffer.append(resourceName, idx + 1, resourceName.length());
+        synchronized (transfers) {
+            Iterator<TransferResourceAndSize> entries = transfers.values().iterator();
+            while (entries.hasNext()) {
+                TransferResourceAndSize entry = entries.next();
+                long total = entry.resource.getContentLength();
+                Long complete = entry.transferredBytes;
+                buffer.append(getStatus(entry.resource.getResourceName(), complete, total));
+                if (entries.hasNext()) {
+                    buffer.append(" | ");
                 }
-                buffer.append(" (");
-            }
-
-            format.formatProgress(buffer, complete, total);
-
-            if (printResourceNames) {
-                buffer.append(")");
-            }
-
-            if (entries.hasNext()) {
-                buffer.append(" | ");
             }
         }
 
@@ -115,7 +91,35 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         buffer.append('\r');
         out.print(buffer);
         out.flush();
-        buffer.setLength(0);
+    }
+
+    private String getStatus(String resourceName, long complete, long total) {
+        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
+        StringBuilder status = new StringBuilder();
+
+        if (printResourceNames) {
+            status.append(resourceName(resourceName));
+            status.append(" (");
+        }
+
+        status.append(format.formatProgress(complete, total));
+
+        if (printResourceNames) {
+            status.append(")");
+        }
+
+        return status.toString();
+    }
+
+    private String resourceName(String resourceName) {
+        if (resourceName == null || resourceName.trim().isEmpty()) {
+            return "";
+        }
+        final int pos = resourceName.lastIndexOf("/");
+        if (pos == -1 || pos == resourceName.length() - 1) {
+            return "";
+        }
+        return resourceName.substring(pos + 1);
     }
 
     private void pad(StringBuilder buffer, int spaces) {
@@ -145,14 +149,23 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     private void overridePreviousTransfer(TransferEvent event) {
         if (lastLength > 0) {
+            StringBuilder buffer = new StringBuilder(128);
             pad(buffer, lastLength);
             buffer.append('\r');
             out.print(buffer);
             out.flush();
             lastLength = 0;
-            buffer.setLength(0);
         }
     }
 
-    private record TransferResourceAndSize(TransferResource resource, long transferredBytes) {}
+    private final class TransferResourceAndSize {
+
+        private final TransferResource resource;
+        private final long transferredBytes;
+
+        private TransferResourceAndSize(TransferResource resource, long transferredBytes) {
+            this.resource = resource;
+            this.transferredBytes = transferredBytes;
+        }
+    }
 }

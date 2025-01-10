@@ -18,21 +18,19 @@
  */
 package org.apache.maven.toolchain.building;
 
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLStreamException;
-
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.api.services.xml.XmlReaderException;
-import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.building.Source;
 import org.apache.maven.building.StringSource;
 import org.apache.maven.internal.impl.DefaultToolchainsXmlFactory;
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.toolchain.io.DefaultToolchainsReader;
+import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
+import org.apache.maven.toolchain.io.ToolchainsParseException;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
@@ -40,25 +38,27 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.apache.maven.internal.impl.StaxLocation.getLocation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultToolchainsBuilderTest {
     private static final String LS = System.lineSeparator();
 
     @Spy
-    private DefaultToolchainsXmlFactory toolchainsXmlFactory;
+    private DefaultToolchainsReader toolchainsReader;
+
+    @Spy
+    private DefaultToolchainsWriter toolchainsWriter;
 
     @InjectMocks
     private DefaultToolchainsBuilder toolchainBuilder;
@@ -71,11 +71,6 @@ class DefaultToolchainsBuilderTest {
         envVarMap.put("testKey", "testValue");
         envVarMap.put("testSpecialCharactersKey", "<test&Value>");
         OperatingSystemUtils.setEnvVarSource(new TestEnvVarSource(envVarMap));
-
-        toolchainBuilder = new DefaultToolchainsBuilder(
-                new org.apache.maven.internal.impl.DefaultToolchainsBuilder(
-                        new DefaultInterpolator(), toolchainsXmlFactory),
-                toolchainsXmlFactory);
     }
 
     @Test
@@ -198,15 +193,12 @@ class DefaultToolchainsBuilderTest {
 
     @Test
     void testStrictToolchainsParseException() throws Exception {
-        Location loc = mock(Location.class);
-        when(loc.getLineNumber()).thenReturn(4);
-        when(loc.getColumnNumber()).thenReturn(2);
-        XMLStreamException parseException = new XMLStreamException("MESSAGE", loc);
-        doThrow(new XmlReaderException("MESSAGE", getLocation(parseException), parseException))
-                .when(toolchainsXmlFactory)
-                .read(any(XmlReaderRequest.class));
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(new StringSource(""));
+        ToolchainsParseException parseException = new ToolchainsParseException("MESSAGE", 4, 2);
+        doThrow(parseException)
+                .when(toolchainsReader)
+                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
 
         try {
             toolchainBuilder.build(request);

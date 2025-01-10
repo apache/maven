@@ -138,16 +138,16 @@ public class DefaultModelProblem implements ModelProblem {
 
     @Override
     public String getMessage() {
-        String msg = null;
+        String msg;
 
-        if (message != null && !message.isEmpty()) {
+        if (message != null && message.length() > 0) {
             msg = message;
-        } else if (exception != null) {
+        } else {
             msg = exception.getMessage();
-        }
 
-        if (msg == null) {
-            msg = "";
+            if (msg == null) {
+                msg = "";
+            }
         }
 
         return msg;
@@ -169,11 +169,7 @@ public class DefaultModelProblem implements ModelProblem {
 
         buffer.append('[').append(getSeverity()).append("] ");
         buffer.append(getMessage());
-        String location = ModelProblemUtils.formatLocation(this, null);
-        if (!location.isEmpty()) {
-            buffer.append(" @ ");
-            buffer.append(location);
-        }
+        buffer.append(" @ ").append(ModelProblemUtils.formatLocation(this, null));
 
         return buffer.toString();
     }

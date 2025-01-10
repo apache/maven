@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
@@ -35,7 +34,6 @@ import org.mockito.Mockito;
 import org.xmlunit.assertj.XmlAssert;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class ConsumerPomArtifactTransformerTest {
@@ -45,7 +43,6 @@ class ConsumerPomArtifactTransformerTest {
         RepositorySystemSession systemSessionMock = Mockito.mock(RepositorySystemSession.class);
         SessionData sessionDataMock = Mockito.mock(SessionData.class);
         when(systemSessionMock.getData()).thenReturn(sessionDataMock);
-        when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
 
         Path beforePomFile =
                 Paths.get("src/test/resources/projects/transform/before.pom").toAbsolutePath();
@@ -73,7 +70,6 @@ class ConsumerPomArtifactTransformerTest {
         RepositorySystemSession systemSessionMock = Mockito.mock(RepositorySystemSession.class);
         SessionData sessionDataMock = Mockito.mock(SessionData.class);
         when(systemSessionMock.getData()).thenReturn(sessionDataMock);
-        when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
 
         Path beforePomFile = Paths.get("src/test/resources/projects/transform/jar/before.pom")
                 .toAbsolutePath();
@@ -103,33 +99,10 @@ class ConsumerPomArtifactTransformerTest {
         RepositorySystemSession systemSessionMock = Mockito.mock(RepositorySystemSession.class);
         SessionData sessionDataMock = Mockito.mock(SessionData.class);
         when(systemSessionMock.getData()).thenReturn(sessionDataMock);
-        when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
 
         new DefaultConsumerPomArtifactTransformer((session, project, src) -> null)
                 .injectTransformedArtifacts(systemSessionMock, emptyProject);
 
         assertThat(emptyProject.getAttachedArtifacts()).isEmpty();
-    }
-
-    private static class NoTransformerContext implements TransformerContext {
-        @Override
-        public String getUserProperty(String key) {
-            return null;
-        }
-
-        @Override
-        public Model getRawModel(Path from, String groupId, String artifactId) throws IllegalStateException {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Model getRawModel(Path from, Path p) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Path locate(Path path) {
-            throw new UnsupportedOperationException();
-        }
     }
 }

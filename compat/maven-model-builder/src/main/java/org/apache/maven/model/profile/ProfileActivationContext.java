@@ -32,7 +32,7 @@ public interface ProfileActivationContext {
     /**
      * Key of the property containing the project's packaging.
      * Available in {@link #getUserProperties()}.
-     * @since 4.0.0
+     * @since 3.9
      */
     String PROPERTY_NAME_PACKAGING = "packaging";
 

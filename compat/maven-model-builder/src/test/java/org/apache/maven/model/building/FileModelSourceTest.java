@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * Test that validate the solution of MNG-6261 issue
  *
  */
+@Deprecated
 class FileModelSourceTest {
 
     /**

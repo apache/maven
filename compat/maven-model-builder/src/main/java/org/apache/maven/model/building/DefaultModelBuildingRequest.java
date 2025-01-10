@@ -19,7 +19,6 @@
 package org.apache.maven.model.building;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,9 +36,10 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
  */
 @Deprecated(since = "4.0.0")
 public class DefaultModelBuildingRequest implements ModelBuildingRequest {
-    private Model fileModel;
 
-    private Path pomPath;
+    private Model rawModel;
+
+    private File pomFile;
 
     private ModelSource modelSource;
 
@@ -71,10 +71,6 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
 
     private WorkspaceModelResolver workspaceResolver;
 
-    private TransformerContextBuilder contextBuilder;
-
-    private Path rootDirectory;
-
     /**
      * Creates an empty request.
      */
@@ -86,7 +82,7 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
      * @param request The request to copy, must not be {@code null}.
      */
     public DefaultModelBuildingRequest(ModelBuildingRequest request) {
-        setPomPath(request.getPomPath());
+        setPomFile(request.getPomFile());
         setModelSource(request.getModelSource());
         setValidationLevel(request.getValidationLevel());
         setProcessPlugins(request.isProcessPlugins());
@@ -101,39 +97,24 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
         setModelResolver(request.getModelResolver());
         setModelBuildingListener(request.getModelBuildingListener());
         setModelCache(request.getModelCache());
-        setWorkspaceModelResolver(request.getWorkspaceModelResolver());
-        setTransformerContextBuilder(request.getTransformerContextBuilder());
-        setRootDirectory(request.getRootDirectory());
     }
 
-    @Deprecated
     @Override
     public File getPomFile() {
-        return pomPath != null ? pomPath.toFile() : null;
+        return pomFile;
     }
 
-    @Override
-    public Path getPomPath() {
-        return pomPath;
-    }
-
-    @Deprecated
     @Override
     public DefaultModelBuildingRequest setPomFile(File pomFile) {
-        this.pomPath = (pomFile != null) ? pomFile.toPath().toAbsolutePath() : null;
-        return this;
-    }
+        this.pomFile = (pomFile != null) ? pomFile.getAbsoluteFile() : null;
 
-    @Override
-    public DefaultModelBuildingRequest setPomPath(Path pomPath) {
-        this.pomPath = (pomPath != null) ? pomPath.toAbsolutePath() : null;
         return this;
     }
 
     @Override
     public synchronized ModelSource getModelSource() {
-        if (modelSource == null && pomPath != null) {
-            modelSource = new FileModelSource(pomPath);
+        if (modelSource == null && pomFile != null) {
+            modelSource = new FileModelSource(pomFile);
         }
         return modelSource;
     }
@@ -266,8 +247,9 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     public DefaultModelBuildingRequest setSystemProperties(Properties systemProperties) {
         if (systemProperties != null) {
             this.systemProperties = new Properties();
-            // avoid concurrent modification if someone else sets/removes an unrelated system property
-            synchronized (systemProperties) {
+            synchronized (
+                    systemProperties) { // avoid concurrentmodification if someone else sets/removes an unrelated system
+                // property
                 this.systemProperties.putAll(systemProperties);
             }
         } else {
@@ -347,23 +329,13 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     }
 
     @Override
-    public Model getFileModel() {
-        return fileModel;
-    }
-
-    @Override
-    public ModelBuildingRequest setFileModel(Model fileModel) {
-        this.fileModel = fileModel;
-        return this;
-    }
-
-    @Override
     public Model getRawModel() {
-        return null;
+        return rawModel;
     }
 
     @Override
     public ModelBuildingRequest setRawModel(Model rawModel) {
+        this.rawModel = rawModel;
         return this;
     }
 
@@ -375,28 +347,6 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
     @Override
     public ModelBuildingRequest setWorkspaceModelResolver(WorkspaceModelResolver workspaceResolver) {
         this.workspaceResolver = workspaceResolver;
-        return this;
-    }
-
-    @Override
-    public TransformerContextBuilder getTransformerContextBuilder() {
-        return contextBuilder;
-    }
-
-    @Override
-    public ModelBuildingRequest setTransformerContextBuilder(TransformerContextBuilder contextBuilder) {
-        this.contextBuilder = contextBuilder;
-        return this;
-    }
-
-    @Override
-    public Path getRootDirectory() {
-        return rootDirectory;
-    }
-
-    @Override
-    public ModelBuildingRequest setRootDirectory(Path rootDirectory) {
-        this.rootDirectory = rootDirectory;
         return this;
     }
 }

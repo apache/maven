@@ -134,7 +134,7 @@ under the License.
     <maven.compiler.release>${javaVersion}</maven.compiler.release>
     <maven.compiler.proc>full</maven.compiler.proc>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
-    <maven.baseline>3.8.8</maven.baseline>
+    <maven.baseline>3.9.8</maven.baseline>
     <!-- Control the name of the distribution and information output by mvn -->
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>
@@ -709,16 +709,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.</licenseText>
           </configuration>
-          <executions>
-            <execution>
-              <id>modello-site-docs</id>
-              <goals>
-                <goal>xdoc</goal>
-                <goal>xsd</goal>
-              </goals>
-              <phase>pre-site</phase>
-            </execution>
-          </executions>
         </plugin>
         <!-- enforce backwards compatibility -->
         <plugin>

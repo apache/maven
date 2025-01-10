@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * ReflectionValueExtractorTest class.
  */
+@Deprecated
 public class ReflectionValueExtractorTest {
     private Project project;
 

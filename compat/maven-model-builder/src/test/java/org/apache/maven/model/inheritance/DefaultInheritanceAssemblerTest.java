@@ -21,7 +21,7 @@ package org.apache.maven.model.inheritance;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
+@Deprecated
 class DefaultInheritanceAssemblerTest {
     private DefaultModelReader reader;
 
@@ -45,7 +46,7 @@ class DefaultInheritanceAssemblerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        reader = new DefaultModelReader(null);
+        reader = new DefaultModelReader();
         writer = new DefaultModelWriter();
         assembler = new DefaultInheritanceAssembler();
     }
@@ -55,7 +56,7 @@ class DefaultInheritanceAssemblerTest {
     }
 
     private Model getModel(String name) throws IOException {
-        return reader.read(getPom(name), null).getDelegate();
+        return reader.read(getPom(name), null);
     }
 
     @Test
@@ -170,13 +171,16 @@ class DefaultInheritanceAssemblerTest {
         if (fromRepo) {
             // when model is read from repo, a stream is used, then pomFile == null
             // (has consequences in inheritance algorithm since getProjectDirectory() returns null)
-            parent = Model.newBuilder(parent, true).pomFile(null).build();
-            child = Model.newBuilder(child, true).pomFile(null).build();
+            parent = parent.clone();
+            parent.setPomFile(null);
+            child = child.clone();
+            child.setPomFile(null);
         }
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        Model assembled = assembler.assembleModelInheritance(child, parent, null, problems);
+        Model assembled = child.clone();
+        assembler.assembleModelInheritance(assembled, parent, null, problems);
 
         // write baseName + "-actual"
         File actual = new File(
@@ -198,11 +202,11 @@ class DefaultInheritanceAssemblerTest {
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        Model model = assembler.assembleModelInheritance(child, parent, null, problems);
+        assembler.assembleModelInheritance(child, parent, null, problems);
 
         File actual = new File("target/test-classes/poms/inheritance/module-path-not-artifactId-actual.xml");
 
-        writer.write(actual, null, model);
+        writer.write(actual, null, child);
 
         // check with getPom( "module-path-not-artifactId-effective" )
         File expected = getPom("module-path-not-artifactId-expected");

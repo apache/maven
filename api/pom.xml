@@ -49,27 +49,6 @@
     <project.directory>api</project.directory>
   </properties>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.modello</groupId>
-          <artifactId>modello-maven-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>modello-site-docs</id>
-              <goals>
-                <goal>xdoc</goal>
-                <goal>xsd</goal>
-              </goals>
-              <phase>none</phase>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-
   <profiles>
     <profile>
       <id>reporting</id>

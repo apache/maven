@@ -53,41 +53,30 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <version>2.0.0</version>
+          <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
+          <models>
+            <model>src/main/mdo/settings.mdo</model>
+          </models>
+          <templates>
+            <template>model.vm</template>
+          </templates>
+          <params>
+            <param>packageModelV4=org.apache.maven.api.settings</param>
+            <param>locationTracking=true</param>
+            <param>generateLocationClasses=true</param>
+          </params>
+        </configuration>
         <executions>
           <execution>
-            <id>velocity</id>
+            <id>modello</id>
             <goals>
               <goal>velocity</goal>
-            </goals>
-            <configuration>
-              <version>2.0.0</version>
-              <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
-              <models>
-                <model>src/main/mdo/settings.mdo</model>
-              </models>
-              <templates>
-                <template>model.vm</template>
-              </templates>
-              <params>
-                <param>packageModelV4=org.apache.maven.api.settings</param>
-                <param>locationTracking=true</param>
-                <param>generateLocationClasses=true</param>
-              </params>
-            </configuration>
-          </execution>
-          <execution>
-            <id>modello-site-docs</id>
-            <goals>
               <goal>xdoc</goal>
               <goal>xsd</goal>
             </goals>
             <phase>generate-resources</phase>
-            <configuration>
-              <version>2.0.0</version>
-              <models>
-                <model>src/main/mdo/settings.mdo</model>
-              </models>
-            </configuration>
           </execution>
         </executions>
       </plugin>

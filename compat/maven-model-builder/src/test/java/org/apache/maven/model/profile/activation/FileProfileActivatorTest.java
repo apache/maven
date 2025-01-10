@@ -28,6 +28,7 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
+import org.apache.maven.model.root.DefaultRootLocator;
 import org.apache.maven.model.root.RootLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Tests {@link FileProfileActivator}.
  *
  */
+@Deprecated
 class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator> {
 
     @TempDir
@@ -50,8 +52,15 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     @BeforeEach
     @Override
     void setUp() throws Exception {
-        activator = new FileProfileActivator(
-                new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), bd -> true));
+        activator = new FileProfileActivator()
+                .setProfileActivationFilePathInterpolator(new ProfileActivationFilePathInterpolator()
+                        .setPathTranslator(new DefaultPathTranslator())
+                        .setRootLocator(new DefaultRootLocator() {
+                            @Override
+                            public Path findRoot(Path basedir) {
+                                return basedir;
+                            }
+                        }));
 
         context.setProjectDirectory(tempDir.toFile());
 

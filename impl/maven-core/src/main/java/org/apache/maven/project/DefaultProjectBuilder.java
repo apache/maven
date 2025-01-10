@@ -79,7 +79,6 @@ import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource2;
-import org.apache.maven.model.building.ModelSource3;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -247,26 +246,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         @Override
         public ModelSource resolve(ModelLocator modelLocator, String relative) {
-            if (modelSource instanceof ModelSource3 ms) {
-                return toSource(ms.getRelatedSource(
-                        new org.apache.maven.model.locator.ModelLocator() {
-                            @Override
-                            public File locatePom(File projectDirectory) {
-                                return null;
-                            }
-
-                            @Override
-                            public Path locatePom(Path projectDirectory) {
-                                return null;
-                            }
-
-                            @Override
-                            public Path locateExistingPom(Path project) {
-                                return modelLocator.locateExistingPom(project);
-                            }
-                        },
-                        relative));
-            }
             return null;
         }
 

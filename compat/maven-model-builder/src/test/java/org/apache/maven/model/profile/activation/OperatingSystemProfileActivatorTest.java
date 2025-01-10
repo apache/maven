@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
  * Tests {@link OperatingSystemProfileActivator}.
  *
  */
+@Deprecated
 class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<OperatingSystemProfileActivator> {
 
     @Override

@@ -33,6 +33,11 @@ under the License.
   <name>Maven Model</name>
   <description>Model for Maven POM (Project Object Model)</description>
 
+  <properties>
+    <!-- in: ModelMerger -->
+    <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -96,20 +101,6 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <id>modello-site-docs</id>
-            <goals>
-              <goal>xdoc</goal>
-            </goals>
-            <phase>pre-site</phase>
-          </execution>
-          <execution>
-            <id>modello-schema</id>
-            <goals>
-              <goal>xsd</goal>
-            </goals>
-            <phase>generate-resources</phase>
-          </execution>
-          <execution>
             <id>model-v3</id>
             <goals>
               <goal>velocity</goal>
@@ -147,10 +138,14 @@ under the License.
               <exclude>org.apache.maven.model.Scm#setChildScmUrlInheritAppendPath(boolean):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.Site#setChildSiteUrlInheritAppendPath(boolean):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.io.xpp3.MavenXpp3Reader#contentTransformer</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3Reader#read(org.codehaus.plexus.util.xml.pull.XmlPullParser,boolean):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx#contentTransformer</exclude>
-              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#stringFormatter</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx#read(org.codehaus.plexus.util.xml.pull.XmlPullParser,boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx#read(org.codehaus.plexus.util.xml.pull.XmlPullParser,boolean,org.apache.maven.model.InputSource):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx:METHOD_REMOVED_IN_SUPERCLASS</exclude>
               <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#toString(org.apache.maven.model.InputLocation):METHOD_REMOVED</exclude>
               <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#writeXpp3DomToSerializer(org.codehaus.plexus.util.xml.Xpp3Dom,org.codehaus.plexus.util.xml.pull.XmlSerializer):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#stringFormatter</exclude>
               <exclude>org.apache.maven.model.merge.ModelMerger</exclude>
             </excludes>
           </parameter>

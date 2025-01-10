@@ -18,62 +18,44 @@
  */
 package org.apache.maven.model.io;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.ModelSourceTransformer;
-import org.apache.maven.model.v4.MavenStaxReader;
-import org.codehaus.plexus.util.xml.XmlStreamWriter;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
- * @deprecated use {@link XmlStreamWriter} instead
+ * @deprecated use {@link org.apache.maven.model.v4.MavenStaxReader} instead
  */
 @Named
 @Singleton
 @Deprecated(since = "4.0.0")
 public class DefaultModelReader implements ModelReader {
-    private final ModelSourceTransformer transformer;
-
-    @Inject
-    public DefaultModelReader(ModelSourceTransformer transformer) {
-        this.transformer = transformer;
-    }
 
     @Override
     public Model read(File input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
-        return read(input.toPath(), options);
-    }
 
-    @Override
-    public Model read(Path path, Map<String, ?> options) throws IOException {
-        Objects.requireNonNull(path, "path cannot be null");
+        Model model = read(new FileInputStream(input), options);
 
-        try (InputStream in = Files.newInputStream(path)) {
-            Model model = read(in, path, options);
+        model.setPomFile(input);
 
-            model.setPomPath(path);
-
-            return model;
-        }
+        return model;
     }
 
     @Override
@@ -81,7 +63,7 @@ public class DefaultModelReader implements ModelReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (Reader in = input) {
-            return read(in, null, options);
+            return read(in, isStrict(options), getSource(options));
         }
     }
 
@@ -89,8 +71,8 @@ public class DefaultModelReader implements ModelReader {
     public Model read(InputStream input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 
-        try (InputStream in = input) {
-            return read(input, null, options);
+        try (XmlStreamReader in = ReaderFactory.newXmlReader(input)) {
+            return read(in, isStrict(options), getSource(options));
         }
     }
 
@@ -104,56 +86,15 @@ public class DefaultModelReader implements ModelReader {
         return (InputSource) value;
     }
 
-    private Path getRootDirectory(Map<String, ?> options) {
-        Object value = (options != null) ? options.get(ROOT_DIRECTORY) : null;
-        return (Path) value;
-    }
-
-    private Model read(InputStream input, Path pomFile, Map<String, ?> options) throws IOException {
+    private Model read(Reader reader, boolean strict, InputSource source) throws IOException {
         try {
-            XMLInputFactory factory = XMLInputFactory.newFactory();
-            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-            XMLStreamReader parser = factory.createXMLStreamReader(input);
-
-            InputSource source = getSource(options);
-            boolean strict = isStrict(options);
-            MavenStaxReader mr = new MavenStaxReader();
-            mr.setAddLocationInformation(source != null);
-            Model model = new Model(mr.read(parser, strict, source != null ? source.toApiSource() : null));
-            return model;
-        } catch (XMLStreamException e) {
-            Location location = e.getLocation();
-            throw new ModelParseException(
-                    e.getMessage(),
-                    location != null ? location.getLineNumber() : -1,
-                    location != null ? location.getColumnNumber() : -1,
-                    e);
-        } catch (Exception e) {
-            throw new IOException("Unable to transform pom", e);
-        }
-    }
-
-    private Model read(Reader reader, Path pomFile, Map<String, ?> options) throws IOException {
-        try {
-            XMLInputFactory factory = XMLInputFactory.newFactory();
-            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-            XMLStreamReader parser = factory.createXMLStreamReader(reader);
-
-            InputSource source = getSource(options);
-            boolean strict = isStrict(options);
-            MavenStaxReader mr = new MavenStaxReader();
-            mr.setAddLocationInformation(source != null);
-            Model model = new Model(mr.read(parser, strict, source != null ? source.toApiSource() : null));
-            return model;
-        } catch (XMLStreamException e) {
-            Location location = e.getLocation();
-            throw new ModelParseException(
-                    e.getMessage(),
-                    location != null ? location.getLineNumber() : -1,
-                    location != null ? location.getColumnNumber() : -1,
-                    e);
-        } catch (Exception e) {
-            throw new IOException("Unable to transform pom", e);
+            if (source != null) {
+                return new MavenXpp3ReaderEx().read(reader, strict, source);
+            } else {
+                return new MavenXpp3Reader().read(reader, strict);
+            }
+        } catch (XmlPullParserException e) {
+            throw new ModelParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
     }
 }

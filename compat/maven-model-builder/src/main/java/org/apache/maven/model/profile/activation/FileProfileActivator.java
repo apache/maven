@@ -34,6 +34,7 @@ import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Determines profile activation based on the existence/absence of some file.
@@ -49,11 +50,13 @@ import org.codehaus.plexus.interpolation.InterpolationException;
 @Deprecated(since = "4.0.0")
 public class FileProfileActivator implements ProfileActivator {
 
-    private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
-
     @Inject
-    public FileProfileActivator(ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator) {
+    private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
+
+    public FileProfileActivator setProfileActivationFilePathInterpolator(
+            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator) {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
+        return this;
     }
 
     @Override
@@ -73,10 +76,10 @@ public class FileProfileActivator implements ProfileActivator {
         String path;
         boolean missing;
 
-        if (file.getExists() != null && !file.getExists().isEmpty()) {
+        if (StringUtils.isNotEmpty(file.getExists())) {
             path = file.getExists();
             missing = false;
-        } else if (file.getMissing() != null && !file.getMissing().isEmpty()) {
+        } else if (StringUtils.isNotEmpty(file.getMissing())) {
             path = file.getMissing();
             missing = true;
         } else {
@@ -106,7 +109,7 @@ public class FileProfileActivator implements ProfileActivator {
 
         boolean fileExists = f.exists();
 
-        return missing != fileExists;
+        return missing ? !fileExists : fileExists;
     }
 
     @Override
@@ -119,6 +122,9 @@ public class FileProfileActivator implements ProfileActivator {
 
         ActivationFile file = activation.getFile();
 
-        return file != null;
+        if (file == null) {
+            return false;
+        }
+        return true;
     }
 }

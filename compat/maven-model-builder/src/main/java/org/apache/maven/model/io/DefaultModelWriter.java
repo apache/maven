@@ -20,25 +20,23 @@ package org.apache.maven.model.io;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.api.model.Model;
-import org.apache.maven.model.v4.MavenStaxWriter;
-import org.codehaus.plexus.util.xml.XmlStreamWriter;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.codehaus.plexus.util.WriterFactory;
 
 /**
  * Handles serialization of a model into some kind of textual format like XML.
  *
- * @deprecated use {@link XmlStreamWriter} instead
+ * @deprecated use {@link org.apache.maven.model.v4.MavenStaxWriter} instead
  */
 @Named
 @Singleton
@@ -52,7 +50,7 @@ public class DefaultModelWriter implements ModelWriter {
 
         output.getParentFile().mkdirs();
 
-        write(new XmlStreamWriter(Files.newOutputStream(output.toPath())), options, model);
+        write(WriterFactory.newXmlWriter(output), options, model);
     }
 
     @Override
@@ -61,9 +59,7 @@ public class DefaultModelWriter implements ModelWriter {
         Objects.requireNonNull(model, "model cannot be null");
 
         try (Writer out = output) {
-            new MavenStaxWriter().write(out, model);
-        } catch (XMLStreamException e) {
-            throw new IOException(e);
+            new MavenXpp3Writer().write(out, model);
         }
     }
 
@@ -73,29 +69,13 @@ public class DefaultModelWriter implements ModelWriter {
         Objects.requireNonNull(model, "model cannot be null");
 
         String encoding = model.getModelEncoding();
-        if (encoding == null || encoding.isEmpty()) {
+        // TODO Use StringUtils here
+        if (encoding == null || encoding.length() <= 0) {
             encoding = "UTF-8";
         }
 
         try (Writer out = new OutputStreamWriter(output, encoding)) {
             write(out, options, model);
         }
-    }
-
-    @Override
-    public void write(File output, Map<String, Object> options, org.apache.maven.model.Model model) throws IOException {
-        write(output, options, model.getDelegate());
-    }
-
-    @Override
-    public void write(Writer output, Map<String, Object> options, org.apache.maven.model.Model model)
-            throws IOException {
-        write(output, options, model.getDelegate());
-    }
-
-    @Override
-    public void write(OutputStream output, Map<String, Object> options, org.apache.maven.model.Model model)
-            throws IOException {
-        write(output, options, model.getDelegate());
     }
 }

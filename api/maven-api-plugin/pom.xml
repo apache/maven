@@ -53,9 +53,11 @@ under the License.
         <artifactId>modello-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>plugin</id>
+            <id>modello-plugin</id>
             <goals>
               <goal>velocity</goal>
+              <goal>xdoc</goal>
+              <goal>xsd</goal>
             </goals>
             <phase>generate-sources</phase>
             <configuration>
@@ -73,23 +75,11 @@ under the License.
             </configuration>
           </execution>
           <execution>
-            <id>plugin-doc</id>
-            <goals>
-              <goal>xdoc</goal>
-              <goal>xsd</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <version>2.0.0</version>
-              <models>
-                <model>src/main/mdo/plugin.mdo</model>
-              </models>
-            </configuration>
-          </execution>
-          <execution>
-            <id>lifecycle</id>
+            <id>modello-lifecycle</id>
             <goals>
               <goal>velocity</goal>
+              <goal>xdoc</goal>
+              <goal>xsd</goal>
             </goals>
             <phase>generate-sources</phase>
             <configuration>
@@ -104,20 +94,6 @@ under the License.
               <params>
                 <param>packageModelV4=org.apache.maven.api.plugin.descriptor.lifecycle</param>
               </params>
-            </configuration>
-          </execution>
-          <execution>
-            <id>lifecycle-doc</id>
-            <goals>
-              <goal>xdoc</goal>
-              <goal>xsd</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <version>1.0.0</version>
-              <models>
-                <model>src/main/mdo/lifecycle.mdo</model>
-              </models>
             </configuration>
           </execution>
         </executions>

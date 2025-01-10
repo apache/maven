@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
  * Tests {@link PropertyProfileActivator}.
  *
  */
+@Deprecated
 class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<PropertyProfileActivator> {
 
     @BeforeEach

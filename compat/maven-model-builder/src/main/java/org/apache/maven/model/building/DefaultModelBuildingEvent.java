@@ -28,7 +28,7 @@ import org.apache.maven.model.Model;
 @Deprecated(since = "4.0.0")
 class DefaultModelBuildingEvent implements ModelBuildingEvent {
 
-    private Model model;
+    private final Model model;
 
     private final ModelBuildingRequest request;
 

@@ -19,7 +19,7 @@
 package org.apache.maven.model.interpolation;
 
 import java.util.Date;
-import java.util.Map;
+import java.util.Properties;
 
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
@@ -28,19 +28,17 @@ import org.codehaus.plexus.interpolation.AbstractValueSource;
  */
 @Deprecated(since = "4.0.0")
 class BuildTimestampValueSource extends AbstractValueSource {
-    private final Date startTime;
-    private final Map<String, String> properties;
+    private final MavenBuildTimestamp mavenBuildTimestamp;
 
-    BuildTimestampValueSource(Date startTime, Map<String, String> properties) {
+    BuildTimestampValueSource(Date startTime, Properties properties) {
         super(false);
-        this.startTime = startTime;
-        this.properties = properties;
+        this.mavenBuildTimestamp = new MavenBuildTimestamp(startTime, properties);
     }
 
     @Override
     public Object getValue(String expression) {
         if ("build.timestamp".equals(expression) || "maven.build.timestamp".equals(expression)) {
-            return new MavenBuildTimestamp(startTime, properties).formattedTimestamp();
+            return mavenBuildTimestamp.formattedTimestamp();
         }
         return null;
     }

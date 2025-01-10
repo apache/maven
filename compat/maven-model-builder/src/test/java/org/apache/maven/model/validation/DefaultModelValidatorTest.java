@@ -19,6 +19,7 @@
 package org.apache.maven.model.validation;
 
 import java.io.InputStream;
+import java.io.Serial;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.UnaryOperator;
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
+@Deprecated
 class DefaultModelValidatorTest {
 
     private ModelValidator validator;
@@ -59,6 +61,7 @@ class DefaultModelValidatorTest {
         return validateRaw(pom, UnaryOperator.identity());
     }
 
+    @SuppressWarnings("SameParameterValue")
     private SimpleProblemCollector validateEffective(String pom, int level) throws Exception {
         return validateEffective(pom, mbr -> mbr.setValidationLevel(level));
     }
@@ -74,6 +77,7 @@ class DefaultModelValidatorTest {
         return problems;
     }
 
+    @SuppressWarnings("SameParameterValue")
     private SimpleProblemCollector validateRaw(String pom, int level) throws Exception {
         return validateRaw(pom, mbr -> mbr.setValidationLevel(level));
     }
@@ -85,8 +89,6 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector problems = new SimpleProblemCollector(model);
 
         ModelBuildingRequest request = requestConfigurer.apply(new DefaultModelBuildingRequest());
-
-        validator.validateFileModel(model, request, problems);
 
         validator.validateRawModel(model, request, problems);
 
@@ -167,11 +169,11 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 2, 0);
 
         assertEquals(
-                "'groupId' with value 'o/a/m' does not match a valid coordinate id pattern.",
+                "'groupId' with value 'o/a/m' does not match a valid id pattern.",
                 result.getErrors().get(0));
 
         assertEquals(
-                "'artifactId' with value 'm$-do$' does not match a valid coordinate id pattern.",
+                "'artifactId' with value 'm$-do$' does not match a valid id pattern.",
                 result.getErrors().get(1));
     }
 
@@ -381,7 +383,7 @@ class DefaultModelValidatorTest {
 
     @Test
     void testDuplicateModule() throws Exception {
-        SimpleProblemCollector result = validateRaw("duplicate-module.xml");
+        SimpleProblemCollector result = validate("duplicate-module.xml");
 
         assertViolations(result, 0, 1, 0);
 
@@ -389,18 +391,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testInvalidProfileId() throws Exception {
-        SimpleProblemCollector result = validateRaw("invalid-profile-ids.xml");
-
-        assertViolations(result, 0, 4, 0);
-
-        assertTrue(result.getErrors().get(0).contains("+invalid-id"));
-        assertTrue(result.getErrors().get(1).contains("-invalid-id"));
-        assertTrue(result.getErrors().get(2).contains("!invalid-id"));
-        assertTrue(result.getErrors().get(3).contains("?invalid-id"));
-    }
-
-    public void testDuplicateProfileId() throws Exception {
+    void testDuplicateProfileId() throws Exception {
         SimpleProblemCollector result = validateRaw("duplicate-profile-id.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -448,16 +439,27 @@ class DefaultModelValidatorTest {
     void testHardCodedSystemPath() throws Exception {
         SimpleProblemCollector result = validateRaw("hard-coded-system-path.xml");
 
-        assertViolations(result, 0, 0, 3);
+        assertViolations(result, 0, 0, 1);
+
+        assertViolations(result, 0, 0, 1);
 
         assertContains(
                 result.getWarnings().get(0),
+                "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path");
+
+        SimpleProblemCollector result_31 =
+                validateRaw("hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1);
+
+        assertViolations(result_31, 0, 0, 3);
+
+        assertContains(
+                result_31.getWarnings().get(0),
                 "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope");
         assertContains(
-                result.getWarnings().get(1),
+                result_31.getWarnings().get(1),
                 "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path");
         assertContains(
-                result.getWarnings().get(2),
+                result_31.getWarnings().get(2),
                 "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope");
     }
 
@@ -474,12 +476,12 @@ class DefaultModelValidatorTest {
     void testDuplicatePlugin() throws Exception {
         SimpleProblemCollector result = validateRaw("duplicate-plugin.xml");
 
-        assertViolations(result, 0, 4, 0);
+        assertViolations(result, 0, 0, 4);
 
-        assertTrue(result.getErrors().get(0).contains("duplicate declaration of plugin test:duplicate"));
-        assertTrue(result.getErrors().get(1).contains("duplicate declaration of plugin test:managed-duplicate"));
-        assertTrue(result.getErrors().get(2).contains("duplicate declaration of plugin profile:duplicate"));
-        assertTrue(result.getErrors().get(3).contains("duplicate declaration of plugin profile:managed-duplicate"));
+        assertTrue(result.getWarnings().get(0).contains("duplicate declaration of plugin test:duplicate"));
+        assertTrue(result.getWarnings().get(1).contains("duplicate declaration of plugin test:managed-duplicate"));
+        assertTrue(result.getWarnings().get(2).contains("duplicate declaration of plugin profile:duplicate"));
+        assertTrue(result.getWarnings().get(3).contains("duplicate declaration of plugin profile:managed-duplicate"));
     }
 
     @Test
@@ -498,12 +500,13 @@ class DefaultModelValidatorTest {
     void testReservedRepositoryId() throws Exception {
         SimpleProblemCollector result = validate("reserved-repository-id.xml");
 
-        assertViolations(result, 0, 4, 0);
+        assertViolations(result, 0, 0, 4);
 
-        assertContains(result.getErrors().get(0), "'repositories.repository.id'" + " must not be 'local'");
-        assertContains(result.getErrors().get(1), "'pluginRepositories.pluginRepository.id' must not be 'local'");
-        assertContains(result.getErrors().get(2), "'distributionManagement.repository.id' must not be 'local'");
-        assertContains(result.getErrors().get(3), "'distributionManagement.snapshotRepository.id' must not be 'local'");
+        assertContains(result.getWarnings().get(0), "'repositories.repository.id'" + " must not be 'local'");
+        assertContains(result.getWarnings().get(1), "'pluginRepositories.pluginRepository.id' must not be 'local'");
+        assertContains(result.getWarnings().get(2), "'distributionManagement.repository.id' must not be 'local'");
+        assertContains(
+                result.getWarnings().get(3), "'distributionManagement.snapshotRepository.id' must not be 'local'");
     }
 
     @Test
@@ -546,36 +549,36 @@ class DefaultModelValidatorTest {
     void testBadVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-version.xml");
 
-        assertViolations(result, 0, 1, 0);
+        assertViolations(result, 0, 0, 1);
 
-        assertContains(result.getErrors().get(0), "'version' must not contain any of these characters");
+        assertContains(result.getWarnings().get(0), "'version' must not contain any of these characters");
     }
 
     @Test
     void testBadSnapshotVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-snapshot-version.xml");
 
-        assertViolations(result, 0, 1, 0);
+        assertViolations(result, 0, 0, 1);
 
-        assertContains(result.getErrors().get(0), "'version' uses an unsupported snapshot version format");
+        assertContains(result.getWarnings().get(0), "'version' uses an unsupported snapshot version format");
     }
 
     @Test
     void testBadRepositoryId() throws Exception {
         SimpleProblemCollector result = validate("bad-repository-id.xml");
 
-        assertViolations(result, 0, 4, 0);
+        assertViolations(result, 0, 0, 4);
 
         assertContains(
-                result.getErrors().get(0), "'repositories.repository.id' must not contain any of these characters");
+                result.getWarnings().get(0), "'repositories.repository.id' must not contain any of these characters");
         assertContains(
-                result.getErrors().get(1),
+                result.getWarnings().get(1),
                 "'pluginRepositories.pluginRepository.id' must not contain any of these characters");
         assertContains(
-                result.getErrors().get(2),
+                result.getWarnings().get(2),
                 "'distributionManagement.repository.id' must not contain any of these characters");
         assertContains(
-                result.getErrors().get(3),
+                result.getWarnings().get(3),
                 "'distributionManagement.snapshotRepository.id' must not contain any of these characters");
     }
 
@@ -639,19 +642,31 @@ class DefaultModelValidatorTest {
     void testSystemPathRefersToProjectBasedir() throws Exception {
         SimpleProblemCollector result = validateRaw("basedir-system-path.xml");
 
-        assertViolations(result, 0, 0, 4);
+        assertViolations(result, 0, 0, 2);
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope");
-        assertContains(
-                result.getWarnings().get(1),
                 "'dependencies.dependency.systemPath' for test:a:jar should not point at files within the project directory");
         assertContains(
-                result.getWarnings().get(2),
+                result.getWarnings().get(1),
+                "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory");
+
+        SimpleProblemCollector result_31 =
+                validateRaw("basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1);
+
+        assertViolations(result_31, 0, 0, 4);
+
+        assertContains(
+                result_31.getWarnings().get(0),
+                "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope");
+        assertContains(
+                result_31.getWarnings().get(1),
+                "'dependencies.dependency.systemPath' for test:a:jar should not point at files within the project directory");
+        assertContains(
+                result_31.getWarnings().get(2),
                 "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope");
         assertContains(
-                result.getWarnings().get(3),
+                result_31.getWarnings().get(3),
                 "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory");
     }
 
@@ -814,10 +829,7 @@ class DefaultModelValidatorTest {
     @Test
     void repositoryWithExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-expression.xml");
-        assertViolations(result, 0, 1, 0);
-        assertEquals(
-                "'repositories.repository.[repo].url' contains an expression but should be a constant.",
-                result.getErrors().get(0));
+        assertViolations(result, 0, 0, 0);
     }
 
     @Test
@@ -831,6 +843,7 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateRaw(
                 "raw-model/profile-activation-file-with-allowed-expressions.xml",
                 mbr -> mbr.setUserProperties(new Properties() {
+                    @Serial
                     private static final long serialVersionUID = 1L;
 
                     {

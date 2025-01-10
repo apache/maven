@@ -35,5 +35,10 @@ interface ModelBuildingEventCatapult {
      */
     void fire(ModelBuildingListener listener, ModelBuildingEvent event);
 
-    ModelBuildingEventCatapult BUILD_EXTENSIONS_ASSEMBLED = ModelBuildingListener::buildExtensionsAssembled;
+    ModelBuildingEventCatapult BUILD_EXTENSIONS_ASSEMBLED = new ModelBuildingEventCatapult() {
+        @Override
+        public void fire(ModelBuildingListener listener, ModelBuildingEvent event) {
+            listener.buildExtensionsAssembled(event);
+        }
+    };
 }
