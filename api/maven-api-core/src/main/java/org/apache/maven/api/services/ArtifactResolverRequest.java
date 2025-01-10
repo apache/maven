@@ -57,8 +57,8 @@ public interface ArtifactResolverRequest {
     static ArtifactResolverRequest build(
             @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinates> coordinates) {
         return builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
-                .coordinates(Objects.requireNonNull(coordinates, "coordinates cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .coordinates(requireNonNull(coordinates, "coordinates cannot be null"))
                 .build();
     }
 
@@ -68,8 +68,8 @@ public interface ArtifactResolverRequest {
             @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
             List<RemoteRepository> repositories) {
         return builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
-                .coordinates(Objects.requireNonNull(coordinates, "coordinates cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .coordinates(requireNonNull(coordinates, "coordinates cannot be null"))
                 .repositories(repositories)
                 .build();
     }
@@ -118,7 +118,7 @@ public interface ArtifactResolverRequest {
                     @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
                     @Nonnull List<RemoteRepository> repositories) {
                 super(session);
-                this.coordinates = unmodifiable(Objects.requireNonNull(coordinates, "coordinates cannot be null"));
+                this.coordinates = unmodifiable(requireNonNull(coordinates, "coordinates cannot be null"));
                 this.repositories = repositories;
             }
 

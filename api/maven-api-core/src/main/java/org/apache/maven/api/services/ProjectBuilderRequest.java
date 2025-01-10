@@ -64,16 +64,16 @@ public interface ProjectBuilderRequest {
     @Nonnull
     static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Source source) {
         return builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
-                .source(Objects.requireNonNull(source, "source cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .source(requireNonNull(source, "source cannot be null"))
                 .build();
     }
 
     @Nonnull
     static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Path path) {
         return builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
-                .path(Objects.requireNonNull(path, "path cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .path(requireNonNull(path, "path cannot be null"))
                 .build();
     }
 

@@ -57,7 +57,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             String extension,
             String type) {
         return DependencyCoordinatesFactoryRequest.builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -71,8 +71,8 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     static DependencyCoordinatesFactoryRequest build(
             @Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
         return builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
-                .groupId(Objects.requireNonNull(coordinates, "coordinates cannot be null")
+                .session(requireNonNull(session, "session cannot be null"))
+                .groupId(requireNonNull(coordinates, "coordinates cannot be null")
                         .getGroupId())
                 .artifactId(coordinates.getArtifactId())
                 .version(coordinates.getVersionConstraint().asString())
@@ -84,8 +84,8 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull Dependency dependency) {
         return builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
-                .groupId(Objects.requireNonNull(dependency, "dependency").getGroupId())
+                .session(requireNonNull(session, "session cannot be null"))
+                .groupId(requireNonNull(dependency, "dependency").getGroupId())
                 .artifactId(dependency.getArtifactId())
                 .version(dependency.getVersion().asString())
                 .classifier(dependency.getClassifier())

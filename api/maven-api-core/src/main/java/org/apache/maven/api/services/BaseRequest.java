@@ -38,7 +38,7 @@ abstract class BaseRequest<S extends ProtoSession> {
     private final S session;
 
     protected BaseRequest(@Nonnull S session) {
-        this.session = Objects.requireNonNull(session, "session cannot be null");
+        this.session = requireNonNull(session, "session cannot be null");
     }
 
     @Nonnull

@@ -94,6 +94,6 @@ public interface Source {
      */
     @Nonnull
     static Source fromPath(@Nonnull Path path) {
-        return new PathSource(Objects.requireNonNull(path, "path cannot be null"));
+        return new PathSource(requireNonNull(path, "path cannot be null"));
     }
 }

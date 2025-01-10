@@ -94,7 +94,7 @@ public interface SettingsBuilderRequest {
             @Nullable Source projectSettingsSource,
             @Nullable Source userSettingsSource) {
         return builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .installationSettingsSource(installationSettingsSource)
                 .projectSettingsSource(projectSettingsSource)
                 .userSettingsSource(userSettingsSource)
@@ -108,7 +108,7 @@ public interface SettingsBuilderRequest {
             @Nullable Path projectSettingsPath,
             @Nullable Path userSettingsPath) {
         return builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .installationSettingsSource(
                         installationSettingsPath != null && Files.exists(installationSettingsPath)
                                 ? Source.fromPath(installationSettingsPath)

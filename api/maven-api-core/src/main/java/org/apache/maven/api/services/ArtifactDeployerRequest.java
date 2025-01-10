@@ -59,9 +59,9 @@ public interface ArtifactDeployerRequest {
             @Nonnull RemoteRepository repository,
             @Nonnull Collection<ProducedArtifact> artifacts) {
         return builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
-                .repository(Objects.requireNonNull(repository, "repository cannot be null"))
-                .artifacts(Objects.requireNonNull(artifacts, "artifacts cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .repository(requireNonNull(repository, "repository cannot be null"))
+                .artifacts(requireNonNull(artifacts, "artifacts cannot be null"))
                 .build();
     }
 
@@ -113,8 +113,8 @@ public interface ArtifactDeployerRequest {
                     @Nonnull Collection<ProducedArtifact> artifacts,
                     int retryFailedDeploymentCount) {
                 super(session);
-                this.repository = Objects.requireNonNull(repository, "repository cannot be null");
-                this.artifacts = unmodifiable(Objects.requireNonNull(artifacts, "artifacts cannot be null"));
+                this.repository = requireNonNull(repository, "repository cannot be null");
+                this.artifacts = unmodifiable(requireNonNull(artifacts, "artifacts cannot be null"));
                 this.retryFailedDeploymentCount = retryFailedDeploymentCount;
             }
 

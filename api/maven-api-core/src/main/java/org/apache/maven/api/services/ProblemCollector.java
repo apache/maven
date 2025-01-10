@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
-import static java.util.Objects.requireNonNull;
+import static java.util.requireNonNull;
 
 /**
  * Collects problems that were encountered during project building.

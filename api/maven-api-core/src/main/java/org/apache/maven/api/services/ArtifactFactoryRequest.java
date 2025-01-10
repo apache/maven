@@ -53,7 +53,7 @@ public interface ArtifactFactoryRequest {
     static ArtifactFactoryRequest build(
             Session session, String groupId, String artifactId, String version, String extension) {
         return ArtifactFactoryRequest.builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -70,7 +70,7 @@ public interface ArtifactFactoryRequest {
             String extension,
             String type) {
         return ArtifactFactoryRequest.builder()
-                .session(Objects.requireNonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
