@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -33,7 +32,6 @@ import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
@@ -136,16 +134,14 @@ public class DefaultModelResolver implements ModelResolver {
                         artifactId,
                         version);
             }
-            Optional<Version> result = session.resolveHighestVersion(coords, repositories);
-            if (result.isEmpty()) {
-                throw new ModelResolverException(
-                        "No versions matched the requested " + (type != null ? type + " " : "") + "version range '"
-                                + version + "'",
-                        groupId,
-                        artifactId,
-                        version);
-            }
-            String newVersion = result.get().asString();
+            String newVersion = session.resolveHighestVersion(coords, repositories)
+                    .orElseThrow(() -> new ModelResolverException(
+                            "No versions matched the requested " + (type != null ? type + " " : "") + "version range '"
+                                    + version + "'",
+                            groupId,
+                            artifactId,
+                            version))
+                    .asString();
             if (!version.equals(newVersion)) {
                 resolvedVersion.accept(newVersion);
             }
