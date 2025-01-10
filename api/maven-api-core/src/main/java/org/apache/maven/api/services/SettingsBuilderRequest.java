@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Collects settings that control the building of effective settings.
@@ -95,7 +95,7 @@ public interface SettingsBuilderRequest {
             @Nullable Source projectSettingsSource,
             @Nullable Source userSettingsSource) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .installationSettingsSource(installationSettingsSource)
                 .projectSettingsSource(projectSettingsSource)
                 .userSettingsSource(userSettingsSource)
@@ -109,7 +109,7 @@ public interface SettingsBuilderRequest {
             @Nullable Path projectSettingsPath,
             @Nullable Path userSettingsPath) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .installationSettingsSource(
                         installationSettingsPath != null && Files.exists(installationSettingsPath)
                                 ? Source.fromPath(installationSettingsPath)

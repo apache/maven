@@ -31,7 +31,7 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  *
@@ -58,7 +58,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             String extension,
             String type) {
         return DependencyCoordinatesFactoryRequest.builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -72,8 +72,9 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     static DependencyCoordinatesFactoryRequest build(
             @Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .groupId(nonNull(coordinates, "coordinates cannot be null").getGroupId())
+                .session(requireNonNull(session, "session cannot be null"))
+                .groupId(requireNonNull(coordinates, "coordinates cannot be null")
+                        .getGroupId())
                 .artifactId(coordinates.getArtifactId())
                 .version(coordinates.getVersionConstraint().asString())
                 .classifier(coordinates.getClassifier())
@@ -84,8 +85,8 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull Dependency dependency) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .groupId(nonNull(dependency, "dependency").getGroupId())
+                .session(requireNonNull(session, "session cannot be null"))
+                .groupId(requireNonNull(dependency, "dependency").getGroupId())
                 .artifactId(dependency.getArtifactId())
                 .version(dependency.getVersion().asString())
                 .classifier(dependency.getClassifier())

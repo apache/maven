@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Provides access to the contents of a source independently of the
@@ -95,6 +95,6 @@ public interface Source {
      */
     @Nonnull
     static Source fromPath(@Nonnull Path path) {
-        return new PathSource(nonNull(path, "path cannot be null"));
+        return new PathSource(requireNonNull(path, "path cannot be null"));
     }
 }

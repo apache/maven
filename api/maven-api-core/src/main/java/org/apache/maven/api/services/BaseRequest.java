@@ -26,6 +26,8 @@ import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Base class for requests.
  *
@@ -37,19 +39,12 @@ abstract class BaseRequest<S extends ProtoSession> {
     private final S session;
 
     protected BaseRequest(@Nonnull S session) {
-        this.session = nonNull(session, "session cannot be null");
+        this.session = requireNonNull(session, "session cannot be null");
     }
 
     @Nonnull
     public S getSession() {
         return session;
-    }
-
-    public static <T> T nonNull(T obj, String message) {
-        if (obj == null) {
-            throw new IllegalArgumentException(message);
-        }
-        return obj;
     }
 
     protected static <T> Collection<T> unmodifiable(Collection<T> obj) {

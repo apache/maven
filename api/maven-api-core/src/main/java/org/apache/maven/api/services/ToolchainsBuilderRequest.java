@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  *
@@ -61,7 +61,7 @@ public interface ToolchainsBuilderRequest {
             @Nullable Source installationToolchainsFile,
             @Nullable Source userToolchainsSource) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .installationToolchainsSource(installationToolchainsFile)
                 .userToolchainsSource(userToolchainsSource)
                 .build();
@@ -73,7 +73,7 @@ public interface ToolchainsBuilderRequest {
             @Nullable Path installationToolchainsFile,
             @Nullable Path userToolchainsPath) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .installationToolchainsSource(
                         installationToolchainsFile != null && Files.exists(installationToolchainsFile)
                                 ? Source.fromPath(installationToolchainsFile)

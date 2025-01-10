@@ -32,7 +32,7 @@ import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Profile;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Request used to build a {@link org.apache.maven.api.Project} using
@@ -143,23 +143,23 @@ public interface ModelBuilderRequest {
 
     @Nonnull
     static ModelBuilderRequest build(@Nonnull ModelBuilderRequest request, @Nonnull ModelSource source) {
-        return builder(nonNull(request, "request cannot be null"))
-                .source(nonNull(source, "source cannot be null"))
+        return builder(requireNonNull(request, "request cannot be null"))
+                .source(requireNonNull(source, "source cannot be null"))
                 .build();
     }
 
     @Nonnull
     static ModelBuilderRequest build(@Nonnull Session session, @Nonnull ModelSource source) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .source(nonNull(source, "source cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .source(requireNonNull(source, "source cannot be null"))
                 .build();
     }
 
     @Nonnull
     static ModelBuilderRequest build(@Nonnull Session session, @Nonnull Path path) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
                 .source(ModelSource.fromPath(path))
                 .build();
     }
@@ -320,7 +320,7 @@ public interface ModelBuilderRequest {
                     List<RemoteRepository> repositories,
                     ModelTransformer lifecycleBindingsInjector) {
                 super(session);
-                this.requestType = nonNull(requestType, "requestType cannot be null");
+                this.requestType = requireNonNull(requestType, "requestType cannot be null");
                 this.locationTracking = locationTracking;
                 this.recursive = recursive;
                 this.source = source;

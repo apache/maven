@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A request for creating a {@link ArtifactCoordinates} object.
@@ -57,7 +57,7 @@ public interface ArtifactCoordinatesFactoryRequest {
     static ArtifactCoordinatesFactoryRequest build(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
         return ArtifactCoordinatesFactoryRequest.builder()
-                .session(nonNull(session, "session"))
+                .session(requireNonNull(session, "session"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -75,7 +75,7 @@ public interface ArtifactCoordinatesFactoryRequest {
             String extension,
             String type) {
         return ArtifactCoordinatesFactoryRequest.builder()
-                .session(nonNull(session, "session"))
+                .session(requireNonNull(session, "session"))
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
@@ -88,16 +88,16 @@ public interface ArtifactCoordinatesFactoryRequest {
     @Nonnull
     static ArtifactCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull String coordinateString) {
         return ArtifactCoordinatesFactoryRequest.builder()
-                .session(nonNull(session, "session"))
-                .coordinateString(nonNull(coordinateString, "coordinateString"))
+                .session(requireNonNull(session, "session"))
+                .coordinateString(requireNonNull(coordinateString, "coordinateString"))
                 .build();
     }
 
     @Nonnull
     static ArtifactCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
         return ArtifactCoordinatesFactoryRequest.builder()
-                .session(nonNull(session, "session"))
-                .groupId(nonNull(coordinates, "coordinates").getGroupId())
+                .session(requireNonNull(session, "session"))
+                .groupId(requireNonNull(coordinates, "coordinates").getGroupId())
                 .artifactId(coordinates.getArtifactId())
                 .classifier(coordinates.getClassifier())
                 .version(coordinates.getVersionConstraint().asString())

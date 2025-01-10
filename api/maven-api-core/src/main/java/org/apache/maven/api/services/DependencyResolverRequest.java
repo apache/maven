@@ -39,6 +39,8 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A request to collect the transitive dependencies and to build a dependency graph from them. There are three ways to
  * create a dependency graph. First, only the root dependency can be given. Second, a root dependency and direct
@@ -394,15 +396,15 @@ public interface DependencyResolverRequest {
                     @Nullable Predicate<PathType> pathTypeFilter,
                     @Nullable List<RemoteRepository> repositories) {
                 super(session);
-                this.requestType = nonNull(requestType, "requestType cannot be null");
+                this.requestType = requireNonNull(requestType, "requestType cannot be null");
                 this.project = project;
                 this.rootArtifact = rootArtifact;
                 this.root = root;
-                this.dependencies = unmodifiable(nonNull(dependencies, "dependencies cannot be null"));
+                this.dependencies = unmodifiable(requireNonNull(dependencies, "dependencies cannot be null"));
                 this.managedDependencies =
-                        unmodifiable(nonNull(managedDependencies, "managedDependencies cannot be null"));
+                        unmodifiable(requireNonNull(managedDependencies, "managedDependencies cannot be null"));
                 this.verbose = verbose;
-                this.pathScope = nonNull(pathScope, "pathScope cannot be null");
+                this.pathScope = requireNonNull(pathScope, "pathScope cannot be null");
                 this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;
                 this.repositories = repositories;
                 if (verbose && requestType != RequestType.COLLECT) {

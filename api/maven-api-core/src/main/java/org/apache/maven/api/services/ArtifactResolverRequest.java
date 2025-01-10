@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A request for resolving an artifact.
@@ -58,8 +58,8 @@ public interface ArtifactResolverRequest {
     static ArtifactResolverRequest build(
             @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinates> coordinates) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .coordinates(nonNull(coordinates, "coordinates cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .coordinates(requireNonNull(coordinates, "coordinates cannot be null"))
                 .build();
     }
 
@@ -69,8 +69,8 @@ public interface ArtifactResolverRequest {
             @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
             List<RemoteRepository> repositories) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .coordinates(nonNull(coordinates, "coordinates cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .coordinates(requireNonNull(coordinates, "coordinates cannot be null"))
                 .repositories(repositories)
                 .build();
     }
@@ -119,7 +119,7 @@ public interface ArtifactResolverRequest {
                     @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
                     @Nonnull List<RemoteRepository> repositories) {
                 super(session);
-                this.coordinates = unmodifiable(nonNull(coordinates, "coordinates cannot be null"));
+                this.coordinates = unmodifiable(requireNonNull(coordinates, "coordinates cannot be null"));
                 this.repositories = repositories;
             }
 
