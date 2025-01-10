@@ -467,8 +467,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                 ExceptionSummary summary = handler.handleException(exception);
                 logSummary(context, summary, references, "");
 
-                if (exception instanceof LifecycleExecutionException) {
-                    failedProjects.add(((LifecycleExecutionException) exception).getProject());
+                if (exception instanceof LifecycleExecutionException lifecycleExecutionException) {
+                    failedProjects.add(lifecycleExecutionException.getProject());
                 }
             }
 

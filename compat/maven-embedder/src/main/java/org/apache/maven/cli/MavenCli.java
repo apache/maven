@@ -986,8 +986,8 @@ public class MavenCli {
 
                 logSummary(summary, references, "", cliRequest.showErrors);
 
-                if (exception instanceof LifecycleExecutionException) {
-                    failedProjects.add(((LifecycleExecutionException) exception).getProject());
+                if (exception instanceof LifecycleExecutionException lifecycleExecutionException) {
+                    failedProjects.add(lifecycleExecutionException.getProject());
                 }
             }
 

@@ -92,12 +92,10 @@ public class CumulativeScopeArtifactFilter extends AbstractScopeArtifactFilter {
             return true;
         }
 
-        if (!(obj instanceof CumulativeScopeArtifactFilter)) {
+        if (obj instanceof CumulativeScopeArtifactFilter that) {
+            return scopes.equals(that.scopes);
+        } else {
             return false;
         }
-
-        CumulativeScopeArtifactFilter that = (CumulativeScopeArtifactFilter) obj;
-
-        return scopes.equals(that.scopes);
     }
 }

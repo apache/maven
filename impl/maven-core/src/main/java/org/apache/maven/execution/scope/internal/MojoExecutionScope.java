@@ -74,8 +74,8 @@ public class MojoExecutionScope extends org.apache.maven.internal.impl.di.MojoEx
         // deduplicate instances to avoid redundant beforeXXX/afterXXX callbacks
         IdentityHashMap<WeakMojoExecutionListener, Object> listeners = new IdentityHashMap<>();
         for (Object provided : getScopeState().provided()) {
-            if (provided instanceof WeakMojoExecutionListener) {
-                listeners.put((WeakMojoExecutionListener) provided, null);
+            if (provided instanceof WeakMojoExecutionListener weakMojoExecutionListener) {
+                listeners.put(weakMojoExecutionListener, null);
             }
         }
         return listeners.keySet();

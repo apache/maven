@@ -65,13 +65,11 @@ public class DefaultProjectRealmCache implements ProjectRealmCache, Disposable {
                 return true;
             }
 
-            if (!(o instanceof CacheKey)) {
+            if (o instanceof CacheKey other) {
+                return extensionRealms.equals(other.extensionRealms);
+            } else {
                 return false;
             }
-
-            CacheKey other = (CacheKey) o;
-
-            return extensionRealms.equals(other.extensionRealms);
         }
 
         @Override

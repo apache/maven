@@ -1192,8 +1192,7 @@ public class StringVisitorModelInterpolator extends AbstractStringBasedModelInte
             if (properties != null) {
                 for (Map.Entry<Object, Object> entry : properties.entrySet()) {
                     Object v = entry.getValue();
-                    if (v instanceof String) {
-                        String value = (String) v;
+                    if (v instanceof String value) {
                         String inter = interpolate(value);
                         if (value != inter && inter != null) {
                             entry.setValue(inter);

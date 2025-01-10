@@ -48,8 +48,8 @@ class FileToRawModelMergerTest {
                         Type returnType = m.getParameterTypes()[0]
                                 .getMethod("get" + entity)
                                 .getGenericReturnType();
-                        if (returnType instanceof ParameterizedType) {
-                            return !((ParameterizedType) returnType).getActualTypeArguments()[0].equals(String.class);
+                        if (returnType instanceof ParameterizedType parameterizedType) {
+                            return !parameterizedType.getActualTypeArguments()[0].equals(String.class);
                         } else {
                             return false;
                         }

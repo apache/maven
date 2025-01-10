@@ -882,8 +882,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             File pomFile = null;
-            if (candidateSource instanceof FileModelSource) {
-                pomFile = ((FileModelSource) candidateSource).getPomFile();
+            if (candidateSource instanceof FileModelSource source) {
+                pomFile = source.getPomFile();
             }
 
             candidateModel = readModel(candidateSource, pomFile, request, problems);
@@ -1307,8 +1307,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     protected boolean hasModelErrors(ModelProblemCollectorExt problems) {
-        if (problems instanceof DefaultModelProblemCollector) {
-            return ((DefaultModelProblemCollector) problems).hasErrors();
+        if (problems instanceof DefaultModelProblemCollector collector) {
+            return collector.hasErrors();
         } else {
             // the default execution path only knows the DefaultModelProblemCollector,
             // only reason it's not in signature is because it's package private
@@ -1317,8 +1317,8 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     protected boolean hasFatalErrors(ModelProblemCollectorExt problems) {
-        if (problems instanceof DefaultModelProblemCollector) {
-            return ((DefaultModelProblemCollector) problems).hasFatalErrors();
+        if (problems instanceof DefaultModelProblemCollector collector) {
+            return collector.hasFatalErrors();
         } else {
             // the default execution path only knows the DefaultModelProblemCollector,
             // only reason it's not in signature is because it's package private

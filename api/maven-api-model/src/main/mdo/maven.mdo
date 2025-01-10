@@ -2465,8 +2465,7 @@
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object other) {
-        if (other instanceof Plugin) {
-            Plugin otherPlugin = (Plugin) other;
+        if (other instanceof Plugin otherPlugin) {
             return getKey().equals(otherPlugin.getKey());
         }
         return false;
@@ -3249,13 +3248,12 @@
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if (!(o instanceof Extension)) {
-            return false;
-        } else {
-            Extension e = (Extension) o;
+        } else if (o instanceof Extension e) {
             return java.util.Objects.equals(e.getArtifactId(), getArtifactId())
                 && java.util.Objects.equals(e.getGroupId(), getGroupId())
                 && java.util.Objects.equals(e.getVersion(), getVersion());
+        } else {
+            return false;
         }
     }
 

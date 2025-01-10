@@ -102,13 +102,12 @@ class Xpp3DomNodeIterator implements NodeIterator {
         if (test == null) {
             return true;
         }
-        if (test instanceof NodeNameTest) {
+        if (test instanceof NodeNameTest nodeNameTest) {
             String nodeName = node.getName();
             if (nodeName == null || nodeName.isEmpty()) {
                 return false;
             }
 
-            NodeNameTest nodeNameTest = (NodeNameTest) test;
             String namespaceURI = nodeNameTest.getNamespaceURI();
             boolean wildcard = nodeNameTest.isWildcard();
             String testName = nodeNameTest.getNodeName().getName();
@@ -121,8 +120,8 @@ class Xpp3DomNodeIterator implements NodeIterator {
             }
             return false;
         }
-        if (test instanceof NodeTypeTest) {
-            return switch (((NodeTypeTest) test).getNodeType()) {
+        if (test instanceof NodeTypeTest nodeTypeTest) {
+            return switch (nodeTypeTest.getNodeType()) {
                 case Compiler.NODE_TYPE_NODE -> true;
                 case Compiler.NODE_TYPE_TEXT -> node.getValue() != null;
                 default -> false;

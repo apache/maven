@@ -85,8 +85,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
 
     @Override
     public void onEvent(Object event) {
-        if (event instanceof ExecutionEvent) {
-            ExecutionEvent executionEvent = (ExecutionEvent) event;
+        if (event instanceof ExecutionEvent executionEvent) {
             if (executionEvent.getType() == ExecutionEvent.Type.SessionStarted) {
                 RepositorySystemSession repositorySystemSession =
                         executionEvent.getSession().getRepositorySession();

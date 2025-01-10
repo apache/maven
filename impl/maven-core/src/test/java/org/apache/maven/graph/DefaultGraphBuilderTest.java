@@ -312,11 +312,11 @@ class DefaultGraphBuilderTest {
         Result<ProjectDependencyGraph> result = graphBuilder.build(session);
 
         // Then
-        if (parameterExpectedResult instanceof SelectedProjectsResult) {
+        if (parameterExpectedResult instanceof SelectedProjectsResult selectedProjectsResult) {
             assertThat(result.hasErrors())
                     .withFailMessage("Expected result not to have errors")
                     .isFalse();
-            List<String> expectedProjectNames = ((SelectedProjectsResult) parameterExpectedResult).projectNames;
+            List<String> expectedProjectNames = selectedProjectsResult.projectNames;
             List<MavenProject> actualReactorProjects = result.get().getSortedProjects();
             List<MavenProject> expectedReactorProjects =
                     expectedProjectNames.stream().map(artifactIdProjectMap::get).collect(toList());

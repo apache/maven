@@ -87,12 +87,10 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                 @Override
                 public Optional<Repository> getRepository(Version version) {
                     ArtifactRepository repo = repos.get(version.toString());
-                    if (repo instanceof org.eclipse.aether.repository.LocalRepository) {
-                        return Optional.of(
-                                new DefaultLocalRepository((org.eclipse.aether.repository.LocalRepository) repo));
-                    } else if (repo instanceof org.eclipse.aether.repository.RemoteRepository) {
-                        return Optional.of(
-                                new DefaultRemoteRepository((org.eclipse.aether.repository.RemoteRepository) repo));
+                    if (repo instanceof org.eclipse.aether.repository.LocalRepository localRepository) {
+                        return Optional.of(new DefaultLocalRepository(localRepository));
+                    } else if (repo instanceof org.eclipse.aether.repository.RemoteRepository remoteRepository) {
+                        return Optional.of(new DefaultRemoteRepository(remoteRepository));
                     } else {
                         return Optional.empty();
                     }

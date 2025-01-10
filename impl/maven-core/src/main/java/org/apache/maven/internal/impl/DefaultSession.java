@@ -201,8 +201,8 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     }
 
     public ArtifactRepository toArtifactRepository(RemoteRepository repository) {
-        if (repository instanceof DefaultRemoteRepository) {
-            org.eclipse.aether.repository.RemoteRepository rr = ((DefaultRemoteRepository) repository).getRepository();
+        if (repository instanceof DefaultRemoteRepository defaultRemoteRepository) {
+            org.eclipse.aether.repository.RemoteRepository rr = defaultRemoteRepository.getRepository();
 
             try {
                 return mavenRepositorySystem.createRepository(

@@ -181,8 +181,8 @@ class WrapperProperties extends Properties {
 
     @Override
     public synchronized boolean equals(Object o) {
-        if (o instanceof WrapperProperties) {
-            o = ((WrapperProperties) o).getter.get();
+        if (o instanceof WrapperProperties wrapperProperties) {
+            o = wrapperProperties.getter.get();
         }
         return getter.get().equals(o);
     }

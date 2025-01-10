@@ -621,8 +621,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 if (buffer.length() > 1) {
                     buffer.append(", ");
                 }
-                if (item instanceof ListItem) {
-                    buffer.append(((ListItem) item).toListString());
+                if (item instanceof ListItem listItem) {
+                    buffer.append(listItem.toListString());
                 } else {
                     buffer.append(item);
                 }
@@ -783,7 +783,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceof ComparableVersion) && items.equals(((ComparableVersion) o).items);
+        return o instanceof ComparableVersion comparableVersion && items.equals(comparableVersion.items);
     }
 
     @Override

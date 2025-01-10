@@ -506,9 +506,7 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
             return true;
         }
 
-        if (object instanceof MojoDescriptor) {
-            MojoDescriptor other = (MojoDescriptor) object;
-
+        if (object instanceof MojoDescriptor other) {
             return Objects.equals(getPluginDescriptor(), other.getPluginDescriptor())
                     && Objects.equals(getGoal(), other.getGoal());
         }

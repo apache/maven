@@ -57,8 +57,8 @@ public final class Features {
     }
 
     private static boolean doGet(Object val, boolean def) {
-        if (val instanceof Boolean) {
-            return (Boolean) val;
+        if (val instanceof Boolean bool) {
+            return bool;
         } else if (val != null) {
             return Boolean.parseBoolean(val.toString());
         } else {

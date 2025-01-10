@@ -75,13 +75,13 @@ public class DiIndexProcessor extends AbstractProcessor {
         StringBuilder className = new StringBuilder(typeElement.getSimpleName());
         Element enclosingElement = typeElement.getEnclosingElement();
 
-        while (enclosingElement instanceof TypeElement) {
-            className.insert(0, "$").insert(0, ((TypeElement) enclosingElement).getSimpleName());
+        while (enclosingElement instanceof TypeElement enclosingTypeElement) {
+            className.insert(0, "$").insert(0, enclosingTypeElement.getSimpleName());
             enclosingElement = enclosingElement.getEnclosingElement();
         }
 
-        if (enclosingElement instanceof PackageElement) {
-            className.insert(0, ".").insert(0, ((PackageElement) enclosingElement).getQualifiedName());
+        if (enclosingElement instanceof PackageElement packageElement) {
+            className.insert(0, ".").insert(0, packageElement.getQualifiedName());
         }
 
         return className.toString();

@@ -331,7 +331,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
         Object value = ee.evaluate("${mojo.plugin.dependencies}");
 
-        assertTrue(value instanceof Collection);
+        assertInstanceOf(Collection.class, value);
 
         @SuppressWarnings("unchecked")
         Collection<Artifact> artifacts = (Collection<Artifact>) value;
