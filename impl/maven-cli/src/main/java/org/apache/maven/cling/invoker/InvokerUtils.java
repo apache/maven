@@ -43,8 +43,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Various utilities.
  */
-public final class InvokerUtils
-{
+public final class InvokerUtils {
     private InvokerUtils() {}
 
     @Nonnull
