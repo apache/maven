@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,7 @@ import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cling.props.MavenPropertiesLoader;
 import org.apache.maven.cling.utils.CLIReportingUtils;
@@ -58,6 +60,17 @@ import static org.apache.maven.cling.invoker.InvokerUtils.stripLeadingAndTrailin
 import static org.apache.maven.cling.invoker.InvokerUtils.toMap;
 
 public abstract class BaseParser implements Parser {
+
+    @Nullable
+    private static Path findRoot( Path topDirectory ) {
+        requireNonNull(topDirectory, "topDirectory");
+        Path rootDirectory =
+                ServiceLoader.load( RootLocator.class).iterator().next().findRoot(topDirectory);
+        if (rootDirectory != null) {
+            return getCanonicalPath(rootDirectory);
+        }
+        return null;
+    }
 
     @SuppressWarnings("VisibilityModifier")
     public static class LocalContext {
@@ -216,7 +229,7 @@ public abstract class BaseParser implements Parser {
 
     @Nullable
     protected Path getRootDirectory(LocalContext context) throws ParserException {
-        return InvokerUtils.findRoot(context.topDirectory);
+        return findRoot(context.topDirectory);
     }
 
     protected Map<String, String> populateSystemProperties(LocalContext context) throws ParserException {

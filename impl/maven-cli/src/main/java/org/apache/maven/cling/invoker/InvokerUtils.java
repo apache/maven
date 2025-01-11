@@ -23,14 +23,10 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
-import java.util.ServiceLoader;
 import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -41,7 +37,8 @@ import org.codehaus.plexus.logging.Logger;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Various utilities.
+ * Various mostly internal utilities used in org.apache.maven.cling.invoker and its subpackages.
+ * Not documented, tested, or intended for external uses.
  */
 public final class InvokerUtils {
     private InvokerUtils() {}
@@ -150,22 +147,4 @@ public final class InvokerUtils {
         };
     }
 
-    @Nullable
-    public static Path findRoot(Path topDirectory) {
-        requireNonNull(topDirectory, "topDirectory");
-        Path rootDirectory =
-                ServiceLoader.load(RootLocator.class).iterator().next().findRoot(topDirectory);
-        if (rootDirectory != null) {
-            return getCanonicalPath(rootDirectory);
-        }
-        return null;
-    }
-
-    @Nonnull
-    public static Path findMandatoryRoot(Path topDirectory) {
-        requireNonNull(topDirectory, "topDirectory");
-        return getCanonicalPath(Optional.ofNullable(
-                        ServiceLoader.load(RootLocator.class).iterator().next().findMandatoryRoot(topDirectory))
-                .orElseThrow());
-    }
 }
