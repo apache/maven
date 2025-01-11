@@ -90,7 +90,7 @@ public final class ReflectionUtils {
                     qualifier = named.value();
                 } else {
                     Class<? extends Annotation> annotationType = annotation.annotationType();
-                    qualifier = isMarker(annotationType) ? annotationType : annotation;
+                    qualifier = annotationType.getDeclaredMethods().length == 0 ? annotationType : annotation;
                 }
             }
         }
@@ -379,21 +379,6 @@ public final class ReflectionUtils {
         }
     }
 
-    public static void getDisplayString(
-            StringBuilder sb, Class<? extends Annotation> annotationType, @Nullable Annotation annotation) {
-        if (annotation == null) {
-            sb.append("@").append(ReflectionUtils.getDisplayName(annotationType));
-        } else {
-            String typeName = annotationType.getName();
-            String str = annotation.toString();
-            if (str.startsWith("@" + typeName)) {
-                sb.append("@").append(getDisplayName(annotationType)).append(str.substring(typeName.length() + 1));
-            } else {
-                sb.append(str);
-            }
-        }
-    }
-
     public static String getDisplayName(Type type) {
         Class<?> raw = Types.getRawType(type);
         String typeName;
@@ -409,7 +394,18 @@ public final class ReflectionUtils {
                 .replaceAll("");
     }
 
-    public static boolean isMarker(Class<? extends Annotation> annotationType) {
-        return annotationType.getDeclaredMethods().length == 0;
+    private static void getDisplayString(
+            StringBuilder sb, Class<? extends Annotation> annotationType, @Nullable Annotation annotation) {
+        if (annotation == null) {
+            sb.append("@").append(ReflectionUtils.getDisplayName(annotationType));
+        } else {
+            String typeName = annotationType.getName();
+            String str = annotation.toString();
+            if (str.startsWith("@" + typeName)) {
+                sb.append("@").append(getDisplayName(annotationType)).append(str.substring(typeName.length() + 1));
+            } else {
+                sb.append(str);
+            }
+        }
     }
 }
