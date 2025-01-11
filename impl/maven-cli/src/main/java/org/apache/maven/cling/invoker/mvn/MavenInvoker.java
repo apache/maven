@@ -91,10 +91,10 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     @Nonnull
-    private static Path findMandatoryRoot( Path topDirectory ) {
+    private static Path findMandatoryRoot(Path topDirectory) {
         requireNonNull(topDirectory, "topDirectory");
-        return InvokerUtils.getCanonicalPath( Optional.ofNullable(
-                        ServiceLoader.load( RootLocator.class).iterator().next().findMandatoryRoot(topDirectory))
+        return InvokerUtils.getCanonicalPath(Optional.ofNullable(
+                        ServiceLoader.load(RootLocator.class).iterator().next().findMandatoryRoot(topDirectory))
                 .orElseThrow());
     }
 

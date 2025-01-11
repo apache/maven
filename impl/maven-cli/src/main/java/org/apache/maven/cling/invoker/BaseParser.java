@@ -38,6 +38,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
@@ -56,16 +57,15 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.InvokerUtils.getCanonicalPath;
 import static org.apache.maven.cling.invoker.InvokerUtils.or;
 import static org.apache.maven.cling.invoker.InvokerUtils.prefix;
-import static org.apache.maven.cling.invoker.InvokerUtils.stripLeadingAndTrailingQuotes;
 import static org.apache.maven.cling.invoker.InvokerUtils.toMap;
 
 public abstract class BaseParser implements Parser {
 
     @Nullable
-    private static Path findRoot( Path topDirectory ) {
+    private static Path findRoot(Path topDirectory) {
         requireNonNull(topDirectory, "topDirectory");
         Path rootDirectory =
-                ServiceLoader.load( RootLocator.class).iterator().next().findRoot(topDirectory);
+                ServiceLoader.load(RootLocator.class).iterator().next().findRoot(topDirectory);
         if (rootDirectory != null) {
             return getCanonicalPath(rootDirectory);
         }
@@ -195,6 +195,19 @@ public abstract class BaseParser implements Parser {
         if (!Objects.equals(System.getProperty(javaSystemPropertyKey), valueString)) {
             context.systemPropertiesOverrides.put(javaSystemPropertyKey, valueString);
         }
+    }
+
+    @Nonnull
+    private static String stripLeadingAndTrailingQuotes(String str) {
+        requireNonNull(str, "str");
+        final int length = str.length();
+        if (length > 1
+                && str.startsWith("\"")
+                && str.endsWith("\"")
+                && str.substring(1, length - 1).indexOf('"') == -1) {
+            str = str.substring(1, length - 1);
+        }
+        return str;
     }
 
     protected Path getTopDirectory(LocalContext context) throws ParserException {

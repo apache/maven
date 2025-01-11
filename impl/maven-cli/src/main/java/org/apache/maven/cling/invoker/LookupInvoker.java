@@ -35,6 +35,7 @@ import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
@@ -87,8 +88,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.cling.invoker.InvokerUtils.toMavenExecutionRequestLoggingLevel;
-import static org.apache.maven.cling.invoker.InvokerUtils.toProperties;
 
 /**
  * Lookup invoker implementation, that boots up DI container.
@@ -462,6 +461,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.eventSpyDispatcher.init(() -> data);
     }
 
+    private static Properties toProperties(Map<String, String> properties) {
+        requireNonNull(properties, "properties");
+        Properties map = new Properties();
+        for (String key : properties.keySet()) {
+            map.put(key, properties.get(key));
+        }
+        return map;
+    }
+
     protected void postCommands(C context) throws Exception {
         InvokerRequest invokerRequest = context.invokerRequest;
         Logger logger = context.logger;
@@ -672,6 +680,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         return context.userResolver
                 .apply(context.protoSession.getUserProperties().get(Constants.MAVEN_USER_CONF))
                 .resolve("repository");
+    }
+
+    @Nonnull
+    private static int toMavenExecutionRequestLoggingLevel(Slf4jConfiguration.Level level) {
+        requireNonNull(level, "level");
+        return switch (level) {
+            case DEBUG -> MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
+            case INFO -> MavenExecutionRequest.LOGGING_LEVEL_INFO;
+            case ERROR -> MavenExecutionRequest.LOGGING_LEVEL_ERROR;
+        };
     }
 
     protected void populateRequest(C context, Lookup lookup, MavenExecutionRequest request) throws Exception {

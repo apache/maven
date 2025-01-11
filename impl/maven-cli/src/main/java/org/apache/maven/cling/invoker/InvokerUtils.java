@@ -32,29 +32,15 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
-import org.codehaus.plexus.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Various mostly internal utilities used in org.apache.maven.cling.invoker and its subpackages.
+ * Various internal utilities used in org.apache.maven.cling.invoker and its subpackages.
  * Not documented, tested, or intended for external uses.
  */
 public final class InvokerUtils {
     private InvokerUtils() {}
-
-    @Nonnull
-    public static String stripLeadingAndTrailingQuotes(String str) {
-        requireNonNull(str, "str");
-        final int length = str.length();
-        if (length > 1
-                && str.startsWith("\"")
-                && str.endsWith("\"")
-                && str.substring(1, length - 1).indexOf('"') == -1) {
-            str = str.substring(1, length - 1);
-        }
-        return str;
-    }
 
     @Nonnull
     public static Path getCanonicalPath(Path path) {
@@ -72,16 +58,6 @@ public final class InvokerUtils {
         HashMap<String, String> map = new HashMap<>();
         for (String key : properties.stringPropertyNames()) {
             map.put(key, properties.getProperty(key));
-        }
-        return map;
-    }
-
-    @Nonnull
-    public static Properties toProperties(Map<String, String> properties) {
-        requireNonNull(properties, "properties");
-        Properties map = new Properties();
-        for (String key : properties.keySet()) {
-            map.put(key, properties.get(key));
         }
         return map;
     }
@@ -126,24 +102,6 @@ public final class InvokerUtils {
                 }
             }
             return null;
-        };
-    }
-
-    public static int toMavenExecutionRequestLoggingLevel(Slf4jConfiguration.Level level) {
-        requireNonNull(level, "level");
-        return switch (level) {
-            case DEBUG -> MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
-            case INFO -> MavenExecutionRequest.LOGGING_LEVEL_INFO;
-            case ERROR -> MavenExecutionRequest.LOGGING_LEVEL_ERROR;
-        };
-    }
-
-    public static int toPlexusLoggingLevel(Slf4jConfiguration.Level level) {
-        requireNonNull(level, "level");
-        return switch (level) {
-            case DEBUG -> Logger.LEVEL_DEBUG;
-            case INFO -> Logger.LEVEL_INFO;
-            case ERROR -> Logger.LEVEL_ERROR;
         };
     }
 
