@@ -28,10 +28,10 @@ import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
+import org.codehaus.plexus.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,7 +53,7 @@ public final class InvokerUtils {
     }
 
     @Nonnull
-    public static Map<String, String> toMap(Properties properties) {
+    static Map<String, String> toMap(Properties properties) {
         requireNonNull(properties, "properties");
         HashMap<String, String> map = new HashMap<>();
         for (String key : properties.stringPropertyNames()) {
@@ -105,4 +105,13 @@ public final class InvokerUtils {
         };
     }
 
+    @Nonnull
+    static int toPlexusLoggingLevel(Slf4jConfiguration.Level level) {
+        requireNonNull(level, "level");
+        return switch (level) {
+            case DEBUG -> Logger.LEVEL_DEBUG;
+            case INFO -> Logger.LEVEL_INFO;
+            case ERROR -> Logger.LEVEL_ERROR;
+        };
+    }
 }
