@@ -32,7 +32,7 @@ import org.apache.maven.cling.invoker.CommonsCliOptions;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 
-import static org.apache.maven.cling.invoker.Utils.createInterpolator;
+import static org.apache.maven.cling.invoker.InvokerUtils.createInterpolator;
 
 /**
  * Implementation of {@link ShellOptions} (base + shell).

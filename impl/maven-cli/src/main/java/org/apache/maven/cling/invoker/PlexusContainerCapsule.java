@@ -25,7 +25,7 @@ import org.apache.maven.internal.impl.DefaultLookup;
 import org.codehaus.plexus.DefaultPlexusContainer;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
+import static org.apache.maven.cling.invoker.InvokerUtils.toPlexusLoggingLevel;
 
 /**
  * Container capsule backed by Plexus Container.

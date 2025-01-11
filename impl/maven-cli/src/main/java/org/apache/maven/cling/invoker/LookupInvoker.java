@@ -87,8 +87,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.cling.invoker.Utils.toMavenExecutionRequestLoggingLevel;
-import static org.apache.maven.cling.invoker.Utils.toProperties;
+import static org.apache.maven.cling.invoker.InvokerUtils.toMavenExecutionRequestLoggingLevel;
+import static org.apache.maven.cling.invoker.InvokerUtils.toProperties;
 
 /**
  * Lookup invoker implementation, that boots up DI container.

@@ -51,11 +51,11 @@ import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.cling.invoker.Utils.getCanonicalPath;
-import static org.apache.maven.cling.invoker.Utils.or;
-import static org.apache.maven.cling.invoker.Utils.prefix;
-import static org.apache.maven.cling.invoker.Utils.stripLeadingAndTrailingQuotes;
-import static org.apache.maven.cling.invoker.Utils.toMap;
+import static org.apache.maven.cling.invoker.InvokerUtils.getCanonicalPath;
+import static org.apache.maven.cling.invoker.InvokerUtils.or;
+import static org.apache.maven.cling.invoker.InvokerUtils.prefix;
+import static org.apache.maven.cling.invoker.InvokerUtils.stripLeadingAndTrailingQuotes;
+import static org.apache.maven.cling.invoker.InvokerUtils.toMap;
 
 public abstract class BaseParser implements Parser {
 
@@ -216,7 +216,7 @@ public abstract class BaseParser implements Parser {
 
     @Nullable
     protected Path getRootDirectory(LocalContext context) throws ParserException {
-        return Utils.findRoot(context.topDirectory);
+        return InvokerUtils.findRoot(context.topDirectory);
     }
 
     protected Map<String, String> populateSystemProperties(LocalContext context) throws ParserException {
