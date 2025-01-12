@@ -21,13 +21,14 @@ package org.apache.maven.slf4j;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.maven.logging.api.LogLevelRecorder;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
 /**
  * LogFactory for Maven which can create a simple logger or one which, if set, fails the build on a severity threshold.
  */
-public class MavenLoggerFactory implements org.apache.maven.logging.api.LogLevelRecorder, ILoggerFactory {
+public class MavenLoggerFactory implements LogLevelRecorder, ILoggerFactory {
     final DefaultLogLevelRecorder logLevelRecorder = new DefaultLogLevelRecorder();
     final ConcurrentMap<String, Logger> loggerMap = new ConcurrentHashMap<>();
 
