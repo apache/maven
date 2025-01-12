@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.RemoteRepository;
@@ -115,7 +116,7 @@ public interface ArtifactDeployerRequest {
                     int retryFailedDeploymentCount) {
                 super(session);
                 this.repository = requireNonNull(repository, "repository cannot be null");
-                this.artifacts = unmodifiable(requireNonNull(artifacts, "artifacts cannot be null"));
+                this.artifacts = List.copyOf(requireNonNull(artifacts, "artifacts cannot be null"));
                 this.retryFailedDeploymentCount = retryFailedDeploymentCount;
             }
 
