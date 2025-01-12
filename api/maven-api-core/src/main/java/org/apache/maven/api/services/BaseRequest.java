@@ -18,10 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -45,11 +41,5 @@ abstract class BaseRequest<S extends ProtoSession> {
     @Nonnull
     public S getSession() {
         return session;
-    }
-
-    protected static <T> Collection<T> unmodifiable(Collection<T> obj) {
-        return obj != null && !obj.isEmpty()
-                ? Collections.unmodifiableCollection(new ArrayList<>(obj))
-                : Collections.emptyList();
     }
 }

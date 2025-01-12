@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Session;
@@ -89,7 +90,7 @@ public interface ArtifactInstallerRequest {
 
             DefaultArtifactInstallerRequest(@Nonnull Session session, @Nonnull Collection<ProducedArtifact> artifacts) {
                 super(session);
-                this.artifacts = unmodifiable(requireNonNull(artifacts, "artifacts cannot be null"));
+                this.artifacts = List.copyOf(requireNonNull(artifacts, "artifacts cannot be null"));
             }
 
             @Nonnull
