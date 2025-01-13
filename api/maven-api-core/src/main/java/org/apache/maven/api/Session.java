@@ -729,6 +729,23 @@ public interface Session extends ProtoSession {
             throws VersionResolverException;
 
     /**
+     * Resolves the highest available version of a version range.
+     * The returned version is only dependent on the configured repositories and their contents.
+     * The supplied request may also refer to a single concrete version rather than a version range.
+     * In this case though, the result contains simply the (parsed) input version, regardless of the
+     * repositories and their contents.
+     *
+     * @param artifact the artifact for which to resolve the versions
+     * @param repositories the repositories to use, or the session repositories if {@code null}
+     * @return the highest resolved {@code Version}.
+     * @throws org.apache.maven.api.services.VersionRangeResolverException if the resolution failed
+     * @see org.apache.maven.api.services.VersionRangeResolver#resolve(Session, ArtifactCoordinates) (String)
+     */
+    @Nonnull
+    Optional<Version> resolveHighestVersion(@Nonnull ArtifactCoordinates artifact, List<RemoteRepository> repositories)
+            throws VersionResolverException;
+
+    /**
      * Parses the specified version string, for example "1.0".
      * <p>
      * Shortcut for {@code getService(VersionParser.class).parseVersion(...)}.
