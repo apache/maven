@@ -18,10 +18,10 @@
  */
 package org.apache.maven.api.cli;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -201,11 +201,11 @@ public interface Options {
     /**
      * Returns a new instance of {@link Options} with values interpolated using the given properties.
      *
-     * @param properties a collection of property maps to use for interpolation
+     * @param callback the callback to use for interpolation
      * @return a new {@link Options} instance with interpolated values
      */
     @Nonnull
-    Options interpolate(@Nonnull Collection<Map<String, String>> properties);
+    Options interpolate(@Nonnull Function<String, String> callback);
 
     /**
      * Emits warning messages if deprecated options are used.

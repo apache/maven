@@ -18,8 +18,7 @@
  */
 package org.apache.maven.api.cli.mvnsh;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -36,9 +35,9 @@ public interface ShellOptions extends Options {
     /**
      * Returns a new instance of ShellOptions with values interpolated using the given properties.
      *
-     * @param properties a collection of property maps to use for interpolation
+     * @param callback a callback to use for interpolation
      * @return a new EncryptOptions instance with interpolated values
      */
     @Nonnull
-    ShellOptions interpolate(Collection<Map<String, String>> properties);
+    ShellOptions interpolate(Function<String, String> callback);
 }
