@@ -48,7 +48,6 @@ import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.Utils;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
@@ -227,12 +226,6 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected void populateRequest(MavenContext context, Lookup lookup, MavenExecutionRequest request)
             throws Exception {
         super.populateRequest(context, lookup, request);
-        if (context.invokerRequest.rootDirectory().isEmpty()) {
-            // maven requires this to be set; so default it (and see below at POM)
-            request.setMultiModuleProjectDirectory(
-                    context.invokerRequest.topDirectory().toFile());
-            request.setRootDirectory(context.invokerRequest.topDirectory());
-        }
 
         MavenOptions options = (MavenOptions) context.invokerRequest.options();
         request.setNoSnapshotUpdates(options.suppressSnapshotUpdates().orElse(false));
@@ -248,13 +241,6 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             request.setPom(pom.toFile());
             if (pom.getParent() != null) {
                 request.setBaseDirectory(pom.getParent().toFile());
-            }
-
-            // project present, but we could not determine rootDirectory: extra work needed
-            if (context.invokerRequest.rootDirectory().isEmpty()) {
-                Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
-                request.setMultiModuleProjectDirectory(rootDirectory.toFile());
-                request.setRootDirectory(rootDirectory);
             }
         }
 
