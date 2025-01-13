@@ -44,6 +44,7 @@ import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cling.props.MavenPropertiesLoader;
 import org.apache.maven.cling.utils.CLIReportingUtils;
@@ -122,8 +123,8 @@ public abstract class BaseParser implements Parser {
         context.userProperties = populateUserProperties(context);
 
         // options: interpolate
-        context.options = context.options.interpolate(
-                Arrays.asList(context.extraInterpolationSource(), context.userProperties, context.systemProperties));
+        context.options = context.options.interpolate(Interpolator.chain(
+                context.extraInterpolationSource()::get, context.userProperties::get, context.systemProperties::get));
 
         // core extensions
         context.extensions = readCoreExtensionsDescriptor(context);

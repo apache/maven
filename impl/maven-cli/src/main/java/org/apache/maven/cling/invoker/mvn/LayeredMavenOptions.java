@@ -21,9 +21,9 @@ package org.apache.maven.cling.invoker.mvn;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.LayeredOptions;
@@ -160,10 +160,10 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     }
 
     @Override
-    public MavenOptions interpolate(Collection<Map<String, String>> properties) {
+    public MavenOptions interpolate(Function<String, String> callback) {
         ArrayList<MavenOptions> interpolatedOptions = new ArrayList<>(options.size());
         for (MavenOptions o : options) {
-            interpolatedOptions.add(o.interpolate(properties));
+            interpolatedOptions.add(o.interpolate(callback));
         }
         return layerMavenOptions(interpolatedOptions);
     }

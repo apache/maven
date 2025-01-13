@@ -20,7 +20,6 @@ package org.apache.maven.cling.invoker;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,12 +29,11 @@ import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.codehaus.plexus.interpolation.AbstractValueSource;
-import org.codehaus.plexus.interpolation.BasicInterpolator;
-import org.codehaus.plexus.interpolation.StringSearchInterpolator;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.codehaus.plexus.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
@@ -90,21 +88,8 @@ public final class Utils {
     }
 
     @Nonnull
-    public static BasicInterpolator createInterpolator(Collection<Map<String, String>> properties) {
-        StringSearchInterpolator interpolator = new StringSearchInterpolator();
-        interpolator.addValueSource(new AbstractValueSource(false) {
-            @Override
-            public Object getValue(String expression) {
-                for (Map<String, String> props : properties) {
-                    String val = props.get(expression);
-                    if (val != null) {
-                        return val;
-                    }
-                }
-                return null;
-            }
-        });
-        return interpolator;
+    public static Interpolator createInterpolator() {
+        return new DefaultInterpolator();
     }
 
     @Nonnull
