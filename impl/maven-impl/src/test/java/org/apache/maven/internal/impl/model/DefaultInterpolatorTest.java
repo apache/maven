@@ -21,7 +21,7 @@ package org.apache.maven.internal.impl.model;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.services.InterpolatorException;
 import org.junit.jupiter.api.Test;
@@ -207,7 +207,7 @@ class DefaultInterpolatorTest {
         performSubstitution(props, null);
     }
 
-    private void performSubstitution(Map<String, String> props, Function<String, String> callback) {
+    private void performSubstitution(Map<String, String> props, UnaryOperator<String> callback) {
         new DefaultInterpolator().performSubstitution(props, callback);
     }
 
@@ -215,7 +215,7 @@ class DefaultInterpolatorTest {
             String val,
             String currentKey,
             Map<String, String> configProps,
-            Function<String, String> callback,
+            UnaryOperator<String> callback,
             boolean defaultsToEmptyString) {
         return new DefaultInterpolator()
                 .substVars(val, currentKey, null, configProps, callback, null, defaultsToEmptyString);

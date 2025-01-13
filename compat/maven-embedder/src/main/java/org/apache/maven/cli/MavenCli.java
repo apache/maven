@@ -45,7 +45,7 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -643,7 +643,7 @@ public class MavenCli {
         populateProperties(cliRequest.commandLine, paths, cliRequest.systemProperties, cliRequest.userProperties);
 
         // now that we have properties, interpolate all arguments
-        Function<String, String> callback = v -> {
+        UnaryOperator<String> callback = v -> {
             String r = paths.getProperty(v);
             if (r == null) {
                 r = cliRequest.systemProperties.getProperty(v);
@@ -724,7 +724,7 @@ public class MavenCli {
 
         container.setLoggerManager(plexusLoggerManager);
 
-        Function<String, String> extensionSource = expression -> {
+        UnaryOperator<String> extensionSource = expression -> {
             String value = cliRequest.userProperties.getProperty(expression);
             if (value == null) {
                 value = cliRequest.systemProperties.getProperty(expression);
@@ -1660,7 +1660,7 @@ public class MavenCli {
         // ----------------------------------------------------------------------
         // Load config files
         // ----------------------------------------------------------------------
-        Function<String, String> callback =
+        UnaryOperator<String> callback =
                 or(paths::getProperty, prefix("cli.", commandLine::getOptionValue), systemProperties::getProperty);
 
         Path mavenConf;
@@ -1686,7 +1686,7 @@ public class MavenCli {
                 .forEach(k -> System.setProperty(k, userProperties.getProperty(k)));
     }
 
-    private static Function<String, String> prefix(String prefix, Function<String, String> cb) {
+    private static UnaryOperator<String> prefix(String prefix, UnaryOperator<String> cb) {
         return s -> {
             String v = null;
             if (s.startsWith(prefix)) {
@@ -1696,9 +1696,9 @@ public class MavenCli {
         };
     }
 
-    private static Function<String, String> or(Function<String, String>... callbacks) {
+    private static UnaryOperator<String> or(UnaryOperator<String>... callbacks) {
         return s -> {
-            for (Function<String, String> cb : callbacks) {
+            for (UnaryOperator<String> cb : callbacks) {
                 String r = cb.apply(s);
                 if (r != null) {
                     return r;

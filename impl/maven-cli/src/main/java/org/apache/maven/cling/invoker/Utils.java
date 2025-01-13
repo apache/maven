@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
@@ -93,7 +93,7 @@ public final class Utils {
     }
 
     @Nonnull
-    public static Function<String, String> prefix(String prefix, Function<String, String> cb) {
+    public static UnaryOperator<String> prefix(String prefix, UnaryOperator<String> cb) {
         return s -> {
             String v = null;
             if (s.startsWith(prefix)) {
@@ -105,9 +105,9 @@ public final class Utils {
 
     @SafeVarargs
     @Nonnull
-    public static Function<String, String> or(Function<String, String>... callbacks) {
+    public static UnaryOperator<String> or(UnaryOperator<String>... callbacks) {
         return s -> {
-            for (Function<String, String> cb : callbacks) {
+            for (UnaryOperator<String> cb : callbacks) {
                 String r = cb.apply(s);
                 if (r != null) {
                     return r;

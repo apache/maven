@@ -20,7 +20,7 @@ package org.apache.maven.api.cli.mvnenc;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -64,5 +64,5 @@ public interface EncryptOptions extends Options {
      * @return a new EncryptOptions instance with interpolated values
      */
     @Nonnull
-    EncryptOptions interpolate(Function<String, String> callback);
+    EncryptOptions interpolate(UnaryOperator<String> callback);
 }

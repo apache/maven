@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -111,7 +111,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
 
         container.setLoggerManager(createLoggerManager());
         ProtoSession protoSession = context.protoSession;
-        Function<String, String> extensionSource = expression -> {
+        UnaryOperator<String> extensionSource = expression -> {
             String value = protoSession.getUserProperties().get(expression);
             if (value == null) {
                 value = protoSession.getSystemProperties().get(expression);

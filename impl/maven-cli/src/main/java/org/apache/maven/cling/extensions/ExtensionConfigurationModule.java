@@ -18,7 +18,7 @@
  */
 package org.apache.maven.cling.extensions;
 
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -35,10 +35,10 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 public class ExtensionConfigurationModule implements Module {
 
     private final CoreExtensionEntry extension;
-    private final Function<String, String> callback;
+    private final UnaryOperator<String> callback;
     private final DefaultInterpolator interpolator = new DefaultInterpolator();
 
-    public ExtensionConfigurationModule(CoreExtensionEntry extension, Function<String, String> callback) {
+    public ExtensionConfigurationModule(CoreExtensionEntry extension, UnaryOperator<String> callback) {
         this.extension = extension;
         this.callback = callback;
     }
@@ -50,8 +50,8 @@ public class ExtensionConfigurationModule implements Module {
             if (configuration == null) {
                 configuration = new XmlNodeImpl("configuration");
             }
-            Function<String, String> cb = Interpolator.memoize(callback);
-            Function<String, String> it = s -> interpolator.interpolate(s, cb);
+            UnaryOperator<String> cb = Interpolator.memoize(callback);
+            UnaryOperator<String> it = s -> interpolator.interpolate(s, cb);
             configuration = new ExtensionInterpolator(it).transform(configuration);
 
             binder.bind(XmlNode.class)
@@ -64,7 +64,7 @@ public class ExtensionConfigurationModule implements Module {
     }
 
     static class ExtensionInterpolator extends MavenTransformer {
-        ExtensionInterpolator(Function<String, String> transformer) {
+        ExtensionInterpolator(UnaryOperator<String> transformer) {
             super(transformer);
         }
 

@@ -20,7 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -90,7 +90,7 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
         });
     }
 
-    static <T> List<T> map(List<T> list, Function<T, T> mapper) {
+    static <T> List<T> map(List<T> list, UnaryOperator<T> mapper) {
         List<T> newList = list;
         for (int i = 0; i < newList.size(); i++) {
             T oldT = newList.get(i);

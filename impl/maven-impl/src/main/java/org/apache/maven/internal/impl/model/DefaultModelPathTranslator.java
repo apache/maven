@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -88,7 +88,7 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
         return model;
     }
 
-    private <T> List<T> map(List<T> resources, Function<T, T> mapper) {
+    private <T> List<T> map(List<T> resources, UnaryOperator<T> mapper) {
         List<T> newResources = null;
         if (resources != null) {
             for (int i = 0; i < resources.size(); i++) {

@@ -20,7 +20,7 @@ package org.apache.maven.internal.impl.model.profile;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -73,7 +73,7 @@ public class ConditionProfileActivator implements ProfileActivator {
         String condition = profile.getActivation().getCondition();
         try {
             Map<String, ConditionParser.ExpressionFunction> functions = registerFunctions(context, versionParser);
-            Function<String, String> propertyResolver = s -> property(context, s);
+            UnaryOperator<String> propertyResolver = s -> property(context, s);
             return toBoolean(new ConditionParser(functions, propertyResolver).parse(condition));
         } catch (Exception e) {
             problems.add(

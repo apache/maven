@@ -31,7 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -563,7 +563,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.projectSettingsPath = projectSettingsFile;
         context.userSettingsPath = userSettingsFile;
 
-        Function<String, String> interpolationSource = Interpolator.chain(
+        UnaryOperator<String> interpolationSource = Interpolator.chain(
                 context.protoSession.getUserProperties()::get, context.protoSession.getSystemProperties()::get);
         SettingsBuilderRequest settingsRequest = SettingsBuilderRequest.builder()
                 .session(context.protoSession)

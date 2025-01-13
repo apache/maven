@@ -19,7 +19,7 @@
 package org.apache.maven.internal.impl.model.profile;
 
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.model.ProfileActivationContext;
@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConditionParserTest {
     ConditionParser parser;
     Map<String, ExpressionFunction> functions;
-    Function<String, String> propertyResolver;
+    UnaryOperator<String> propertyResolver;
 
     @BeforeEach
     void setUp() {

@@ -21,7 +21,7 @@ package org.apache.maven.api.cli;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -205,7 +205,7 @@ public interface Options {
      * @return a new {@link Options} instance with interpolated values
      */
     @Nonnull
-    Options interpolate(@Nonnull Function<String, String> callback);
+    Options interpolate(@Nonnull UnaryOperator<String> callback);
 
     /**
      * Emits warning messages if deprecated options are used.

@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 
@@ -36,7 +36,7 @@ public class MavenPropertiesLoader {
             "maven.override."; // prefix that marks that system property should override defaults.
 
     public static void loadProperties(
-            java.util.Properties properties, Path path, Function<String, String> callback, boolean escape)
+            java.util.Properties properties, Path path, UnaryOperator<String> callback, boolean escape)
             throws IOException {
         MavenProperties sp = new MavenProperties(false);
         if (Files.exists(path)) {
@@ -49,7 +49,7 @@ public class MavenPropertiesLoader {
         sp.forEach(properties::setProperty);
     }
 
-    public static void substitute(MavenProperties props, Function<String, String> callback) {
+    public static void substitute(MavenProperties props, UnaryOperator<String> callback) {
         for (Enumeration<?> e = props.propertyNames(); e.hasMoreElements(); ) {
             String name = (String) e.nextElement();
             String value = props.getProperty(name);
@@ -66,8 +66,8 @@ public class MavenPropertiesLoader {
         props.keySet().removeIf(k -> k.startsWith(OVERRIDE_PREFIX));
     }
 
-    private static MavenProperties loadPropertiesFile(
-            Path path, boolean failIfNotFound, Function<String, String> callback) throws IOException {
+    private static MavenProperties loadPropertiesFile(Path path, boolean failIfNotFound, UnaryOperator<String> callback)
+            throws IOException {
         MavenProperties configProps = new MavenProperties(null, false);
         if (Files.exists(path) || failIfNotFound) {
             configProps.load(path);
@@ -77,7 +77,7 @@ public class MavenPropertiesLoader {
         return configProps;
     }
 
-    private static void loadIncludes(Path configProp, MavenProperties configProps, Function<String, String> callback)
+    private static void loadIncludes(Path configProp, MavenProperties configProps, UnaryOperator<String> callback)
             throws IOException {
         String includes = configProps.get(INCLUDES_PROPERTY);
         if (includes != null) {
@@ -161,7 +161,7 @@ public class MavenPropertiesLoader {
     }
 
     public static String substVars(
-            String value, String name, Map<String, String> props, Function<String, String> callback) {
+            String value, String name, Map<String, String> props, UnaryOperator<String> callback) {
         return DefaultInterpolator.substVars(value, name, null, props, callback, null, false);
     }
 }
