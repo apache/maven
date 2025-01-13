@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -50,7 +50,7 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
     }
 
     private static CommonsCliEncryptOptions interpolate(
-            CommonsCliEncryptOptions options, Function<String, String> callback) {
+            CommonsCliEncryptOptions options, UnaryOperator<String> callback) {
         try {
             // now that we have properties, interpolate all arguments
             Interpolator interpolator = createInterpolator();
@@ -100,7 +100,7 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
     }
 
     @Override
-    public EncryptOptions interpolate(Function<String, String> callback) {
+    public EncryptOptions interpolate(UnaryOperator<String> callback) {
         return interpolate(this, callback);
     }
 

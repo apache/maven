@@ -26,8 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -110,8 +111,8 @@ public class DefaultModelInterpolator implements ModelInterpolator {
         Map<String, Optional<String>> cache = new HashMap<>();
         Function<String, Optional<String>> ucb =
                 v -> Optional.ofNullable(callback(model, projectDir, request, problems, v));
-        Function<String, String> cb = v -> cache.computeIfAbsent(v, ucb).orElse(null);
-        BiFunction<String, String, String> postprocessor = (e, v) -> postProcess(projectDir, request, e, v);
+        UnaryOperator<String> cb = v -> cache.computeIfAbsent(v, ucb).orElse(null);
+        BinaryOperator<String> postprocessor = (e, v) -> postProcess(projectDir, request, e, v);
         return value -> {
             try {
                 return interpolator.interpolate(value, cb, postprocessor, false);

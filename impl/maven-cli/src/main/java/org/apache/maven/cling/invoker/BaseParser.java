@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
@@ -264,7 +264,7 @@ public abstract class BaseParser implements Parser {
         // Load config files
         // ----------------------------------------------------------------------
         Map<String, String> paths = context.extraInterpolationSource();
-        Function<String, String> callback =
+        UnaryOperator<String> callback =
                 or(paths::get, prefix("cli.", userSpecifiedProperties::get), context.systemProperties::get);
 
         Path mavenConf;

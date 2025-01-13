@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -44,8 +44,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         super(source, cliManager, commandLine);
     }
 
-    private static CommonsCliMavenOptions interpolate(
-            CommonsCliMavenOptions options, Function<String, String> callback) {
+    private static CommonsCliMavenOptions interpolate(CommonsCliMavenOptions options, UnaryOperator<String> callback) {
         try {
             // now that we have properties, interpolate all arguments
             Interpolator interpolator = createInterpolator();
@@ -248,7 +247,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
-    public MavenOptions interpolate(Function<String, String> callback) {
+    public MavenOptions interpolate(UnaryOperator<String> callback) {
         return interpolate(this, callback);
     }
 

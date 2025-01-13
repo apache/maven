@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.BinaryOperator;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
@@ -43,8 +43,8 @@ public class DefaultInterpolator implements Interpolator {
     @Override
     public void interpolate(
             Map<String, String> map,
-            Function<String, String> callback,
-            BiFunction<String, String, String> postprocessor,
+            UnaryOperator<String> callback,
+            BinaryOperator<String> postprocessor,
             boolean defaultsToEmpty) {
         Map<String, String> org = new HashMap<>(map);
         for (String name : map.keySet()) {
@@ -68,10 +68,7 @@ public class DefaultInterpolator implements Interpolator {
 
     @Override
     public String interpolate(
-            String val,
-            Function<String, String> callback,
-            BiFunction<String, String, String> postprocessor,
-            boolean defaultsToEmpty) {
+            String val, UnaryOperator<String> callback, BinaryOperator<String> postprocessor, boolean defaultsToEmpty) {
         return interpolate(val, null, null, callback, postprocessor, defaultsToEmpty);
     }
 
@@ -80,8 +77,8 @@ public class DefaultInterpolator implements Interpolator {
             @Nullable String val,
             @Nullable String currentKey,
             @Nullable Set<String> cycleMap,
-            @Nullable Function<String, String> callback,
-            @Nullable BiFunction<String, String, String> postprocessor,
+            @Nullable UnaryOperator<String> callback,
+            @Nullable BinaryOperator<String> postprocessor,
             boolean defaultsToEmpty) {
         return substVars(val, currentKey, cycleMap, null, callback, postprocessor, defaultsToEmpty);
     }
@@ -92,7 +89,7 @@ public class DefaultInterpolator implements Interpolator {
      * @param properties the property set to perform substitution on
      * @param callback Callback for substitution
      */
-    public void performSubstitution(Map<String, String> properties, Function<String, String> callback) {
+    public void performSubstitution(Map<String, String> properties, UnaryOperator<String> callback) {
         performSubstitution(properties, callback, true);
     }
 
@@ -104,7 +101,7 @@ public class DefaultInterpolator implements Interpolator {
      * @param defaultsToEmptyString sets an empty string if a replacement value is not found, leaves intact otherwise
      */
     public void performSubstitution(
-            Map<String, String> properties, Function<String, String> callback, boolean defaultsToEmptyString) {
+            Map<String, String> properties, UnaryOperator<String> callback, boolean defaultsToEmptyString) {
         Map<String, String> org = new HashMap<>(properties);
         for (String name : properties.keySet()) {
             properties.compute(
@@ -166,7 +163,7 @@ public class DefaultInterpolator implements Interpolator {
             String currentKey,
             Set<String> cycleMap,
             Map<String, String> configProps,
-            Function<String, String> callback) {
+            UnaryOperator<String> callback) {
         return substVars(val, currentKey, cycleMap, configProps, callback, null, false);
     }
 
@@ -199,8 +196,8 @@ public class DefaultInterpolator implements Interpolator {
             String currentKey,
             Set<String> cycleMap,
             Map<String, String> configProps,
-            Function<String, String> callback,
-            BiFunction<String, String, String> postprocessor,
+            UnaryOperator<String> callback,
+            BinaryOperator<String> postprocessor,
             boolean defaultsToEmptyString) {
         return unescape(
                 doSubstVars(val, currentKey, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString));
@@ -211,8 +208,8 @@ public class DefaultInterpolator implements Interpolator {
             String currentKey,
             Set<String> cycleMap,
             Map<String, String> configProps,
-            Function<String, String> callback,
-            BiFunction<String, String, String> postprocessor,
+            UnaryOperator<String> callback,
+            BinaryOperator<String> postprocessor,
             boolean defaultsToEmptyString) {
         if (val == null || val.isEmpty()) {
             return val;
@@ -291,8 +288,8 @@ public class DefaultInterpolator implements Interpolator {
             String org,
             Set<String> cycleMap,
             Map<String, String> configProps,
-            Function<String, String> callback,
-            BiFunction<String, String, String> postprocessor,
+            UnaryOperator<String> callback,
+            BinaryOperator<String> postprocessor,
             boolean defaultsToEmptyString) {
 
         // Process chained operators from left to right
@@ -365,8 +362,8 @@ public class DefaultInterpolator implements Interpolator {
             String variable,
             Set<String> cycleMap,
             Map<String, String> configProps,
-            Function<String, String> callback,
-            BiFunction<String, String, String> postprocessor,
+            UnaryOperator<String> callback,
+            BinaryOperator<String> postprocessor,
             boolean defaultsToEmptyString) {
 
         // Verify that this is not a recursive variable reference

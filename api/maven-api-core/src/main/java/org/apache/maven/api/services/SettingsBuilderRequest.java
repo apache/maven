@@ -21,7 +21,7 @@ package org.apache.maven.api.services;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Experimental;
@@ -72,7 +72,7 @@ public interface SettingsBuilderRequest {
      * @return the interpolation source for interpolation
      */
     @Nonnull
-    Optional<Function<String, String>> getInterpolationSource();
+    Optional<UnaryOperator<String>> getInterpolationSource();
 
     @Nonnull
     static SettingsBuilderRequest build(
@@ -136,7 +136,7 @@ public interface SettingsBuilderRequest {
         Source installationSettingsSource;
         Source projectSettingsSource;
         Source userSettingsSource;
-        Function<String, String> interpolationSource;
+        UnaryOperator<String> interpolationSource;
 
         public SettingsBuilderRequestBuilder session(ProtoSession session) {
             this.session = session;
@@ -158,7 +158,7 @@ public interface SettingsBuilderRequest {
             return this;
         }
 
-        public SettingsBuilderRequestBuilder interpolationSource(Function<String, String> interpolationSource) {
+        public SettingsBuilderRequestBuilder interpolationSource(UnaryOperator<String> interpolationSource) {
             this.interpolationSource = interpolationSource;
             return this;
         }
@@ -177,7 +177,7 @@ public interface SettingsBuilderRequest {
             private final Source installationSettingsSource;
             private final Source projectSettingsSource;
             private final Source userSettingsSource;
-            private final Function<String, String> interpolationSource;
+            private final UnaryOperator<String> interpolationSource;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultSettingsBuilderRequest(
@@ -185,7 +185,7 @@ public interface SettingsBuilderRequest {
                     @Nullable Source installationSettingsSource,
                     @Nullable Source projectSettingsSource,
                     @Nullable Source userSettingsSource,
-                    @Nullable Function<String, String> interpolationSource) {
+                    @Nullable UnaryOperator<String> interpolationSource) {
                 super(session);
                 this.installationSettingsSource = installationSettingsSource;
                 this.projectSettingsSource = projectSettingsSource;
@@ -213,7 +213,7 @@ public interface SettingsBuilderRequest {
 
             @Nonnull
             @Override
-            public Optional<Function<String, String>> getInterpolationSource() {
+            public Optional<UnaryOperator<String>> getInterpolationSource() {
                 return Optional.ofNullable(interpolationSource);
             }
         }

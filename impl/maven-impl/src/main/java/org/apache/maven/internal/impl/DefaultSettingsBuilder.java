@@ -29,8 +29,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -232,7 +232,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private Settings interpolate(
             Settings settings, SettingsBuilderRequest request, ProblemCollector<BuilderProblem> problems) {
-        Function<String, String> src;
+        UnaryOperator<String> src;
         if (request.getInterpolationSource().isPresent()) {
             src = request.getInterpolationSource().get();
         } else {
@@ -245,7 +245,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     static class DefSettingsTransformer extends SettingsTransformer {
-        DefSettingsTransformer(Function<String, String> transformer) {
+        DefSettingsTransformer(UnaryOperator<String> transformer) {
             super(transformer);
         }
 
@@ -267,7 +267,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
         SecDispatcher secDispatcher = new DefaultSecDispatcher(dispatchers, getSecuritySettings(request.getSession()));
         final AtomicInteger preMaven4Passwords = new AtomicInteger(0);
-        Function<String, String> decryptFunction = str -> {
+        UnaryOperator<String> decryptFunction = str -> {
             if (str != null && !str.isEmpty() && !str.contains("${") && secDispatcher.isAnyEncryptedString(str)) {
                 if (secDispatcher.isLegacyEncryptedString(str)) {
                     // add a problem

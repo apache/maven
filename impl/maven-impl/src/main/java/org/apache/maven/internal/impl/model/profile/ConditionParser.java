@@ -21,7 +21,7 @@ package org.apache.maven.internal.impl.model.profile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * The {@code ConditionParser} class is responsible for parsing and evaluating expressions.
@@ -46,7 +46,7 @@ public class ConditionParser {
     }
 
     private final Map<String, ExpressionFunction> functions; // Map to store functions by their names
-    private final Function<String, String> propertyResolver; // Property resolver
+    private final UnaryOperator<String> propertyResolver; // Property resolver
     private List<String> tokens; // List of tokens derived from the expression
     private int current; // Keeps track of the current token index
 
@@ -56,7 +56,7 @@ public class ConditionParser {
      * @param functions a map of function names to their corresponding {@code ExpressionFunction} implementations
      * @param propertyResolver the property resolver
      */
-    public ConditionParser(Map<String, ExpressionFunction> functions, Function<String, String> propertyResolver) {
+    public ConditionParser(Map<String, ExpressionFunction> functions, UnaryOperator<String> propertyResolver) {
         this.functions = functions;
         this.propertyResolver = propertyResolver;
     }

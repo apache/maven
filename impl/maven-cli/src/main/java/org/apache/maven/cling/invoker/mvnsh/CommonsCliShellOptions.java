@@ -20,7 +20,7 @@ package org.apache.maven.cling.invoker.mvnsh;
 
 import java.util.List;
 import java.util.ListIterator;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -46,8 +46,7 @@ public class CommonsCliShellOptions extends CommonsCliOptions implements ShellOp
         super(source, cliManager, commandLine);
     }
 
-    private static CommonsCliShellOptions interpolate(
-            CommonsCliShellOptions options, Function<String, String> callback) {
+    private static CommonsCliShellOptions interpolate(CommonsCliShellOptions options, UnaryOperator<String> callback) {
         try {
             // now that we have properties, interpolate all arguments
             Interpolator interpolator = createInterpolator();
@@ -73,7 +72,7 @@ public class CommonsCliShellOptions extends CommonsCliOptions implements ShellOp
     }
 
     @Override
-    public ShellOptions interpolate(Function<String, String> callback) {
+    public ShellOptions interpolate(UnaryOperator<String> callback) {
         return interpolate(this, callback);
     }
 

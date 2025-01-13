@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -130,7 +130,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     /**
      * Returns a list suited for the builders, i.e. null if not modified
      */
-    private <T> List<T> injectList(List<T> list, Function<T, T> modifer) {
+    private <T> List<T> injectList(List<T> list, UnaryOperator<T> modifer) {
         List<T> newList = null;
         for (int i = 0; i < list.size(); i++) {
             T oldT = list.get(i);
