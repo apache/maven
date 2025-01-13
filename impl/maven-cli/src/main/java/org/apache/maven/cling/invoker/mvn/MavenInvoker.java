@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +46,7 @@ import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
 import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.api.services.model.ModelProcessor;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
@@ -241,6 +243,12 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             request.setPom(pom.toFile());
             if (pom.getParent() != null) {
                 request.setBaseDirectory(pom.getParent().toFile());
+            }
+
+            // project present, but we could not determine rootDirectory: extra work needed
+            if (context.invokerRequest.rootDirectory().isEmpty()) {
+                throw new IllegalArgumentException(
+                        ServiceLoader.load(RootLocator.class).iterator().next().getNoRootMessage());
             }
         }
 
