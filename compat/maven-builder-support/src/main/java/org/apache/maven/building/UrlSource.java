@@ -26,7 +26,9 @@ import java.util.Objects;
 /**
  * Wraps an ordinary {@link URL} as a source.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services} instead
  */
+@Deprecated(since = "4.0.0")
 public class UrlSource implements Source {
 
     private final URL url;

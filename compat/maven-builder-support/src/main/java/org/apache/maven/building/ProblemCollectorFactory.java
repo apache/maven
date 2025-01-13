@@ -23,7 +23,9 @@ import java.util.List;
 /**
  *
  * @since 3.3.0
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services} instead
  */
+@Deprecated(since = "4.0.0")
 public class ProblemCollectorFactory {
 
     /**

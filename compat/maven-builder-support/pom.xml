@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>maven-builder-support</artifactId>
 
-  <name>Maven Builder Support</name>
+  <name>Maven Builder Support (deprecated)</name>
   <description>Support for descriptor builders (model, setting, toolchains)</description>
 
   <dependencies>

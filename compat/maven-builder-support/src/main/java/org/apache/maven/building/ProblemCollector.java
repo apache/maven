@@ -23,7 +23,9 @@ import java.util.List;
 /**
  * Collects problems that are encountered during settings building.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ProblemCollector {
 
     /**

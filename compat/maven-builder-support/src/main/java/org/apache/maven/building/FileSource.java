@@ -28,7 +28,9 @@ import java.util.Objects;
 /**
  * Wraps an ordinary {@link File} as a source.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services} instead
  */
+@Deprecated(since = "4.0.0")
 public class FileSource implements Source {
     private final Path path;
 
