@@ -1612,6 +1612,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     groupId,
                     artifactId,
                     version,
+                    null,
                     IMPORT,
                     () -> doLoadDependencyManagement(dependency, groupId, artifactId, version, importIds));
             DependencyManagement importMgmt = importModel != null ? importModel.getDependencyManagement() : null;
@@ -1720,9 +1721,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                 String groupId,
                 String artifactId,
                 String version,
+                String classifier,
                 String tag,
                 Supplier<T> supplier) {
-            return cache.computeIfAbsent(repositories, groupId, artifactId, version, tag, supplier);
+            return cache.computeIfAbsent(repositories, groupId, artifactId, version, classifier, tag, supplier);
         }
 
         private <T> T cache(Source source, String tag, Supplier<T> supplier) throws ModelBuilderException {
@@ -1819,36 +1821,75 @@ public class DefaultModelBuilder implements ModelBuilder {
             public ModelSource resolveModel(
                     Session session,
                     List<RemoteRepository> repositories,
+                    Parent parent,
+                    AtomicReference<Parent> modified)
+                    throws ModelResolverException {
+                ModelResolverResult result = cache.computeIfAbsent(
+                        repositories,
+                        parent.getGroupId(),
+                        parent.getArtifactId(),
+                        parent.getVersion(),
+                        null,
+                        MODEL,
+                        () -> {
+                            AtomicReference<Parent> mod = new AtomicReference<>();
+                            ModelSource res = modelResolver.resolveModel(session, repositories, parent, mod);
+                            return new ModelResolverResult(
+                                    res, mod.get() != null ? mod.get().getVersion() : null);
+                        });
+                if (result.resolvedVersion != null && modified != null) {
+                    modified.set(parent.withVersion(result.resolvedVersion));
+                }
+                return result.source;
+            }
+
+            @Override
+            public ModelSource resolveModel(
+                    Session session,
+                    List<RemoteRepository> repositories,
+                    Dependency dependency,
+                    AtomicReference<Dependency> modified)
+                    throws ModelResolverException {
+                ModelResolverResult result = cache.computeIfAbsent(
+                        repositories,
+                        dependency.getGroupId(),
+                        dependency.getArtifactId(),
+                        dependency.getVersion(),
+                        dependency.getClassifier(),
+                        MODEL,
+                        () -> {
+                            AtomicReference<Dependency> mod = new AtomicReference<>();
+                            ModelSource res = modelResolver.resolveModel(session, repositories, dependency, mod);
+                            return new ModelResolverResult(
+                                    res, mod.get() != null ? mod.get().getVersion() : null);
+                        });
+                if (result.resolvedVersion != null && modified != null) {
+                    modified.set(dependency.withVersion(result.resolvedVersion));
+                }
+                return result.source;
+            }
+
+            @Override
+            public ModelSource resolveModel(
+                    Session session,
+                    List<RemoteRepository> repositories,
                     String groupId,
                     String artifactId,
                     String version,
                     String classifier,
                     Consumer<String> resolvedVersion)
                     throws ModelResolverException {
-                ModelResolverResult result = cache.computeIfAbsent(
-                        repositories,
-                        groupId,
-                        artifactId,
-                        classifier != null && !classifier.isEmpty() ? version + ":" + classifier : version,
-                        MODEL,
-                        () -> doResolve(session, repositories, groupId, artifactId, version, classifier));
+                ModelResolverResult result =
+                        cache.computeIfAbsent(repositories, groupId, artifactId, version, classifier, MODEL, () -> {
+                            AtomicReference<String> mod = new AtomicReference<>();
+                            ModelSource res = modelResolver.resolveModel(
+                                    session, repositories, groupId, artifactId, version, classifier, mod::set);
+                            return new ModelResolverResult(res, mod.get());
+                        });
                 if (result.resolvedVersion != null) {
                     resolvedVersion.accept(result.resolvedVersion);
                 }
                 return result.source;
-            }
-
-            ModelResolverResult doResolve(
-                    Session session,
-                    List<RemoteRepository> repositories,
-                    String groupId,
-                    String artifactId,
-                    String version,
-                    String classifier) {
-                AtomicReference<String> resolvedVersion = new AtomicReference<>();
-                ModelSource source = modelResolver.resolveModel(
-                        session, repositories, groupId, artifactId, version, classifier, resolvedVersion::set);
-                return new ModelResolverResult(source, resolvedVersion.get());
             }
         }
     }
