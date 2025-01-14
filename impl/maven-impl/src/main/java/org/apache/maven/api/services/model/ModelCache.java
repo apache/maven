@@ -47,6 +47,7 @@ public interface ModelCache {
             String groupId,
             String artifactId,
             String version,
+            String classifier,
             String tag,
             Supplier<T> data);
 

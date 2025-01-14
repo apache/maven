@@ -53,9 +53,10 @@ public class DefaultModelCache implements ModelCache {
             String groupId,
             String artifactId,
             String version,
+            String classifier,
             String tag,
             Supplier<T> data) {
-        return (T) computeIfAbsent(new RgavCacheKey(repositories, groupId, artifactId, version, tag), data);
+        return (T) computeIfAbsent(new RgavCacheKey(repositories, groupId, artifactId, version, classifier, tag), data);
     }
 
     @Override
@@ -84,8 +85,13 @@ public class DefaultModelCache implements ModelCache {
         private final int hash;
 
         RgavCacheKey(
-                List<RemoteRepository> repositories, String groupId, String artifactId, String version, String tag) {
-            this(repositories, gav(groupId, artifactId, version), tag);
+                List<RemoteRepository> repositories,
+                String groupId,
+                String artifactId,
+                String version,
+                String classifier,
+                String tag) {
+            this(repositories, gav(groupId, artifactId, version, classifier), tag);
         }
 
         RgavCacheKey(List<RemoteRepository> repositories, String gav, String tag) {
@@ -95,7 +101,7 @@ public class DefaultModelCache implements ModelCache {
             this.hash = Objects.hash(this.repositories, this.gav, this.tag);
         }
 
-        private static String gav(String groupId, String artifactId, String version) {
+        private static String gav(String groupId, String artifactId, String version, String classifier) {
             StringBuilder sb = new StringBuilder();
             if (groupId != null) {
                 sb.append(groupId);
@@ -107,6 +113,10 @@ public class DefaultModelCache implements ModelCache {
             sb.append(":");
             if (version != null) {
                 sb.append(version);
+            }
+            sb.append(":");
+            if (classifier != null) {
+                sb.append(classifier);
             }
             return sb.toString();
         }
