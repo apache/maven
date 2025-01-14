@@ -82,15 +82,6 @@ public final class InvokerUtils {
         return interpolator;
     }
 
-    public static Properties toProperties(Map<String, String> properties) {
-        requireNonNull(properties, "properties");
-        Properties map = new Properties();
-        for (String key : properties.keySet()) {
-            map.put(key, properties.get(key));
-        }
-        return map;
-    }
-
     @Nonnull
     public static Interpolator createInterpolator() {
         return new DefaultInterpolator();
