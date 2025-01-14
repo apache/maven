@@ -25,7 +25,6 @@ import java.util.Objects;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.di.impl.ReflectionUtils;
 import org.apache.maven.di.impl.Types;
-import org.apache.maven.di.impl.Utils;
 
 /**
  * The key defines an identity of a binding. In any DI, a key is usually a type of the object along
@@ -128,15 +127,19 @@ public abstract class Key<T> {
      * and prepended qualifier display string if this key has a qualifier.
      */
     public String getDisplayString() {
-        return (qualifier != null ? getQualifierDisplayString() + " " : "") + ReflectionUtils.getDisplayName(type);
-    }
-
-    private String getQualifierDisplayString() {
+        StringBuilder result = new StringBuilder();
         if (qualifier instanceof String s) {
-            return s.isEmpty() ? "@Named" : "@Named(\"" + s + "\")";
+            if (s.isEmpty()) {
+                result.append("@Named ");
+            } else {
+                result.append("@Named(\"").append(s).append("\") ");
+            }
+        } else if (qualifier != null) {
+            ReflectionUtils.getDisplayString(result, qualifier);
+            result.append(" ");
         }
-        String s = Utils.getDisplayString(qualifier);
-        return s;
+        result.append(ReflectionUtils.getDisplayName(type));
+        return result.toString();
     }
 
     @Override

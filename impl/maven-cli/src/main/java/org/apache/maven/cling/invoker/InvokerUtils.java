@@ -24,10 +24,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.BasicInterpolator;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -80,8 +82,22 @@ public final class InvokerUtils {
         return interpolator;
     }
 
+    public static Properties toProperties(Map<String, String> properties) {
+        requireNonNull(properties, "properties");
+        Properties map = new Properties();
+        for (String key : properties.keySet()) {
+            map.put(key, properties.get(key));
+        }
+        return map;
+    }
+
     @Nonnull
-    public static Function<String, String> prefix(String prefix, Function<String, String> cb) {
+    public static Interpolator createInterpolator() {
+        return new DefaultInterpolator();
+    }
+
+    @Nonnull
+    public static UnaryOperator<String> prefix(String prefix, UnaryOperator<String> cb) {
         return s -> {
             String v = null;
             if (s.startsWith(prefix)) {
@@ -93,9 +109,9 @@ public final class InvokerUtils {
 
     @SafeVarargs
     @Nonnull
-    public static Function<String, String> or(Function<String, String>... callbacks) {
+    public static UnaryOperator<String> or(UnaryOperator<String>... callbacks) {
         return s -> {
-            for (Function<String, String> cb : callbacks) {
+            for (UnaryOperator<String> cb : callbacks) {
                 String r = cb.apply(s);
                 if (r != null) {
                     return r;

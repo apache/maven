@@ -56,21 +56,6 @@ public final class ReflectionUtils {
     private static final Pattern PACKAGE_AND_PARENT = Pattern.compile(PACKAGE.pattern() + "(?:" + IDENT + "\\$\\d*)?");
     private static final Pattern ARRAY_SIGNATURE = Pattern.compile("\\[L(.*?);");
 
-    public static String getDisplayName(Type type) {
-        Class<?> raw = Types.getRawType(type);
-        String typeName;
-        if (raw.isAnonymousClass()) {
-            Type superclass = raw.getGenericSuperclass();
-            typeName = "? extends " + superclass.getTypeName();
-        } else {
-            typeName = type.getTypeName();
-        }
-
-        return PACKAGE_AND_PARENT
-                .matcher(ARRAY_SIGNATURE.matcher(typeName).replaceAll("$1[]"))
-                .replaceAll("");
-    }
-
     public static @Nullable Object getOuterClassInstance(Object innerClassInstance) {
         if (innerClassInstance == null) {
             return null;
@@ -105,7 +90,7 @@ public final class ReflectionUtils {
                     qualifier = named.value();
                 } else {
                     Class<? extends Annotation> annotationType = annotation.annotationType();
-                    qualifier = Utils.isMarker(annotationType) ? annotationType : annotation;
+                    qualifier = annotationType.getDeclaredMethods().length == 0 ? annotationType : annotation;
                 }
             }
         }
@@ -381,5 +366,46 @@ public final class ReflectionUtils {
         }
 
         return binding.withKey(key);
+    }
+
+    public static void getDisplayString(StringBuilder sb, Object object) {
+        if (object instanceof Class<?> clazz && clazz.isAnnotation()) {
+            //noinspection unchecked
+            getDisplayString(sb, (Class<? extends Annotation>) object, null);
+        } else if (object instanceof Annotation annotation) {
+            getDisplayString(sb, annotation.annotationType(), annotation);
+        } else {
+            sb.append(object.toString());
+        }
+    }
+
+    public static String getDisplayName(Type type) {
+        Class<?> raw = Types.getRawType(type);
+        String typeName;
+        if (raw.isAnonymousClass()) {
+            Type superclass = raw.getGenericSuperclass();
+            typeName = "? extends " + superclass.getTypeName();
+        } else {
+            typeName = type.getTypeName();
+        }
+
+        return PACKAGE_AND_PARENT
+                .matcher(ARRAY_SIGNATURE.matcher(typeName).replaceAll("$1[]"))
+                .replaceAll("");
+    }
+
+    private static void getDisplayString(
+            StringBuilder sb, Class<? extends Annotation> annotationType, @Nullable Annotation annotation) {
+        if (annotation == null) {
+            sb.append("@").append(ReflectionUtils.getDisplayName(annotationType));
+        } else {
+            String typeName = annotationType.getName();
+            String str = annotation.toString();
+            if (str.startsWith("@" + typeName)) {
+                sb.append("@").append(getDisplayName(annotationType)).append(str.substring(typeName.length() + 1));
+            } else {
+                sb.append(str);
+            }
+        }
     }
 }

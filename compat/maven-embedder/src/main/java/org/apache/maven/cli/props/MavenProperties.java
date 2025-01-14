@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
 
@@ -81,7 +81,7 @@ public class MavenProperties extends AbstractMap<String, String> {
     private List<String> header;
     private List<String> footer;
     private Path location;
-    private Function<String, String> callback;
+    private UnaryOperator<String> callback;
     boolean substitute = true;
     boolean typed;
 
@@ -91,7 +91,7 @@ public class MavenProperties extends AbstractMap<String, String> {
         this(location, null);
     }
 
-    public MavenProperties(Path location, Function<String, String> callback) throws IOException {
+    public MavenProperties(Path location, UnaryOperator<String> callback) throws IOException {
         this.location = location;
         this.callback = callback;
         if (Files.exists(location)) {
@@ -474,7 +474,7 @@ public class MavenProperties extends AbstractMap<String, String> {
         substitute(callback);
     }
 
-    public void substitute(Function<String, String> callback) {
+    public void substitute(UnaryOperator<String> callback) {
         new DefaultInterpolator().interpolate(storage, callback);
     }
 

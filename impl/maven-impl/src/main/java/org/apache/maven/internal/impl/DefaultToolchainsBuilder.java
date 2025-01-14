@@ -24,7 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -156,7 +156,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
             ProblemCollector<BuilderProblem> problems) {
         Map<String, String> userProperties = request.getSession().getUserProperties();
         Map<String, String> systemProperties = request.getSession().getSystemProperties();
-        Function<String, String> src = Interpolator.chain(userProperties::get, systemProperties::get);
+        UnaryOperator<String> src = Interpolator.chain(userProperties::get, systemProperties::get);
         return new MavenToolchainsTransformer(value -> value != null ? interpolator.interpolate(value, src) : null)
                 .visit(toolchains);
     }

@@ -23,8 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Experimental;
@@ -47,7 +48,7 @@ public interface Interpolator extends Service {
      * @param properties The map containing key-value pairs to be interpolated.
      * @param callback The function to resolve variable values not found in the map.
      */
-    default void interpolate(@Nonnull Map<String, String> properties, @Nullable Function<String, String> callback) {
+    default void interpolate(@Nonnull Map<String, String> properties, @Nullable UnaryOperator<String> callback) {
         interpolate(properties, callback, null, true);
     }
 
@@ -59,7 +60,7 @@ public interface Interpolator extends Service {
      * @param defaultsToEmpty If true, unresolved placeholders are replaced with empty strings. If false, they are left unchanged.
      */
     default void interpolate(
-            @Nonnull Map<String, String> map, @Nullable Function<String, String> callback, boolean defaultsToEmpty) {
+            @Nonnull Map<String, String> map, @Nullable UnaryOperator<String> callback, boolean defaultsToEmpty) {
         interpolate(map, callback, null, defaultsToEmpty);
     }
 
@@ -72,8 +73,8 @@ public interface Interpolator extends Service {
      */
     void interpolate(
             @Nonnull Map<String, String> map,
-            @Nullable Function<String, String> callback,
-            @Nullable BiFunction<String, String, String> postprocessor,
+            @Nullable UnaryOperator<String> callback,
+            @Nullable BinaryOperator<String> postprocessor,
             boolean defaultsToEmpty);
 
     /**
@@ -85,7 +86,7 @@ public interface Interpolator extends Service {
      * @return The interpolated string, or null if the input was null.
      */
     @Nullable
-    default String interpolate(@Nullable String val, @Nullable Function<String, String> callback) {
+    default String interpolate(@Nullable String val, @Nullable UnaryOperator<String> callback) {
         return interpolate(val, callback, false);
     }
 
@@ -99,7 +100,7 @@ public interface Interpolator extends Service {
      */
     @Nullable
     default String interpolate(
-            @Nullable String val, @Nullable Function<String, String> callback, boolean defaultsToEmpty) {
+            @Nullable String val, @Nullable UnaryOperator<String> callback, boolean defaultsToEmpty) {
         return interpolate(val, callback, null, defaultsToEmpty);
     }
 
@@ -114,8 +115,8 @@ public interface Interpolator extends Service {
     @Nullable
     String interpolate(
             @Nullable String val,
-            @Nullable Function<String, String> callback,
-            @Nullable BiFunction<String, String, String> postprocessor,
+            @Nullable UnaryOperator<String> callback,
+            @Nullable BinaryOperator<String> postprocessor,
             boolean defaultsToEmpty);
 
     /**
@@ -127,9 +128,9 @@ public interface Interpolator extends Service {
      *
      * @throws NullPointerException if the input collection is null or contains null elements.
      */
-    static Function<String, String> chain(Collection<? extends Function<String, String>> functions) {
+    static UnaryOperator<String> chain(Collection<? extends UnaryOperator<String>> functions) {
         return s -> {
-            for (Function<String, String> function : functions) {
+            for (UnaryOperator<String> function : functions) {
                 String v = function.apply(s);
                 if (v != null) {
                     return v;
@@ -140,7 +141,7 @@ public interface Interpolator extends Service {
     }
 
     @SafeVarargs
-    static Function<String, String> chain(Function<String, String>... functions) {
+    static UnaryOperator<String> chain(UnaryOperator<String>... functions) {
         return chain(List.of(functions));
     }
 
@@ -150,14 +151,14 @@ public interface Interpolator extends Service {
      * improving performance for repeated calls with the same input.
      *
      * @param callback The original function to be memoized. It takes a String as input and returns a String.
-     * @return A new {@code Function<String, String>} that caches the results of the original function.
+     * @return A new {@code UnaryOperator<String>} that caches the results of the original function.
      *         If the original function returns null for a given input, null will be cached and returned for subsequent calls with the same input.
      *
      * @see Function
      * @see Optional
      * @see HashMap#computeIfAbsent(Object, Function)
      */
-    static Function<String, String> memoize(Function<String, String> callback) {
+    static UnaryOperator<String> memoize(UnaryOperator<String> callback) {
         Map<String, Optional<String>> cache = new HashMap<>();
         return s -> cache.computeIfAbsent(s, v -> Optional.ofNullable(callback.apply(v)))
                 .orElse(null);

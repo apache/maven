@@ -864,6 +864,14 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
+    public Optional<Version> resolveHighestVersion(ArtifactCoordinates artifact, List<RemoteRepository> repositories)
+            throws VersionResolverException {
+        return getService(VersionRangeResolver.class)
+                .resolve(this, artifact, repositories)
+                .getHighestVersion();
+    }
+
+    @Override
     public Type requireType(String id) {
         return getService(TypeRegistry.class).require(id);
     }

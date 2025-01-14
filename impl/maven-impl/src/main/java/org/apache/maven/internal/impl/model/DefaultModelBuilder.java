@@ -40,7 +40,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
@@ -1880,7 +1879,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Map<String, String> map1 = request.getSession().getUserProperties();
             Map<String, String> map2 = model.getProperties();
             Map<String, String> map3 = request.getSession().getSystemProperties();
-            Function<String, String> cb = Interpolator.chain(map1::get, map2::get, map3::get);
+            UnaryOperator<String> cb = Interpolator.chain(map1::get, map2::get, map3::get);
             try {
                 String interpolated =
                         interpolator.interpolate(interpolatedModel.getParent().getVersion(), cb);

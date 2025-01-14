@@ -119,7 +119,7 @@ public interface ArtifactResolverRequest {
                     @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
                     @Nonnull List<RemoteRepository> repositories) {
                 super(session);
-                this.coordinates = unmodifiable(requireNonNull(coordinates, "coordinates cannot be null"));
+                this.coordinates = List.copyOf(requireNonNull(coordinates, "coordinates cannot be null"));
                 this.repositories = repositories;
             }
 

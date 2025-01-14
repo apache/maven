@@ -18,10 +18,9 @@
  */
 package org.apache.maven.api.cli.mvn;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -217,11 +216,11 @@ public interface MavenOptions extends Options {
     Optional<List<String>> goals();
 
     /**
-     * Returns a new instance of {@link MavenOptions} with values interpolated using the given properties.
+     * Returns a new instance of {@link MavenOptions} with values interpolated using the given callback.
      *
-     * @param properties a collection of property maps to use for interpolation
+     * @param callback a callback to use for interpolation
      * @return a new MavenOptions instance with interpolated values
      */
     @Nonnull
-    MavenOptions interpolate(@Nonnull Collection<Map<String, String>> properties);
+    MavenOptions interpolate(@Nonnull UnaryOperator<String> callback);
 }

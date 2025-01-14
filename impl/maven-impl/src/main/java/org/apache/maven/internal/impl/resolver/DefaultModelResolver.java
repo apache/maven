@@ -32,7 +32,6 @@ import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
@@ -135,16 +134,14 @@ public class DefaultModelResolver implements ModelResolver {
                         artifactId,
                         version);
             }
-            List<Version> versions = session.resolveVersionRange(coords, repositories);
-            if (versions.isEmpty()) {
-                throw new ModelResolverException(
-                        "No versions matched the requested " + (type != null ? type + " " : "") + "version range '"
-                                + version + "'",
-                        groupId,
-                        artifactId,
-                        version);
-            }
-            String newVersion = versions.get(versions.size() - 1).asString();
+            String newVersion = session.resolveHighestVersion(coords, repositories)
+                    .orElseThrow(() -> new ModelResolverException(
+                            "No versions matched the requested " + (type != null ? type + " " : "") + "version range '"
+                                    + version + "'",
+                            groupId,
+                            artifactId,
+                            version))
+                    .asString();
             if (!version.equals(newVersion)) {
                 resolvedVersion.accept(newVersion);
             }

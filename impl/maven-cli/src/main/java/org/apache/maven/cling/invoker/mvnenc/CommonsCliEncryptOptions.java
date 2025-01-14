@@ -18,12 +18,11 @@
  */
 package org.apache.maven.cling.invoker.mvnenc;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -31,9 +30,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
+import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.cling.invoker.CommonsCliOptions;
-import org.codehaus.plexus.interpolation.BasicInterpolator;
-import org.codehaus.plexus.interpolation.InterpolationException;
 
 import static org.apache.maven.cling.invoker.InvokerUtils.createInterpolator;
 
@@ -51,27 +50,27 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
     }
 
     private static CommonsCliEncryptOptions interpolate(
-            CommonsCliEncryptOptions options, Collection<Map<String, String>> properties) {
+            CommonsCliEncryptOptions options, UnaryOperator<String> callback) {
         try {
             // now that we have properties, interpolate all arguments
-            BasicInterpolator interpolator = createInterpolator(properties);
+            Interpolator interpolator = createInterpolator();
             CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
             commandLineBuilder.setDeprecatedHandler(o -> {});
             for (Option option : options.commandLine.getOptions()) {
                 if (!CLIManager.USER_PROPERTY.equals(option.getOpt())) {
                     List<String> values = option.getValuesList();
                     for (ListIterator<String> it = values.listIterator(); it.hasNext(); ) {
-                        it.set(interpolator.interpolate(it.next()));
+                        it.set(interpolator.interpolate(it.next(), callback));
                     }
                 }
                 commandLineBuilder.addOption(option);
             }
             for (String arg : options.commandLine.getArgList()) {
-                commandLineBuilder.addArg(interpolator.interpolate(arg));
+                commandLineBuilder.addArg(interpolator.interpolate(arg, callback));
             }
             return new CommonsCliEncryptOptions(
                     options.source, (CLIManager) options.cliManager, commandLineBuilder.build());
-        } catch (InterpolationException e) {
+        } catch (InterpolatorException e) {
             throw new IllegalArgumentException("Could not interpolate CommonsCliOptions", e);
         }
     }
@@ -101,8 +100,8 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
     }
 
     @Override
-    public EncryptOptions interpolate(Collection<Map<String, String>> properties) {
-        return interpolate(this, properties);
+    public EncryptOptions interpolate(UnaryOperator<String> callback) {
+        return interpolate(this, callback);
     }
 
     @Override

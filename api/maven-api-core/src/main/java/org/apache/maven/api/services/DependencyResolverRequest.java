@@ -400,9 +400,9 @@ public interface DependencyResolverRequest {
                 this.project = project;
                 this.rootArtifact = rootArtifact;
                 this.root = root;
-                this.dependencies = unmodifiable(requireNonNull(dependencies, "dependencies cannot be null"));
+                this.dependencies = List.copyOf(requireNonNull(dependencies, "dependencies cannot be null"));
                 this.managedDependencies =
-                        unmodifiable(requireNonNull(managedDependencies, "managedDependencies cannot be null"));
+                        List.copyOf(requireNonNull(managedDependencies, "managedDependencies cannot be null"));
                 this.verbose = verbose;
                 this.pathScope = requireNonNull(pathScope, "pathScope cannot be null");
                 this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;

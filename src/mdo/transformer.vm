@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Objects;
 import java.util.function.BinaryOperator;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -54,9 +54,9 @@ import org.apache.maven.internal.xml.XmlNodeImpl;
 @Generated
 public class ${className} {
 
-    private final Function<String, String> transformer;
+    private final UnaryOperator<String> transformer;
 
-    public ${className}(Function<String, String> transformer) {
+    public ${className}(UnaryOperator<String> transformer) {
         this.transformer = transformer;
     }
 
@@ -141,7 +141,7 @@ public class ${className} {
 
   #end
 #end
-    protected <T> List<T> transform(List<T> list, Function<T, T> transformer) {
+    protected <T> List<T> transform(List<T> list, UnaryOperator<T> transformer) {
         List<T> newList = list;
         for (int i = 0; i < list.size(); i++) {
             T oldVal = list.get(i);
@@ -156,7 +156,7 @@ public class ${className} {
         return newList;
     }
 
-    protected <T> Map<String, T> transform(Map<String, T> map, Function<T, T> transformer) {
+    protected <T> Map<String, T> transform(Map<String, T> map, UnaryOperator<T> transformer) {
         Map<String, T> newMap = map;
         for (String key : map.keySet()) {
             T oldVal = map.get(key);

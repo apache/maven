@@ -18,10 +18,9 @@
  */
 package org.apache.maven.api.cli.mvnenc;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -61,9 +60,9 @@ public interface EncryptOptions extends Options {
     /**
      * Returns a new instance of EncryptOptions with values interpolated using the given properties.
      *
-     * @param properties a collection of property maps to use for interpolation
+     * @param callback a callback to use for interpolation
      * @return a new EncryptOptions instance with interpolated values
      */
     @Nonnull
-    EncryptOptions interpolate(Collection<Map<String, String>> properties);
+    EncryptOptions interpolate(UnaryOperator<String> callback);
 }

@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -139,7 +139,7 @@ public class BootstrapCoreExtensionManager {
             InternalSession.associate(repoSession, iSession);
 
             List<RemoteRepository> repositories = RepositoryUtils.toRepos(request.getPluginArtifactRepositories());
-            Function<String, String> interpolator = createInterpolator(request);
+            UnaryOperator<String> interpolator = createInterpolator(request);
 
             return resolveCoreExtensions(repoSession, repositories, providedArtifacts, extensions, interpolator);
         }
@@ -150,7 +150,7 @@ public class BootstrapCoreExtensionManager {
             List<RemoteRepository> repositories,
             Set<String> providedArtifacts,
             List<CoreExtension> configuration,
-            Function<String, String> interpolator)
+            UnaryOperator<String> interpolator)
             throws Exception {
         List<CoreExtensionEntry> extensions = new ArrayList<>();
 
@@ -208,7 +208,7 @@ public class BootstrapCoreExtensionManager {
             RepositorySystemSession repoSession,
             List<RemoteRepository> repositories,
             DependencyFilter dependencyFilter,
-            Function<String, String> interpolator)
+            UnaryOperator<String> interpolator)
             throws ExtensionResolutionException {
         try {
             /* TODO: Enhance the PluginDependenciesResolver to provide a
@@ -232,9 +232,9 @@ public class BootstrapCoreExtensionManager {
         }
     }
 
-    private static Function<String, String> createInterpolator(MavenExecutionRequest request) {
+    private static UnaryOperator<String> createInterpolator(MavenExecutionRequest request) {
         Interpolator interpolator = new DefaultInterpolator();
-        Function<String, String> callback = v -> {
+        UnaryOperator<String> callback = v -> {
             String r = request.getUserProperties().getProperty(v);
             if (r == null) {
                 r = request.getSystemProperties().getProperty(v);
