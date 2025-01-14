@@ -64,6 +64,7 @@ public abstract class BaseParser implements Parser {
 
     @Nullable
     private static Path findRoot(Path topDirectory) {
+        // TODO is this OK? Tracing through the code it looks like topDirectory is nullable
         requireNonNull(topDirectory, "topDirectory");
         Path rootDirectory =
                 ServiceLoader.load(RootLocator.class).iterator().next().findRoot(topDirectory);

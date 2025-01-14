@@ -76,7 +76,6 @@ import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
 
 import static java.util.Comparator.comparing;
-import static java.util.Objects.requireNonNull;
 
 /**
  * The Maven invoker, that expects whole Maven on classpath and invokes it.
@@ -91,8 +90,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     @Nonnull
-    private static Path findMandatoryRoot(Path topDirectory) {
-        requireNonNull(topDirectory, "topDirectory");
+    private static Path findMandatoryRoot(@Nonnull Path topDirectory) {
         return InvokerUtils.getCanonicalPath(Optional.ofNullable(
                         ServiceLoader.load(RootLocator.class).iterator().next().findMandatoryRoot(topDirectory))
                 .orElseThrow());
