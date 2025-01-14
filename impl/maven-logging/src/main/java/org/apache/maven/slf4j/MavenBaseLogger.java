@@ -22,6 +22,8 @@ import java.io.PrintStream;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -270,7 +272,9 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         Instant now = MonotonicClock.now();
         String dateText;
         synchronized (CONFIG_PARAMS.dateFormatter) {
-            dateText = CONFIG_PARAMS.dateFormatter.format(now);
+            // Convert Instant to ZonedDateTime using system default time zone
+            ZonedDateTime zonedDateTime = now.atZone(ZoneId.systemDefault());
+            dateText = CONFIG_PARAMS.dateFormatter.format(zonedDateTime);
         }
         return dateText;
     }
