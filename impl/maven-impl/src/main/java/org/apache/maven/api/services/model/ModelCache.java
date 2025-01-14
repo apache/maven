@@ -18,8 +18,10 @@
  */
 package org.apache.maven.api.services.model;
 
+import java.util.List;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.services.Source;
@@ -40,7 +42,13 @@ import org.apache.maven.api.services.Source;
 @ThreadSafe
 public interface ModelCache {
 
-    <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<T> data);
+    <T> T computeIfAbsent(
+            List<RemoteRepository> repositories,
+            String groupId,
+            String artifactId,
+            String version,
+            String tag,
+            Supplier<T> data);
 
     <T> T computeIfAbsent(Source path, String tag, Supplier<T> data);
 
