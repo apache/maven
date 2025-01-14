@@ -28,7 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.matchesPattern;
 
 class MavenBaseLoggerTimestampTest {
     private ByteArrayOutputStream logOutput;
@@ -146,7 +146,7 @@ class MavenBaseLoggerTimestampTest {
     }
 
     private String getLastLine(String output) {
-        String[] lines = output.split(System.lineSeparator());
+        String[] lines = output.split("\\R");
         return lines[lines.length - 1].trim();
     }
 }
