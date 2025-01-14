@@ -19,7 +19,6 @@
 package org.apache.maven.slf4j;
 
 import java.io.PrintStream;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -163,7 +162,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
 
     static final SimpleLoggerConfiguration CONFIG_PARAMS = new SimpleLoggerConfiguration();
 
-    private static boolean initialized = false;
+    static boolean initialized = false;
 
     static void lazyInit() {
         if (initialized) {
@@ -370,9 +369,8 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         // Append date-time if so configured
         if (CONFIG_PARAMS.showDateTime) {
             DateTimeFormatter formatter = CONFIG_PARAMS.dateFormatter;
-            Instant now = MonotonicClock.now();
             if (formatter != null) {
-                ZonedDateTime zonedDateTime = now.atZone(ZoneId.systemDefault());
+                ZonedDateTime zonedDateTime = MonotonicClock.now().atZone(ZoneId.systemDefault());
                 String dateText = formatter.format(zonedDateTime);
                 buf.append(dateText);
                 buf.append(SP);
