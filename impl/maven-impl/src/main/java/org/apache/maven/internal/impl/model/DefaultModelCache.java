@@ -18,11 +18,13 @@
  */
 package org.apache.maven.internal.impl.model;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.model.ModelCache;
 
@@ -46,8 +48,14 @@ public class DefaultModelCache implements ModelCache {
 
     @Override
     @SuppressWarnings({"unchecked"})
-    public <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<T> data) {
-        return (T) computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), data);
+    public <T> T computeIfAbsent(
+            List<RemoteRepository> repositories,
+            String groupId,
+            String artifactId,
+            String version,
+            String tag,
+            Supplier<T> data) {
+        return (T) computeIfAbsent(new RgavCacheKey(repositories, groupId, artifactId, version, tag), data);
     }
 
     @Override
@@ -65,7 +73,9 @@ public class DefaultModelCache implements ModelCache {
         return cache.computeIfAbsent(key, k -> new CachingSupplier<>(data)).get();
     }
 
-    static class GavCacheKey {
+    static class RgavCacheKey {
+
+        private final List<RemoteRepository> repositories;
 
         private final String gav;
 
@@ -73,14 +83,16 @@ public class DefaultModelCache implements ModelCache {
 
         private final int hash;
 
-        GavCacheKey(String groupId, String artifactId, String version, String tag) {
-            this(gav(groupId, artifactId, version), tag);
+        RgavCacheKey(
+                List<RemoteRepository> repositories, String groupId, String artifactId, String version, String tag) {
+            this(repositories, gav(groupId, artifactId, version), tag);
         }
 
-        GavCacheKey(String gav, String tag) {
+        RgavCacheKey(List<RemoteRepository> repositories, String gav, String tag) {
+            this.repositories = List.copyOf(repositories);
             this.gav = gav;
             this.tag = tag;
-            this.hash = Objects.hash(gav, tag);
+            this.hash = Objects.hash(this.repositories, this.gav, this.tag);
         }
 
         private static String gav(String groupId, String artifactId, String version) {
@@ -107,8 +119,10 @@ public class DefaultModelCache implements ModelCache {
             if (null == obj || !getClass().equals(obj.getClass())) {
                 return false;
             }
-            GavCacheKey that = (GavCacheKey) obj;
-            return Objects.equals(this.gav, that.gav) && Objects.equals(this.tag, that.tag);
+            RgavCacheKey that = (RgavCacheKey) obj;
+            return Objects.equals(this.repositories, that.repositories)
+                    && Objects.equals(this.gav, that.gav)
+                    && Objects.equals(this.tag, that.tag);
         }
 
         @Override
