@@ -24,7 +24,9 @@ import java.io.InputStream;
 /**
  * Provides access to the contents of a source independently of the backing store (e.g. file system, database, memory).
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services} instead
  */
+@Deprecated(since = "4.0.0")
 public interface Source {
 
     /**

@@ -26,7 +26,9 @@ import java.nio.charset.StandardCharsets;
 /**
  * Wraps an ordinary {@link CharSequence} as a source.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services} instead
  */
+@Deprecated(since = "4.0.0")
 public class StringSource implements Source {
     private final String content;
 
