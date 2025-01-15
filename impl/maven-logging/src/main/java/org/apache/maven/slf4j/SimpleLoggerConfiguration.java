@@ -44,7 +44,10 @@ import org.slf4j.helpers.Reporter;
  */
 public class SimpleLoggerConfiguration {
 
-    private static final String CONFIGURATION_FILE = "simplelogger.properties";
+    private static final String CONFIGURATION_FILE = "maven.logger.properties";
+
+    @Deprecated(since = "4.0.0")
+    private static final String LEGACY_CONFIGURATION_FILE = "simplelogger.properties";
 
     static final int DEFAULT_LOG_LEVEL_DEFAULT = MavenBaseLogger.LOG_LEVEL_INFO;
     int defaultLogLevel = DEFAULT_LOG_LEVEL_DEFAULT;
@@ -127,12 +130,36 @@ public class SimpleLoggerConfiguration {
     }
 
     private void loadProperties() {
-        // Add props from the resource simplelogger.properties
         ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
         ClassLoader toUseCL = (threadCL != null ? threadCL : ClassLoader.getSystemClassLoader());
+
+        // Try loading maven properties first
+        boolean mavenPropsLoaded = false;
         try (InputStream in = toUseCL.getResourceAsStream(CONFIGURATION_FILE)) {
             if (in != null) {
                 properties.load(in);
+                mavenPropsLoaded = true;
+            }
+        } catch (java.io.IOException e) {
+            // ignored
+        }
+
+        // Try loading legacy properties
+        try (InputStream in = toUseCL.getResourceAsStream(LEGACY_CONFIGURATION_FILE)) {
+            if (in != null) {
+                Properties legacyProps = new Properties();
+                legacyProps.load(in);
+                if (!mavenPropsLoaded) {
+                    Reporter.warn("Using deprecated " + LEGACY_CONFIGURATION_FILE + ". Please migrate to "
+                            + CONFIGURATION_FILE);
+                }
+                // Only load legacy properties if there's no maven equivalent
+                for (String propName : legacyProps.stringPropertyNames()) {
+                    String mavenKey = propName.replace(MavenBaseLogger.LEGACY_PREFIX, MavenBaseLogger.MAVEN_PREFIX);
+                    if (!properties.containsKey(mavenKey)) {
+                        properties.setProperty(mavenKey, legacyProps.getProperty(propName));
+                    }
+                }
             }
         } catch (java.io.IOException e) {
             // ignored
@@ -152,11 +179,32 @@ public class SimpleLoggerConfiguration {
     String getStringProperty(String name) {
         String prop = null;
         try {
+            // Try maven property first
             prop = System.getProperty(name);
+            if (prop == null && name.startsWith(MavenBaseLogger.MAVEN_PREFIX)) {
+                // Try legacy property
+                String legacyName = name.replace(MavenBaseLogger.MAVEN_PREFIX, MavenBaseLogger.LEGACY_PREFIX);
+                prop = System.getProperty(legacyName);
+                if (prop != null) {
+                    Reporter.warn("Using deprecated property " + legacyName + ". Please migrate to " + name);
+                }
+            }
         } catch (SecurityException e) {
             // Ignore
         }
-        return (prop == null) ? properties.getProperty(name) : prop;
+
+        if (prop == null) {
+            prop = properties.getProperty(name);
+            if (prop == null && name.startsWith(MavenBaseLogger.MAVEN_PREFIX)) {
+                // Try legacy property from properties file
+                String legacyName = name.replace(MavenBaseLogger.MAVEN_PREFIX, MavenBaseLogger.LEGACY_PREFIX);
+                prop = properties.getProperty(legacyName);
+                if (prop != null) {
+                    Reporter.warn("Using deprecated property " + legacyName + ". Please migrate to " + name);
+                }
+            }
+        }
+        return prop;
     }
 
     static int stringToLevel(String levelStr) {
