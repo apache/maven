@@ -36,6 +36,7 @@ public class ExtensionConfigurationModule implements Module {
 
     private final CoreExtensionEntry extension;
     private final UnaryOperator<String> callback;
+
     private final DefaultInterpolator interpolator = new DefaultInterpolator();
 
     public ExtensionConfigurationModule(CoreExtensionEntry extension, UnaryOperator<String> callback) {
