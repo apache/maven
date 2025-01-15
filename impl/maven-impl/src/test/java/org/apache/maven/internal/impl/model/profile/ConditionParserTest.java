@@ -52,8 +52,9 @@ class ConditionParserTest {
                 new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()));
         DefaultRootLocator rootLocator = new DefaultRootLocator();
 
-        functions = ConditionProfileActivator.registerFunctions(context, versionParser);
-        propertyResolver = s -> ConditionProfileActivator.property(context, s);
+        ConditionProfileActivator activator = new ConditionProfileActivator(versionParser, new DefaultInterpolator());
+        functions = activator.registerFunctions(context, versionParser);
+        propertyResolver = s -> activator.property(context, s);
         parser = new ConditionParser(functions, propertyResolver);
     }
 

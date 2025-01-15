@@ -53,7 +53,8 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     @Override
     void setUp() throws Exception {
         activator = new ConditionProfileActivator(
-                new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme())));
+                new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme())),
+                new DefaultInterpolator());
 
         Path file = tempDir.resolve("file.txt");
         Files.createFile(file);

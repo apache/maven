@@ -108,6 +108,8 @@ public class BootstrapCoreExtensionManager {
 
     private final RepositorySystem repoSystem;
 
+    private final Interpolator interpolator;
+
     @Inject
     public BootstrapCoreExtensionManager(
             DefaultPluginDependenciesResolver pluginDependenciesResolver,
@@ -115,7 +117,8 @@ public class BootstrapCoreExtensionManager {
             CoreExports coreExports,
             PlexusContainer container,
             @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader,
-            RepositorySystem repoSystem) {
+            RepositorySystem repoSystem,
+            Interpolator interpolator) {
         this.pluginDependenciesResolver = pluginDependenciesResolver;
         this.repositorySystemSessionFactory = repositorySystemSessionFactory;
         this.coreExports = coreExports;
@@ -123,6 +126,7 @@ public class BootstrapCoreExtensionManager {
         this.parentRealm = container.getContainerRealm();
         this.ideWorkspaceReader = ideWorkspaceReader;
         this.repoSystem = repoSystem;
+        this.interpolator = interpolator;
     }
 
     public List<CoreExtensionEntry> loadCoreExtensions(
@@ -230,8 +234,7 @@ public class BootstrapCoreExtensionManager {
         }
     }
 
-    private static UnaryOperator<String> createInterpolator(MavenExecutionRequest request) {
-        Interpolator interpolator = new DefaultInterpolator();
+    private UnaryOperator<String> createInterpolator(MavenExecutionRequest request) {
         UnaryOperator<String> callback = v -> {
             String r = request.getUserProperties().getProperty(v);
             if (r == null) {
