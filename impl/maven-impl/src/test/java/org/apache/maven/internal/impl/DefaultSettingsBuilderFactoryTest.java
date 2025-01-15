@@ -29,6 +29,7 @@ import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
+import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,7 +62,8 @@ class DefaultSettingsBuilderFactoryTest {
 
     @Test
     void testCompleteWiring() {
-        SettingsBuilder builder = new DefaultSettingsBuilder();
+        SettingsBuilder builder =
+                new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
         assertNotNull(builder);
 
         SettingsBuilderRequest request = SettingsBuilderRequest.builder()

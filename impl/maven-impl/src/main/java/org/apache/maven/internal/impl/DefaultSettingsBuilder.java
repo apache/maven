@@ -53,7 +53,6 @@ import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.RepositoryPolicy;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.settings.v4.SettingsMerger;
 import org.apache.maven.settings.v4.SettingsTransformer;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
@@ -76,13 +75,6 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     private final Interpolator interpolator;
 
     private final Map<String, Dispatcher> dispatchers;
-
-    /**
-     * This ctor is used in legacy components.
-     */
-    public DefaultSettingsBuilder() {
-        this(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
-    }
 
     /**
      * In Maven4 the {@link SecDispatcher} is injected and build settings are fully decrypted as well.

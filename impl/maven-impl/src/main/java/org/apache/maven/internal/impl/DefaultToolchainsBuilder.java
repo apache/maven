@@ -40,7 +40,6 @@ import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.toolchain.PersistedToolchains;
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
 import org.apache.maven.toolchain.v4.MavenToolchainsMerger;
 import org.apache.maven.toolchain.v4.MavenToolchainsTransformer;
 
@@ -56,10 +55,6 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     private final Interpolator interpolator;
 
     private final ToolchainsXmlFactory toolchainsXmlFactory;
-
-    public DefaultToolchainsBuilder() {
-        this(new DefaultInterpolator(), new DefaultToolchainsXmlFactory());
-    }
 
     @Inject
     public DefaultToolchainsBuilder(Interpolator interpolator, ToolchainsXmlFactory toolchainsXmlFactory) {
