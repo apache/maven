@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +35,7 @@ import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
@@ -45,10 +48,11 @@ import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
 import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.api.services.model.ModelProcessor;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cling.event.ExecutionEventLogger;
+import org.apache.maven.cling.invoker.InvokerUtils;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.Utils;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
@@ -83,6 +87,13 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
     public MavenInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
         super(protoLookup, contextConsumer);
+    }
+
+    @Nonnull
+    private static Path findMandatoryRoot(@Nonnull Path topDirectory) {
+        return InvokerUtils.getCanonicalPath(Optional.ofNullable(
+                        ServiceLoader.load(RootLocator.class).iterator().next().findMandatoryRoot(topDirectory))
+                .orElseThrow());
     }
 
     @Override
@@ -252,7 +263,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
             // project present, but we could not determine rootDirectory: extra work needed
             if (context.invokerRequest.rootDirectory().isEmpty()) {
-                Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
+                Path rootDirectory = findMandatoryRoot(context.invokerRequest.topDirectory());
                 request.setMultiModuleProjectDirectory(rootDirectory.toFile());
                 request.setRootDirectory(rootDirectory);
             }
