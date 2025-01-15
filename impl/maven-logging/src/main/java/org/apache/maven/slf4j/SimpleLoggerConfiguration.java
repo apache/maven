@@ -53,8 +53,6 @@ public class SimpleLoggerConfiguration {
     boolean showDateTime = SHOW_DATE_TIME_DEFAULT;
 
     private static final String DATE_TIME_FORMAT_STR_DEFAULT = null;
-    private static String dateTimeFormatStr = DATE_TIME_FORMAT_STR_DEFAULT;
-
     DateTimeFormatter dateFormatter = null;
 
     private static final boolean SHOW_THREAD_NAME_DEFAULT = true;
@@ -90,12 +88,18 @@ public class SimpleLoggerConfiguration {
     private final Properties properties = new Properties();
 
     void init() {
+        // Reset state before initialization
+        dateFormatter = null;
+
         loadProperties();
 
         String defaultLogLevelString = getStringProperty(MavenBaseLogger.DEFAULT_LOG_LEVEL_KEY, null);
         if (defaultLogLevelString != null) {
             defaultLogLevel = stringToLevel(defaultLogLevelString);
         }
+
+        // local variable,
+        String dateTimeFormatStr;
 
         showLogName =
                 getBooleanProperty(MavenBaseLogger.SHOW_LOG_NAME_KEY, SimpleLoggerConfiguration.SHOW_LOG_NAME_DEFAULT);

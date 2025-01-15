@@ -19,9 +19,9 @@
 package org.apache.maven.slf4j;
 
 import java.io.PrintStream;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,9 +146,6 @@ import org.slf4j.spi.LocationAwareLogger;
  */
 public class MavenBaseLogger extends LegacyAbstractLogger {
 
-    private static final Clock MONOTONIC_CLOCK = Clock.tick(Clock.systemUTC(), Duration.ofMillis(1));
-    private static final Instant START_TIME = MonotonicClock.now();
-
     protected static final int LOG_LEVEL_TRACE = LocationAwareLogger.TRACE_INT;
     protected static final int LOG_LEVEL_DEBUG = LocationAwareLogger.DEBUG_INT;
     protected static final int LOG_LEVEL_INFO = LocationAwareLogger.INFO_INT;
@@ -165,7 +162,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
 
     static final SimpleLoggerConfiguration CONFIG_PARAMS = new SimpleLoggerConfiguration();
 
-    private static boolean initialized = false;
+    static boolean initialized = false;
 
     static void lazyInit() {
         if (initialized) {
@@ -264,15 +261,6 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         if (t != null) {
             t.printStackTrace(targetStream);
         }
-    }
-
-    protected String getFormattedDate() {
-        Instant now = MonotonicClock.now();
-        String dateText;
-        synchronized (CONFIG_PARAMS.dateFormatter) {
-            dateText = CONFIG_PARAMS.dateFormatter.format(now);
-        }
-        return dateText;
     }
 
     protected String computeShortName() {
@@ -380,11 +368,14 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
 
         // Append date-time if so configured
         if (CONFIG_PARAMS.showDateTime) {
-            if (CONFIG_PARAMS.dateFormatter != null) {
-                buf.append(getFormattedDate());
+            DateTimeFormatter formatter = CONFIG_PARAMS.dateFormatter;
+            if (formatter != null) {
+                ZonedDateTime zonedDateTime = MonotonicClock.now().atZone(ZoneId.systemDefault());
+                String dateText = formatter.format(zonedDateTime);
+                buf.append(dateText);
                 buf.append(SP);
             } else {
-                buf.append(Duration.between(START_TIME, MonotonicClock.now()).toMillis());
+                buf.append(MonotonicClock.elapsed().toMillis());
                 buf.append(SP);
             }
         }

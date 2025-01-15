@@ -19,6 +19,7 @@
 package org.apache.maven.api;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -78,6 +79,27 @@ public class MonotonicClock extends Clock {
     }
 
     /**
+     * Returns the initialization time of this monotonic clock.
+     * This is a convenience method equivalent to {@code get().start()}.
+     *
+     * @return the instant when this monotonic clock was initialized
+     * @see #startInstant()
+     */
+    public static Instant start() {
+        return get().startInstant();
+    }
+
+    /**
+     * Returns the elapsed time since clock initialization.
+     * This is a convenience method equivalent to {@code get().elapsedTime()}.
+     *
+     * @return the duration since clock initialization
+     */
+    public static Duration elapsed() {
+        return get().elapsedTime();
+    }
+
+    /**
      * Returns a monotonically increasing instant.
      * <p>
      * The returned instant is calculated by adding the elapsed nanoseconds
@@ -91,6 +113,36 @@ public class MonotonicClock extends Clock {
     public Instant instant() {
         long elapsedNanos = System.nanoTime() - startNanos;
         return startInstant.plusNanos(elapsedNanos);
+    }
+
+    /**
+     * Returns the wall clock time captured when this monotonic clock was initialized.
+     * <p>
+     * This instant serves as the base time from which all subsequent {@link #instant()}
+     * calls are calculated by adding the elapsed monotonic duration. This ensures
+     * consistency between the monotonic measurements and wall clock time.
+     *
+     * @return the initial wall clock instant when this clock was created
+     * @see #instant()
+     */
+    public Instant startInstant() {
+        return startInstant;
+    }
+
+    /**
+     * Returns the duration elapsed since this clock was initialized.
+     * <p>
+     * The returned duration is calculated using {@link System#nanoTime()}
+     * to ensure monotonic behavior. This duration represents the exact time
+     * span between clock initialization and the current instant.
+     *
+     * @return the duration since clock initialization
+     * @see #startInstant()
+     * @see #instant()
+     */
+    public Duration elapsedTime() {
+        long elapsedNanos = System.nanoTime() - startNanos;
+        return Duration.ofNanos(elapsedNanos);
     }
 
     /**
