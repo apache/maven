@@ -136,7 +136,7 @@
         <field>
           <name>provides</name>
           <version>1.0.0/1.0.99</version> <!-- fake upperbound, it's inclusive -->
-          <type>DOM</type> <!-- DOM for Maven 2.0.9/2.3.3 -->
+          <type>DOM</type>
           <description>
             Toolchain identification information, which will be matched against project requirements.
             &lt;p>Actual content structure is completely open: each toolchain type will define its own format and
@@ -148,7 +148,7 @@
         <field>
           <name>provides</name>
           <version>1.1.0+</version>
-          <type>Properties</type> <!-- Properties for Maven 2.3.4+ -->
+          <type>Properties</type>
           <association xml.mapStyle="inline">
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -156,10 +156,6 @@
           <!-- <identifier>true</identifier> -->
           <description>
             Toolchain identification information, which will be matched against project requirements.
-            &lt;p>For Maven 2.0.9 to 3.2.3, the actual content structure was completely open: each toolchain type would
-            define its own format and semantics. This was generally a properties format.
-            &lt;p>Since Maven 3.2.4, the type for this field has been changed to Properties to match the de-facto
-            format.
             &lt;p>Each toolchain defines its own properties names and semantics.
           </description>
         </field>

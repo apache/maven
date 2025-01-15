@@ -103,8 +103,6 @@ h4. Working with POMs during development
 
 During the development of a plugin we would want to make it easy for a developer to create a plugin which means we would allow the direct use of a POM to state the dependencies of a given plugin and any tooling we created would be responsible for turning the dependency information in the POM into plugin metadata which described the dependencies of the plugin.
 
-We are looking at using Mercury for the resolution and retrieval of the plugin dependencies so during development we would translate the POMs into dependency information that Mercury can understand, and in production we would have the pre-digested format that Mercury could utilize to resolve and retrieve dependencies. We need to be careful that we are using Mercury during development and production so that we don’t get in the situation where Maven 2.x is resolving differently than Mercury is. We can still leverage POMs during development but we need to make sure Mercury is doing the work.
-
 With respect to development inside an IDE the workspace from which we would like to resolve and retrieve dependencies is a read-only local repository to Mercury which is put at the front-end of the search order of any repository that Mercury will consult for artifacts.
 
 h4. Generation of plugin metadata and packaging
