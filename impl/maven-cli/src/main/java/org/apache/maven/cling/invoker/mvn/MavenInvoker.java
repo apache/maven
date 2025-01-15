@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,10 +46,10 @@ import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
 import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.api.services.model.ModelProcessor;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.Utils;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
@@ -227,12 +228,6 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected void populateRequest(MavenContext context, Lookup lookup, MavenExecutionRequest request)
             throws Exception {
         super.populateRequest(context, lookup, request);
-        if (context.invokerRequest.rootDirectory().isEmpty()) {
-            // maven requires this to be set; so default it (and see below at POM)
-            request.setMultiModuleProjectDirectory(
-                    context.invokerRequest.topDirectory().toFile());
-            request.setRootDirectory(context.invokerRequest.topDirectory());
-        }
 
         MavenOptions options = (MavenOptions) context.invokerRequest.options();
         request.setNoSnapshotUpdates(options.suppressSnapshotUpdates().orElse(false));
@@ -252,9 +247,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
             // project present, but we could not determine rootDirectory: extra work needed
             if (context.invokerRequest.rootDirectory().isEmpty()) {
-                Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
-                request.setMultiModuleProjectDirectory(rootDirectory.toFile());
-                request.setRootDirectory(rootDirectory);
+                throw new IllegalArgumentException(
+                        ServiceLoader.load(RootLocator.class).iterator().next().getNoRootMessage());
             }
         }
 
