@@ -43,11 +43,11 @@ import org.slf4j.spi.LocationAwareLogger;
  *
  *
  * <ul>
- * <li><code>org.slf4j.simpleLogger.logFile</code> - The output target which can
+ * <li><code>maven.logger.logFile</code> - The output target which can
  * be the <em>path</em> to a file, or the special values "System.out" and
  * "System.err". Default is "System.err".</li>
  *
- * <li><code>org.slf4j.simpleLogger.cacheOutputStream</code> - If the output
+ * <li><code>maven.logger.cacheOutputStream</code> - If the output
  * target is set to "System.out" or "System.err" (see preceding entry), by
  * default, logs will be output to the latest value referenced by
  * <code>System.out/err</code> variables. By setting this parameter to true, the
@@ -55,49 +55,49 @@ import org.slf4j.spi.LocationAwareLogger;
  * re-used independently of the current value referenced by
  * <code>System.out/err</code>.</li>
  *
- * <li><code>org.slf4j.simpleLogger.defaultLogLevel</code> - Default log level
+ * <li><code>maven.logger.defaultLogLevel</code> - Default log level
  * for all instances of SimpleLogger. Must be one of ("trace", "debug", "info",
  * "warn", "error" or "off"). If not specified, defaults to "info".</li>
  *
- * <li><code>org.slf4j.simpleLogger.log.<em>a.b.c</em></code> - Logging detail
+ * <li><code>maven.logger.log.<em>a.b.c</em></code> - Logging detail
  * level for a SimpleLogger instance named "a.b.c". Right-side value must be one
  * of "trace", "debug", "info", "warn", "error" or "off". When a SimpleLogger
  * named "a.b.c" is initialized, its level is assigned from this property. If
  * unspecified, the level of nearest parent logger will be used, and if none is
  * set, then the value specified by
- * <code>org.slf4j.simpleLogger.defaultLogLevel</code> will be used.</li>
+ * <code>maven.logger.defaultLogLevel</code> will be used.</li>
  *
- * <li><code>org.slf4j.simpleLogger.showDateTime</code> - Set to
+ * <li><code>maven.logger.showDateTime</code> - Set to
  * <code>true</code> if you want the current date and time to be included in
  * output messages. Default is <code>false</code></li>
  *
- * <li><code>org.slf4j.simpleLogger.dateTimeFormat</code> - The date and time
+ * <li><code>maven.logger.dateTimeFormat</code> - The date and time
  * format to be used in the output messages. The pattern describing the date and
  * time format is defined by <a href=
  * "http://docs.oracle.com/javase/1.5.0/docs/api/java/text/SimpleDateFormat.html">
  * <code>SimpleDateFormat</code></a>. If the format is not specified or is
  * invalid, the number of milliseconds since start up will be output.</li>
  *
- * <li><code>org.slf4j.simpleLogger.showThreadName</code> -Set to
+ * <li><code>maven.logger.showThreadName</code> -Set to
  * <code>true</code> if you want to output the current thread name. Defaults to
  * <code>true</code>.</li>
  *
- * <li>(since version 1.7.33 and 2.0.0-alpha6) <code>org.slf4j.simpleLogger.showThreadId</code> -
+ * <li>(since version 1.7.33 and 2.0.0-alpha6) <code>maven.logger.showThreadId</code> -
  * If you would like to output the current thread id, then set to
  * <code>true</code>. Defaults to <code>false</code>.</li>
  *
- * <li><code>org.slf4j.simpleLogger.showLogName</code> - Set to
+ * <li><code>maven.logger.showLogName</code> - Set to
  * <code>true</code> if you want the Logger instance name to be included in
  * output messages. Defaults to <code>true</code>.</li>
  *
- * <li><code>org.slf4j.simpleLogger.showShortLogName</code> - Set to
+ * <li><code>maven.logger.showShortLogName</code> - Set to
  * <code>true</code> if you want the last component of the name to be included
  * in output messages. Defaults to <code>false</code>.</li>
  *
- * <li><code>org.slf4j.simpleLogger.levelInBrackets</code> - Should the level
+ * <li><code>maven.logger.levelInBrackets</code> - Should the level
  * string be output in brackets? Defaults to <code>false</code>.</li>
  *
- * <li><code>org.slf4j.simpleLogger.warnLevelString</code> - The string value
+ * <li><code>maven.logger.warnLevelString</code> - The string value
  * output for the warn level. Defaults to <code>WARN</code>.</li>
  *
  * </ul>
@@ -184,34 +184,28 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     private transient String shortLogName = null;
 
     /**
-     * All system properties used by <code>SimpleLogger</code> start with this
-     * prefix
+     * All system properties used by Maven Logger start with this prefix.
      */
-    public static final String SYSTEM_PREFIX = "org.slf4j.simpleLogger.";
+    public static final String MAVEN_PREFIX = "maven.logger.";
 
-    public static final String LOG_KEY_PREFIX = MavenBaseLogger.SYSTEM_PREFIX + "log.";
+    /**
+     * Legacy SLF4J prefix maintained for backwards compatibility
+     */
+    public static final String LEGACY_PREFIX = "org.slf4j.simpleLogger.";
 
-    public static final String CACHE_OUTPUT_STREAM_STRING_KEY = MavenBaseLogger.SYSTEM_PREFIX + "cacheOutputStream";
-
-    public static final String WARN_LEVEL_STRING_KEY = MavenBaseLogger.SYSTEM_PREFIX + "warnLevelString";
-
-    public static final String LEVEL_IN_BRACKETS_KEY = MavenBaseLogger.SYSTEM_PREFIX + "levelInBrackets";
-
-    public static final String LOG_FILE_KEY = MavenBaseLogger.SYSTEM_PREFIX + "logFile";
-
-    public static final String SHOW_SHORT_LOG_NAME_KEY = MavenBaseLogger.SYSTEM_PREFIX + "showShortLogName";
-
-    public static final String SHOW_LOG_NAME_KEY = MavenBaseLogger.SYSTEM_PREFIX + "showLogName";
-
-    public static final String SHOW_THREAD_NAME_KEY = MavenBaseLogger.SYSTEM_PREFIX + "showThreadName";
-
-    public static final String SHOW_THREAD_ID_KEY = MavenBaseLogger.SYSTEM_PREFIX + "showThreadId";
-
-    public static final String DATE_TIME_FORMAT_KEY = MavenBaseLogger.SYSTEM_PREFIX + "dateTimeFormat";
-
-    public static final String SHOW_DATE_TIME_KEY = MavenBaseLogger.SYSTEM_PREFIX + "showDateTime";
-
-    public static final String DEFAULT_LOG_LEVEL_KEY = MavenBaseLogger.SYSTEM_PREFIX + "defaultLogLevel";
+    // Property keys with new maven prefix
+    public static final String LOG_KEY_PREFIX = MAVEN_PREFIX + "log.";
+    public static final String CACHE_OUTPUT_STREAM_STRING_KEY = MAVEN_PREFIX + "cacheOutputStream";
+    public static final String WARN_LEVEL_STRING_KEY = MAVEN_PREFIX + "warnLevelString";
+    public static final String LEVEL_IN_BRACKETS_KEY = MAVEN_PREFIX + "levelInBrackets";
+    public static final String LOG_FILE_KEY = MAVEN_PREFIX + "logFile";
+    public static final String SHOW_SHORT_LOG_NAME_KEY = MAVEN_PREFIX + "showShortLogName";
+    public static final String SHOW_LOG_NAME_KEY = MAVEN_PREFIX + "showLogName";
+    public static final String SHOW_THREAD_NAME_KEY = MAVEN_PREFIX + "showThreadName";
+    public static final String SHOW_THREAD_ID_KEY = MAVEN_PREFIX + "showThreadId";
+    public static final String DATE_TIME_FORMAT_KEY = MAVEN_PREFIX + "dateTimeFormat";
+    public static final String SHOW_DATE_TIME_KEY = MAVEN_PREFIX + "showDateTime";
+    public static final String DEFAULT_LOG_LEVEL_KEY = MAVEN_PREFIX + "defaultLogLevel";
 
     /**
      * Protected access allows only {@link MavenLoggerFactory} and also derived classes to instantiate
@@ -235,7 +229,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         while ((levelString == null) && (indexOfLastDot > -1)) {
             tempName = tempName.substring(0, indexOfLastDot);
             levelString = CONFIG_PARAMS.getStringProperty(MavenBaseLogger.LOG_KEY_PREFIX + tempName, null);
-            indexOfLastDot = String.valueOf(tempName).lastIndexOf(".");
+            indexOfLastDot = tempName.lastIndexOf(".");
         }
         return levelString;
     }
@@ -244,8 +238,8 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
      * To avoid intermingling of log messages and associated stack traces, the two
      * operations are done in a synchronized block.
      *
-     * @param buf
-     * @param t
+     * @param buf   The StringBuilder containing the log message to be written
+     * @param t     The Throwable object whose stack trace should be written, may be null
      */
     protected void write(StringBuilder buf, Throwable t) {
         PrintStream targetStream = CONFIG_PARAMS.outputChoice.getTargetPrintStream();
