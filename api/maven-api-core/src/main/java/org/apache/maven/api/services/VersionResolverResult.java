@@ -31,7 +31,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0.0
  */
 @Experimental
-public interface VersionResolverResult {
+public interface VersionResolverResult extends Result<VersionResolverRequest> {
 
     @Nonnull
     List<Exception> getExceptions();

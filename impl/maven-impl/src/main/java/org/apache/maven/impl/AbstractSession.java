@@ -84,6 +84,7 @@ import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.services.ProjectScopeRegistry;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
@@ -899,5 +900,21 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public PathScope requirePathScope(String id) {
         return getService(PathScopeRegistry.class).require(id);
+    }
+
+    @Override
+    public void setCurrentTrace(RequestTrace trace) {
+        getTraceHolder().set(trace);
+    }
+
+    @Override
+    public RequestTrace getCurrentTrace() {
+        return getTraceHolder().get();
+    }
+
+    @SuppressWarnings("unchecked")
+    private ThreadLocal<RequestTrace> getTraceHolder() {
+        org.eclipse.aether.SessionData data = session.getData();
+        return (ThreadLocal<RequestTrace>) data.computeIfAbsent(RequestTrace.class, ThreadLocal::new);
     }
 }

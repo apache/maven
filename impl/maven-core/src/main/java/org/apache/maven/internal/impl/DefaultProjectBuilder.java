@@ -43,6 +43,7 @@ import org.apache.maven.api.services.Source;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.impl.DefaultDependencyResolverResult;
 import org.apache.maven.impl.MappedCollection;
+import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource2;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -67,6 +68,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuilderResult build(ProjectBuilderRequest request)
             throws ProjectBuilderException, IllegalArgumentException {
         InternalMavenSession session = InternalMavenSession.from(request.getSession());
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
         try {
             List<ArtifactRepository> repositories = session.toArtifactRepositories(
                     request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories());
@@ -87,6 +89,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 throw new IllegalArgumentException("Invalid request");
             }
             return new ProjectBuilderResult() {
+                @Override
+                public ProjectBuilderRequest getRequest() {
+                    return request;
+                }
+
                 @Nonnull
                 @Override
                 public String getProjectId() {
@@ -175,11 +182,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 public Optional<DependencyResolverResult> getDependencyResolverResult() {
                     return Optional.ofNullable(res.getDependencyResolutionResult())
                             .map(r -> new DefaultDependencyResolverResult(
-                                    null, r.getCollectionErrors(), session.getNode(r.getDependencyGraph()), 0));
+                                    // TODO: this should not be null
+                                    null, null, r.getCollectionErrors(), session.getNode(r.getDependencyGraph()), 0));
                 }
             };
         } catch (ProjectBuildingException e) {
             throw new ProjectBuilderException("Unable to build project", e);
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
     }
 

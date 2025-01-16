@@ -39,9 +39,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ArtifactResolverRequest {
-    @Nonnull
-    Session getSession();
+public interface ArtifactResolverRequest extends Request<Session> {
 
     @Nonnull
     Collection<? extends ArtifactCoordinates> getCoordinates();
@@ -78,6 +76,7 @@ public interface ArtifactResolverRequest {
     @NotThreadSafe
     class ArtifactResolverRequestBuilder {
         Session session;
+        RequestTrace trace;
         Collection<? extends ArtifactCoordinates> coordinates;
         List<RemoteRepository> repositories;
 
@@ -86,6 +85,12 @@ public interface ArtifactResolverRequest {
         @Nonnull
         public ArtifactResolverRequestBuilder session(Session session) {
             this.session = session;
+            return this;
+        }
+
+        @Nonnull
+        public ArtifactResolverRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -103,7 +108,7 @@ public interface ArtifactResolverRequest {
 
         @Nonnull
         public ArtifactResolverRequest build() {
-            return new DefaultArtifactResolverRequest(session, coordinates, repositories);
+            return new DefaultArtifactResolverRequest(session, trace, coordinates, repositories);
         }
 
         private static class DefaultArtifactResolverRequest extends BaseRequest<Session>
@@ -116,9 +121,10 @@ public interface ArtifactResolverRequest {
 
             DefaultArtifactResolverRequest(
                     @Nonnull Session session,
+                    @Nullable RequestTrace trace,
                     @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
                     @Nonnull List<RemoteRepository> repositories) {
-                super(session);
+                super(session, trace);
                 this.coordinates = List.copyOf(requireNonNull(coordinates, "coordinates cannot be null"));
                 this.repositories = repositories;
             }
@@ -133,6 +139,13 @@ public interface ArtifactResolverRequest {
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
+            }
+
+            @Override
+            public String toString() {
+                return "ArtifactResolverRequest[" + "coordinates="
+                        + coordinates + ", repositories="
+                        + repositories + ']';
             }
         }
     }

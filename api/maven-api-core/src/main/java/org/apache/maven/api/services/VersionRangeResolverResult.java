@@ -36,7 +36,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0.0
  */
 @Experimental
-public interface VersionRangeResolverResult {
+public interface VersionRangeResolverResult extends Result<VersionRangeResolverRequest> {
 
     /**
      * Gets the exceptions that occurred while resolving the version range.

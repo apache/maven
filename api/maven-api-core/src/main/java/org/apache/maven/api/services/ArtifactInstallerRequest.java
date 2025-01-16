@@ -39,10 +39,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ArtifactInstallerRequest {
-
-    @Nonnull
-    Session getSession();
+public interface ArtifactInstallerRequest extends Request<Session> {
 
     @Nonnull
     Collection<ProducedArtifact> getArtifacts();
@@ -63,6 +60,7 @@ public interface ArtifactInstallerRequest {
     @NotThreadSafe
     class ArtifactInstallerRequestBuilder {
         Session session;
+        RequestTrace trace;
         Collection<ProducedArtifact> artifacts = Collections.emptyList();
 
         ArtifactInstallerRequestBuilder() {}
@@ -74,6 +72,12 @@ public interface ArtifactInstallerRequest {
         }
 
         @Nonnull
+        public ArtifactInstallerRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
+            return this;
+        }
+
+        @Nonnull
         public ArtifactInstallerRequestBuilder artifacts(@Nullable Collection<ProducedArtifact> artifacts) {
             this.artifacts = artifacts != null ? artifacts : Collections.emptyList();
             return this;
@@ -81,15 +85,18 @@ public interface ArtifactInstallerRequest {
 
         @Nonnull
         public ArtifactInstallerRequest build() {
-            return new DefaultArtifactInstallerRequest(session, artifacts);
+            return new DefaultArtifactInstallerRequest(session, trace, artifacts);
         }
 
         static class DefaultArtifactInstallerRequest extends BaseRequest<Session> implements ArtifactInstallerRequest {
 
             private final Collection<ProducedArtifact> artifacts;
 
-            DefaultArtifactInstallerRequest(@Nonnull Session session, @Nonnull Collection<ProducedArtifact> artifacts) {
-                super(session);
+            DefaultArtifactInstallerRequest(
+                    @Nonnull Session session,
+                    @Nullable RequestTrace trace,
+                    @Nonnull Collection<ProducedArtifact> artifacts) {
+                super(session, trace);
                 this.artifacts = List.copyOf(requireNonNull(artifacts, "artifacts cannot be null"));
             }
 
@@ -97,6 +104,11 @@ public interface ArtifactInstallerRequest {
             @Override
             public Collection<ProducedArtifact> getArtifacts() {
                 return artifacts;
+            }
+
+            @Override
+            public String toString() {
+                return "ArtifactInstallerRequest[" + "artifacts=" + artifacts + ']';
             }
         }
     }

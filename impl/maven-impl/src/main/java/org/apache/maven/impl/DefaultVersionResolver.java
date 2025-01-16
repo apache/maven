@@ -53,18 +53,24 @@ public class DefaultVersionResolver implements VersionResolver {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
 
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
-            VersionResult res = repositorySystem.resolveVersion(
-                    session.getSession(),
-                    new VersionRequest(
+            VersionRequest req = new VersionRequest(
                             session.toArtifact(request.getArtifactCoordinates()),
                             session.toRepositories(
                                     request.getRepositories() != null
                                             ? request.getRepositories()
                                             : session.getRemoteRepositories()),
-                            null));
+                            trace.context())
+                    .setTrace(trace.trace());
+            VersionResult res = repositorySystem.resolveVersion(session.getSession(), req);
 
             return new VersionResolverResult() {
+                @Override
+                public VersionResolverRequest getRequest() {
+                    return request;
+                }
+
                 @Override
                 public List<Exception> getExceptions() {
                     return res.getExceptions();
@@ -89,6 +95,8 @@ public class DefaultVersionResolver implements VersionResolver {
             };
         } catch (VersionResolutionException e) {
             throw new VersionResolverException("Unable to resolve version", e);
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
     }
 }

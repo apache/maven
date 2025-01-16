@@ -30,16 +30,26 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 @Experimental
-abstract class BaseRequest<S extends ProtoSession> {
+abstract class BaseRequest<S extends ProtoSession> implements Request<S> {
 
     private final S session;
+    private final RequestTrace trace;
 
     protected BaseRequest(@Nonnull S session) {
+        this(session, null);
+    }
+
+    protected BaseRequest(@Nonnull S session, RequestTrace trace) {
         this.session = requireNonNull(session, "session cannot be null");
+        this.trace = trace;
     }
 
     @Nonnull
     public S getSession() {
         return session;
+    }
+
+    public RequestTrace getTrace() {
+        return trace;
     }
 }

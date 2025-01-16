@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultPluginVersionResolver implements PluginVersionResolver {
-    private static final String REPOSITORY_CONTEXT = "plugin";
+    private static final String REPOSITORY_CONTEXT = org.apache.maven.api.services.RequestTrace.CONTEXT_PLUGIN;
 
     private static final Object CACHE_KEY = new Object();
 

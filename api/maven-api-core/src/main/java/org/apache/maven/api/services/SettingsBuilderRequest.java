@@ -37,10 +37,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface SettingsBuilderRequest {
-
-    @Nonnull
-    ProtoSession getSession();
+public interface SettingsBuilderRequest extends Request<ProtoSession> {
 
     /**
      * Gets the installation settings source.
@@ -133,6 +130,7 @@ public interface SettingsBuilderRequest {
     @NotThreadSafe
     class SettingsBuilderRequestBuilder {
         ProtoSession session;
+        RequestTrace trace;
         Source installationSettingsSource;
         Source projectSettingsSource;
         Source userSettingsSource;
@@ -140,6 +138,11 @@ public interface SettingsBuilderRequest {
 
         public SettingsBuilderRequestBuilder session(ProtoSession session) {
             this.session = session;
+            return this;
+        }
+
+        public SettingsBuilderRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -166,6 +169,7 @@ public interface SettingsBuilderRequest {
         public SettingsBuilderRequest build() {
             return new DefaultSettingsBuilderRequest(
                     session,
+                    trace,
                     installationSettingsSource,
                     projectSettingsSource,
                     userSettingsSource,
@@ -182,11 +186,12 @@ public interface SettingsBuilderRequest {
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultSettingsBuilderRequest(
                     @Nonnull ProtoSession session,
+                    @Nullable RequestTrace trace,
                     @Nullable Source installationSettingsSource,
                     @Nullable Source projectSettingsSource,
                     @Nullable Source userSettingsSource,
                     @Nullable UnaryOperator<String> interpolationSource) {
-                super(session);
+                super(session, trace);
                 this.installationSettingsSource = installationSettingsSource;
                 this.projectSettingsSource = projectSettingsSource;
                 this.userSettingsSource = userSettingsSource;
@@ -215,6 +220,15 @@ public interface SettingsBuilderRequest {
             @Override
             public Optional<UnaryOperator<String>> getInterpolationSource() {
                 return Optional.ofNullable(interpolationSource);
+            }
+
+            @Override
+            public String toString() {
+                return "SettingsBuilderRequest[" + "installationSettingsSource="
+                        + installationSettingsSource + ", projectSettingsSource="
+                        + projectSettingsSource + ", userSettingsSource="
+                        + userSettingsSource + ", interpolationSource="
+                        + interpolationSource + ']';
             }
         }
     }

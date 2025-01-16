@@ -19,31 +19,35 @@
 package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.settings.Settings;
 
 /**
+ * Base interface for service operation results in Maven. This interface defines the common contract
+ * for operation results, providing access to the original request that generated this result.
  *
+ * <p>Each result is linked to its originating {@link Request}, allowing for:
+ * <ul>
+ *   <li>Traceability between requests and their outcomes</li>
+ *   <li>Access to the session context used during processing</li>
+ *   <li>Correlation of results with their initiating parameters</li>
+ * </ul>
+ *
+ * @param <REQ> the type of Request that produced this result, ensuring type-safe
+ *              access to the original request parameters
+ *
+ * @see Request
  * @since 4.0.0
  */
 @Experimental
-public interface SettingsBuilderResult extends Result<SettingsBuilderRequest> {
+@Immutable
+public interface Result<REQ extends Request<?>> {
 
     /**
-     * Gets the assembled settings.
+     * Returns the request that produced this result.
      *
-     * @return the assembled settings, never {@code null}
+     * @return the originating request instance, never {@code null}
      */
     @Nonnull
-    Settings getEffectiveSettings();
-
-    /**
-     * Gets the problems that were encountered during the settings building. Note that only problems of severity
-     * {@link BuilderProblem.Severity#WARNING} and below are reported here. Problems with a higher severity level cause
-     * the settings builder to fail with a {@link SettingsBuilderException}.
-     *
-     * @return the problems that were encountered during the settings building, can be empty but never {@code null}
-     */
-    @Nonnull
-    ProblemCollector<BuilderProblem> getProblems();
+    REQ getRequest();
 }

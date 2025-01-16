@@ -27,7 +27,7 @@ import org.apache.maven.api.toolchain.PersistedToolchains;
  * @since 4.0.0
  */
 @Experimental
-public interface ToolchainsBuilderResult {
+public interface ToolchainsBuilderResult extends Result<ToolchainsBuilderRequest> {
     /**
      * Gets the assembled toolchains.
      *

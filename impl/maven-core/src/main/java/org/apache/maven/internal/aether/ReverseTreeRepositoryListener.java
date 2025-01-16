@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.Plugin;
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.Plugin;
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositorySystemSession;
@@ -78,6 +78,8 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
                 artifactRequest = artifactRequestData;
             } else if (data instanceof Plugin pluginData) {
                 plugin = pluginData;
+            } else if (data instanceof org.apache.maven.model.Plugin pluginData) {
+                plugin = pluginData.getDelegate();
             }
             trace = trace.getParent();
         }
@@ -152,7 +154,7 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
         }
 
         if (trackingFile == null) {
-            return;
+            return; // parent or imported bom ?
         }
         try {
             Files.createDirectories(trackingDir);
