@@ -184,7 +184,7 @@ public class DefaultModelCache implements ModelCache {
     }
 
     static class CachingSupplier<T> implements Supplier<T> {
-        final Supplier<T> supplier;
+        Supplier<T> supplier;
         volatile Object value;
 
         CachingSupplier(Supplier<T> supplier) {
@@ -200,6 +200,7 @@ public class DefaultModelCache implements ModelCache {
                     if ((v = value) == null) {
                         try {
                             v = value = supplier.get();
+                            supplier = null;
                         } catch (Exception e) {
                             v = value = new AltRes(e);
                         }
