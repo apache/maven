@@ -19,7 +19,6 @@
 package org.apache.maven.internal.impl.model;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
@@ -74,35 +73,19 @@ public class DefaultModelCache implements ModelCache {
         return cache.computeIfAbsent(key, k -> new CachingSupplier<>(data)).get();
     }
 
-    static class RgavCacheKey {
+    record RgavCacheKey(
+            List<RemoteRepository> repositories,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String tag) {
 
-        private final List<RemoteRepository> repositories;
-
-        private final String gav;
-
-        private final String tag;
-
-        private final int hash;
-
-        RgavCacheKey(
-                List<RemoteRepository> repositories,
-                String groupId,
-                String artifactId,
-                String version,
-                String classifier,
-                String tag) {
-            this(repositories, gav(groupId, artifactId, version, classifier), tag);
-        }
-
-        RgavCacheKey(List<RemoteRepository> repositories, String gav, String tag) {
-            this.repositories = List.copyOf(repositories);
-            this.gav = gav;
-            this.tag = tag;
-            this.hash = Objects.hash(this.repositories, this.gav, this.tag);
-        }
-
-        private static String gav(String groupId, String artifactId, String version, String classifier) {
+        @Override
+        public String toString() {
             StringBuilder sb = new StringBuilder();
+            sb.append("GavCacheKey[");
+            sb.append("gav='");
             if (groupId != null) {
                 sb.append(groupId);
             }
@@ -118,68 +101,19 @@ public class DefaultModelCache implements ModelCache {
             if (classifier != null) {
                 sb.append(classifier);
             }
+            sb.append("', tag='");
+            sb.append(tag);
+            sb.append("']");
             return sb.toString();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (null == obj || !getClass().equals(obj.getClass())) {
-                return false;
-            }
-            RgavCacheKey that = (RgavCacheKey) obj;
-            return Objects.equals(this.repositories, that.repositories)
-                    && Objects.equals(this.gav, that.gav)
-                    && Objects.equals(this.tag, that.tag);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        @Override
-        public String toString() {
-            return "GavCacheKey[" + "gav='" + gav + '\'' + ", tag='" + tag + '\'' + ']';
         }
     }
 
-    private static final class SourceCacheKey {
-        private final Source source;
-
-        private final String tag;
-
-        private final int hash;
-
-        SourceCacheKey(Source source, String tag) {
-            this.source = source;
-            this.tag = tag;
-            this.hash = Objects.hash(source, tag);
-        }
+    record SourceCacheKey(Source source, String tag) {
 
         @Override
         public String toString() {
             return "SourceCacheKey[" + "location=" + source.getLocation() + ", tag=" + tag + ", path="
                     + source.getPath() + ']';
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (null == obj || !getClass().equals(obj.getClass())) {
-                return false;
-            }
-            SourceCacheKey that = (SourceCacheKey) obj;
-            return Objects.equals(this.source, that.source) && Objects.equals(this.tag, that.tag);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
         }
     }
 
