@@ -148,6 +148,13 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             }
         }
 
+        List<Exclusion> exclusions = project.getExclusions();
+        if (exclusions != null) {
+            for (Exclusion exclusion : exclusions) {
+                collect.addExclusion(RepositoryUtils.toExclusion(exclusion));
+            }
+        }
+
         DependencyRequest depRequest = new DependencyRequest(collect, filter);
         depRequest.setTrace(trace);
 
