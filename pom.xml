@@ -142,7 +142,7 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2024-12-13T23:22:29Z</project.build.outputTimestamp>
     <!-- various versions -->
-    <assertjVersion>3.27.2</assertjVersion>
+    <assertjVersion>3.27.3</assertjVersion>
     <asmVersion>9.7.1</asmVersion>
     <byteBuddyVersion>1.15.11</byteBuddyVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
