@@ -22,6 +22,7 @@ import org.apache.maven.api.Constants;
 import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
 import org.apache.maven.slf4j.MavenLoggerFactory;
 import org.slf4j.ILoggerFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -30,6 +31,8 @@ import org.slf4j.LoggerFactory;
  * @since 3.1.0
  */
 public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MavenSimpleConfiguration.class);
+
     @Override
     public void setRootLoggerLevel(Level level) {
         String value =
@@ -38,7 +41,14 @@ public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
                     case INFO -> "info";
                     default -> "error";
                 };
-        System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, value);
+
+        String current = System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, value);
+        if (current != null && !value.equalsIgnoreCase(current)) {
+            LOGGER.info(
+                    "System property '" + Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL + "' is already set to '" + current
+                            + "' - ignoring system property and get log level from -X/-e/-q options, log level will be set to"
+                            + value);
+        }
     }
 
     @Override

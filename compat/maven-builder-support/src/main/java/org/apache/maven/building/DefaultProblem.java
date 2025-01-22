@@ -23,7 +23,9 @@ package org.apache.maven.building;
  * thrown or a simple string message. In addition, a problem carries a hint about its source, e.g. the settings file
  * that exhibits the problem.
  *
+ * @deprecated since 4.0.0, use {@link org.apache.maven.api.services} instead
  */
+@Deprecated(since = "4.0.0")
 class DefaultProblem implements Problem {
 
     private final String source;

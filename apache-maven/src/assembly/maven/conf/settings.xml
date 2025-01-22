@@ -173,7 +173,7 @@ under the License.
   <repositories>
     <repository>
       <id>central</id>
-      <name>Central Repository</name>
+      <name>Maven Central Repository</name>
       <url>${maven.repo.central}</url>
       <snapshots>
         <enabled>false</enabled>
@@ -187,7 +187,7 @@ under the License.
   <pluginRepositories>
     <pluginRepository>
       <id>central</id>
-      <name>Central Repository</name>
+      <name>Maven Central Repository</name>
       <url>${maven.repo.central}</url>
       <snapshots>
         <enabled>false</enabled>
