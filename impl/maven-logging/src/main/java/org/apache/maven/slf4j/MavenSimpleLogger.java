@@ -41,6 +41,8 @@ public class MavenSimpleLogger extends MavenBaseLogger {
 
     static Consumer<String> logSink;
 
+    public static final String DEFAULT_LOG_LEVEL_KEY = "org.slf4j.simpleLogger.defaultLogLevel";
+
     public static void setLogSink(Consumer<String> logSink) {
         MavenSimpleLogger.logSink = logSink;
     }
