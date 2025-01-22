@@ -24,8 +24,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -88,7 +90,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         this.namespaceUri = namespaceUri == null ? "" : namespaceUri;
         this.name = Objects.requireNonNull(name);
         this.value = value;
-        this.attributes = Map.copyOf(attributes != null ? attributes : Map.of());
+        this.attributes = Collections.unmodifiableMap(new LinkedHashMap<>(attributes != null ? attributes : Map.of()));
         this.children = List.copyOf(children != null ? children : List.of());
         this.location = location;
     }

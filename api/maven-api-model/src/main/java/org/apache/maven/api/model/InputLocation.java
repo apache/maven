@@ -63,7 +63,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-        this.locations = Map.copyOf(locations != null ? locations : Map.of());
+        this.locations = Collections.unmodifiableMap(new LinkedHashMap<>(locations != null ? locations : Map.of()));
         this.importedFrom = null;
     }
 

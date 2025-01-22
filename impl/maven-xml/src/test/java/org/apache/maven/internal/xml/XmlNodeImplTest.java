@@ -24,15 +24,11 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -475,27 +471,6 @@ class XmlNodeImplTest {
         assertEquals(dom, dom);
         assertNotEquals(dom, null);
         assertNotEquals(dom, new XmlNodeImpl(""));
-    }
-
-    /**
-     * <p>testEqualsIsNullSafe.</p>
-     */
-    @Test
-    @Disabled("TODO: temporarily disabled")
-    // TODO see disabled
-    void testEqualsIsNullSafe() throws XMLStreamException, IOException {
-        String testDom = "<configuration><items thing='blah'><item>one</item><item>two</item></items></configuration>";
-        XmlNode dom = toXmlNode(testDom);
-
-        Map<String, String> attributes = new HashMap<>();
-        attributes.put("nullValue", null);
-        attributes.put(null, "nullKey");
-        List<XmlNode> childList = new ArrayList<>();
-        childList.add(null);
-        Xpp3Dom dom2 = new Xpp3Dom(new XmlNodeImpl(dom.getName(), null, attributes, childList, null));
-
-        assertNotEquals(dom, dom2);
-        assertNotEquals(dom2, dom);
     }
 
     /**

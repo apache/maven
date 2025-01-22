@@ -47,6 +47,7 @@
     #set ( $dummy = $imports.add( "java.util.Collections" ) )
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "java.util.LinkedHashMap" ) )
     #set ( $dummy = $imports.add( "java.util.Objects" ) )
     #set ( $dummy = $imports.add( "java.util.Optional" ) )
     #set ( $dummy = $imports.add( "java.util.Set" ) )
@@ -66,6 +67,7 @@
         #set ( $dummy = $types.put( $field, "List<" + $field.to + ">" ) )
       #elseif ( $field.type == "java.util.Properties" )
         #set ( $dummy = $imports.add( "java.util.Map" ) )
+        #set ( $dummy = $imports.add( "java.util.LinkedHashMap" ) )
         #set ( $dummy = $types.put( $field, "Map<String, String>" ) )
       #elseif ( $field.type == "DOM" )
         #set ( $dummy = $imports.add( "org.apache.maven.api.xml.XmlNode" ) )
@@ -163,7 +165,7 @@ public class ${class.name}
       #if ( $field.type == "java.util.List" )
         this.${field.name} = List.copyOf(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : List.of()));
       #elseif ( $field.type == "java.util.Map" || $field.type == "java.util.Properties" )
-        this.${field.name} = Map.copyOf(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : Map.of()));
+        this.${field.name} = Collections.unmodifiableMap(new LinkedHashMap<>(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : Map.of())));
       #else
         #if ( $field.type == "boolean" || $field.type == "int" )
         this.${field.name} = builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : ${field.defaultValue});
