@@ -60,7 +60,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-        this.locations = ImmutableCollections.copy(locations);
+        this.locations = Map.copyOf(locations != null ? locations : Collections.emptyMap());
     }
 
     public int getLineNumber() {

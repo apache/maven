@@ -39,8 +39,6 @@
 #MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/InputSource.java
     #parse ( "java/InputSource.java" )
   #end
-#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/ImmutableCollections.java
-#parse ( "java/ImmutableCollections.java" )
   #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
 #MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/${className}.java
     #set ( $types = { } )
@@ -162,8 +160,10 @@ public class ${class.name}
         this.modelEncoding = builder.modelEncoding != null ? builder.modelEncoding : (builder.base != null ? builder.base.modelEncoding :  "UTF-8");
     #end
     #foreach ( $field in $class.getFields($version) )
-      #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
-        this.${field.name} = ImmutableCollections.copy(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : null));
+      #if ( $field.type == "java.util.List" )
+        this.${field.name} = List.copyOf(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : List.of()));
+      #elseif ( $field.type == "java.util.Map" || $field.type == "java.util.Properties" )
+        this.${field.name} = Map.copyOf(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : Map.of()));
       #else
         #if ( $field.type == "boolean" || $field.type == "int" )
         this.${field.name} = builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : ${field.defaultValue});

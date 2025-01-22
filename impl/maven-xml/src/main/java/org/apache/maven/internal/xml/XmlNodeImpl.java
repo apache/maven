@@ -88,8 +88,8 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         this.namespaceUri = namespaceUri == null ? "" : namespaceUri;
         this.name = Objects.requireNonNull(name);
         this.value = value;
-        this.attributes = ImmutableCollections.copy(attributes);
-        this.children = ImmutableCollections.copy(children);
+        this.attributes = Map.copyOf(attributes != null ? attributes : Map.of());
+        this.children = List.copyOf(children != null ? children : List.of());
         this.location = location;
     }
 

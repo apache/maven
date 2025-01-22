@@ -49,7 +49,7 @@ public class InputSource implements Serializable {
     public InputSource(Collection<InputSource> inputs) {
         this.modelId = null;
         this.location = null;
-        this.inputs = ImmutableCollections.copy(inputs);
+        this.inputs = List.copyOf(inputs != null ? inputs : List.of());
         this.importedFrom = null;
     }
 
