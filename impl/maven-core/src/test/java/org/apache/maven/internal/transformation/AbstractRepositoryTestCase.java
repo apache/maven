@@ -31,6 +31,7 @@ import org.apache.maven.internal.impl.DefaultRepositoryFactory;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.InternalSession;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.internal.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -40,6 +41,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
 import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
 import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
+import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.transfer.TransferListener;
@@ -67,8 +69,9 @@ public abstract class AbstractRepositoryTestCase {
         return container;
     }
 
-    public static RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system) {
+    public RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system) {
         DefaultRepositorySystemSession rsession = new DefaultRepositorySystemSession(h -> false);
+        rsession.setScopeManager(new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE));
 
         LocalRepository localRepo = new LocalRepository("target/local-repo");
         rsession.setLocalRepositoryManager(system.newLocalRepositoryManager(rsession, localRepo));
@@ -78,19 +81,18 @@ public abstract class AbstractRepositoryTestCase {
 
         DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenSession mavenSession = new MavenSession(rsession, request, new DefaultMavenExecutionResult());
-        DefaultSession session = new DefaultSession(
-                mavenSession,
-                null,
-                null,
-                null,
-                new SimpleLookup(List.of(
-                        new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
-                                new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())),
-                        new DefaultInterpolator())),
-                null);
+        DefaultSession session =
+                new DefaultSession(mavenSession, null, null, null, new SimpleLookup(getSessionServices()), null);
         InternalSession.associate(rsession, session);
 
         return rsession;
+    }
+
+    protected List<Object> getSessionServices() {
+        return List.of(
+                new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
+                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())),
+                new DefaultInterpolator());
     }
 
     public static RemoteRepository newTestRepository() throws MalformedURLException {

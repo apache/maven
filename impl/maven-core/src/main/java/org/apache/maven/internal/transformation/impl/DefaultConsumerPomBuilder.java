@@ -99,7 +99,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
 
-        if (!model.getDependencyManagement().getDependencies().isEmpty()) {
+        if (model.getDependencyManagement() != null
+                && !model.getDependencyManagement().getDependencies().isEmpty()) {
             ArtifactCoordinates artifact = iSession.createArtifactCoordinates(
                     model.getGroupId(), model.getArtifactId(), model.getVersion(), null);
             DependencyCoordinates dependency = iSession.createDependencyCoordinates(artifact);
