@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicClock;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -184,28 +185,9 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     private transient String shortLogName = null;
 
     /**
-     * All system properties used by Maven Logger start with this prefix.
-     */
-    public static final String MAVEN_PREFIX = "maven.logger.";
-
-    /**
      * Legacy SLF4J prefix maintained for backwards compatibility
      */
     public static final String LEGACY_PREFIX = "org.slf4j.simpleLogger.";
-
-    // Property keys with new maven prefix
-    public static final String LOG_KEY_PREFIX = MAVEN_PREFIX + "log.";
-    public static final String CACHE_OUTPUT_STREAM_STRING_KEY = MAVEN_PREFIX + "cacheOutputStream";
-    public static final String WARN_LEVEL_STRING_KEY = MAVEN_PREFIX + "warnLevelString";
-    public static final String LEVEL_IN_BRACKETS_KEY = MAVEN_PREFIX + "levelInBrackets";
-    public static final String LOG_FILE_KEY = MAVEN_PREFIX + "logFile";
-    public static final String SHOW_SHORT_LOG_NAME_KEY = MAVEN_PREFIX + "showShortLogName";
-    public static final String SHOW_LOG_NAME_KEY = MAVEN_PREFIX + "showLogName";
-    public static final String SHOW_THREAD_NAME_KEY = MAVEN_PREFIX + "showThreadName";
-    public static final String SHOW_THREAD_ID_KEY = MAVEN_PREFIX + "showThreadId";
-    public static final String DATE_TIME_FORMAT_KEY = MAVEN_PREFIX + "dateTimeFormat";
-    public static final String SHOW_DATE_TIME_KEY = MAVEN_PREFIX + "showDateTime";
-    public static final String DEFAULT_LOG_LEVEL_KEY = MAVEN_PREFIX + "defaultLogLevel";
 
     /**
      * Protected access allows only {@link MavenLoggerFactory} and also derived classes to instantiate
@@ -228,7 +210,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         int indexOfLastDot = tempName.length();
         while ((levelString == null) && (indexOfLastDot > -1)) {
             tempName = tempName.substring(0, indexOfLastDot);
-            levelString = CONFIG_PARAMS.getStringProperty(MavenBaseLogger.LOG_KEY_PREFIX + tempName, null);
+            levelString = CONFIG_PARAMS.getStringProperty(Constants.MAVEN_LOGGER_LOG_PREFIX + tempName, null);
             indexOfLastDot = tempName.lastIndexOf(".");
         }
         return levelString;

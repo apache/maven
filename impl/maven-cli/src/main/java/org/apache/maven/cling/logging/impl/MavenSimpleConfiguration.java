@@ -18,9 +18,9 @@
  */
 package org.apache.maven.cling.logging.impl;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
 import org.apache.maven.slf4j.MavenLoggerFactory;
-import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
                     case INFO -> "info";
                     default -> "error";
                 };
-        System.setProperty(MavenSimpleLogger.DEFAULT_LOG_LEVEL_KEY, value);
+        System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, value);
     }
 
     @Override
