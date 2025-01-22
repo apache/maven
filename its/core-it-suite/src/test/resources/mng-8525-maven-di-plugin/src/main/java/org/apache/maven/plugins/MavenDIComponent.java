@@ -44,7 +44,7 @@ import org.apache.maven.api.di.Singleton;
 @Singleton
 public class MavenDIComponent {
 
-    public void hello() {
-        System.out.println("Hello! I am a component that is being used via field injection!");
+    public String hello(String name) {
+        return "Hello " + name + "! I am a component that is being used via field injection!";
     }
 }

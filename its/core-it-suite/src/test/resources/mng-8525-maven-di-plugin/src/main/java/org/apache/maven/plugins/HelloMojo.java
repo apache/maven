@@ -39,7 +39,9 @@ package org.apache.maven.plugins;
 
 import org.apache.maven.api.Lifecycle.Phase;
 import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.plugin.annotations.Mojo;
+import org.apache.maven.api.plugin.annotations.Parameter;
 
 @Mojo(name = "hello", defaultPhase = Phase.VALIDATE, projectRequired = false)
 public class HelloMojo implements org.apache.maven.api.plugin.Mojo {
@@ -47,10 +49,19 @@ public class HelloMojo implements org.apache.maven.api.plugin.Mojo {
     @Inject
     private MavenDIComponent component;
 
+    @Inject
+    private Log logger;
+
+    @Parameter(property = "name")
+    private String name;
+
     public void execute() {
         //
         // Say hello to the world, my little constructor injected component!
         //
-        component.hello();
+        String message = component.hello(name);
+        logger.info(message);
+
+
     }
 }
