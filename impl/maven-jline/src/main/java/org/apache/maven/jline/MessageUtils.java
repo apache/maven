@@ -49,8 +49,15 @@ public class MessageUtils {
     public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, Consumer<Terminal> terminalConsumer) {
         MessageUtils.terminal = new FastTerminal(
                 () -> {
-                    TerminalBuilder builder =
-                            TerminalBuilder.builder().name("Maven").dumb(true);
+                    TerminalBuilder builder = TerminalBuilder.builder()
+                            // explicitly disabled providers
+                            .jna(false)
+                            .jansi(false)
+                            .exec(false)
+                            // enabled provider dumb for fallback
+                            .dumb(true)
+                            // common
+                            .name("Maven");
                     if (builderConsumer != null) {
                         builderConsumer.accept(builder);
                     }

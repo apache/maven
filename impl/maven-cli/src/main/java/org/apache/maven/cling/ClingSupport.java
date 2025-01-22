@@ -19,11 +19,15 @@
 package org.apache.maven.cling;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
-import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.api.cli.ParserRequest;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import static java.util.Objects.requireNonNull;
@@ -60,8 +64,18 @@ public abstract class ClingSupport {
      * The main entry point.
      */
     public int run(String[] args) throws IOException {
+        return run(args, null, null, null);
+    }
+
+    /**
+     * The main entry point with IO management.
+     */
+    public int run(String[] args, @Nullable InputStream in, @Nullable OutputStream out, @Nullable OutputStream err)
+            throws IOException {
         try (Invoker invoker = createInvoker()) {
-            return invoker.invoke(parseArguments(args));
+            return invoker.invoke(createParser()
+                    .parseInvocation(
+                            parserRequestBuilder(args).in(in).out(out).err(err).build()));
         } catch (ParserException e) {
             System.err.println(e.getMessage());
             return 1;
@@ -76,5 +90,7 @@ public abstract class ClingSupport {
 
     protected abstract Invoker createInvoker();
 
-    protected abstract InvokerRequest parseArguments(String[] args) throws ParserException, IOException;
+    protected abstract Parser createParser();
+
+    protected abstract ParserRequest.Builder parserRequestBuilder(String[] args) throws ParserException;
 }

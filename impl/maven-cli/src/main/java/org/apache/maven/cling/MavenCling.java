@@ -19,9 +19,12 @@
 package org.apache.maven.cling;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
-import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLogger;
@@ -48,7 +51,20 @@ public class MavenCling extends ClingSupport {
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
     public static int main(String[] args, ClassWorld world) throws IOException {
-        return new MavenCling(world).run(args);
+        return main(args, world, null, null, null);
+    }
+
+    /**
+     * Embedded entry point.
+     */
+    public static int main(
+            String[] args,
+            ClassWorld world,
+            @Nullable InputStream in,
+            @Nullable OutputStream out,
+            @Nullable OutputStream err)
+            throws IOException {
+        return new MavenCling(world).run(args, in, out, err);
     }
 
     public MavenCling() {
@@ -66,9 +82,12 @@ public class MavenCling extends ClingSupport {
     }
 
     @Override
-    protected InvokerRequest parseArguments(String[] args) throws ParserException, IOException {
-        return new MavenParser()
-                .parseInvocation(ParserRequest.mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory())
-                        .build());
+    protected Parser createParser() {
+        return new MavenParser();
+    }
+
+    @Override
+    protected ParserRequest.Builder parserRequestBuilder(String[] args) throws ParserException {
+        return ParserRequest.mvn(args, new ProtoLogger(), new JLineMessageBuilderFactory());
     }
 }

@@ -118,7 +118,10 @@ public class ToolboxTool implements ExecutorTool {
         if (helper.mavenVersion().startsWith("4.")) {
             builder.argument("--raw-streams");
         }
-        return builder.argument(TOOLBOX + mojo).argument("--quiet").argument("-DforceStdout");
+        return builder.argument(TOOLBOX + mojo)
+                .argument("--batch-mode")
+                .argument("--quiet")
+                .argument("-DforceStdout");
     }
 
     private void doExecute(ExecutorRequest.Builder builder) {

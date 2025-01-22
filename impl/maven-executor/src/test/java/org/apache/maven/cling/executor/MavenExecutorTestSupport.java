@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cling.executor;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
 import org.junit.jupiter.api.Disabled;
@@ -33,6 +35,8 @@ import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class MavenExecutorTestSupport {
     @Test
@@ -99,10 +103,63 @@ public abstract class MavenExecutorTestSupport {
                 tempDir.resolve(logfile),
                 List.of(mvn4ExecutorRequestBuilder()
                         .cwd(tempDir)
+                        .argument("-V")
                         .argument("verify")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
+    }
+
+    @Test
+    void defaultFsCaptureOutput(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .stdoutConsumer(stdout)
+                        .build()));
+        assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
+    }
+
+    @Test
+    void defaultFsCaptureOutputWithForcedColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
+            throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("--color=yes")
+                        .stdoutConsumer(stdout)
+                        .build()));
+        assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
+    }
+
+    @Test
+    void defaultFsCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
+            throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("--color=no")
+                        .stdoutConsumer(stdout)
+                        .build()));
+        assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
     @Test
@@ -121,10 +178,63 @@ public abstract class MavenExecutorTestSupport {
                 tempDir.resolve(logfile),
                 List.of(mvn3ExecutorRequestBuilder()
                         .cwd(tempDir)
+                        .argument("-V")
                         .argument("verify")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
+    }
+
+    @Test
+    void defaultFs3xCaptureOutput(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .stdoutConsumer(stdout)
+                        .build()));
+        assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
+    }
+
+    @Test
+    void defaultFs3xCaptureOutputWithForcedColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
+            throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("--color=yes")
+                        .stdoutConsumer(stdout)
+                        .build()));
+        assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
+    }
+
+    @Test
+    void defaultFs3xCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
+            throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("--color=no")
+                        .stdoutConsumer(stdout)
+                        .build()));
+        assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
     @Test
@@ -180,12 +290,12 @@ public abstract class MavenExecutorTestSupport {
             }
             """;
 
-    protected void execute(Path logFile, Collection<ExecutorRequest> requests) throws Exception {
+    protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
         try (Executor invoker = createExecutor()) {
             for (ExecutorRequest request : requests) {
                 int exitCode = invoker.execute(request);
                 if (exitCode != 0) {
-                    throw new FailedExecution(request, exitCode, Files.readString(logFile));
+                    throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));
                 }
             }
         }

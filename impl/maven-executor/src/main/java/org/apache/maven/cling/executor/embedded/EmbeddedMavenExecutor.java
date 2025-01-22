@@ -21,9 +21,9 @@ package org.apache.maven.cling.executor.embedded;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,8 +56,13 @@ import static java.util.Objects.requireNonNull;
  * long as instance of this class is not closed. Subsequent execution requests over same installation home are cached.
  */
 public class EmbeddedMavenExecutor implements Executor {
-    protected static final Map<String, String> MAIN_CLASSES =
-            Map.of("mvn", "org.apache.maven.cling.MavenCling", "mvnenc", "org.apache.maven.cling.MavenEncCling");
+    protected static final Map<String, String> MAIN_CLASSES = Map.of(
+            "mvn",
+            "org.apache.maven.cling.MavenCling",
+            "mvnenc",
+            "org.apache.maven.cling.MavenEncCling",
+            "mvnsh",
+            "org.apache.maven.cling.MavenShellCling");
 
     protected static final class Context {
         private final URLClassLoader bootClassLoader;
@@ -144,12 +149,6 @@ public class EmbeddedMavenExecutor implements Executor {
 
         Thread.currentThread().setContextClassLoader(context.tccl);
         try {
-            if (executorRequest.stdoutConsumer().isPresent()) {
-                System.setOut(new PrintStream(executorRequest.stdoutConsumer().get(), true));
-            }
-            if (executorRequest.stderrConsumer().isPresent()) {
-                System.setErr(new PrintStream(executorRequest.stderrConsumer().get(), true));
-            }
             return context.exec.apply(executorRequest);
         } catch (Exception e) {
             throw new ExecutorException("Failed to execute", e);
@@ -274,39 +273,47 @@ public class EmbeddedMavenExecutor implements Executor {
                 Method doMain = cliClass.getMethod("doMain", parameterTypes);
                 exec = r -> {
                     System.setProperties(prepareProperties(r));
+                    InputStream originalInputStream = System.in;
+                    r.stdinProvider().ifPresent(System::setIn);
                     try {
                         ArrayList<String> args = new ArrayList<>(mavenArgs);
                         args.addAll(r.arguments());
+                        PrintStream stdout = r.stdoutConsumer().isEmpty()
+                                ? null
+                                : new PrintStream(r.stdoutConsumer().orElseThrow(), true);
+                        PrintStream stderr = r.stderrConsumer().isEmpty()
+                                ? null
+                                : new PrintStream(r.stderrConsumer().orElseThrow(), true);
                         return (int) doMain.invoke(mavenCli, new Object[] {
-                            args.toArray(new String[0]), r.cwd().toString(), null, null
+                            args.toArray(new String[0]), r.cwd().toString(), stdout, stderr
                         });
                     } catch (Exception e) {
                         throw new ExecutorException("Failed to execute", e);
+                    } finally {
+                        System.setIn(originalInputStream);
                     }
                 };
             } else {
                 // assume 4.x
-                Method mainMethod = cliClass.getMethod("main", String[].class, classWorld.getClass());
-                Class<?> ansiConsole = cliClass.getClassLoader().loadClass("org.jline.jansi.AnsiConsole");
-                Field ansiConsoleInstalled = ansiConsole.getDeclaredField("installed");
-                ansiConsoleInstalled.setAccessible(true);
+                Method mainMethod = cliClass.getMethod(
+                        "main",
+                        String[].class,
+                        classWorld.getClass(),
+                        InputStream.class,
+                        OutputStream.class,
+                        OutputStream.class);
                 exec = r -> {
                     System.setProperties(prepareProperties(r));
                     try {
-                        try {
-                            if (r.stdoutConsumer().isPresent()
-                                    || r.stderrConsumer().isPresent()) {
-                                ansiConsoleInstalled.set(null, 1);
-                            }
-                            ArrayList<String> args = new ArrayList<>(mavenArgs);
-                            args.addAll(r.arguments());
-                            return (int) mainMethod.invoke(null, args.toArray(new String[0]), classWorld);
-                        } finally {
-                            if (r.stdoutConsumer().isPresent()
-                                    || r.stderrConsumer().isPresent()) {
-                                ansiConsoleInstalled.set(null, 0);
-                            }
-                        }
+                        ArrayList<String> args = new ArrayList<>(mavenArgs);
+                        args.addAll(r.arguments());
+                        return (int) mainMethod.invoke(
+                                null,
+                                args.toArray(new String[0]),
+                                classWorld,
+                                r.stdinProvider().orElse(System.in),
+                                r.stdoutConsumer().orElse(System.out),
+                                r.stderrConsumer().orElse(System.err));
                     } catch (Exception e) {
                         throw new ExecutorException("Failed to execute", e);
                     }
@@ -338,10 +345,6 @@ public class EmbeddedMavenExecutor implements Executor {
                 "maven.multiModuleProjectDirectory", request.cwd().toString());
         String mainClass = requireNonNull(MAIN_CLASSES.get(request.command()), "mainClass");
         properties.setProperty("maven.mainClass", mainClass);
-        properties.setProperty(
-                "library.jline.path", mavenHome.resolve("lib/jline-native").toString());
-        // TODO: is this needed?
-        properties.setProperty("org.jline.terminal.provider", "dumb");
 
         if (request.jvmSystemProperties().isPresent()) {
             properties.putAll(request.jvmSystemProperties().get());

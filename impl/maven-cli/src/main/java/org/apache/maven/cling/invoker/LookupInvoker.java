@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -80,7 +81,6 @@ import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.slf4j.LoggerFactory;
@@ -257,35 +257,42 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void createTerminal(C context) {
+        Options options = context.invokerRequest.options();
+        boolean stdStreamsRedirected = context.invokerRequest.in().isPresent()
+                || context.invokerRequest.out().isPresent()
+                || context.invokerRequest.err().isPresent();
+        boolean colorWanted = Objects.requireNonNullElse(
+                context.coloredOutput,
+                options.logFile().isEmpty() && options.nonInteractive().isEmpty());
         if (context.terminal == null) {
             MessageUtils.systemInstall(
                     builder -> {
-                        builder.streams(
-                                context.invokerRequest.in().orElse(null),
-                                context.invokerRequest.out().orElse(null));
-                        builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
-                        // The exec builder suffers from https://github.com/jline/jline3/issues/1098
-                        // We could re-enable it when fixed to provide support for non-standard architectures,
-                        // for which JLine does not provide any native library.
-                        builder.exec(false);
-                        if (context.coloredOutput != null) {
-                            builder.color(context.coloredOutput);
+                        if (stdStreamsRedirected) {
+                            builder.system(false);
+                            builder.jni(false);
+                            builder.exec(true);
+
+                            builder.streams(
+                                    context.invokerRequest.in().orElse(System.in),
+                                    context.invokerRequest.out().orElse(System.out));
+                        } else {
+                            builder.system(true);
+                            builder.jni(true);
+                            builder.exec(false);
                         }
+                        builder.color(colorWanted);
                     },
                     terminal -> doConfigureWithTerminal(context, terminal));
 
             context.terminal = MessageUtils.getTerminal();
+            context.closeables.add(context.terminal);
             // JLine is quite slow to start due to the native library unpacking and loading
             // so boot it asynchronously
             context.closeables.add(MessageUtils::systemUninstall);
+            MessageUtils.setColorEnabled(colorWanted);
             MessageUtils.registerShutdownHook(); // safety belt
-            if (context.coloredOutput != null) {
-                MessageUtils.setColorEnabled(context.coloredOutput);
-            }
         } else {
-            if (context.coloredOutput != null) {
-                MessageUtils.setColorEnabled(context.coloredOutput);
-            }
+            doConfigureWithTerminal(context, context.terminal);
         }
     }
 

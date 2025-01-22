@@ -62,6 +62,12 @@ under the License.
       <classifier>bin</classifier>
       <type>zip</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 

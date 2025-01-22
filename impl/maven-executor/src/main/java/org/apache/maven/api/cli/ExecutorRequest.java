@@ -19,6 +19,7 @@
 package org.apache.maven.api.cli;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -118,6 +119,14 @@ public interface ExecutorRequest {
     Optional<List<String>> jvmArguments();
 
     /**
+     * Optional provider for STD in of the Maven. If given, this provider will be piped into std input of
+     * Maven.
+     *
+     * @return an Optional containing the stdin provider, or empty if not specified.
+     */
+    Optional<InputStream> stdinProvider();
+
+    /**
      * Optional consumer for STD out of the Maven. If given, this consumer will get all output from the std out of
      * Maven. Note: whether consumer gets to consume anything depends on invocation arguments passed in
      * {@link #arguments()}, as if log file is set, not much will go to stdout.
@@ -149,6 +158,7 @@ public interface ExecutorRequest {
                 jvmSystemProperties().orElse(null),
                 environmentVariables().orElse(null),
                 jvmArguments().orElse(null),
+                stdinProvider().orElse(null),
                 stdoutConsumer().orElse(null),
                 stderrConsumer().orElse(null));
     }
@@ -171,6 +181,7 @@ public interface ExecutorRequest {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 
@@ -183,6 +194,7 @@ public interface ExecutorRequest {
         private Map<String, String> jvmSystemProperties;
         private Map<String, String> environmentVariables;
         private List<String> jvmArguments;
+        private InputStream stdinProvider;
         private OutputStream stdoutConsumer;
         private OutputStream stderrConsumer;
 
@@ -198,6 +210,7 @@ public interface ExecutorRequest {
                 Map<String, String> jvmSystemProperties,
                 Map<String, String> environmentVariables,
                 List<String> jvmArguments,
+                InputStream stdinProvider,
                 OutputStream stdoutConsumer,
                 OutputStream stderrConsumer) {
             this.command = command;
@@ -208,6 +221,7 @@ public interface ExecutorRequest {
             this.jvmSystemProperties = jvmSystemProperties;
             this.environmentVariables = environmentVariables;
             this.jvmArguments = jvmArguments;
+            this.stdinProvider = stdinProvider;
             this.stdoutConsumer = stdoutConsumer;
             this.stderrConsumer = stderrConsumer;
         }
@@ -301,6 +315,11 @@ public interface ExecutorRequest {
             return this;
         }
 
+        public Builder stdinProvider(InputStream stdinProvider) {
+            this.stdinProvider = stdinProvider;
+            return this;
+        }
+
         @Nonnull
         public Builder stdoutConsumer(OutputStream stdoutConsumer) {
             this.stdoutConsumer = stdoutConsumer;
@@ -324,6 +343,7 @@ public interface ExecutorRequest {
                     jvmSystemProperties,
                     environmentVariables,
                     jvmArguments,
+                    stdinProvider,
                     stdoutConsumer,
                     stderrConsumer);
         }
@@ -337,6 +357,7 @@ public interface ExecutorRequest {
             private final Map<String, String> jvmSystemProperties;
             private final Map<String, String> environmentVariables;
             private final List<String> jvmArguments;
+            private final InputStream inputStream;
             private final OutputStream stdoutConsumer;
             private final OutputStream stderrConsumer;
 
@@ -350,6 +371,7 @@ public interface ExecutorRequest {
                     Map<String, String> jvmSystemProperties,
                     Map<String, String> environmentVariables,
                     List<String> jvmArguments,
+                    InputStream inputStream,
                     OutputStream stdoutConsumer,
                     OutputStream stderrConsumer) {
                 this.command = requireNonNull(command);
@@ -360,6 +382,7 @@ public interface ExecutorRequest {
                 this.jvmSystemProperties = jvmSystemProperties != null ? Map.copyOf(jvmSystemProperties) : null;
                 this.environmentVariables = environmentVariables != null ? Map.copyOf(environmentVariables) : null;
                 this.jvmArguments = jvmArguments != null ? List.copyOf(jvmArguments) : null;
+                this.inputStream = inputStream;
                 this.stdoutConsumer = stdoutConsumer;
                 this.stderrConsumer = stderrConsumer;
             }
@@ -402,6 +425,11 @@ public interface ExecutorRequest {
             @Override
             public Optional<List<String>> jvmArguments() {
                 return Optional.ofNullable(jvmArguments);
+            }
+
+            @Override
+            public Optional<InputStream> stdinProvider() {
+                return Optional.ofNullable(inputStream);
             }
 
             @Override

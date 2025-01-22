@@ -87,19 +87,23 @@ public class ForkedMavenExecutor implements Executor {
 
     @Nullable
     protected Consumer<Process> wrapStdouterrConsumer(ExecutorRequest executorRequest) {
-        if (executorRequest.stdoutConsumer().isEmpty()
+        if (executorRequest.stdinProvider().isEmpty()
+                && executorRequest.stdoutConsumer().isEmpty()
                 && executorRequest.stderrConsumer().isEmpty()) {
             return null;
         } else {
             return p -> {
                 try {
+                    if (executorRequest.stdinProvider().isPresent()) {
+                        executorRequest.stdinProvider().orElseThrow().transferTo(p.getOutputStream());
+                    }
                     if (executorRequest.stdoutConsumer().isPresent()) {
                         p.getInputStream()
-                                .transferTo(executorRequest.stdoutConsumer().get());
+                                .transferTo(executorRequest.stdoutConsumer().orElseThrow());
                     }
                     if (executorRequest.stderrConsumer().isPresent()) {
                         p.getErrorStream()
-                                .transferTo(executorRequest.stderrConsumer().get());
+                                .transferTo(executorRequest.stderrConsumer().orElseThrow());
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);

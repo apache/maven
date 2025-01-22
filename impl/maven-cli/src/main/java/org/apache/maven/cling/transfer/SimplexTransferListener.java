@@ -76,7 +76,7 @@ public final class SimplexTransferListener extends AbstractTransferListener {
         this.blockOnLastEvent = blockOnLastEvent;
 
         this.eventQueue = new ArrayBlockingQueue<>(queueSize);
-        Thread updater = new Thread(this::feedConsumer);
+        Thread updater = new Thread(this::feedConsumer, "simplex-feed-consumer");
         updater.setDaemon(true);
         updater.start();
     }
