@@ -36,7 +36,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
 import org.apache.maven.model.v4.MavenStaxWriter;
@@ -77,8 +76,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
             // If there is no build POM there is no reason to inject artifacts for the consumer POM.
             return;
         }
-        boolean isModel40 = ModelBuilder.MODEL_VERSION_4_0_0.equals(project.getModelVersion());
-        if (Features.consumerPom(session.getUserProperties(), !isModel40)) {
+        if (Features.consumerPom(session.getUserProperties(), true)) {
             Path buildDir =
                     project.getBuild() != null ? Paths.get(project.getBuild().getDirectory()) : null;
             if (buildDir != null) {
