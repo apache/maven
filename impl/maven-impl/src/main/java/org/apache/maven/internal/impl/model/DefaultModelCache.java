@@ -18,11 +18,12 @@
  */
 package org.apache.maven.internal.impl.model;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.model.ModelCache;
 
@@ -46,8 +47,15 @@ public class DefaultModelCache implements ModelCache {
 
     @Override
     @SuppressWarnings({"unchecked"})
-    public <T> T computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<T> data) {
-        return (T) computeIfAbsent(new GavCacheKey(groupId, artifactId, version, tag), data);
+    public <T> T computeIfAbsent(
+            List<RemoteRepository> repositories,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String tag,
+            Supplier<T> data) {
+        return (T) computeIfAbsent(new RgavCacheKey(repositories, groupId, artifactId, version, classifier, tag), data);
     }
 
     @Override
@@ -65,26 +73,19 @@ public class DefaultModelCache implements ModelCache {
         return cache.computeIfAbsent(key, k -> new CachingSupplier<>(data)).get();
     }
 
-    static class GavCacheKey {
+    record RgavCacheKey(
+            List<RemoteRepository> repositories,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String tag) {
 
-        private final String gav;
-
-        private final String tag;
-
-        private final int hash;
-
-        GavCacheKey(String groupId, String artifactId, String version, String tag) {
-            this(gav(groupId, artifactId, version), tag);
-        }
-
-        GavCacheKey(String gav, String tag) {
-            this.gav = gav;
-            this.tag = tag;
-            this.hash = Objects.hash(gav, tag);
-        }
-
-        private static String gav(String groupId, String artifactId, String version) {
+        @Override
+        public String toString() {
             StringBuilder sb = new StringBuilder();
+            sb.append("GavCacheKey[");
+            sb.append("gav='");
             if (groupId != null) {
                 sb.append(groupId);
             }
@@ -96,71 +97,28 @@ public class DefaultModelCache implements ModelCache {
             if (version != null) {
                 sb.append(version);
             }
+            sb.append(":");
+            if (classifier != null) {
+                sb.append(classifier);
+            }
+            sb.append("', tag='");
+            sb.append(tag);
+            sb.append("']");
             return sb.toString();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (null == obj || !getClass().equals(obj.getClass())) {
-                return false;
-            }
-            GavCacheKey that = (GavCacheKey) obj;
-            return Objects.equals(this.gav, that.gav) && Objects.equals(this.tag, that.tag);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        @Override
-        public String toString() {
-            return "GavCacheKey[" + "gav='" + gav + '\'' + ", tag='" + tag + '\'' + ']';
         }
     }
 
-    private static final class SourceCacheKey {
-        private final Source source;
-
-        private final String tag;
-
-        private final int hash;
-
-        SourceCacheKey(Source source, String tag) {
-            this.source = source;
-            this.tag = tag;
-            this.hash = Objects.hash(source, tag);
-        }
+    record SourceCacheKey(Source source, String tag) {
 
         @Override
         public String toString() {
             return "SourceCacheKey[" + "location=" + source.getLocation() + ", tag=" + tag + ", path="
                     + source.getPath() + ']';
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (null == obj || !getClass().equals(obj.getClass())) {
-                return false;
-            }
-            SourceCacheKey that = (SourceCacheKey) obj;
-            return Objects.equals(this.source, that.source) && Objects.equals(this.tag, that.tag);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
     }
 
     static class CachingSupplier<T> implements Supplier<T> {
-        final Supplier<T> supplier;
+        Supplier<T> supplier;
         volatile Object value;
 
         CachingSupplier(Supplier<T> supplier) {
@@ -176,6 +134,7 @@ public class DefaultModelCache implements ModelCache {
                     if ((v = value) == null) {
                         try {
                             v = value = supplier.get();
+                            supplier = null;
                         } catch (Exception e) {
                             v = value = new AltRes(e);
                         }
