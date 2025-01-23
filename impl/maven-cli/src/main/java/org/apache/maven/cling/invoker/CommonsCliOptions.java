@@ -37,7 +37,7 @@ import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.jline.MessageUtils;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.cling.invoker.Utils.toMap;
+import static org.apache.maven.cling.invoker.InvokerUtils.toMap;
 
 public abstract class CommonsCliOptions implements Options {
 

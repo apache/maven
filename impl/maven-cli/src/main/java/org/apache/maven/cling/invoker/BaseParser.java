@@ -33,10 +33,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
@@ -45,6 +47,7 @@ import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cling.props.MavenPropertiesLoader;
 import org.apache.maven.cling.utils.CLIReportingUtils;
@@ -52,13 +55,24 @@ import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.cling.invoker.Utils.getCanonicalPath;
-import static org.apache.maven.cling.invoker.Utils.or;
-import static org.apache.maven.cling.invoker.Utils.prefix;
-import static org.apache.maven.cling.invoker.Utils.stripLeadingAndTrailingQuotes;
-import static org.apache.maven.cling.invoker.Utils.toMap;
+import static org.apache.maven.cling.invoker.InvokerUtils.getCanonicalPath;
+import static org.apache.maven.cling.invoker.InvokerUtils.or;
+import static org.apache.maven.cling.invoker.InvokerUtils.prefix;
+import static org.apache.maven.cling.invoker.InvokerUtils.toMap;
 
 public abstract class BaseParser implements Parser {
+
+    @Nullable
+    private static Path findRoot(Path topDirectory) {
+        // TODO is this OK? Tracing through the code it looks like topDirectory is nullable
+        requireNonNull(topDirectory, "topDirectory");
+        Path rootDirectory =
+                ServiceLoader.load(RootLocator.class).iterator().next().findRoot(topDirectory);
+        if (rootDirectory != null) {
+            return getCanonicalPath(rootDirectory);
+        }
+        return null;
+    }
 
     @SuppressWarnings("VisibilityModifier")
     public static class LocalContext {
@@ -185,6 +199,19 @@ public abstract class BaseParser implements Parser {
         }
     }
 
+    @Nonnull
+    private static String stripLeadingAndTrailingQuotes(String str) {
+        requireNonNull(str, "str");
+        final int length = str.length();
+        if (length > 1
+                && str.startsWith("\"")
+                && str.endsWith("\"")
+                && str.substring(1, length - 1).indexOf('"') == -1) {
+            str = str.substring(1, length - 1);
+        }
+        return str;
+    }
+
     protected Path getTopDirectory(LocalContext context) throws ParserException {
         // We need to locate the top level project which may be pointed at using
         // the -f/--file option.
@@ -217,7 +244,7 @@ public abstract class BaseParser implements Parser {
 
     @Nullable
     protected Path getRootDirectory(LocalContext context) throws ParserException {
-        return Utils.findRoot(context.topDirectory);
+        return findRoot(context.topDirectory);
     }
 
     protected Map<String, String> populateSystemProperties(LocalContext context) throws ParserException {

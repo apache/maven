@@ -20,42 +20,29 @@ package org.apache.maven.cling.invoker;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
-import java.util.ServiceLoader;
 import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.Interpolator;
-import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.codehaus.plexus.interpolation.AbstractValueSource;
+import org.codehaus.plexus.interpolation.BasicInterpolator;
+import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Various utilities, mostly to bridge "old" and "new" stuff, like Properties vs Maps, File vs Paths, etc.
+ * Various internal utilities used in org.apache.maven.cling.invoker and its subpackages.
+ * Not documented, tested, or intended for external uses.
  */
-public final class Utils {
-    private Utils() {}
-
-    @Nonnull
-    public static String stripLeadingAndTrailingQuotes(String str) {
-        requireNonNull(str, "str");
-        final int length = str.length();
-        if (length > 1
-                && str.startsWith("\"")
-                && str.endsWith("\"")
-                && str.substring(1, length - 1).indexOf('"') == -1) {
-            str = str.substring(1, length - 1);
-        }
-        return str;
-    }
+public final class InvokerUtils {
+    private InvokerUtils() {}
 
     @Nonnull
     public static Path getCanonicalPath(Path path) {
@@ -68,7 +55,7 @@ public final class Utils {
     }
 
     @Nonnull
-    public static Map<String, String> toMap(Properties properties) {
+    static Map<String, String> toMap(Properties properties) {
         requireNonNull(properties, "properties");
         HashMap<String, String> map = new HashMap<>();
         for (String key : properties.stringPropertyNames()) {
@@ -78,13 +65,21 @@ public final class Utils {
     }
 
     @Nonnull
-    public static Properties toProperties(Map<String, String> properties) {
-        requireNonNull(properties, "properties");
-        Properties map = new Properties();
-        for (String key : properties.keySet()) {
-            map.put(key, properties.get(key));
-        }
-        return map;
+    public static BasicInterpolator createInterpolator(Collection<Map<String, String>> properties) {
+        StringSearchInterpolator interpolator = new StringSearchInterpolator();
+        interpolator.addValueSource(new AbstractValueSource(false) {
+            @Override
+            public Object getValue(String expression) {
+                for (Map<String, String> props : properties) {
+                    String val = props.get(expression);
+                    if (val != null) {
+                        return val;
+                    }
+                }
+                return null;
+            }
+        });
+        return interpolator;
     }
 
     @Nonnull
@@ -117,40 +112,13 @@ public final class Utils {
         };
     }
 
-    public static int toMavenExecutionRequestLoggingLevel(Slf4jConfiguration.Level level) {
-        requireNonNull(level, "level");
-        return switch (level) {
-            case DEBUG -> MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
-            case INFO -> MavenExecutionRequest.LOGGING_LEVEL_INFO;
-            case ERROR -> MavenExecutionRequest.LOGGING_LEVEL_ERROR;
-        };
-    }
-
-    public static int toPlexusLoggingLevel(Slf4jConfiguration.Level level) {
+    @Nonnull
+    static int toPlexusLoggingLevel(Slf4jConfiguration.Level level) {
         requireNonNull(level, "level");
         return switch (level) {
             case DEBUG -> Logger.LEVEL_DEBUG;
             case INFO -> Logger.LEVEL_INFO;
             case ERROR -> Logger.LEVEL_ERROR;
         };
-    }
-
-    @Nullable
-    public static Path findRoot(Path topDirectory) {
-        requireNonNull(topDirectory, "topDirectory");
-        Path rootDirectory =
-                ServiceLoader.load(RootLocator.class).iterator().next().findRoot(topDirectory);
-        if (rootDirectory != null) {
-            return getCanonicalPath(rootDirectory);
-        }
-        return null;
-    }
-
-    @Nonnull
-    public static Path findMandatoryRoot(Path topDirectory) {
-        requireNonNull(topDirectory, "topDirectory");
-        return getCanonicalPath(Optional.ofNullable(
-                        ServiceLoader.load(RootLocator.class).iterator().next().findMandatoryRoot(topDirectory))
-                .orElseThrow());
     }
 }
