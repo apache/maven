@@ -37,6 +37,7 @@ import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.impl.DefaultNode;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyNode;
 

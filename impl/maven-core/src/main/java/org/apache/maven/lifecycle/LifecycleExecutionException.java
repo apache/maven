@@ -20,7 +20,7 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.internal.impl.DefaultMessageBuilderFactory;
+import org.apache.maven.impl.DefaultMessageBuilderFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 

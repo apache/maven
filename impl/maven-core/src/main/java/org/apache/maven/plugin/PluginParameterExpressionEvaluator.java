@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.model.reflection.ReflectionValueExtractor;
+import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;

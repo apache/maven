@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.impl.DefaultMessageBuilderFactory;
+import org.apache.maven.impl.DefaultMessageBuilderFactory;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;

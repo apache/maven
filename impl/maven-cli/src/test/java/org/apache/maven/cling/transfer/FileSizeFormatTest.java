@@ -22,7 +22,7 @@ import java.util.Locale;
 
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.cling.transfer.FileSizeFormat.ScaleUnit;
-import org.apache.maven.internal.impl.DefaultMessageBuilder;
+import org.apache.maven.impl.DefaultMessageBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

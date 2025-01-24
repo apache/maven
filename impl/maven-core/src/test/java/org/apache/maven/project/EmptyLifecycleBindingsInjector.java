@@ -38,7 +38,7 @@ import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.PackagingRegistry;
-import org.apache.maven.internal.impl.model.DefaultLifecycleBindingsInjector;
+import org.apache.maven.impl.model.DefaultLifecycleBindingsInjector;
 
 import static org.apache.maven.api.Lifecycle.DEFAULT;
 

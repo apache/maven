@@ -31,7 +31,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.resolver.MavenWorkspaceReader;
+import org.apache.maven.impl.resolver.MavenWorkspaceReader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.junit.jupiter.api.Test;
