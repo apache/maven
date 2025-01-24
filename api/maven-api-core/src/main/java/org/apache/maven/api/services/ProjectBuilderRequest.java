@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.RemoteRepository;
@@ -186,6 +187,22 @@ public interface ProjectBuilderRequest extends Request<Session> {
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultProjectBuilderRequest that
+                        && allowStubModel == that.allowStubModel
+                        && recursive == that.recursive
+                        && processPlugins == that.processPlugins
+                        && Objects.equals(path, that.path)
+                        && Objects.equals(source, that.source)
+                        && Objects.equals(repositories, that.repositories);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(path, source, allowStubModel, recursive, processPlugins, repositories);
             }
 
             @Override

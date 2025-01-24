@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Dependency;
@@ -299,6 +300,36 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             @Override
             public Collection<Exclusion> getExclusions() {
                 return exclusions;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultDependencyCoordinatesFactoryRequest that
+                        && optional == that.optional
+                        && Objects.equals(groupId, that.groupId)
+                        && Objects.equals(artifactId, that.artifactId)
+                        && Objects.equals(version, that.version)
+                        && Objects.equals(classifier, that.classifier)
+                        && Objects.equals(extension, that.extension)
+                        && Objects.equals(type, that.type)
+                        && Objects.equals(coordinateString, that.coordinateString)
+                        && Objects.equals(scope, that.scope)
+                        && Objects.equals(exclusions, that.exclusions);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(
+                        groupId,
+                        artifactId,
+                        version,
+                        classifier,
+                        extension,
+                        type,
+                        coordinateString,
+                        scope,
+                        optional,
+                        exclusions);
             }
 
             @Override

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -497,6 +498,36 @@ public interface DependencyResolverRequest extends Request<Session> {
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultDependencyResolverRequest that
+                        && verbose == that.verbose
+                        && requestType == that.requestType
+                        && Objects.equals(project, that.project)
+                        && Objects.equals(rootArtifact, that.rootArtifact)
+                        && Objects.equals(root, that.root)
+                        && Objects.equals(dependencies, that.dependencies)
+                        && Objects.equals(managedDependencies, that.managedDependencies)
+                        && Objects.equals(pathScope, that.pathScope)
+                        && Objects.equals(pathTypeFilter, that.pathTypeFilter)
+                        && Objects.equals(repositories, that.repositories);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(
+                        requestType,
+                        project,
+                        rootArtifact,
+                        root,
+                        dependencies,
+                        managedDependencies,
+                        verbose,
+                        pathScope,
+                        pathTypeFilter,
+                        repositories);
             }
 
             @Override
