@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.RemoteRepository;
@@ -139,6 +140,18 @@ public interface ArtifactResolverRequest extends Request<Session> {
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultArtifactResolverRequest that
+                        && Objects.equals(coordinates, that.coordinates)
+                        && Objects.equals(repositories, that.repositories);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(coordinates, repositories);
             }
 
             @Override

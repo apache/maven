@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.Objects;
+
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -196,6 +198,22 @@ public interface ArtifactFactoryRequest extends Request<Session> {
             @Override
             public String getType() {
                 return type;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultArtifactFactoryRequest that
+                        && Objects.equals(groupId, that.groupId)
+                        && Objects.equals(artifactId, that.artifactId)
+                        && Objects.equals(version, that.version)
+                        && Objects.equals(classifier, that.classifier)
+                        && Objects.equals(extension, that.extension)
+                        && Objects.equals(type, that.type);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(groupId, artifactId, version, classifier, extension, type);
             }
 
             @Override

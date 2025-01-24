@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.PathScope;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.junit.jupiter.api.Test;
@@ -59,6 +60,11 @@ class RequestImplementationTest {
                 .repositories(repositories1)
                 .build();
 
+        // Test equals and hashCode
+        assertEquals(request1, request2);
+        assertEquals(request1.hashCode(), request2.hashCode());
+        assertNotEquals(request1, request3);
+
         // Test toString
         String toString = request1.toString();
         assertTrue(toString.contains("coordinates="));
@@ -75,5 +81,34 @@ class RequestImplementationTest {
 
         assertEquals(trace, request.getTrace());
         assertEquals(session, request.getSession());
+    }
+
+    @Test
+    void testDependencyResolverRequestEquality() {
+        Session session = mock(Session.class);
+
+        DependencyResolverRequest.DependencyResolverRequestBuilder builder = DependencyResolverRequest.builder();
+        DependencyResolverRequest request1 = builder.session(session)
+                .requestType(DependencyResolverRequest.RequestType.COLLECT)
+                .pathScope(PathScope.MAIN_COMPILE)
+                .build();
+
+        DependencyResolverRequest request2 = builder.session(session)
+                .requestType(DependencyResolverRequest.RequestType.COLLECT)
+                .pathScope(PathScope.MAIN_COMPILE)
+                .build();
+
+        DependencyResolverRequest request3 = builder.session(session)
+                .requestType(DependencyResolverRequest.RequestType.RESOLVE)
+                .pathScope(PathScope.MAIN_COMPILE)
+                .build();
+
+        assertEquals(request1, request2);
+        assertEquals(request1.hashCode(), request2.hashCode());
+        assertNotEquals(request1, request3);
+
+        String toString = request1.toString();
+        assertTrue(toString.contains("requestType="));
+        assertTrue(toString.contains("pathScope="));
     }
 }

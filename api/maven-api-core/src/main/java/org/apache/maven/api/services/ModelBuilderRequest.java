@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -400,6 +401,40 @@ public interface ModelBuilderRequest extends Request<Session> {
             @Override
             public ModelTransformer getLifecycleBindingsInjector() {
                 return lifecycleBindingsInjector;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultModelBuilderRequest that
+                        && locationTracking == that.locationTracking
+                        && recursive == that.recursive
+                        && requestType == that.requestType
+                        && Objects.equals(source, that.source)
+                        && Objects.equals(profiles, that.profiles)
+                        && Objects.equals(activeProfileIds, that.activeProfileIds)
+                        && Objects.equals(inactiveProfileIds, that.inactiveProfileIds)
+                        && Objects.equals(systemProperties, that.systemProperties)
+                        && Objects.equals(userProperties, that.userProperties)
+                        && repositoryMerging == that.repositoryMerging
+                        && Objects.equals(repositories, that.repositories)
+                        && Objects.equals(lifecycleBindingsInjector, that.lifecycleBindingsInjector);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(
+                        requestType,
+                        locationTracking,
+                        recursive,
+                        source,
+                        profiles,
+                        activeProfileIds,
+                        inactiveProfileIds,
+                        systemProperties,
+                        userProperties,
+                        repositoryMerging,
+                        repositories,
+                        lifecycleBindingsInjector);
             }
 
             @Override

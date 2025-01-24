@@ -79,6 +79,27 @@ public interface Request<S extends ProtoSession> {
     RequestTrace getTrace();
 
     /**
+     * Returns a hashcode value for this request, based on all significant fields.
+     * Implementations must ensure that if two requests are equal according to
+     * {@link #equals(Object)}, they have the same hashcode.
+     *
+     * @return a hash code value for this request
+     */
+    @Override
+    int hashCode();
+
+    /**
+     * Returns {@code true} if the specified object is equal to this request.
+     * Two requests are considered equal if they have the same type and all
+     * significant fields are equal.
+     *
+     * @param obj the object to compare with this request
+     * @return {@code true} if the objects are equal, {@code false} otherwise
+     */
+    @Override
+    boolean equals(Object obj);
+
+    /**
      * Returns a string representation of this request, used for debugging and logging purposes.
      * The format should include the request type and any significant attributes that define the
      * request's state.
