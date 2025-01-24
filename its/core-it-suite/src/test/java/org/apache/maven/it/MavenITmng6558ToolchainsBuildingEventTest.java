@@ -65,7 +65,7 @@ public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenInte
         assertTrue(
                 lines.contains(
                         matchesVersionRange("[4.0.0-beta-5,)")
-                                ? "event: org.apache.maven.internal.impl.DefaultToolchainsBuilder$DefaultToolchainsBuilderResult"
+                                ? "event: org.apache.maven.impl.DefaultToolchainsBuilder$DefaultToolchainsBuilderResult"
                                 : "event: org.apache.maven.toolchain.building.DefaultToolchainsBuildingResult"),
                 lines.toString());
     }

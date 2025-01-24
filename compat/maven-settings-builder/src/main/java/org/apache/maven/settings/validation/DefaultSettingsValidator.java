@@ -36,7 +36,7 @@ import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 
 /**
- * @deprecated since 4.0.0, use {@link org.apache.maven.internal.impl.DefaultSettingsValidator} instead
+ * @deprecated since 4.0.0, use {@link org.apache.maven.impl.DefaultSettingsValidator} instead
  */
 @Named
 @Singleton

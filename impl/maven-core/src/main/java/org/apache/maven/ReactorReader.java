@@ -48,7 +48,7 @@ import org.apache.maven.api.services.Lookup;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.resolver.MavenWorkspaceReader;
+import org.apache.maven.impl.resolver.MavenWorkspaceReader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.artifact.Artifact;

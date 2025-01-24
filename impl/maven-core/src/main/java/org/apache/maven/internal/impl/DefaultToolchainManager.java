@@ -32,6 +32,7 @@ import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.services.ToolchainManager;
 import org.apache.maven.api.services.ToolchainManagerException;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.impl.MappedList;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.ToolchainPrivate;

@@ -21,7 +21,7 @@ package org.apache.maven.project;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
+import org.apache.maven.impl.resolver.DefaultModelResolver;
 
 @Named
 @Singleton

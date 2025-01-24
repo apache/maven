@@ -33,10 +33,11 @@ import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.impl.DefaultArtifact;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import static org.apache.maven.impl.Utils.nonNull;
 
 @Named
 @Typed

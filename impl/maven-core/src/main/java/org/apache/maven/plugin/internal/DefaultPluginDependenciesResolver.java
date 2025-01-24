@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.impl.resolver.RelocatedArtifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -117,9 +118,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
             if (logger.isWarnEnabled() && !result.getRelocations().isEmpty()) {
                 String message =
-                        pluginArtifact instanceof org.apache.maven.internal.impl.resolver.RelocatedArtifact relocated
-                                ? ": " + relocated.getMessage()
-                                : "";
+                        pluginArtifact instanceof RelocatedArtifact relocated ? ": " + relocated.getMessage() : "";
                 logger.warn(
                         "The artifact {} has been relocated to {}{}",
                         result.getRelocations().get(0),

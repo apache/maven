@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
-import org.apache.maven.internal.impl.SettingsUtilsV4;
+import org.apache.maven.impl.SettingsUtilsV4;
 import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;

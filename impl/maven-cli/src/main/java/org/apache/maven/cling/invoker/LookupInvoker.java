@@ -69,7 +69,7 @@ import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.internal.impl.SettingsUtilsV4;
+import org.apache.maven.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.BuildEventListener;
