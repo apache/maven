@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
@@ -220,6 +221,21 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
             @Override
             public Optional<UnaryOperator<String>> getInterpolationSource() {
                 return Optional.ofNullable(interpolationSource);
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultSettingsBuilderRequest that
+                        && Objects.equals(installationSettingsSource, that.installationSettingsSource)
+                        && Objects.equals(projectSettingsSource, that.projectSettingsSource)
+                        && Objects.equals(userSettingsSource, that.userSettingsSource)
+                        && Objects.equals(interpolationSource, that.interpolationSource);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(
+                        installationSettingsSource, projectSettingsSource, userSettingsSource, interpolationSource);
             }
 
             @Override

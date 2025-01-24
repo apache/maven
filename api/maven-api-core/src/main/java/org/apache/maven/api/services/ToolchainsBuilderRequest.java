@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.ProtoSession;
@@ -146,6 +147,18 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
             @Override
             public Optional<Source> getUserToolchainsSource() {
                 return Optional.ofNullable(userToolchainsSource);
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultToolchainsBuilderRequest that
+                        && Objects.equals(installationToolchainsSource, that.installationToolchainsSource)
+                        && Objects.equals(userToolchainsSource, that.userToolchainsSource);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(installationToolchainsSource, userToolchainsSource);
             }
 
             @Override
