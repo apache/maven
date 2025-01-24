@@ -61,7 +61,6 @@ public class HelloMojo implements org.apache.maven.api.plugin.Mojo {
         //
         String message = component.hello(name);
         logger.info(message);
-
-
     }
+
 }
