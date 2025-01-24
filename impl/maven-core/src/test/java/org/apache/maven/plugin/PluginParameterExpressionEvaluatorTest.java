@@ -41,7 +41,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.model.reflection.IntrospectionException;
+import org.apache.maven.impl.model.reflection.IntrospectionException;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;

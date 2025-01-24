@@ -27,7 +27,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.impl.model.DefaultInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

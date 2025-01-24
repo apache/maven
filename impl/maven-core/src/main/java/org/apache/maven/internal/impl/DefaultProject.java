@@ -38,11 +38,13 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.impl.MappedCollection;
+import org.apache.maven.impl.MappedList;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import static org.apache.maven.impl.Utils.nonNull;
 
 public class DefaultProject implements Project {
 

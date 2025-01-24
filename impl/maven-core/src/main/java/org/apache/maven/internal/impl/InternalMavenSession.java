@@ -25,8 +25,9 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.impl.InternalSession;
 
-import static org.apache.maven.internal.impl.Utils.cast;
+import static org.apache.maven.impl.Utils.cast;
 
 public interface InternalMavenSession extends InternalSession {
 

@@ -42,6 +42,7 @@ import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.spi.PackagingProvider;
+import org.apache.maven.impl.ExtensibleEnumRegistries;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.lifecycle.mapping.LifecycleMojo;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;

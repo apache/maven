@@ -24,6 +24,8 @@ import java.nio.file.Paths;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.impl.DefaultModelVersionParser;
+import org.apache.maven.impl.DefaultVersionParser;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;

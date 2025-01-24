@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Session;
-import org.apache.maven.internal.impl.di.OutOfScopeException;
+import org.apache.maven.impl.di.OutOfScopeException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;

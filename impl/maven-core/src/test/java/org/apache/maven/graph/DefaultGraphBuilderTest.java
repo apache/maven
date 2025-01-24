@@ -35,7 +35,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
-import org.apache.maven.internal.impl.model.DefaultModelProcessor;
+import org.apache.maven.impl.model.DefaultModelProcessor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.building.Result;

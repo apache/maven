@@ -21,7 +21,7 @@ package org.apache.maven.internal.aether;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
-import org.apache.maven.internal.impl.resolver.type.DefaultType;
+import org.apache.maven.impl.resolver.type.DefaultType;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
