@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.impl.resolver.RelocatedArtifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
@@ -170,10 +171,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                 if (!child.getRelocations().isEmpty()) {
                     org.eclipse.aether.artifact.Artifact artifact =
                             child.getDependency().getArtifact();
-                    String message =
-                            artifact instanceof org.apache.maven.internal.impl.resolver.RelocatedArtifact relocated
-                                    ? relocated.getMessage()
-                                    : null;
+                    String message = artifact instanceof RelocatedArtifact relocated ? relocated.getMessage() : null;
                     logger.warn("The artifact " + child.getRelocations().get(0) + " has been relocated to " + artifact
                             + (message != null ? ": " + message : ""));
                 }
