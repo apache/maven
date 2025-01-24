@@ -67,7 +67,7 @@ public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase
         assertTrue(
                 lines.contains(
                         matchesVersionRange("[4.0.0-beta-5,)")
-                                ? "event: org.apache.maven.internal.impl.DefaultSettingsBuilder$DefaultSettingsBuilderResult"
+                                ? "event: org.apache.maven.impl.DefaultSettingsBuilder$DefaultSettingsBuilderResult"
                                 : "event: org.apache.maven.settings.building.DefaultSettingsBuildingResult"),
                 lines.toString());
         assertTrue(lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionRequest"), lines.toString());
