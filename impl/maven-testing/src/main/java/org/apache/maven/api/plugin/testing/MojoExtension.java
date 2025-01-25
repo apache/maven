@@ -560,9 +560,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                 .filter(e -> e.getChild("artifactId").getValue().equals(artifactId))
                 .findFirst()
                 .flatMap(buildElement -> child(buildElement, "configuration"))
-                .orElseThrow(
-                        () -> new ConfigurationException("Cannot find a configuration element for a plugin with an "
-                                + "artifactId of " + artifactId + "."));
+                .orElse(Xpp3DomBuilder.build(new StringReader("<configuration/>")));
         return pluginConfigurationElement.getDom();
     }
 
