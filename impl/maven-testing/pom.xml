@@ -82,7 +82,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>4.0.0</version>
+      <version>4.0.2</version>
     </dependency>
     <dependency>
       <!-- correct version must be provided by project depends on Maven version -->
