@@ -40,6 +40,9 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.impl.AbstractSession;
+import org.apache.maven.impl.DefaultRemoteRepository;
+import org.apache.maven.impl.PropertiesAsMap;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -48,8 +51,8 @@ import org.apache.maven.rtinfo.RuntimeInformation;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
-import static org.apache.maven.internal.impl.Utils.map;
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import static org.apache.maven.impl.Utils.map;
+import static org.apache.maven.impl.Utils.nonNull;
 
 public class DefaultSession extends AbstractSession implements InternalMavenSession {
 

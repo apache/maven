@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.impl.model.DefaultInterpolator;
 
 /**
  * Enhancement of the standard <code>Properties</code>

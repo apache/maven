@@ -27,7 +27,7 @@ import java.util.Properties;
 
 import org.apache.maven.building.Source;
 import org.apache.maven.building.StringSource;
-import org.apache.maven.internal.impl.DefaultToolchainsXmlFactory;
+import org.apache.maven.impl.DefaultToolchainsXmlFactory;
 import org.apache.maven.toolchain.io.DefaultToolchainsReader;
 import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
 import org.apache.maven.toolchain.io.ToolchainsParseException;

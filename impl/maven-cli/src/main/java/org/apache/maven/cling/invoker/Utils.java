@@ -33,7 +33,7 @@ import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.impl.model.DefaultInterpolator;
 import org.codehaus.plexus.logging.Logger;
 
 import static java.util.Objects.requireNonNull;

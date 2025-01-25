@@ -43,12 +43,14 @@ import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ProjectManager;
+import org.apache.maven.impl.MappedList;
+import org.apache.maven.impl.PropertiesAsMap;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
 
 import static java.util.stream.Collectors.toList;
-import static org.apache.maven.internal.impl.Utils.map;
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import static org.apache.maven.impl.Utils.map;
+import static org.apache.maven.impl.Utils.nonNull;
 
 @Named
 @Typed

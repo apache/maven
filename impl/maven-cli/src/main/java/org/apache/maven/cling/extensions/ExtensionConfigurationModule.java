@@ -26,7 +26,7 @@ import com.google.inject.name.Names;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.v4.MavenTransformer;

@@ -30,10 +30,15 @@ under the License.
 
   <artifactId>maven-builder-support</artifactId>
 
-  <name>Maven Builder Support</name>
+  <name>Maven Builder Support (deprecated)</name>
   <description>Support for descriptor builders (model, setting, toolchains)</description>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>

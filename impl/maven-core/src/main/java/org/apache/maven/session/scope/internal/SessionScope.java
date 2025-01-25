@@ -28,7 +28,7 @@ import com.google.inject.name.Named;
 /**
  * SessionScope
  */
-public class SessionScope extends org.apache.maven.internal.impl.di.SessionScope implements Scope {
+public class SessionScope extends org.apache.maven.impl.di.SessionScope implements Scope {
 
     public <T> void seed(Class<T> clazz, Provider<T> value) {
         getScopeState().seed(clazz, value::get);

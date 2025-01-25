@@ -33,7 +33,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 /**
  * MojoExecutionScope
  */
-public class MojoExecutionScope extends org.apache.maven.internal.impl.di.MojoExecutionScope
+public class MojoExecutionScope extends org.apache.maven.impl.di.MojoExecutionScope
         implements Scope, MojoExecutionListener {
 
     public <T> void seed(Class<T> clazz, Provider<T> value) {

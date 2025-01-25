@@ -39,9 +39,9 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
 
-import static org.apache.maven.internal.impl.StaxLocation.getLocation;
-import static org.apache.maven.internal.impl.StaxLocation.getMessage;
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import static org.apache.maven.impl.StaxLocation.getLocation;
+import static org.apache.maven.impl.StaxLocation.getMessage;
+import static org.apache.maven.impl.Utils.nonNull;
 
 @Named
 @Singleton

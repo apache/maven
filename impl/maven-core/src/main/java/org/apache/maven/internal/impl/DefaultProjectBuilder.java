@@ -41,6 +41,8 @@ import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.ProjectBuilderResult;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.impl.DefaultDependencyResolverResult;
+import org.apache.maven.impl.MappedCollection;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource2;
 import org.apache.maven.project.DefaultProjectBuildingRequest;

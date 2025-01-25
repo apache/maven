@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.UnaryOperator;
 
-import org.apache.maven.internal.impl.model.DefaultInterpolator;
+import org.apache.maven.impl.model.DefaultInterpolator;
 
 @Deprecated
 public class MavenPropertiesLoader {
