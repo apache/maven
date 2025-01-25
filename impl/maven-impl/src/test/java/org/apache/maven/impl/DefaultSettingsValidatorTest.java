@@ -19,6 +19,7 @@
 package org.apache.maven.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ProblemCollector;
@@ -26,6 +27,7 @@ import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.impl.model.DefaultInterpolator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +43,7 @@ class DefaultSettingsValidatorTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        validator = new DefaultSettingsBuilder();
+        validator = new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
     }
 
     @AfterEach

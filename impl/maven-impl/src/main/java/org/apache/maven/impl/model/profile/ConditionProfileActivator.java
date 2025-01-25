@@ -28,12 +28,12 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.BuilderProblem.Severity;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
-import org.apache.maven.impl.model.DefaultInterpolator;
 
 import static org.apache.maven.impl.model.profile.ConditionParser.toBoolean;
 
@@ -47,14 +47,18 @@ public class ConditionProfileActivator implements ProfileActivator {
 
     private final VersionParser versionParser;
 
+    private final Interpolator interpolator;
+
     /**
      * Constructs a new ConditionProfileActivator with the necessary dependencies.
      *
      * @param versionParser The parser for handling version comparisons
+     * @param interpolator  The interpolator for interpolating the values in the given map using the provided callback function
      */
     @Inject
-    public ConditionProfileActivator(VersionParser versionParser) {
+    public ConditionProfileActivator(VersionParser versionParser, Interpolator interpolator) {
         this.versionParser = versionParser;
+        this.interpolator = interpolator;
     }
 
     /**
@@ -106,7 +110,7 @@ public class ConditionProfileActivator implements ProfileActivator {
      * @param versionParser The parser for handling version comparisons
      * @return A map of function names to their implementations
      */
-    public static Map<String, ConditionParser.ExpressionFunction> registerFunctions(
+    public Map<String, ConditionParser.ExpressionFunction> registerFunctions(
             ProfileActivationContext context, VersionParser versionParser) {
         Map<String, ConditionParser.ExpressionFunction> functions = new HashMap<>();
 
@@ -156,9 +160,9 @@ public class ConditionProfileActivator implements ProfileActivator {
      * @return The value of the property, or null if not found
      * @throws IllegalArgumentException if the number of arguments is not exactly one
      */
-    static String property(ProfileActivationContext context, String name) {
+    String property(ProfileActivationContext context, String name) {
         String value = doGetProperty(context, name);
-        return new DefaultInterpolator().interpolate(value, s -> doGetProperty(context, s));
+        return interpolator.interpolate(value, s -> doGetProperty(context, s));
     }
 
     static String doGetProperty(ProfileActivationContext context, String name) {
