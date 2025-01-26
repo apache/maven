@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,13 +30,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Language;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.model.Resource;
@@ -48,7 +48,6 @@ import org.apache.maven.impl.PropertiesAsMap;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
 
-import static java.util.stream.Collectors.toList;
 import static org.apache.maven.impl.Utils.map;
 import static org.apache.maven.impl.Utils.nonNull;
 
@@ -131,30 +130,15 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     public List<Path> getCompileSourceRoots(Project project, ProjectScope scope) {
         MavenProject prj = getMavenProject(nonNull(project, "project"));
-        List<String> roots;
-        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
-            roots = prj.getCompileSourceRoots();
-        } else if (scope == ProjectScope.TEST) {
-            roots = prj.getTestCompileSourceRoots();
-        } else {
-            throw new IllegalArgumentException("Unsupported scope " + scope);
-        }
-        return roots.stream()
-                .map(Paths::get)
-                .collect(Collectors.collectingAndThen(toList(), Collections::unmodifiableList));
+        return prj.getSourceRoots(scope, Language.JAVA_FAMILY)
+                .map(SourceRoot::directory)
+                .toList();
     }
 
     @Override
     public void addCompileSourceRoot(Project project, ProjectScope scope, Path sourceRoot) {
         MavenProject prj = getMavenProject(nonNull(project, "project"));
-        String root = nonNull(sourceRoot, "sourceRoot").toAbsolutePath().toString();
-        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
-            prj.addCompileSourceRoot(root);
-        } else if (scope == ProjectScope.TEST) {
-            prj.addTestCompileSourceRoot(root);
-        } else {
-            throw new IllegalArgumentException("Unsupported scope " + scope);
-        }
+        prj.addSourceRoot(nonNull(scope, "scope"), Language.JAVA_FAMILY, nonNull(sourceRoot, "sourceRoot"));
     }
 
     @Override

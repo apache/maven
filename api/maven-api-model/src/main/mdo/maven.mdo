@@ -2041,7 +2041,7 @@
             ]]>
           </description>
           <type>String</type>
-          <defaultValue>main</defaultValue>
+          <defaultValue>java</defaultValue>
         </field>
         <field>
           <name>module</name>
