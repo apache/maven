@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.ArtifactCoordinates;
-import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.SessionData;
@@ -103,49 +103,57 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                 && !model.getDependencyManagement().getDependencies().isEmpty()) {
             ArtifactCoordinates artifact = iSession.createArtifactCoordinates(
                     model.getGroupId(), model.getArtifactId(), model.getVersion(), null);
-            DependencyCoordinates dependency = iSession.createDependencyCoordinates(artifact);
-            Node node = iSession.collectDependencies(dependency, PathScope.TEST_RUNTIME);
+            Node node = iSession.collectDependencies(
+                    iSession.createDependencyCoordinates(artifact), PathScope.TEST_RUNTIME);
 
-            Map<String, Node> nodes =
-                    node.stream().collect(Collectors.toMap(n -> getDependencyKey(n.getDependency()), n -> n));
-            Map<String, Dependency> directDeps = model.getDependencies().stream()
-                    .collect(Collectors.toMap(d -> getDependencyKey(d), d -> d, this::merge, LinkedHashMap::new));
-            Map<String, Dependency> managedDeps = model.getDependencyManagement().getDependencies().stream()
-                    .filter(d -> nodes.containsKey(getDependencyKey(d)))
-                    .collect(Collectors.toMap(d -> getDependencyKey(d), d -> d, this::merge, LinkedHashMap::new));
+            Map<String, Node> nodes = node.stream()
+                    .collect(Collectors.toMap(n -> getDependencyKey(n.getDependency()), Function.identity()));
+            Map<String, Dependency> directDependencies = model.getDependencies().stream()
+                    .collect(Collectors.toMap(
+                            DefaultConsumerPomBuilder::getDependencyKey,
+                            Function.identity(),
+                            this::merge,
+                            LinkedHashMap::new));
+            Map<String, Dependency> managedDependencies = model.getDependencyManagement().getDependencies().stream()
+                    .filter(dependency -> nodes.containsKey(getDependencyKey(dependency)))
+                    .collect(Collectors.toMap(
+                            DefaultConsumerPomBuilder::getDependencyKey,
+                            Function.identity(),
+                            this::merge,
+                            LinkedHashMap::new));
 
             // for each managed dep in the model:
             // * if there is no corresponding node in the tree, discard the managed dep
             // * if there's a direct dependency, apply the managed dependency to it and discard the managed dep
             // * else keep the managed dep
-            managedDeps.keySet().retainAll(nodes.keySet());
+            managedDependencies.keySet().retainAll(nodes.keySet());
 
-            directDeps.replaceAll((key, dep) -> {
-                var managedDep = managedDeps.get(key);
-                if (managedDep != null) {
-                    if (dep.getVersion() == null && managedDep.getVersion() != null) {
-                        dep = dep.withVersion(managedDep.getVersion());
+            directDependencies.replaceAll((key, dependency) -> {
+                var managedDependency = managedDependencies.get(key);
+                if (managedDependency != null) {
+                    if (dependency.getVersion() == null && managedDependency.getVersion() != null) {
+                        dependency = dependency.withVersion(managedDependency.getVersion());
                     }
-                    if (dep.getScope() == null && managedDep.getScope() != null) {
-                        dep = dep.withScope(managedDep.getScope());
+                    if (dependency.getScope() == null && managedDependency.getScope() != null) {
+                        dependency = dependency.withScope(managedDependency.getScope());
                     }
-                    if (dep.getOptional() == null && managedDep.getOptional() != null) {
-                        dep = dep.withOptional(managedDep.getOptional());
+                    if (dependency.getOptional() == null && managedDependency.getOptional() != null) {
+                        dependency = dependency.withOptional(managedDependency.getOptional());
                     }
-                    if (dep.getExclusions().isEmpty()
-                            && !managedDep.getExclusions().isEmpty()) {
-                        dep = dep.withExclusions(managedDep.getExclusions());
+                    if (dependency.getExclusions().isEmpty()
+                            && !managedDependency.getExclusions().isEmpty()) {
+                        dependency = dependency.withExclusions(managedDependency.getExclusions());
                     }
                 }
-                return dep;
+                return dependency;
             });
-            managedDeps.keySet().removeAll(directDeps.keySet());
+            managedDependencies.keySet().removeAll(directDependencies.keySet());
 
             model = model.withDependencyManagement(
-                            managedDeps.isEmpty()
+                            managedDependencies.isEmpty()
                                     ? null
-                                    : model.getDependencyManagement().withDependencies(managedDeps.values()))
-                    .withDependencies(directDeps.isEmpty() ? null : directDeps.values());
+                                    : model.getDependencyManagement().withDependencies(managedDependencies.values()))
+                    .withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
         }
 
         return model;
@@ -155,13 +163,15 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         throw new IllegalArgumentException("Duplicate dependency: " + dep1);
     }
 
-    private static String getDependencyKey(org.apache.maven.api.Dependency d) {
-        return d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getType() + ":" + d.getClassifier();
+    private static String getDependencyKey(org.apache.maven.api.Dependency dependency) {
+        return dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getType() + ":"
+                + dependency.getClassifier();
     }
 
-    private static String getDependencyKey(Dependency d) {
-        return d.getGroupId() + ":" + d.getArtifactId() + ":" + (d.getType() != null ? d.getType() : "") + ":"
-                + (d.getClassifier() != null ? d.getClassifier() : "");
+    private static String getDependencyKey(Dependency dependency) {
+        return dependency.getGroupId() + ":" + dependency.getArtifactId() + ":"
+                + (dependency.getType() != null ? dependency.getType() : "") + ":"
+                + (dependency.getClassifier() != null ? dependency.getClassifier() : "");
     }
 
     private ModelBuilderResult buildModel(RepositorySystemSession session, Path src) throws ModelBuilderException {
