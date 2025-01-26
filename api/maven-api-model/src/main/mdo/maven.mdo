@@ -775,7 +775,7 @@
           <type>String</type>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "resource" scope. -->
+          <!-- TODO: replaced by <Source> with "main" scope and "resources" language -->
           <name>resources</name>
           <version>3.0.0+</version>
           <description>
@@ -790,7 +790,7 @@
           </association>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "testResource" scope. -->
+          <!-- TODO: replaced by <Source> with "test" scope and "resources" language -->
           <name>testResources</name>
           <version>4.0.0+</version>
           <description>
@@ -887,7 +887,7 @@
           <type>String</type>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "script" scope. -->
+          <!-- TODO: replaced by <Source> with "script" language -->
           <name>scriptSourceDirectory</name>
           <version>4.0.0+</version>
           <required>true</required>
@@ -2134,7 +2134,7 @@
       </fields>
     </class>
     <class>
-      <!-- TODO: Replaced by <Source>. -->
+      <!-- TODO: Replaced by <Source> with "resources" language. -->
       <name>Resource</name>
       <description>This element describes all of the classpath resources associated with a project
         or unit tests.</description>
