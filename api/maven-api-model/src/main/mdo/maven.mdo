@@ -783,7 +783,7 @@
             package.
             The default value is {@code src/main/resources}.
 
-            @deprecated Replaced by &lt;Source&gt; with "main" scope and "resources" language.
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code main} scope and {@code resources} language.
           </description>
           <association>
             <type>Resource</type>
@@ -798,7 +798,7 @@
             files associated with a project's unit tests.
             The default value is {@code src/test/resources}.
 
-            @deprecated Replaced by &lt;Source&gt; with "test" scope and "resources" language.
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code test} scope and {@code resources} language.
           </description>
           <association>
             <type>Resource</type>
@@ -885,7 +885,7 @@
             built. The path given is relative to the project descriptor.
             The default value is {@code src/main/java}.
 
-            @deprecated Replaced by &lt;Source&gt; with "main" scope.
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code main} scope.
           </description>
           <type>String</type>
         </field>
@@ -900,7 +900,7 @@
             interpreted rather than compiled).
             The default value is {@code src/main/scripts}.
 
-            @deprecated Replaced by &lt;Source&gt; with "script" language.
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code script} language.
           </description>
           <type>String</type>
         </field>
@@ -914,7 +914,7 @@
             being tested. The path given is relative to the project descriptor.
             The default value is {@code src/test/java}.
 
-            @deprecated Replaced by &lt;Source&gt; with "test" scope.
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code test} scope.
           </description>
           <type>String</type>
         </field>
@@ -2166,7 +2166,7 @@
             This is not required if you simply put the resources in that directory
             structure at the source, however.
 
-            @deprecated Replaced by &lt;Source&gt; with "resources" language.
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code resources} language.
           </description>
           <type>String</type>
         </field>
