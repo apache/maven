@@ -775,7 +775,6 @@
           <type>String</type>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "main" scope and "resources" language -->
           <name>resources</name>
           <version>3.0.0+</version>
           <description>
@@ -783,6 +782,8 @@
             files associated with a project. These resources are often included in the final
             package.
             The default value is {@code src/main/resources}.
+
+            @deprecated Replaced by &lt;Source&gt; with "main" scope and "resources" language.
           </description>
           <association>
             <type>Resource</type>
@@ -790,13 +791,14 @@
           </association>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "test" scope and "resources" language -->
           <name>testResources</name>
           <version>4.0.0+</version>
           <description>
             This element describes all the classpath resources such as properties
             files associated with a project's unit tests.
             The default value is {@code src/test/resources}.
+
+            @deprecated Replaced by &lt;Source&gt; with "test" scope and "resources" language.
           </description>
           <association>
             <type>Resource</type>
@@ -874,7 +876,6 @@
           </association>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "main" scope. -->
           <name>sourceDirectory</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -883,11 +884,12 @@
             generated build system will compile the sources from this directory when the project is
             built. The path given is relative to the project descriptor.
             The default value is {@code src/main/java}.
+
+            @deprecated Replaced by &lt;Source&gt; with "main" scope.
           </description>
           <type>String</type>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "script" language -->
           <name>scriptSourceDirectory</name>
           <version>4.0.0+</version>
           <required>true</required>
@@ -897,11 +899,12 @@
             contents will be copied to the output directory in most cases (since scripts are
             interpreted rather than compiled).
             The default value is {@code src/main/scripts}.
+
+            @deprecated Replaced by &lt;Source&gt; with "script" language.
           </description>
           <type>String</type>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "test" scope. -->
           <name>testSourceDirectory</name>
           <version>4.0.0+</version>
           <required>true</required>
@@ -910,6 +913,8 @@
             project. The generated build system will compile these directories when the project is
             being tested. The path given is relative to the project descriptor.
             The default value is {@code src/test/java}.
+
+            @deprecated Replaced by &lt;Source&gt; with "test" scope.
           </description>
           <type>String</type>
         </field>
@@ -2143,7 +2148,6 @@
       </fields>
     </class>
     <class>
-      <!-- TODO: Replaced by <Source> with "resources" language. -->
       <name>Resource</name>
       <description>This element describes all of the classpath resources associated with a project
         or unit tests.</description>
@@ -2161,6 +2165,8 @@
             element with this value: {@code org/apache/maven/messages}.
             This is not required if you simply put the resources in that directory
             structure at the source, however.
+
+            @deprecated Replaced by &lt;Source&gt; with "resources" language.
           </description>
           <type>String</type>
         </field>
