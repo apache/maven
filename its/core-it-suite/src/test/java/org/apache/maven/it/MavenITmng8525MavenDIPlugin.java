@@ -48,7 +48,7 @@ public class MavenITmng8525MavenDIPlugin extends AbstractMavenIntegrationTestCas
         Verifier v0 = newVerifier(testDir.getAbsolutePath());
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
-        v0.deleteArtifacts("org.apache.maven.plugins");
+        v0.deleteArtifacts("org.apache.maven.its");
         v0.addCliArgument("install");
         v0.execute();
         v0.verifyErrorFreeLog();
@@ -58,9 +58,10 @@ public class MavenITmng8525MavenDIPlugin extends AbstractMavenIntegrationTestCas
         //
         Verifier v1 = newVerifier(testDir.getAbsolutePath());
         v1.setAutoclean(false);
-        v1.addCliArgument("org.apache.maven.plugins:mavendi-maven-plugin:0.0.1-SNAPSHOT:hello");
+        v1.addCliArgument("org.apache.maven.its:mavendi-maven-plugin:0.0.1-SNAPSHOT:hello");
+        v1.addCliArgument("-Dname=World");
         v1.execute();
         v1.verifyErrorFreeLog();
-        v1.verifyTextInLog("Hello! I am a component that is being used via field injection!");
+        v1.verifyTextInLog("Hello World! I am a component that is being used via field injection!");
     }
 }
