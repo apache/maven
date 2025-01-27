@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -352,6 +353,8 @@ public class MavenProject implements Cloneable {
      * @throws IllegalArgumentException if a source exists for the given language, scope and directory
      *         but with different values for the other properties.
      *
+     * @see #getSourceRoots()
+     *
      * @since 4.0.0
      */
     public void addSourceRoot(SourceRoot source) {
@@ -371,6 +374,8 @@ public class MavenProject implements Cloneable {
      * @param scope scope (main or test) of the directory to add
      * @param language language of the files contained in the directory to add
      * @param directory the directory to add if not already present in the source
+     *
+     * @see #getEnabledSourceRoots(ProjectScope, Language)
      *
      * @since 4.0.0
      */
@@ -420,17 +425,29 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * {@return all sources that provide files in the given language for the given scope}.
-     * If the given scope is {@code null}, then this method returns the sources for all scopes.
-     * If the given language is {@code null}, then this method returns the sources for all languages.
+     * {@return all source root directories, including the disabled ones, for all languages and scopes}.
+     * The returned collection is unmodifiable.
+     *
+     * @see #addSourceRoot(SourceRoot)
+     */
+    public Collection<SourceRoot> getSourceRoots() {
+        return Collections.unmodifiableCollection(sources.values());
+    }
+
+    /**
+     * {@return all enabled sources that provide files in the given language for the given scope}.
+     * If the given scope is {@code null}, then this method returns the enabled sources for all scopes.
+     * If the given language is {@code null}, then this method returns the enabled sources for all languages.
      *
      * @param scope the scope of the sources to return, or {@code null} for all scopes
      * @param language the language of the sources to return, or {@code null} for all languages
      *
+     * @see #addSourceRoot(ProjectScope, Language, Path)
+     *
      * @since 4.0.0
      */
-    public Stream<SourceRoot> getSourceRoots(ProjectScope scope, Language language) {
-        Stream<SourceRoot> s = sources.values().stream();
+    public Stream<SourceRoot> getEnabledSourceRoots(ProjectScope scope, Language language) {
+        Stream<SourceRoot> s = sources.values().stream().filter(SourceRoot::enabled);
         if (scope != null) {
             s = s.filter((source) -> scope.equals(source.scope()));
         }
@@ -447,13 +464,13 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated
     private List<String> getSourceRootDirs(ProjectScope scope, Language language) {
-        return getSourceRoots(scope, language)
+        return getEnabledSourceRoots(scope, language)
                 .map((source) -> source.directory().toString())
                 .toList();
     }
 
     /**
-     * @deprecated Replaced by {@code getSourceRoots(ProjectScope.MAIN, Language.JAVA_FAMILY)}.
+     * @deprecated Replaced by {@code getEnabledSourceRoots(ProjectScope.MAIN, Language.JAVA_FAMILY)}.
      */
     @Deprecated(since = "4.0.0")
     public List<String> getCompileSourceRoots() {
@@ -461,7 +478,7 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * @deprecated Replaced by {@code getSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)}.
+     * @deprecated Replaced by {@code getEnabledSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)}.
      */
     @Deprecated(since = "4.0.0")
     public List<String> getTestCompileSourceRoots() {
@@ -747,7 +764,7 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * @deprecated Replaced by {@code getSourceRoots(ProjectScope.MAIN, Language.RESOURCES)}.
+     * @deprecated Replaced by {@code getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)}.
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getResources() {
@@ -755,7 +772,7 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * @deprecated Replaced by {@code getSourceRoots(ProjectScope.TEST, Language.RESOURCES)}.
+     * @deprecated Replaced by {@code getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)}.
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getTestResources() {

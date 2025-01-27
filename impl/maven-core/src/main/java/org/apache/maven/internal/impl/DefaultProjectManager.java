@@ -130,7 +130,7 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     public List<Path> getCompileSourceRoots(Project project, ProjectScope scope) {
         MavenProject prj = getMavenProject(nonNull(project, "project"));
-        return prj.getSourceRoots(scope, Language.JAVA_FAMILY)
+        return prj.getEnabledSourceRoots(scope, Language.JAVA_FAMILY)
                 .map(SourceRoot::directory)
                 .toList();
     }
