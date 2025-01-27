@@ -536,7 +536,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <annotations>
-            <annotation>@Deprecated</annotation>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
           </annotations>
         </field>
         <field xdoc.separator="blank">
@@ -630,6 +630,9 @@
             @deprecated Now ignored by Maven.
           </description>
           <type>DOM</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>reporting</name>
@@ -789,6 +792,9 @@
             <type>Resource</type>
             <multiplicity>*</multiplicity>
           </association>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>testResources</name>
@@ -804,6 +810,9 @@
             <type>Resource</type>
             <multiplicity>*</multiplicity>
           </association>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>directory</name>
@@ -888,6 +897,9 @@
             @deprecated Replaced by {@code &lt;Source&gt;} with {@code main} scope.
           </description>
           <type>String</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>scriptSourceDirectory</name>
@@ -903,6 +915,9 @@
             @deprecated Replaced by {@code &lt;Source&gt;} with {@code script} language.
           </description>
           <type>String</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>testSourceDirectory</name>
@@ -917,6 +932,9 @@
             @deprecated Replaced by {@code &lt;Source&gt;} with {@code test} scope.
           </description>
           <type>String</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>outputDirectory</name>
@@ -1049,6 +1067,9 @@
           <description>
             @deprecated Where to send the notification to - eg email address.
           </description>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>configuration</name>
@@ -2169,6 +2190,9 @@
             @deprecated Replaced by {@code &lt;Source&gt;} with {@code resources} language.
           </description>
           <type>String</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>filtering</name>
@@ -2567,6 +2591,9 @@
             @deprecated Unused by Maven.
           </description>
           <type>DOM</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>dependencies</name>
