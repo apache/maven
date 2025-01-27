@@ -19,6 +19,7 @@
 package org.apache.maven.plugins;
 
 import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.plugin.testing.InjectMojo;
@@ -51,6 +52,7 @@ public class HelloMojoTest {
 
     @Singleton
     @Provides
+    @Priority(10)
     private MavenDIComponent createMavenDIComponent() {
         return mock(MavenDIComponent.class);
     }
