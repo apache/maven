@@ -18,7 +18,7 @@
  */
 package org.apache.maven.api.di.testing;
 
-import java.io.*;
+import java.io.File;
 
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;

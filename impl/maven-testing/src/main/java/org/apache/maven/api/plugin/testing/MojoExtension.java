@@ -18,7 +18,12 @@
  */
 package org.apache.maven.api.plugin.testing;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -26,7 +31,15 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,7 +59,12 @@ import org.apache.maven.api.plugin.Mojo;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.plugin.descriptor.Parameter;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.api.plugin.testing.stubs.*;
+import org.apache.maven.api.plugin.testing.stubs.MojoExecutionStub;
+import org.apache.maven.api.plugin.testing.stubs.PluginStub;
+import org.apache.maven.api.plugin.testing.stubs.ProducedArtifactStub;
+import org.apache.maven.api.plugin.testing.stubs.ProjectStub;
+import org.apache.maven.api.plugin.testing.stubs.RepositorySystemSupplier;
+import org.apache.maven.api.plugin.testing.stubs.SessionMock;
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactInstaller;
@@ -81,7 +99,11 @@ import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.eclipse.aether.RepositorySystem;
-import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.slf4j.LoggerFactory;
 
@@ -212,6 +234,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
     }
 
     @Override
+    @SuppressWarnings("checkstyle:MethodLength")
     public void beforeEach(ExtensionContext context) throws Exception {
         if (pluginBasedir == null) {
             pluginBasedir = MavenDIExtension.getBasedir();

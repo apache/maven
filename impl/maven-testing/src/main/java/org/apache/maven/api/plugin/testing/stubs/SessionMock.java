@@ -85,6 +85,7 @@ public class SessionMock {
         return getMockSession(localRepository);
     }
 
+    @SuppressWarnings("checkstyle:MethodLength")
     public static InternalSession getMockSession(LocalRepository localRepository) {
         InternalSession session = mock(InternalSession.class);
 

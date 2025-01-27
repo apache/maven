@@ -19,9 +19,20 @@
 package org.apache.maven.api.plugin.testing.stubs;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
-import org.apache.maven.api.*;
+import org.apache.maven.api.DependencyCoordinates;
+import org.apache.maven.api.Language;
+import org.apache.maven.api.Packaging;
+import org.apache.maven.api.PathType;
+import org.apache.maven.api.ProducedArtifact;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.PluginContainer;
