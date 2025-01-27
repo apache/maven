@@ -159,18 +159,18 @@ public class SessionMock {
                 .installArtifacts(any(Collection.class));
         doAnswer(iom -> {
                     artifactInstaller.install(ArtifactInstallerRequest.build(
-                            session, Arrays.asList(iom.getArgument(0, Artifact[].class))));
+                            session, Arrays.asList(iom.getArgument(0, ProducedArtifact[].class))));
                     return null;
                 })
                 .when(session)
-                .installArtifacts(any(Artifact[].class));
+                .installArtifacts(any(ProducedArtifact[].class));
         doAnswer(iom -> {
                     artifactInstaller.install(ArtifactInstallerRequest.build(
                             iom.getArgument(0, Session.class), iom.getArgument(1, Collection.class)));
                     return null;
                 })
                 .when(artifactInstaller)
-                .install(any(Session.class), ArgumentMatchers.<Collection<Artifact>>any());
+                .install(any(Session.class), ArgumentMatchers.<Collection<ProducedArtifact>>any());
         when(session.getService(ArtifactInstaller.class)).thenReturn(artifactInstaller);
 
         //
@@ -181,7 +181,7 @@ public class SessionMock {
                     artifactDeployer.deploy(ArtifactDeployerRequest.build(
                             iom.getArgument(0, Session.class),
                             iom.getArgument(1, RemoteRepository.class),
-                            Arrays.asList(iom.getArgument(2, Artifact[].class))));
+                            Arrays.asList(iom.getArgument(2, ProducedArtifact[].class))));
                     return null;
                 })
                 .when(session)

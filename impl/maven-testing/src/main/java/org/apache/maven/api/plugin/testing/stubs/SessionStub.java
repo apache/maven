@@ -341,13 +341,13 @@ public class SessionStub implements Session {
     }
 
     @Override
-    public void installArtifacts(Artifact... artifacts) {}
+    public void installArtifacts(ProducedArtifact... artifacts) {}
 
     @Override
-    public void installArtifacts(Collection<Artifact> artifacts) {}
+    public void installArtifacts(Collection<ProducedArtifact> artifacts) {}
 
     @Override
-    public void deployArtifact(RemoteRepository repository, Artifact... artifacts) {}
+    public void deployArtifact(RemoteRepository repository, ProducedArtifact... artifacts) {}
 
     @Override
     public void setArtifactPath(ProducedArtifact artifact, Path path) {}

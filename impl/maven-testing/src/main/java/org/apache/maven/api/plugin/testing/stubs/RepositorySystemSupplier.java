@@ -47,7 +47,6 @@ import org.apache.maven.internal.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.model.DefaultPluginManagementInjector;
 import org.apache.maven.internal.impl.model.DefaultProfileInjector;
 import org.apache.maven.internal.impl.model.DefaultProfileSelector;
-import org.apache.maven.internal.impl.model.ProfileActivationFilePathInterpolator;
 import org.apache.maven.internal.impl.model.rootlocator.DefaultRootLocator;
 import org.apache.maven.internal.impl.resolver.DefaultArtifactDescriptorReader;
 import org.apache.maven.internal.impl.resolver.DefaultModelResolver;
@@ -140,6 +139,7 @@ import org.eclipse.aether.named.providers.NoopNamedLockFactory;
 import org.eclipse.aether.spi.artifact.ArtifactPredicateFactory;
 import org.eclipse.aether.spi.artifact.decorator.ArtifactDecoratorFactory;
 import org.eclipse.aether.spi.artifact.generator.ArtifactGeneratorFactory;
+import org.eclipse.aether.spi.artifact.transformer.ArtifactTransformer;
 import org.eclipse.aether.spi.checksums.ProvidedChecksumsSource;
 import org.eclipse.aether.spi.checksums.TrustedChecksumsSource;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
@@ -752,6 +752,7 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 getRepositoryEventDispatcher(),
                 getArtifactGeneratorFactories(),
                 getMetadataGeneratorFactories(),
+                getArtifactTransformers(),
                 getSyncContextFactory());
     }
 
@@ -774,6 +775,7 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 getUpdateCheckManager(),
                 getArtifactGeneratorFactories(),
                 getMetadataGeneratorFactories(),
+                getArtifactTransformers(),
                 getSyncContextFactory(),
                 getOfflineController());
     }
@@ -933,6 +935,20 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         return new HashMap<>();
     }
 
+    protected Map<String, ArtifactTransformer> artifactTransformers;
+
+    public final Map<String, ArtifactTransformer> getArtifactTransformers() {
+        checkClosed();
+        if (artifactTransformers == null) {
+            artifactTransformers = createArtifactTransformers();
+        }
+        return artifactTransformers;
+    }
+
+    protected Map<String, ArtifactTransformer> createArtifactTransformers() {
+        return new HashMap<>();
+    }
+
     // Maven provided
 
     private Map<String, MetadataGeneratorFactory> metadataGeneratorFactories;
@@ -1058,13 +1074,13 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 new DefaultDependencyManagementInjector(),
                 new DefaultDependencyManagementImporter(),
                 new DefaultPluginConfigurationExpander(),
-                new ProfileActivationFilePathInterpolator(
-                        new DefaultPathTranslator(), new DefaultRootLocator(), new DefaultInterpolator()),
                 new DefaultModelVersionParser(getVersionScheme()),
                 List.of(),
                 new DefaultModelCacheFactory(),
                 new DefaultModelResolver(),
-                new DefaultInterpolator());
+                new DefaultInterpolator(),
+                new DefaultPathTranslator(),
+                new DefaultRootLocator());
     }
 
     private RepositorySystem repositorySystem;
