@@ -35,6 +35,17 @@ under the License.
 | `maven.installation.extensions` | `String` | Maven installation extensions. |  `${maven.installation.conf}/extensions.xml`  | 4.0.0 | User properties |
 | `maven.installation.settings` | `String` | Maven installation settings. |  `${maven.installation.conf}/settings.xml`  | 4.0.0 | User properties |
 | `maven.installation.toolchains` | `String` | Maven installation toolchains. |  `${maven.installation.conf}/toolchains.xml`  | 4.0.0 | User properties |
+| `maven.logger.cacheOutputStream` | `Boolean` | If the output target is set to "System.out" or "System.err" (see preceding entry), by default, logs will be output to the latest value referenced by System.out/err variables. By setting this parameter to true, the output stream will be cached, i.e. assigned once at initialization time and re-used independently of the current value referenced by System.out/err. |  `false`  | 4.0.0 | User properties |
+| `maven.logger.dateTimeFormat` | `String` | The date and time format to be used in the output messages. The pattern describing the date and time format is defined by SimpleDateFormat. If the format is not specified or is invalid, the number of milliseconds since start up will be output. |  -  | 4.0.0 | User properties |
+| `maven.logger.defaultLogLevel` | `String` | Default log level for all instances of SimpleLogger. Must be one of ("trace", "debug", "info", "warn", "error" or "off"). If not specified, defaults to "info". |  -  | 4.0.0 | User properties |
+| `maven.logger.levelInBrackets` | `Boolean` | Should the level string be output in brackets? Defaults to false. |  `false`  | 4.0.0 | User properties |
+| `maven.logger.logFile` | `String` | The output target which can be the path to a file, or the special values "System.out" and "System.err". Default is "System.err". |  -  | 4.0.0 | User properties |
+| `maven.logger.showDateTime` | `Boolean` | Set to true if you want the current date and time to be included in output messages. Default is false. |  `false`  | 4.0.0 | User properties |
+| `maven.logger.showLogName` | `Boolean` | Set to true if you want the Logger instance name to be included in output messages. Defaults to true. |  `true`  | 4.0.0 | User properties |
+| `maven.logger.showShortLogName` | `Boolean` | Set to true if you want the last component of the name to be included in output messages. Defaults to false. |  `false`  | 4.0.0 | User properties |
+| `maven.logger.showThreadId` | `Boolean` | If you would like to output the current thread id, then set to true. Defaults to false. |  `false`  | 4.0.0 | User properties |
+| `maven.logger.showThreadName` | `Boolean` | Set to true if you want to output the current thread name. Defaults to true. |  `true`  | 4.0.0 | User properties |
+| `maven.logger.warnLevelString` | `String` | The string value output for the warn level. Defaults to WARN. |  `WARN`  | 4.0.0 | User properties |
 | `maven.modelBuilder.parallelism` | `Integer` | ProjectBuilder parallelism. |  `cores/2 + 1`  | 4.0.0 | User properties |
 | `maven.plugin.validation` | `String` | Plugin validation level. |  `inline`  | 3.9.2 | User properties |
 | `maven.plugin.validation.excludes` | `String` | Plugin validation exclusions. |  -  | 3.9.6 | User properties |

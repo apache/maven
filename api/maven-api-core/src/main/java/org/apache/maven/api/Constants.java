@@ -453,5 +453,117 @@ public final class Constants {
     @Config(type = "java.lang.Integer", defaultValue = "100")
     public static final String MAVEN_BUILDER_MAX_PROBLEMS = "maven.builder.maxProblems";
 
+    /**
+     * All system properties used by Maven Logger start with this prefix.
+     *
+     * @since 4.0.0
+     */
+    public static final String MAVEN_LOGGER_PREFIX = "maven.logger.";
+
+    /**
+     * Default log level for all instances of SimpleLogger. Must be one of ("trace", "debug", "info",
+     * "warn", "error" or "off"). If not specified, defaults to "info".
+     *
+     * @since 4.0.0
+     */
+    @Config
+    public static final String MAVEN_LOGGER_DEFAULT_LOG_LEVEL = MAVEN_LOGGER_PREFIX + "defaultLogLevel";
+
+    /**
+     * Set to true if you want the current date and time to be included in output messages. Default is false.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_LOGGER_SHOW_DATE_TIME = MAVEN_LOGGER_PREFIX + "showDateTime";
+
+    /**
+     * The date and time format to be used in the output messages. The pattern describing the date and
+     * time format is defined by SimpleDateFormat. If the format is not specified or is invalid, the
+     * number of milliseconds since start up will be output.
+     *
+     * @since 4.0.0
+     */
+    @Config
+    public static final String MAVEN_LOGGER_DATE_TIME_FORMAT = MAVEN_LOGGER_PREFIX + "dateTimeFormat";
+
+    /**
+     * If you would like to output the current thread id, then set to true. Defaults to false.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_LOGGER_SHOW_THREAD_ID = MAVEN_LOGGER_PREFIX + "showThreadId";
+
+    /**
+     * Set to true if you want to output the current thread name. Defaults to true.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_LOGGER_SHOW_THREAD_NAME = MAVEN_LOGGER_PREFIX + "showThreadName";
+
+    /**
+     * Set to true if you want the Logger instance name to be included in output messages. Defaults to true.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_LOGGER_SHOW_LOG_NAME = MAVEN_LOGGER_PREFIX + "showLogName";
+
+    /**
+     * Set to true if you want the last component of the name to be included in output messages. Defaults to false.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_LOGGER_SHOW_SHORT_LOG_NAME = MAVEN_LOGGER_PREFIX + "showShortLogName";
+
+    /**
+     * The output target which can be the path to a file, or the special values "System.out" and "System.err".
+     * Default is "System.err".
+     *
+     * @since 4.0.0
+     */
+    @Config
+    public static final String MAVEN_LOGGER_LOG_FILE = MAVEN_LOGGER_PREFIX + "logFile";
+
+    /**
+     * Should the level string be output in brackets? Defaults to false.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_LOGGER_LEVEL_IN_BRACKETS = MAVEN_LOGGER_PREFIX + "levelInBrackets";
+
+    /**
+     * The string value output for the warn level. Defaults to WARN.
+     *
+     * @since 4.0.0
+     */
+    @Config(defaultValue = "WARN")
+    public static final String MAVEN_LOGGER_WARN_LEVEL = MAVEN_LOGGER_PREFIX + "warnLevelString";
+
+    /**
+     * If the output target is set to "System.out" or "System.err" (see preceding entry), by default, logs will
+     * be output to the latest value referenced by System.out/err variables. By setting this parameter to true,
+     * the output stream will be cached, i.e. assigned once at initialization time and re-used independently of
+     * the current value referenced by System.out/err.
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_LOGGER_CACHE_OUTPUT_STREAM = MAVEN_LOGGER_PREFIX + "cacheOutputStream";
+
+    /**
+     * maven.logger.log.a.b.c - Logging detail level for a SimpleLogger instance named "a.b.c". Right-side value
+     * must be one of "trace", "debug", "info", "warn", "error" or "off". When a logger named "a.b.c" is initialized,
+     * its level is assigned from this property. If unspecified, the level of nearest parent logger will be used,
+     * and if none is set, then the value specified by {@code maven.logger.defaultLogLevel} will be used.
+     *
+     * @since 4.0.0
+     */
+    public static final String MAVEN_LOGGER_LOG_PREFIX = MAVEN_LOGGER_PREFIX + "log.";
+
     private Constants() {}
 }
