@@ -109,13 +109,15 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             Map<String, Node> nodes = node.stream()
                     .collect(Collectors.toMap(n -> getDependencyKey(n.getDependency()), Function.identity()));
             Map<String, Dependency> directDependencies = model.getDependencies().stream()
+                    .filter(dependency -> !"import".equals(dependency.getScope()))
                     .collect(Collectors.toMap(
                             DefaultConsumerPomBuilder::getDependencyKey,
                             Function.identity(),
                             this::merge,
                             LinkedHashMap::new));
             Map<String, Dependency> managedDependencies = model.getDependencyManagement().getDependencies().stream()
-                    .filter(dependency -> nodes.containsKey(getDependencyKey(dependency)))
+                    .filter(dependency ->
+                            nodes.containsKey(getDependencyKey(dependency)) && !"import".equals(dependency.getScope()))
                     .collect(Collectors.toMap(
                             DefaultConsumerPomBuilder::getDependencyKey,
                             Function.identity(),
@@ -299,8 +301,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                     .build());
         }
         // only keep repositories other than 'central'
-        builder.pluginRepositories(pruneRepositories(model.getPluginRepositories()));
         builder.repositories(pruneRepositories(model.getRepositories()));
+        builder.pluginRepositories(null);
         return builder;
     }
 
