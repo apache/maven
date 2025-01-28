@@ -39,6 +39,8 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.ReportPlugin;
 import org.apache.maven.api.model.ReportSet;
 import org.apache.maven.api.model.Reporting;
+import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.model.RepositoryBase;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ProfileInjector;
@@ -237,6 +239,11 @@ public class DefaultProfileInjector implements ProfileInjector {
 
                 builder.reportSets(merged.values());
             }
+        }
+
+        @Override
+        protected KeyComputer<Repository> getRepositoryKey() {
+            return RepositoryBase::getId;
         }
     }
 }
