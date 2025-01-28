@@ -21,8 +21,11 @@ package org.apache.maven.cling.invoker.mvn;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
@@ -81,6 +84,11 @@ public abstract class MavenInvokerTestSupport {
             """;
 
     protected void invoke(Path cwd, Path userHome, Collection<String> goals) throws Exception {
+        invoke(cwd, userHome, goals, List.of());
+    }
+
+    protected Map<String, String> invoke(Path cwd, Path userHome, Collection<String> goals, Collection<String> args)
+            throws Exception {
         // works only in recent Maven4
         Assumptions.assumeTrue(
                 Files.isRegularFile(Paths.get(System.getProperty("maven.home"))
@@ -95,22 +103,24 @@ public abstract class MavenInvokerTestSupport {
         Files.createDirectories(appJava.getParent());
         Files.writeString(appJava, APP_JAVA_STRING);
 
+        HashMap<String, String> logs = new HashMap<>();
         Parser parser = createParser();
         try (Invoker invoker = createInvoker()) {
             for (String goal : goals) {
                 Path logFile = cwd.resolve(goal + "-build.log").toAbsolutePath();
-                int exitCode = invoker.invoke(parser.parseInvocation(ParserRequest.mvn(
-                                List.of("-l", logFile.toString(), goal),
-                                new ProtoLogger(),
-                                new JLineMessageBuilderFactory())
-                        .cwd(cwd)
-                        .userHome(userHome)
-                        .build()));
+                List<String> mvnArgs = new ArrayList<>(args);
+                mvnArgs.addAll(List.of("-l", logFile.toString(), goal));
+                int exitCode = invoker.invoke(parser.parseInvocation(
+                        ParserRequest.mvn(mvnArgs, new ProtoLogger(), new JLineMessageBuilderFactory())
+                                .cwd(cwd)
+                                .userHome(userHome)
+                                .build()));
                 String log = Files.readString(logFile);
-                System.out.println(log);
+                logs.put(goal, log);
                 assertEquals(0, exitCode, log);
             }
         }
+        return logs;
     }
 
     protected abstract Invoker createInvoker();

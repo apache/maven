@@ -22,6 +22,8 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
@@ -149,10 +151,9 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path userExtensions = userConf.resolve("settings.xml");
         Files.writeString(userExtensions, settingsXml);
 
-        invoke(cwd, userHome, Arrays.asList("verify"));
+        Map<String, String> logs = invoke(cwd, userHome, List.of("verify"), List.of("-Dmaven.repo.local=local"));
 
-        Path logFile = cwd.resolve("verify-build.log").toAbsolutePath();
-        String log = Files.readString(logFile);
+        String log = logs.get("verify");
         assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
         assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
     }
