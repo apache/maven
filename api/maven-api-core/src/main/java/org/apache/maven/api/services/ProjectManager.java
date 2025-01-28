@@ -36,7 +36,6 @@ import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.model.Resource;
 
 /**
  * Interface to manage the project during its lifecycle.
@@ -123,63 +122,6 @@ public interface ProjectManager extends Service {
      * @throws IllegalArgumentException if the project, artifact or path is null
      */
     void attachArtifact(@Nonnull Project project, @Nonnull ProducedArtifact artifact, @Nonnull Path path);
-
-    /**
-     * Obtain an immutable list of compile source roots for the given project and scope.
-     * Paths are absolute.
-     *
-     * @param project the project
-     * @param scope the scope, i.e. usually main or test
-     * @return the list of compile source roots
-     *
-     * @deprecated Replaced by {@link Project#getEnabledSourceRoots(ProjectScope, Language)}
-     *             with {@link Language#JAVA_FAMILY}.
-     */
-    @Nonnull
-    @Deprecated
-    List<Path> getCompileSourceRoots(@Nonnull Project project, @Nonnull ProjectScope scope);
-
-    /**
-     * Add a compilation source root to the given project for the given scope.
-     * The path will be transformed into an absolute path and added to the list for the given scope,
-     * if not already present.
-     *
-     * @param project the project
-     * @param scope the scope, i.e. usually main or test
-     * @param sourceRoot the new source root
-     *
-     * @deprecated Replaced by {@link #addSourceRoot(Project, ProjectScope, Language, Path)}
-     *             with {@link Language#JAVA_FAMILY}.
-     */
-    @Deprecated
-    void addCompileSourceRoot(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Path sourceRoot);
-
-    /**
-     * Get the list of resources for the given project and scope
-     *
-     * @param project the project
-     * @param scope the scope, i.e. usually main or test
-     * @return the list of resources
-     *
-     * @deprecated Replaced by {@link Project#getEnabledSourceRoots(ProjectScope, Language)}
-     *             with {@link Language#RESOURCES}.
-     */
-    @Deprecated
-    List<Resource> getResources(@Nonnull Project project, @Nonnull ProjectScope scope);
-
-    /**
-     * Add a resource set to the given project for the given scope.
-     *
-     * @param project the project
-     * @param scope the scope, i.e. usually main or test
-     * @param resource the resource set to add
-     *
-     * @deprecated Replaced by {@link #addSourceRoot(Project, ProjectScope, Language, Path)}
-     *             with {@link Language#RESOURCES} or by {@link #addSourceRoot(Project, SourceRoot)}
-     *             if there is a need to specify filters.
-     */
-    @Deprecated
-    void addResource(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Resource resource);
 
     /**
      * Adds the given source to the given project.

@@ -40,7 +40,6 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
-import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.impl.MappedList;
@@ -125,51 +124,6 @@ public class DefaultProjectManager implements ProjectManager {
                 .addAttachedArtifact(RepositoryUtils.toArtifact(
                         ((DefaultProject) project).getSession().toArtifact(artifact)));
         artifactManager.setPath(artifact, path);
-    }
-
-    @Override
-    @Deprecated
-    public List<Path> getCompileSourceRoots(Project project, ProjectScope scope) {
-        MavenProject prj = getMavenProject(nonNull(project, "project"));
-        return prj.getEnabledSourceRoots(scope, Language.JAVA_FAMILY)
-                .map(SourceRoot::directory)
-                .toList();
-    }
-
-    @Override
-    @Deprecated
-    public void addCompileSourceRoot(Project project, ProjectScope scope, Path sourceRoot) {
-        MavenProject prj = getMavenProject(nonNull(project, "project"));
-        prj.addSourceRoot(nonNull(scope, "scope"), Language.JAVA_FAMILY, nonNull(sourceRoot, "sourceRoot"));
-    }
-
-    @Override
-    @Deprecated
-    public List<Resource> getResources(@Nonnull Project project, @Nonnull ProjectScope scope) {
-        Project prj = nonNull(project, "project");
-        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
-            return prj.getBuild().getResources();
-        } else if (scope == ProjectScope.TEST) {
-            return prj.getBuild().getTestResources();
-        } else {
-            throw new IllegalArgumentException("Unsupported scope " + scope);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public void addResource(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Resource resource) {
-        // TODO: we should not modify the underlying model here, but resources should be stored
-        // TODO: in a separate field in the project, however, that could break v3 plugins
-        MavenProject prj = getMavenProject(nonNull(project, "project"));
-        org.apache.maven.model.Resource res = new org.apache.maven.model.Resource(nonNull(resource, "resource"));
-        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
-            prj.addResource(res);
-        } else if (scope == ProjectScope.TEST) {
-            prj.addTestResource(res);
-        } else {
-            throw new IllegalArgumentException("Unsupported scope " + scope);
-        }
     }
 
     @Override
