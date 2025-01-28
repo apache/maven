@@ -128,6 +128,7 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
+    @Deprecated
     public List<Path> getCompileSourceRoots(Project project, ProjectScope scope) {
         MavenProject prj = getMavenProject(nonNull(project, "project"));
         return prj.getEnabledSourceRoots(scope, Language.JAVA_FAMILY)
@@ -136,12 +137,14 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
+    @Deprecated
     public void addCompileSourceRoot(Project project, ProjectScope scope, Path sourceRoot) {
         MavenProject prj = getMavenProject(nonNull(project, "project"));
         prj.addSourceRoot(nonNull(scope, "scope"), Language.JAVA_FAMILY, nonNull(sourceRoot, "sourceRoot"));
     }
 
     @Override
+    @Deprecated
     public List<Resource> getResources(@Nonnull Project project, @Nonnull ProjectScope scope) {
         Project prj = nonNull(project, "project");
         if (nonNull(scope, "scope") == ProjectScope.MAIN) {
@@ -154,6 +157,7 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
+    @Deprecated
     public void addResource(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Resource resource) {
         // TODO: we should not modify the underlying model here, but resources should be stored
         // TODO: in a separate field in the project, however, that could break v3 plugins
@@ -166,6 +170,18 @@ public class DefaultProjectManager implements ProjectManager {
         } else {
             throw new IllegalArgumentException("Unsupported scope " + scope);
         }
+    }
+
+    @Override
+    public void addSourceRoot(Project project, SourceRoot source) {
+        MavenProject prj = getMavenProject(nonNull(project, "project"));
+        prj.addSourceRoot(nonNull(source, "source"));
+    }
+
+    @Override
+    public void addSourceRoot(Project project, ProjectScope scope, Language language, Path directory) {
+        MavenProject prj = getMavenProject(nonNull(project, "project"));
+        prj.addSourceRoot(nonNull(scope, "scope"), nonNull(language, "language"), nonNull(directory, "directory"));
     }
 
     @Override
