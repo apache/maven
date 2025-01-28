@@ -426,6 +426,7 @@ public class MavenProject implements Cloneable {
 
     /**
      * {@return all source root directories, including the disabled ones, for all languages and scopes}.
+     * The iteration order is the order in which the sources are declared in the POM file.
      * The returned collection is unmodifiable.
      *
      * @see #addSourceRoot(SourceRoot)
@@ -438,6 +439,7 @@ public class MavenProject implements Cloneable {
      * {@return all enabled sources that provide files in the given language for the given scope}.
      * If the given scope is {@code null}, then this method returns the enabled sources for all scopes.
      * If the given language is {@code null}, then this method returns the enabled sources for all languages.
+     * The iteration order is the order in which the sources are declared in the POM file.
      *
      * @param scope the scope of the sources to return, or {@code null} for all scopes
      * @param language the language of the sources to return, or {@code null} for all languages

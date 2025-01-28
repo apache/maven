@@ -24,14 +24,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Exclusion;
+import org.apache.maven.api.Language;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.ProjectScope;
+import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
@@ -122,6 +126,7 @@ public class DefaultProject implements Project {
         return nonNull(project.getFile(), "pomPath").toPath();
     }
 
+    @Nonnull
     @Override
     public Path getBasedir() {
         return nonNull(project.getBasedir(), "basedir").toPath();
@@ -162,6 +167,18 @@ public class DefaultProject implements Project {
     public Optional<Project> getParent() {
         MavenProject parent = project.getParent();
         return Optional.ofNullable(session.getProject(parent));
+    }
+
+    @Nonnull
+    @Override
+    public Collection<SourceRoot> getSourceRoots() {
+        return project.getSourceRoots();
+    }
+
+    @Nonnull
+    @Override
+    public Stream<SourceRoot> getEnabledSourceRoots(ProjectScope scope, Language language) {
+        return project.getEnabledSourceRoots(scope, language);
     }
 
     @Nonnull
