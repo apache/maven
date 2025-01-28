@@ -48,6 +48,7 @@ import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.settings.Activation;
+import org.apache.maven.api.settings.IdentifiableBase;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.RepositoryPolicy;
@@ -68,7 +69,12 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final DefaultSettingsValidator settingsValidator = new DefaultSettingsValidator();
 
-    private final SettingsMerger settingsMerger = new SettingsMerger();
+    private final SettingsMerger settingsMerger = new SettingsMerger() {
+        @Override
+        protected KeyComputer<Repository> getRepositoryKey() {
+            return IdentifiableBase::getId;
+        }
+    };
 
     private final SettingsXmlFactory settingsXmlFactory;
 
