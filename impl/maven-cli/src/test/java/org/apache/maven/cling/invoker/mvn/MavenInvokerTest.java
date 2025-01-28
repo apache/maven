@@ -153,8 +153,8 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
 
         Path logFile = cwd.resolve("verify-build.log").toAbsolutePath();
         String log = Files.readString(logFile);
-        assertTrue(log.contains("https://repo1.maven.org/maven2"));
-        assertFalse(log.contains("https://repo.maven.apache.org/maven2"));
+        assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
+        assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
     }
 
     @Disabled("Until we move off fully from File")
