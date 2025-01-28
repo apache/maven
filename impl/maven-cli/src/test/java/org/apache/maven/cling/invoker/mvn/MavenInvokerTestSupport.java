@@ -88,7 +88,7 @@ public abstract class MavenInvokerTestSupport {
                         .resolve("maven.properties")),
                 "${maven.home}/conf/maven.properties must be a file");
 
-        Files.createDirectory(cwd.resolve(".mvn"));
+        Files.createDirectories(cwd.resolve(".mvn"));
         Path pom = cwd.resolve("pom.xml").toAbsolutePath();
         Files.writeString(pom, POM_STRING);
         Path appJava = cwd.resolve("src/main/java/org/apache/maven/samples/sample/App.java");
