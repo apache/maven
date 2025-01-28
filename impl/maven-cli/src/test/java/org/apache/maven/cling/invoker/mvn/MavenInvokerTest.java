@@ -151,7 +151,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path userExtensions = userConf.resolve("settings.xml");
         Files.writeString(userExtensions, settingsXml);
 
-        Map<String, String> logs = invoke(cwd, userHome, List.of("verify"), List.of("-Dmaven.repo.local=local"));
+        Map<String, String> logs = invoke(cwd, userHome, List.of("verify"), List.of("--force-interactive"));
 
         String log = logs.get("verify");
         assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
