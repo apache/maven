@@ -18,13 +18,13 @@
  */
 package org.apache.maven.it;
 
-import org.junit.jupiter.api.Test;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,8 +50,10 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Path consumerPomPath = Paths.get(verifier.getArtifactPath("org.apache.maven.its.mng-8527", "child", "1.0.0-SNAPSHOT", "pom"));
-        Path buildPomPath = Paths.get(verifier.getArtifactPath("org.apache.maven.its.mng-8527", "child", "1.0.0-SNAPSHOT", "pom", "build"));
+        Path consumerPomPath =
+                Paths.get(verifier.getArtifactPath("org.apache.maven.its.mng-8527", "child", "1.0.0-SNAPSHOT", "pom"));
+        Path buildPomPath = Paths.get(
+                verifier.getArtifactPath("org.apache.maven.its.mng-8527", "child", "1.0.0-SNAPSHOT", "pom", "build"));
 
         assertTrue(Files.exists(consumerPomPath), "consumer pom not found at " + consumerPomPath);
         assertTrue(Files.exists(buildPomPath), "consumer pom not found at " + consumerPomPath);
@@ -60,16 +62,32 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
         try (Stream<String> lines = Files.lines(consumerPomPath)) {
             consumerPomLines = lines.toList();
         }
-        assertTrue(consumerPomLines.stream().noneMatch(s -> s.contains("<parent>")), "Consumer pom should not have any <parent> element");
-        assertTrue(consumerPomLines.stream().anyMatch(s -> s.contains("<organization>")), "Consumer pom should have an <organization> element");
-        assertEquals(2, consumerPomLines.stream().filter(s -> s.contains("<dependency>")).count(), "Consumer pom should have two dependencies");
+        assertTrue(
+                consumerPomLines.stream().noneMatch(s -> s.contains("<parent>")),
+                "Consumer pom should not have any <parent> element");
+        assertTrue(
+                consumerPomLines.stream().anyMatch(s -> s.contains("<organization>")),
+                "Consumer pom should have an <organization> element");
+        assertEquals(
+                2,
+                consumerPomLines.stream()
+                        .filter(s -> s.contains("<dependency>"))
+                        .count(),
+                "Consumer pom should have two dependencies");
 
         List<String> buildPomLines;
         try (Stream<String> lines = Files.lines(buildPomPath)) {
             buildPomLines = lines.toList();
         }
-        assertTrue(buildPomLines.stream().anyMatch(s -> s.contains("<parent>")), "Build pom should have a <parent> element");
-        assertTrue(buildPomLines.stream().noneMatch(s -> s.contains("<organization>")), "Build pom should not have an <organization> element");
-        assertEquals(2, buildPomLines.stream().filter(s -> s.contains("<dependency>")).count(), "Build pom should have two dependencies");
+        assertTrue(
+                buildPomLines.stream().anyMatch(s -> s.contains("<parent>")),
+                "Build pom should have a <parent> element");
+        assertTrue(
+                buildPomLines.stream().noneMatch(s -> s.contains("<organization>")),
+                "Build pom should not have an <organization> element");
+        assertEquals(
+                2,
+                buildPomLines.stream().filter(s -> s.contains("<dependency>")).count(),
+                "Build pom should have two dependencies");
     }
 }
