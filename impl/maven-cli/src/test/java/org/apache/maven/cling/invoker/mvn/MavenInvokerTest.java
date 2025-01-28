@@ -85,8 +85,8 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Files.writeString(projectExtensions, extensionsXml);
 
         Path userConf = userHome.resolve(".m2");
-        Path userExtensions = userConf.resolve("extensions.xml");
         Files.createDirectories(userConf);
+        Path userExtensions = userConf.resolve("extensions.xml");
         Files.writeString(userExtensions, extensionsXml);
 
         assertThrows(ParserException.class, () -> invoke(cwd, userHome, Arrays.asList("clean", "verify")));
