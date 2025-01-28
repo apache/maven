@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -26,6 +27,7 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
+import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
@@ -33,6 +35,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Local UT.
@@ -57,6 +61,35 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
         invoke(cwd, userHome, Arrays.asList("clean", "verify"));
+    }
+
+    @Test
+    void conflictingExtensions(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String extensionsXml =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <extensions>
+                    <extension>
+                        <groupId>eu.maveniverse.maven.mimir</groupId>
+                        <artifactId>extension3</artifactId>
+                        <version>0.3.4</version>
+                    </extension>
+                </extensions>
+                """;
+        Path dotMvn = cwd.resolve(".mvn");
+        Files.createDirectories(dotMvn);
+        Path projectExtensions = dotMvn.resolve("extensions.xml");
+        Files.writeString(projectExtensions, extensionsXml);
+
+        Path userConf = userHome.resolve(".m2");
+        Files.createDirectories(userConf);
+        Path userExtensions = userConf.resolve("extensions.xml");
+        Files.writeString(userExtensions, extensionsXml);
+
+        assertThrows(ParserException.class, () -> invoke(cwd, userHome, Arrays.asList("clean", "verify")));
     }
 
     @Disabled("Until we move off fully from File")
