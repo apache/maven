@@ -43,7 +43,8 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8527").getAbsoluteFile().toPath();
+        Path basedir =
+                extractResources("/mng-8527-consumer-pom").getAbsoluteFile().toPath();
 
         Verifier verifier = newVerifier(basedir.toString());
         verifier.addCliArgument("install");
