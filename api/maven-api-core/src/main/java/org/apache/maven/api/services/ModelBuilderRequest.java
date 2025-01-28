@@ -160,7 +160,7 @@ public interface ModelBuilderRequest {
     static ModelBuilderRequest build(@Nonnull Session session, @Nonnull Path path) {
         return builder()
                 .session(requireNonNull(session, "session cannot be null"))
-                .source(ModelSource.fromPath(path))
+                .source(PathSource.buildSource(path))
                 .build();
     }
 

@@ -38,6 +38,7 @@ import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.PathSource;
 import org.apache.maven.api.services.model.ModelResolver;
 import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.di.Injector;
@@ -112,7 +113,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
         Model orgModel = mbs.build(ModelBuilderRequest.builder()
                         .session(InternalSession.from(session))
-                        .source(ModelSource.fromPath(file))
+                        .source(PathSource.buildSource(file))
                         .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .build())
                 .getEffectiveModel();
@@ -138,7 +139,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
         Model orgModel = mbs.build(ModelBuilderRequest.builder()
                         .session(InternalSession.from(session))
-                        .source(ModelSource.fromPath(file))
+                        .source(PathSource.buildSource(file))
                         .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .build())
                 .getEffectiveModel();
@@ -165,11 +166,11 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 throws ModelResolverException {
             String id = groupId + ":" + artifactId + ":" + version;
             if (id.startsWith("org.sonatype.mavenbook.multi:parent:")) {
-                return ModelSource.fromPath(Paths.get("src/test/resources/consumer/simple/pom.xml"));
+                return PathSource.buildSource(Paths.get("src/test/resources/consumer/simple/pom.xml"));
             } else if (id.startsWith("org.sonatype.mavenbook.multi:simple-parent:")) {
-                return ModelSource.fromPath(Paths.get("src/test/resources/consumer/simple/simple-parent/pom.xml"));
+                return PathSource.buildSource(Paths.get("src/test/resources/consumer/simple/simple-parent/pom.xml"));
             } else if (id.startsWith("org.my.group:parent:")) {
-                return ModelSource.fromPath(Paths.get("src/test/resources/consumer/trivial/pom.xml"));
+                return PathSource.buildSource(Paths.get("src/test/resources/consumer/trivial/pom.xml"));
             }
             return null;
         }

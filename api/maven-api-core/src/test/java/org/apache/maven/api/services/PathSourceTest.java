@@ -22,13 +22,13 @@ import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class PathSourceTest {
 
     @Test
     void testEquals() {
-        PathSource source = new PathSource(Paths.get("/tmp"));
-        assertFalse(source.equals(null));
+        PathSource source = PathSource.buildSource(Paths.get("/tmp"));
+        assertNotEquals(null, source);
     }
 }

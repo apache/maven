@@ -23,8 +23,6 @@ import java.nio.file.Path;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * A Source specific to load POMs.  The {@link #resolve(ModelLocator, String)} method
  * will be used to find POMs for subprojects.
@@ -46,14 +44,4 @@ public interface ModelSource extends Source {
 
     @Nullable
     ModelSource resolve(@Nonnull ModelLocator modelLocator, @Nonnull String relative);
-
-    @Nonnull
-    static ModelSource fromPath(@Nonnull Path path) {
-        return fromPath(path, null);
-    }
-
-    @Nonnull
-    static ModelSource fromPath(@Nonnull Path path, @Nullable String location) {
-        return new PathSource(requireNonNull(path, "path cannot be null"), location);
-    }
 }

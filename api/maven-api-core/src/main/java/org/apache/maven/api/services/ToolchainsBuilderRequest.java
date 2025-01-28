@@ -76,11 +76,11 @@ public interface ToolchainsBuilderRequest {
                 .session(requireNonNull(session, "session cannot be null"))
                 .installationToolchainsSource(
                         installationToolchainsFile != null && Files.exists(installationToolchainsFile)
-                                ? Source.fromPath(installationToolchainsFile)
+                                ? PathSource.buildSource(installationToolchainsFile)
                                 : null)
                 .userToolchainsSource(
                         userToolchainsPath != null && Files.exists(userToolchainsPath)
-                                ? Source.fromPath(userToolchainsPath)
+                                ? PathSource.buildSource(userToolchainsPath)
                                 : null)
                 .build();
     }

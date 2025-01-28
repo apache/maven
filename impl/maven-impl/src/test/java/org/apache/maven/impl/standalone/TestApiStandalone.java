@@ -29,7 +29,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.PathSource;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +46,7 @@ class TestApiStandalone {
         ModelBuilderResult result = builder.newSession()
                 .build(ModelBuilderRequest.builder()
                         .session(session)
-                        .source(ModelSource.fromPath(Paths.get("pom.xml").toAbsolutePath()))
+                        .source(PathSource.buildSource(Paths.get("pom.xml").toAbsolutePath()))
                         .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .recursive(true)
                         .build());

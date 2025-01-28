@@ -25,23 +25,37 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-class PathSource implements ModelSource {
+import org.apache.maven.api.annotations.Nullable;
 
+import static java.util.Objects.requireNonNull;
+
+public final class PathSource implements ModelSource {
+
+    public static PathSource buildSource(Path path) {
+        return new PathSource(true, requireNonNull(path, "path"), null);
+    }
+
+    public static PathSource resolvedSource(Path path, @Nullable String location) {
+        return new PathSource(false, requireNonNull(path, "path"), location);
+    }
+
+    private final boolean buildSource;
     private final Path path;
     private final String location;
 
-    PathSource(Path path) {
-        this(path, null);
+    private PathSource(boolean buildSource, Path path) {
+        this(buildSource, path, null);
     }
 
-    PathSource(Path path, String location) {
+    private PathSource(boolean buildSource, Path path, String location) {
+        this.buildSource = buildSource;
         this.path = path.normalize();
         this.location = location != null ? location : this.path.toString();
     }
 
     @Override
     public Path getPath() {
-        return path;
+        return buildSource ? path : null;
     }
 
     @Override
@@ -56,16 +70,18 @@ class PathSource implements ModelSource {
 
     @Override
     public Source resolve(String relative) {
-        return new PathSource(path.resolve(relative));
+        return buildSource ? new PathSource(true, path.resolve(relative)) : null;
     }
 
     @Override
     public ModelSource resolve(ModelLocator locator, String relative) {
-        String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
-        Path path = getPath().getParent().resolve(norm);
-        Path relatedPom = locator.locateExistingPom(path);
-        if (relatedPom != null) {
-            return new PathSource(relatedPom);
+        if (buildSource) {
+            String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
+            Path path = getPath().getParent().resolve(norm);
+            Path relatedPom = locator.locateExistingPom(path);
+            if (relatedPom != null) {
+                return new PathSource(true, relatedPom);
+            }
         }
         return null;
     }
@@ -76,16 +92,20 @@ class PathSource implements ModelSource {
             return false;
         }
 
-        return this == o || o.getClass() == getClass() && Objects.equals(path, ((PathSource) o).path);
+        return this == o
+                || o.getClass() == getClass()
+                        && Objects.equals(buildSource, ((PathSource) o).buildSource)
+                        && Objects.equals(path, ((PathSource) o).path);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(path);
+        return Objects.hash(buildSource, path);
     }
 
     @Override
     public String toString() {
-        return "PathSource[" + "location='" + location + '\'' + ", " + "path=" + path + ']';
+        return getClass().getSimpleName() + "[buildSource=" + buildSource + ", location='" + location + "', " + "path="
+                + path + ']';
     }
 }

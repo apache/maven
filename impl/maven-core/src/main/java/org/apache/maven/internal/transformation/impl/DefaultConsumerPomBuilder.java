@@ -44,7 +44,7 @@ import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.PathSource;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
@@ -181,7 +181,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER);
         request.session(iSession);
-        request.source(ModelSource.fromPath(src));
+        request.source(PathSource.buildSource(src));
         request.locationTracking(false);
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());

@@ -85,7 +85,11 @@ public interface SettingsBuilderRequest {
     @Nonnull
     static SettingsBuilderRequest build(
             @Nonnull ProtoSession session, @Nonnull Path installationSettingsPath, @Nonnull Path userSettingsPath) {
-        return build(session, Source.fromPath(installationSettingsPath), null, Source.fromPath(userSettingsPath));
+        return build(
+                session,
+                PathSource.buildSource(installationSettingsPath),
+                null,
+                PathSource.buildSource(userSettingsPath));
     }
 
     @Nonnull
@@ -112,15 +116,15 @@ public interface SettingsBuilderRequest {
                 .session(requireNonNull(session, "session cannot be null"))
                 .installationSettingsSource(
                         installationSettingsPath != null && Files.exists(installationSettingsPath)
-                                ? Source.fromPath(installationSettingsPath)
+                                ? PathSource.buildSource(installationSettingsPath)
                                 : null)
                 .projectSettingsSource(
                         projectSettingsPath != null && Files.exists(projectSettingsPath)
-                                ? Source.fromPath(projectSettingsPath)
+                                ? PathSource.buildSource(projectSettingsPath)
                                 : null)
                 .userSettingsSource(
                         userSettingsPath != null && Files.exists(userSettingsPath)
-                                ? Source.fromPath(userSettingsPath)
+                                ? PathSource.buildSource(userSettingsPath)
                                 : null)
                 .build();
     }

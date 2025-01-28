@@ -48,10 +48,10 @@ import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.PathSource;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
-import org.apache.maven.api.services.Source;
 import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Proxy;
@@ -570,15 +570,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 .session(context.protoSession)
                 .installationSettingsSource(
                         installationSettingsFile != null && Files.exists(installationSettingsFile)
-                                ? Source.fromPath(installationSettingsFile)
+                                ? PathSource.buildSource(installationSettingsFile)
                                 : null)
                 .projectSettingsSource(
                         projectSettingsFile != null && Files.exists(projectSettingsFile)
-                                ? Source.fromPath(projectSettingsFile)
+                                ? PathSource.buildSource(projectSettingsFile)
                                 : null)
                 .userSettingsSource(
                         userSettingsFile != null && Files.exists(userSettingsFile)
-                                ? Source.fromPath(userSettingsFile)
+                                ? PathSource.buildSource(userSettingsFile)
                                 : null)
                 .interpolationSource(interpolationSource)
                 .build();
