@@ -36,7 +36,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Local UT.
@@ -90,6 +92,69 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Files.writeString(userExtensions, extensionsXml);
 
         assertThrows(ParserException.class, () -> invoke(cwd, userHome, Arrays.asList("clean", "verify")));
+    }
+
+    @Test
+    void conflictingSettings(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String settingsXml =
+                """
+<?xml version="1.0"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <profiles>
+    <profile>
+      <id>oss-development</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>oss-development</activeProfile>
+  </activeProfiles>
+</settings>""";
+        Path dotMvn = cwd.resolve(".mvn");
+        Files.createDirectories(dotMvn);
+        Path projectExtensions = dotMvn.resolve("settings.xml");
+        Files.writeString(projectExtensions, settingsXml);
+
+        Path userConf = userHome.resolve(".m2");
+        Files.createDirectories(userConf);
+        Path userExtensions = userConf.resolve("settings.xml");
+        Files.writeString(userExtensions, settingsXml);
+
+        invoke(cwd, userHome, Arrays.asList("verify"));
+
+        Path logFile = cwd.resolve("verify-build.log").toAbsolutePath();
+        String log = Files.readString(logFile);
+        assertTrue(log.contains("https://repo1.maven.org/maven2"));
+        assertFalse(log.contains("https://repo.maven.apache.org/maven2"));
     }
 
     @Disabled("Until we move off fully from File")
