@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -1407,6 +1408,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                                                         model.getParent().getVersion()))
                                         : null)
                         .build();
+                // Override model properties with user properties
+                Map<String, String> newProps = merge(model.getProperties(), session.getUserProperties());
+                if (newProps != null) {
+                    model = model.withProperties(newProps);
+                }
+                model = model.withProfiles(merge(model.getProfiles(), session.getUserProperties()));
             }
 
             for (var transformer : transformers) {
@@ -1423,6 +1430,57 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             return model;
+        }
+
+        /**
+         * Merges a list of model profiles with user-defined properties.
+         * For each property defined in both the model and user properties, the user property value
+         * takes precedence and overrides the model value.
+         *
+         * @param profiles list of profiles from the model
+         * @param userProperties map of user-defined properties that override model properties
+         * @return a new list containing profiles with overridden properties if changes were made,
+         *         or the original list if no overrides were needed
+         */
+        List<Profile> merge(List<Profile> profiles, Map<String, String> userProperties) {
+            List<Profile> result = null;
+            for (int i = 0; i < profiles.size(); i++) {
+                Profile profile = profiles.get(i);
+                Map<String, String> props = merge(profile.getProperties(), userProperties);
+                if (props != null) {
+                    Profile merged = profile.withProperties(props);
+                    if (result == null) {
+                        result = new ArrayList<>(profiles);
+                    }
+                    result.set(i, merged);
+                }
+            }
+            return result != null ? result : profiles;
+        }
+
+        /**
+         * Merges model properties with user properties, giving precedence to user properties.
+         * For any property key present in both maps, the user property value will override
+         * the model property value when they differ.
+         *
+         * @param properties properties defined in the model
+         * @param userProperties user-defined properties that override model properties
+         * @return a new map with model properties overridden by user properties if changes were needed,
+         *         or null if no overrides were needed
+         */
+        Map<String, String> merge(Map<String, String> properties, Map<String, String> userProperties) {
+            Map<String, String> result = null;
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                String key = entry.getKey();
+                String value = userProperties.get(key);
+                if (value != null && !Objects.equals(value, entry.getValue())) {
+                    if (result == null) {
+                        result = new LinkedHashMap<>(properties);
+                    }
+                    result.put(entry.getKey(), value);
+                }
+            }
+            return result;
         }
 
         Model readRawModel() throws ModelBuilderException {
