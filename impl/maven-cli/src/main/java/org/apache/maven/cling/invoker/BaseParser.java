@@ -308,23 +308,23 @@ public abstract class BaseParser implements Parser {
                 new ArrayList<>(readCoreExtensionsDescriptorFromFile(context.cwd.resolve(projectExtensionsFile)));
 
         // merge these 3 but check for GA uniqueness; we don't want to load up same extension w/ different Vs
-        ArrayList<CoreExtension> extensions =
-                new ArrayList<>(installationExtensions.size() + userExtensions.size() + projectExtensions.size());
         HashMap<String, String> gas = new HashMap<>();
         ArrayList<String> conflicts = new ArrayList<>();
 
-        mergeExtensions(installationExtensions, installationExtensionsFile, gas, conflicts);
-        mergeExtensions(userExtensions, userExtensionsFile, gas, conflicts);
-        mergeExtensions(projectExtensions, projectExtensionsFile, gas, conflicts);
+        ArrayList<CoreExtension> coreExtensions =
+                new ArrayList<>(installationExtensions.size() + userExtensions.size() + projectExtensions.size());
+        coreExtensions.addAll(mergeExtensions(installationExtensions, installationExtensionsFile, gas, conflicts));
+        coreExtensions.addAll(mergeExtensions(userExtensions, userExtensionsFile, gas, conflicts));
+        coreExtensions.addAll(mergeExtensions(projectExtensions, projectExtensionsFile, gas, conflicts));
 
         if (!conflicts.isEmpty()) {
             throw new ParserException("Extension conflicts: " + String.join("; ", conflicts));
         }
 
-        return extensions;
+        return coreExtensions;
     }
 
-    private void mergeExtensions(
+    private List<CoreExtension> mergeExtensions(
             List<CoreExtension> extensions, String extensionsSource, Map<String, String> gas, List<String> conflicts) {
         for (CoreExtension extension : extensions) {
             String ga = extension.getGroupId() + ":" + extension.getArtifactId();
@@ -334,6 +334,7 @@ public abstract class BaseParser implements Parser {
                 gas.put(ga, extensionsSource);
             }
         }
+        return extensions;
     }
 
     protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile)
