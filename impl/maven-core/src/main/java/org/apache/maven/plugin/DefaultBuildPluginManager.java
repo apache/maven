@@ -81,6 +81,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
      * @throws PluginResolutionException The plugin could be found but could not be resolved.
      * @throws InvalidPluginDescriptorException
      */
+    @Override
     public PluginDescriptor loadPlugin(
             Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
@@ -92,6 +93,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
     // Mojo execution
     // ----------------------------------------------------------------------
 
+    @Override
     public void executeMojo(MavenSession session, MojoExecution mojoExecution)
             throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException {
         MavenProject project = session.getCurrentProject();
@@ -201,6 +203,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
      *      call, which is not nice.
      * @throws PluginResolutionException
      */
+    @Override
     public ClassRealm getPluginRealm(MavenSession session, PluginDescriptor pluginDescriptor)
             throws PluginResolutionException, PluginManagerException {
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
@@ -213,6 +216,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         return pluginDescriptor.getClassRealm();
     }
 
+    @Override
     public MojoDescriptor getMojoDescriptor(
             Plugin plugin, String goal, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
@@ -228,8 +232,14 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         }
 
         @Override
-        public void execute() {
-            mojoV4.execute();
+        public void execute() throws org.apache.maven.plugin.MojoExecutionException {
+            try {
+                mojoV4.execute();
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new MojoExecutionException(e);
+            }
         }
 
         @Override
