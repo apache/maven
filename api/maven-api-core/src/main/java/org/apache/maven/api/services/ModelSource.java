@@ -23,8 +23,6 @@ import java.nio.file.Path;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * Represents a source for loading Maven Project Object Model (POM) files. This interface
  * extends the basic {@link Source} interface with specific functionality for handling
@@ -43,37 +41,6 @@ import static java.util.Objects.requireNonNull;
  * @see Source
  */
 public interface ModelSource extends Source {
-
-    /**
-     * Creates a new build source for the specified path.
-     * Build sources are used for POM files of projects being built by Maven
-     * in the filesystem and support resolving related POMs.
-     *
-     * @param path the path to the POM file or project directory
-     * @return a new ModelSource instance configured as a build source
-     * @throws NullPointerException if path is null
-     */
-    @Nonnull
-    static ModelSource buildSource(@Nonnull Path path) {
-        return new PathSource(true, requireNonNull(path, "path"), null);
-    }
-
-    /**
-     * Creates a new resolved source for the specified path and location.
-     * Resolved sources are used for artifacts that have been resolved by Maven
-     * from repositories (using groupId:artifactId:version coordinates) and
-     * downloaded to the local repository. These sources do not support resolving
-     * other sources.
-     *
-     * @param path the path to the POM file or project directory
-     * @param location optional logical location of the source, used for reporting purposes
-     * @return a new ModelSource instance configured as a resolved source
-     * @throws NullPointerException if path is null
-     */
-    @Nonnull
-    static ModelSource resolvedSource(@Nonnull Path path, @Nullable String location) {
-        return new PathSource(false, requireNonNull(path, "path"), location);
-    }
 
     /**
      * Interface for locating POM files within a project structure.

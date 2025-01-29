@@ -34,8 +34,8 @@ import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
-import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ProblemCollector;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.ModelProblemUtils;
@@ -196,7 +196,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 ModelBuilderRequest modelRequest = ModelBuilderRequest.builder()
                         .session(iSession)
                         .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
-                        .source(ModelSource.resolvedSource(pomArtifact.getPath(), gav))
+                        .source(Sources.resolvedSource(pomArtifact.getPath(), gav))
                         // This merge is on purpose because otherwise user properties would override model
                         // properties in dependencies the user does not know. See MNG-7563 for details.
                         .systemProperties(toProperties(session.getUserProperties(), session.getSystemProperties()))

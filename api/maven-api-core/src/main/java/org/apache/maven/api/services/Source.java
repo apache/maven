@@ -31,59 +31,83 @@ import org.apache.maven.api.annotations.Nullable;
  * Provides access to the contents of a source independently of the
  * backing store (e.g. file system, database, memory).
  * <p>
- * This is mainly used to parse files into objects such as
- * {@link org.apache.maven.api.Project},
- * {@link org.apache.maven.api.model.Model},
- * {@link org.apache.maven.api.settings.Settings}, or
- * {@link org.apache.maven.api.toolchain.PersistedToolchains}.
+ * This is mainly used to parse files into objects such as Maven projects,
+ * models, settings, or toolchains. The source implementation handles
+ * all the details of accessing the underlying content while providing
+ * a uniform API to consumers.
+ * <p>
+ * Sources can represent:
+ * <ul>
+ *   <li>Local filesystem files</li>
+ *   <li>In-memory content</li>
+ *   <li>Database entries</li>
+ *   <li>Network resources</li>
+ * </ul>
  *
  * @since 4.0.0
  * @see org.apache.maven.api.services.ProjectBuilder#build(Session, Source)
- * @see org.apache.maven.api.services.SettingsBuilder#build(Session, Source, Source, Source)
- * @see org.apache.maven.api.services.ToolchainsBuilder#build(Session, Source, Source)
  */
 @Experimental
 public interface Source {
-
     /**
-     * Provides access the file to be parsed, if this source is backed by a file.
+     * Provides access to the file backing this source, if available.
+     * Not all sources are backed by files - for example, in-memory sources
+     * or database-backed sources will return null.
      *
-     * @return the underlying {@code Path}, or {@code null} if this source is not backed by a file
+     * @return the underlying {@code Path} if this source is file-backed,
+     *         or {@code null} if this source has no associated file
      */
     @Nullable
     Path getPath();
 
     /**
-     * Creates a new byte stream to the source contents.
-     * Closing the returned stream is the responsibility of the caller.
+     * Creates a new input stream to read the source contents.
+     * Each call creates a fresh stream starting from the beginning.
+     * The caller is responsible for closing the returned stream.
      *
-     * @return a byte stream to the source contents, never {@code null}
-     * @throws IOException in case of IO issue
+     * @return a new input stream positioned at the start of the content
+     * @throws IOException if the stream cannot be created or opened
      */
     @Nonnull
     InputStream openStream() throws IOException;
 
     /**
-     * Provides a user-friendly hint about the location of the source.
-     * This could be a local file path, a URI or just an empty string.
-     * The intention is to assist users during error reporting.
+     * Returns a human-readable description of where this source came from,
+     * used primarily for error messages and debugging.
+     * <p>
+     * Examples of locations:
+     * <ul>
+     *   <li>Absolute file path: {@code /path/to/pom.xml}</li>
+     *   <li>Relative file path: {@code ../parent/pom.xml}</li>
+     *   <li>URL: {@code https://repo.maven.org/.../pom.xml}</li>
+     *   <li>Description: {@code <memory>} or {@code <database>}</li>
+     * </ul>
      *
-     * @return a user-friendly hint about the location of the source, never {@code null}
+     * @return a non-null string describing the source location
      */
     @Nonnull
     String getLocation();
 
     /**
-     * Returns a new source identified by a relative path. Implementation <strong>MUST</strong>
-     * be able to accept <code>relative</code> parameter values that
+     * Resolves a new source relative to this one.
+     * <p>
+     * The resolution strategy depends on the source type:
      * <ul>
-     * <li>use either / or \ file path separator,</li>
-     * <li>have .. parent directory references,</li>
-     * <li>point either at file or directory.</li>
+     *   <li>File sources resolve against their parent directory</li>
+     *   <li>URL sources resolve against their base URL</li>
+     *   <li>Other sources may not support resolution and return null</li>
+     * </ul>
+     * <p>
+     * The implementation must handle:
+     * <ul>
+     *   <li>Both forward and back slashes as path separators</li>
+     *   <li>Parent directory references (..)</li>
+     *   <li>Both file and directory targets</li>
      * </ul>
      *
-     * @param relative is the path of the requested source relative to this source
-     * @return related source or <code>null</code> if no such source
+     * @param relative path to resolve relative to this source
+     * @return the resolved source, or null if resolution not possible
+     * @throws NullPointerException if relative is null
      */
     @Nullable
     Source resolve(@Nonnull String relative);

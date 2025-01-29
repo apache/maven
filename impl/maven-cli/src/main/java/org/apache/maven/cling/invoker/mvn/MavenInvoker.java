@@ -40,7 +40,7 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
-import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
 import org.apache.maven.api.services.ToolchainsBuilderResult;
@@ -180,11 +180,11 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                 .session(context.protoSession)
                 .installationToolchainsSource(
                         installationToolchainsFile != null && Files.isRegularFile(installationToolchainsFile)
-                                ? ModelSource.buildSource(installationToolchainsFile)
+                                ? Sources.fromPath(installationToolchainsFile)
                                 : null)
                 .userToolchainsSource(
                         userToolchainsFile != null && Files.isRegularFile(userToolchainsFile)
-                                ? ModelSource.buildSource(userToolchainsFile)
+                                ? Sources.fromPath(userToolchainsFile)
                                 : null)
                 .build();
 
