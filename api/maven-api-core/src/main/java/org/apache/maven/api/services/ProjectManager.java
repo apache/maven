@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Language;
@@ -103,6 +104,7 @@ public interface ProjectManager extends Service {
      * @param type the type of the artifact (e.g., "jar", "war", "sources")
      * @param path the path to the artifact file
      * @throws IllegalArgumentException if the session, project, type or path is null
+     *
      * @see org.apache.maven.api.Type
      */
     default void attachArtifact(
@@ -124,6 +126,37 @@ public interface ProjectManager extends Service {
     void attachArtifact(@Nonnull Project project, @Nonnull ProducedArtifact artifact, @Nonnull Path path);
 
     /**
+     * {@return all source root directories}, including the disabled ones, for all languages and scopes.
+     * For listing only the {@linkplain SourceRoot#enabled() enabled} source roots,
+     * the following code can be used:
+     *
+     * <pre>{@literal
+     * List<SourceRoot> enabledRoots = project.getSourceRoots()
+     *         .stream().filter(SourceRoot::enabled).toList();
+     * }</pre>
+     *
+     * The iteration order is the order in which the sources are declared in the POM file.
+     *
+     * @param project the project for which to get the source roots
+     */
+    @Nonnull
+    Collection<SourceRoot> getSourceRoots(@Nonnull Project project);
+
+    /**
+     * {@return all enabled sources that provide files in the given language for the given scope}.
+     * If the given scope is {@code null}, then this method returns the enabled sources for all scopes.
+     * If the given language is {@code null}, then this method returns the enabled sources for all languages.
+     * An arbitrary number of source roots may exist for the same scope and language.
+     * It may be, for example, the case of a multi-versions project.
+     * The iteration order is the order in which the sources are declared in the POM file.
+     *
+     * @param project the project for which to get the enabled source roots
+     * @param scope the scope of the sources to return, or {@code null} for all scopes
+     * @param language the language of the sources to return, or {@code null} for all languages
+     */
+    Stream<SourceRoot> getEnabledSourceRoots(@Nonnull Project project, ProjectScope scope, Language language);
+
+    /**
      * Adds the given source to the given project.
      * If a source already exists for the given scope, language and directory,
      * then the behavior depends on the {@code ProjectManager} implementation.
@@ -133,7 +166,7 @@ public interface ProjectManager extends Service {
      * @param source the source to add
      * @throws IllegalArgumentException if this project manager rejects the given source because of conflict
      *
-     * @see Project#getSourceRoots()
+     * @see #getSourceRoots(Project)
      */
     void addSourceRoot(@Nonnull Project project, @Nonnull SourceRoot source);
 
@@ -150,7 +183,7 @@ public interface ProjectManager extends Service {
      * @param language language of the files contained in the directory to add
      * @param directory the directory to add if not already present in the source
      *
-     * @see Project#getEnabledSourceRoots(ProjectScope, Language)
+     * @see #getEnabledSourceRoots(Project, ProjectScope, Language)
      */
     void addSourceRoot(
             @Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull Path directory);
@@ -173,6 +206,8 @@ public interface ProjectManager extends Service {
 
     /**
      * {@return an immutable map of the project properties}.
+     *
+     * @param project the project for which to get the properties
      *
      * @see #setProperty(Project, String, String)
      */

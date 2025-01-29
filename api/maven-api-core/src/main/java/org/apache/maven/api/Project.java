@@ -19,10 +19,8 @@
 package org.apache.maven.api;
 
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -239,32 +237,4 @@ public interface Project {
      */
     @Nonnull
     Optional<Project> getParent();
-
-    /**
-     * {@return all source root directories}, including the disabled ones, for all languages and scopes.
-     * For listing only the {@linkplain SourceRoot#enabled() enabled} source roots,
-     * the following code can be used:
-     *
-     * <pre>{@literal
-     * List<SourceRoot> enabledRoots = project.getSourceRoots()
-     *         .stream().filter(SourceRoot::enabled).toList();
-     * }</pre>
-     *
-     * The iteration order is the order in which the sources are declared in the POM file.
-     */
-    @Nonnull
-    Collection<SourceRoot> getSourceRoots();
-
-    /**
-     * {@return all enabled sources that provide files in the given language for the given scope}.
-     * If the given scope is {@code null}, then this method returns the enabled sources for all scopes.
-     * If the given language is {@code null}, then this method returns the enabled sources for all languages.
-     * An arbitrary number of source roots may exist for the same scope and language.
-     * It may be, for example, the case of a multi-versions project.
-     * The iteration order is the order in which the sources are declared in the POM file.
-     *
-     * @param scope the scope of the sources to return, or {@code null} for all scopes
-     * @param language the language of the sources to return, or {@code null} for all languages
-     */
-    Stream<SourceRoot> getEnabledSourceRoots(ProjectScope scope, Language language);
 }

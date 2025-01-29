@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Language;
@@ -124,6 +125,20 @@ public class DefaultProjectManager implements ProjectManager {
                 .addAttachedArtifact(RepositoryUtils.toArtifact(
                         ((DefaultProject) project).getSession().toArtifact(artifact)));
         artifactManager.setPath(artifact, path);
+    }
+
+    @Nonnull
+    @Override
+    public Collection<SourceRoot> getSourceRoots(Project project) {
+        MavenProject prj = getMavenProject(nonNull(project, "project"));
+        return prj.getSourceRoots();
+    }
+
+    @Nonnull
+    @Override
+    public Stream<SourceRoot> getEnabledSourceRoots(Project project, ProjectScope scope, Language language) {
+        MavenProject prj = getMavenProject(nonNull(project, "project"));
+        return prj.getEnabledSourceRoots(scope, language);
     }
 
     @Override
