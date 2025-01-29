@@ -51,6 +51,11 @@ public class DefaultArtifactResolver implements ArtifactResolver {
             throws ArtifactResolverException, IllegalArgumentException {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
+        return session.request(request, this::doResolve);
+    }
+
+    protected ArtifactResolverResult doResolve(ArtifactResolverRequest request) {
+        InternalSession session = InternalSession.from(request.getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             Map<DownloadedArtifact, Path> paths = new HashMap<>();
