@@ -232,7 +232,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         }
 
         @Override
-        public void execute() throws org.apache.maven.plugin.MojoExecutionException {
+        public void execute() throws MojoExecutionException {
             try {
                 mojoV4.execute();
             } catch (RuntimeException e) {

@@ -54,12 +54,15 @@ import org.apache.maven.api.annotations.ThreadSafe;
 @ThreadSafe
 public interface Mojo {
     /**
-     * Perform whatever build-process behavior this {@code Mojo} implements. This is
-     * the main trigger for the {@code Mojo} inside the Maven system, and allows the
-     * {@code Mojo} to communicate errors.
+     * Executes the behavior defined by this {@code Mojo}. This method is invoked
+     * during the Maven build lifecycle to perform the Mojo's designated task.
      *
-     * @throws Exception if any problem occurs that prevents the mojo from its
-     *                   execution
+     * <p>Implementations should handle any task-specific logic and may communicate
+     * errors by throwing an {@link Exception}. Error conditions should provide
+     * sufficient detail to aid troubleshooting.</p>
+     *
+     * @throws Exception if any issue occurs that prevents the successful execution
+     *                   of the Mojo
      */
     void execute() throws Exception;
 }
