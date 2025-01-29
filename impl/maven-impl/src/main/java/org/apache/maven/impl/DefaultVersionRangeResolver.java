@@ -57,7 +57,12 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             throws VersionRangeResolverException {
         requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
+        return session.request(request, this::doResolve);
+    }
 
+    public VersionRangeResolverResult doResolve(VersionRangeResolverRequest request)
+            throws VersionRangeResolverException {
+        InternalSession session = InternalSession.from(request.getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             VersionRangeResult res = repositorySystem.resolveVersionRange(
