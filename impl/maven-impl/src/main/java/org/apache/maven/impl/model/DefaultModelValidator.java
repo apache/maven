@@ -787,7 +787,7 @@ public class DefaultModelValidator implements ModelValidator {
             ModelProblemCollector problems, String fieldPathPrefix, InputLocationTracker tracker, XmlNode xmlNode) {
         validateXmlNode(problems, fieldPathPrefix, tracker, xmlNode);
         for (XmlNode child : xmlNode.getChildren()) {
-            validateXmlNodeRecursively(problems, fieldPathPrefix, tracker, child);
+            validateXmlNodeRecursively(problems, fieldPathPrefix + "." + xmlNode.getName(), tracker, child);
         }
     }
 
