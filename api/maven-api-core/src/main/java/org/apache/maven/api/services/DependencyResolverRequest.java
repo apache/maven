@@ -52,16 +52,13 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface DependencyResolverRequest {
+public interface DependencyResolverRequest extends Request<Session> {
 
     enum RequestType {
         COLLECT,
         FLATTEN,
         RESOLVE
     }
-
-    @Nonnull
-    Session getSession();
 
     @Nonnull
     RequestType getRequestType();
@@ -173,6 +170,7 @@ public interface DependencyResolverRequest {
     class DependencyResolverRequestBuilder {
 
         Session session;
+        RequestTrace trace;
         RequestType requestType;
         Project project;
         Artifact rootArtifact;
@@ -189,6 +187,12 @@ public interface DependencyResolverRequest {
         @Nonnull
         public DependencyResolverRequestBuilder session(@Nonnull Session session) {
             this.session = session;
+            return this;
+        }
+
+        @Nonnull
+        public DependencyResolverRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -350,6 +354,7 @@ public interface DependencyResolverRequest {
         public DependencyResolverRequest build() {
             return new DefaultDependencyResolverRequest(
                     session,
+                    trace,
                     requestType,
                     project,
                     rootArtifact,
@@ -364,6 +369,31 @@ public interface DependencyResolverRequest {
 
         static class DefaultDependencyResolverRequest extends BaseRequest<Session>
                 implements DependencyResolverRequest {
+
+            static final class AlwaysTrueFilter implements Predicate<PathType> {
+                @Override
+                public boolean test(PathType pathType) {
+                    return true;
+                }
+
+                @Override
+                public boolean equals(Object obj) {
+                    return obj instanceof AlwaysTrueFilter;
+                }
+
+                @Override
+                public int hashCode() {
+                    return AlwaysTrueFilter.class.hashCode();
+                }
+
+                @Override
+                public String toString() {
+                    return "AlwaysTrueFilter[]";
+                }
+            }
+
+            private static final Predicate<PathType> DEFAULT_FILTER = new AlwaysTrueFilter();
+
             private final RequestType requestType;
             private final Project project;
             private final Artifact rootArtifact;
@@ -385,6 +415,7 @@ public interface DependencyResolverRequest {
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultDependencyResolverRequest(
                     @Nonnull Session session,
+                    @Nullable RequestTrace trace,
                     @Nonnull RequestType requestType,
                     @Nullable Project project,
                     @Nullable Artifact rootArtifact,
@@ -395,7 +426,7 @@ public interface DependencyResolverRequest {
                     @Nullable PathScope pathScope,
                     @Nullable Predicate<PathType> pathTypeFilter,
                     @Nullable List<RemoteRepository> repositories) {
-                super(session);
+                super(session, trace);
                 this.requestType = requireNonNull(requestType, "requestType cannot be null");
                 this.project = project;
                 this.rootArtifact = rootArtifact;
@@ -405,7 +436,7 @@ public interface DependencyResolverRequest {
                         List.copyOf(requireNonNull(managedDependencies, "managedDependencies cannot be null"));
                 this.verbose = verbose;
                 this.pathScope = requireNonNull(pathScope, "pathScope cannot be null");
-                this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : (t) -> true;
+                this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : DEFAULT_FILTER;
                 this.repositories = repositories;
                 if (verbose && requestType != RequestType.COLLECT) {
                     throw new IllegalArgumentException("verbose cannot only be true when collecting dependencies");
@@ -468,10 +499,19 @@ public interface DependencyResolverRequest {
                 return repositories;
             }
 
-            @Nonnull
             @Override
             public String toString() {
-                return getRoot() + " -> " + getDependencies();
+                return "DependencyResolverRequest[" + "requestType="
+                        + requestType + ", project="
+                        + project + ", rootArtifact="
+                        + rootArtifact + ", root="
+                        + root + ", dependencies="
+                        + dependencies + ", managedDependencies="
+                        + managedDependencies + ", verbose="
+                        + verbose + ", pathScope="
+                        + pathScope + ", pathTypeFilter="
+                        + pathTypeFilter + ", repositories="
+                        + repositories + ']';
             }
         }
     }

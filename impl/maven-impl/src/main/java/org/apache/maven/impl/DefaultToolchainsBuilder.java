@@ -78,7 +78,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
             throw new ToolchainsBuilderException("Error building toolchains", problems);
         }
 
-        return new DefaultToolchainsBuilderResult(effective, problems);
+        return new DefaultToolchainsBuilderResult(request, effective, problems);
     }
 
     private PersistedToolchains readToolchains(
@@ -162,14 +162,24 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
      */
     static class DefaultToolchainsBuilderResult implements ToolchainsBuilderResult {
 
+        private final ToolchainsBuilderRequest request;
+
         private final PersistedToolchains effectiveToolchains;
 
         private final ProblemCollector<BuilderProblem> problems;
 
         DefaultToolchainsBuilderResult(
-                PersistedToolchains effectiveToolchains, ProblemCollector<BuilderProblem> problems) {
+                ToolchainsBuilderRequest request,
+                PersistedToolchains effectiveToolchains,
+                ProblemCollector<BuilderProblem> problems) {
+            this.request = request;
             this.effectiveToolchains = effectiveToolchains;
             this.problems = (problems != null) ? problems : ProblemCollector.empty();
+        }
+
+        @Override
+        public ToolchainsBuilderRequest getRequest() {
+            return request;
         }
 
         @Override

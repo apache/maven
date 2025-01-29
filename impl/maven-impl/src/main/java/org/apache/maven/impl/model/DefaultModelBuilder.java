@@ -82,6 +82,7 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.VersionParserException;
@@ -109,6 +110,8 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
+import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.util.PhasingExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,24 +220,30 @@ public class DefaultModelBuilder implements ModelBuilder {
          */
         @Override
         public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
-            // Create or derive a session based on the request
-            ModelBuilderSessionState session;
-            if (mainSession == null) {
-                mainSession = new ModelBuilderSessionState(request);
-                session = mainSession;
-            } else {
-                session = mainSession.derive(
-                        request, new DefaultModelBuilderResult(ProblemCollector.create(mainSession.session)));
+            RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
+            try {
+                // Create or derive a session based on the request
+                ModelBuilderSessionState session;
+                if (mainSession == null) {
+                    mainSession = new ModelBuilderSessionState(request);
+                    session = mainSession;
+                } else {
+                    session = mainSession.derive(
+                            request,
+                            new DefaultModelBuilderResult(request, ProblemCollector.create(mainSession.session)));
+                }
+                // Build the request
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                    // build the build poms
+                    session.buildBuildPom();
+                } else {
+                    // simply build the effective model
+                    session.buildEffectiveModel(new LinkedHashSet<>());
+                }
+                return session.result;
+            } finally {
+                RequestTraceHelper.exit(trace);
             }
-            // Build the request
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
-                // build the build poms
-                session.buildBuildPom();
-            } else {
-                // simply build the effective model
-                session.buildEffectiveModel(new LinkedHashSet<>());
-            }
-            return session.result;
         }
     }
 
@@ -260,7 +269,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             this(
                     request.getSession(),
                     request,
-                    new DefaultModelBuilderResult(ProblemCollector.create(request.getSession())),
+                    new DefaultModelBuilderResult(request, ProblemCollector.create(request.getSession())),
                     request.getSession()
                             .getData()
                             .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance),
@@ -302,7 +311,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         ModelBuilderSessionState derive(ModelSource source) {
-            return derive(source, new DefaultModelBuilderResult(ProblemCollector.create(session)));
+            return derive(source, new DefaultModelBuilderResult(request, ProblemCollector.create(session)));
         }
 
         ModelBuilderSessionState derive(ModelSource source, DefaultModelBuilderResult result) {
@@ -313,7 +322,7 @@ public class DefaultModelBuilder implements ModelBuilder {
          * Creates a new session, sharing cached datas and propagating errors.
          */
         ModelBuilderSessionState derive(ModelBuilderRequest request) {
-            return derive(request, new DefaultModelBuilderResult(ProblemCollector.create(session)));
+            return derive(request, new DefaultModelBuilderResult(request, ProblemCollector.create(session)));
         }
 
         ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
@@ -638,16 +647,21 @@ public class DefaultModelBuilder implements ModelBuilder {
             // This is done through the phased executor
             var allResults = results(result).toList();
             List<RuntimeException> exceptions = new CopyOnWriteArrayList<>();
+            InternalSession session = InternalSession.from(this.session);
+            RequestTrace trace = session.getCurrentTrace();
             try (PhasingExecutor executor = createExecutor()) {
                 for (DefaultModelBuilderResult r : allResults) {
                     executor.execute(() -> {
                         ModelBuilderSessionState mbs = derive(r.getSource(), r);
+                        session.setCurrentTrace(trace);
                         try {
                             mbs.buildEffectiveModel(new LinkedHashSet<>());
                         } catch (ModelBuilderException e) {
                             // gathered with problem collector
                         } catch (RuntimeException t) {
                             exceptions.add(t);
+                        } finally {
+                            session.setCurrentTrace(null);
                         }
                     });
                 }
@@ -681,7 +695,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             try (PhasingExecutor executor = createExecutor()) {
                 DefaultModelBuilderResult r = Objects.equals(top, root)
                         ? result
-                        : new DefaultModelBuilderResult(ProblemCollector.create(session));
+                        : new DefaultModelBuilderResult(request, ProblemCollector.create(session));
                 loadFilePom(executor, top, root, Set.of(), r);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {
@@ -755,12 +769,21 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                     DefaultModelBuilderResult cr = Objects.equals(top, subprojectFile)
                             ? result
-                            : new DefaultModelBuilderResult(ProblemCollector.create(session));
+                            : new DefaultModelBuilderResult(request, ProblemCollector.create(session));
                     if (request.isRecursive()) {
                         r.getChildren().add(cr);
                     }
 
-                    executor.execute(() -> loadFilePom(executor, top, subprojectFile, concat(parents, pom), cr));
+                    InternalSession session = InternalSession.from(this.session);
+                    RequestTrace trace = session.getCurrentTrace();
+                    executor.execute(() -> {
+                        session.setCurrentTrace(trace);
+                        try {
+                            loadFilePom(executor, top, subprojectFile, concat(parents, pom), cr);
+                        } finally {
+                            session.setCurrentTrace(null);
+                        }
+                    });
                 }
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
@@ -1881,12 +1904,17 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     @Override
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
-        ModelBuilderSessionState build = new ModelBuilderSessionState(request);
-        Model model = build.readRawModel();
-        if (build.hasErrors()) {
-            throw build.newModelBuilderException();
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
+        try {
+            ModelBuilderSessionState build = new ModelBuilderSessionState(request);
+            Model model = build.readRawModel();
+            if (build.hasErrors()) {
+                throw build.newModelBuilderException();
+            }
+            return model;
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
-        return model;
     }
 
     static String getGroupId(Model model) {

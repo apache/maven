@@ -32,7 +32,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0.0
  */
 @Experimental
-public interface ProjectBuilderResult {
+public interface ProjectBuilderResult extends Result<ProjectBuilderRequest> {
 
     /**
      * Gets the identifier of the project that could not be built. The general format of the identifier is {@code

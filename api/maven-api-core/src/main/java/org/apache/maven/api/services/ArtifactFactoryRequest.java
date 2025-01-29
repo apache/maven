@@ -23,6 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
+import org.apache.maven.api.annotations.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,10 +34,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ArtifactFactoryRequest {
-
-    @Nonnull
-    Session getSession();
+public interface ArtifactFactoryRequest extends Request<Session> {
 
     String getGroupId();
 
@@ -87,6 +85,7 @@ public interface ArtifactFactoryRequest {
     @NotThreadSafe
     class ArtifactFactoryRequestBuilder {
         private Session session;
+        private RequestTrace trace;
         private String groupId;
         private String artifactId;
         private String version;
@@ -98,6 +97,11 @@ public interface ArtifactFactoryRequest {
 
         public ArtifactFactoryRequestBuilder session(Session session) {
             this.session = session;
+            return this;
+        }
+
+        public ArtifactFactoryRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -133,7 +137,7 @@ public interface ArtifactFactoryRequest {
 
         public ArtifactFactoryRequest build() {
             return new DefaultArtifactFactoryRequest(
-                    session, groupId, artifactId, version, classifier, extension, type);
+                    session, trace, groupId, artifactId, version, classifier, extension, type);
         }
 
         private static class DefaultArtifactFactoryRequest extends BaseRequest<Session>
@@ -145,15 +149,17 @@ public interface ArtifactFactoryRequest {
             private final String extension;
             private final String type;
 
+            @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultArtifactFactoryRequest(
                     @Nonnull Session session,
+                    @Nullable RequestTrace trace,
                     String groupId,
                     String artifactId,
                     String version,
                     String classifier,
                     String extension,
                     String type) {
-                super(session);
+                super(session, trace);
                 this.groupId = groupId;
                 this.artifactId = artifactId;
                 this.version = version;
@@ -190,6 +196,17 @@ public interface ArtifactFactoryRequest {
             @Override
             public String getType() {
                 return type;
+            }
+
+            @Override
+            public String toString() {
+                return "ArtifactFactoryRequest[" + "groupId='"
+                        + groupId + '\'' + ", artifactId='"
+                        + artifactId + '\'' + ", version='"
+                        + version + '\'' + ", classifier='"
+                        + classifier + '\'' + ", extension='"
+                        + extension + '\'' + ", type='"
+                        + type + '\'' + ']';
             }
         }
     }

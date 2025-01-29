@@ -42,10 +42,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ProjectBuilderRequest {
-
-    @Nonnull
-    Session getSession();
+public interface ProjectBuilderRequest extends Request<Session> {
 
     @Nonnull
     Optional<Path> getPath();
@@ -86,6 +83,7 @@ public interface ProjectBuilderRequest {
     @NotThreadSafe
     class ProjectBuilderRequestBuilder {
         Session session;
+        RequestTrace trace;
         Path path;
         Source source;
         boolean allowStubModel;
@@ -97,6 +95,11 @@ public interface ProjectBuilderRequest {
 
         public ProjectBuilderRequestBuilder session(Session session) {
             this.session = session;
+            return this;
+        }
+
+        public ProjectBuilderRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -122,7 +125,7 @@ public interface ProjectBuilderRequest {
 
         public ProjectBuilderRequest build() {
             return new DefaultProjectBuilderRequest(
-                    session, path, source, allowStubModel, recursive, processPlugins, repositories);
+                    session, trace, path, source, allowStubModel, recursive, processPlugins, repositories);
         }
 
         private static class DefaultProjectBuilderRequest extends BaseRequest<Session>
@@ -137,13 +140,14 @@ public interface ProjectBuilderRequest {
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultProjectBuilderRequest(
                     @Nonnull Session session,
+                    @Nullable RequestTrace trace,
                     @Nullable Path path,
                     @Nullable Source source,
                     boolean allowStubModel,
                     boolean recursive,
                     boolean processPlugins,
                     @Nullable List<RemoteRepository> repositories) {
-                super(session);
+                super(session, trace);
                 this.path = path;
                 this.source = source;
                 this.allowStubModel = allowStubModel;
@@ -182,6 +186,17 @@ public interface ProjectBuilderRequest {
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
+            }
+
+            @Override
+            public String toString() {
+                return "ProjectBuilderRequest[" + "path="
+                        + path + ", source="
+                        + source + ", allowStubModel="
+                        + allowStubModel + ", recursive="
+                        + recursive + ", processPlugins="
+                        + processPlugins + ", repositories="
+                        + repositories + ']';
             }
         }
     }

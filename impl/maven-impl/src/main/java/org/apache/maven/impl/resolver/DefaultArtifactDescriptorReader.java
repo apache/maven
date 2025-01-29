@@ -38,6 +38,7 @@ import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.model.ModelProblemUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -195,6 +196,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         pomArtifact.getGroupId() + ":" + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion();
                 ModelBuilderRequest modelRequest = ModelBuilderRequest.builder()
                         .session(iSession)
+                        .trace(RequestTraceHelper.toMaven(request.getRequestContext(), trace))
                         .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
                         .source(ModelSource.fromPath(pomArtifact.getPath(), gav))
                         // This merge is on purpose because otherwise user properties would override model

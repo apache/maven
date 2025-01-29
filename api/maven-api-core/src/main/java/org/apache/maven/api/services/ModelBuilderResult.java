@@ -31,7 +31,7 @@ import org.apache.maven.api.model.Profile;
  * @since 4.0.0
  */
 @Experimental
-public interface ModelBuilderResult {
+public interface ModelBuilderResult extends Result<ModelBuilderRequest> {
 
     /**
      * Gets the source from which the model was read.

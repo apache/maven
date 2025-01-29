@@ -30,6 +30,8 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.services.RequestTrace;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -86,4 +88,26 @@ public interface InternalSession extends Session {
     RepositorySystemSession getSession();
 
     RepositorySystem getRepositorySystem();
+
+    /**
+     * Sets the current request trace for the session.
+     * The request trace provides contextual information about the current operation
+     * being performed and can be used for debugging and monitoring purposes.
+     * The trace is stored in thread-local storage, allowing for concurrent operations
+     * with different traces.
+     *
+     * @param trace the trace to set as current, may be null to clear the trace
+     * @see RequestTraceHelper#enter(Session, Object) For the recommended way to manage traces
+     */
+    void setCurrentTrace(@Nullable RequestTrace trace);
+
+    /**
+     * Gets the current request trace for the session from thread-local storage.
+     * Each thread maintains its own trace context, ensuring thread-safety for
+     * concurrent operations.
+     *
+     * @return the current request trace, or null if no trace is set
+     * @see RequestTraceHelper#enter(Session, Object) For the recommended way to manage traces
+     */
+    RequestTrace getCurrentTrace();
 }

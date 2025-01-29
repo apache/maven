@@ -135,7 +135,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             throw new SettingsBuilderException("Error building settings", problems);
         }
 
-        return new DefaultSettingsBuilderResult(effective, problems);
+        return new DefaultSettingsBuilderResult(request, effective, problems);
     }
 
     private Settings readSettings(
@@ -330,13 +330,22 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
      */
     static class DefaultSettingsBuilderResult implements SettingsBuilderResult {
 
+        private final SettingsBuilderRequest request;
+
         private final Settings effectiveSettings;
 
         private final ProblemCollector<BuilderProblem> problems;
 
-        DefaultSettingsBuilderResult(Settings effectiveSettings, ProblemCollector<BuilderProblem> problems) {
+        DefaultSettingsBuilderResult(
+                SettingsBuilderRequest request, Settings effectiveSettings, ProblemCollector<BuilderProblem> problems) {
+            this.request = request;
             this.effectiveSettings = effectiveSettings;
             this.problems = (problems != null) ? problems : ProblemCollector.empty();
+        }
+
+        @Override
+        public SettingsBuilderRequest getRequest() {
+            return request;
         }
 
         @Override
