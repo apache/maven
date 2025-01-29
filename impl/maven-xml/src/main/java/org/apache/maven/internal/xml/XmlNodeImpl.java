@@ -374,32 +374,20 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     private static String getChildCombinationMode(Map<String, String> attrs) {
         String attribute = attrs.get(CHILDREN_COMBINATION_MODE_ATTRIBUTE);
-        if (attribute == null) {
-            return DEFAULT_CHILDREN_COMBINATION_MODE;
-        }
         if (CHILDREN_COMBINATION_APPEND.equals(attribute) || CHILDREN_COMBINATION_MERGE.equals(attribute)) {
             return attribute;
         }
-        throw new IllegalArgumentException("Unsupported value '" + attribute + "' for "
-                + CHILDREN_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
-                + CHILDREN_COMBINATION_APPEND + ", and " + CHILDREN_COMBINATION_MERGE
-                + " (default is: " + DEFAULT_SELF_COMBINATION_MODE + ")");
+        return DEFAULT_CHILDREN_COMBINATION_MODE;
     }
 
     private static String getSelfCombinationMode(XmlNode node) {
         String attribute = node.getAttribute(SELF_COMBINATION_MODE_ATTRIBUTE);
-        if (attribute == null) {
-            return DEFAULT_SELF_COMBINATION_MODE;
-        }
         if (SELF_COMBINATION_OVERRIDE.equals(attribute)
                 || SELF_COMBINATION_MERGE.equals(attribute)
                 || SELF_COMBINATION_REMOVE.equals(attribute)) {
             return attribute;
         }
-        throw new IllegalArgumentException("Unsupported value '" + attribute + "' for "
-                + SELF_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
-                + SELF_COMBINATION_OVERRIDE + ", " + SELF_COMBINATION_MERGE + ", and " + SELF_COMBINATION_REMOVE
-                + " (default is: " + DEFAULT_SELF_COMBINATION_MODE + ")");
+        return DEFAULT_SELF_COMBINATION_MODE;
     }
 
     /**
