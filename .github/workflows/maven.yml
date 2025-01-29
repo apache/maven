@@ -52,7 +52,7 @@ jobs:
 
       - name: Set up Maven
         shell: bash
-        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-1"
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-2"
 
       - name: Build Maven distributions
         shell: bash

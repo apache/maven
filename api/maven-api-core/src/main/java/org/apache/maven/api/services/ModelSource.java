@@ -23,37 +23,72 @@ import java.nio.file.Path;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
-import static java.util.Objects.requireNonNull;
-
 /**
- * A Source specific to load POMs.  The {@link #resolve(ModelLocator, String)} method
- * will be used to find POMs for subprojects.
+ * Represents a source for loading Maven Project Object Model (POM) files. This interface
+ * extends the basic {@link Source} interface with specific functionality for handling
+ * Maven POM files and resolving related project POMs.
+ *
+ * <p>The interface provides two types of sources:</p>
+ * <ul>
+ *   <li>Build sources: Used for POM files of projects being built by Maven in the filesystem.
+ *       These sources support resolving related POMs using the {@link ModelLocator}.</li>
+ *   <li>Resolved sources: Used for artifacts that have been resolved by Maven from repositories
+ *       (using groupId:artifactId:version coordinates) and downloaded to the local repository.
+ *       These sources do not support resolving other sources.</li>
+ * </ul>
  *
  * @since 4.0.0
+ * @see Source
  */
 public interface ModelSource extends Source {
 
+    /**
+     * Interface for locating POM files within a project structure.
+     * Implementations of this interface provide the ability to find POM files
+     * in various project contexts.
+     *
+     * @since 4.0.0
+     */
     interface ModelLocator {
         /**
-         * Returns the file containing the pom or null if a pom can not be
-         * found at the given file or in the given directory.
+         * Attempts to locate an existing POM file at or within the specified project path.
          *
-         * @since 4.0.0
+         * <p>This method is used to find POM files in various contexts, such as:</p>
+         * <ul>
+         *   <li>Directly at the specified path</li>
+         *   <li>Within a directory at the specified path</li>
+         *   <li>In standard Maven project locations relative to the specified path</li>
+         * </ul>
+         *
+         * @param project the path to search for a POM file
+         * @return the path to the located POM file, or null if no POM can be found
+         * @throws NullPointerException if project is null
          */
         @Nullable
         Path locateExistingPom(@Nonnull Path project);
     }
 
+    /**
+     * Resolves a relative path to another POM file using the provided model locator.
+     * This method is specifically used to locate POM files for subprojects or related
+     * projects referenced from the current POM.
+     *
+     * <p>The resolution process typically involves:</p>
+     * <ul>
+     *   <li>Normalizing the relative path for the current platform</li>
+     *   <li>Resolving the path against the current POM's location</li>
+     *   <li>Using the model locator to find an existing POM at the resolved location</li>
+     * </ul>
+     *
+     * @param modelLocator the locator to use for finding the related POM file
+     * @param relative the relative path to resolve
+     * @return a new ModelSource for the resolved POM, or null if:
+     *         <ul>
+     *           <li>This is not a build source</li>
+     *           <li>No POM can be found at the resolved location</li>
+     *         </ul>
+     * @throws NullPointerException if modelLocator or relative is null
+     */
     @Nullable
     ModelSource resolve(@Nonnull ModelLocator modelLocator, @Nonnull String relative);
-
-    @Nonnull
-    static ModelSource fromPath(@Nonnull Path path) {
-        return fromPath(path, null);
-    }
-
-    @Nonnull
-    static ModelSource fromPath(@Nonnull Path path, @Nullable String location) {
-        return new PathSource(requireNonNull(path, "path cannot be null"), location);
-    }
 }

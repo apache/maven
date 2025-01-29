@@ -157,7 +157,7 @@ public interface ModelBuilderRequest extends Request<Session> {
     static ModelBuilderRequest build(@Nonnull Session session, @Nonnull Path path) {
         return builder()
                 .session(requireNonNull(session, "session cannot be null"))
-                .source(ModelSource.fromPath(path))
+                .source(Sources.buildSource(path))
                 .build();
     }
 

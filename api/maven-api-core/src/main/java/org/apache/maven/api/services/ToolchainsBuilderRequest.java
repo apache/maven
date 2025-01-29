@@ -74,11 +74,11 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
                 .session(requireNonNull(session, "session cannot be null"))
                 .installationToolchainsSource(
                         installationToolchainsFile != null && Files.exists(installationToolchainsFile)
-                                ? Source.fromPath(installationToolchainsFile)
+                                ? Sources.fromPath(installationToolchainsFile)
                                 : null)
                 .userToolchainsSource(
                         userToolchainsPath != null && Files.exists(userToolchainsPath)
-                                ? Source.fromPath(userToolchainsPath)
+                                ? Sources.fromPath(userToolchainsPath)
                                 : null)
                 .build();
     }

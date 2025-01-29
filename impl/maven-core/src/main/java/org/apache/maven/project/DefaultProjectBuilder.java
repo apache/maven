@@ -47,6 +47,8 @@ import java.util.stream.Stream;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -68,6 +70,7 @@ import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ModelTransformer;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -134,7 +137,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuildingResult build(File pomFile, ProjectBuildingRequest request) throws ProjectBuildingException {
         try (BuildSession bs = new BuildSession(request)) {
             Path path = pomFile.toPath();
-            return bs.build(path, ModelSource.fromPath(path));
+            return bs.build(path, Sources.buildSource(path));
         }
     }
 
@@ -149,7 +152,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     @Deprecated
     static ModelSource toSource(org.apache.maven.model.building.ModelSource modelSource) {
         if (modelSource instanceof FileModelSource fms) {
-            return ModelSource.fromPath(fms.getPath());
+            return Sources.buildSource(fms.getPath());
         } else {
             return new WrapModelSource(modelSource);
         }
@@ -195,27 +198,32 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
 
         @Override
-        public ModelSource resolve(ModelLocator modelLocator, String relative) {
+        @Nullable
+        public ModelSource resolve(@Nonnull ModelLocator modelLocator, @Nonnull String relative) {
             return null;
         }
 
         @Override
+        @Nullable
         public Path getPath() {
             return null;
         }
 
         @Override
+        @Nonnull
         public InputStream openStream() throws IOException {
             return new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         }
 
         @Override
+        @Nonnull
         public String getLocation() {
             return artifact.getId();
         }
 
         @Override
-        public Source resolve(String relative) {
+        @Nullable
+        public Source resolve(@Nonnull String relative) {
             return null;
         }
 
@@ -245,27 +253,32 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
 
         @Override
-        public ModelSource resolve(ModelLocator modelLocator, String relative) {
+        @Nullable
+        public ModelSource resolve(@Nonnull ModelLocator modelLocator, @Nonnull String relative) {
             return null;
         }
 
         @Override
+        @Nullable
         public Path getPath() {
             return null;
         }
 
         @Override
+        @Nonnull
         public InputStream openStream() throws IOException {
             return modelSource.getInputStream();
         }
 
         @Override
+        @Nonnull
         public String getLocation() {
             return modelSource.getLocation();
         }
 
         @Override
-        public Source resolve(String relative) {
+        @Nullable
+        public Source resolve(@Nonnull String relative) {
             if (modelSource instanceof ModelSource2 ms) {
                 return toSource(ms.getRelatedSource(relative));
             } else {
@@ -416,11 +429,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
 
             if (localProject) {
-                return build(pomFile, ModelSource.fromPath(pomFile));
+                return build(pomFile, Sources.buildSource(pomFile));
             } else {
                 return build(
                         null,
-                        ModelSource.fromPath(
+                        Sources.resolvedSource(
                                 pomFile,
                                 artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion()));
             }
@@ -468,7 +481,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     return injectLifecycleBindings(m, r, p, project, request);
                 };
                 ModelBuilderRequest modelBuildingRequest = getModelBuildingRequest()
-                        .source(ModelSource.fromPath(pomFile.toPath()))
+                        .source(Sources.buildSource(pomFile.toPath()))
                         .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .locationTracking(true)
                         .recursive(recursive)
@@ -740,7 +753,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());
                         try {
-                            parent = build(parentPomFile, ModelSource.fromPath(parentPomFile))
+                            parent = build(parentPomFile, Sources.buildSource(parentPomFile))
                                     .getProject();
                         } catch (ProjectBuildingException e) {
                             // MNG-4488 where let invalid parents slide on by
