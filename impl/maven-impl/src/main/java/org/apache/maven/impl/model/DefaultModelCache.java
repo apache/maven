@@ -84,8 +84,7 @@ public class DefaultModelCache implements ModelCache {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("GavCacheKey[");
-            sb.append("gav='");
+            sb.append(getClass().getSimpleName()).append("[").append("gav='");
             if (groupId != null) {
                 sb.append(groupId);
             }
@@ -112,7 +111,7 @@ public class DefaultModelCache implements ModelCache {
 
         @Override
         public String toString() {
-            return "SourceCacheKey[" + "location=" + source.getLocation() + ", tag=" + tag + ", path="
+            return getClass().getSimpleName() + "[" + "location=" + source.getLocation() + ", tag=" + tag + ", path="
                     + source.getPath() + ']';
         }
     }
