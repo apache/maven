@@ -24,12 +24,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
-import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Model;
@@ -37,11 +35,7 @@ import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
-import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Sources;
-import org.apache.maven.api.services.model.ModelResolver;
-import org.apache.maven.api.services.model.ModelResolverException;
-import org.apache.maven.di.Injector;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.DefaultArtifactCoordinatesFactory;
 import org.apache.maven.impl.DefaultDependencyCoordinatesFactory;
@@ -52,7 +46,6 @@ import org.apache.maven.impl.resolver.MavenVersionScheme;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.transformation.AbstractRepositoryTestCase;
 import org.apache.maven.project.MavenProject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -66,15 +59,6 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
     @Inject
     ModelBuilder modelBuilder;
-
-    @BeforeEach
-    void setupTransformerContext() throws Exception {
-        // We need bind the model resolver explicitly to avoid going to maven central
-        getContainer().lookup(Injector.class).bindImplicit(MyModelResolver.class);
-        InternalSession iSession = InternalSession.from(session);
-        // set up the model resolver
-        iSession.getData().set(SessionData.key(ModelResolver.class), new MyModelResolver());
-    }
 
     @Override
     protected List<Object> getSessionServices() {
@@ -151,28 +135,5 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         assertNotNull(model);
         assertTrue(model.getProfiles().isEmpty());
-    }
-
-    static class MyModelResolver implements ModelResolver {
-        @Override
-        public ModelSource resolveModel(
-                Session session,
-                List<RemoteRepository> repositories,
-                String groupId,
-                String artifactId,
-                String version,
-                String classifier,
-                Consumer<String> resolvedVersion)
-                throws ModelResolverException {
-            String id = groupId + ":" + artifactId + ":" + version;
-            if (id.startsWith("org.sonatype.mavenbook.multi:parent:")) {
-                return Sources.buildSource(Paths.get("src/test/resources/consumer/simple/pom.xml"));
-            } else if (id.startsWith("org.sonatype.mavenbook.multi:simple-parent:")) {
-                return Sources.buildSource(Paths.get("src/test/resources/consumer/simple/simple-parent/pom.xml"));
-            } else if (id.startsWith("org.my.group:parent:")) {
-                return Sources.buildSource(Paths.get("src/test/resources/consumer/trivial/pom.xml"));
-            }
-            return null;
-        }
     }
 }

@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -84,7 +85,9 @@ import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.services.ProjectScopeRegistry;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
@@ -116,6 +119,8 @@ public abstract class AbstractSession implements InternalSession {
     private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
             Collections.synchronizedMap(new WeakHashMap<>());
 
+    private final Map<Object, CachingSupplier<?, ?>> requestCache;
+
     static {
         TransferResource.setClock(MonotonicClock.get());
     }
@@ -130,6 +135,77 @@ public abstract class AbstractSession implements InternalSession {
         this.repositorySystem = repositorySystem;
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
+        this.requestCache = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public <REQ extends Request<?>, REP extends Result<REQ>> REP request(REQ req, Function<REQ, REP> supplier) {
+        if (requestCache == null) {
+            return supplier.apply(req);
+        }
+        @SuppressWarnings("all")
+        CachingSupplier<REQ, REP> cs =
+                (CachingSupplier) requestCache.computeIfAbsent(req, r -> new CachingSupplier<>(supplier));
+        return cs.apply(req);
+    }
+
+    /**
+     * A caching supplier wrapper that caches results and exceptions from the underlying supplier.
+     * Used internally to cache expensive computations in the session.
+     *
+     * @param <REQ> The request type
+     * @param <REP> The response type
+     */
+    static class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
+        final Function<REQ, REP> supplier;
+        volatile Object value;
+
+        CachingSupplier(Function<REQ, REP> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Override
+        @SuppressWarnings({"unchecked", "checkstyle:InnerAssignment"})
+        public REP apply(REQ req) {
+            Object v;
+            if ((v = value) == null) {
+                synchronized (this) {
+                    if ((v = value) == null) {
+                        try {
+                            v = value = supplier.apply(req);
+                        } catch (Exception e) {
+                            v = value = new CachingSupplier.AltRes(e);
+                        }
+                    }
+                }
+            }
+            if (v instanceof CachingSupplier.AltRes altRes) {
+                uncheckedThrow(altRes.t);
+            }
+            return (REP) v;
+        }
+
+        /**
+         * Special holder class for exceptions that occur during supplier execution.
+         * Allows caching and re-throwing of exceptions on subsequent calls.
+         */
+        static class AltRes {
+            final Throwable t;
+
+            /**
+             * Creates a new AltRes with the given throwable.
+             *
+             * @param t The throwable to store
+             */
+            AltRes(Throwable t) {
+                this.t = t;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T extends Throwable> void uncheckedThrow(Throwable t) throws T {
+        throw (T) t; // rely on vacuous cast
     }
 
     @Override
