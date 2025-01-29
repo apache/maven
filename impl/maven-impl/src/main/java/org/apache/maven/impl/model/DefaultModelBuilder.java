@@ -80,7 +80,6 @@ import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.PathSource;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Source;
@@ -382,7 +381,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return null;
             }
             try {
-                return derive(PathSource.buildSource(path)).readRawModel();
+                return derive(ModelSource.buildSource(path)).readRawModel();
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
             }
@@ -704,7 +703,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Executor executor, Path top, Path pom, Set<Path> parents, DefaultModelBuilderResult r) {
             try {
                 Path pomDirectory = Files.isDirectory(pom) ? pom : pom.getParent();
-                ModelSource src = PathSource.buildSource(pom);
+                ModelSource src = ModelSource.buildSource(pom);
                 Model model = derive(src, r).readFileModel();
                 // keep all loaded file models in memory, those will be needed
                 // during the raw to build transformation
@@ -1336,7 +1335,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         }
                         if (pomPath != null && Files.isRegularFile(pomPath)) {
                             Model parentModel =
-                                    derive(PathSource.buildSource(pomPath)).readFileModel();
+                                    derive(ModelSource.buildSource(pomPath)).readFileModel();
                             String parentGroupId = getGroupId(parentModel);
                             String parentArtifactId = parentModel.getArtifactId();
                             String parentVersion = getVersion(parentModel);
@@ -1392,7 +1391,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     Path rootModelPath = modelProcessor.locateExistingPom(rootDirectory);
                     if (rootModelPath != null) {
                         Model rootModel =
-                                derive(PathSource.buildSource(rootModelPath)).readFileModel();
+                                derive(ModelSource.buildSource(rootModelPath)).readFileModel();
                         properties.putAll(rootModel.getProperties());
                     }
                 } else {

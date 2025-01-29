@@ -28,7 +28,7 @@ class PathSourceTest {
 
     @Test
     void testEquals() {
-        PathSource source = PathSource.buildSource(Paths.get("/tmp"));
+        ModelSource source = ModelSource.buildSource(Paths.get("/tmp"));
         assertNotEquals(null, source);
     }
 }

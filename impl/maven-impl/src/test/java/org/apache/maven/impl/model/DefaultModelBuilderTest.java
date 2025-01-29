@@ -25,7 +25,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.PathSource;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ class DefaultModelBuilderTest {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
-                .source(PathSource.buildSource(getPom("props-and-profiles")))
+                .source(ModelSource.buildSource(getPom("props-and-profiles")))
                 .build();
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);

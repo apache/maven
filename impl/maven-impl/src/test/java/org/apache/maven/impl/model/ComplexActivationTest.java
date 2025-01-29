@@ -27,7 +27,7 @@ import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.PathSource;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ class ComplexActivationTest {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
-                .source(PathSource.buildSource(getPom("complex")))
+                .source(ModelSource.buildSource(getPom("complex")))
                 .systemProperties(Map.of("myproperty", "test"))
                 .build();
         ModelBuilderResult result = builder.newSession().build(request);
@@ -72,7 +72,7 @@ class ComplexActivationTest {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
-                .source(PathSource.buildSource(getPom("complexExistsAndMissing")))
+                .source(ModelSource.buildSource(getPom("complexExistsAndMissing")))
                 .build();
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);

@@ -37,7 +37,6 @@ import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ModelSource;
-import org.apache.maven.api.services.PathSource;
 import org.apache.maven.api.services.VersionRangeResolverException;
 import org.apache.maven.api.services.model.ModelResolver;
 import org.apache.maven.api.services.model.ModelResolverException;
@@ -143,7 +142,7 @@ public class DefaultModelResolver implements ModelResolver {
             }
 
             Path path = getPath(session, repositories, groupId, artifactId, newVersion, classifier);
-            return PathSource.resolvedSource(path, groupId + ":" + artifactId + ":" + newVersion);
+            return ModelSource.resolvedSource(path, groupId + ":" + artifactId + ":" + newVersion);
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
                     e.getMessage() + " (remote repositories: "

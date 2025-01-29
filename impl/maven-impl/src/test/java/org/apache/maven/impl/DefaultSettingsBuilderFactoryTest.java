@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Session;
-import org.apache.maven.api.services.PathSource;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
@@ -68,7 +68,7 @@ class DefaultSettingsBuilderFactoryTest {
 
         SettingsBuilderRequest request = SettingsBuilderRequest.builder()
                 .session(session)
-                .userSettingsSource(PathSource.buildSource(getSettings("settings-simple")))
+                .userSettingsSource(ModelSource.buildSource(getSettings("settings-simple")))
                 .build();
 
         SettingsBuilderResult result = builder.build(request);
