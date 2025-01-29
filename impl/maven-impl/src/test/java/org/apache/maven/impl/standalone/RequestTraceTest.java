@@ -33,8 +33,8 @@ import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.eclipse.aether.AbstractRepositoryListener;
@@ -56,7 +56,7 @@ class RequestTraceTest {
         ModelBuilderResult result = builder.newSession()
                 .build(ModelBuilderRequest.builder()
                         .session(session)
-                        .source(ModelSource.fromPath(Paths.get("pom.xml").toAbsolutePath()))
+                        .source(Sources.buildSource(Paths.get("pom.xml").toAbsolutePath()))
                         .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .recursive(true)
                         .build());
