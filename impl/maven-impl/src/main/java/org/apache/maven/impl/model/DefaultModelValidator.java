@@ -754,7 +754,7 @@ public class DefaultModelValidator implements ModelValidator {
             Set<String> executionIds = new HashSet<>();
 
             if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0) {
-                validateXmlNode(
+                validateXmlNodeRecursively(
                         problems,
                         prefix + prefix2 + "[" + plugin.getKey() + "].configuration",
                         plugin,
@@ -773,7 +773,7 @@ public class DefaultModelValidator implements ModelValidator {
                             exec);
                 }
                 if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0) {
-                    validateXmlNode(
+                    validateXmlNodeRecursively(
                             problems,
                             prefix + prefix2 + "[" + plugin.getKey() + "].executions.execution." + exec.getId(),
                             exec,
