@@ -871,6 +871,6 @@ class DefaultModelValidatorTest {
     @Test
     void selfCombineBad() throws Exception {
         SimpleProblemCollector result = validateFile("raw-model/self-combine-bad.xml");
-        assertViolations(result, 0, 0, 0);
+        assertViolations(result, 0, 1, 0);
     }
 }
