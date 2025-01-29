@@ -753,7 +753,7 @@ public class DefaultModelValidator implements ModelValidator {
 
             Set<String> executionIds = new HashSet<>();
 
-            if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0) {
+            if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0 && plugin.getConfiguration() != null) {
                 validateXmlNodeRecursively(
                         problems,
                         prefix + prefix2 + "[" + plugin.getKey() + "].configuration",
@@ -772,7 +772,7 @@ public class DefaultModelValidator implements ModelValidator {
                             "must be unique but found duplicate execution with id " + exec.getId(),
                             exec);
                 }
-                if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0) {
+                if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0 && exec.getConfiguration() != null) {
                     validateXmlNodeRecursively(
                             problems,
                             prefix + prefix2 + "[" + plugin.getKey() + "].executions.execution." + exec.getId(),
@@ -793,8 +793,8 @@ public class DefaultModelValidator implements ModelValidator {
 
     private void validateXmlNode(
             ModelProblemCollector problems, String fieldPathPrefix, InputLocationTracker tracker, XmlNode xmlNode) {
-        String childrenCombinationModeAttribute =
-                xmlNode.getAttributes().get(XmlNode.CHILDREN_COMBINATION_MODE_ATTRIBUTE);
+        String childrenCombinationModeAttribute = xmlNode.getAttributes()
+                .getOrDefault(XmlNode.CHILDREN_COMBINATION_MODE_ATTRIBUTE, XmlNode.DEFAULT_CHILDREN_COMBINATION_MODE);
         if (!(XmlNode.CHILDREN_COMBINATION_APPEND.equals(childrenCombinationModeAttribute)
                 || XmlNode.CHILDREN_COMBINATION_MERGE.equals(childrenCombinationModeAttribute))) {
             addViolation(
@@ -811,7 +811,8 @@ public class DefaultModelValidator implements ModelValidator {
                             + " (default is: " + XmlNode.DEFAULT_SELF_COMBINATION_MODE + ")",
                     tracker);
         }
-        String selfCombinationModeAttribute = xmlNode.getAttribute(XmlNode.SELF_COMBINATION_MODE_ATTRIBUTE);
+        String selfCombinationModeAttribute = xmlNode.getAttributes()
+                .getOrDefault(XmlNode.SELF_COMBINATION_MODE_ATTRIBUTE, XmlNode.DEFAULT_SELF_COMBINATION_MODE);
         if (!(XmlNode.SELF_COMBINATION_OVERRIDE.equals(selfCombinationModeAttribute)
                 || XmlNode.SELF_COMBINATION_MERGE.equals(selfCombinationModeAttribute)
                 || XmlNode.SELF_COMBINATION_REMOVE.equals(selfCombinationModeAttribute))) {
