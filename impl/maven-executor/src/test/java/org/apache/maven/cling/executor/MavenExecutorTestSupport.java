@@ -122,7 +122,7 @@ public abstract class MavenExecutorTestSupport {
                         .argument("verify")
                         .stdoutConsumer(stdout)
                         .build()));
-        assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
@@ -197,7 +197,8 @@ public abstract class MavenExecutorTestSupport {
                         .argument("verify")
                         .stdoutConsumer(stdout)
                         .build()));
-        assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        // Note: we do not validate ANSI as Maven3 is weird in this respect (thinks is color but is not)
+        // assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 

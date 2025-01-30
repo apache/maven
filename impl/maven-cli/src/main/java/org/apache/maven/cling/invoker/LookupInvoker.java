@@ -258,12 +258,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void createTerminal(C context) {
         Options options = context.invokerRequest.options();
-        boolean stdStreamsRedirected = context.invokerRequest.in().isPresent()
-                || context.invokerRequest.out().isPresent()
-                || context.invokerRequest.err().isPresent();
+        boolean stdStreamsRedirected = System.console() == null
+                || context.invokerRequest.in().isPresent()
+                || context.invokerRequest.out().isPresent();
         boolean colorWanted = Objects.requireNonNullElse(
                 context.coloredOutput,
-                options.logFile().isEmpty() && options.nonInteractive().isEmpty());
+                !stdStreamsRedirected
+                        && options.logFile().isEmpty()
+                        && options.nonInteractive().isEmpty());
         if (context.terminal == null) {
             MessageUtils.systemInstall(
                     builder -> {
@@ -271,7 +273,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                             builder.system(false);
                             builder.jni(false);
                             builder.exec(true);
-
                             builder.streams(
                                     context.invokerRequest.in().orElse(System.in),
                                     context.invokerRequest.out().orElse(System.out));
@@ -283,9 +284,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                         builder.color(colorWanted);
                     },
                     terminal -> doConfigureWithTerminal(context, terminal));
-
-            context.terminal = MessageUtils.getTerminal();
-            context.closeables.add(context.terminal);
             // JLine is quite slow to start due to the native library unpacking and loading
             // so boot it asynchronously
             context.closeables.add(MessageUtils::systemUninstall);
