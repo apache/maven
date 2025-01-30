@@ -311,9 +311,9 @@ public class EmbeddedMavenExecutor implements Executor {
                                 null,
                                 args.toArray(new String[0]),
                                 classWorld,
-                                r.stdinProvider().orElse(System.in),
-                                r.stdoutConsumer().orElse(System.out),
-                                r.stderrConsumer().orElse(System.err));
+                                r.stdinProvider().orElse(null),
+                                r.stdoutConsumer().orElse(null),
+                                r.stderrConsumer().orElse(null));
                     } catch (Exception e) {
                         throw new ExecutorException("Failed to execute", e);
                     }

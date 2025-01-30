@@ -20,7 +20,6 @@ package org.apache.maven.cling.invoker.mvnenc.goals;
 
 import java.io.IOError;
 import java.io.InterruptedIOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -94,13 +93,14 @@ public class Init extends InteractiveGoalSupport {
         config.setDefaultDispatcher(null);
         config.getConfigurations().clear();
 
-        try (ConsolePrompt prompt = new ConsolePrompt(context.reader, context.terminal, promptConfig)) {
-            Map<String, PromptResultItemIF> dispatcherResult = new HashMap<>();
-            Map<String, PromptResultItemIF> dispatcherConfigResult = new HashMap<>();
-            Map<String, PromptResultItemIF> confirmChoice = new HashMap<>();
+        ConsolePrompt prompt = new ConsolePrompt(context.reader, context.terminal, promptConfig);
+        Map<String, PromptResultItemIF> dispatcherResult;
+        Map<String, PromptResultItemIF> dispatcherConfigResult;
+        Map<String, PromptResultItemIF> confirmChoice;
 
-            prompt.prompt(
-                    context.header, dispatcherPrompt(prompt.getPromptBuilder()).build(), dispatcherResult);
+        try {
+            dispatcherResult = prompt.prompt(
+                    context.header, dispatcherPrompt(prompt.getPromptBuilder()).build());
             if (dispatcherResult.isEmpty()) {
                 throw new InterruptedException();
             }
@@ -121,11 +121,10 @@ public class Init extends InteractiveGoalSupport {
                         .findFirst()
                         .orElseThrow();
                 if (!meta.fields().isEmpty()) {
-                    prompt.prompt(
+                    dispatcherConfigResult = prompt.prompt(
                             context.header,
                             configureDispatcher(context, meta, prompt.getPromptBuilder())
-                                    .build(),
-                            dispatcherConfigResult);
+                                    .build());
                     if (dispatcherConfigResult.isEmpty()) {
                         throw new InterruptedException();
                     }
@@ -136,18 +135,17 @@ public class Init extends InteractiveGoalSupport {
                     if (!editables.isEmpty()) {
                         context.addInHeader("");
                         context.addInHeader("Please customize the editable value:");
-                        Map<String, PromptResultItemIF> editMap = new HashMap<>(editables.size());
+                        Map<String, PromptResultItemIF> editMap;
                         for (Map.Entry<String, PromptResultItemIF> editable : editables) {
                             String template = editable.getValue().getResult();
-                            prompt.prompt(
+                            editMap = prompt.prompt(
                                     context.header,
                                     prompt.getPromptBuilder()
                                             .createInputPrompt()
                                             .name("edit")
                                             .message(template)
                                             .addPrompt()
-                                            .build(),
-                                    editMap);
+                                            .build());
                             if (editMap.isEmpty()) {
                                 throw new InterruptedException();
                             }
@@ -183,8 +181,8 @@ public class Init extends InteractiveGoalSupport {
                     }
                 }
 
-                prompt.prompt(
-                        context.header, confirmPrompt(prompt.getPromptBuilder()).build(), confirmChoice);
+                confirmChoice = prompt.prompt(
+                        context.header, confirmPrompt(prompt.getPromptBuilder()).build());
                 ConfirmResult confirm = (ConfirmResult) confirmChoice.get("confirm");
                 if (confirm.getConfirmed() == ConfirmChoice.ConfirmationValue.YES) {
                     context.terminal

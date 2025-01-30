@@ -20,6 +20,7 @@ package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -139,22 +140,28 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int doInvoke(C context) throws Exception {
-        validate(context);
-        pushCoreProperties(context);
-        pushUserProperties(context);
-        configureLogging(context);
-        createTerminal(context);
-        activateLogging(context);
-        helpOrVersionAndMayExit(context);
-        preCommands(context);
-        container(context);
-        postContainer(context);
-        pushUserProperties(context); // after PropertyContributor SPI
-        lookup(context);
-        init(context);
-        postCommands(context);
-        settings(context);
-        return execute(context);
+        try {
+            validate(context);
+            pushCoreProperties(context);
+            pushUserProperties(context);
+            configureLogging(context);
+            createTerminal(context);
+            activateLogging(context);
+            helpOrVersionAndMayExit(context);
+            preCommands(context);
+            container(context);
+            postContainer(context);
+            pushUserProperties(context); // after PropertyContributor SPI
+            lookup(context);
+            init(context);
+            postCommands(context);
+            settings(context);
+            return execute(context);
+        } finally {
+            if (context.terminal != null) {
+                context.terminal.writer().flush();
+            }
+        }
     }
 
     protected InvokerException handleException(C context, Exception e) throws InvokerException {
@@ -288,18 +295,17 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (context.terminal == null) {
             MessageUtils.systemInstall(
                     builder -> {
+                        InputStream inputStream = context.invokerRequest.in().orElse(System.in);
                         if (stdStreamsRedirected) {
                             builder.system(false);
-                            builder.jni(false);
-                            builder.exec(true);
-                            builder.streams(
-                                    context.invokerRequest.in().orElse(System.in),
-                                    context.invokerRequest.out().orElse(System.out));
+                            inputStream = InputStream.nullInputStream();
                         } else {
                             builder.system(true);
-                            builder.jni(true);
-                            builder.exec(false);
                         }
+                        builder.jni(true);
+                        builder.exec(false);
+                        builder.streams(
+                                inputStream, context.invokerRequest.out().orElse(System.out));
                         builder.color(colorWanted);
                     },
                     terminal -> doConfigureWithTerminal(context, terminal));
