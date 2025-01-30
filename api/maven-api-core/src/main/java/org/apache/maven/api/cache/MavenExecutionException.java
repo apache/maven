@@ -16,36 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
-
-import java.io.Serial;
+package org.apache.maven.api.cache;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.services.MavenException;
 
 /**
- *
+ * Exception thrown when an error occurs during Maven execution.
+ * This exception wraps the original cause of the execution failure.
  *
  * @since 4.0.0
  */
 @Experimental
-public class ArtifactResolverException extends MavenException {
-
-    @Serial
-    private static final long serialVersionUID = 7252294837746943917L;
-
-    private final ArtifactResolverResult result;
+public class MavenExecutionException extends MavenException {
 
     /**
-     * @param message the message for the exception
-     * @param e the exception itself
-     * @param result the resolution result containing detailed information
+     * Constructs a new MavenExecutionException with the specified cause.
+     *
+     * @param cause The underlying exception that caused the execution failure
      */
-    public ArtifactResolverException(String message, Exception e, ArtifactResolverResult result) {
-        super(message, e);
-        this.result = result;
-    }
-
-    public ArtifactResolverResult getResult() {
-        return result;
+    public MavenExecutionException(Throwable cause) {
+        super(cause);
     }
 }

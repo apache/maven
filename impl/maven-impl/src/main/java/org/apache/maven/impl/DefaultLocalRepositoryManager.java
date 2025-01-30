@@ -24,6 +24,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.LocalRepositoryManager;
@@ -32,20 +33,24 @@ import org.apache.maven.api.services.LocalRepositoryManager;
 @Singleton
 public class DefaultLocalRepositoryManager implements LocalRepositoryManager {
 
+    @Nonnull
     @Override
-    public Path getPathForLocalArtifact(Session session, LocalRepository local, Artifact artifact) {
+    public Path getPathForLocalArtifact(
+            @Nonnull Session session, @Nonnull LocalRepository local, @Nonnull Artifact artifact) {
         InternalSession s = InternalSession.from(session);
-        String path = getManager(s, local).getPathForLocalArtifact(s.toArtifact(artifact));
-        return local.getPath().resolve(path);
+        return getManager(s, local).getAbsolutePathForLocalArtifact(s.toArtifact(artifact));
     }
 
+    @Nonnull
     @Override
     public Path getPathForRemoteArtifact(
-            Session session, LocalRepository local, RemoteRepository remote, Artifact artifact) {
+            @Nonnull Session session,
+            @Nonnull LocalRepository local,
+            @Nonnull RemoteRepository remote,
+            @Nonnull Artifact artifact) {
         InternalSession s = InternalSession.from(session);
-        String path =
-                getManager(s, local).getPathForRemoteArtifact(s.toArtifact(artifact), s.toRepository(remote), null);
-        return local.getPath().resolve(path);
+        return getManager(s, local)
+                .getAbsolutePathForRemoteArtifact(s.toArtifact(artifact), s.toRepository(remote), null);
     }
 
     private org.eclipse.aether.repository.LocalRepositoryManager getManager(

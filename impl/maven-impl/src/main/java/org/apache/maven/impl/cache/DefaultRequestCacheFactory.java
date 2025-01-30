@@ -16,36 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.impl.cache;
 
-import java.io.Serial;
+import org.apache.maven.api.cache.RequestCache;
+import org.apache.maven.api.cache.RequestCacheFactory;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 
-import org.apache.maven.api.annotations.Experimental;
+@Named
+@Singleton
+public class DefaultRequestCacheFactory implements RequestCacheFactory {
 
-/**
- *
- *
- * @since 4.0.0
- */
-@Experimental
-public class ArtifactResolverException extends MavenException {
-
-    @Serial
-    private static final long serialVersionUID = 7252294837746943917L;
-
-    private final ArtifactResolverResult result;
-
-    /**
-     * @param message the message for the exception
-     * @param e the exception itself
-     * @param result the resolution result containing detailed information
-     */
-    public ArtifactResolverException(String message, Exception e, ArtifactResolverResult result) {
-        super(message, e);
-        this.result = result;
-    }
-
-    public ArtifactResolverResult getResult() {
-        return result;
+    public RequestCache createCache() {
+        return new DefaultRequestCache();
     }
 }

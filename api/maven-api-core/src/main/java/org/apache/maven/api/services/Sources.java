@@ -28,6 +28,8 @@ import java.util.Objects;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
@@ -191,9 +193,17 @@ public final class Sources {
 
     /**
      * Implementation of {@link ModelSource} that extends {@link PathSource} with model-specific
-     * functionality.
+     * functionality. This implementation uses request-scoped caching ({@link CacheRetention#REQUEST_SCOPED})
+     * since it represents a POM file that is actively being built and may change during the build process.
+     * <p>
+     * The request-scoped retention policy ensures that:
+     * <ul>
+     *   <li>Changes to the POM file during the build are detected</li>
+     *   <li>Cache entries don't persist beyond the current build request</li>
+     *   <li>Memory is freed once the build request completes</li>
+     * </ul>
      */
-    static class BuildPathSource extends PathSource implements ModelSource {
+    static class BuildPathSource extends PathSource implements ModelSource, CacheMetadata {
 
         /**
          * Constructs a new ModelPathSource.
@@ -224,6 +234,11 @@ public final class Sources {
                 return new BuildPathSource(relatedPom);
             }
             return null;
+        }
+
+        @Override
+        public CacheRetention getCacheRetention() {
+            return CacheRetention.REQUEST_SCOPED;
         }
     }
 }
