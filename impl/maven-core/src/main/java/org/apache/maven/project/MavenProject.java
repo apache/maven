@@ -146,7 +146,7 @@ public class MavenProject implements Cloneable {
     /**
      * A tuple of {@link SourceRoot} properties for which we decide that no duplicated value should exist in a project.
      * The set of properties that we choose to put in this record may be modified in any future Maven version.
-     * The intend is to detect some configuration errors.
+     * The intent is to detect some configuration errors.
      */
     private record SourceKey(ProjectScope scope, Language language, Path directory) {
         /**
