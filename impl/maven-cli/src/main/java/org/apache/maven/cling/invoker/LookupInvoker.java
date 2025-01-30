@@ -176,11 +176,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected abstract C createContext(InvokerRequest invokerRequest) throws InvokerException;
 
     protected void validate(C context) throws InvokerException {
-        // warn about deprecated options
-        context.invokerRequest
-                .options()
-                .warnAboutDeprecatedOptions(context.invokerRequest.parserRequest(), System.out::println);
-
+        // in case of parser error: report errors and bail out; invokerRequest contents may be incomplete
         if (!context.invokerRequest.parserErrors().isEmpty()) {
             context.logger.error(
                     "There were " + context.invokerRequest.parserErrors().size() + " parsing errors:");
@@ -189,6 +185,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
             throw new InvokerException.ExitException(1);
         }
+
+        // warn about deprecated options
+        context.invokerRequest
+                .options()
+                .warnAboutDeprecatedOptions(context.invokerRequest.parserRequest(), s -> context.logger.warn(s));
     }
 
     protected void pushCoreProperties(C context) throws Exception {
