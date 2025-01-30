@@ -35,7 +35,7 @@ import org.apache.maven.cling.invoker.BaseParser;
 public class MavenParser extends BaseParser {
 
     @Override
-    protected List<Options> parseCliOptions(LocalContext context) throws ParserException, IOException {
+    protected List<Options> parseCliOptions(LocalContext context) throws ParserException {
         ArrayList<Options> result = new ArrayList<>();
         // CLI args
         result.add(parseMavenCliOptions(context.parserRequest.args()));
@@ -51,7 +51,7 @@ public class MavenParser extends BaseParser {
         return parseArgs(Options.SOURCE_CLI, args);
     }
 
-    protected MavenOptions parseMavenConfigOptions(Path configFile) throws ParserException, IOException {
+    protected MavenOptions parseMavenConfigOptions(Path configFile) throws ParserException {
         try (Stream<String> lines = Files.lines(configFile, Charset.defaultCharset())) {
             List<String> args =
                     lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toList();
@@ -62,6 +62,8 @@ public class MavenParser extends BaseParser {
                         + options.goals().get());
             }
             return options;
+        } catch (IOException e) {
+            throw new ParserException("Error reading config file: " + configFile, e);
         }
     }
 
@@ -74,9 +76,19 @@ public class MavenParser extends BaseParser {
     }
 
     @Override
+    protected MavenOptions emptyOptions() {
+        try {
+            return CommonsCliMavenOptions.parse(Options.SOURCE_CLI, new String[0]);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    @Override
     protected MavenInvokerRequest getInvokerRequest(LocalContext context) {
         return new MavenInvokerRequest(
                 context.parserRequest,
+                context.parserErrors,
                 context.cwd,
                 context.installationDirectory,
                 context.userHomeDirectory,
@@ -88,7 +100,6 @@ public class MavenParser extends BaseParser {
                 context.parserRequest.out(),
                 context.parserRequest.err(),
                 context.extensions,
-                getJvmArguments(context.rootDirectory),
                 (MavenOptions) context.options);
     }
 

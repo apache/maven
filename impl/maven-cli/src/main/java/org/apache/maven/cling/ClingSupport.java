@@ -62,9 +62,8 @@ public abstract class ClingSupport {
     public int run(String[] args) throws IOException {
         try (Invoker invoker = createInvoker()) {
             return invoker.invoke(parseArguments(args));
-        } catch (ParserException e) {
-            System.err.println(e.getMessage());
-            return 1;
+        } catch (InvokerException.ExitException e) {
+            return e.getExitCode();
         } catch (InvokerException e) {
             return 1;
         } finally {

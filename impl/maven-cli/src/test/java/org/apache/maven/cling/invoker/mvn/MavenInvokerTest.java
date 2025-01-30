@@ -28,8 +28,8 @@ import java.util.Map;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
+import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.Parser;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
@@ -93,7 +93,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path userExtensions = userConf.resolve("extensions.xml");
         Files.writeString(userExtensions, extensionsXml);
 
-        assertThrows(ParserException.class, () -> invoke(cwd, userHome, Arrays.asList("clean", "verify")));
+        assertThrows(InvokerException.class, () -> invoke(cwd, userHome, Arrays.asList("clean", "verify")));
     }
 
     @Test

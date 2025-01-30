@@ -28,10 +28,21 @@ import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class EncryptParser extends BaseParser {
+
+    @Override
+    protected EncryptOptions emptyOptions() {
+        try {
+            return CommonsCliEncryptOptions.parse(new String[0]);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     @Override
     protected EncryptInvokerRequest getInvokerRequest(LocalContext context) {
         return new EncryptInvokerRequest(
                 context.parserRequest,
+                context.parserErrors,
                 context.cwd,
                 context.installationDirectory,
                 context.userHomeDirectory,
@@ -43,7 +54,6 @@ public class EncryptParser extends BaseParser {
                 context.parserRequest.out(),
                 context.parserRequest.err(),
                 context.extensions,
-                getJvmArguments(context.rootDirectory),
                 (EncryptOptions) context.options);
     }
 

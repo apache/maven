@@ -29,9 +29,19 @@ import org.apache.maven.cling.invoker.BaseParser;
 
 public class ShellParser extends BaseParser {
     @Override
+    protected ShellOptions emptyOptions() {
+        try {
+            return CommonsCliShellOptions.parse(new String[0]);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    @Override
     protected ShellInvokerRequest getInvokerRequest(LocalContext context) {
         return new ShellInvokerRequest(
                 context.parserRequest,
+                context.parserErrors,
                 context.cwd,
                 context.installationDirectory,
                 context.userHomeDirectory,
@@ -43,7 +53,6 @@ public class ShellParser extends BaseParser {
                 context.parserRequest.out(),
                 context.parserRequest.err(),
                 context.extensions,
-                getJvmArguments(context.rootDirectory),
                 (ShellOptions) context.options);
     }
 

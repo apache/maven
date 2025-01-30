@@ -22,7 +22,6 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,10 +62,12 @@ public abstract class BaseParser implements Parser {
     @SuppressWarnings("VisibilityModifier")
     public static class LocalContext {
         public final ParserRequest parserRequest;
+        public final List<ParserException> parserErrors;
         public final Map<String, String> systemPropertiesOverrides;
 
         public LocalContext(ParserRequest parserRequest) {
             this.parserRequest = parserRequest;
+            this.parserErrors = new ArrayList<>();
             this.systemPropertiesOverrides = new HashMap<>();
         }
 
@@ -94,43 +95,91 @@ public abstract class BaseParser implements Parser {
     }
 
     @Override
-    public InvokerRequest parseInvocation(ParserRequest parserRequest) throws ParserException, IOException {
+    public InvokerRequest parseInvocation(ParserRequest parserRequest) {
         requireNonNull(parserRequest);
 
         LocalContext context = new LocalContext(parserRequest);
 
         // the basics
-        context.cwd = requireNonNull(getCwd(context));
-        context.installationDirectory = requireNonNull(getInstallationDirectory(context));
-        context.userHomeDirectory = requireNonNull(getUserHomeDirectory(context));
+        try {
+            context.cwd = getCwd(context);
+        } catch (ParserException e) {
+            context.cwd = getCanonicalPath(Paths.get("."));
+            context.parserErrors.add(e);
+        }
+        try {
+            context.installationDirectory = getInstallationDirectory(context);
+        } catch (ParserException e) {
+            context.installationDirectory = context.cwd;
+            context.parserErrors.add(e);
+        }
+        try {
+            context.userHomeDirectory = getUserHomeDirectory(context);
+        } catch (ParserException e) {
+            context.userHomeDirectory = context.cwd;
+            context.parserErrors.add(e);
+        }
 
         // top/root
-        context.topDirectory = requireNonNull(getTopDirectory(context));
-        context.rootDirectory = getRootDirectory(context);
+        try {
+            context.topDirectory = getTopDirectory(context);
+        } catch (ParserException e) {
+            context.topDirectory = context.cwd;
+            context.parserErrors.add(e);
+        }
+        try {
+            context.rootDirectory = getRootDirectory(context);
+        } catch (ParserException e) {
+            context.rootDirectory = context.cwd;
+            context.parserErrors.add(e);
+        }
 
         // options
-        List<Options> parsedOptions = parseCliOptions(context);
-
-        // warn about deprecated options
-        PrintWriter printWriter = new PrintWriter(parserRequest.out() != null ? parserRequest.out() : System.out, true);
-        parsedOptions.forEach(o -> o.warnAboutDeprecatedOptions(parserRequest, printWriter::println));
+        List<Options> parsedOptions;
+        try {
+            parsedOptions = parseCliOptions(context);
+        } catch (ParserException e) {
+            parsedOptions = List.of(emptyOptions());
+            context.parserErrors.add(e);
+        }
 
         // assemble options if needed
-        context.options = assembleOptions(parsedOptions);
+        try {
+            context.options = assembleOptions(parsedOptions);
+        } catch (ParserException e) {
+            context.options = emptyOptions();
+            context.parserErrors.add(e);
+        }
 
         // system and user properties
-        context.systemProperties = populateSystemProperties(context);
-        context.userProperties = populateUserProperties(context);
+        try {
+            context.systemProperties = populateSystemProperties(context);
+        } catch (ParserException e) {
+            context.systemProperties = new HashMap<>();
+            context.parserErrors.add(e);
+        }
+        try {
+            context.userProperties = populateUserProperties(context);
+        } catch (ParserException e) {
+            context.userProperties = new HashMap<>();
+            context.parserErrors.add(e);
+        }
 
         // options: interpolate
         context.options = context.options.interpolate(Interpolator.chain(
                 context.extraInterpolationSource()::get, context.userProperties::get, context.systemProperties::get));
 
         // core extensions
-        context.extensions = readCoreExtensionsDescriptor(context);
+        try {
+            context.extensions = readCoreExtensionsDescriptor(context);
+        } catch (ParserException e) {
+            context.parserErrors.add(e);
+        }
 
         return getInvokerRequest(context);
     }
+
+    protected abstract Options emptyOptions();
 
     protected abstract InvokerRequest getInvokerRequest(LocalContext context);
 
@@ -248,7 +297,7 @@ public abstract class BaseParser implements Parser {
         return result;
     }
 
-    protected Map<String, String> populateUserProperties(LocalContext context) throws ParserException, IOException {
+    protected Map<String, String> populateUserProperties(LocalContext context) throws ParserException {
         Properties userProperties = new Properties();
 
         // ----------------------------------------------------------------------
@@ -281,7 +330,11 @@ public abstract class BaseParser implements Parser {
             mavenConf = context.installationDirectory.resolve("");
         }
         Path propertiesFile = mavenConf.resolve("maven.properties");
-        MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
+        try {
+            MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
+        } catch (IOException e) {
+            throw new ParserException("Error loading properties from " + propertiesFile, e);
+        }
 
         // CLI specified properties are most dominant
         userProperties.putAll(userSpecifiedProperties);
@@ -289,12 +342,11 @@ public abstract class BaseParser implements Parser {
         return toMap(userProperties);
     }
 
-    protected abstract List<Options> parseCliOptions(LocalContext context) throws ParserException, IOException;
+    protected abstract List<Options> parseCliOptions(LocalContext context) throws ParserException;
 
-    protected abstract Options assembleOptions(List<Options> parsedOptions);
+    protected abstract Options assembleOptions(List<Options> parsedOptions) throws ParserException;
 
-    protected List<CoreExtension> readCoreExtensionsDescriptor(LocalContext context)
-            throws ParserException, IOException {
+    protected List<CoreExtension> readCoreExtensionsDescriptor(LocalContext context) throws ParserException {
         String installationExtensionsFile = context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS);
         ArrayList<CoreExtension> installationExtensions = new ArrayList<>(readCoreExtensionsDescriptorFromFile(
                 context.installationDirectory.resolve(installationExtensionsFile)));
@@ -337,8 +389,7 @@ public abstract class BaseParser implements Parser {
         return extensions;
     }
 
-    protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile)
-            throws ParserException, IOException {
+    protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile) throws ParserException {
         try {
             if (extensionsFile != null && Files.exists(extensionsFile)) {
                 try (InputStream is = Files.newInputStream(extensionsFile)) {
@@ -346,7 +397,7 @@ public abstract class BaseParser implements Parser {
                 }
             }
             return List.of();
-        } catch (XMLStreamException e) {
+        } catch (XMLStreamException | IOException e) {
             throw new ParserException("Failed to parse extensions file: " + extensionsFile, e);
         }
     }

@@ -18,8 +18,6 @@
  */
 package org.apache.maven.api.cli;
 
-import java.io.IOException;
-
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -35,10 +33,9 @@ public interface Parser {
      * This method does interpret tool arguments.
      *
      * @param parserRequest the request containing all necessary information for parsing
-     * @return the parsed invoker request
-     * @throws ParserException if there's an error during parsing of the request
-     * @throws IOException if there's an I/O error during the parsing process
+     * @return the parsed invoker request. Caller must start by checking {@link InvokerRequest#parserErrors()} as
+     * if there are parser errors, the contents of request may not be fully processed.
      */
     @Nonnull
-    InvokerRequest parseInvocation(@Nonnull ParserRequest parserRequest) throws ParserException, IOException;
+    InvokerRequest parseInvocation(@Nonnull ParserRequest parserRequest);
 }

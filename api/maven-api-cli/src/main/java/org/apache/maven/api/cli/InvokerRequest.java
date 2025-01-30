@@ -48,6 +48,13 @@ public interface InvokerRequest {
     ParserRequest parserRequest();
 
     /**
+     * Returns parser errors collected while parsed the parser request into invoker request. If this list is
+     * non-empty, this instance must be considered potentially incomplete and not process at all.
+     */
+    @Nonnull
+    List<ParserException> parserErrors();
+
+    /**
      * Returns the current working directory for the Maven execution.
      * This is typically the directory from which Maven was invoked.
      *
@@ -73,16 +80,6 @@ public interface InvokerRequest {
      */
     @Nonnull
     Path userHomeDirectory();
-
-    /**
-     * Returns the list of extra JVM arguments to be passed to the forked process.
-     * These arguments allow for customization of the JVM environment in which tool will run.
-     * This property is used ONLY by executors and invokers that spawn a new JVM.
-     *
-     * @return an Optional containing the list of extra JVM arguments, or empty if not specified
-     */
-    @Nonnull
-    Optional<List<String>> jvmArguments();
 
     /**
      * Shorthand for {@link Logger} to use.
