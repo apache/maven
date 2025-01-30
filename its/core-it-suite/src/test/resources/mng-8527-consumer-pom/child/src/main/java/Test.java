@@ -16,19 +16,4 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
-
-import java.nio.file.Paths;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-class PathSourceTest {
-
-    @Test
-    void testEquals() {
-        PathSource source = new PathSource(Paths.get("/tmp"));
-        assertFalse(source.equals(null));
-    }
-}
+public class Test {}

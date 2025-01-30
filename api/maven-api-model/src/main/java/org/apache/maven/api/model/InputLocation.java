@@ -195,6 +195,6 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
     @Override
     public String toString() {
-        return String.format("%s @ %d:%d", source.getLocation(), lineNumber, columnNumber);
+        return String.format("%s @ %d:%d", source != null ? source.getLocation() : "n/a", lineNumber, columnNumber);
     }
 }

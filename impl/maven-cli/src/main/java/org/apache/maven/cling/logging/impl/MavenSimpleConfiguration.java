@@ -18,9 +18,9 @@
  */
 package org.apache.maven.cling.logging.impl;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
 import org.apache.maven.slf4j.MavenLoggerFactory;
-import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +42,10 @@ public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
                     default -> "error";
                 };
 
-        String current = System.setProperty(MavenSimpleLogger.DEFAULT_LOG_LEVEL_KEY, value);
+        String current = System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, value);
         if (current != null && !value.equalsIgnoreCase(current)) {
             LOGGER.info(
-                    "System property '" + MavenSimpleLogger.DEFAULT_LOG_LEVEL_KEY + "' is already set to '" + current
+                    "System property '" + Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL + "' is already set to '" + current
                             + "' - ignoring system property and get log level from -X/-e/-q options, log level will be set to"
                             + value);
         }

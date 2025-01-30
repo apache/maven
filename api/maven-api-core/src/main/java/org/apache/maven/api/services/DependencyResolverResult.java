@@ -41,7 +41,7 @@ import org.apache.maven.api.annotations.Nullable;
  * @see DependencyResolver#resolve(DependencyResolverRequest)
  */
 @Experimental
-public interface DependencyResolverResult {
+public interface DependencyResolverResult extends Result<DependencyResolverRequest> {
 
     /**
      * Gets the exceptions that occurred while building the dependency graph.

@@ -27,6 +27,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,10 +38,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ArtifactDeployerRequest {
-
-    @Nonnull
-    Session getSession();
+public interface ArtifactDeployerRequest extends Request<Session> {
 
     @Nonnull
     RemoteRepository getRepository();
@@ -69,6 +67,7 @@ public interface ArtifactDeployerRequest {
 
     class ArtifactDeployerRequestBuilder {
         Session session;
+        RequestTrace trace;
         RemoteRepository repository;
         Collection<ProducedArtifact> artifacts;
         int retryFailedDeploymentCount;
@@ -78,6 +77,12 @@ public interface ArtifactDeployerRequest {
         @Nonnull
         public ArtifactDeployerRequestBuilder session(Session session) {
             this.session = session;
+            return this;
+        }
+
+        @Nonnull
+        public ArtifactDeployerRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -99,7 +104,8 @@ public interface ArtifactDeployerRequest {
 
         @Nonnull
         public ArtifactDeployerRequest build() {
-            return new DefaultArtifactDeployerRequest(session, repository, artifacts, retryFailedDeploymentCount);
+            return new DefaultArtifactDeployerRequest(
+                    session, trace, repository, artifacts, retryFailedDeploymentCount);
         }
 
         private static class DefaultArtifactDeployerRequest extends BaseRequest<Session>
@@ -111,10 +117,11 @@ public interface ArtifactDeployerRequest {
 
             DefaultArtifactDeployerRequest(
                     @Nonnull Session session,
+                    @Nullable RequestTrace trace,
                     @Nonnull RemoteRepository repository,
                     @Nonnull Collection<ProducedArtifact> artifacts,
                     int retryFailedDeploymentCount) {
-                super(session);
+                super(session, trace);
                 this.repository = requireNonNull(repository, "repository cannot be null");
                 this.artifacts = List.copyOf(requireNonNull(artifacts, "artifacts cannot be null"));
                 this.retryFailedDeploymentCount = retryFailedDeploymentCount;
@@ -135,6 +142,14 @@ public interface ArtifactDeployerRequest {
             @Override
             public int getRetryFailedDeploymentCount() {
                 return retryFailedDeploymentCount;
+            }
+
+            @Override
+            public String toString() {
+                return "ArtifactDeployerRequest[" + "repository="
+                        + repository + ", artifacts="
+                        + artifacts + ", retryFailedDeploymentCount="
+                        + retryFailedDeploymentCount + ']';
             }
         }
     }

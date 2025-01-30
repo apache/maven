@@ -30,6 +30,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
+import org.apache.maven.api.annotations.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -105,6 +106,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     @NotThreadSafe
     class DependencyCoordinatesFactoryRequestBuilder {
         private Session session;
+        private RequestTrace trace;
         private String groupId;
         private String artifactId;
         private String version;
@@ -120,6 +122,11 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
 
         public DependencyCoordinatesFactoryRequestBuilder session(Session session) {
             this.session = session;
+            return this;
+        }
+
+        public DependencyCoordinatesFactoryRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -191,6 +198,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
         public DependencyCoordinatesFactoryRequest build() {
             return new DefaultDependencyCoordinatesFactoryRequest(
                     session,
+                    trace,
                     groupId,
                     artifactId,
                     version,
@@ -219,6 +227,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             @SuppressWarnings("checkstyle:ParameterNumber")
             private DefaultDependencyCoordinatesFactoryRequest(
                     @Nonnull Session session,
+                    @Nullable RequestTrace trace,
                     String groupId,
                     String artifactId,
                     String version,
@@ -229,7 +238,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                     String scope,
                     boolean optional,
                     Collection<Exclusion> exclusions) {
-                super(session);
+                super(session, trace);
                 this.groupId = groupId;
                 this.artifactId = artifactId;
                 this.version = version;
@@ -290,6 +299,21 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             @Override
             public Collection<Exclusion> getExclusions() {
                 return exclusions;
+            }
+
+            @Override
+            public String toString() {
+                return "DependencyCoordinatesFactoryRequest[" + "groupId='"
+                        + groupId + '\'' + ", artifactId='"
+                        + artifactId + '\'' + ", version='"
+                        + version + '\'' + ", classifier='"
+                        + classifier + '\'' + ", extension='"
+                        + extension + '\'' + ", type='"
+                        + type + '\'' + ", coordinateString='"
+                        + coordinateString + '\'' + ", scope='"
+                        + scope + '\'' + ", optional="
+                        + optional + ", exclusions="
+                        + exclusions + ']';
             }
         }
     }

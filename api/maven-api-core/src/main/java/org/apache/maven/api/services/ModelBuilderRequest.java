@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ModelBuilderRequest {
+public interface ModelBuilderRequest extends Request<Session> {
 
     /**
      * The possible request types for building a model.
@@ -86,9 +86,6 @@ public interface ModelBuilderRequest {
          */
         REQUEST_DOMINANT,
     }
-
-    @Nonnull
-    Session getSession();
 
     @Nonnull
     ModelSource getSource();
@@ -160,7 +157,7 @@ public interface ModelBuilderRequest {
     static ModelBuilderRequest build(@Nonnull Session session, @Nonnull Path path) {
         return builder()
                 .session(requireNonNull(session, "session cannot be null"))
-                .source(ModelSource.fromPath(path))
+                .source(Sources.buildSource(path))
                 .build();
     }
 
@@ -177,6 +174,7 @@ public interface ModelBuilderRequest {
     @NotThreadSafe
     class ModelBuilderRequestBuilder {
         Session session;
+        RequestTrace trace;
         RequestType requestType;
         boolean locationTracking;
         boolean recursive;
@@ -194,6 +192,7 @@ public interface ModelBuilderRequest {
 
         ModelBuilderRequestBuilder(ModelBuilderRequest request) {
             this.session = request.getSession();
+            this.trace = request.getTrace();
             this.requestType = request.getRequestType();
             this.locationTracking = request.isLocationTracking();
             this.recursive = request.isRecursive();
@@ -210,6 +209,11 @@ public interface ModelBuilderRequest {
 
         public ModelBuilderRequestBuilder session(Session session) {
             this.session = session;
+            return this;
+        }
+
+        public ModelBuilderRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -276,6 +280,7 @@ public interface ModelBuilderRequest {
         public ModelBuilderRequest build() {
             return new DefaultModelBuilderRequest(
                     session,
+                    trace,
                     requestType,
                     locationTracking,
                     recursive,
@@ -307,6 +312,7 @@ public interface ModelBuilderRequest {
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultModelBuilderRequest(
                     @Nonnull Session session,
+                    @Nullable RequestTrace trace,
                     @Nonnull RequestType requestType,
                     boolean locationTracking,
                     boolean recursive,
@@ -319,7 +325,7 @@ public interface ModelBuilderRequest {
                     RepositoryMerging repositoryMerging,
                     List<RemoteRepository> repositories,
                     ModelTransformer lifecycleBindingsInjector) {
-                super(session);
+                super(session, trace);
                 this.requestType = requireNonNull(requestType, "requestType cannot be null");
                 this.locationTracking = locationTracking;
                 this.recursive = recursive;
@@ -394,6 +400,23 @@ public interface ModelBuilderRequest {
             @Override
             public ModelTransformer getLifecycleBindingsInjector() {
                 return lifecycleBindingsInjector;
+            }
+
+            @Override
+            public String toString() {
+                return "ModelBuilderRequest[" + "requestType="
+                        + requestType + ", locationTracking="
+                        + locationTracking + ", recursive="
+                        + recursive + ", source="
+                        + source + ", profiles="
+                        + profiles + ", activeProfileIds="
+                        + activeProfileIds + ", inactiveProfileIds="
+                        + inactiveProfileIds + ", systemProperties="
+                        + systemProperties + ", userProperties="
+                        + userProperties + ", repositoryMerging="
+                        + repositoryMerging + ", repositories="
+                        + repositories + ", lifecycleBindingsInjector="
+                        + lifecycleBindingsInjector + ']';
             }
         }
     }

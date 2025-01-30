@@ -35,9 +35,7 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 @Experimental
-public interface ToolchainsBuilderRequest {
-    @Nonnull
-    ProtoSession getSession();
+public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
 
     /**
      * Gets the installation Toolchains source.
@@ -76,11 +74,11 @@ public interface ToolchainsBuilderRequest {
                 .session(requireNonNull(session, "session cannot be null"))
                 .installationToolchainsSource(
                         installationToolchainsFile != null && Files.exists(installationToolchainsFile)
-                                ? Source.fromPath(installationToolchainsFile)
+                                ? Sources.fromPath(installationToolchainsFile)
                                 : null)
                 .userToolchainsSource(
                         userToolchainsPath != null && Files.exists(userToolchainsPath)
-                                ? Source.fromPath(userToolchainsPath)
+                                ? Sources.fromPath(userToolchainsPath)
                                 : null)
                 .build();
     }
@@ -93,11 +91,17 @@ public interface ToolchainsBuilderRequest {
     @NotThreadSafe
     class ToolchainsBuilderRequestBuilder {
         ProtoSession session;
+        RequestTrace trace;
         Source installationToolchainsSource;
         Source userToolchainsSource;
 
         public ToolchainsBuilderRequestBuilder session(ProtoSession session) {
             this.session = session;
+            return this;
+        }
+
+        public ToolchainsBuilderRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -113,7 +117,7 @@ public interface ToolchainsBuilderRequest {
 
         public ToolchainsBuilderRequest build() {
             return new ToolchainsBuilderRequestBuilder.DefaultToolchainsBuilderRequest(
-                    session, installationToolchainsSource, userToolchainsSource);
+                    session, trace, installationToolchainsSource, userToolchainsSource);
         }
 
         private static class DefaultToolchainsBuilderRequest extends BaseRequest<ProtoSession>
@@ -124,9 +128,10 @@ public interface ToolchainsBuilderRequest {
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultToolchainsBuilderRequest(
                     @Nonnull ProtoSession session,
+                    @Nullable RequestTrace trace,
                     @Nullable Source installationToolchainsSource,
                     @Nullable Source userToolchainsSource) {
-                super(session);
+                super(session, trace);
                 this.installationToolchainsSource = installationToolchainsSource;
                 this.userToolchainsSource = userToolchainsSource;
             }
@@ -141,6 +146,13 @@ public interface ToolchainsBuilderRequest {
             @Override
             public Optional<Source> getUserToolchainsSource() {
                 return Optional.ofNullable(userToolchainsSource);
+            }
+
+            @Override
+            public String toString() {
+                return "ToolchainsBuilderRequest[" + "installationToolchainsSource="
+                        + installationToolchainsSource + ", userToolchainsSource="
+                        + userToolchainsSource + ']';
             }
         }
     }

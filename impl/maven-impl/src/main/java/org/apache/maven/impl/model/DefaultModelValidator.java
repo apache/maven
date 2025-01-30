@@ -70,6 +70,7 @@ import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelValidator;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
 
@@ -752,6 +753,14 @@ public class DefaultModelValidator implements ModelValidator {
 
             Set<String> executionIds = new HashSet<>();
 
+            if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0 && plugin.getConfiguration() != null) {
+                validateXmlNodeRecursively(
+                        problems,
+                        prefix + prefix2 + "[" + plugin.getKey() + "].configuration",
+                        plugin,
+                        plugin.getConfiguration());
+            }
+
             for (PluginExecution exec : plugin.getExecutions()) {
                 if (!executionIds.add(exec.getId())) {
                     addViolation(
@@ -763,7 +772,64 @@ public class DefaultModelValidator implements ModelValidator {
                             "must be unique but found duplicate execution with id " + exec.getId(),
                             exec);
                 }
+                if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0 && exec.getConfiguration() != null) {
+                    validateXmlNodeRecursively(
+                            problems,
+                            prefix + prefix2 + "[" + plugin.getKey() + "].executions.execution." + exec.getId(),
+                            exec,
+                            exec.getConfiguration());
+                }
             }
+        }
+    }
+
+    private void validateXmlNodeRecursively(
+            ModelProblemCollector problems, String fieldPathPrefix, InputLocationTracker tracker, XmlNode xmlNode) {
+        validateXmlNode(problems, fieldPathPrefix, tracker, xmlNode);
+        for (XmlNode child : xmlNode.getChildren()) {
+            validateXmlNodeRecursively(problems, fieldPathPrefix + "." + xmlNode.getName(), tracker, child);
+        }
+    }
+
+    private void validateXmlNode(
+            ModelProblemCollector problems, String fieldPathPrefix, InputLocationTracker tracker, XmlNode xmlNode) {
+        String childrenCombinationModeAttribute = xmlNode.getAttributes()
+                .getOrDefault(XmlNode.CHILDREN_COMBINATION_MODE_ATTRIBUTE, XmlNode.DEFAULT_CHILDREN_COMBINATION_MODE);
+        if (!(XmlNode.CHILDREN_COMBINATION_APPEND.equals(childrenCombinationModeAttribute)
+                || XmlNode.CHILDREN_COMBINATION_MERGE.equals(childrenCombinationModeAttribute))) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V40,
+                    fieldPathPrefix + "." + xmlNode.getName(),
+                    xmlNode.getInputLocation() != null
+                            ? xmlNode.getInputLocation().toString()
+                            : null,
+                    "Unsupported value '" + childrenCombinationModeAttribute + "' for "
+                            + XmlNode.CHILDREN_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
+                            + XmlNode.CHILDREN_COMBINATION_APPEND + ", and " + XmlNode.CHILDREN_COMBINATION_MERGE
+                            + " (default is: " + XmlNode.DEFAULT_SELF_COMBINATION_MODE + ")",
+                    tracker);
+        }
+        String selfCombinationModeAttribute = xmlNode.getAttributes()
+                .getOrDefault(XmlNode.SELF_COMBINATION_MODE_ATTRIBUTE, XmlNode.DEFAULT_SELF_COMBINATION_MODE);
+        if (!(XmlNode.SELF_COMBINATION_OVERRIDE.equals(selfCombinationModeAttribute)
+                || XmlNode.SELF_COMBINATION_MERGE.equals(selfCombinationModeAttribute)
+                || XmlNode.SELF_COMBINATION_REMOVE.equals(selfCombinationModeAttribute))) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V40,
+                    fieldPathPrefix + "." + xmlNode.getName(),
+                    xmlNode.getInputLocation() != null
+                            ? xmlNode.getInputLocation().toString()
+                            : null,
+                    "Unsupported value '" + selfCombinationModeAttribute + "' for "
+                            + XmlNode.SELF_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
+                            + XmlNode.SELF_COMBINATION_OVERRIDE + ", " + XmlNode.SELF_COMBINATION_MERGE + ", and "
+                            + XmlNode.SELF_COMBINATION_REMOVE
+                            + " (default is: " + XmlNode.DEFAULT_SELF_COMBINATION_MODE + ")",
+                    tracker);
         }
     }
 

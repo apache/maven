@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.slf4j.OutputChoice.OutputChoiceType;
 import org.slf4j.helpers.Reporter;
 
@@ -44,7 +45,10 @@ import org.slf4j.helpers.Reporter;
  */
 public class SimpleLoggerConfiguration {
 
-    private static final String CONFIGURATION_FILE = "simplelogger.properties";
+    private static final String CONFIGURATION_FILE = "maven.logger.properties";
+
+    @Deprecated(since = "4.0.0")
+    private static final String LEGACY_CONFIGURATION_FILE = "simplelogger.properties";
 
     static final int DEFAULT_LOG_LEVEL_DEFAULT = MavenBaseLogger.LOG_LEVEL_INFO;
     int defaultLogLevel = DEFAULT_LOG_LEVEL_DEFAULT;
@@ -93,7 +97,7 @@ public class SimpleLoggerConfiguration {
 
         loadProperties();
 
-        String defaultLogLevelString = getStringProperty(MavenBaseLogger.DEFAULT_LOG_LEVEL_KEY, null);
+        String defaultLogLevelString = getStringProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, null);
         if (defaultLogLevelString != null) {
             defaultLogLevel = stringToLevel(defaultLogLevelString);
         }
@@ -101,20 +105,18 @@ public class SimpleLoggerConfiguration {
         // local variable,
         String dateTimeFormatStr;
 
-        showLogName =
-                getBooleanProperty(MavenBaseLogger.SHOW_LOG_NAME_KEY, SimpleLoggerConfiguration.SHOW_LOG_NAME_DEFAULT);
-        showShortLogName = getBooleanProperty(MavenBaseLogger.SHOW_SHORT_LOG_NAME_KEY, SHOW_SHORT_LOG_NAME_DEFAULT);
-        showDateTime = getBooleanProperty(MavenBaseLogger.SHOW_DATE_TIME_KEY, SHOW_DATE_TIME_DEFAULT);
-        showThreadName = getBooleanProperty(MavenBaseLogger.SHOW_THREAD_NAME_KEY, SHOW_THREAD_NAME_DEFAULT);
-        showThreadId = getBooleanProperty(MavenBaseLogger.SHOW_THREAD_ID_KEY, SHOW_THREAD_ID_DEFAULT);
-        dateTimeFormatStr = getStringProperty(MavenBaseLogger.DATE_TIME_FORMAT_KEY, DATE_TIME_FORMAT_STR_DEFAULT);
-        levelInBrackets = getBooleanProperty(MavenBaseLogger.LEVEL_IN_BRACKETS_KEY, LEVEL_IN_BRACKETS_DEFAULT);
-        warnLevelString = getStringProperty(MavenBaseLogger.WARN_LEVEL_STRING_KEY, WARN_LEVELS_STRING_DEFAULT);
+        showLogName = getBooleanProperty(Constants.MAVEN_LOGGER_SHOW_LOG_NAME, SHOW_LOG_NAME_DEFAULT);
+        showShortLogName = getBooleanProperty(Constants.MAVEN_LOGGER_SHOW_SHORT_LOG_NAME, SHOW_SHORT_LOG_NAME_DEFAULT);
+        showDateTime = getBooleanProperty(Constants.MAVEN_LOGGER_SHOW_DATE_TIME, SHOW_DATE_TIME_DEFAULT);
+        showThreadName = getBooleanProperty(Constants.MAVEN_LOGGER_SHOW_THREAD_NAME, SHOW_THREAD_NAME_DEFAULT);
+        showThreadId = getBooleanProperty(Constants.MAVEN_LOGGER_SHOW_THREAD_ID, SHOW_THREAD_ID_DEFAULT);
+        dateTimeFormatStr = getStringProperty(Constants.MAVEN_LOGGER_DATE_TIME_FORMAT, DATE_TIME_FORMAT_STR_DEFAULT);
+        levelInBrackets = getBooleanProperty(Constants.MAVEN_LOGGER_LEVEL_IN_BRACKETS, LEVEL_IN_BRACKETS_DEFAULT);
+        warnLevelString = getStringProperty(Constants.MAVEN_LOGGER_WARN_LEVEL, WARN_LEVELS_STRING_DEFAULT);
 
-        logFile = getStringProperty(MavenBaseLogger.LOG_FILE_KEY, logFile);
+        logFile = getStringProperty(Constants.MAVEN_LOGGER_LOG_FILE, logFile);
 
-        cacheOutputStream =
-                getBooleanProperty(MavenBaseLogger.CACHE_OUTPUT_STREAM_STRING_KEY, CACHE_OUTPUT_STREAM_DEFAULT);
+        cacheOutputStream = getBooleanProperty(Constants.MAVEN_LOGGER_CACHE_OUTPUT_STREAM, CACHE_OUTPUT_STREAM_DEFAULT);
         outputChoice = computeOutputChoice(logFile, cacheOutputStream);
 
         if (dateTimeFormatStr != null) {
@@ -127,12 +129,36 @@ public class SimpleLoggerConfiguration {
     }
 
     private void loadProperties() {
-        // Add props from the resource simplelogger.properties
         ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
         ClassLoader toUseCL = (threadCL != null ? threadCL : ClassLoader.getSystemClassLoader());
+
+        // Try loading maven properties first
+        boolean mavenPropsLoaded = false;
         try (InputStream in = toUseCL.getResourceAsStream(CONFIGURATION_FILE)) {
             if (in != null) {
                 properties.load(in);
+                mavenPropsLoaded = true;
+            }
+        } catch (java.io.IOException e) {
+            // ignored
+        }
+
+        // Try loading legacy properties
+        try (InputStream in = toUseCL.getResourceAsStream(LEGACY_CONFIGURATION_FILE)) {
+            if (in != null) {
+                Properties legacyProps = new Properties();
+                legacyProps.load(in);
+                if (!mavenPropsLoaded) {
+                    Reporter.warn("Using deprecated " + LEGACY_CONFIGURATION_FILE + ". Please migrate to "
+                            + CONFIGURATION_FILE);
+                }
+                // Only load legacy properties if there's no maven equivalent
+                for (String propName : legacyProps.stringPropertyNames()) {
+                    String mavenKey = propName.replace(MavenBaseLogger.LEGACY_PREFIX, Constants.MAVEN_LOGGER_PREFIX);
+                    if (!properties.containsKey(mavenKey)) {
+                        properties.setProperty(mavenKey, legacyProps.getProperty(propName));
+                    }
+                }
             }
         } catch (java.io.IOException e) {
             // ignored
@@ -152,11 +178,32 @@ public class SimpleLoggerConfiguration {
     String getStringProperty(String name) {
         String prop = null;
         try {
+            // Try maven property first
             prop = System.getProperty(name);
+            if (prop == null && name.startsWith(Constants.MAVEN_LOGGER_PREFIX)) {
+                // Try legacy property
+                String legacyName = name.replace(Constants.MAVEN_LOGGER_PREFIX, MavenBaseLogger.LEGACY_PREFIX);
+                prop = System.getProperty(legacyName);
+                if (prop != null) {
+                    Reporter.warn("Using deprecated property " + legacyName + ". Please migrate to " + name);
+                }
+            }
         } catch (SecurityException e) {
             // Ignore
         }
-        return (prop == null) ? properties.getProperty(name) : prop;
+
+        if (prop == null) {
+            prop = properties.getProperty(name);
+            if (prop == null && name.startsWith(Constants.MAVEN_LOGGER_PREFIX)) {
+                // Try legacy property from properties file
+                String legacyName = name.replace(Constants.MAVEN_LOGGER_PREFIX, MavenBaseLogger.LEGACY_PREFIX);
+                prop = properties.getProperty(legacyName);
+                if (prop != null) {
+                    Reporter.warn("Using deprecated property " + legacyName + ". Please migrate to " + name);
+                }
+            }
+        }
+        return prop;
     }
 
     static int stringToLevel(String levelStr) {

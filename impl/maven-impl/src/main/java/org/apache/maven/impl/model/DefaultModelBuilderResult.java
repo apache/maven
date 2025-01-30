@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
@@ -34,6 +35,7 @@ import org.apache.maven.api.services.ProblemCollector;
  * Collects the output of the model builder.
  */
 class DefaultModelBuilderResult implements ModelBuilderResult {
+    private ModelBuilderRequest request;
     private ModelSource source;
     private Model fileModel;
     private Model rawModel;
@@ -44,8 +46,14 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     private final ProblemCollector<ModelProblem> problemCollector;
     private final List<DefaultModelBuilderResult> children = new ArrayList<>();
 
-    DefaultModelBuilderResult(ProblemCollector<ModelProblem> problemCollector) {
+    DefaultModelBuilderResult(ModelBuilderRequest request, ProblemCollector<ModelProblem> problemCollector) {
+        this.request = request;
         this.problemCollector = problemCollector;
+    }
+
+    @Override
+    public ModelBuilderRequest getRequest() {
+        return request;
     }
 
     @Override

@@ -30,6 +30,8 @@ import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -70,7 +72,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultPluginDependenciesResolver implements PluginDependenciesResolver {
-    private static final String REPOSITORY_CONTEXT = "plugin";
+    private static final String REPOSITORY_CONTEXT = org.apache.maven.api.services.RequestTrace.CONTEXT_PLUGIN;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -187,7 +189,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
             throws PluginResolutionException {
-        RequestTrace trace = RequestTrace.newChild(null, plugin);
+        InternalSession iSession = InternalSession.from(session);
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(iSession, plugin.getDelegate());
 
         if (pluginArtifact == null) {
             pluginArtifact = toArtifact(plugin, session);
@@ -217,9 +220,9 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             }
 
             DependencyRequest depRequest = new DependencyRequest(request, resolutionFilter);
-            depRequest.setTrace(trace);
+            depRequest.setTrace(trace.trace());
 
-            request.setTrace(RequestTrace.newChild(trace, depRequest));
+            request.setTrace(RequestTrace.newChild(trace.trace(), depRequest));
 
             node = repoSystem.collectDependencies(pluginSession, request).getRoot();
 
@@ -239,6 +242,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                                     .flatMap(r -> r.getExceptions().stream()))
                     .collect(Collectors.toList());
             throw new PluginResolutionException(plugin, exceptions, e);
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
     }
 }

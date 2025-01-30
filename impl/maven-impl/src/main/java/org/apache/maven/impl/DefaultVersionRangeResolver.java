@@ -58,22 +58,29 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
         requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
 
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             VersionRangeResult res = repositorySystem.resolveVersionRange(
                     session.getSession(),
                     new VersionRangeRequest(
-                            session.toArtifact(request.getArtifactCoordinates()),
-                            session.toRepositories(
-                                    request.getRepositories() != null
-                                            ? request.getRepositories()
-                                            : session.getRemoteRepositories()),
-                            null));
+                                    session.toArtifact(request.getArtifactCoordinates()),
+                                    session.toRepositories(
+                                            request.getRepositories() != null
+                                                    ? request.getRepositories()
+                                                    : session.getRemoteRepositories()),
+                                    trace.context())
+                            .setTrace(trace.trace()));
 
             Map<String, ArtifactRepository> repos = res.getVersions().stream()
                     .filter(v -> res.getRepository(v) != null)
                     .collect(Collectors.toMap(v -> v.toString(), res::getRepository));
 
             return new VersionRangeResolverResult() {
+                @Override
+                public VersionRangeResolverRequest getRequest() {
+                    return request;
+                }
+
                 @Override
                 public List<Exception> getExceptions() {
                     return res.getExceptions();
@@ -98,6 +105,8 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             };
         } catch (VersionRangeResolutionException e) {
             throw new VersionRangeResolverException("Unable to resolve version range", e);
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
     }
 }

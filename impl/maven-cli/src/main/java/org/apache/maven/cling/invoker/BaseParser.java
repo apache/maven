@@ -295,17 +295,45 @@ public abstract class BaseParser implements Parser {
 
     protected List<CoreExtension> readCoreExtensionsDescriptor(LocalContext context)
             throws ParserException, IOException {
-        ArrayList<CoreExtension> extensions = new ArrayList<>();
         String installationExtensionsFile = context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptorFromFile(
+        ArrayList<CoreExtension> installationExtensions = new ArrayList<>(readCoreExtensionsDescriptorFromFile(
                 context.installationDirectory.resolve(installationExtensionsFile)));
 
-        String projectExtensionsFile = context.userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptorFromFile(context.cwd.resolve(projectExtensionsFile)));
-
         String userExtensionsFile = context.userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
-        extensions.addAll(readCoreExtensionsDescriptorFromFile(context.userHomeDirectory.resolve(userExtensionsFile)));
+        ArrayList<CoreExtension> userExtensions = new ArrayList<>(
+                readCoreExtensionsDescriptorFromFile(context.userHomeDirectory.resolve(userExtensionsFile)));
 
+        String projectExtensionsFile = context.userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS);
+        ArrayList<CoreExtension> projectExtensions =
+                new ArrayList<>(readCoreExtensionsDescriptorFromFile(context.cwd.resolve(projectExtensionsFile)));
+
+        // merge these 3 but check for GA uniqueness; we don't want to load up same extension w/ different Vs
+        HashMap<String, String> gas = new HashMap<>();
+        ArrayList<String> conflicts = new ArrayList<>();
+
+        ArrayList<CoreExtension> coreExtensions =
+                new ArrayList<>(installationExtensions.size() + userExtensions.size() + projectExtensions.size());
+        coreExtensions.addAll(mergeExtensions(installationExtensions, installationExtensionsFile, gas, conflicts));
+        coreExtensions.addAll(mergeExtensions(userExtensions, userExtensionsFile, gas, conflicts));
+        coreExtensions.addAll(mergeExtensions(projectExtensions, projectExtensionsFile, gas, conflicts));
+
+        if (!conflicts.isEmpty()) {
+            throw new ParserException("Extension conflicts: " + String.join("; ", conflicts));
+        }
+
+        return coreExtensions;
+    }
+
+    private List<CoreExtension> mergeExtensions(
+            List<CoreExtension> extensions, String extensionsSource, Map<String, String> gas, List<String> conflicts) {
+        for (CoreExtension extension : extensions) {
+            String ga = extension.getGroupId() + ":" + extension.getArtifactId();
+            if (gas.containsKey(ga)) {
+                conflicts.add(ga + " from " + extensionsSource + " already specified in " + gas.get(ga));
+            } else {
+                gas.put(ga, extensionsSource);
+            }
+        }
         return extensions;
     }
 

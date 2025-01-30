@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
-    private static final String REPOSITORY_CONTEXT = "plugin";
+    private static final String REPOSITORY_CONTEXT = org.apache.maven.api.services.RequestTrace.CONTEXT_PLUGIN;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final BuildPluginManager pluginManager;

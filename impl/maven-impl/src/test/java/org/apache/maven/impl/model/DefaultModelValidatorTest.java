@@ -861,4 +861,16 @@ class DefaultModelValidatorTest {
                         + "${project.version} expressions are not supported during profile activation.",
                 result.getWarnings().get(1));
     }
+
+    @Test
+    void selfCombineOk() throws Exception {
+        SimpleProblemCollector result = validateFile("raw-model/self-combine-ok.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void selfCombineBad() throws Exception {
+        SimpleProblemCollector result = validateFile("raw-model/self-combine-bad.xml");
+        assertViolations(result, 0, 1, 0);
+    }
 }

@@ -33,7 +33,7 @@ import org.apache.maven.api.annotations.Nullable;
  * @since 4.0.0
  */
 @Experimental
-public interface ArtifactResolverResult {
+public interface ArtifactResolverResult extends Result<ArtifactResolverRequest> {
     /**
      * @return {@link Artifact}
      */

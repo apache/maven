@@ -19,13 +19,17 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
+import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
@@ -33,6 +37,10 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Local UT.
@@ -57,6 +65,97 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
         invoke(cwd, userHome, Arrays.asList("clean", "verify"));
+    }
+
+    @Test
+    void conflictingExtensions(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String extensionsXml =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <extensions>
+                    <extension>
+                        <groupId>eu.maveniverse.maven.mimir</groupId>
+                        <artifactId>extension3</artifactId>
+                        <version>0.3.4</version>
+                    </extension>
+                </extensions>
+                """;
+        Path dotMvn = cwd.resolve(".mvn");
+        Files.createDirectories(dotMvn);
+        Path projectExtensions = dotMvn.resolve("extensions.xml");
+        Files.writeString(projectExtensions, extensionsXml);
+
+        Path userConf = userHome.resolve(".m2");
+        Files.createDirectories(userConf);
+        Path userExtensions = userConf.resolve("extensions.xml");
+        Files.writeString(userExtensions, extensionsXml);
+
+        assertThrows(ParserException.class, () -> invoke(cwd, userHome, Arrays.asList("clean", "verify")));
+    }
+
+    @Test
+    void conflictingSettings(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String settingsXml =
+                """
+<?xml version="1.0"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <profiles>
+    <profile>
+      <id>oss-development</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>oss-development</activeProfile>
+  </activeProfiles>
+</settings>""";
+        Path dotMvn = cwd.resolve(".mvn");
+        Files.createDirectories(dotMvn);
+        Path projectExtensions = dotMvn.resolve("settings.xml");
+        Files.writeString(projectExtensions, settingsXml);
+
+        Path userConf = userHome.resolve(".m2");
+        Files.createDirectories(userConf);
+        Path userExtensions = userConf.resolve("settings.xml");
+        Files.writeString(userExtensions, settingsXml);
+
+        Map<String, String> logs = invoke(cwd, userHome, List.of("verify"), List.of("--force-interactive"));
+
+        String log = logs.get("verify");
+        assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
+        assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
     }
 
     @Disabled("Until we move off fully from File")

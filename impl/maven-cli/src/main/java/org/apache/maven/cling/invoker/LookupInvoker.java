@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,7 +51,7 @@ import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
-import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Proxy;
@@ -58,7 +59,6 @@ import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.spi.PropertyContributor;
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
@@ -576,15 +576,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 .session(context.protoSession)
                 .installationSettingsSource(
                         installationSettingsFile != null && Files.exists(installationSettingsFile)
-                                ? Source.fromPath(installationSettingsFile)
+                                ? Sources.fromPath(installationSettingsFile)
                                 : null)
                 .projectSettingsSource(
                         projectSettingsFile != null && Files.exists(projectSettingsFile)
-                                ? Source.fromPath(projectSettingsFile)
+                                ? Sources.fromPath(projectSettingsFile)
                                 : null)
                 .userSettingsSource(
                         userSettingsFile != null && Files.exists(userSettingsFile)
-                                ? Source.fromPath(userSettingsFile)
+                                ? Sources.fromPath(userSettingsFile)
                                 : null)
                 .interpolationSource(interpolationSource)
                 .build();
@@ -767,51 +767,60 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             request.addMirror(new org.apache.maven.settings.Mirror(mirror));
         }
 
+        // Collect repositories; are sensitive to ordering
+        LinkedHashMap<String, Repository> remoteRepositories = new LinkedHashMap<>();
+        LinkedHashMap<String, Repository> remotePluginRepositories = new LinkedHashMap<>();
+
+        // settings/repositories
         for (Repository remoteRepository : settings.getRepositories()) {
-            try {
-                request.addRemoteRepository(MavenRepositorySystem.buildArtifactRepository(
-                        new org.apache.maven.settings.Repository(remoteRepository)));
-            } catch (InvalidRepositoryException e) {
-                // do nothing for now
-            }
+            remoteRepositories.put(remoteRepository.getId(), remoteRepository);
         }
-
         for (Repository pluginRepository : settings.getPluginRepositories()) {
-            try {
-                request.addPluginArtifactRepository(MavenRepositorySystem.buildArtifactRepository(
-                        new org.apache.maven.settings.Repository(pluginRepository)));
-            } catch (InvalidRepositoryException e) {
-                // do nothing for now
-            }
+            remotePluginRepositories.put(pluginRepository.getId(), pluginRepository);
         }
 
-        request.setActiveProfiles(settings.getActiveProfiles());
+        // profiles (if active)
         for (Profile rawProfile : settings.getProfiles()) {
             request.addProfile(
                     new org.apache.maven.model.Profile(SettingsUtilsV4.convertFromSettingsProfile(rawProfile)));
 
             if (settings.getActiveProfiles().contains(rawProfile.getId())) {
-                List<Repository> remoteRepositories = rawProfile.getRepositories();
-                for (Repository remoteRepository : remoteRepositories) {
-                    try {
-                        request.addRemoteRepository(MavenRepositorySystem.buildArtifactRepository(
-                                new org.apache.maven.settings.Repository(remoteRepository)));
-                    } catch (InvalidRepositoryException e) {
-                        // do nothing for now
-                    }
+                for (Repository remoteRepository : rawProfile.getRepositories()) {
+                    remoteRepositories.put(remoteRepository.getId(), remoteRepository);
                 }
 
-                List<Repository> pluginRepositories = rawProfile.getPluginRepositories();
-                for (Repository pluginRepository : pluginRepositories) {
-                    try {
-                        request.addPluginArtifactRepository(MavenRepositorySystem.buildArtifactRepository(
-                                new org.apache.maven.settings.Repository(pluginRepository)));
-                    } catch (InvalidRepositoryException e) {
-                        // do nothing for now
-                    }
+                for (Repository pluginRepository : rawProfile.getPluginRepositories()) {
+                    remotePluginRepositories.put(pluginRepository.getId(), pluginRepository);
                 }
             }
         }
+
+        // pour onto request
+        request.setActiveProfiles(settings.getActiveProfiles());
+        request.setRemoteRepositories(remoteRepositories.values().stream()
+                .map(r -> {
+                    try {
+                        return MavenRepositorySystem.buildArtifactRepository(
+                                new org.apache.maven.settings.Repository(r));
+                    } catch (Exception e) {
+                        // nothing currently
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList());
+        request.setPluginArtifactRepositories(remotePluginRepositories.values().stream()
+                .map(r -> {
+                    try {
+                        return MavenRepositorySystem.buildArtifactRepository(
+                                new org.apache.maven.settings.Repository(r));
+                    } catch (Exception e) {
+                        // nothing currently
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList());
     }
 
     protected int calculateDegreeOfConcurrency(String threadConfiguration) {

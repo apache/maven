@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,6 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Activation;
-import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
@@ -71,7 +71,6 @@ import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.Interpolator;
-import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -83,7 +82,9 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.VersionParserException;
 import org.apache.maven.api.services.model.DependencyManagementImporter;
@@ -110,8 +111,9 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
+import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.util.PhasingExecutor;
-import org.apache.maven.model.v4.MavenTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -219,24 +221,30 @@ public class DefaultModelBuilder implements ModelBuilder {
          */
         @Override
         public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
-            // Create or derive a session based on the request
-            ModelBuilderSessionState session;
-            if (mainSession == null) {
-                mainSession = new ModelBuilderSessionState(request);
-                session = mainSession;
-            } else {
-                session = mainSession.derive(
-                        request, new DefaultModelBuilderResult(ProblemCollector.create(mainSession.session)));
+            RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
+            try {
+                // Create or derive a session based on the request
+                ModelBuilderSessionState session;
+                if (mainSession == null) {
+                    mainSession = new ModelBuilderSessionState(request);
+                    session = mainSession;
+                } else {
+                    session = mainSession.derive(
+                            request,
+                            new DefaultModelBuilderResult(request, ProblemCollector.create(mainSession.session)));
+                }
+                // Build the request
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                    // build the build poms
+                    session.buildBuildPom();
+                } else {
+                    // simply build the effective model
+                    session.buildEffectiveModel(new LinkedHashSet<>());
+                }
+                return session.result;
+            } finally {
+                RequestTraceHelper.exit(trace);
             }
-            // Build the request
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
-                // build the build poms
-                session.buildBuildPom();
-            } else {
-                // simply build the effective model
-                session.buildEffectiveModel(new LinkedHashSet<>());
-            }
-            return session.result;
         }
     }
 
@@ -262,7 +270,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             this(
                     request.getSession(),
                     request,
-                    new DefaultModelBuilderResult(ProblemCollector.create(request.getSession())),
+                    new DefaultModelBuilderResult(request, ProblemCollector.create(request.getSession())),
                     request.getSession()
                             .getData()
                             .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance),
@@ -304,7 +312,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         ModelBuilderSessionState derive(ModelSource source) {
-            return derive(source, new DefaultModelBuilderResult(ProblemCollector.create(session)));
+            return derive(source, new DefaultModelBuilderResult(request, ProblemCollector.create(session)));
         }
 
         ModelBuilderSessionState derive(ModelSource source, DefaultModelBuilderResult result) {
@@ -315,7 +323,7 @@ public class DefaultModelBuilder implements ModelBuilder {
          * Creates a new session, sharing cached datas and propagating errors.
          */
         ModelBuilderSessionState derive(ModelBuilderRequest request) {
-            return derive(request, new DefaultModelBuilderResult(ProblemCollector.create(session)));
+            return derive(request, new DefaultModelBuilderResult(request, ProblemCollector.create(session)));
         }
 
         ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
@@ -383,7 +391,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return null;
             }
             try {
-                return derive(ModelSource.fromPath(path)).readRawModel();
+                return derive(Sources.buildSource(path)).readRawModel();
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
             }
@@ -640,16 +648,21 @@ public class DefaultModelBuilder implements ModelBuilder {
             // This is done through the phased executor
             var allResults = results(result).toList();
             List<RuntimeException> exceptions = new CopyOnWriteArrayList<>();
+            InternalSession session = InternalSession.from(this.session);
+            RequestTrace trace = session.getCurrentTrace();
             try (PhasingExecutor executor = createExecutor()) {
                 for (DefaultModelBuilderResult r : allResults) {
                     executor.execute(() -> {
                         ModelBuilderSessionState mbs = derive(r.getSource(), r);
+                        session.setCurrentTrace(trace);
                         try {
                             mbs.buildEffectiveModel(new LinkedHashSet<>());
                         } catch (ModelBuilderException e) {
                             // gathered with problem collector
                         } catch (RuntimeException t) {
                             exceptions.add(t);
+                        } finally {
+                            session.setCurrentTrace(null);
                         }
                     });
                 }
@@ -683,7 +696,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             try (PhasingExecutor executor = createExecutor()) {
                 DefaultModelBuilderResult r = Objects.equals(top, root)
                         ? result
-                        : new DefaultModelBuilderResult(ProblemCollector.create(session));
+                        : new DefaultModelBuilderResult(request, ProblemCollector.create(session));
                 loadFilePom(executor, top, root, Set.of(), r);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {
@@ -705,7 +718,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Executor executor, Path top, Path pom, Set<Path> parents, DefaultModelBuilderResult r) {
             try {
                 Path pomDirectory = Files.isDirectory(pom) ? pom : pom.getParent();
-                ModelSource src = ModelSource.fromPath(pom);
+                ModelSource src = Sources.buildSource(pom);
                 Model model = derive(src, r).readFileModel();
                 // keep all loaded file models in memory, those will be needed
                 // during the raw to build transformation
@@ -757,12 +770,21 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                     DefaultModelBuilderResult cr = Objects.equals(top, subprojectFile)
                             ? result
-                            : new DefaultModelBuilderResult(ProblemCollector.create(session));
+                            : new DefaultModelBuilderResult(request, ProblemCollector.create(session));
                     if (request.isRecursive()) {
                         r.getChildren().add(cr);
                     }
 
-                    executor.execute(() -> loadFilePom(executor, top, subprojectFile, concat(parents, pom), cr));
+                    InternalSession session = InternalSession.from(this.session);
+                    RequestTrace trace = session.getCurrentTrace();
+                    executor.execute(() -> {
+                        session.setCurrentTrace(trace);
+                        try {
+                            loadFilePom(executor, top, subprojectFile, concat(parents, pom), cr);
+                        } finally {
+                            session.setCurrentTrace(null);
+                        }
+                    });
                 }
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
@@ -1174,11 +1196,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             // profile activation
             profileActivationContext.setModel(model);
 
-            List<Profile> interpolatedProfiles =
-                    interpolateActivations(model.getProfiles(), profileActivationContext, this);
-
             // profile injection
-            List<Profile> activePomProfiles = getActiveProfiles(interpolatedProfiles, profileActivationContext);
+            List<Profile> activePomProfiles = getActiveProfiles(model.getProfiles(), profileActivationContext);
             model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
             model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
 
@@ -1340,7 +1359,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         }
                         if (pomPath != null && Files.isRegularFile(pomPath)) {
                             Model parentModel =
-                                    derive(ModelSource.fromPath(pomPath)).readFileModel();
+                                    derive(Sources.buildSource(pomPath)).readFileModel();
                             String parentGroupId = getGroupId(parentModel);
                             String parentArtifactId = parentModel.getArtifactId();
                             String parentVersion = getVersion(parentModel);
@@ -1396,7 +1415,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     Path rootModelPath = modelProcessor.locateExistingPom(rootDirectory);
                     if (rootModelPath != null) {
                         Model rootModel =
-                                derive(ModelSource.fromPath(rootModelPath)).readFileModel();
+                                derive(Sources.buildSource(rootModelPath)).readFileModel();
                         properties.putAll(rootModel.getProperties());
                     }
                 } else {
@@ -1413,6 +1432,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                                                         model.getParent().getVersion()))
                                         : null)
                         .build();
+                // Override model properties with user properties
+                Map<String, String> newProps = merge(model.getProperties(), session.getUserProperties());
+                if (newProps != null) {
+                    model = model.withProperties(newProps);
+                }
+                model = model.withProfiles(merge(model.getProfiles(), session.getUserProperties()));
             }
 
             for (var transformer : transformers) {
@@ -1429,6 +1454,57 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             return model;
+        }
+
+        /**
+         * Merges a list of model profiles with user-defined properties.
+         * For each property defined in both the model and user properties, the user property value
+         * takes precedence and overrides the model value.
+         *
+         * @param profiles list of profiles from the model
+         * @param userProperties map of user-defined properties that override model properties
+         * @return a new list containing profiles with overridden properties if changes were made,
+         *         or the original list if no overrides were needed
+         */
+        List<Profile> merge(List<Profile> profiles, Map<String, String> userProperties) {
+            List<Profile> result = null;
+            for (int i = 0; i < profiles.size(); i++) {
+                Profile profile = profiles.get(i);
+                Map<String, String> props = merge(profile.getProperties(), userProperties);
+                if (props != null) {
+                    Profile merged = profile.withProperties(props);
+                    if (result == null) {
+                        result = new ArrayList<>(profiles);
+                    }
+                    result.set(i, merged);
+                }
+            }
+            return result != null ? result : profiles;
+        }
+
+        /**
+         * Merges model properties with user properties, giving precedence to user properties.
+         * For any property key present in both maps, the user property value will override
+         * the model property value when they differ.
+         *
+         * @param properties properties defined in the model
+         * @param userProperties user-defined properties that override model properties
+         * @return a new map with model properties overridden by user properties if changes were needed,
+         *         or null if no overrides were needed
+         */
+        Map<String, String> merge(Map<String, String> properties, Map<String, String> userProperties) {
+            Map<String, String> result = null;
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                String key = entry.getKey();
+                String value = userProperties.get(key);
+                if (value != null && !Objects.equals(value, entry.getValue())) {
+                    if (result == null) {
+                        result = new LinkedHashMap<>(properties);
+                    }
+                    result.put(entry.getKey(), value);
+                }
+            }
+            return result;
         }
 
         Model readRawModel() throws ModelBuilderException {
@@ -1505,11 +1581,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .assembleModelInheritance(raw, parentData, request, this);
 
             // activate profiles
-            List<Profile> parentInterpolatedProfiles =
-                    interpolateActivations(parent.getProfiles(), profileActivationContext, this);
+            List<Profile> parentActivePomProfiles = getActiveProfiles(parent.getProfiles(), profileActivationContext);
             // profile injection
-            List<Profile> parentActivePomProfiles =
-                    getActiveProfiles(parentInterpolatedProfiles, profileActivationContext);
             Model injectedParentModel = profileInjector
                     .injectProfiles(parent, parentActivePomProfiles, request, this)
                     .withProfiles(List.of());
@@ -1741,79 +1814,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             return request.getRequestType() != ModelBuilderRequest.RequestType.BUILD_CONSUMER;
         }
 
-        private List<Profile> interpolateActivations(
-                List<Profile> profiles, DefaultProfileActivationContext context, ModelProblemCollector problems) {
-            if (profiles.stream()
-                    .map(org.apache.maven.api.model.Profile::getActivation)
-                    .noneMatch(Objects::nonNull)) {
-                return profiles;
-            }
-            Interpolator interpolator = request.getSession().getService(Interpolator.class);
-
-            class ProfileInterpolator extends MavenTransformer implements UnaryOperator<Profile> {
-                ProfileInterpolator() {
-                    super(s -> {
-                        try {
-                            return interpolator.interpolate(
-                                    s, Interpolator.chain(context::getUserProperty, context::getSystemProperty));
-                        } catch (InterpolatorException e) {
-                            problems.add(Severity.ERROR, Version.BASE, e.getMessage(), e);
-                        }
-                        return s;
-                    });
-                }
-
-                @Override
-                public Profile apply(Profile p) {
-                    return Profile.newBuilder(p)
-                            .activation(transformActivation(p.getActivation()))
-                            .build();
-                }
-
-                @Override
-                protected Activation.Builder transformActivation_Condition(
-                        Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
-                    // do not interpolate the condition activation
-                    return builder;
-                }
-
-                @Override
-                protected ActivationFile.Builder transformActivationFile_Missing(
-                        Supplier<? extends ActivationFile.Builder> creator,
-                        ActivationFile.Builder builder,
-                        ActivationFile target) {
-                    String path = target.getMissing();
-                    String xformed = transformPath(path, target, "missing");
-                    return xformed != path ? (builder != null ? builder : creator.get()).missing(xformed) : builder;
-                }
-
-                @Override
-                protected ActivationFile.Builder transformActivationFile_Exists(
-                        Supplier<? extends ActivationFile.Builder> creator,
-                        ActivationFile.Builder builder,
-                        ActivationFile target) {
-                    final String path = target.getExists();
-                    final String xformed = transformPath(path, target, "exists");
-                    return xformed != path ? (builder != null ? builder : creator.get()).exists(xformed) : builder;
-                }
-
-                private String transformPath(String path, ActivationFile target, String locationKey) {
-                    try {
-                        return context.interpolatePath(path);
-                    } catch (InterpolatorException e) {
-                        problems.add(
-                                Severity.ERROR,
-                                Version.BASE,
-                                "Failed to interpolate file location " + path + ": " + e.getMessage(),
-                                target.getLocation(locationKey),
-                                e);
-                    }
-                    return path;
-                }
-            }
-            return profiles.stream().map(new ProfileInterpolator()).toList();
-        }
-
         record ModelResolverResult(ModelSource source, String resolvedVersion) {}
 
         class CachingModelResolver implements ModelResolver {
@@ -1905,12 +1905,17 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     @Override
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
-        ModelBuilderSessionState build = new ModelBuilderSessionState(request);
-        Model model = build.readRawModel();
-        if (build.hasErrors()) {
-            throw build.newModelBuilderException();
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
+        try {
+            ModelBuilderSessionState build = new ModelBuilderSessionState(request);
+            Model model = build.readRawModel();
+            if (build.hasErrors()) {
+                throw build.newModelBuilderException();
+            }
+            return model;
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
-        return model;
     }
 
     static String getGroupId(Model model) {

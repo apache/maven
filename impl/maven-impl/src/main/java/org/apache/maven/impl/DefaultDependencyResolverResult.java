@@ -53,6 +53,10 @@ import org.apache.maven.api.services.DependencyResolverResult;
  */
 public class DefaultDependencyResolverResult implements DependencyResolverResult {
     /**
+     * The corresponding request.
+     */
+    private final DependencyResolverRequest request;
+    /**
      * The exceptions that occurred while building the dependency graph.
      */
     private final List<Exception> exceptions;
@@ -97,13 +101,19 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      * Creates an initially empty result. Callers should add path elements by calls
      * to {@link #addDependency(Node, Dependency, Predicate, Path)}.
      *
+     * @param request the corresponding request
      * @param cache cache of module information about each dependency
      * @param exceptions the exceptions that occurred while building the dependency graph
      * @param root the root node of the dependency graph
      * @param count estimated number of dependencies
      */
     public DefaultDependencyResolverResult(
-            PathModularizationCache cache, List<Exception> exceptions, Node root, int count) {
+            DependencyResolverRequest request,
+            PathModularizationCache cache,
+            List<Exception> exceptions,
+            Node root,
+            int count) {
+        this.request = request;
         this.cache = cache;
         this.exceptions = exceptions;
         this.root = root;
@@ -331,6 +341,11 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
             }
         }
         return null;
+    }
+
+    @Override
+    public DependencyResolverRequest getRequest() {
+        return request;
     }
 
     @Override

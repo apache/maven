@@ -35,10 +35,7 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 @Experimental
-public interface VersionRangeResolverRequest {
-
-    @Nonnull
-    Session getSession();
+public interface VersionRangeResolverRequest extends Request<Session> {
 
     @Nonnull
     ArtifactCoordinates getArtifactCoordinates();
@@ -72,11 +69,17 @@ public interface VersionRangeResolverRequest {
     @NotThreadSafe
     class VersionResolverRequestBuilder {
         Session session;
+        RequestTrace trace;
         ArtifactCoordinates artifactCoordinates;
         List<RemoteRepository> repositories;
 
         public VersionResolverRequestBuilder session(Session session) {
             this.session = session;
+            return this;
+        }
+
+        public VersionResolverRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
@@ -91,7 +94,7 @@ public interface VersionRangeResolverRequest {
         }
 
         public VersionRangeResolverRequest build() {
-            return new DefaultVersionResolverRequest(session, artifactCoordinates, repositories);
+            return new DefaultVersionResolverRequest(session, trace, artifactCoordinates, repositories);
         }
 
         private static class DefaultVersionResolverRequest extends BaseRequest<Session>
@@ -102,9 +105,10 @@ public interface VersionRangeResolverRequest {
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultVersionResolverRequest(
                     @Nonnull Session session,
+                    @Nullable RequestTrace trace,
                     @Nonnull ArtifactCoordinates artifactCoordinates,
                     @Nullable List<RemoteRepository> repositories) {
-                super(session);
+                super(session, trace);
                 this.artifactCoordinates = artifactCoordinates;
                 this.repositories = repositories;
             }
@@ -119,6 +123,13 @@ public interface VersionRangeResolverRequest {
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
+            }
+
+            @Override
+            public String toString() {
+                return "VersionResolverRequest[" + "artifactCoordinates="
+                        + artifactCoordinates + ", repositories="
+                        + repositories + ']';
             }
         }
     }

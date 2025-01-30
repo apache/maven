@@ -51,6 +51,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
             throws ArtifactResolverException, IllegalArgumentException {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             Map<DownloadedArtifact, Path> paths = new HashMap<>();
             ArtifactManager artifactManager = session.getService(ArtifactManager.class);
@@ -68,7 +69,8 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                     DownloadedArtifact resolved = session.getArtifact(DownloadedArtifact.class, aetherArtifact);
                     paths.put(resolved, path);
                 } else {
-                    requests.add(new ArtifactRequest(aetherArtifact, repositories, null));
+                    requests.add(
+                            new ArtifactRequest(aetherArtifact, repositories, trace.context()).setTrace(trace.trace()));
                 }
             }
             if (!requests.isEmpty()) {
@@ -80,17 +82,27 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                     paths.put(artifact, path);
                 }
             }
-            return new DefaultArtifactResolverResult(paths);
+            return new DefaultArtifactResolverResult(request, paths);
         } catch (ArtifactResolutionException e) {
             throw new ArtifactResolverException("Unable to resolve artifact: " + e.getMessage(), e);
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
     }
 
     static class DefaultArtifactResolverResult implements ArtifactResolverResult {
+
+        final ArtifactResolverRequest request;
         final Map<DownloadedArtifact, Path> paths;
 
-        DefaultArtifactResolverResult(Map<DownloadedArtifact, Path> paths) {
+        DefaultArtifactResolverResult(ArtifactResolverRequest request, Map<DownloadedArtifact, Path> paths) {
+            this.request = request;
             this.paths = paths;
+        }
+
+        @Override
+        public ArtifactResolverRequest getRequest() {
+            return request;
         }
 
         @Override

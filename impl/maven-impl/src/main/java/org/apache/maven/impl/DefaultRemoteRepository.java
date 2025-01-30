@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl;
 
+import java.util.Objects;
+
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -54,6 +56,16 @@ public class DefaultRemoteRepository implements RemoteRepository {
     @Override
     public String getProtocol() {
         return repository.getProtocol();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof DefaultRemoteRepository that && Objects.equals(repository, that.repository);
+    }
+
+    @Override
+    public int hashCode() {
+        return repository.hashCode();
     }
 
     @Override

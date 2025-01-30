@@ -27,7 +27,7 @@ import org.apache.maven.api.settings.Settings;
  * @since 4.0.0
  */
 @Experimental
-public interface SettingsBuilderResult {
+public interface SettingsBuilderResult extends Result<SettingsBuilderRequest> {
 
     /**
      * Gets the assembled settings.
