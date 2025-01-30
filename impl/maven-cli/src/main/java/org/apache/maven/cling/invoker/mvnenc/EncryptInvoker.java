@@ -107,8 +107,6 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
                 context.logger.error(e.getMessage());
             }
             return ERROR;
-        } finally {
-            context.terminal.writer().flush();
         }
     }
 
