@@ -26,9 +26,39 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Specifies the priority of a bean implementation when multiple implementations
+ * of the same type are available.
+ * <p>
+ * Higher values indicate higher priority. When multiple implementations of the same
+ * type exist, the one with the highest priority will be selected for injection.
+ * <p>
+ * Example usage:
+ * <pre>
+ * {@literal @}Priority(100)
+ * public class PreferredImplementation implements Service {
+ *     // Implementation
+ * }
+ * </pre>
+ *
+ * @since 4.0.0
+ */
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Documented
 public @interface Priority {
+    /**
+     * The priority value for the annotated element.
+     * <p>
+     * Higher values indicate higher priority. When multiple implementations
+     * of the same type exist in the container, the one with the highest
+     * priority value will be selected for injection.
+     * <p>
+     * There are no predefined minimum or maximum values, but it's recommended
+     * to use values that allow for future adjustments (e.g., using values
+     * like 100, 200, 300 rather than consecutive numbers).
+     *
+     * @return the priority value for ordering
+     */
     int value();
 }

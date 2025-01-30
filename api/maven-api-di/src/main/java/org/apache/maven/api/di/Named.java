@@ -23,9 +23,37 @@ import java.lang.annotation.Retention;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Provides a unique identifier for dependencies when multiple implementations
+ * of the same type are available.
+ * <p>
+ * This annotation can be used in conjunction with {@link Inject} to specify
+ * which implementation should be injected when multiple candidates exist.
+ * The value represents a unique identifier for the dependency.
+ * <p>
+ * Example usage:
+ * <pre>
+ * {@literal @}Inject
+ * {@literal @}Named("mysql")
+ * private Repository mysqlRepository;
+ * </pre>
+ *
+ * @see Inject
+ * @see Qualifier
+ * @since 4.0.0
+ */
 @Qualifier
 @Retention(RUNTIME)
 @Documented
 public @interface Named {
+    /**
+     * The name identifier for the annotated element.
+     * <p>
+     * If no value is specified, the default empty string will be used.
+     * When used as a qualifier, this value helps distinguish between different
+     * implementations or instances of the same type.
+     *
+     * @return the name that identifies this component
+     */
     String value() default "";
 }

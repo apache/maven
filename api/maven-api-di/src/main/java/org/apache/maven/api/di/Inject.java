@@ -27,6 +27,32 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Marks a dependency injection point for constructor, method, or field injection.
+ * <p>
+ * This annotation is used to identify injection points where the container should
+ * provide an instance of the requested type. It can be applied to:
+ * <ul>
+ *   <li>Constructors</li>
+ *   <li>Methods</li>
+ *   <li>Fields</li>
+ * </ul>
+ * <p>
+ * Example usage:
+ * <pre>
+ * public class MyService {
+ *     private final Repository repository;
+ *
+ *     {@literal @}Inject
+ *     public MyService(Repository repository) {
+ *         this.repository = repository;
+ *     }
+ * }
+ * </pre>
+ *
+ * @see Named
+ * @since 4.0.0
+ */
 @Target({FIELD, CONSTRUCTOR, METHOD})
 @Retention(RUNTIME)
 @Documented

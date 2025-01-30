@@ -25,6 +25,25 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Meta-annotation that marks other annotations as qualifier annotations.
+ * <p>
+ * Qualifiers are used to distinguish between multiple beans of the same type,
+ * allowing for more precise control over which implementation should be injected.
+ * Custom qualifier annotations should be annotated with {@code @Qualifier}.
+ * <p>
+ * Example of creating a custom qualifier:
+ * <pre>
+ * {@literal @}Qualifier
+ * {@literal @}Retention(RUNTIME)
+ * public @interface Database {
+ *     String value();
+ * }
+ * </pre>
+ *
+ * @see Named
+ * @since 4.0.0
+ */
 @Target(ANNOTATION_TYPE)
 @Retention(RUNTIME)
 @Documented
