@@ -240,6 +240,16 @@ class ComparableVersionTest {
     }
 
     @Test
+    void testNonAsciiDigits() {
+        // These should be treated the same as non-digit characters
+        ComparableVersion c1 = new ComparableVersion("1");
+        // ArabicIndicNine
+        ComparableVersion c2 = new ComparableVersion( "\u0669" );
+        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\u0669" );
+        assertTrue(c2.compareTo(c1) < 0, "expected " + "\u0669" + " < " + "1" );
+    }
+
+    @Test
     void testGetCanonical() {
         // MNG-7700
         newComparable("0.x");
