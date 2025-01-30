@@ -148,7 +148,11 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
-    public void addSourceRoot(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull Path directory) {
+    public void addSourceRoot(
+            @Nonnull Project project,
+            @Nonnull ProjectScope scope,
+            @Nonnull Language language,
+            @Nonnull Path directory) {
         MavenProject prj = getMavenProject(nonNull(project, "project"));
         prj.addSourceRoot(nonNull(scope, "scope"), nonNull(language, "language"), nonNull(directory, "directory"));
     }
