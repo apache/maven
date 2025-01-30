@@ -225,18 +225,18 @@ class ComparableVersionTest {
     @Test
     void testDigitGreaterThanNonAscii() {
         ComparableVersion c1 = new ComparableVersion("1");
-        ComparableVersion c2 = new ComparableVersion( "é" );
-        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\uD835\uDFE4" );
-        assertTrue(c2.compareTo(c1) < 0, "expected " + "\uD835\uDFE4" + " < " + "1" );
+        ComparableVersion c2 = new ComparableVersion("é");
+        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\uD835\uDFE4");
+        assertTrue(c2.compareTo(c1) < 0, "expected " + "\uD835\uDFE4" + " < " + "1");
     }
 
     @Test
     void testDigitGreaterThanNonBmpCharacters() {
         ComparableVersion c1 = new ComparableVersion("1");
         // MATHEMATICAL SANS-SERIF DIGIT TWO
-        ComparableVersion c2 = new ComparableVersion( "\uD835\uDFE4" );
-        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\uD835\uDFE4" );
-        assertTrue(c2.compareTo(c1) < 0, "expected " + "\uD835\uDFE4" + " < " + "1" );
+        ComparableVersion c2 = new ComparableVersion("\uD835\uDFE4");
+        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\uD835\uDFE4");
+        assertTrue(c2.compareTo(c1) < 0, "expected " + "\uD835\uDFE4" + " < " + "1");
     }
 
     @Test
@@ -244,9 +244,9 @@ class ComparableVersionTest {
         // These should be treated the same as non-digit characters
         ComparableVersion c1 = new ComparableVersion("1");
         // ArabicIndicNine
-        ComparableVersion c2 = new ComparableVersion( "\u0669" );
-        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\u0669" );
-        assertTrue(c2.compareTo(c1) < 0, "expected " + "\u0669" + " < " + "1" );
+        ComparableVersion c2 = new ComparableVersion("\u0669");
+        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\u0669");
+        assertTrue(c2.compareTo(c1) < 0, "expected " + "\u0669" + " < " + "1");
     }
 
     @Test

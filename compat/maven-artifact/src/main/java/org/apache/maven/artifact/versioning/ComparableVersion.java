@@ -658,15 +658,16 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         for (int i = 0; i < version.length(); i++) {
             char character = version.charAt(i);
             int c = character;
-            if (Character.isHighSurrogate( character )) {
+            if (Character.isHighSurrogate(character)) {
                 // read the next character as a low surrogate and combine into a single int
                 try {
-                    char low = version.charAt( i + 1);
+                    char low = version.charAt(i + 1);
                     char[] both = {character, low};
-                    c = Character.codePointAt( both, 0 );
+                    c = Character.codePointAt(both, 0);
                     i++;
                 } catch (IndexOutOfBoundsException ex) {
-                    // high surrogate without low surrogate. Not a lot we can do here except treat it as a regular character
+                    // high surrogate without low surrogate. Not a lot we can do here except treat it as a regular
+                    // character
                 }
             }
 
