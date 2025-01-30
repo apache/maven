@@ -26,7 +26,6 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.Parser;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -76,9 +75,8 @@ public abstract class ClingSupport {
             return invoker.invoke(createParser()
                     .parseInvocation(
                             parserRequestBuilder(args).in(in).out(out).err(err).build()));
-        } catch (ParserException e) {
-            System.err.println(e.getMessage());
-            return 1;
+        } catch (InvokerException.ExitException e) {
+            return e.getExitCode();
         } catch (InvokerException e) {
             return 1;
         } finally {
@@ -92,5 +90,5 @@ public abstract class ClingSupport {
 
     protected abstract Parser createParser();
 
-    protected abstract ParserRequest.Builder parserRequestBuilder(String[] args) throws ParserException;
+    protected abstract ParserRequest.Builder parserRequestBuilder(String[] args);
 }

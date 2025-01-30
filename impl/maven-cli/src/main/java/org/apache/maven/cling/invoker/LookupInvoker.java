@@ -43,6 +43,7 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Lookup;
@@ -126,8 +127,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                                     .get());
                 }
                 return doInvoke(context);
-            } catch (InvokerException.ExitException e) {
-                return e.getExitCode();
+            } catch (InvokerException e) {
+                throw e;
             } catch (Exception e) {
                 throw handleException(context, e);
             }
@@ -138,6 +139,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int doInvoke(C context) throws Exception {
+        validate(context);
         pushCoreProperties(context);
         pushUserProperties(context);
         configureLogging(context);
@@ -172,6 +174,22 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected abstract C createContext(InvokerRequest invokerRequest) throws InvokerException;
+
+    protected void validate(C context) throws InvokerException {
+        // warn about deprecated options
+        context.invokerRequest
+                .options()
+                .warnAboutDeprecatedOptions(context.invokerRequest.parserRequest(), System.out::println);
+
+        if (!context.invokerRequest.parserErrors().isEmpty()) {
+            context.logger.error(
+                    "There were " + context.invokerRequest.parserErrors().size() + " parsing errors:");
+            for (ParserException parserException : context.invokerRequest.parserErrors()) {
+                context.logger.error(parserException.getMessage());
+            }
+            throw new InvokerException.ExitException(1);
+        }
+    }
 
     protected void pushCoreProperties(C context) throws Exception {
         System.setProperty(

@@ -319,7 +319,7 @@ public interface ParserRequest {
             return new ParserRequestImpl(
                     command,
                     commandName,
-                    args,
+                    List.copyOf(args),
                     logger,
                     messageBuilderFactory,
                     lookup,
