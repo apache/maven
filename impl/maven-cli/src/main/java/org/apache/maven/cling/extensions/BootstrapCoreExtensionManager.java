@@ -31,6 +31,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.RequestCacheFactory;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -43,6 +44,7 @@ import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
+import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
@@ -55,6 +57,7 @@ import org.apache.maven.impl.DefaultRepositoryFactory;
 import org.apache.maven.impl.DefaultVersionParser;
 import org.apache.maven.impl.DefaultVersionRangeResolver;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.cache.DefaultRequestCacheFactory;
 import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.DefaultArtifactManager;
 import org.apache.maven.internal.impl.DefaultSession;
@@ -250,7 +253,15 @@ public class BootstrapCoreExtensionManager {
                 MavenSession session,
                 RepositorySystem repositorySystem,
                 List<org.apache.maven.api.RemoteRepository> repositories) {
-            super(session, repositorySystem, repositories, null, null, null);
+            super(
+                    session,
+                    repositorySystem,
+                    repositories,
+                    null,
+                    ProtoLookup.builder()
+                            .addMapping(RequestCacheFactory.class, new DefaultRequestCacheFactory())
+                            .build(),
+                    null);
         }
 
         @Override

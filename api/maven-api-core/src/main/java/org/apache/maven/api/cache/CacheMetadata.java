@@ -16,36 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
-
-import java.io.Serial;
+package org.apache.maven.api.cache;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
- *
+ * Interface defining metadata for cache behavior and lifecycle management.
+ * Implementations can specify how long cached data should be retained.
  *
  * @since 4.0.0
  */
 @Experimental
-public class ArtifactResolverException extends MavenException {
-
-    @Serial
-    private static final long serialVersionUID = 7252294837746943917L;
-
-    private final ArtifactResolverResult result;
+public interface CacheMetadata {
 
     /**
-     * @param message the message for the exception
-     * @param e the exception itself
-     * @param result the resolution result containing detailed information
+     * Returns the cache retention that should be applied to the associated data.
+     *
+     * @return The CacheRetention indicating how long data should be retained, or null if
+     *         no specific cache retention is defined
      */
-    public ArtifactResolverException(String message, Exception e, ArtifactResolverResult result) {
-        super(message, e);
-        this.result = result;
-    }
-
-    public ArtifactResolverResult getResult() {
-        return result;
-    }
+    @Nullable
+    CacheRetention getCacheRetention();
 }

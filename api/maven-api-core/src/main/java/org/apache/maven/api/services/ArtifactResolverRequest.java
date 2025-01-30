@@ -45,7 +45,7 @@ public interface ArtifactResolverRequest extends Request<Session> {
     @Nonnull
     Collection<? extends ArtifactCoordinates> getCoordinates();
 
-    @Nonnull
+    @Nullable
     List<RemoteRepository> getRepositories();
 
     @Nonnull
@@ -155,6 +155,7 @@ public interface ArtifactResolverRequest extends Request<Session> {
             }
 
             @Override
+            @Nonnull
             public String toString() {
                 return "ArtifactResolverRequest[" + "coordinates="
                         + coordinates + ", repositories="

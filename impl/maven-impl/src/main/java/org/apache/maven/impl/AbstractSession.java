@@ -61,8 +61,11 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.WorkspaceRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.RequestCache;
+import org.apache.maven.api.cache.RequestCacheFactory;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.ArtifactDeployer;
@@ -97,6 +100,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.transfer.TransferResource;
 
 import static org.apache.maven.impl.Utils.map;
@@ -118,8 +122,7 @@ public abstract class AbstractSession implements InternalSession {
             Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
             Collections.synchronizedMap(new WeakHashMap<>());
-
-    private final Map<Object, CachingSupplier<?, ?>> requestCache;
+    private volatile RequestCache requestCache;
 
     static {
         TransferResource.setClock(MonotonicClock.get());
@@ -135,82 +138,72 @@ public abstract class AbstractSession implements InternalSession {
         this.repositorySystem = repositorySystem;
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
-        this.requestCache = new ConcurrentHashMap<>();
     }
 
     @Override
     public <REQ extends Request<?>, REP extends Result<REQ>> REP request(REQ req, Function<REQ, REP> supplier) {
-        if (requestCache == null) {
-            return supplier.apply(req);
-        }
-        @SuppressWarnings("all")
-        CachingSupplier<REQ, REP> cs =
-                (CachingSupplier) requestCache.computeIfAbsent(req, r -> new CachingSupplier<>(supplier));
-        return cs.apply(req);
+        return getRequestCache().request(req, supplier);
     }
 
-    /**
-     * A caching supplier wrapper that caches results and exceptions from the underlying supplier.
-     * Used internally to cache expensive computations in the session.
-     *
-     * @param <REQ> The request type
-     * @param <REP> The response type
-     */
-    static class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
-        final Function<REQ, REP> supplier;
-        volatile Object value;
+    @Override
+    public <REQ extends Request<?>, REP extends Result<REQ>> List<REP> requests(
+            List<REQ> reqs, Function<List<REQ>, List<REP>> supplier) {
+        return getRequestCache().requests(reqs, supplier);
+    }
 
-        CachingSupplier(Function<REQ, REP> supplier) {
-            this.supplier = supplier;
-        }
-
-        @Override
-        @SuppressWarnings({"unchecked", "checkstyle:InnerAssignment"})
-        public REP apply(REQ req) {
-            Object v;
-            if ((v = value) == null) {
-                synchronized (this) {
-                    if ((v = value) == null) {
-                        try {
-                            v = value = supplier.apply(req);
-                        } catch (Exception e) {
-                            v = value = new CachingSupplier.AltRes(e);
-                        }
-                    }
+    private RequestCache getRequestCache() {
+        RequestCache cache = requestCache;
+        if (cache == null) {
+            synchronized (this) {
+                cache = requestCache;
+                if (cache == null) {
+                    RequestCacheFactory factory = lookup.lookup(RequestCacheFactory.class);
+                    requestCache = factory.createCache();
+                    cache = requestCache;
                 }
             }
-            if (v instanceof CachingSupplier.AltRes altRes) {
-                uncheckedThrow(altRes.t);
-            }
-            return (REP) v;
         }
-
-        /**
-         * Special holder class for exceptions that occur during supplier execution.
-         * Allows caching and re-throwing of exceptions on subsequent calls.
-         */
-        static class AltRes {
-            final Throwable t;
-
-            /**
-             * Creates a new AltRes with the given throwable.
-             *
-             * @param t The throwable to store
-             */
-            AltRes(Throwable t) {
-                this.t = t;
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    static <T extends Throwable> void uncheckedThrow(Throwable t) throws T {
-        throw (T) t; // rely on vacuous cast
+        return cache;
     }
 
     @Override
     public RemoteRepository getRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository) {
         return allRepositories.computeIfAbsent(repository, DefaultRemoteRepository::new);
+    }
+
+    @Override
+    public LocalRepository getLocalRepository(org.eclipse.aether.repository.LocalRepository repository) {
+        return new DefaultLocalRepository(repository);
+    }
+
+    @Override
+    public WorkspaceRepository getWorkspaceRepository(org.eclipse.aether.repository.WorkspaceRepository repository) {
+        return new WorkspaceRepository() {
+            @Nonnull
+            @Override
+            public String getId() {
+                return repository.getId();
+            }
+
+            @Nonnull
+            @Override
+            public String getType() {
+                return repository.getContentType();
+            }
+        };
+    }
+
+    @Override
+    public org.apache.maven.api.Repository getRepository(ArtifactRepository repository) {
+        if (repository instanceof org.eclipse.aether.repository.RemoteRepository remote) {
+            return getRemoteRepository(remote);
+        } else if (repository instanceof org.eclipse.aether.repository.LocalRepository local) {
+            return getLocalRepository(local);
+        } else if (repository instanceof org.eclipse.aether.repository.WorkspaceRepository workspace) {
+            return getWorkspaceRepository(workspace);
+        } else {
+            throw new IllegalArgumentException("Unsupported repository type: " + repository.getClass());
+        }
     }
 
     @Override
@@ -624,9 +617,11 @@ public abstract class AbstractSession implements InternalSession {
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates) {
         return getService(ArtifactResolver.class)
                 .resolve(this, Collections.singletonList(coordinates))
-                .getArtifacts()
+                .getResults()
+                .values()
                 .iterator()
-                .next();
+                .next()
+                .getArtifact();
     }
 
     /**
@@ -639,9 +634,11 @@ public abstract class AbstractSession implements InternalSession {
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates, List<RemoteRepository> repositories) {
         return getService(ArtifactResolver.class)
                 .resolve(this, Collections.singletonList(coordinates), repositories)
-                .getArtifacts()
+                .getResults()
+                .values()
                 .iterator()
-                .next();
+                .next()
+                .getArtifact();
     }
 
     /**

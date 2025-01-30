@@ -42,6 +42,7 @@ import org.apache.maven.impl.DefaultDependencyCoordinatesFactory;
 import org.apache.maven.impl.DefaultModelVersionParser;
 import org.apache.maven.impl.DefaultVersionParser;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.cache.DefaultRequestCacheFactory;
 import org.apache.maven.impl.resolver.MavenVersionScheme;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.transformation.AbstractRepositoryTestCase;
@@ -77,6 +78,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         Mockito.when(node.getChildren()).thenReturn(List.of(child));
 
         services.addAll(List.of(
+                new DefaultRequestCacheFactory(),
                 new DefaultArtifactCoordinatesFactory(),
                 new DefaultDependencyCoordinatesFactory(),
                 new DefaultVersionParser(new DefaultModelVersionParser(new MavenVersionScheme())),

@@ -29,7 +29,9 @@ import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Repository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.WorkspaceRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.Request;
@@ -70,7 +72,16 @@ public interface InternalSession extends Session {
      */
     <REQ extends Request<?>, REP extends Result<REQ>> REP request(REQ req, Function<REQ, REP> supplier);
 
+    <REQ extends Request<?>, REP extends Result<REQ>> List<REP> requests(
+            List<REQ> req, Function<List<REQ>, List<REP>> supplier);
+
     RemoteRepository getRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository);
+
+    LocalRepository getLocalRepository(org.eclipse.aether.repository.LocalRepository repository);
+
+    WorkspaceRepository getWorkspaceRepository(org.eclipse.aether.repository.WorkspaceRepository repository);
+
+    Repository getRepository(org.eclipse.aether.repository.ArtifactRepository repository);
 
     Node getNode(org.eclipse.aether.graph.DependencyNode node);
 
