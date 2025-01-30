@@ -148,7 +148,7 @@ public class MavenProject implements Cloneable {
      * The set of properties that we choose to put in this record may be modified in any future Maven version.
      * The intend is to detect some configuration errors.
      */
-    private static record SourceKey(ProjectScope scope, Language language, Path directory) {
+    private record SourceKey(ProjectScope scope, Language language, Path directory) {
         /**
          * Converts this key into a source root.
          * Used for adding a new source when no other information is available.
