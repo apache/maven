@@ -46,6 +46,8 @@ import java.util.stream.Stream;
 
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Language;
+import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
@@ -76,6 +78,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.impl.DefaultSourceRoot;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.resolver.ArtifactDescriptorUtils;
 import org.apache.maven.model.building.DefaultModelProblem;
@@ -589,9 +592,43 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             // only set those on 2nd phase, ignore on 1st pass
             if (project.getFile() != null) {
                 Build build = project.getBuild().getDelegate();
-                project.addScriptSourceRoot(build.getScriptSourceDirectory());
-                project.addCompileSourceRoot(build.getSourceDirectory());
-                project.addTestCompileSourceRoot(build.getTestSourceDirectory());
+                List<org.apache.maven.api.model.Source> sources = build.getSources();
+                Path baseDir = project.getBaseDirectory();
+                InternalSession s = InternalSession.from(session);
+                boolean hasScript = false;
+                boolean hasMain = false;
+                boolean hasTest = false;
+                for (var source : sources) {
+                    var src = new DefaultSourceRoot(s, baseDir, source);
+                    project.addSourceRoot(src);
+                    Language language = src.language();
+                    if (Language.JAVA_FAMILY.equals(language)) {
+                        ProjectScope scope = src.scope();
+                        if (ProjectScope.MAIN.equals(scope)) {
+                            hasMain = true;
+                        } else {
+                            hasTest |= ProjectScope.TEST.equals(scope);
+                        }
+                    } else {
+                        hasScript |= Language.SCRIPT.equals(language);
+                    }
+                }
+                /*
+                 * `sourceDirectory`, `testSourceDirectory` and `scriptSourceDirectory`
+                 * are ignored if the POM file contains at least one <source> element
+                 * for the corresponding scope and langiage. This rule exists because
+                 * Maven provides default values for those elements which may conflict
+                 * with user's configuration.
+                 */
+                if (!hasScript) {
+                    project.addScriptSourceRoot(build.getScriptSourceDirectory());
+                }
+                if (!hasMain) {
+                    project.addCompileSourceRoot(build.getSourceDirectory());
+                }
+                if (!hasTest) {
+                    project.addTestCompileSourceRoot(build.getTestSourceDirectory());
+                }
             }
 
             project.setActiveProfiles(

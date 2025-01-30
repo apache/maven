@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,16 +30,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Language;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
-import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.impl.MappedList;
@@ -48,7 +48,6 @@ import org.apache.maven.impl.PropertiesAsMap;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
 
-import static java.util.stream.Collectors.toList;
 import static org.apache.maven.impl.Utils.map;
 import static org.apache.maven.impl.Utils.nonNull;
 
@@ -128,60 +127,34 @@ public class DefaultProjectManager implements ProjectManager {
         artifactManager.setPath(artifact, path);
     }
 
+    @Nonnull
     @Override
-    public List<Path> getCompileSourceRoots(Project project, ProjectScope scope) {
+    public Collection<SourceRoot> getSourceRoots(@Nonnull Project project) {
         MavenProject prj = getMavenProject(nonNull(project, "project"));
-        List<String> roots;
-        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
-            roots = prj.getCompileSourceRoots();
-        } else if (scope == ProjectScope.TEST) {
-            roots = prj.getTestCompileSourceRoots();
-        } else {
-            throw new IllegalArgumentException("Unsupported scope " + scope);
-        }
-        return roots.stream()
-                .map(Paths::get)
-                .collect(Collectors.collectingAndThen(toList(), Collections::unmodifiableList));
+        return prj.getSourceRoots();
+    }
+
+    @Nonnull
+    @Override
+    public Stream<SourceRoot> getEnabledSourceRoots(@Nonnull Project project, ProjectScope scope, Language language) {
+        MavenProject prj = getMavenProject(nonNull(project, "project"));
+        return prj.getEnabledSourceRoots(scope, language);
     }
 
     @Override
-    public void addCompileSourceRoot(Project project, ProjectScope scope, Path sourceRoot) {
+    public void addSourceRoot(@Nonnull Project project, @Nonnull SourceRoot source) {
         MavenProject prj = getMavenProject(nonNull(project, "project"));
-        String root = nonNull(sourceRoot, "sourceRoot").toAbsolutePath().toString();
-        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
-            prj.addCompileSourceRoot(root);
-        } else if (scope == ProjectScope.TEST) {
-            prj.addTestCompileSourceRoot(root);
-        } else {
-            throw new IllegalArgumentException("Unsupported scope " + scope);
-        }
+        prj.addSourceRoot(nonNull(source, "source"));
     }
 
     @Override
-    public List<Resource> getResources(@Nonnull Project project, @Nonnull ProjectScope scope) {
-        Project prj = nonNull(project, "project");
-        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
-            return prj.getBuild().getResources();
-        } else if (scope == ProjectScope.TEST) {
-            return prj.getBuild().getTestResources();
-        } else {
-            throw new IllegalArgumentException("Unsupported scope " + scope);
-        }
-    }
-
-    @Override
-    public void addResource(@Nonnull Project project, @Nonnull ProjectScope scope, @Nonnull Resource resource) {
-        // TODO: we should not modify the underlying model here, but resources should be stored
-        // TODO: in a separate field in the project, however, that could break v3 plugins
+    public void addSourceRoot(
+            @Nonnull Project project,
+            @Nonnull ProjectScope scope,
+            @Nonnull Language language,
+            @Nonnull Path directory) {
         MavenProject prj = getMavenProject(nonNull(project, "project"));
-        org.apache.maven.model.Resource res = new org.apache.maven.model.Resource(nonNull(resource, "resource"));
-        if (nonNull(scope, "scope") == ProjectScope.MAIN) {
-            prj.addResource(res);
-        } else if (scope == ProjectScope.TEST) {
-            prj.addTestResource(res);
-        } else {
-            throw new IllegalArgumentException("Unsupported scope " + scope);
-        }
+        prj.addSourceRoot(nonNull(scope, "scope"), nonNull(language, "language"), nonNull(directory, "directory"));
     }
 
     @Override

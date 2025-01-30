@@ -49,25 +49,25 @@ import org.apache.maven.api.model.Model;
 public interface Project {
 
     /**
-     * Returns the project groupId.
+     * {@return the project groupId}.
      */
     @Nonnull
     String getGroupId();
 
     /**
-     * Returns the project artifactId.
+     * {@return the project artifactId}.
      */
     @Nonnull
     String getArtifactId();
 
     /**
-     * Returns the project version.
+     * {@return the project version}.
      */
     @Nonnull
     String getVersion();
 
     /**
-     * Returns the project packaging.
+     * {@return the project packaging}.
      * <p>
      * Note: unlike in legacy code, logical checks against string representing packaging (returned by this method)
      * are NOT recommended (code like {@code "pom".equals(project.getPackaging)} must be avoided). Use method
@@ -79,7 +79,7 @@ public interface Project {
     Packaging getPackaging();
 
     /**
-     * Returns the project language. It is by default determined by {@link #getPackaging()}.
+     * {@return the project language}. It is by default determined by {@link #getPackaging()}.
      *
      * @see #getPackaging()
      */
@@ -89,7 +89,7 @@ public interface Project {
     }
 
     /**
-     * Returns the project POM artifact, which is the artifact of the POM of this project. Every project have a POM
+     * {@return the project POM artifact}, which is the artifact of the POM of this project. Every project have a POM
      * artifact, even if the existence of backing POM file is NOT a requirement (i.e. for some transient projects).
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
@@ -100,7 +100,7 @@ public interface Project {
     }
 
     /**
-     * Returns the project main artifact, which is the artifact produced by this project build, if applicable.
+     * {@return the project main artifact}, which is the artifact produced by this project build, if applicable.
      * This artifact MAY be absent if the project is actually not producing any main artifact (i.e. "pom" packaging).
      *
      * @see #getPackaging()
@@ -113,7 +113,7 @@ public interface Project {
     }
 
     /**
-     * Returns the project artifacts as immutable list. Elements are the project POM artifact and the artifact
+     * {@return the project artifacts as immutable list}. Elements are the project POM artifact and the artifact
      * produced by this project build, if applicable. Hence, the returned list may have one or two elements
      * (never less than 1, never more than 2), depending on project packaging.
      * <p>
@@ -129,13 +129,15 @@ public interface Project {
     List<ProducedArtifact> getArtifacts();
 
     /**
-     * Returns the project model.
+     * {@return the project model}.
      */
     @Nonnull
     Model getModel();
 
     /**
      * Shorthand method.
+     *
+     * @return the build element of the project model
      */
     @Nonnull
     default Build getBuild() {
@@ -170,19 +172,19 @@ public interface Project {
     Path getBasedir();
 
     /**
-     * Returns the project direct dependencies (directly specified or inherited).
+     * {@return the project direct dependencies (directly specified or inherited)}.
      */
     @Nonnull
     List<DependencyCoordinates> getDependencies();
 
     /**
-     * Returns the project managed dependencies (directly specified or inherited).
+     * {@return the project managed dependencies (directly specified or inherited)}.
      */
     @Nonnull
     List<DependencyCoordinates> getManagedDependencies();
 
     /**
-     * Returns the project ID, usable as key.
+     * {@return the project ID, usable as key}.
      */
     @Nonnull
     default String getId() {
@@ -216,6 +218,7 @@ public interface Project {
      * Gets the root directory of the project, which is the parent directory
      * containing the {@code .mvn} directory or flagged with {@code root="true"}.
      *
+     * @return the root directory of the project
      * @throws IllegalStateException if the root directory could not be found
      * @see Session#getRootDirectory()
      */

@@ -80,7 +80,7 @@ public class ExtensibleEnumRegistries {
 
         @Inject
         public DefaultLanguageRegistry(List<LanguageProvider> providers) {
-            super(providers, Language.NONE, Language.JAVA_FAMILY);
+            super(providers, Language.NONE, Language.RESOURCES, Language.SCRIPT, Language.JAVA_FAMILY);
         }
     }
 
