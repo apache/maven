@@ -43,6 +43,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ProjectManager;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.impl.PropertiesAsMap;
 import org.apache.maven.project.MavenProject;
@@ -67,26 +68,26 @@ public class DefaultProjectManager implements ProjectManager {
 
     @Nonnull
     @Override
-    public Optional<Path> getPath(Project project) {
+    public Optional<Path> getPath(@Nonnull Project project) {
+        nonNull(project, "project");
         Optional<ProducedArtifact> mainArtifact = project.getMainArtifact();
-        if (mainArtifact.isPresent()) {
-            return artifactManager.getPath(mainArtifact.get());
-        }
-        return Optional.empty();
+        return mainArtifact.flatMap(artifactManager::getPath);
     }
 
     @Nonnull
     @Override
-    public Collection<ProducedArtifact> getAttachedArtifacts(Project project) {
-        InternalMavenSession session = ((DefaultProject) project).getSession();
-        Collection<ProducedArtifact> attached = map(
-                getMavenProject(project).getAttachedArtifacts(),
-                a -> session.getArtifact(ProducedArtifact.class, RepositoryUtils.toArtifact(a)));
+    public Collection<ProducedArtifact> getAttachedArtifacts(@Nonnull Project project) {
+        nonNull(project, "project");
+        Collection<ProducedArtifact> attached =
+                map(getMavenProject(project).getAttachedArtifacts(), a -> getSession(project)
+                        .getArtifact(ProducedArtifact.class, RepositoryUtils.toArtifact(a)));
         return Collections.unmodifiableCollection(attached);
     }
 
     @Override
-    public Collection<ProducedArtifact> getAllArtifacts(Project project) {
+    @Nonnull
+    public Collection<ProducedArtifact> getAllArtifacts(@Nonnull Project project) {
+        nonNull(project, "project");
         ArrayList<ProducedArtifact> result = new ArrayList<>(2);
         result.addAll(project.getArtifacts());
         result.addAll(getAttachedArtifacts(project));
@@ -94,7 +95,8 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
-    public void attachArtifact(Project project, ProducedArtifact artifact, Path path) {
+    @SuppressWarnings("deprecation")
+    public void attachArtifact(@Nonnull Project project, @Nonnull ProducedArtifact artifact, @Nonnull Path path) {
         nonNull(project, "project");
         nonNull(artifact, "artifact");
         nonNull(path, "path");
@@ -122,8 +124,8 @@ public class DefaultProjectManager implements ProjectManager {
                             + artifact.getBaseVersion());
         }
         getMavenProject(project)
-                .addAttachedArtifact(RepositoryUtils.toArtifact(
-                        ((DefaultProject) project).getSession().toArtifact(artifact)));
+                .addAttachedArtifact(
+                        RepositoryUtils.toArtifact(getSession(project).toArtifact(artifact)));
         artifactManager.setPath(artifact, path);
     }
 
@@ -158,19 +160,21 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
-    public List<RemoteRepository> getRemoteProjectRepositories(Project project) {
+    @Nonnull
+    public List<RemoteRepository> getRemoteProjectRepositories(@Nonnull Project project) {
         return Collections.unmodifiableList(new MappedList<>(
-                ((DefaultProject) project).getProject().getRemoteProjectRepositories(), session::getRemoteRepository));
+                getMavenProject(project).getRemoteProjectRepositories(), session::getRemoteRepository));
     }
 
     @Override
-    public List<RemoteRepository> getRemotePluginRepositories(Project project) {
-        return Collections.unmodifiableList(new MappedList<>(
-                ((DefaultProject) project).getProject().getRemotePluginRepositories(), session::getRemoteRepository));
+    @Nonnull
+    public List<RemoteRepository> getRemotePluginRepositories(@Nonnull Project project) {
+        return Collections.unmodifiableList(
+                new MappedList<>(getMavenProject(project).getRemotePluginRepositories(), session::getRemoteRepository));
     }
 
     @Override
-    public void setProperty(Project project, String key, String value) {
+    public void setProperty(@Nonnull Project project, @Nonnull String key, String value) {
         Properties properties = getMavenProject(project).getProperties();
         if (value == null) {
             properties.remove(key);
@@ -180,13 +184,15 @@ public class DefaultProjectManager implements ProjectManager {
     }
 
     @Override
-    public Map<String, String> getProperties(Project project) {
+    @Nonnull
+    public Map<String, String> getProperties(@Nonnull Project project) {
         return Collections.unmodifiableMap(
-                new PropertiesAsMap(((DefaultProject) project).getProject().getProperties()));
+                new PropertiesAsMap(getMavenProject(project).getProperties()));
     }
 
     @Override
-    public Optional<Project> getExecutionProject(Project project) {
+    @Nonnull
+    public Optional<Project> getExecutionProject(@Nonnull Project project) {
         // Session keep tracks of the Project per project id,
         // so we cannot use session.getProject(p) for forked projects
         // which are temporary clones
@@ -196,5 +202,9 @@ public class DefaultProjectManager implements ProjectManager {
 
     private MavenProject getMavenProject(Project project) {
         return ((DefaultProject) project).getProject();
+    }
+
+    private static InternalSession getSession(Project project) {
+        return ((DefaultProject) project).getSession();
     }
 }
