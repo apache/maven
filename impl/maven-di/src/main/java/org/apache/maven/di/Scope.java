@@ -24,28 +24,46 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A {@code Scope} defines how visible instances are when managed by a {@link org.apache.maven.di.Injector}.
- * Typically, instances are created with <i>no scope</i>, meaning they don’t retain any state from the
- * framework’s perspective: the {@code Injector} generates the instance, injects it into the necessary class,
- * and then immediately forgets it. By linking a scope to a specific binding, the created instance can be
- * “remembered” and reused for future injections.
+ * Defines how object instances are managed within a specific scope.
  * <p>
- * Instances are associated to a given scope by means of a {@link org.apache.maven.api.di.Scope @Scope}
- * annotation, usually put on another annotation. For example, the {@code @Singleton} annotation is used
- * to indicate that a given binding should be scoped as a singleton.
+ * A Scope controls the lifecycle and visibility of objects created by the injector.
+ * It determines when new instances are created and when existing instances can be
+ * reused. This allows for different caching strategies depending on the desired
+ * lifecycle of the objects.
  * <p>
- * The following scopes are currently supported:
- * <ul>
- *     <li>{@link org.apache.maven.api.di.Singleton @Singleton}</li>
- *     <li>{@link org.apache.maven.api.di.SessionScoped @SessionScoped}</li>
- *     <li>{@link org.apache.maven.api.di.MojoExecutionScoped @MojoExecutionScoped}</li>
- * </ul>
+ * Example implementation for a simple caching scope:
+ * <pre>
+ * public class CachingScope implements Scope {
+ *     private final Map&lt;Key&lt;?&gt;, Object&gt; cache = new ConcurrentHashMap&lt;&gt;();
  *
+ *     {@literal @}Override
+ *     public &lt;T&gt; Supplier&lt;T&gt; scope(Key&lt;T&gt; key, Supplier&lt;T&gt; unscoped) {
+ *         return () -&gt; {
+ *             return (T) cache.computeIfAbsent(key, k -&gt; unscoped.get());
+ *         };
+ *     }
+ * }
+ * </pre>
+ *
+ * @see org.apache.maven.api.di.Scope
  * @since 4.0.0
  */
 @Experimental
 public interface Scope {
 
+    /**
+     * Scopes a supplier of instances.
+     * <p>
+     * This method wraps an unscoped instance supplier with scope-specific logic
+     * that controls when new instances are created versus when existing instances
+     * are reused.
+     *
+     * @param <T> the type of instance being scoped
+     * @param key the key identifying the instance type
+     * @param unscoped the original unscoped instance supplier
+     * @return a scoped supplier that implements the scope's caching strategy
+     * @throws NullPointerException if key or unscoped is null
+     */
     @Nonnull
     <T> Supplier<T> scope(@Nonnull Key<T> key, @Nonnull Supplier<T> unscoped);
 }

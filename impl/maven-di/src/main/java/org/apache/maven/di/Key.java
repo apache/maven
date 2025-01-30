@@ -27,19 +27,26 @@ import org.apache.maven.di.impl.ReflectionUtils;
 import org.apache.maven.di.impl.Types;
 
 /**
- * The key defines an identity of a binding. In any DI, a key is usually a type of the object along
- * with some optional tag to distinguish between bindings which make objects of the same type.
+ * A binding key that uniquely identifies a dependency in the injection system.
  * <p>
- * In Maven Inject, a key is also a type token - special abstract class that can store type information
- * with the shortest syntax possible in Java.
+ * Keys combine a type with an optional qualifier to uniquely identify dependencies
+ * within the injection system. They also serve as type tokens, allowing preservation
+ * of generic type information at runtime.
  * <p>
- * For example, to create a key of type Map&lt;String, List&lt;Integer&gt;&gt;, you can just use
- * this syntax: <code>new Key&lt;Map&lt;String, List&lt;Integer&gt;&gt;&gt;(){}</code>.
- * <p>
- * If your types are not known at compile time, you can use {@link Types#parameterizedType} to make a
- * parameterized type and give it to a {@link #ofType Key.ofType} constructor.
+ * Example usage:
+ * <pre>
+ * // Simple key for a type
+ * Key&lt;Service&gt; simple = Key.of(Service.class);
  *
- * @param <T> binding type
+ * // Key with generic type information
+ * Key&lt;List&lt;String&gt;&gt; generic = new Key&lt;List&lt;String&gt;&gt;(){};
+ *
+ * // Key with qualifier
+ * Key&lt;Service&gt; qualified = Key.of(Service.class, "primary");
+ * </pre>
+ *
+ * @param <T> The type this key represents
+ * @since 4.0.0
  */
 public abstract class Key<T> {
     private final Type type;
@@ -67,10 +74,27 @@ public abstract class Key<T> {
         }
     }
 
+    /**
+     * Creates a new Key instance for the specified type.
+     *
+     * @param <T> the type parameter
+     * @param type the Class object representing the type
+     * @return a new Key instance
+     * @throws NullPointerException if type is null
+     */
     public static <T> Key<T> of(Class<T> type) {
         return new KeyImpl<>(type, null);
     }
 
+    /**
+     * Creates a new Key instance for the specified type with a qualifier.
+     *
+     * @param <T> the type parameter
+     * @param type the Class object representing the type
+     * @param qualifier the qualifier object (typically an annotation instance)
+     * @return a new Key instance
+     * @throws NullPointerException if type is null
+     */
     public static <T> Key<T> of(Class<T> type, @Nullable Object qualifier) {
         return new KeyImpl<>(type, qualifier);
     }
@@ -93,6 +117,13 @@ public abstract class Key<T> {
                 : typeArgument;
     }
 
+    /**
+     * Returns the actual type represented by this key.
+     * <p>
+     * This includes full generic type information if available.
+     *
+     * @return the type represented by this key
+     */
     public Type getType() {
         return type;
     }
@@ -118,6 +149,11 @@ public abstract class Key<T> {
         throw new IllegalStateException("Expected type from key " + getDisplayString() + " to be parameterized");
     }
 
+    /**
+     * Returns the qualifier associated with this key, if any.
+     *
+     * @return the qualifier object or null if none exists
+     */
     public @Nullable Object getQualifier() {
         return qualifier;
     }

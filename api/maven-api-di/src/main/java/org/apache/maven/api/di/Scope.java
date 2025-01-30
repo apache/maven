@@ -25,6 +25,24 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Meta-annotation that marks other annotations as scope annotations.
+ * <p>
+ * Scopes define the lifecycle and visibility of objects in the dependency injection
+ * system. Custom scope annotations should be annotated with {@code @Scope}.
+ * <p>
+ * Built-in scopes include:
+ * <ul>
+ *   <li>{@link Singleton} - One instance per container</li>
+ *   <li>{@link SessionScoped} - One instance per Maven session</li>
+ *   <li>{@link MojoExecutionScoped} - One instance per plugin execution</li>
+ * </ul>
+ *
+ * @see Singleton
+ * @see SessionScoped
+ * @see MojoExecutionScoped
+ * @since 4.0.0
+ */
 @Target(ANNOTATION_TYPE)
 @Retention(RUNTIME)
 @Documented
