@@ -21,8 +21,8 @@
  * Invoker logging, that happens in three ways:
  * <ul>
  * <li>"early logging" when {@link org.apache.maven.cling.invoker.logging.AccumulatingLogger} just accumulates logged entries.</li>
- * <li>"early failure" when we use {@link java.lang.System#err}</li>
- * <li>"post Logging setup" when we have properly set up SLF4J logging that is used for logging</li>>
+ * <li>"early failure" when we use {@link org.apache.maven.cling.invoker.logging.SystemLogger}</li>
+ * <li>"post Logging setup" when we use {@link org.apache.maven.cling.invoker.logging.Slf4jLogger}</li>
  * </ul>
  */
 package org.apache.maven.cling.invoker.logging;
