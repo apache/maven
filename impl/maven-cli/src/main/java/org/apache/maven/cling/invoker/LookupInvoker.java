@@ -195,9 +195,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected abstract C createContext(InvokerRequest invokerRequest) throws InvokerException;
 
     protected void validate(C context) throws InvokerException {
-        List<Logger.Entry> allEntries = context.logger.drain();
         if (context.invokerRequest.parsingFailed()) {
             // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
+            List<Logger.Entry> allEntries = context.logger.drain();
             List<Logger.Entry> errorEntries = allEntries.stream()
                     .filter(e -> e.level() == Logger.Level.ERROR)
                     .toList();
@@ -220,9 +220,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             // we skip handleException above as we did output
             throw new InvokerException.ExitException(1);
         }
-
-        // reply all the non-errors (if there were ERROR, we'd bail out above)
-        allEntries.forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
 
         // warn about deprecated options
         context.invokerRequest
@@ -416,12 +413,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
 
-        // at this point logging is set up, reply so far accumulated logs, if any
-        List<Logger.Entry> entries = context.logger.drain();
+        // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
         Logger logger =
                 new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
-        entries.forEach(e -> logger.log(e.level(), e.message(), e.error()));
-        // swap it out, from now on we do "live logging"
+        context.logger.drain().forEach(e -> logger.log(e.level(), e.message(), e.error()));
         context.logger = logger;
     }
 
