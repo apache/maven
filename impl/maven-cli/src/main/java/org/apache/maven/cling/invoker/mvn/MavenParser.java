@@ -28,14 +28,13 @@ import java.util.stream.Stream;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class MavenParser extends BaseParser {
 
     @Override
-    protected List<Options> parseCliOptions(LocalContext context) throws ParserException {
+    protected List<Options> parseCliOptions(LocalContext context) {
         ArrayList<Options> result = new ArrayList<>();
         // CLI args
         result.add(parseMavenCliOptions(context.parserRequest.args()));
@@ -47,31 +46,31 @@ public class MavenParser extends BaseParser {
         return result;
     }
 
-    protected MavenOptions parseMavenCliOptions(List<String> args) throws ParserException {
+    protected MavenOptions parseMavenCliOptions(List<String> args) {
         try {
             return parseArgs(Options.SOURCE_CLI, args);
         } catch (ParseException e) {
-            throw new ParserException("Failed to parse CLI arguments: " + e.getMessage(), e.getCause());
+            throw new IllegalArgumentException("Failed to parse CLI arguments: " + e.getMessage(), e.getCause());
         }
     }
 
-    protected MavenOptions parseMavenConfigOptions(Path configFile) throws ParserException {
+    protected MavenOptions parseMavenConfigOptions(Path configFile) {
         try (Stream<String> lines = Files.lines(configFile, Charset.defaultCharset())) {
             List<String> args =
                     lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toList();
             MavenOptions options = parseArgs("maven.config", args);
             if (options.goals().isPresent()) {
                 // This file can only contain options, not args (goals or phases)
-                throw new ParserException("Unrecognized entries in maven.config (" + configFile + ") file: "
+                throw new IllegalArgumentException("Unrecognized entries in maven.config (" + configFile + ") file: "
                         + options.goals().get());
             }
             return options;
         } catch (ParseException e) {
-            throw new ParserException(
+            throw new IllegalArgumentException(
                     "Failed to parse arguments from maven.config file (" + configFile + "): " + e.getMessage(),
                     e.getCause());
         } catch (IOException e) {
-            throw new ParserException("Error reading config file: " + configFile, e);
+            throw new IllegalStateException("Error reading config file: " + configFile, e);
         }
     }
 

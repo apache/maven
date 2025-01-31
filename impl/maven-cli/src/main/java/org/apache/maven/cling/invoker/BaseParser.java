@@ -34,14 +34,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.Parser;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.services.Interpolator;
@@ -103,21 +101,21 @@ public abstract class BaseParser implements Parser {
         // the basics
         try {
             context.cwd = getCwd(context);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             context.cwd = getCanonicalPath(Paths.get("."));
             parserRequest.logger().error("Error determining working directory", e);
         }
         try {
             context.installationDirectory = getInstallationDirectory(context);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             context.installationDirectory = context.cwd;
             parserRequest.logger().error("Error determining installation directory", e);
         }
         try {
             context.userHomeDirectory = getUserHomeDirectory(context);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             context.userHomeDirectory = context.cwd;
             parserRequest.logger().error("Error determining user home directory", e);
@@ -126,14 +124,14 @@ public abstract class BaseParser implements Parser {
         // top/root
         try {
             context.topDirectory = getTopDirectory(context);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             context.topDirectory = context.cwd;
             parserRequest.logger().error("Error determining top directory", e);
         }
         try {
             context.rootDirectory = getRootDirectory(context);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             context.rootDirectory = context.cwd;
             parserRequest.logger().error("Error determining root directory", e);
@@ -143,7 +141,7 @@ public abstract class BaseParser implements Parser {
         List<Options> parsedOptions;
         try {
             parsedOptions = parseCliOptions(context);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             parsedOptions = List.of(emptyOptions());
             parserRequest.logger().error("Error parsing program arguments", e);
@@ -152,7 +150,7 @@ public abstract class BaseParser implements Parser {
         // assemble options if needed
         try {
             context.options = assembleOptions(parsedOptions);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             context.options = emptyOptions();
             parserRequest.logger().error("Error assembling program arguments", e);
@@ -161,14 +159,14 @@ public abstract class BaseParser implements Parser {
         // system and user properties
         try {
             context.systemProperties = populateSystemProperties(context);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             context.systemProperties = new HashMap<>();
             parserRequest.logger().error("Error populating system properties", e);
         }
         try {
             context.userProperties = populateUserProperties(context);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             context.userProperties = new HashMap<>();
             parserRequest.logger().error("Error populating user properties", e);
@@ -181,11 +179,12 @@ public abstract class BaseParser implements Parser {
         // core extensions
         try {
             context.extensions = readCoreExtensionsDescriptor(context);
-        } catch (ParserException e) {
+        } catch (Exception e) {
             context.parsingFailed = true;
             parserRequest.logger().error("Error reading core extensions descriptor", e);
         }
 
+        // only if not failed so far; otherwise we may have no options to validate
         if (!context.parsingFailed) {
             validate(context);
         }
@@ -246,7 +245,7 @@ public abstract class BaseParser implements Parser {
 
     protected abstract InvokerRequest getInvokerRequest(LocalContext context);
 
-    protected Path getCwd(LocalContext context) throws ParserException {
+    protected Path getCwd(LocalContext context) {
         if (context.parserRequest.cwd() != null) {
             Path result = getCanonicalPath(context.parserRequest.cwd());
             context.systemPropertiesOverrides.put("user.dir", result.toString());
@@ -258,7 +257,7 @@ public abstract class BaseParser implements Parser {
         }
     }
 
-    protected Path getInstallationDirectory(LocalContext context) throws ParserException {
+    protected Path getInstallationDirectory(LocalContext context) {
         if (context.parserRequest.mavenHome() != null) {
             Path result = getCanonicalPath(context.parserRequest.mavenHome());
             context.systemPropertiesOverrides.put(Constants.MAVEN_HOME, result.toString());
@@ -266,7 +265,8 @@ public abstract class BaseParser implements Parser {
         } else {
             String mavenHome = System.getProperty(Constants.MAVEN_HOME);
             if (mavenHome == null) {
-                throw new ParserException("local mode requires " + Constants.MAVEN_HOME + " Java System Property set");
+                throw new IllegalStateException(
+                        "local mode requires " + Constants.MAVEN_HOME + " Java System Property set");
             }
             Path result = getCanonicalPath(Paths.get(mavenHome));
             mayOverrideDirectorySystemProperty(context, Constants.MAVEN_HOME, result);
@@ -274,7 +274,7 @@ public abstract class BaseParser implements Parser {
         }
     }
 
-    protected Path getUserHomeDirectory(LocalContext context) throws ParserException {
+    protected Path getUserHomeDirectory(LocalContext context) {
         if (context.parserRequest.userHome() != null) {
             Path result = getCanonicalPath(context.parserRequest.userHome());
             context.systemPropertiesOverrides.put("user.home", result.toString());
@@ -297,7 +297,7 @@ public abstract class BaseParser implements Parser {
         }
     }
 
-    protected Path getTopDirectory(LocalContext context) throws ParserException {
+    protected Path getTopDirectory(LocalContext context) {
         // We need to locate the top level project which may be pointed at using
         // the -f/--file option.
         Path topDirectory = requireNonNull(context.cwd);
@@ -311,11 +311,11 @@ public abstract class BaseParser implements Parser {
                 } else if (Files.isRegularFile(path)) {
                     topDirectory = path.getParent();
                     if (!Files.isDirectory(topDirectory)) {
-                        throw new ParserException("Directory " + topDirectory
+                        throw new IllegalArgumentException("Directory " + topDirectory
                                 + " extracted from the -f/--file command-line argument " + arg + " does not exist");
                     }
                 } else {
-                    throw new ParserException(
+                    throw new IllegalArgumentException(
                             "POM file " + arg + " specified with the -f/--file command line argument does not exist");
                 }
                 break;
@@ -328,11 +328,11 @@ public abstract class BaseParser implements Parser {
     }
 
     @Nullable
-    protected Path getRootDirectory(LocalContext context) throws ParserException {
+    protected Path getRootDirectory(LocalContext context) {
         return Utils.findRoot(context.topDirectory);
     }
 
-    protected Map<String, String> populateSystemProperties(LocalContext context) throws ParserException {
+    protected Map<String, String> populateSystemProperties(LocalContext context) {
         Properties systemProperties = new Properties();
 
         // ----------------------------------------------------------------------
@@ -360,7 +360,7 @@ public abstract class BaseParser implements Parser {
         return result;
     }
 
-    protected Map<String, String> populateUserProperties(LocalContext context) throws ParserException {
+    protected Map<String, String> populateUserProperties(LocalContext context) {
         Properties userProperties = new Properties();
 
         // ----------------------------------------------------------------------
@@ -396,7 +396,7 @@ public abstract class BaseParser implements Parser {
         try {
             MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
         } catch (IOException e) {
-            throw new ParserException("Error loading properties from " + propertiesFile, e);
+            throw new IllegalStateException("Error loading properties from " + propertiesFile, e);
         }
 
         // CLI specified properties are most dominant
@@ -405,11 +405,11 @@ public abstract class BaseParser implements Parser {
         return toMap(userProperties);
     }
 
-    protected abstract List<Options> parseCliOptions(LocalContext context) throws ParserException;
+    protected abstract List<Options> parseCliOptions(LocalContext context);
 
-    protected abstract Options assembleOptions(List<Options> parsedOptions) throws ParserException;
+    protected abstract Options assembleOptions(List<Options> parsedOptions);
 
-    protected List<CoreExtension> readCoreExtensionsDescriptor(LocalContext context) throws ParserException {
+    protected List<CoreExtension> readCoreExtensionsDescriptor(LocalContext context) {
         String installationExtensionsFile = context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS);
         ArrayList<CoreExtension> installationExtensions = new ArrayList<>(readCoreExtensionsDescriptorFromFile(
                 context.installationDirectory.resolve(installationExtensionsFile)));
@@ -433,7 +433,7 @@ public abstract class BaseParser implements Parser {
         coreExtensions.addAll(mergeExtensions(projectExtensions, projectExtensionsFile, gas, conflicts));
 
         if (!conflicts.isEmpty()) {
-            throw new ParserException("Extension conflicts: " + String.join("; ", conflicts));
+            throw new IllegalStateException("Extension conflicts: " + String.join("; ", conflicts));
         }
 
         return coreExtensions;
@@ -452,7 +452,7 @@ public abstract class BaseParser implements Parser {
         return extensions;
     }
 
-    protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile) throws ParserException {
+    protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile) {
         try {
             if (extensionsFile != null && Files.exists(extensionsFile)) {
                 try (InputStream is = Files.newInputStream(extensionsFile)) {
@@ -461,24 +461,7 @@ public abstract class BaseParser implements Parser {
             }
             return List.of();
         } catch (XMLStreamException | IOException e) {
-            throw new ParserException("Failed to parse extensions file: " + extensionsFile, e);
+            throw new IllegalArgumentException("Failed to parse extensions file: " + extensionsFile, e);
         }
-    }
-
-    protected List<String> getJvmArguments(Path rootDirectory) throws ParserException {
-        if (rootDirectory != null) {
-            Path jvmConfig = rootDirectory.resolve(".mvn/jvm.config");
-            if (Files.exists(jvmConfig)) {
-                try {
-                    return Files.readAllLines(jvmConfig).stream()
-                            .filter(l -> !l.isBlank() && !l.startsWith("#"))
-                            .flatMap(l -> Arrays.stream(l.split(" ")))
-                            .collect(Collectors.toList());
-                } catch (IOException e) {
-                    throw new ParserException("Failed to read JVM configuration file: " + jvmConfig, e);
-                }
-            }
-        }
-        return null;
     }
 }

@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.mvnsh.ShellOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
@@ -57,15 +56,15 @@ public class ShellParser extends BaseParser {
     }
 
     @Override
-    protected List<Options> parseCliOptions(LocalContext context) throws ParserException {
+    protected List<Options> parseCliOptions(LocalContext context) {
         return Collections.singletonList(parseShellCliOptions(context.parserRequest.args()));
     }
 
-    protected CommonsCliShellOptions parseShellCliOptions(List<String> args) throws ParserException {
+    protected CommonsCliShellOptions parseShellCliOptions(List<String> args) {
         try {
             return CommonsCliShellOptions.parse(args.toArray(new String[0]));
         } catch (ParseException e) {
-            throw new ParserException("Failed to parse command line options: " + e.getMessage(), e);
+            throw new IllegalArgumentException("Failed to parse command line options: " + e.getMessage(), e);
         }
     }
 

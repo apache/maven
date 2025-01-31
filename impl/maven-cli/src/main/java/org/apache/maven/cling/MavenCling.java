@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
@@ -65,7 +64,7 @@ public class MavenCling extends ClingSupport {
     }
 
     @Override
-    protected InvokerRequest parseArguments(String[] args) throws ParserException {
+    protected InvokerRequest parseArguments(String[] args) {
         return new MavenParser()
                 .parseInvocation(ParserRequest.mvn(args, new JLineMessageBuilderFactory())
                         .build());

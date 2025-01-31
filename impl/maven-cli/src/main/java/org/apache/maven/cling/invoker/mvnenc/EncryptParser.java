@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
@@ -58,15 +57,15 @@ public class EncryptParser extends BaseParser {
     }
 
     @Override
-    protected List<Options> parseCliOptions(LocalContext context) throws ParserException {
+    protected List<Options> parseCliOptions(LocalContext context) {
         return Collections.singletonList(parseEncryptCliOptions(context.parserRequest.args()));
     }
 
-    protected CommonsCliEncryptOptions parseEncryptCliOptions(List<String> args) throws ParserException {
+    protected CommonsCliEncryptOptions parseEncryptCliOptions(List<String> args) {
         try {
             return CommonsCliEncryptOptions.parse(args.toArray(new String[0]));
         } catch (ParseException e) {
-            throw new ParserException("Failed to parse command line options: " + e.getMessage(), e);
+            throw new IllegalArgumentException("Failed to parse command line options: " + e.getMessage(), e);
         }
     }
 

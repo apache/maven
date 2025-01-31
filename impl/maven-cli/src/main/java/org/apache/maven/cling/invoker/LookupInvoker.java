@@ -43,7 +43,6 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
@@ -202,26 +201,24 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             List<Logger.Entry> errorEntries = allEntries.stream()
                     .filter(e -> e.level() == Logger.Level.ERROR)
                     .toList();
-            if (!errorEntries.isEmpty()) {
-                printErrors(
-                        context,
-                        context.invokerRequest
-                                .parserRequest()
-                                .args()
-                                .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG),
-                        errorEntries.stream()
-                                .map(e -> {
-                                    if (e.error() != null) {
-                                        return new ParserException(e.message(), e.error());
-                                    } else {
-                                        return new ParserException(e.message());
-                                    }
-                                })
-                                .toList(),
-                        new SystemLogger());
-                // we skip handleException above as we did out output
-                throw new InvokerException.ExitException(1);
-            }
+            printErrors(
+                    context,
+                    context.invokerRequest
+                            .parserRequest()
+                            .args()
+                            .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG),
+                    errorEntries.stream()
+                            .map(e -> {
+                                if (e.error() != null) {
+                                    return new IllegalStateException(e.message(), e.error());
+                                } else {
+                                    return new IllegalStateException(e.message());
+                                }
+                            })
+                            .toList(),
+                    new SystemLogger());
+            // we skip handleException above as we did output
+            throw new InvokerException.ExitException(1);
         }
 
         // reply all the non-errors (if there were ERROR, we'd bail out above)

@@ -23,7 +23,6 @@ import java.io.IOException;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.ParserException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import static java.util.Objects.requireNonNull;
@@ -75,5 +74,5 @@ public abstract class ClingSupport {
 
     protected abstract Invoker createInvoker();
 
-    protected abstract InvokerRequest parseArguments(String[] args) throws ParserException, IOException;
+    protected abstract InvokerRequest parseArguments(String[] args);
 }
