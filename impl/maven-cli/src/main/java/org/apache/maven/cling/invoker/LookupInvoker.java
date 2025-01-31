@@ -140,22 +140,28 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int doInvoke(C context) throws Exception {
-        validate(context);
-        pushCoreProperties(context);
-        pushUserProperties(context);
-        configureLogging(context);
-        createTerminal(context);
-        activateLogging(context);
-        helpOrVersionAndMayExit(context);
-        preCommands(context);
-        container(context);
-        postContainer(context);
-        pushUserProperties(context); // after PropertyContributor SPI
-        lookup(context);
-        init(context);
-        postCommands(context);
-        settings(context);
-        return execute(context);
+        try {
+            validate(context);
+            pushCoreProperties(context);
+            pushUserProperties(context);
+            configureLogging(context);
+            createTerminal(context);
+            activateLogging(context);
+            helpOrVersionAndMayExit(context);
+            preCommands(context);
+            container(context);
+            postContainer(context);
+            pushUserProperties(context); // after PropertyContributor SPI
+            lookup(context);
+            init(context);
+            postCommands(context);
+            settings(context);
+            return execute(context);
+        } finally {
+            if (context.terminal != null) {
+                context.terminal.writer().flush();
+            }
+        }
     }
 
     protected InvokerException handleException(C context, Exception e) throws InvokerException {

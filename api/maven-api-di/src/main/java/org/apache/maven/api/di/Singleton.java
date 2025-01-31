@@ -23,6 +23,24 @@ import java.lang.annotation.Retention;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Denotes that a bean should be created as a singleton instance.
+ * <p>
+ * Singleton-scoped beans are instantiated once and reused throughout the entire
+ * Maven execution. This scope should be used for stateless services or components
+ * that can be safely shared across the entire build process.
+ * <p>
+ * Example usage:
+ * <pre>
+ * {@literal @}Singleton
+ * public class GlobalConfiguration {
+ *     // Implementation
+ * }
+ * </pre>
+ *
+ * @see Scope
+ * @since 4.0.0
+ */
 @Scope
 @Documented
 @Retention(RUNTIME)
