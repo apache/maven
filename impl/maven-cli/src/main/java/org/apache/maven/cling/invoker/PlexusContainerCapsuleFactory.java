@@ -31,7 +31,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
-import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.extensions.CoreExtension;
@@ -70,13 +69,9 @@ import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
  */
 public class PlexusContainerCapsuleFactory<C extends LookupContext> implements ContainerCapsuleFactory<C> {
     @Override
-    public ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws InvokerException {
-        try {
-            return new PlexusContainerCapsule(
-                    context, Thread.currentThread().getContextClassLoader(), container(invoker, context));
-        } catch (Exception e) {
-            throw new InvokerException("Failed to create Plexus DI Container", e);
-        }
+    public ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws Exception {
+        return new PlexusContainerCapsule(
+                context, Thread.currentThread().getContextClassLoader(), container(invoker, context));
     }
 
     protected DefaultPlexusContainer container(LookupInvoker<C> invoker, C context) throws Exception {

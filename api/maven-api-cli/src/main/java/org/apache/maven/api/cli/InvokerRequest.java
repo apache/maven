@@ -48,6 +48,13 @@ public interface InvokerRequest {
     ParserRequest parserRequest();
 
     /**
+     * Flag representing parser processing result: if there were some fatal errors during
+     * {@link Parser#parseInvocation(ParserRequest)} this method will return {@code true} and invoker should
+     * handle this request as "early failure".
+     */
+    boolean parsingFailed();
+
+    /**
      * Returns the current working directory for the Maven execution.
      * This is typically the directory from which Maven was invoked.
      *
@@ -73,23 +80,6 @@ public interface InvokerRequest {
      */
     @Nonnull
     Path userHomeDirectory();
-
-    /**
-     * Returns the list of extra JVM arguments to be passed to the forked process.
-     * These arguments allow for customization of the JVM environment in which tool will run.
-     * This property is used ONLY by executors and invokers that spawn a new JVM.
-     *
-     * @return an Optional containing the list of extra JVM arguments, or empty if not specified
-     */
-    @Nonnull
-    Optional<List<String>> jvmArguments();
-
-    /**
-     * Shorthand for {@link Logger} to use.
-     */
-    default Logger logger() {
-        return parserRequest().logger();
-    }
 
     /**
      * Shorthand for {@link MessageBuilderFactory}.

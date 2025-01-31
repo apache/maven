@@ -23,7 +23,7 @@ import java.io.IOException;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.cling.invoker.logging.SystemLogger;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 import static java.util.Objects.requireNonNull;
@@ -62,10 +62,11 @@ public abstract class ClingSupport {
     public int run(String[] args) throws IOException {
         try (Invoker invoker = createInvoker()) {
             return invoker.invoke(parseArguments(args));
-        } catch (ParserException e) {
-            System.err.println(e.getMessage());
-            return 1;
-        } catch (InvokerException e) {
+        } catch (InvokerException.ExitException e) {
+            return e.getExitCode();
+        } catch (Exception e) {
+            // last resort; as ideally we should get ExitException only
+            new SystemLogger().error(e.getMessage(), e);
             return 1;
         } finally {
             if (classWorldManaged) {
@@ -76,5 +77,5 @@ public abstract class ClingSupport {
 
     protected abstract Invoker createInvoker();
 
-    protected abstract InvokerRequest parseArguments(String[] args) throws ParserException, IOException;
+    protected abstract InvokerRequest parseArguments(String[] args);
 }

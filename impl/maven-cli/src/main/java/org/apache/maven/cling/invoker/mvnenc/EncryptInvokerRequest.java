@@ -38,6 +38,7 @@ public class EncryptInvokerRequest extends BaseInvokerRequest {
     @SuppressWarnings("ParameterNumber")
     public EncryptInvokerRequest(
             ParserRequest parserRequest,
+            boolean parsingFailed,
             Path cwd,
             Path installationDirectory,
             Path userHomeDirectory,
@@ -49,10 +50,10 @@ public class EncryptInvokerRequest extends BaseInvokerRequest {
             OutputStream out,
             OutputStream err,
             List<CoreExtension> coreExtensions,
-            List<String> jvmArguments,
             EncryptOptions options) {
         super(
                 parserRequest,
+                parsingFailed,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
@@ -63,8 +64,7 @@ public class EncryptInvokerRequest extends BaseInvokerRequest {
                 in,
                 out,
                 err,
-                coreExtensions,
-                jvmArguments);
+                coreExtensions);
         this.options = requireNonNull(options);
     }
 

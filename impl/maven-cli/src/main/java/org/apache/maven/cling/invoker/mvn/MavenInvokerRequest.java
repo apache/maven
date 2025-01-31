@@ -41,6 +41,7 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
     @SuppressWarnings("ParameterNumber")
     public MavenInvokerRequest(
             ParserRequest parserRequest,
+            boolean parseFailed,
             Path cwd,
             Path installationDirectory,
             Path userHomeDirectory,
@@ -52,10 +53,10 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
             OutputStream out,
             OutputStream err,
             List<CoreExtension> coreExtensions,
-            List<String> jvmArguments,
             MavenOptions options) {
         super(
                 parserRequest,
+                parseFailed,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
@@ -66,8 +67,7 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
                 in,
                 out,
                 err,
-                coreExtensions,
-                jvmArguments);
+                coreExtensions);
         this.options = requireNonNull(options);
     }
 

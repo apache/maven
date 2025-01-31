@@ -35,10 +35,10 @@ import static java.util.Objects.requireNonNull;
 
 public abstract class BaseInvokerRequest implements InvokerRequest {
     private final ParserRequest parserRequest;
+    private final boolean parsingFailed;
     private final Path cwd;
     private final Path installationDirectory;
     private final Path userHomeDirectory;
-    private final List<String> jvmArguments;
     private final Map<String, String> userProperties;
     private final Map<String, String> systemProperties;
     private final Path topDirectory;
@@ -51,6 +51,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     @SuppressWarnings("ParameterNumber")
     public BaseInvokerRequest(
             @Nonnull ParserRequest parserRequest,
+            boolean parsingFailed,
             @Nonnull Path cwd,
             @Nonnull Path installationDirectory,
             @Nonnull Path userHomeDirectory,
@@ -61,13 +62,12 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
             @Nullable InputStream in,
             @Nullable OutputStream out,
             @Nullable OutputStream err,
-            @Nullable List<CoreExtension> coreExtensions,
-            @Nullable List<String> jvmArguments) {
+            @Nullable List<CoreExtension> coreExtensions) {
         this.parserRequest = requireNonNull(parserRequest);
+        this.parsingFailed = parsingFailed;
         this.cwd = requireNonNull(cwd);
         this.installationDirectory = requireNonNull(installationDirectory);
         this.userHomeDirectory = requireNonNull(userHomeDirectory);
-        this.jvmArguments = jvmArguments;
 
         this.userProperties = requireNonNull(userProperties);
         this.systemProperties = requireNonNull(systemProperties);
@@ -86,6 +86,11 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     }
 
     @Override
+    public boolean parsingFailed() {
+        return parsingFailed;
+    }
+
+    @Override
     public Path cwd() {
         return cwd;
     }
@@ -98,11 +103,6 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     @Override
     public Path userHomeDirectory() {
         return userHomeDirectory;
-    }
-
-    @Override
-    public Optional<List<String>> jvmArguments() {
-        return Optional.ofNullable(jvmArguments);
     }
 
     @Override

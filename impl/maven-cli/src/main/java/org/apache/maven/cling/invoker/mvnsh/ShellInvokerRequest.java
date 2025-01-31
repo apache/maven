@@ -38,6 +38,7 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
     @SuppressWarnings("ParameterNumber")
     public ShellInvokerRequest(
             ParserRequest parserRequest,
+            boolean parsingFailed,
             Path cwd,
             Path installationDirectory,
             Path userHomeDirectory,
@@ -49,10 +50,10 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
             OutputStream out,
             OutputStream err,
             List<CoreExtension> coreExtensions,
-            List<String> jvmArguments,
             ShellOptions options) {
         super(
                 parserRequest,
+                parsingFailed,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
@@ -63,8 +64,7 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
                 in,
                 out,
                 err,
-                coreExtensions,
-                jvmArguments);
+                coreExtensions);
         this.options = requireNonNull(options);
     }
 

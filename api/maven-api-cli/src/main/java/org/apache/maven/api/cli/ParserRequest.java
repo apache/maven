@@ -30,6 +30,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -153,84 +154,72 @@ public interface ParserRequest {
      * Creates a new Builder instance for constructing a Maven ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvn(
-            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return mvn(Arrays.asList(args), logger, messageBuilderFactory);
+    static Builder mvn(@Nonnull String[] args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvn(Arrays.asList(args), messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvn(
-            @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return builder(Tools.MVN_CMD, Tools.MVN_NAME, args, logger, messageBuilderFactory);
+    static Builder mvn(@Nonnull List<String> args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(Tools.MVN_CMD, Tools.MVN_NAME, args, messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven Encrypting Tool ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvnenc(
-            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return mvnenc(Arrays.asList(args), logger, messageBuilderFactory);
+    static Builder mvnenc(@Nonnull String[] args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvnenc(Arrays.asList(args), messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven Encrypting Tool ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvnenc(
-            @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return builder(Tools.MVNENC_CMD, Tools.MVNENC_NAME, args, logger, messageBuilderFactory);
+    static Builder mvnenc(@Nonnull List<String> args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(Tools.MVNENC_CMD, Tools.MVNENC_NAME, args, messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven Shell Tool ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvnsh(
-            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return mvnsh(Arrays.asList(args), logger, messageBuilderFactory);
+    static Builder mvnsh(@Nonnull String[] args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvnsh(Arrays.asList(args), messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven Shell Tool ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvnsh(
-            @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return builder(Tools.MVNSHELL_CMD, Tools.MVNSHELL_NAME, args, logger, messageBuilderFactory);
+    static Builder mvnsh(@Nonnull List<String> args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(Tools.MVNSHELL_CMD, Tools.MVNSHELL_NAME, args, messageBuilderFactory);
     }
 
     /**
@@ -239,7 +228,6 @@ public interface ParserRequest {
      * @param command the Maven command to be executed
      * @param commandName the Maven command Name to be executed
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
@@ -248,17 +236,17 @@ public interface ParserRequest {
             @Nonnull String command,
             @Nonnull String commandName,
             @Nonnull List<String> args,
-            @Nonnull Logger logger,
             @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return new Builder(command, commandName, args, logger, messageBuilderFactory);
+        return new Builder(command, commandName, args, messageBuilderFactory);
     }
 
     class Builder {
         private final String command;
         private final String commandName;
         private final List<String> args;
-        private final Logger logger;
         private final MessageBuilderFactory messageBuilderFactory;
+
+        private final Logger logger;
         private Lookup lookup = EMPTY_LOOKUP;
         private Path cwd;
         private Path mavenHome;
@@ -268,16 +256,12 @@ public interface ParserRequest {
         private OutputStream err;
 
         private Builder(
-                String command,
-                String commandName,
-                List<String> args,
-                Logger logger,
-                MessageBuilderFactory messageBuilderFactory) {
+                String command, String commandName, List<String> args, MessageBuilderFactory messageBuilderFactory) {
             this.command = requireNonNull(command, "command");
             this.commandName = requireNonNull(commandName, "commandName");
             this.args = requireNonNull(args, "args");
-            this.logger = requireNonNull(logger, "logger");
             this.messageBuilderFactory = requireNonNull(messageBuilderFactory, "messageBuilderFactory");
+            this.logger = new AccumulatingLogger();
         }
 
         public Builder lookup(@Nonnull Lookup lookup) {
@@ -319,7 +303,7 @@ public interface ParserRequest {
             return new ParserRequestImpl(
                     command,
                     commandName,
-                    args,
+                    List.copyOf(args),
                     logger,
                     messageBuilderFactory,
                     lookup,

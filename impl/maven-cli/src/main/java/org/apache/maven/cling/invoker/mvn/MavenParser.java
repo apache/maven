@@ -28,14 +28,13 @@ import java.util.stream.Stream;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class MavenParser extends BaseParser {
 
     @Override
-    protected List<Options> parseCliOptions(LocalContext context) throws ParserException, IOException {
+    protected List<Options> parseCliOptions(LocalContext context) {
         ArrayList<Options> result = new ArrayList<>();
         // CLI args
         result.add(parseMavenCliOptions(context.parserRequest.args()));
@@ -47,29 +46,44 @@ public class MavenParser extends BaseParser {
         return result;
     }
 
-    protected MavenOptions parseMavenCliOptions(List<String> args) throws ParserException {
-        return parseArgs(Options.SOURCE_CLI, args);
+    protected MavenOptions parseMavenCliOptions(List<String> args) {
+        try {
+            return parseArgs(Options.SOURCE_CLI, args);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Failed to parse CLI arguments: " + e.getMessage(), e.getCause());
+        }
     }
 
-    protected MavenOptions parseMavenConfigOptions(Path configFile) throws ParserException, IOException {
+    protected MavenOptions parseMavenConfigOptions(Path configFile) {
         try (Stream<String> lines = Files.lines(configFile, Charset.defaultCharset())) {
             List<String> args =
                     lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toList();
             MavenOptions options = parseArgs("maven.config", args);
             if (options.goals().isPresent()) {
                 // This file can only contain options, not args (goals or phases)
-                throw new ParserException("Unrecognized maven.config file entries: "
+                throw new IllegalArgumentException("Unrecognized entries in maven.config (" + configFile + ") file: "
                         + options.goals().get());
             }
             return options;
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(
+                    "Failed to parse arguments from maven.config file (" + configFile + "): " + e.getMessage(),
+                    e.getCause());
+        } catch (IOException e) {
+            throw new IllegalStateException("Error reading config file: " + configFile, e);
         }
     }
 
-    protected MavenOptions parseArgs(String source, List<String> args) throws ParserException {
+    protected MavenOptions parseArgs(String source, List<String> args) throws ParseException {
+        return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
+    }
+
+    @Override
+    protected MavenOptions emptyOptions() {
         try {
-            return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
+            return CommonsCliMavenOptions.parse(Options.SOURCE_CLI, new String[0]);
         } catch (ParseException e) {
-            throw new ParserException("Failed to parse source " + source + ": " + e.getMessage(), e.getCause());
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -77,6 +91,7 @@ public class MavenParser extends BaseParser {
     protected MavenInvokerRequest getInvokerRequest(LocalContext context) {
         return new MavenInvokerRequest(
                 context.parserRequest,
+                context.parsingFailed,
                 context.cwd,
                 context.installationDirectory,
                 context.userHomeDirectory,
@@ -88,7 +103,6 @@ public class MavenParser extends BaseParser {
                 context.parserRequest.out(),
                 context.parserRequest.err(),
                 context.extensions,
-                getJvmArguments(context.rootDirectory),
                 (MavenOptions) context.options);
     }
 
