@@ -54,7 +54,7 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompt
 
     @Override
     public boolean isColorEnabled() {
-        return false;
+        return MessageUtils.isColorEnabled();
     }
 
     @Override
