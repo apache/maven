@@ -33,8 +33,8 @@ public interface Parser {
      * This method does interpret tool arguments.
      *
      * @param parserRequest the request containing all necessary information for parsing
-     * @return the parsed invoker request. Caller must start by checking {@link InvokerRequest#logger()} as
-     * if there are parser errors, the contents of request may not be fully processed.
+     * @return the parsed invoker request. Caller must start by checking {@link InvokerRequest#parsingFailed()} as
+     * if there are parser errors, this request may not be fully processed and should immediately be failed.
      */
     @Nonnull
     InvokerRequest parseInvocation(@Nonnull ParserRequest parserRequest);

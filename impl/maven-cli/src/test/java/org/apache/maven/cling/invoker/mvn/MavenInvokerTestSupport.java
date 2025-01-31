@@ -30,7 +30,6 @@ import java.util.Map;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.cling.invoker.logging.AccumulatingLogger;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.junit.jupiter.api.Assumptions;
 
@@ -110,8 +109,8 @@ public abstract class MavenInvokerTestSupport {
                 Path logFile = cwd.resolve(goal + "-build.log").toAbsolutePath();
                 List<String> mvnArgs = new ArrayList<>(args);
                 mvnArgs.addAll(List.of("-l", logFile.toString(), goal));
-                int exitCode = invoker.invoke(parser.parseInvocation(
-                        ParserRequest.mvn(mvnArgs, new AccumulatingLogger(), new JLineMessageBuilderFactory())
+                int exitCode = invoker.invoke(
+                        parser.parseInvocation(ParserRequest.mvn(mvnArgs, new JLineMessageBuilderFactory())
                                 .cwd(cwd)
                                 .userHome(userHome)
                                 .build()));

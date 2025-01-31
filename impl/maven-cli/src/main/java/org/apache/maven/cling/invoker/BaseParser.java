@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -69,6 +70,7 @@ public abstract class BaseParser implements Parser {
             this.systemPropertiesOverrides = new HashMap<>();
         }
 
+        public boolean parsingFailed = false;
         public Path cwd;
         public Path installationDirectory;
         public Path userHomeDirectory;
@@ -102,18 +104,21 @@ public abstract class BaseParser implements Parser {
         try {
             context.cwd = getCwd(context);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             context.cwd = getCanonicalPath(Paths.get("."));
             parserRequest.logger().error("Error determining working directory", e);
         }
         try {
             context.installationDirectory = getInstallationDirectory(context);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             context.installationDirectory = context.cwd;
             parserRequest.logger().error("Error determining installation directory", e);
         }
         try {
             context.userHomeDirectory = getUserHomeDirectory(context);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             context.userHomeDirectory = context.cwd;
             parserRequest.logger().error("Error determining user home directory", e);
         }
@@ -122,12 +127,14 @@ public abstract class BaseParser implements Parser {
         try {
             context.topDirectory = getTopDirectory(context);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             context.topDirectory = context.cwd;
             parserRequest.logger().error("Error determining top directory", e);
         }
         try {
             context.rootDirectory = getRootDirectory(context);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             context.rootDirectory = context.cwd;
             parserRequest.logger().error("Error determining root directory", e);
         }
@@ -137,28 +144,32 @@ public abstract class BaseParser implements Parser {
         try {
             parsedOptions = parseCliOptions(context);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             parsedOptions = List.of(emptyOptions());
-            parserRequest.logger().error("Error parsing CLI arguments", e);
+            parserRequest.logger().error("Error parsing program arguments", e);
         }
 
         // assemble options if needed
         try {
             context.options = assembleOptions(parsedOptions);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             context.options = emptyOptions();
-            parserRequest.logger().error("Error assembling CLI arguments", e);
+            parserRequest.logger().error("Error assembling program arguments", e);
         }
 
         // system and user properties
         try {
             context.systemProperties = populateSystemProperties(context);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             context.systemProperties = new HashMap<>();
             parserRequest.logger().error("Error populating system properties", e);
         }
         try {
             context.userProperties = populateUserProperties(context);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             context.userProperties = new HashMap<>();
             parserRequest.logger().error("Error populating user properties", e);
         }
@@ -171,10 +182,64 @@ public abstract class BaseParser implements Parser {
         try {
             context.extensions = readCoreExtensionsDescriptor(context);
         } catch (ParserException e) {
+            context.parsingFailed = true;
             parserRequest.logger().error("Error reading core extensions descriptor", e);
         }
 
+        if (!context.parsingFailed) {
+            validate(context);
+        }
+
         return getInvokerRequest(context);
+    }
+
+    protected void validate(LocalContext context) {
+        Options options = context.options;
+
+        options.failOnSeverity().ifPresent(severity -> {
+            String c = severity.toLowerCase(Locale.ENGLISH);
+            if (!Arrays.asList("warn", "warning", "error").contains(c)) {
+                context.parsingFailed = true;
+                context.parserRequest
+                        .logger()
+                        .error("Invalid fail on severity threshold '" + c
+                                + "'. Supported values are 'WARN', 'WARNING' and 'ERROR'.");
+            }
+        });
+        options.altUserSettings()
+                .ifPresent(userSettings ->
+                        failIfFileNotExists(context, userSettings, "The specified user settings file does not exist"));
+        options.altProjectSettings()
+                .ifPresent(projectSettings -> failIfFileNotExists(
+                        context, projectSettings, "The specified project settings file does not exist"));
+        options.altInstallationSettings()
+                .ifPresent(installationSettings -> failIfFileNotExists(
+                        context, installationSettings, "The specified installation settings file does not exist"));
+        options.altUserToolchains()
+                .ifPresent(userToolchains -> failIfFileNotExists(
+                        context, userToolchains, "The specified user toolchains file does not exist"));
+        options.altInstallationToolchains()
+                .ifPresent(installationToolchains -> failIfFileNotExists(
+                        context, installationToolchains, "The specified installation toolchains file does not exist"));
+        options.color().ifPresent(color -> {
+            String c = color.toLowerCase(Locale.ENGLISH);
+            if (!Arrays.asList("always", "yes", "force", "never", "no", "none", "auto", "tty", "if-tty")
+                    .contains(c)) {
+                context.parsingFailed = true;
+                context.parserRequest
+                        .logger()
+                        .error("Invalid color configuration value '" + c
+                                + "'. Supported values are 'auto', 'always', 'never'.");
+            }
+        });
+    }
+
+    protected void failIfFileNotExists(LocalContext context, String fileName, String message) {
+        Path path = context.cwd.resolve(fileName);
+        if (!Files.isRegularFile(path)) {
+            context.parsingFailed = true;
+            context.parserRequest.logger().error(message + ": " + path);
+        }
     }
 
     protected abstract Options emptyOptions();

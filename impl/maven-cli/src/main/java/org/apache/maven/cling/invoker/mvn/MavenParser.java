@@ -48,7 +48,11 @@ public class MavenParser extends BaseParser {
     }
 
     protected MavenOptions parseMavenCliOptions(List<String> args) throws ParserException {
-        return parseArgs(Options.SOURCE_CLI, args);
+        try {
+            return parseArgs(Options.SOURCE_CLI, args);
+        } catch (ParseException e) {
+            throw new ParserException("Failed to parse CLI arguments: " + e.getMessage(), e.getCause());
+        }
     }
 
     protected MavenOptions parseMavenConfigOptions(Path configFile) throws ParserException {
@@ -58,21 +62,21 @@ public class MavenParser extends BaseParser {
             MavenOptions options = parseArgs("maven.config", args);
             if (options.goals().isPresent()) {
                 // This file can only contain options, not args (goals or phases)
-                throw new ParserException("Unrecognized maven.config file entries: "
+                throw new ParserException("Unrecognized entries in maven.config (" + configFile + ") file: "
                         + options.goals().get());
             }
             return options;
+        } catch (ParseException e) {
+            throw new ParserException(
+                    "Failed to parse arguments from maven.config file (" + configFile + "): " + e.getMessage(),
+                    e.getCause());
         } catch (IOException e) {
             throw new ParserException("Error reading config file: " + configFile, e);
         }
     }
 
-    protected MavenOptions parseArgs(String source, List<String> args) throws ParserException {
-        try {
-            return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
-        } catch (ParseException e) {
-            throw new ParserException("Failed to parse source " + source + ": " + e.getMessage(), e.getCause());
-        }
+    protected MavenOptions parseArgs(String source, List<String> args) throws ParseException {
+        return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
     }
 
     @Override
@@ -88,6 +92,7 @@ public class MavenParser extends BaseParser {
     protected MavenInvokerRequest getInvokerRequest(LocalContext context) {
         return new MavenInvokerRequest(
                 context.parserRequest,
+                context.parsingFailed,
                 context.cwd,
                 context.installationDirectory,
                 context.userHomeDirectory,

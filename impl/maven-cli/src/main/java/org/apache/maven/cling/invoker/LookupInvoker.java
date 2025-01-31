@@ -44,6 +44,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Lookup;
@@ -65,7 +66,6 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.cling.invoker.logging.AccumulatingLogger;
 import org.apache.maven.cling.invoker.logging.Slf4jLogger;
 import org.apache.maven.cling.invoker.logging.SystemLogger;
 import org.apache.maven.cling.invoker.spi.PropertyContributorsHolder;
@@ -168,31 +168,27 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected InvokerException handleException(C context, Exception e) throws InvokerException {
-        ArrayList<Throwable> causes = new ArrayList<>();
-        for (Throwable cause = e.getCause(); cause != null && cause != cause.getCause(); cause = cause.getCause()) {
-            causes.add(cause);
-        }
         Logger logger = context.logger;
         if (logger instanceof AccumulatingLogger) {
             logger = new SystemLogger();
         }
-        printErrors(context, context.invokerRequest.options().showErrors().orElse(false), e, causes, logger);
+        printErrors(context, context.invokerRequest.options().showErrors().orElse(false), List.of(e), logger);
         return new InvokerException.ExitException(1);
     }
 
-    protected void printErrors(C context, boolean showStackTrace, Exception e, List<Throwable> causes, Logger logger) {
-        if (showStackTrace) {
-            logger.error(
-                    "Error executing " + context.invokerRequest.parserRequest().commandName() + ".", e);
-            for (Throwable error : causes) {
-                logger.error("  " + error.getMessage(), error);
-            }
-        } else {
-            logger.error(
-                    "Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
-            logger.error(e.getMessage());
-            for (Throwable error : causes) {
-                logger.error("Caused by: " + error.getMessage());
+    protected void printErrors(C context, boolean showStackTrace, List<? extends Exception> exceptions, Logger logger) {
+        // this is important message; many Maven IT assert for presence of this message
+        logger.error("Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
+        for (Exception exception : exceptions) {
+            if (showStackTrace) {
+                logger.error(exception.getMessage(), exception);
+            } else {
+                logger.error(exception.getMessage());
+                for (Throwable cause = exception.getCause();
+                        cause != null && cause != cause.getCause();
+                        cause = cause.getCause()) {
+                    logger.error("Caused by: " + cause.getMessage());
+                }
             }
         }
     }
@@ -201,26 +197,31 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void validate(C context) throws InvokerException {
         List<Logger.Entry> allEntries = context.logger.drain();
-        List<Logger.Entry> errorEntries =
-                allEntries.stream().filter(e -> e.level() == Logger.Level.ERROR).toList();
-        // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
-        if (!errorEntries.isEmpty()) {
-            printErrors(
-                    context,
-                    context.invokerRequest.parserRequest().args().contains("-e"),
-                    new InvokerException("There were " + errorEntries.size() + " errors:"),
-                    errorEntries.stream()
-                            .map(e -> {
-                                if (e.error() != null) {
-                                    return e.error();
-                                } else {
-                                    return new ParserException(e.message());
-                                }
-                            })
-                            .toList(),
-                    new SystemLogger());
-            // we skip handleException above as we did out output
-            throw new InvokerException.ExitException(1);
+        if (context.invokerRequest.parsingFailed()) {
+            // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
+            List<Logger.Entry> errorEntries = allEntries.stream()
+                    .filter(e -> e.level() == Logger.Level.ERROR)
+                    .toList();
+            if (!errorEntries.isEmpty()) {
+                printErrors(
+                        context,
+                        context.invokerRequest
+                                .parserRequest()
+                                .args()
+                                .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG),
+                        errorEntries.stream()
+                                .map(e -> {
+                                    if (e.error() != null) {
+                                        return new ParserException(e.message(), e.error());
+                                    } else {
+                                        return new ParserException(e.message());
+                                    }
+                                })
+                                .toList(),
+                        new SystemLogger());
+                // we skip handleException above as we did out output
+                throw new InvokerException.ExitException(1);
+            }
         }
 
         // reply all the non-errors (if there were ERROR, we'd bail out above)
@@ -268,7 +269,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         String styleColor = mavenOptions
                 .color()
                 .orElse(userProperties.getOrDefault(
-                        Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")));
+                        Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")))
+                .toLowerCase(Locale.ENGLISH);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
             context.coloredOutput = true;
         } else if ("never".equals(styleColor) || "no".equals(styleColor) || "none".equals(styleColor)) {

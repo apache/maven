@@ -48,6 +48,13 @@ public interface InvokerRequest {
     ParserRequest parserRequest();
 
     /**
+     * Flag representing parser processing result: if there were some fatal errors during
+     * {@link Parser#parseInvocation(ParserRequest)} this method will return {@code true} and invoker should
+     * handle this request as "early failure".
+     */
+    boolean parsingFailed();
+
+    /**
      * Returns the current working directory for the Maven execution.
      * This is typically the directory from which Maven was invoked.
      *
@@ -73,13 +80,6 @@ public interface InvokerRequest {
      */
     @Nonnull
     Path userHomeDirectory();
-
-    /**
-     * Shorthand for {@link Logger} to use.
-     */
-    default Logger logger() {
-        return parserRequest().logger();
-    }
 
     /**
      * Shorthand for {@link MessageBuilderFactory}.

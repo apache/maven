@@ -23,7 +23,7 @@ import org.apache.maven.api.cli.Logger;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Proto {@link Logger} that just passes to now functioning {@link org.slf4j.Logger} instance.
+ * Proto {@link Logger} that just passes to functioning {@link org.slf4j.Logger} instance.
  */
 public class Slf4jLogger implements Logger {
     private final org.slf4j.Logger logger;

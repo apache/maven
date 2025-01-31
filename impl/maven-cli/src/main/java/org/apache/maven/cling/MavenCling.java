@@ -25,7 +25,6 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.logging.AccumulatingLogger;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
@@ -66,9 +65,9 @@ public class MavenCling extends ClingSupport {
     }
 
     @Override
-    protected InvokerRequest parseArguments(String[] args) throws ParserException, IOException {
+    protected InvokerRequest parseArguments(String[] args) throws ParserException {
         return new MavenParser()
-                .parseInvocation(ParserRequest.mvn(args, new AccumulatingLogger(), new JLineMessageBuilderFactory())
+                .parseInvocation(ParserRequest.mvn(args, new JLineMessageBuilderFactory())
                         .build());
     }
 }

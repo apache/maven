@@ -38,6 +38,7 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
     @SuppressWarnings("ParameterNumber")
     public ShellInvokerRequest(
             ParserRequest parserRequest,
+            boolean parsingFailed,
             Path cwd,
             Path installationDirectory,
             Path userHomeDirectory,
@@ -52,6 +53,7 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
             ShellOptions options) {
         super(
                 parserRequest,
+                parsingFailed,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,

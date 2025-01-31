@@ -263,6 +263,7 @@ public abstract class CommonsCliOptions implements Options {
         public static final String VERBOSE = "X";
 
         public static final String SHOW_ERRORS = "e";
+
         public static final String FAIL_ON_SEVERITY = "fos";
         public static final String NON_INTERACTIVE = "non-interactive";
         public static final String BATCH_MODE = "B";
@@ -277,6 +278,9 @@ public abstract class CommonsCliOptions implements Options {
         public static final String COLOR = "color";
         public static final String OFFLINE = "o";
         public static final String HELP = "h";
+
+        // Not an Option: used only for early detection, when CLI args may not be even parsed
+        public static final String SHOW_ERRORS_CLI_ARG = "-" + SHOW_ERRORS;
 
         // parameters handled by script
         public static final String DEBUG = "debug";

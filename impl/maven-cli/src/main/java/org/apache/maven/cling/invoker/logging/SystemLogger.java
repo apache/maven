@@ -27,7 +27,8 @@ import org.apache.maven.api.cli.Logger;
 
 /**
  * System {@link Logger}. Uses provided {@link PrintStream}s or {@link System} ones as fallback.
- * Supports only two levels: ERROR and WARNING, that is emitted to STDERR and STDOUT.
+ * Supports only two levels: ERROR and WARNING, that is emitted to STDERR and STDOUT. This logger is used in
+ * case of "early failures" (when no logging may be set up yet).
  */
 public class SystemLogger implements Logger {
 

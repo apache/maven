@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker.logging;
+package org.apache.maven.api.cli.logging;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -27,8 +27,8 @@ import org.apache.maven.api.cli.Logger;
 import static java.util.Objects.requireNonNull;
 
 /**
- * CLI {@link Logger} that simply accumulates log entries until some point a real logger can emit them, as it exists
- * when no logging is set up yet.
+ * Early CLI {@link Logger} that simply accumulates log entries until some point a real logger can emit them. This
+ * logger is created at start, and it exists while no logging is available yet.
  */
 public class AccumulatingLogger implements Logger {
     private final AtomicReference<List<Entry>> entries = new AtomicReference<>(new CopyOnWriteArrayList<>());
