@@ -88,7 +88,6 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
 
         private Consumer<LookupContext> contextCopier() {
             return result -> {
-                result.logger = shellContext.logger;
                 result.loggerFactory = shellContext.loggerFactory;
                 result.slf4jConfiguration = shellContext.slf4jConfiguration;
                 result.loggerLevel = shellContext.loggerLevel;

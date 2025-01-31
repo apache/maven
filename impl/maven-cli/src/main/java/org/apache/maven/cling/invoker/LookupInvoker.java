@@ -65,6 +65,9 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.cling.invoker.logging.AccumulatingLogger;
+import org.apache.maven.cling.invoker.logging.Slf4jLogger;
+import org.apache.maven.cling.invoker.logging.SystemLogger;
 import org.apache.maven.cling.invoker.spi.PropertyContributorsHolder;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
@@ -109,7 +112,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     @Override
-    public int invoke(InvokerRequest invokerRequest) throws InvokerException {
+    public final int invoke(InvokerRequest invokerRequest) throws InvokerException {
         requireNonNull(invokerRequest);
 
         Properties oldProps = new Properties();
@@ -128,10 +131,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                                     .get());
                 }
                 return doInvoke(context);
-            } catch (InvokerException e) {
+            } catch (InvokerException.ExitException e) {
+                // contract of ExitException is that nothing needed by us
                 throw e;
             } catch (Exception e) {
+                // other exceptions (including InvokerException but sans Exit, see above): we need to inform user
                 throw handleException(context, e);
+            } finally {
+                if (context.terminal != null) {
+                    context.terminal.writer().flush();
+                }
             }
         } finally {
             Thread.currentThread().setContextClassLoader(oldCL);
@@ -140,63 +149,87 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int doInvoke(C context) throws Exception {
-        try {
-            validate(context);
-            pushCoreProperties(context);
-            pushUserProperties(context);
-            configureLogging(context);
-            createTerminal(context);
-            activateLogging(context);
-            helpOrVersionAndMayExit(context);
-            preCommands(context);
-            container(context);
-            postContainer(context);
-            pushUserProperties(context); // after PropertyContributor SPI
-            lookup(context);
-            init(context);
-            postCommands(context);
-            settings(context);
-            return execute(context);
-        } finally {
-            if (context.terminal != null) {
-                context.terminal.writer().flush();
-            }
-        }
+        validate(context);
+        pushCoreProperties(context);
+        pushUserProperties(context);
+        configureLogging(context);
+        createTerminal(context);
+        activateLogging(context);
+        helpOrVersionAndMayExit(context);
+        preCommands(context);
+        container(context);
+        postContainer(context);
+        pushUserProperties(context); // after PropertyContributor SPI
+        lookup(context);
+        init(context);
+        postCommands(context);
+        settings(context);
+        return execute(context);
     }
 
     protected InvokerException handleException(C context, Exception e) throws InvokerException {
-        boolean showStackTrace = context.invokerRequest.options().showErrors().orElse(false);
+        ArrayList<Throwable> causes = new ArrayList<>();
+        for (Throwable cause = e.getCause(); cause != null && cause != cause.getCause(); cause = cause.getCause()) {
+            causes.add(cause);
+        }
+        Logger logger = context.logger;
+        if (logger instanceof AccumulatingLogger) {
+            logger = new SystemLogger();
+        }
+        printErrors(context, context.invokerRequest.options().showErrors().orElse(false), e, causes, logger);
+        return new InvokerException.ExitException(1);
+    }
+
+    protected void printErrors(C context, boolean showStackTrace, Exception e, List<Throwable> causes, Logger logger) {
         if (showStackTrace) {
-            context.logger.error(
+            logger.error(
                     "Error executing " + context.invokerRequest.parserRequest().commandName() + ".", e);
+            for (Throwable error : causes) {
+                logger.error("  " + error.getMessage(), error);
+            }
         } else {
-            context.logger.error(
+            logger.error(
                     "Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
-            context.logger.error(e.getMessage());
-            for (Throwable cause = e.getCause(); cause != null && cause != cause.getCause(); cause = cause.getCause()) {
-                context.logger.error("Caused by: " + cause.getMessage());
+            logger.error(e.getMessage());
+            for (Throwable error : causes) {
+                logger.error("Caused by: " + error.getMessage());
             }
         }
-        return new InvokerException(e.getMessage(), e);
     }
 
     protected abstract C createContext(InvokerRequest invokerRequest) throws InvokerException;
 
     protected void validate(C context) throws InvokerException {
-        // in case of parser error: report errors and bail out; invokerRequest contents may be incomplete
-        if (!context.invokerRequest.parserErrors().isEmpty()) {
-            context.logger.error(
-                    "There were " + context.invokerRequest.parserErrors().size() + " parsing errors:");
-            for (ParserException parserException : context.invokerRequest.parserErrors()) {
-                context.logger.error(parserException.getMessage());
-            }
+        List<Logger.Entry> allEntries = context.logger.drain();
+        List<Logger.Entry> errorEntries =
+                allEntries.stream().filter(e -> e.level() == Logger.Level.ERROR).toList();
+        // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
+        if (!errorEntries.isEmpty()) {
+            printErrors(
+                    context,
+                    context.invokerRequest.parserRequest().args().contains("-e"),
+                    new InvokerException("There were " + errorEntries.size() + " errors:"),
+                    errorEntries.stream()
+                            .map(e -> {
+                                if (e.error() != null) {
+                                    return e.error();
+                                } else {
+                                    return new ParserException(e.message());
+                                }
+                            })
+                            .toList(),
+                    new SystemLogger());
+            // we skip handleException above as we did out output
             throw new InvokerException.ExitException(1);
         }
+
+        // reply all the non-errors (if there were ERROR, we'd bail out above)
+        allEntries.forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
 
         // warn about deprecated options
         context.invokerRequest
                 .options()
-                .warnAboutDeprecatedOptions(context.invokerRequest.parserRequest(), s -> context.logger.warn(s));
+                .warnAboutDeprecatedOptions(context.invokerRequest.parserRequest(), context.logger::warn);
     }
 
     protected void pushCoreProperties(C context) throws Exception {
@@ -363,11 +396,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         Options mavenOptions = invokerRequest.options();
 
         context.slf4jConfiguration.activate();
-        org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
-        context.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
-                .setCause(error)
-                .log(message);
-
         if (mavenOptions.failOnSeverity().isPresent()) {
             String logLevelThreshold = mavenOptions.failOnSeverity().get();
             if (context.loggerFactory instanceof LogLevelRecorder recorder) {
@@ -388,6 +416,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                         + "The --fail-on-severity flag will not take effect.");
             }
         }
+
+        // at this point logging is set up, reply so far accumulated logs, if any
+        List<Logger.Entry> entries = context.logger.drain();
+        Logger logger =
+                new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
+        entries.forEach(e -> logger.log(e.level(), e.message(), e.error()));
+        // swap it out, from now on we do "live logging"
+        context.logger = logger;
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {

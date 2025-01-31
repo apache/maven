@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -42,7 +41,6 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
     @SuppressWarnings("ParameterNumber")
     public MavenInvokerRequest(
             ParserRequest parserRequest,
-            List<ParserException> parserErrors,
             Path cwd,
             Path installationDirectory,
             Path userHomeDirectory,
@@ -57,7 +55,6 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
             MavenOptions options) {
         super(
                 parserRequest,
-                parserErrors,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,

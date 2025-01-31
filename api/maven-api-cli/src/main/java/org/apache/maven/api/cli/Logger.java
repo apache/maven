@@ -18,12 +18,17 @@
  */
 package org.apache.maven.api.cli;
 
+import java.util.List;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * Defines a simple logging interface for Maven CLI operations.
+ * Defines a simple logging interface for Maven CLI operations. These operations happen "early", when there may
+ * be no logging set up even. Implementations may be "accumulating", in which case {@link #drain()}  method should
+ * be used.
+ * <p>
  * This interface provides methods for logging messages at different severity levels
  * and supports logging with or without associated exceptions.
  *
@@ -135,5 +140,22 @@ public interface Logger {
      */
     default void error(@Nonnull String message, @Nullable Throwable error) {
         log(Level.ERROR, message, error);
+    }
+
+    /**
+     * Logger entries returned by {@link #drain()} method.
+     * @param level The logging level, never {@code null}.
+     * @param message The logging message, never {@code null}.
+     * @param error The error, if applicable.
+     */
+    record Entry(@Nonnull Level level, @Nonnull String message, @Nullable Throwable error) {}
+
+    /**
+     * If this is an accumulating log, it will "drain" this instance. It returns the accumulated log entries, and
+     * also "resets" this instance to empty (initial) state.
+     */
+    @Nonnull
+    default List<Entry> drain() {
+        return List.of();
     }
 }

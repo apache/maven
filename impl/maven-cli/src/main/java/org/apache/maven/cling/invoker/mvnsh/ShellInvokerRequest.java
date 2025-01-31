@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.cli.ParserException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvnsh.ShellOptions;
@@ -39,7 +38,6 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
     @SuppressWarnings("ParameterNumber")
     public ShellInvokerRequest(
             ParserRequest parserRequest,
-            List<ParserException> parserErrors,
             Path cwd,
             Path installationDirectory,
             Path userHomeDirectory,
@@ -54,7 +52,6 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
             ShellOptions options) {
         super(
                 parserRequest,
-                parserErrors,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,

@@ -41,7 +41,6 @@ public class ShellParser extends BaseParser {
     protected ShellInvokerRequest getInvokerRequest(LocalContext context) {
         return new ShellInvokerRequest(
                 context.parserRequest,
-                context.parserErrors,
                 context.cwd,
                 context.installationDirectory,
                 context.userHomeDirectory,

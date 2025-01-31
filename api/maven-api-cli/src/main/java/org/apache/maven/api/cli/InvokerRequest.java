@@ -48,13 +48,6 @@ public interface InvokerRequest {
     ParserRequest parserRequest();
 
     /**
-     * Returns parser errors collected while parsed the parser request into invoker request. If this list is
-     * non-empty, this instance must be considered potentially incomplete and not process at all.
-     */
-    @Nonnull
-    List<ParserException> parserErrors();
-
-    /**
      * Returns the current working directory for the Maven execution.
      * This is typically the directory from which Maven was invoked.
      *

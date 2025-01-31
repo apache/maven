@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.invoker;
+package org.apache.maven.cling.invoker.logging;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -26,19 +26,19 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Logger;
 
 /**
- * Proto {@link Logger}. Uses provided {@link PrintStream}s or {@link System} ones as fallback.
+ * System {@link Logger}. Uses provided {@link PrintStream}s or {@link System} ones as fallback.
  * Supports only two levels: ERROR and WARNING, that is emitted to STDERR and STDOUT.
  */
-public class ProtoLogger implements Logger {
+public class SystemLogger implements Logger {
 
     private final PrintWriter out;
     private final PrintWriter err;
 
-    public ProtoLogger() {
+    public SystemLogger() {
         this(null, null);
     }
 
-    public ProtoLogger(@Nullable OutputStream out, @Nullable OutputStream err) {
+    public SystemLogger(@Nullable OutputStream out, @Nullable OutputStream err) {
         this.out = new PrintWriter(toPsOrDef(out, System.out), true);
         this.err = new PrintWriter(toPsOrDef(err, System.err), true);
     }
@@ -61,7 +61,7 @@ public class ProtoLogger implements Logger {
     public void log(Level level, String message, Throwable error) {
         PrintWriter pw = level == Level.ERROR ? err : level == Level.WARN ? out : null;
         if (pw != null) {
-            pw.println(level.name() + " " + message);
+            pw.println("[" + level.name() + "] " + message);
             if (error != null) {
                 error.printStackTrace(pw);
             }

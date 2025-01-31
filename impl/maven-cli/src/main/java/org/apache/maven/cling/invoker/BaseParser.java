@@ -62,12 +62,10 @@ public abstract class BaseParser implements Parser {
     @SuppressWarnings("VisibilityModifier")
     public static class LocalContext {
         public final ParserRequest parserRequest;
-        public final List<ParserException> parserErrors;
         public final Map<String, String> systemPropertiesOverrides;
 
         public LocalContext(ParserRequest parserRequest) {
             this.parserRequest = parserRequest;
-            this.parserErrors = new ArrayList<>();
             this.systemPropertiesOverrides = new HashMap<>();
         }
 
@@ -105,19 +103,19 @@ public abstract class BaseParser implements Parser {
             context.cwd = getCwd(context);
         } catch (ParserException e) {
             context.cwd = getCanonicalPath(Paths.get("."));
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error determining working directory", e);
         }
         try {
             context.installationDirectory = getInstallationDirectory(context);
         } catch (ParserException e) {
             context.installationDirectory = context.cwd;
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error determining installation directory", e);
         }
         try {
             context.userHomeDirectory = getUserHomeDirectory(context);
         } catch (ParserException e) {
             context.userHomeDirectory = context.cwd;
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error determining user home directory", e);
         }
 
         // top/root
@@ -125,13 +123,13 @@ public abstract class BaseParser implements Parser {
             context.topDirectory = getTopDirectory(context);
         } catch (ParserException e) {
             context.topDirectory = context.cwd;
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error determining top directory", e);
         }
         try {
             context.rootDirectory = getRootDirectory(context);
         } catch (ParserException e) {
             context.rootDirectory = context.cwd;
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error determining root directory", e);
         }
 
         // options
@@ -140,7 +138,7 @@ public abstract class BaseParser implements Parser {
             parsedOptions = parseCliOptions(context);
         } catch (ParserException e) {
             parsedOptions = List.of(emptyOptions());
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error parsing CLI arguments", e);
         }
 
         // assemble options if needed
@@ -148,7 +146,7 @@ public abstract class BaseParser implements Parser {
             context.options = assembleOptions(parsedOptions);
         } catch (ParserException e) {
             context.options = emptyOptions();
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error assembling CLI arguments", e);
         }
 
         // system and user properties
@@ -156,13 +154,13 @@ public abstract class BaseParser implements Parser {
             context.systemProperties = populateSystemProperties(context);
         } catch (ParserException e) {
             context.systemProperties = new HashMap<>();
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error populating system properties", e);
         }
         try {
             context.userProperties = populateUserProperties(context);
         } catch (ParserException e) {
             context.userProperties = new HashMap<>();
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error populating user properties", e);
         }
 
         // options: interpolate
@@ -173,7 +171,7 @@ public abstract class BaseParser implements Parser {
         try {
             context.extensions = readCoreExtensionsDescriptor(context);
         } catch (ParserException e) {
-            context.parserErrors.add(e);
+            parserRequest.logger().error("Error reading core extensions descriptor", e);
         }
 
         return getInvokerRequest(context);

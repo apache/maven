@@ -88,7 +88,6 @@ public class MavenParser extends BaseParser {
     protected MavenInvokerRequest getInvokerRequest(LocalContext context) {
         return new MavenInvokerRequest(
                 context.parserRequest,
-                context.parserErrors,
                 context.cwd,
                 context.installationDirectory,
                 context.userHomeDirectory,

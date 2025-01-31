@@ -79,12 +79,13 @@ public class LookupContext implements AutoCloseable {
                 .build();
     }
 
+    public Logger logger;
+
     // this one "evolves" as process progresses (instance is immutable but instances are replaced)
     public ProtoSession protoSession;
     // here we track which user properties we pushed to Java System Properties (internal only)
     public Set<String> pushedUserProperties;
 
-    public Logger logger;
     public ILoggerFactory loggerFactory;
     public Slf4jConfiguration slf4jConfiguration;
     public Slf4jConfiguration.Level loggerLevel;

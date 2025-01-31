@@ -42,7 +42,6 @@ public class EncryptParser extends BaseParser {
     protected EncryptInvokerRequest getInvokerRequest(LocalContext context) {
         return new EncryptInvokerRequest(
                 context.parserRequest,
-                context.parserErrors,
                 context.cwd,
                 context.installationDirectory,
                 context.userHomeDirectory,
