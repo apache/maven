@@ -21,27 +21,28 @@ package org.apache.maven.cling.invoker.logging;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Logger;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * System {@link Logger}. Uses provided {@link PrintStream}s or {@link System} ones as fallback.
- * Supports only two levels: ERROR and WARNING, that is emitted to STDERR and STDOUT. This logger is used in
- * case of "early failures" (when no logging may be set up yet).
+ * System {@link Logger}. Uses provided {@link PrintStream}s or {@link System#err} ones as fallback.
+ * This logger is used in case of "early failures" (when no logging may be set up yet).
  */
 public class SystemLogger implements Logger {
-
     private final PrintWriter out;
-    private final PrintWriter err;
+    private final Level threshold;
 
     public SystemLogger() {
         this(null, null);
     }
 
-    public SystemLogger(@Nullable OutputStream out, @Nullable OutputStream err) {
-        this.out = new PrintWriter(toPsOrDef(out, System.out), true);
-        this.err = new PrintWriter(toPsOrDef(err, System.err), true);
+    public SystemLogger(@Nullable OutputStream out, @Nullable Level threshold) {
+        this.out = new PrintWriter(toPsOrDef(out, System.err), true);
+        this.threshold = Objects.requireNonNullElse(threshold, Level.INFO);
     }
 
     private PrintStream toPsOrDef(OutputStream outputStream, PrintStream def) {
@@ -51,20 +52,17 @@ public class SystemLogger implements Logger {
         if (outputStream instanceof PrintStream ps) {
             return ps;
         }
-        return new PrintStream(outputStream);
+        return new PrintStream(outputStream, true);
     }
-
-    //
-    // These are the only methods we need in our primordial logger
-    //
 
     @Override
     public void log(Level level, String message, Throwable error) {
-        PrintWriter pw = level == Level.ERROR ? err : level == Level.WARN ? out : null;
-        if (pw != null) {
-            pw.println("[" + level.name() + "] " + message);
+        requireNonNull(level, "level");
+        requireNonNull(message, "message");
+        if (level.ordinal() >= threshold.ordinal()) {
+            out.println("[" + level.name() + "] " + message);
             if (error != null) {
-                error.printStackTrace(pw);
+                error.printStackTrace(out);
             }
         }
     }

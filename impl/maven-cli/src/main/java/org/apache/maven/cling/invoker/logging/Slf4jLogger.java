@@ -34,6 +34,8 @@ public class Slf4jLogger implements Logger {
 
     @Override
     public void log(Level level, String message, Throwable error) {
+        requireNonNull(level, "level");
+        requireNonNull(message, "message");
         switch (level) {
             case ERROR -> logger.error(message, error);
             case WARN -> logger.warn(message, error);

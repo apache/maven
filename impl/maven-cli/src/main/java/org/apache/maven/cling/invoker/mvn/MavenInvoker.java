@@ -34,7 +34,6 @@ import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -86,7 +85,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     @Override
-    protected MavenContext createContext(InvokerRequest invokerRequest) throws InvokerException {
+    protected MavenContext createContext(InvokerRequest invokerRequest) {
         return new MavenContext(invokerRequest);
     }
 

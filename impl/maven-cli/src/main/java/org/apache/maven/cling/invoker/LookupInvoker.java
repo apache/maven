@@ -111,7 +111,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     @Override
-    public final int invoke(InvokerRequest invokerRequest) throws InvokerException {
+    public final int invoke(InvokerRequest invokerRequest) {
         requireNonNull(invokerRequest);
 
         Properties oldProps = new Properties();
@@ -166,56 +166,49 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         return execute(context);
     }
 
-    protected InvokerException handleException(C context, Exception e) throws InvokerException {
+    protected InvokerException.ExitException handleException(C context, Exception e) {
         Logger logger = context.logger;
         if (logger instanceof AccumulatingLogger) {
             logger = new SystemLogger();
         }
-        printErrors(context, context.invokerRequest.options().showErrors().orElse(false), List.of(e), logger);
-        return new InvokerException.ExitException(1);
+        printErrors(
+                context,
+                context.invokerRequest.options().showErrors().orElse(false),
+                List.of(new Logger.Entry(Logger.Level.ERROR, e.getMessage(), e.getCause())),
+                logger);
+        return new InvokerException.ExitException(2);
     }
 
-    protected void printErrors(C context, boolean showStackTrace, List<? extends Exception> exceptions, Logger logger) {
+    protected void printErrors(C context, boolean showStackTrace, List<Logger.Entry> entries, Logger logger) {
         // this is important message; many Maven IT assert for presence of this message
         logger.error("Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
-        for (Exception exception : exceptions) {
+        for (Logger.Entry entry : entries) {
             if (showStackTrace) {
-                logger.error(exception.getMessage(), exception);
+                logger.log(entry.level(), entry.message(), entry.error());
             } else {
-                logger.error(exception.getMessage());
-                for (Throwable cause = exception.getCause();
+                logger.error(entry.message());
+                for (Throwable cause = entry.error();
                         cause != null && cause != cause.getCause();
                         cause = cause.getCause()) {
-                    logger.error("Caused by: " + cause.getMessage());
+                    logger.log(entry.level(), "Caused by: " + cause.getMessage());
                 }
             }
         }
     }
 
-    protected abstract C createContext(InvokerRequest invokerRequest) throws InvokerException;
+    protected abstract C createContext(InvokerRequest invokerRequest);
 
-    protected void validate(C context) throws InvokerException {
+    protected void validate(C context) throws Exception {
         if (context.invokerRequest.parsingFailed()) {
             // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
-            List<Logger.Entry> allEntries = context.logger.drain();
-            List<Logger.Entry> errorEntries = allEntries.stream()
-                    .filter(e -> e.level() == Logger.Level.ERROR)
-                    .toList();
+            List<Logger.Entry> entries = context.logger.drain();
             printErrors(
                     context,
                     context.invokerRequest
                             .parserRequest()
                             .args()
                             .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG),
-                    errorEntries.stream()
-                            .map(e -> {
-                                if (e.error() != null) {
-                                    return new IllegalStateException(e.message(), e.error());
-                                } else {
-                                    return new IllegalStateException(e.message());
-                                }
-                            })
-                            .toList(),
+                    entries,
                     new SystemLogger());
             // we skip handleException above as we did output
             throw new InvokerException.ExitException(1);

@@ -133,13 +133,13 @@ public class LookupContext implements AutoCloseable {
         }
     }
 
-    public final void closeContainer() {
+    public final void closeContainer() throws Exception {
         if (containerCapsuleManaged) {
             doCloseContainer();
         }
     }
 
-    public void doCloseContainer() {
+    public void doCloseContainer() throws Exception {
         if (containerCapsule != null) {
             try {
                 containerCapsule.close();
