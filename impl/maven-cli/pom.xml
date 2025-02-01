@@ -169,7 +169,7 @@ under the License.
           </properties>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
-            <maven.home>${maven.home}</maven.home>
+            <maven.home>${basedir}/src/test/resources/mavenHome</maven.home>
           </systemPropertyVariables>
         </configuration>
       </plugin>

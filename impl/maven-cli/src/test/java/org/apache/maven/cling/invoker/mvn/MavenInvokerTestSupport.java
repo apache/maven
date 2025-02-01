@@ -88,13 +88,6 @@ public abstract class MavenInvokerTestSupport {
 
     protected Map<String, String> invoke(Path cwd, Path userHome, Collection<String> goals, Collection<String> args)
             throws Exception {
-        // works only in recent Maven4
-        Assumptions.assumeTrue(
-                Files.isRegularFile(Paths.get(System.getProperty("maven.home"))
-                        .resolve("conf")
-                        .resolve("maven.properties")),
-                "${maven.home}/conf/maven.properties must be a file");
-
         Files.createDirectories(cwd.resolve(".mvn"));
         Path pom = cwd.resolve("pom.xml").toAbsolutePath();
         Files.writeString(pom, POM_STRING);
