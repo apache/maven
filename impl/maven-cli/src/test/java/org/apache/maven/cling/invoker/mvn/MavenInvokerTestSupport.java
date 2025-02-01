@@ -20,7 +20,6 @@ package org.apache.maven.cling.invoker.mvn;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,7 +30,6 @@ import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
-import org.junit.jupiter.api.Assumptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -88,13 +86,6 @@ public abstract class MavenInvokerTestSupport {
 
     protected Map<String, String> invoke(Path cwd, Path userHome, Collection<String> goals, Collection<String> args)
             throws Exception {
-        // works only in recent Maven4
-        Assumptions.assumeTrue(
-                Files.isRegularFile(Paths.get(System.getProperty("maven.home"))
-                        .resolve("conf")
-                        .resolve("maven.properties")),
-                "${maven.home}/conf/maven.properties must be a file");
-
         Files.createDirectories(cwd.resolve(".mvn"));
         Path pom = cwd.resolve("pom.xml").toAbsolutePath();
         Files.writeString(pom, POM_STRING);
