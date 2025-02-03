@@ -21,7 +21,6 @@ package org.apache.maven.cling.invoker;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -180,7 +179,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected void printErrors(C context, boolean showStackTrace, List<Logger.Entry> entries, Logger logger) {
         // this is important message; many Maven IT assert for presence of this message
         if (logger instanceof AccumulatingLogger) {
-            logger = new SystemLogger(context.invokerRequest.stdErr().orElse(System.err));
+            logger = new SystemLogger(context.invokerRequest.stdErr().orElse(null));
         }
         logger.error("Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
         for (Logger.Entry entry : entries) {

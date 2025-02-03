@@ -21,7 +21,6 @@ package org.apache.maven.cling;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
@@ -85,7 +84,7 @@ public abstract class ClingSupport {
             return e.getExitCode();
         } catch (Exception e) {
             // last resort; as ideally we should get ExitException only
-            new SystemLogger(Objects.requireNonNullElse(stdErr, System.err)).error(e.getMessage(), e);
+            new SystemLogger(stdErr).error(e.getMessage(), e);
             return 1;
         } finally {
             if (classWorldManaged) {
