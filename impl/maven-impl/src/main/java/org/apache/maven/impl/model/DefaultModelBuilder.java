@@ -51,9 +51,12 @@ import java.util.stream.Stream;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -81,7 +84,9 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.SuperPomProvider;
@@ -89,8 +94,6 @@ import org.apache.maven.api.services.VersionParserException;
 import org.apache.maven.api.services.model.DependencyManagementImporter;
 import org.apache.maven.api.services.model.DependencyManagementInjector;
 import org.apache.maven.api.services.model.InheritanceAssembler;
-import org.apache.maven.api.services.model.ModelCache;
-import org.apache.maven.api.services.model.ModelCacheFactory;
 import org.apache.maven.api.services.model.ModelInterpolator;
 import org.apache.maven.api.services.model.ModelNormalizer;
 import org.apache.maven.api.services.model.ModelPathTranslator;
@@ -151,7 +154,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final PluginConfigurationExpander pluginConfigurationExpander;
     private final ModelVersionParser versionParser;
     private final List<ModelTransformer> transformers;
-    private final ModelCacheFactory modelCacheFactory;
     private final ModelResolver modelResolver;
     private final Interpolator interpolator;
     private final PathTranslator pathTranslator;
@@ -176,7 +178,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             PluginConfigurationExpander pluginConfigurationExpander,
             ModelVersionParser versionParser,
             List<ModelTransformer> transformers,
-            ModelCacheFactory modelCacheFactory,
             ModelResolver modelResolver,
             Interpolator interpolator,
             PathTranslator pathTranslator,
@@ -197,7 +198,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.pluginConfigurationExpander = pluginConfigurationExpander;
         this.versionParser = versionParser;
         this.transformers = transformers;
-        this.modelCacheFactory = modelCacheFactory;
         this.modelResolver = modelResolver;
         this.interpolator = interpolator;
         this.pathTranslator = pathTranslator;
@@ -253,7 +253,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         final Session session;
         final ModelBuilderRequest request;
         final DefaultModelBuilderResult result;
-        final ModelCache cache;
         final Graph dag;
         final Map<GAKey, Set<ModelSource>> mappedSources;
 
@@ -270,9 +269,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                     request.getSession(),
                     request,
                     new DefaultModelBuilderResult(request, ProblemCollector.create(request.getSession())),
-                    request.getSession()
-                            .getData()
-                            .computeIfAbsent(SessionData.key(ModelCache.class), modelCacheFactory::newInstance),
                     new Graph(),
                     new ConcurrentHashMap<>(64),
                     List.of(),
@@ -292,7 +288,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Session session,
                 ModelBuilderRequest request,
                 DefaultModelBuilderResult result,
-                ModelCache cache,
                 Graph dag,
                 Map<GAKey, Set<ModelSource>> mappedSources,
                 List<RemoteRepository> pomRepositories,
@@ -301,7 +296,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.session = session;
             this.request = request;
             this.result = result;
-            this.cache = cache;
             this.dag = dag;
             this.mappedSources = mappedSources;
             this.pomRepositories = pomRepositories;
@@ -330,15 +324,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throw new IllegalArgumentException("Session mismatch");
             }
             return new ModelBuilderSessionState(
-                    session,
-                    request,
-                    result,
-                    cache,
-                    dag,
-                    mappedSources,
-                    pomRepositories,
-                    externalRepositories,
-                    repositories);
+                    session, request, result, dag, mappedSources, pomRepositories, externalRepositories, repositories);
         }
 
         @Override
@@ -346,8 +332,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return "ModelBuilderSession[" + "session="
                     + session + ", " + "request="
                     + request + ", " + "result="
-                    + result + ", " + "cache="
-                    + cache + ']';
+                    + result + ']';
         }
 
         PhasingExecutor createExecutor() {
@@ -707,7 +692,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 + "build, the top project will be used as the root project.",
                         top,
                         root);
-                cache.clear();
                 mappedSources.clear();
                 loadFromRoot(top, top);
             }
@@ -1789,6 +1773,124 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
+        record RgavCacheKey(
+                Session session,
+                RequestTrace trace,
+                List<RemoteRepository> repositories,
+                String groupId,
+                String artifactId,
+                String version,
+                String classifier,
+                String tag)
+                implements Request<Session> {
+            @Nonnull
+            @Override
+            public Session getSession() {
+                return session;
+            }
+
+            @Nullable
+            @Override
+            public RequestTrace getTrace() {
+                return trace;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof RgavCacheKey that
+                        && Objects.equals(tag, that.tag)
+                        && Objects.equals(groupId, that.groupId)
+                        && Objects.equals(version, that.version)
+                        && Objects.equals(artifactId, that.artifactId)
+                        && Objects.equals(classifier, that.classifier)
+                        && Objects.equals(repositories, that.repositories);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(repositories, groupId, artifactId, version, classifier, tag);
+            }
+
+            @Override
+            public String toString() {
+                StringBuilder sb = new StringBuilder();
+                sb.append(getClass().getSimpleName()).append("[").append("gav='");
+                if (groupId != null) {
+                    sb.append(groupId);
+                }
+                sb.append(":");
+                if (artifactId != null) {
+                    sb.append(artifactId);
+                }
+                sb.append(":");
+                if (version != null) {
+                    sb.append(version);
+                }
+                sb.append(":");
+                if (classifier != null) {
+                    sb.append(classifier);
+                }
+                sb.append("', tag='");
+                sb.append(tag);
+                sb.append("']");
+                return sb.toString();
+            }
+        }
+
+        record SourceCacheKey(Session session, RequestTrace trace, Source source, String tag)
+                implements Request<Session>, CacheMetadata {
+            @Nonnull
+            @Override
+            public Session getSession() {
+                return session;
+            }
+
+            @Nullable
+            @Override
+            public RequestTrace getTrace() {
+                return trace;
+            }
+
+            @Override
+            public CacheRetention getCacheRetention() {
+                return source instanceof CacheMetadata cacheMetadata ? cacheMetadata.getCacheRetention() : null;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof SourceCacheKey that
+                        && Objects.equals(tag, that.tag)
+                        && Objects.equals(source, that.source);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(source, tag);
+            }
+
+            @Override
+            public String toString() {
+                return getClass().getSimpleName() + "[" + "location=" + source.getLocation() + ", tag=" + tag
+                        + ", path=" + source.getPath() + ']';
+            }
+        }
+
+        static class SourceResponse<R extends Request<?>, T> implements Result<R> {
+            private final R request;
+            private final T response;
+
+            SourceResponse(R request, T response) {
+                this.request = request;
+                this.response = response;
+            }
+
+            @Nonnull
+            @Override
+            public R getRequest() {
+                return request;
+            }
+        }
+
         private <T> T cache(
                 List<RemoteRepository> repositories,
                 String groupId,
@@ -1797,11 +1899,28 @@ public class DefaultModelBuilder implements ModelBuilder {
                 String classifier,
                 String tag,
                 Supplier<T> supplier) {
-            return cache.computeIfAbsent(repositories, groupId, artifactId, version, classifier, tag, supplier);
+            RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+            try {
+                RgavCacheKey r = new RgavCacheKey(
+                        session, trace.mvnTrace(), repositories, groupId, artifactId, version, classifier, tag);
+                SourceResponse<RgavCacheKey, T> response =
+                        InternalSession.from(session).request(r, tr -> new SourceResponse<>(tr, supplier.get()));
+                return response.response;
+            } finally {
+                RequestTraceHelper.exit(trace);
+            }
         }
 
         private <T> T cache(Source source, String tag, Supplier<T> supplier) throws ModelBuilderException {
-            return cache.computeIfAbsent(source, tag, supplier);
+            RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+            try {
+                SourceCacheKey r = new SourceCacheKey(session, trace.mvnTrace(), source, tag);
+                SourceResponse<SourceCacheKey, T> response =
+                        InternalSession.from(session).request(r, tr -> new SourceResponse<>(tr, supplier.get()));
+                return response.response;
+            } finally {
+                RequestTraceHelper.exit(trace);
+            }
         }
 
         boolean isBuildRequest() {
