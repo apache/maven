@@ -227,8 +227,7 @@ public class Verifier {
             }
             ByteArrayOutputStream stdout = new ByteArrayOutputStream();
             ByteArrayOutputStream stderr = new ByteArrayOutputStream();
-            ExecutorRequest request =
-                    builder.stdoutConsumer(stdout).stderrConsumer(stderr).build();
+            ExecutorRequest request = builder.stdOut(stdout).stdErr(stderr).build();
             int ret = executorHelper.execute(mode, request);
             if (ret > 0) {
                 String dump;
