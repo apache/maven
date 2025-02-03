@@ -16,36 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api;
 
-import java.io.Serial;
-
-import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
- *
- *
- * @since 4.0.0
+ * Represents a repository backed by an IDE workspace, the output of a build session,
+ * or similar ad-hoc collections of artifacts. This repository is considered read-only
+ * within the context of a session, meaning it can only be used for artifact resolution,
+ * not for installation or deployment. This interface does not provide direct access
+ * to artifacts; that functionality is handled by a {@code WorkspaceReader}.
  */
-@Experimental
-public class ArtifactResolverException extends MavenException {
-
-    @Serial
-    private static final long serialVersionUID = 7252294837746943917L;
-
-    private final ArtifactResolverResult result;
+public interface WorkspaceRepository extends Repository {
 
     /**
-     * @param message the message for the exception
-     * @param e the exception itself
-     * @param result the resolution result containing detailed information
+     * {@return the type of the repository, i.e. "workspace"}
      */
-    public ArtifactResolverException(String message, Exception e, ArtifactResolverResult result) {
-        super(message, e);
-        this.result = result;
-    }
-
-    public ArtifactResolverResult getResult() {
-        return result;
+    @Nonnull
+    @Override
+    default String getType() {
+        return "workspace";
     }
 }

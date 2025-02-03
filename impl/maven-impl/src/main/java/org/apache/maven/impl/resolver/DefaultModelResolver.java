@@ -21,7 +21,6 @@ package org.apache.maven.impl.resolver;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.ArtifactCoordinates;
@@ -41,6 +40,8 @@ import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.VersionRangeResolverException;
 import org.apache.maven.api.services.model.ModelResolver;
 import org.apache.maven.api.services.model.ModelResolverException;
+import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.RequestTraceHelper;
 
 /**
  * A model resolver to assist building of dependency POMs.
@@ -59,16 +60,21 @@ public class DefaultModelResolver implements ModelResolver {
             @Nonnull Parent parent,
             @Nonnull AtomicReference<Parent> modified)
             throws ModelResolverException {
-        return resolveModel(
-                session,
-                repositories,
-                parent.getGroupId(),
-                parent.getArtifactId(),
-                parent.getVersion(),
-                "parent",
-                null,
+        ModelResolverResult result = resolveModel(
+                new ModelResolverRequest(
+                        session,
+                        null,
+                        repositories,
+                        parent.getGroupId(),
+                        parent.getArtifactId(),
+                        parent.getVersion(),
+                        null),
                 parent.getLocation("version"),
-                version -> modified.set(parent.withVersion(version)));
+                "parent");
+        if (result.version() != null) {
+            modified.set(parent.withVersion(result.version()));
+        }
+        return result.source();
     }
 
     @Nonnull
@@ -78,44 +84,46 @@ public class DefaultModelResolver implements ModelResolver {
             @Nonnull Dependency dependency,
             @Nonnull AtomicReference<Dependency> modified)
             throws ModelResolverException {
-        return resolveModel(
-                session,
-                repositories,
-                dependency.getGroupId(),
-                dependency.getArtifactId(),
-                dependency.getVersion(),
-                "dependency",
-                dependency.getClassifier(),
+        ModelResolverResult result = resolveModel(
+                new ModelResolverRequest(
+                        session,
+                        null,
+                        repositories,
+                        dependency.getGroupId(),
+                        dependency.getArtifactId(),
+                        dependency.getVersion(),
+                        dependency.getClassifier()),
                 dependency.getLocation("version"),
-                version -> modified.set(dependency.withVersion(version)));
+                "dependency");
+        if (result.version() != null) {
+            modified.set(dependency.withVersion(result.version()));
+        }
+        return result.source();
     }
 
+    @Nonnull
     @Override
-    public ModelSource resolveModel(
-            @Nonnull Session session,
-            @Nullable List<RemoteRepository> repositories,
-            @Nonnull String groupId,
-            @Nonnull String artifactId,
-            @Nonnull String version,
-            @Nullable String classifier,
-            @Nonnull Consumer<String> resolvedVersion)
-            throws ModelResolverException {
-        return resolveModel(
-                session, repositories, groupId, artifactId, version, null, classifier, null, resolvedVersion);
+    public ModelResolverResult resolveModel(@Nonnull ModelResolverRequest request) throws ModelResolverException {
+        return resolveModel(request, null, null);
     }
 
-    @SuppressWarnings("checkstyle:ParameterNumber")
-    public ModelSource resolveModel(
-            Session session,
-            List<RemoteRepository> repositories,
-            String groupId,
-            String artifactId,
-            String version,
-            String type,
-            String classifier,
-            InputLocation location,
-            Consumer<String> resolvedVersion)
+    public ModelResolverResult resolveModel(
+            @Nonnull ModelResolverRequest request, InputLocation location, String modelType)
             throws ModelResolverException {
+        return InternalSession.from(request.session()).request(request, r -> doResolveModel(r, location, modelType));
+    }
+
+    public ModelResolverResult doResolveModel(
+            @Nonnull ModelResolverRequest request, InputLocation location, String modelType)
+            throws ModelResolverException {
+        Session session = request.session();
+        String groupId = request.groupId();
+        String artifactId = request.artifactId();
+        String version = request.version();
+        String classifier = request.classifier();
+        List<RemoteRepository> repositories = request.repositories();
+
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             ArtifactCoordinates coords =
                     session.createArtifactCoordinates(groupId, artifactId, version, classifier, "pom", null);
@@ -123,7 +131,8 @@ public class DefaultModelResolver implements ModelResolver {
                     && coords.getVersionConstraint().getVersionRange().getUpperBoundary() == null) {
                 // Message below is checked for in the MNG-2199 core IT.
                 throw new ModelResolverException(
-                        "The requested " + (type != null ? type + " " : "") + "version range '" + version + "'"
+                        "The requested " + (modelType != null ? modelType + " " : "") + "version range '" + version
+                                + "'"
                                 + (location != null ? " (at " + location + ")" : "")
                                 + " does not specify an upper bound",
                         groupId,
@@ -132,18 +141,18 @@ public class DefaultModelResolver implements ModelResolver {
             }
             String newVersion = session.resolveHighestVersion(coords, repositories)
                     .orElseThrow(() -> new ModelResolverException(
-                            "No versions matched the requested " + (type != null ? type + " " : "") + "version range '"
-                                    + version + "'",
+                            "No versions matched the requested " + (modelType != null ? modelType + " " : "")
+                                    + "version range '" + version + "'",
                             groupId,
                             artifactId,
                             version))
                     .asString();
-            if (!version.equals(newVersion)) {
-                resolvedVersion.accept(newVersion);
-            }
-
+            String resultVersion = version.equals(newVersion) ? null : newVersion;
             Path path = getPath(session, repositories, groupId, artifactId, newVersion, classifier);
-            return Sources.resolvedSource(path, groupId + ":" + artifactId + ":" + newVersion);
+            return new ModelResolverResult(
+                    request,
+                    Sources.resolvedSource(path, groupId + ":" + artifactId + ":" + newVersion),
+                    resultVersion);
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
                     e.getMessage() + " (remote repositories: "
@@ -154,6 +163,8 @@ public class DefaultModelResolver implements ModelResolver {
                     artifactId,
                     version,
                     e);
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
     }
 

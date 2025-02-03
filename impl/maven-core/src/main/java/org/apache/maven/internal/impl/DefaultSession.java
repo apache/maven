@@ -182,6 +182,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         }
     }
 
+    @Override
     protected Session newSession(RepositorySystemSession repoSession, List<RemoteRepository> repositories) {
         final MavenSession ms = nonNull(getMavenSession());
         final MavenSession mss;

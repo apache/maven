@@ -16,36 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
-
-import java.io.Serial;
+package org.apache.maven.api.cache;
 
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- *
+ * Factory interface for creating new RequestCache instances.
+ * Implementations should handle the creation and configuration of cache instances
+ * based on the current Maven session and environment.
  *
  * @since 4.0.0
+ * @see RequestCache
  */
 @Experimental
-public class ArtifactResolverException extends MavenException {
-
-    @Serial
-    private static final long serialVersionUID = 7252294837746943917L;
-
-    private final ArtifactResolverResult result;
+public interface RequestCacheFactory {
 
     /**
-     * @param message the message for the exception
-     * @param e the exception itself
-     * @param result the resolution result containing detailed information
+     * Creates a new RequestCache instance.
+     * The created cache should be configured according to the current Maven session
+     * and environment settings.
+     *
+     * @return A new RequestCache instance
      */
-    public ArtifactResolverException(String message, Exception e, ArtifactResolverResult result) {
-        super(message, e);
-        this.result = result;
-    }
-
-    public ArtifactResolverResult getResult() {
-        return result;
-    }
+    RequestCache createCache();
 }

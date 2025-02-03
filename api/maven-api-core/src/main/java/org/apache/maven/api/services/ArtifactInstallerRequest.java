@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Session;
@@ -104,6 +105,16 @@ public interface ArtifactInstallerRequest extends Request<Session> {
             @Override
             public Collection<ProducedArtifact> getArtifacts() {
                 return artifacts;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultArtifactInstallerRequest that && Objects.equals(artifacts, that.artifacts);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hashCode(artifacts);
             }
 
             @Override

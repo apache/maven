@@ -42,6 +42,7 @@ import org.apache.maven.api.services.ProjectBuilderResult;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.impl.DefaultDependencyResolverResult;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.MappedCollection;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.model.building.ModelProblem;
@@ -66,6 +67,12 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     @Nonnull
     @Override
     public ProjectBuilderResult build(ProjectBuilderRequest request)
+            throws ProjectBuilderException, IllegalArgumentException {
+        InternalSession session = InternalSession.from(request.getSession());
+        return session.request(request, this::doBuild);
+    }
+
+    protected ProjectBuilderResult doBuild(ProjectBuilderRequest request)
             throws ProjectBuilderException, IllegalArgumentException {
         InternalMavenSession session = InternalMavenSession.from(request.getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
