@@ -307,8 +307,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void createTerminal(C context) {
-        boolean stdStreamsRedirected = System.console() == null
-                || context.invokerRequest.in().isPresent()
+        boolean stdStreamsRedirected = context.invokerRequest.in().isPresent()
                 || context.invokerRequest.out().isPresent()
                 || context.invokerRequest.err().isPresent();
         context.invokerRequest.err().ifPresent(err -> {

@@ -152,7 +152,6 @@ public class ForkedMavenExecutor implements Executor {
         try {
             ProcessBuilder pb = new ProcessBuilder()
                     .directory(executorRequest.cwd().toFile())
-                    .redirectError(ProcessBuilder.Redirect.PIPE)
                     .command(cmdAndArguments);
             if (!env.isEmpty()) {
                 pb.environment().putAll(env);
