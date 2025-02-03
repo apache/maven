@@ -1884,9 +1884,10 @@ class PomConstructionTest {
 
         ProjectBuildingRequest config = new DefaultProjectBuildingRequest();
 
-        String localRepoUrl =
-                System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository");
-        localRepoUrl = "file://" + localRepoUrl;
+        String localRepoPath = System.getProperty(
+                "maven.repo.local",
+                System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository");
+        String localRepoUrl = new File(localRepoPath).getAbsoluteFile().toURI().toString();
         config.setLocalRepository(repositorySystem.createArtifactRepository(
                 "local", localRepoUrl, new DefaultRepositoryLayout(), null, null));
         config.setActiveProfileIds(Arrays.asList(profileIds));
