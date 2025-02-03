@@ -47,7 +47,7 @@ public class ForkedMavenExecutor implements Executor {
         requireNonNull(executorRequest);
         validate(executorRequest);
 
-        return doExecute(executorRequest, wrapStdouterrConsumer(executorRequest));
+        return doExecute(executorRequest, wrapRequestStandardStreams(executorRequest));
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ForkedMavenExecutor implements Executor {
     protected void validate(ExecutorRequest executorRequest) throws ExecutorException {}
 
     @Nullable
-    protected Consumer<Process> wrapStdouterrConsumer(ExecutorRequest executorRequest) {
+    protected Consumer<Process> wrapRequestStandardStreams(ExecutorRequest executorRequest) {
         if (executorRequest.stdIn().isEmpty()
                 && executorRequest.stdOut().isEmpty()
                 && executorRequest.stdErr().isEmpty()) {
