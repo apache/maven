@@ -20,6 +20,8 @@ package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -305,16 +307,29 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void createTerminal(C context) {
+        boolean stdStreamsRedirected = System.console() == null
+                || context.invokerRequest.in().isPresent()
+                || context.invokerRequest.out().isPresent()
+                || context.invokerRequest.err().isPresent();
+        context.invokerRequest.err().ifPresent(err -> {
+            if (err instanceof PrintStream errPs) {
+                System.setErr(errPs);
+            } else {
+                System.setErr(new PrintStream(err, true));
+            }
+        });
         if (context.terminal == null) {
             MessageUtils.systemInstall(
                     builder -> {
-                        builder.streams(
-                                context.invokerRequest.in().orElse(null),
-                                context.invokerRequest.out().orElse(null));
-                        builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
-                        // The exec builder suffers from https://github.com/jline/jline3/issues/1098
-                        // We could re-enable it when fixed to provide support for non-standard architectures,
-                        // for which JLine does not provide any native library.
+                        if (stdStreamsRedirected) {
+                            builder.system(false);
+                            builder.streams(
+                                    context.invokerRequest.in().orElse(InputStream.nullInputStream()),
+                                    context.invokerRequest.out().orElse(System.out));
+                        } else {
+                            builder.system(true);
+                            builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+                        }
                         builder.exec(false);
                         if (context.coloredOutput != null) {
                             builder.color(context.coloredOutput);
@@ -323,14 +338,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     terminal -> doConfigureWithTerminal(context, terminal));
 
             context.terminal = MessageUtils.getTerminal();
-            // JLine is quite slow to start due to the native library unpacking and loading
-            // so boot it asynchronously
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
             if (context.coloredOutput != null) {
                 MessageUtils.setColorEnabled(context.coloredOutput);
             }
         } else {
+            doConfigureWithTerminal(context, context.terminal);
             if (context.coloredOutput != null) {
                 MessageUtils.setColorEnabled(context.coloredOutput);
             }

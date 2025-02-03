@@ -87,12 +87,16 @@ public class ForkedMavenExecutor implements Executor {
 
     @Nullable
     protected Consumer<Process> wrapStdouterrConsumer(ExecutorRequest executorRequest) {
-        if (executorRequest.stdoutConsumer().isEmpty()
+        if (executorRequest.stdinProvider().isEmpty()
+                && executorRequest.stdoutConsumer().isEmpty()
                 && executorRequest.stderrConsumer().isEmpty()) {
             return null;
         } else {
             return p -> {
                 try {
+                    if (executorRequest.stdinProvider().isPresent()) {
+                        executorRequest.stdinProvider().orElseThrow().transferTo(p.getOutputStream());
+                    }
                     if (executorRequest.stdoutConsumer().isPresent()) {
                         p.getInputStream()
                                 .transferTo(executorRequest.stdoutConsumer().get());
@@ -148,6 +152,7 @@ public class ForkedMavenExecutor implements Executor {
         try {
             ProcessBuilder pb = new ProcessBuilder()
                     .directory(executorRequest.cwd().toFile())
+                    .redirectError(ProcessBuilder.Redirect.PIPE)
                     .command(cmdAndArguments);
             if (!env.isEmpty()) {
                 pb.environment().putAll(env);
