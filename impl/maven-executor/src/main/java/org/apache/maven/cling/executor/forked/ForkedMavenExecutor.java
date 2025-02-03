@@ -93,19 +93,43 @@ public class ForkedMavenExecutor implements Executor {
             return null;
         } else {
             return p -> {
-                try {
-                    if (executorRequest.stdIn().isPresent()) {
-                        executorRequest.stdIn().orElseThrow().transferTo(p.getOutputStream());
-                    }
-                    if (executorRequest.stdOut().isPresent()) {
-                        p.getInputStream().transferTo(executorRequest.stdOut().get());
-                    }
-                    if (executorRequest.stdErr().isPresent()) {
-                        p.getErrorStream().transferTo(executorRequest.stdErr().get());
-                    }
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
+                String suffix = "-pump-" + p.pid();
+                executorRequest.stdOut().ifPresent(stdout -> {
+                    Thread pump = new Thread(() -> {
+                        try {
+                            p.getInputStream().transferTo(stdout);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                    pump.setName("stdout" + suffix);
+                    pump.setDaemon(true);
+                    pump.start();
+                });
+                executorRequest.stdErr().ifPresent(stderr -> {
+                    Thread pump = new Thread(() -> {
+                        try {
+                            p.getErrorStream().transferTo(stderr);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                    pump.setName("stderr" + suffix);
+                    pump.setDaemon(true);
+                    pump.start();
+                });
+                executorRequest.stdIn().ifPresent(stdin -> {
+                    Thread pump = new Thread(() -> {
+                        try {
+                            stdin.transferTo(p.getOutputStream());
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                    pump.setName("stdin" + suffix);
+                    pump.setDaemon(true);
+                    pump.start();
+                });
             };
         }
     }
