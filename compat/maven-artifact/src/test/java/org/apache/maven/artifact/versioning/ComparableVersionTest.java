@@ -240,13 +240,23 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testNonAsciiDigits() {
-        // These should be treated the same as non-digit characters
+    void testCompareDigitToLetter() { // These should not be treated as digits.
         ComparableVersion c1 = new ComparableVersion("1");
-        // ArabicIndicNine
-        ComparableVersion c2 = new ComparableVersion("\u0669");
-        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\u0669");
-        assertTrue(c2.compareTo(c1) < 0, "expected " + "\u0669" + " < " + "1");
+        ComparableVersion c2 = new ComparableVersion("J");
+        assertTrue(c1.compareTo(c2) < 0, "expected " + "1" + " < " + "J");
+        assertTrue(c2.compareTo(c1) > 0, "expected " + "J" + " > " + "1");
+    }
+
+    @Test
+    void testNonAsciiDigits() { // These should not be treated as digits.
+        ComparableVersion c1 = new ComparableVersion("1");
+        // ArabicIndicEight
+        ComparableVersion c2 = new ComparableVersion("\u0668");
+        ComparableVersion c3 = new ComparableVersion("9");
+        assertTrue(c1.compareTo(c2) < 0, "expected " + "1" + " < " + "\u0668");
+        assertTrue(c2.compareTo(c1) > 0, "expected " + "\u0668" + " > " + "1");
+        assertTrue(c3.compareTo(c2) < 0, "expected " + "9" + " > " + "\u0668");
+        assertTrue(c2.compareTo(c3) > 0, "expected " + "\u0668" + " < " + "9");
     }
 
     @Test
