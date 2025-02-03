@@ -40,7 +40,7 @@ public class MavenShellCling extends ClingSupport {
      * circumstances.
      */
     public static void main(String[] args) throws IOException {
-        int exitCode = new MavenShellCling().run(args, null, null, null);
+        int exitCode = new MavenShellCling().run(args, null, null, null, false);
         System.exit(exitCode);
     }
 
@@ -48,11 +48,11 @@ public class MavenShellCling extends ClingSupport {
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
     public static int main(String[] args, ClassWorld world) throws IOException {
-        return main(args, world, null, null, null);
+        return new MavenShellCling().run(args, null, null, null, false);
     }
 
     /**
-     * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
+     * ClassWorld Launcher "embedded" entry point: returning exitCode and accepts Class World and streams.
      */
     public static int main(
             String[] args,
@@ -61,7 +61,7 @@ public class MavenShellCling extends ClingSupport {
             @Nullable OutputStream out,
             @Nullable OutputStream err)
             throws IOException {
-        return new MavenShellCling(world).run(args, in, out, err);
+        return new MavenShellCling(world).run(args, in, out, err, true);
     }
 
     public MavenShellCling() {

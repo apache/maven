@@ -151,6 +151,13 @@ public interface ParserRequest {
     OutputStream err();
 
     /**
+     * Returns {@code true} if this call happens in "embedded" mode, for example by another application that
+     * embeds Maven. When running in "embedded" mode, Maven will not try to grab system terminal and will use
+     * provided {@link #in()} or {@link InputStream#nullInputStream()} as standard in stream.
+     */
+    boolean embedded();
+
+    /**
      * Creates a new Builder instance for constructing a Maven ParserRequest.
      *
      * @param args the command-line arguments
@@ -254,6 +261,7 @@ public interface ParserRequest {
         private InputStream in;
         private OutputStream out;
         private OutputStream err;
+        private boolean embedded = false;
 
         private Builder(
                 String command, String commandName, List<String> args, MessageBuilderFactory messageBuilderFactory) {
@@ -299,6 +307,11 @@ public interface ParserRequest {
             return this;
         }
 
+        public Builder embedded(boolean embedded) {
+            this.embedded = embedded;
+            return this;
+        }
+
         public ParserRequest build() {
             return new ParserRequestImpl(
                     command,
@@ -312,7 +325,8 @@ public interface ParserRequest {
                     userHome,
                     in,
                     out,
-                    err);
+                    err,
+                    embedded);
         }
 
         @SuppressWarnings("ParameterNumber")
@@ -329,6 +343,7 @@ public interface ParserRequest {
             private final InputStream in;
             private final OutputStream out;
             private final OutputStream err;
+            private final boolean embedded;
 
             private ParserRequestImpl(
                     String command,
@@ -342,7 +357,8 @@ public interface ParserRequest {
                     Path userHome,
                     InputStream in,
                     OutputStream out,
-                    OutputStream err) {
+                    OutputStream err,
+                    boolean embedded) {
                 this.command = requireNonNull(command, "command");
                 this.commandName = requireNonNull(commandName, "commandName");
                 this.args = List.copyOf(requireNonNull(args, "args"));
@@ -355,6 +371,7 @@ public interface ParserRequest {
                 this.in = in;
                 this.out = out;
                 this.err = err;
+                this.embedded = embedded;
             }
 
             @Override
@@ -415,6 +432,11 @@ public interface ParserRequest {
             @Override
             public OutputStream err() {
                 return err;
+            }
+
+            @Override
+            public boolean embedded() {
+                return embedded;
             }
         }
 

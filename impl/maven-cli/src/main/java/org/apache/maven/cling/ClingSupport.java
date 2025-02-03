@@ -65,7 +65,12 @@ public abstract class ClingSupport {
     /**
      * The main entry point.
      */
-    public int run(String[] args, @Nullable InputStream in, @Nullable OutputStream out, @Nullable OutputStream err)
+    public int run(
+            String[] args,
+            @Nullable InputStream in,
+            @Nullable OutputStream out,
+            @Nullable OutputStream err,
+            boolean embedded)
             throws IOException {
         try (Invoker invoker = createInvoker()) {
             return invoker.invoke(createParser()
@@ -73,6 +78,7 @@ public abstract class ClingSupport {
                             .in(in)
                             .out(out)
                             .err(err)
+                            .embedded(embedded)
                             .build()));
         } catch (InvokerException.ExitException e) {
             return e.getExitCode();

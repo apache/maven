@@ -307,20 +307,19 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void createTerminal(C context) {
-        boolean stdStreamsRedirected = context.invokerRequest.in().isPresent()
-                || context.invokerRequest.out().isPresent()
-                || context.invokerRequest.err().isPresent();
-        context.invokerRequest.err().ifPresent(err -> {
-            if (err instanceof PrintStream errPs) {
-                System.setErr(errPs);
-            } else {
-                System.setErr(new PrintStream(err, true));
-            }
-        });
+        if (context.invokerRequest.embedded()) {
+            context.invokerRequest.err().ifPresent(err -> {
+                if (err instanceof PrintStream errPs) {
+                    System.setErr(errPs);
+                } else {
+                    System.setErr(new PrintStream(err, true));
+                }
+            });
+        }
         if (context.terminal == null) {
             MessageUtils.systemInstall(
                     builder -> {
-                        if (stdStreamsRedirected) {
+                        if (context.invokerRequest.embedded()) {
                             builder.system(false);
                             builder.streams(
                                     context.invokerRequest.in().orElse(InputStream.nullInputStream()),
