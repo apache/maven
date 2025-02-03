@@ -53,7 +53,6 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
-import org.apache.maven.impl.DefaultLocalRepository;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
 import org.apache.maven.rtinfo.RuntimeInformation;
@@ -66,7 +65,6 @@ import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
-import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -119,7 +117,7 @@ class TestApi {
         // create session with any local repo, is redefined anyway below
         RepositorySystemSession rss = new MavenSessionBuilderSupplier(repositorySystem)
                 .get()
-                .withLocalRepositoryBaseDirectories(new File("target").toPath())
+                .withLocalRepositoryBaseDirectories(new File("target/test-classes/apiv4-repo").toPath())
                 .build();
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         DefaultMavenExecutionResult meres = new DefaultMavenExecutionResult();
@@ -131,12 +129,9 @@ class TestApi {
                 mavenRepositorySystem,
                 new DefaultLookup(plexusContainer),
                 runtimeInformation);
-        DefaultLocalRepository localRepository =
-                new DefaultLocalRepository(new LocalRepository("target/test-classes/apiv4-repo"));
         org.apache.maven.api.RemoteRepository remoteRepository = session.getRemoteRepository(
                 new RemoteRepository.Builder("mirror", "default", "file:target/test-classes/repo").build());
-        this.session = session.withLocalRepository(localRepository)
-                .withRemoteRepositories(Collections.singletonList(remoteRepository));
+        this.session = session.withRemoteRepositories(Collections.singletonList(remoteRepository));
         InternalSession.associate(rss, this.session);
         sessionScope.enter();
         sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(this.session));

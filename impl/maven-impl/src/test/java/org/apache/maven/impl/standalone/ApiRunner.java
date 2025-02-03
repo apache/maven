@@ -42,6 +42,7 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.model.PluginContainer;
@@ -83,10 +84,15 @@ public class ApiRunner {
      * Create a new session.
      */
     public static Session createSession(Consumer<Injector> injectorConsumer) {
+        return createSession(injectorConsumer, null);
+    }
+
+    public static Session createSession(Consumer<Injector> injectorConsumer, Path localRepo) {
         Injector injector = Injector.create();
         injector.bindInstance(Injector.class, injector);
         injector.bindImplicit(ApiRunner.class);
         injector.bindImplicit(RepositorySystemSupplier.class);
+        injector.bindInstance(LocalRepoProvider.class, () -> localRepo);
         injector.discover(ApiRunner.class.getClassLoader());
         if (injectorConsumer != null) {
             injectorConsumer.accept(injector);
@@ -97,6 +103,10 @@ public class ApiRunner {
         scope.seed(Session.class, session);
         injector.bindScope(SessionScoped.class, scope);
         return session;
+    }
+
+    interface LocalRepoProvider {
+        Path getLocalRepo();
     }
 
     static class DefaultSession extends AbstractSession {
@@ -300,7 +310,7 @@ public class ApiRunner {
 
     @Provides
     @SuppressWarnings("unused")
-    static Session newSession(RepositorySystem system, Lookup lookup) {
+    static Session newSession(RepositorySystem system, Lookup lookup, @Nullable LocalRepoProvider localRepoProvider) {
         Map<String, String> properties = new HashMap<>();
         // Env variables prefixed with "env."
         System.getenv().forEach((k, v) -> properties.put("env." + k, v));
@@ -352,7 +362,9 @@ public class ApiRunner {
         String localRepository = settings.getLocalRepository() != null
                         && !settings.getLocalRepository().isEmpty()
                 ? settings.getLocalRepository()
-                : mavenUserHome.resolve("repository").toString();
+                : localRepoProvider != null && localRepoProvider.getLocalRepo() != null
+                        ? localRepoProvider.getLocalRepo().toString()
+                        : mavenUserHome.resolve("repository").toString();
         LocalRepositoryManager llm = system.newLocalRepositoryManager(rsession, new LocalRepository(localRepository));
         rsession.setLocalRepositoryManager(llm);
         // active proxies
