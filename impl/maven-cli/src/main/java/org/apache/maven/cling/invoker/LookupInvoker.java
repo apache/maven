@@ -320,12 +320,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             MessageUtils.systemInstall(
                     builder -> {
                         if (context.invokerRequest.embedded()) {
-                            builder.system(false);
                             builder.streams(
                                     context.invokerRequest.in().orElse(InputStream.nullInputStream()),
                                     context.invokerRequest.out().orElse(System.out));
                         } else {
-                            builder.system(true);
                             builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
                         }
                         builder.exec(false);
