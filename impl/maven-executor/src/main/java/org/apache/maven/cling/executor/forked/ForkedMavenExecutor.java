@@ -96,7 +96,7 @@ public class ForkedMavenExecutor implements Executor {
                 String suffix = "-pump-" + p.pid();
                 executorRequest.stdOut().ifPresent(stdout -> {
                     Thread pump = new Thread(() -> {
-                        try (stdout) {
+                        try {
                             p.getInputStream().transferTo(stdout);
                             stdout.flush();
                         } catch (IOException e) {
@@ -109,7 +109,7 @@ public class ForkedMavenExecutor implements Executor {
                 });
                 executorRequest.stdErr().ifPresent(stderr -> {
                     Thread pump = new Thread(() -> {
-                        try (stderr) {
+                        try {
                             p.getErrorStream().transferTo(stderr);
                             stderr.flush();
                         } catch (IOException e) {
@@ -122,7 +122,7 @@ public class ForkedMavenExecutor implements Executor {
                 });
                 executorRequest.stdIn().ifPresent(stdin -> {
                     Thread pump = new Thread(() -> {
-                        try (stdin) {
+                        try {
                             stdin.transferTo(p.getOutputStream());
                             p.getOutputStream().flush();
                         } catch (IOException e) {
