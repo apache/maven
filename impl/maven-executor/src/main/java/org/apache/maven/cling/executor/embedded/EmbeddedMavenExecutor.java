@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -303,9 +302,6 @@ public class EmbeddedMavenExecutor implements Executor {
                         InputStream.class,
                         OutputStream.class,
                         OutputStream.class);
-                Class<?> ansiConsole = cliClass.getClassLoader().loadClass("org.jline.jansi.AnsiConsole");
-                Field ansiConsoleInstalled = ansiConsole.getDeclaredField("installed");
-                ansiConsoleInstalled.setAccessible(true);
                 exec = r -> {
                     System.setProperties(prepareProperties(r));
                     try {
