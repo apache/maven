@@ -125,30 +125,37 @@ public interface ParserRequest {
 
     /**
      * Returns the input stream to be used for the Maven execution.
-     * If not set, System.in will be used by default.
+     * If not set, {@link System#in} will be used by default.
      *
      * @return the input stream, or null if not set
      */
     @Nullable
-    InputStream in();
+    InputStream stdIn();
 
     /**
      * Returns the output stream to be used for the Maven execution.
-     * If not set, System.out will be used by default.
+     * If not set, {@link System#out} will be used by default.
      *
      * @return the output stream, or null if not set
      */
     @Nullable
-    OutputStream out();
+    OutputStream stdOut();
 
     /**
      * Returns the error stream to be used for the Maven execution.
-     * If not set, System.err will be used by default.
+     * If not set, {@link System#err} will be used by default.
      *
      * @return the error stream, or null if not set
      */
     @Nullable
-    OutputStream err();
+    OutputStream stdErr();
+
+    /**
+     * Returns {@code true} if this call happens in "embedded" mode, for example by another application that
+     * embeds Maven. When running in "embedded" mode, Maven will not try to grab system terminal and will use
+     * provided {@link #stdIn()} or {@link InputStream#nullInputStream()} as standard in stream.
+     */
+    boolean embedded();
 
     /**
      * Creates a new Builder instance for constructing a Maven ParserRequest.
@@ -251,9 +258,10 @@ public interface ParserRequest {
         private Path cwd;
         private Path mavenHome;
         private Path userHome;
-        private InputStream in;
-        private OutputStream out;
-        private OutputStream err;
+        private InputStream stdIn;
+        private OutputStream stdOut;
+        private OutputStream stdErr;
+        private boolean embedded = false;
 
         private Builder(
                 String command, String commandName, List<String> args, MessageBuilderFactory messageBuilderFactory) {
@@ -284,18 +292,23 @@ public interface ParserRequest {
             return this;
         }
 
-        public Builder in(InputStream in) {
-            this.in = in;
+        public Builder stdIn(InputStream stdIn) {
+            this.stdIn = stdIn;
             return this;
         }
 
-        public Builder out(OutputStream out) {
-            this.out = out;
+        public Builder stdOut(OutputStream stdOut) {
+            this.stdOut = stdOut;
             return this;
         }
 
-        public Builder err(OutputStream err) {
-            this.err = err;
+        public Builder stdErr(OutputStream stdErr) {
+            this.stdErr = stdErr;
+            return this;
+        }
+
+        public Builder embedded(boolean embedded) {
+            this.embedded = embedded;
             return this;
         }
 
@@ -310,9 +323,10 @@ public interface ParserRequest {
                     cwd,
                     mavenHome,
                     userHome,
-                    in,
-                    out,
-                    err);
+                    stdIn,
+                    stdOut,
+                    stdErr,
+                    embedded);
         }
 
         @SuppressWarnings("ParameterNumber")
@@ -326,9 +340,10 @@ public interface ParserRequest {
             private final Path cwd;
             private final Path mavenHome;
             private final Path userHome;
-            private final InputStream in;
-            private final OutputStream out;
-            private final OutputStream err;
+            private final InputStream stdIn;
+            private final OutputStream stdOut;
+            private final OutputStream stdErr;
+            private final boolean embedded;
 
             private ParserRequestImpl(
                     String command,
@@ -340,9 +355,10 @@ public interface ParserRequest {
                     Path cwd,
                     Path mavenHome,
                     Path userHome,
-                    InputStream in,
-                    OutputStream out,
-                    OutputStream err) {
+                    InputStream stdIn,
+                    OutputStream stdOut,
+                    OutputStream stdErr,
+                    boolean embedded) {
                 this.command = requireNonNull(command, "command");
                 this.commandName = requireNonNull(commandName, "commandName");
                 this.args = List.copyOf(requireNonNull(args, "args"));
@@ -352,9 +368,10 @@ public interface ParserRequest {
                 this.cwd = cwd;
                 this.mavenHome = mavenHome;
                 this.userHome = userHome;
-                this.in = in;
-                this.out = out;
-                this.err = err;
+                this.stdIn = stdIn;
+                this.stdOut = stdOut;
+                this.stdErr = stdErr;
+                this.embedded = embedded;
             }
 
             @Override
@@ -403,18 +420,23 @@ public interface ParserRequest {
             }
 
             @Override
-            public InputStream in() {
-                return in;
+            public InputStream stdIn() {
+                return stdIn;
             }
 
             @Override
-            public OutputStream out() {
-                return out;
+            public OutputStream stdOut() {
+                return stdOut;
             }
 
             @Override
-            public OutputStream err() {
-                return err;
+            public OutputStream stdErr() {
+                return stdErr;
+            }
+
+            @Override
+            public boolean embedded() {
+                return embedded;
             }
         }
 

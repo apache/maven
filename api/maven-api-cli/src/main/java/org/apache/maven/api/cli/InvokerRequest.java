@@ -55,6 +55,15 @@ public interface InvokerRequest {
     boolean parsingFailed();
 
     /**
+     * Returns {@code true} if this call happens in "embedded" mode.
+     *
+     * @see ParserRequest#embedded()
+     */
+    default boolean embedded() {
+        return parserRequest().embedded();
+    }
+
+    /**
      * Returns the current working directory for the Maven execution.
      * This is typically the directory from which Maven was invoked.
      *
@@ -138,7 +147,9 @@ public interface InvokerRequest {
      * @return an {@link Optional} containing the input stream, or empty if not applicable
      */
     @Nonnull
-    Optional<InputStream> in();
+    default Optional<InputStream> stdIn() {
+        return Optional.ofNullable(parserRequest().stdIn());
+    }
 
     /**
      * Returns the output stream for the Maven execution, if running in embedded mode.
@@ -146,7 +157,9 @@ public interface InvokerRequest {
      * @return an {@link Optional} containing the output stream, or empty if not applicable
      */
     @Nonnull
-    Optional<OutputStream> out();
+    default Optional<OutputStream> stdOut() {
+        return Optional.ofNullable(parserRequest().stdOut());
+    }
 
     /**
      * Returns the error stream for the Maven execution, if running in embedded mode.
@@ -154,7 +167,9 @@ public interface InvokerRequest {
      * @return an {@link Optional} containing the error stream, or empty if not applicable
      */
     @Nonnull
-    Optional<OutputStream> err();
+    default Optional<OutputStream> stdErr() {
+        return Optional.ofNullable(parserRequest().stdErr());
+    }
 
     /**
      * Returns a list of core extensions, if configured in the .mvn/extensions.xml file.

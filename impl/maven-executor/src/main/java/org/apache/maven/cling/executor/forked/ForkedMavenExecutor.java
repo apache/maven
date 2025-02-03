@@ -47,7 +47,7 @@ public class ForkedMavenExecutor implements Executor {
         requireNonNull(executorRequest);
         validate(executorRequest);
 
-        return doExecute(executorRequest, wrapStdouterrConsumer(executorRequest));
+        return doExecute(executorRequest, wrapRequestStandardStreams(executorRequest));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ForkedMavenExecutor implements Executor {
                 int exitCode = execute(executorRequest.toBuilder()
                         .cwd(cwd)
                         .arguments(List.of("--version", "--quiet"))
-                        .stdoutConsumer(stdout)
+                        .stdOut(stdout)
                         .build());
                 if (exitCode == 0) {
                     if (stdout.size() > 0) {
@@ -86,24 +86,53 @@ public class ForkedMavenExecutor implements Executor {
     protected void validate(ExecutorRequest executorRequest) throws ExecutorException {}
 
     @Nullable
-    protected Consumer<Process> wrapStdouterrConsumer(ExecutorRequest executorRequest) {
-        if (executorRequest.stdoutConsumer().isEmpty()
-                && executorRequest.stderrConsumer().isEmpty()) {
+    protected Consumer<Process> wrapRequestStandardStreams(ExecutorRequest executorRequest) {
+        if (executorRequest.stdIn().isEmpty()
+                && executorRequest.stdOut().isEmpty()
+                && executorRequest.stdErr().isEmpty()) {
             return null;
         } else {
             return p -> {
-                try {
-                    if (executorRequest.stdoutConsumer().isPresent()) {
-                        p.getInputStream()
-                                .transferTo(executorRequest.stdoutConsumer().get());
-                    }
-                    if (executorRequest.stderrConsumer().isPresent()) {
-                        p.getErrorStream()
-                                .transferTo(executorRequest.stderrConsumer().get());
-                    }
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
+                String suffix = "-pump-" + p.pid();
+                executorRequest.stdOut().ifPresent(stdout -> {
+                    Thread pump = new Thread(() -> {
+                        try {
+                            p.getInputStream().transferTo(stdout);
+                            stdout.flush();
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                    pump.setName("stdout" + suffix);
+                    pump.setDaemon(true);
+                    pump.start();
+                });
+                executorRequest.stdErr().ifPresent(stderr -> {
+                    Thread pump = new Thread(() -> {
+                        try {
+                            p.getErrorStream().transferTo(stderr);
+                            stderr.flush();
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                    pump.setName("stderr" + suffix);
+                    pump.setDaemon(true);
+                    pump.start();
+                });
+                executorRequest.stdIn().ifPresent(stdin -> {
+                    Thread pump = new Thread(() -> {
+                        try {
+                            stdin.transferTo(p.getOutputStream());
+                            p.getOutputStream().flush();
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                    pump.setName("stdin" + suffix);
+                    pump.setDaemon(true);
+                    pump.start();
+                });
             };
         }
     }

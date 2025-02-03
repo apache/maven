@@ -36,8 +36,8 @@ public class SystemLogger implements Logger {
     private final PrintWriter out;
     private final Level threshold;
 
-    public SystemLogger() {
-        this(null, null);
+    public SystemLogger(@Nullable OutputStream out) {
+        this(out, null);
     }
 
     public SystemLogger(@Nullable OutputStream out, @Nullable Level threshold) {

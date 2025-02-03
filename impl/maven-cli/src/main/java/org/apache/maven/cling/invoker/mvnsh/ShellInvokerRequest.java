@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cling.invoker.mvnsh;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +44,6 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
             Map<String, String> systemProperties,
             Path topDirectory,
             Path rootDirectory,
-            InputStream in,
-            OutputStream out,
-            OutputStream err,
             List<CoreExtension> coreExtensions,
             ShellOptions options) {
         super(
@@ -61,9 +56,6 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
                 systemProperties,
                 topDirectory,
                 rootDirectory,
-                in,
-                out,
-                err,
                 coreExtensions);
         this.options = requireNonNull(options);
     }

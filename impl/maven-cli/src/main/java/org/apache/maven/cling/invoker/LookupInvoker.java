@@ -20,6 +20,8 @@ package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -167,19 +169,19 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected InvokerException.ExitException handleException(C context, Exception e) {
-        Logger logger = context.logger;
-        if (logger instanceof AccumulatingLogger) {
-            logger = new SystemLogger();
-        }
         printErrors(
                 context,
                 context.invokerRequest.options().showErrors().orElse(false),
                 List.of(new Logger.Entry(Logger.Level.ERROR, e.getMessage(), e.getCause())),
-                logger);
+                context.logger);
         return new InvokerException.ExitException(2);
     }
 
     protected void printErrors(C context, boolean showStackTrace, List<Logger.Entry> entries, Logger logger) {
+        // if accumulating logger passed, this is "early failure", swap logger for stdErr and use that to emit log
+        if (logger instanceof AccumulatingLogger) {
+            logger = new SystemLogger(context.invokerRequest.stdErr().orElse(null));
+        }
         // this is important message; many Maven IT assert for presence of this message
         logger.error("Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
         for (Logger.Entry entry : entries) {
@@ -209,7 +211,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                             .args()
                             .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG),
                     entries,
-                    new SystemLogger());
+                    context.logger);
             // we skip handleException above as we did output
             throw new InvokerException.ExitException(1);
         }
@@ -308,13 +310,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (context.terminal == null) {
             MessageUtils.systemInstall(
                     builder -> {
-                        builder.streams(
-                                context.invokerRequest.in().orElse(null),
-                                context.invokerRequest.out().orElse(null));
-                        builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
-                        // The exec builder suffers from https://github.com/jline/jline3/issues/1098
-                        // We could re-enable it when fixed to provide support for non-standard architectures,
-                        // for which JLine does not provide any native library.
+                        if (context.invokerRequest.embedded()) {
+                            InputStream in = context.invokerRequest.stdIn().orElse(InputStream.nullInputStream());
+                            OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
+                            builder.streams(in, out);
+                            context.closeables.add(out::flush);
+                        } else {
+                            builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+                        }
                         builder.exec(false);
                         if (context.coloredOutput != null) {
                             builder.color(context.coloredOutput);
@@ -323,14 +326,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     terminal -> doConfigureWithTerminal(context, terminal));
 
             context.terminal = MessageUtils.getTerminal();
-            // JLine is quite slow to start due to the native library unpacking and loading
-            // so boot it asynchronously
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
             if (context.coloredOutput != null) {
                 MessageUtils.setColorEnabled(context.coloredOutput);
             }
         } else {
+            doConfigureWithTerminal(context, context.terminal);
             if (context.coloredOutput != null) {
                 MessageUtils.setColorEnabled(context.coloredOutput);
             }

@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cling.invoker;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +42,6 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     private final Path topDirectory;
     private final Path rootDirectory;
     private final List<CoreExtension> coreExtensions;
-    private final InputStream in;
-    private final OutputStream out;
-    private final OutputStream err;
 
     @SuppressWarnings("ParameterNumber")
     public BaseInvokerRequest(
@@ -59,9 +54,6 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
             @Nonnull Map<String, String> systemProperties,
             @Nonnull Path topDirectory,
             @Nullable Path rootDirectory,
-            @Nullable InputStream in,
-            @Nullable OutputStream out,
-            @Nullable OutputStream err,
             @Nullable List<CoreExtension> coreExtensions) {
         this.parserRequest = requireNonNull(parserRequest);
         this.parsingFailed = parsingFailed;
@@ -74,10 +66,6 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
         this.topDirectory = requireNonNull(topDirectory);
         this.rootDirectory = rootDirectory;
         this.coreExtensions = coreExtensions;
-
-        this.in = in;
-        this.out = out;
-        this.err = err;
     }
 
     @Override
@@ -123,21 +111,6 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     @Override
     public Optional<Path> rootDirectory() {
         return Optional.ofNullable(rootDirectory);
-    }
-
-    @Override
-    public Optional<InputStream> in() {
-        return Optional.ofNullable(in);
-    }
-
-    @Override
-    public Optional<OutputStream> out() {
-        return Optional.ofNullable(out);
-    }
-
-    @Override
-    public Optional<OutputStream> err() {
-        return Optional.ofNullable(err);
     }
 
     @Override
