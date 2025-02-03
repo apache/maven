@@ -236,6 +236,17 @@ class ComparableVersionTest {
         assertEquals("0.2", version2.getCanonical());
     }
 
+    @Test
+    void testCompareDigitToLetter() {
+        ComparableVersion c1 = new ComparableVersion("7");
+        ComparableVersion c2 = new ComparableVersion("J");
+        ComparableVersion c3 = new ComparableVersion("c");
+        assertTrue(c1.compareTo(c2) > 0, "expected 7 > J");
+        assertTrue(c2.compareTo(c1) < 0, "expected J < 1");
+        assertTrue(c1.compareTo(c3) > 0, "expected 7 > c");
+        assertTrue(c3.compareTo(c1) < 0, "expected c < 7");
+    }
+
     /**
      * Test <a href="https://issues.apache.org/jira/browse/MNG-5568">MNG-5568</a> edge case
      * which was showing transitive inconsistency: since A &gt; B and B &gt; C then we should have A &gt; C
