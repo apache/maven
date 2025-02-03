@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -414,6 +415,29 @@ public class MavenRepositorySystem {
             repository = artifactRepositoryLayout2.newMavenArtifactRepository(id, url, snapshots, releases);
         } else {
             repository = new MavenArtifactRepository(id, url, repositoryLayout, snapshots, releases);
+        }
+
+        return repository;
+    }
+
+    public static ArtifactRepository createArtifactRepository(
+            String id,
+            Path path,
+            ArtifactRepositoryLayout repositoryLayout,
+            ArtifactRepositoryPolicy snapshots,
+            ArtifactRepositoryPolicy releases) {
+        if (snapshots == null) {
+            snapshots = new ArtifactRepositoryPolicy();
+        }
+        if (releases == null) {
+            releases = new ArtifactRepositoryPolicy();
+        }
+        ArtifactRepository repository;
+        if (repositoryLayout instanceof ArtifactRepositoryLayout2 artifactRepositoryLayout2) {
+            repository = artifactRepositoryLayout2.newMavenArtifactRepository(
+                    id, path.toUri().toString(), snapshots, releases);
+        } else {
+            repository = new MavenArtifactRepository(id, path, repositoryLayout, snapshots, releases);
         }
 
         return repository;

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.artifact.repository;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -44,6 +46,10 @@ public interface ArtifactRepository {
     void setUrl(String url);
 
     String getBasedir();
+
+    default Path getBasedirPath() {
+        return Paths.get(getBasedir());
+    }
 
     String getProtocol();
 

@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.maven.MavenTestHelper;
 import org.apache.maven.api.settings.InputSource;
@@ -108,16 +110,17 @@ class PomConstructionWithSettingsTest {
             config.addProfile(profile);
         }
 
-        String localRepoUrl =
-                System.getProperty("maven.repo.local", System.getProperty("user.home") + "/.m2/repository");
-        localRepoUrl = "file://" + localRepoUrl;
-        config.setLocalRepository(repositorySystem.createArtifactRepository(
-                "local", localRepoUrl, new DefaultRepositoryLayout(), null, null));
+        String localRepoPath = System.getProperty(
+                "maven.repo.local",
+                System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository");
+        Path absolutePath = Paths.get(localRepoPath).toAbsolutePath();
+        config.setLocalRepository(MavenRepositorySystem.createArtifactRepository(
+                "local", absolutePath, new DefaultRepositoryLayout(), null, null));
         config.setActiveProfileIds(settings.getActiveProfiles());
 
         DefaultRepositorySystemSession repoSession = MavenTestHelper.createSession(repositorySystem, container);
         LocalRepository localRepo =
-                new LocalRepository(config.getLocalRepository().getBasedir());
+                new LocalRepository(config.getLocalRepository().getBasedirPath());
         repoSession.setLocalRepositoryManager(
                 new SimpleLocalRepositoryManagerFactory().newInstance(repoSession, localRepo));
         config.setRepositorySession(repoSession);
