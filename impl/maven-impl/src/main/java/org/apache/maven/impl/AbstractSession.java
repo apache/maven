@@ -338,6 +338,11 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public Session withLocalRepository(@Nonnull LocalRepository localRepository) {
         nonNull(localRepository, "localRepository");
+        System.err.println("Overriding session local repo from "
+                + (session.getLocalRepository() != null
+                        ? session.getLocalRepository().getBasePath()
+                        : null)
+                + " to " + localRepository.getPath());
         if (session.getLocalRepository() != null
                 && Objects.equals(session.getLocalRepository().getBasePath(), localRepository.getPath())) {
             return this;
