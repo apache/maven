@@ -177,10 +177,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void printErrors(C context, boolean showStackTrace, List<Logger.Entry> entries, Logger logger) {
-        // this is important message; many Maven IT assert for presence of this message
+        // if accumulating logger passed, this is "early failure", swap logger for stdErr and use that to emit log
         if (logger instanceof AccumulatingLogger) {
             logger = new SystemLogger(context.invokerRequest.stdErr().orElse(null));
         }
+        // this is important message; many Maven IT assert for presence of this message
         logger.error("Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
         for (Logger.Entry entry : entries) {
             if (showStackTrace) {
