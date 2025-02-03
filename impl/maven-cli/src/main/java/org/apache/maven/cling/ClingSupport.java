@@ -21,6 +21,7 @@ package org.apache.maven.cling;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
@@ -67,24 +68,24 @@ public abstract class ClingSupport {
      */
     public int run(
             String[] args,
-            @Nullable InputStream in,
-            @Nullable OutputStream out,
-            @Nullable OutputStream err,
+            @Nullable InputStream stdIn,
+            @Nullable OutputStream stdOut,
+            @Nullable OutputStream stdErr,
             boolean embedded)
             throws IOException {
         try (Invoker invoker = createInvoker()) {
             return invoker.invoke(createParser()
                     .parseInvocation(createParserRequestBuilder(args)
-                            .in(in)
-                            .out(out)
-                            .err(err)
+                            .stdIn(stdIn)
+                            .stdOut(stdOut)
+                            .stdErr(stdErr)
                             .embedded(embedded)
                             .build()));
         } catch (InvokerException.ExitException e) {
             return e.getExitCode();
         } catch (Exception e) {
             // last resort; as ideally we should get ExitException only
-            new SystemLogger().error(e.getMessage(), e);
+            new SystemLogger(Objects.requireNonNullElse(stdErr, System.err)).error(e.getMessage(), e);
             return 1;
         } finally {
             if (classWorldManaged) {

@@ -57,11 +57,11 @@ public class MavenShellCling extends ClingSupport {
     public static int main(
             String[] args,
             ClassWorld world,
-            @Nullable InputStream in,
-            @Nullable OutputStream out,
-            @Nullable OutputStream err)
+            @Nullable InputStream stdIn,
+            @Nullable OutputStream stdOut,
+            @Nullable OutputStream stdErr)
             throws IOException {
-        return new MavenShellCling(world).run(args, in, out, err, true);
+        return new MavenShellCling(world).run(args, stdIn, stdOut, stdErr, true);
     }
 
     public MavenShellCling() {

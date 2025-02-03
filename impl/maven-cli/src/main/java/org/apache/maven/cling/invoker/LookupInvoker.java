@@ -169,20 +169,19 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected InvokerException.ExitException handleException(C context, Exception e) {
-        Logger logger = context.logger;
-        if (logger instanceof AccumulatingLogger) {
-            logger = new SystemLogger();
-        }
         printErrors(
                 context,
                 context.invokerRequest.options().showErrors().orElse(false),
                 List.of(new Logger.Entry(Logger.Level.ERROR, e.getMessage(), e.getCause())),
-                logger);
+                context.logger);
         return new InvokerException.ExitException(2);
     }
 
     protected void printErrors(C context, boolean showStackTrace, List<Logger.Entry> entries, Logger logger) {
         // this is important message; many Maven IT assert for presence of this message
+        if (logger instanceof AccumulatingLogger) {
+            logger = new SystemLogger(context.invokerRequest.stdErr().orElse(System.err));
+        }
         logger.error("Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
         for (Logger.Entry entry : entries) {
             if (showStackTrace) {
@@ -211,7 +210,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                             .args()
                             .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG),
                     entries,
-                    new SystemLogger());
+                    context.logger);
             // we skip handleException above as we did output
             throw new InvokerException.ExitException(1);
         }
@@ -307,22 +306,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void createTerminal(C context) {
-        if (context.invokerRequest.embedded()) {
-            context.invokerRequest.err().ifPresent(err -> {
-                if (err instanceof PrintStream errPs) {
-                    System.setErr(errPs);
-                } else {
-                    System.setErr(new PrintStream(err, true));
-                }
-            });
-        }
         if (context.terminal == null) {
             MessageUtils.systemInstall(
                     builder -> {
                         if (context.invokerRequest.embedded()) {
                             builder.streams(
-                                    context.invokerRequest.in().orElse(InputStream.nullInputStream()),
-                                    context.invokerRequest.out().orElse(System.out));
+                                    context.invokerRequest.stdIn().orElse(InputStream.nullInputStream()),
+                                    context.invokerRequest.stdOut().orElse(System.out));
                         } else {
                             builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
                         }

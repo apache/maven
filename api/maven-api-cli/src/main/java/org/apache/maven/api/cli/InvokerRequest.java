@@ -147,8 +147,8 @@ public interface InvokerRequest {
      * @return an {@link Optional} containing the input stream, or empty if not applicable
      */
     @Nonnull
-    default Optional<InputStream> in() {
-        return Optional.ofNullable(parserRequest().in());
+    default Optional<InputStream> stdIn() {
+        return Optional.ofNullable(parserRequest().stdIn());
     }
 
     /**
@@ -157,8 +157,8 @@ public interface InvokerRequest {
      * @return an {@link Optional} containing the output stream, or empty if not applicable
      */
     @Nonnull
-    default Optional<OutputStream> out() {
-        return Optional.ofNullable(parserRequest().out());
+    default Optional<OutputStream> stdOut() {
+        return Optional.ofNullable(parserRequest().stdOut());
     }
 
     /**
@@ -167,8 +167,8 @@ public interface InvokerRequest {
      * @return an {@link Optional} containing the error stream, or empty if not applicable
      */
     @Nonnull
-    default Optional<OutputStream> err() {
-        return Optional.ofNullable(parserRequest().err());
+    default Optional<OutputStream> stdErr() {
+        return Optional.ofNullable(parserRequest().stdErr());
     }
 
     /**

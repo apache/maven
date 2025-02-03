@@ -54,8 +54,8 @@ public class ToolboxTool implements ExecutorTool {
         ByteArrayOutputStream stderr = new ByteArrayOutputStream();
         ExecutorRequest.Builder builder = mojo(executorRequest, "gav-dump")
                 .argument("-DasProperties")
-                .stdoutConsumer(stdout)
-                .stderrConsumer(stderr);
+                .stdOut(stdout)
+                .stdErr(stderr);
         doExecute(builder);
         try {
             Properties properties = new Properties();
@@ -76,8 +76,8 @@ public class ToolboxTool implements ExecutorTool {
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         ByteArrayOutputStream stderr = new ByteArrayOutputStream();
         ExecutorRequest.Builder builder = mojo(executorRequest, "gav-local-repository-path")
-                .stdoutConsumer(stdout)
-                .stderrConsumer(stderr);
+                .stdOut(stdout)
+                .stdErr(stderr);
         doExecute(builder);
         return shaveStdout(stdout);
     }
@@ -89,8 +89,8 @@ public class ToolboxTool implements ExecutorTool {
         ByteArrayOutputStream stderr = new ByteArrayOutputStream();
         ExecutorRequest.Builder builder = mojo(executorRequest, "gav-artifact-path")
                 .argument("-Dgav=" + gav)
-                .stdoutConsumer(stdout)
-                .stderrConsumer(stderr);
+                .stdOut(stdout)
+                .stdErr(stderr);
         if (repositoryId != null) {
             builder.argument("-Drepository=" + repositoryId + "::unimportant");
         }
@@ -105,8 +105,8 @@ public class ToolboxTool implements ExecutorTool {
         ByteArrayOutputStream stderr = new ByteArrayOutputStream();
         ExecutorRequest.Builder builder = mojo(executorRequest, "gav-metadata-path")
                 .argument("-Dgav=" + gav)
-                .stdoutConsumer(stdout)
-                .stderrConsumer(stderr);
+                .stdOut(stdout)
+                .stdErr(stderr);
         if (repositoryId != null) {
             builder.argument("-Drepository=" + repositoryId + "::unimportant");
         }
@@ -126,8 +126,8 @@ public class ToolboxTool implements ExecutorTool {
         int ec = helper.execute(request);
         if (ec != 0) {
             throw new ExecutorException("Unexpected exit code=" + ec + "; stdout="
-                    + request.stdoutConsumer().orElse(null) + "; stderr="
-                    + request.stderrConsumer().orElse(null));
+                    + request.stdOut().orElse(null) + "; stderr="
+                    + request.stdErr().orElse(null));
         }
     }
 

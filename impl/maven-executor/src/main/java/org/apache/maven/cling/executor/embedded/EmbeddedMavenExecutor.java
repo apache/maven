@@ -277,16 +277,16 @@ public class EmbeddedMavenExecutor implements Executor {
                 Method doMain = cliClass.getMethod("doMain", parameterTypes);
                 exec = r -> {
                     System.setProperties(prepareProperties(r));
-                    r.stdinProvider().ifPresent(System::setIn);
+                    r.stdIn().ifPresent(System::setIn);
                     try {
                         ArrayList<String> args = new ArrayList<>(mavenArgs);
                         args.addAll(r.arguments());
-                        PrintStream stdout = r.stdoutConsumer().isEmpty()
+                        PrintStream stdout = r.stdOut().isEmpty()
                                 ? null
-                                : new PrintStream(r.stdoutConsumer().orElseThrow(), true);
-                        PrintStream stderr = r.stderrConsumer().isEmpty()
+                                : new PrintStream(r.stdOut().orElseThrow(), true);
+                        PrintStream stderr = r.stdErr().isEmpty()
                                 ? null
-                                : new PrintStream(r.stderrConsumer().orElseThrow(), true);
+                                : new PrintStream(r.stdErr().orElseThrow(), true);
                         return (int) doMain.invoke(mavenCli, new Object[] {
                             args.toArray(new String[0]), r.cwd().toString(), stdout, stderr
                         });
@@ -315,9 +315,9 @@ public class EmbeddedMavenExecutor implements Executor {
                                 null,
                                 args.toArray(new String[0]),
                                 classWorld,
-                                r.stdinProvider().orElse(null),
-                                r.stdoutConsumer().orElse(null),
-                                r.stderrConsumer().orElse(null));
+                                r.stdIn().orElse(null),
+                                r.stdOut().orElse(null),
+                                r.stdErr().orElse(null));
                     } catch (Exception e) {
                         throw new ExecutorException("Failed to execute", e);
                     }

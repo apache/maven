@@ -124,7 +124,7 @@ public interface ExecutorRequest {
      *
      * @return an Optional containing the stdin provider, or empty if not specified.
      */
-    Optional<InputStream> stdinProvider();
+    Optional<InputStream> stdIn();
 
     /**
      * Optional consumer for STD out of the Maven. If given, this consumer will get all output from the std out of
@@ -133,7 +133,7 @@ public interface ExecutorRequest {
      *
      * @return an Optional containing the stdout consumer, or empty if not specified.
      */
-    Optional<OutputStream> stdoutConsumer();
+    Optional<OutputStream> stdOut();
 
     /**
      * Optional consumer for STD err of the Maven. If given, this consumer will get all output from the std err of
@@ -142,7 +142,7 @@ public interface ExecutorRequest {
      *
      * @return an Optional containing the stderr consumer, or empty if not specified.
      */
-    Optional<OutputStream> stderrConsumer();
+    Optional<OutputStream> stdErr();
 
     /**
      * Returns {@link Builder} created from this instance.
@@ -158,9 +158,9 @@ public interface ExecutorRequest {
                 jvmSystemProperties().orElse(null),
                 environmentVariables().orElse(null),
                 jvmArguments().orElse(null),
-                stdinProvider().orElse(null),
-                stdoutConsumer().orElse(null),
-                stderrConsumer().orElse(null));
+                stdIn().orElse(null),
+                stdOut().orElse(null),
+                stdErr().orElse(null));
     }
 
     /**
@@ -194,9 +194,9 @@ public interface ExecutorRequest {
         private Map<String, String> jvmSystemProperties;
         private Map<String, String> environmentVariables;
         private List<String> jvmArguments;
-        private InputStream stdinProvider;
-        private OutputStream stdoutConsumer;
-        private OutputStream stderrConsumer;
+        private InputStream stdIn;
+        private OutputStream stdOut;
+        private OutputStream stdErr;
 
         private Builder() {}
 
@@ -210,9 +210,9 @@ public interface ExecutorRequest {
                 Map<String, String> jvmSystemProperties,
                 Map<String, String> environmentVariables,
                 List<String> jvmArguments,
-                InputStream stdinProvider,
-                OutputStream stdoutConsumer,
-                OutputStream stderrConsumer) {
+                InputStream stdIn,
+                OutputStream stdOut,
+                OutputStream stdErr) {
             this.command = command;
             this.arguments = arguments;
             this.cwd = cwd;
@@ -221,9 +221,9 @@ public interface ExecutorRequest {
             this.jvmSystemProperties = jvmSystemProperties;
             this.environmentVariables = environmentVariables;
             this.jvmArguments = jvmArguments;
-            this.stdinProvider = stdinProvider;
-            this.stdoutConsumer = stdoutConsumer;
-            this.stderrConsumer = stderrConsumer;
+            this.stdIn = stdIn;
+            this.stdOut = stdOut;
+            this.stdErr = stdErr;
         }
 
         @Nonnull
@@ -316,20 +316,20 @@ public interface ExecutorRequest {
         }
 
         @Nonnull
-        public Builder stdinProvider(InputStream stdinProvider) {
-            this.stdinProvider = stdinProvider;
+        public Builder stdIn(InputStream stdIn) {
+            this.stdIn = stdIn;
             return this;
         }
 
         @Nonnull
-        public Builder stdoutConsumer(OutputStream stdoutConsumer) {
-            this.stdoutConsumer = stdoutConsumer;
+        public Builder stdOut(OutputStream stdOut) {
+            this.stdOut = stdOut;
             return this;
         }
 
         @Nonnull
-        public Builder stderrConsumer(OutputStream stderrConsumer) {
-            this.stderrConsumer = stderrConsumer;
+        public Builder stdErr(OutputStream stdErr) {
+            this.stdErr = stdErr;
             return this;
         }
 
@@ -344,9 +344,9 @@ public interface ExecutorRequest {
                     jvmSystemProperties,
                     environmentVariables,
                     jvmArguments,
-                    stdinProvider,
-                    stdoutConsumer,
-                    stderrConsumer);
+                    stdIn,
+                    stdOut,
+                    stdErr);
         }
 
         private static class Impl implements ExecutorRequest {
@@ -358,9 +358,9 @@ public interface ExecutorRequest {
             private final Map<String, String> jvmSystemProperties;
             private final Map<String, String> environmentVariables;
             private final List<String> jvmArguments;
-            private final InputStream stdinProvider;
-            private final OutputStream stdoutConsumer;
-            private final OutputStream stderrConsumer;
+            private final InputStream stdIn;
+            private final OutputStream stdOut;
+            private final OutputStream stdErr;
 
             @SuppressWarnings("ParameterNumber")
             private Impl(
@@ -372,9 +372,9 @@ public interface ExecutorRequest {
                     Map<String, String> jvmSystemProperties,
                     Map<String, String> environmentVariables,
                     List<String> jvmArguments,
-                    InputStream stdinProvider,
-                    OutputStream stdoutConsumer,
-                    OutputStream stderrConsumer) {
+                    InputStream stdIn,
+                    OutputStream stdOut,
+                    OutputStream stdErr) {
                 this.command = requireNonNull(command);
                 this.arguments = arguments == null ? List.of() : List.copyOf(arguments);
                 this.cwd = getCanonicalPath(requireNonNull(cwd));
@@ -383,9 +383,9 @@ public interface ExecutorRequest {
                 this.jvmSystemProperties = jvmSystemProperties != null ? Map.copyOf(jvmSystemProperties) : null;
                 this.environmentVariables = environmentVariables != null ? Map.copyOf(environmentVariables) : null;
                 this.jvmArguments = jvmArguments != null ? List.copyOf(jvmArguments) : null;
-                this.stdinProvider = stdinProvider;
-                this.stdoutConsumer = stdoutConsumer;
-                this.stderrConsumer = stderrConsumer;
+                this.stdIn = stdIn;
+                this.stdOut = stdOut;
+                this.stdErr = stdErr;
             }
 
             @Override
@@ -429,18 +429,18 @@ public interface ExecutorRequest {
             }
 
             @Override
-            public Optional<InputStream> stdinProvider() {
-                return Optional.ofNullable(stdinProvider);
+            public Optional<InputStream> stdIn() {
+                return Optional.ofNullable(stdIn);
             }
 
             @Override
-            public Optional<OutputStream> stdoutConsumer() {
-                return Optional.ofNullable(stdoutConsumer);
+            public Optional<OutputStream> stdOut() {
+                return Optional.ofNullable(stdOut);
             }
 
             @Override
-            public Optional<OutputStream> stderrConsumer() {
-                return Optional.ofNullable(stderrConsumer);
+            public Optional<OutputStream> stdErr() {
+                return Optional.ofNullable(stdErr);
             }
 
             @Override
@@ -454,9 +454,9 @@ public interface ExecutorRequest {
                         + jvmSystemProperties + ", environmentVariables="
                         + environmentVariables + ", jvmArguments="
                         + jvmArguments + ", stdinProvider="
-                        + stdinProvider + ", stdoutConsumer="
-                        + stdoutConsumer + ", stderrConsumer="
-                        + stderrConsumer + '}';
+                        + stdIn + ", stdoutConsumer="
+                        + stdOut + ", stderrConsumer="
+                        + stdErr + '}';
             }
         }
     }

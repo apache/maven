@@ -61,7 +61,7 @@ public class ForkedMavenExecutor implements Executor {
                 int exitCode = execute(executorRequest.toBuilder()
                         .cwd(cwd)
                         .arguments(List.of("--version", "--quiet"))
-                        .stdoutConsumer(stdout)
+                        .stdOut(stdout)
                         .build());
                 if (exitCode == 0) {
                     if (stdout.size() > 0) {
@@ -87,23 +87,21 @@ public class ForkedMavenExecutor implements Executor {
 
     @Nullable
     protected Consumer<Process> wrapStdouterrConsumer(ExecutorRequest executorRequest) {
-        if (executorRequest.stdinProvider().isEmpty()
-                && executorRequest.stdoutConsumer().isEmpty()
-                && executorRequest.stderrConsumer().isEmpty()) {
+        if (executorRequest.stdIn().isEmpty()
+                && executorRequest.stdOut().isEmpty()
+                && executorRequest.stdErr().isEmpty()) {
             return null;
         } else {
             return p -> {
                 try {
-                    if (executorRequest.stdinProvider().isPresent()) {
-                        executorRequest.stdinProvider().orElseThrow().transferTo(p.getOutputStream());
+                    if (executorRequest.stdIn().isPresent()) {
+                        executorRequest.stdIn().orElseThrow().transferTo(p.getOutputStream());
                     }
-                    if (executorRequest.stdoutConsumer().isPresent()) {
-                        p.getInputStream()
-                                .transferTo(executorRequest.stdoutConsumer().get());
+                    if (executorRequest.stdOut().isPresent()) {
+                        p.getInputStream().transferTo(executorRequest.stdOut().get());
                     }
-                    if (executorRequest.stderrConsumer().isPresent()) {
-                        p.getErrorStream()
-                                .transferTo(executorRequest.stderrConsumer().get());
+                    if (executorRequest.stdErr().isPresent()) {
+                        p.getErrorStream().transferTo(executorRequest.stdErr().get());
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
