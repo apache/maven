@@ -21,6 +21,7 @@ package org.apache.maven.cling.invoker;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -312,7 +313,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                         if (context.invokerRequest.embedded()) {
                             builder.streams(
                                     context.invokerRequest.stdIn().orElse(InputStream.nullInputStream()),
-                                    context.invokerRequest.stdOut().orElse(System.out));
+                                    context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream()));
                         } else {
                             builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
                         }
