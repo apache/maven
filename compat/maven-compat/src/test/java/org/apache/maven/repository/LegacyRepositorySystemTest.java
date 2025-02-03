@@ -21,10 +21,16 @@ package org.apache.maven.repository;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.SimpleLookup;
+import org.apache.maven.api.ProducedArtifact;
+import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.SwitchableMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -34,7 +40,12 @@ import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.impl.DefaultArtifact;
+import org.apache.maven.impl.DefaultArtifactCoordinatesFactory;
+import org.apache.maven.impl.DefaultArtifactResolver;
+import org.apache.maven.impl.DefaultModelVersionParser;
 import org.apache.maven.impl.DefaultRepositoryFactory;
+import org.apache.maven.impl.DefaultVersionParser;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.cache.DefaultRequestCacheFactory;
 import org.apache.maven.internal.impl.DefaultSession;
@@ -53,6 +64,7 @@ import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
 import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -76,6 +88,9 @@ class LegacyRepositorySystemTest {
 
     @Inject
     private PlexusContainer container;
+
+    @Inject
+    private org.eclipse.aether.RepositorySystem resolverRepositorySystem;
 
     protected List<ArtifactRepository> getRemoteRepositories() throws Exception {
         File repoDir = new File(getBasedir(), "src/test/remote-repo").getAbsoluteFile();
@@ -130,13 +145,34 @@ class LegacyRepositorySystemTest {
         legacySupport.setSession(mavenSession);
         InternalSession iSession = new DefaultSession(
                 mavenSession,
-                null,
+                resolverRepositorySystem,
                 null,
                 null,
                 new SimpleLookup(List.of(
                         new DefaultRequestCacheFactory(),
                         new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
-                                new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
+                                new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())),
+                        new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme())),
+                        new DefaultArtifactCoordinatesFactory(),
+                        new DefaultArtifactResolver(),
+                        new DefaultRequestCacheFactory(),
+                        new ArtifactManager() {
+                            private final Map<String, Path> paths = new ConcurrentHashMap<>();
+
+                            @Override
+                            public Optional<Path> getPath(org.apache.maven.api.Artifact artifact) {
+                                Path path = paths.get(artifact.key());
+                                if (path == null && artifact instanceof DefaultArtifact defaultArtifact) {
+                                    path = defaultArtifact.getArtifact().getPath();
+                                }
+                                return Optional.ofNullable(path);
+                            }
+
+                            @Override
+                            public void setPath(ProducedArtifact artifact, Path path) {
+                                paths.put(artifact.key(), path);
+                            }
+                        })),
                 null);
         InternalSession.associate(session, iSession);
 
