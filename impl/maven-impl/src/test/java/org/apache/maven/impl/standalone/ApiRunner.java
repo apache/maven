@@ -21,6 +21,7 @@ package org.apache.maven.impl.standalone;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,6 +44,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.model.PluginContainer;
@@ -57,6 +59,7 @@ import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.spi.TypeProvider;
+import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
@@ -138,6 +141,12 @@ public class ApiRunner {
         @Override
         public Settings getSettings() {
             return Settings.newInstance();
+        }
+
+        @Override
+        @Nonnull
+        public Collection<ToolchainModel> getToolchains() {
+            return List.of();
         }
 
         @Override

@@ -177,7 +177,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             DependencyManagementImporter dependencyManagementImporter,
             PluginConfigurationExpander pluginConfigurationExpander,
             ModelVersionParser versionParser,
-            List<ModelTransformer> transformers,
+            @Nullable List<ModelTransformer> transformers,
             ModelResolver modelResolver,
             Interpolator interpolator,
             PathTranslator pathTranslator,

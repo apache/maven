@@ -29,7 +29,12 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Service to manage {@link Toolchain}s.
+ * Service interface for managing Maven toolchains, which provide abstraction for different
+ * build tools and environments.
+ *
+ * <p>A toolchain represents a specific build tool configuration (e.g., JDK, compiler) that can be
+ * used during the Maven build process. This service allows for retrieving, storing, and managing
+ * these toolchains.</p>
  *
  * @since 4.0.0
  */
@@ -37,42 +42,50 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface ToolchainManager extends Service {
 
     /**
+     * Retrieves toolchains matching the specified type and requirements.
      *
-     * @param session
-     * @param type
-     * @param requirements
-     * @return the selected {@link Toolchain}s
-     * @throws ToolchainManagerException if an exception occurs
+     * @param session The Maven session context
+     * @param type The type of toolchain (e.g., "jdk", "compiler")
+     * @param requirements Key-value pairs specifying toolchain requirements (e.g., "version": "11")
+     * @return List of matching toolchains, never null
+     * @throws ToolchainManagerException if toolchain retrieval fails
      */
     @Nonnull
     List<Toolchain> getToolchains(@Nonnull Session session, String type, Map<String, String> requirements);
 
     /**
+     * Retrieves all toolchains of the specified type without additional requirements.
      *
-     * @param session
-     * @param type
-     * @return the selected {@link Toolchain}
-     * @throws ToolchainManagerException if an exception occurs
+     * @param session The Maven session context
+     * @param type The type of toolchain to retrieve
+     * @return List of matching toolchains, never null
+     * @throws ToolchainManagerException if toolchain retrieval fails
      */
     @Nonnull
-    Optional<Toolchain> getToolchainFromBuildContext(@Nonnull Session session, String type)
+    default List<Toolchain> getToolchains(@Nonnull Session session, @Nonnull String type)
+            throws ToolchainManagerException {
+        return getToolchains(session, type, null);
+    }
+
+    /**
+     * Retrieves the currently active toolchain from the build context.
+     *
+     * @param session The Maven session context
+     * @param type The type of toolchain to retrieve
+     * @return Optional containing the toolchain if found
+     * @throws ToolchainManagerException if toolchain retrieval fails
+     */
+    @Nonnull
+    Optional<Toolchain> getToolchainFromBuildContext(@Nonnull Session session, @Nonnull String type)
             throws ToolchainManagerException;
 
     /**
+     * Stores a toolchain in the build context for later retrieval.
      *
-     * @param session
-     * @param type
-     * @return the selected {@link Toolchain}s
-     * @throws ToolchainManagerException if an exception occurs
+     * @param session The Maven session context
+     * @param toolchain The toolchain to store
+     * @throws ToolchainManagerException if storing the toolchain fails
      */
-    @Nonnull
-    List<Toolchain> getToolchainsForType(@Nonnull Session session, String type) throws ToolchainManagerException;
-
-    /**
-     *
-     * @param session
-     * @param toolchain
-     * @throws ToolchainManagerException if an exception occurs
-     */
-    void storeToolchainToBuildContext(@Nonnull Session session, Toolchain toolchain) throws ToolchainManagerException;
+    void storeToolchainToBuildContext(@Nonnull Session session, @Nonnull Toolchain toolchain)
+            throws ToolchainManagerException;
 }

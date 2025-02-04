@@ -16,29 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.coreit.toolchain;
-
-import java.util.Optional;
-
-import org.apache.maven.api.Toolchain;
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.services.ToolchainFactory;
-import org.apache.maven.api.toolchain.ToolchainModel;
+package org.apache.maven.api.services;
 
 /**
- * @author Benjamin Bentmann
+ * Exception thrown when toolchain factory operations fail.
+ *
+ * <p>This exception wraps errors that occur during toolchain creation or initialization.</p>
  */
-@Named
-public class CoreItToolchainFactory implements ToolchainFactory {
+public class ToolchainFactoryException extends MavenException {
 
-    public Optional<Toolchain> createDefaultToolchain() {
-        return Optional.empty();
+    public ToolchainFactoryException(String message) {
+        super(message);
     }
 
-    public Toolchain createToolchain(ToolchainModel model) {
-        if (model == null) {
-            return null;
-        }
-        return new CoreItToolchain(model);
+    public ToolchainFactoryException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ToolchainFactoryException(Throwable cause) {
+        super(cause);
     }
 }

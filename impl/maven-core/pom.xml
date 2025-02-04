@@ -348,8 +348,6 @@ under the License.
               <exclude>org.apache.maven.project.DefaultProjectDependenciesResolver#DefaultProjectDependenciesResolver()</exclude>
               <exclude>org.apache.maven.rtinfo.internal.DefaultRuntimeInformation#DefaultRuntimeInformation()</exclude>
               <exclude>org.apache.maven.settings.DefaultMavenSettingsBuilder#DefaultMavenSettingsBuilder()</exclude>
-              <exclude>org.apache.maven.toolchain.DefaultToolchainManager#DefaultToolchainManager():CONSTRUCTOR_REMOVED</exclude>
-              <exclude>org.apache.maven.toolchain.DefaultToolchainManagerPrivate#DefaultToolchainManagerPrivate()</exclude>
               <!-- END default constructor on Plexus/JSR 330 components -->
               <!-- system property with that name no longer evaluated -->
               <exclude>org.apache.maven.project.DefaultProjectBuilder#DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY</exclude>
@@ -384,7 +382,18 @@ under the License.
               <exclude>org.apache.maven.repository.RepositorySystem</exclude>
               <exclude>org.apache.maven.settings.DefaultMavenSettingsBuilder</exclude>
               <exclude>org.apache.maven.settings.MavenSettingsBuilder</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchain</exclude>
               <exclude>org.apache.maven.toolchain.DefaultToolchainsBuilder</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchainManager</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchainManagerPrivate</exclude>
+              <exclude>org.apache.maven.toolchain.MisconfiguredToolchainException</exclude>
+              <exclude>org.apache.maven.toolchain.RequirementMatcher</exclude>
+              <exclude>org.apache.maven.toolchain.RequirementMatcherFactory</exclude>
+              <exclude>org.apache.maven.toolchain.Toolchain</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainFactory</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainManager</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainManagerPrivate</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainsBuilder</exclude>
             </excludes>
           </parameter>

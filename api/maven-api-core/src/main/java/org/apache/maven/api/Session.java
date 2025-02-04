@@ -34,6 +34,7 @@ import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactory;
 import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
  * The session to install / deploy / resolve artifacts and dependencies.
@@ -59,6 +60,14 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     Settings getSettings();
+
+    /**
+     * Retrieves toolchain models that have been explicitly configured.
+     *
+     * @return the toolchain models
+     */
+    @Nonnull
+    Collection<ToolchainModel> getToolchains();
 
     /**
      * Retrieves the local repository associated with this session.

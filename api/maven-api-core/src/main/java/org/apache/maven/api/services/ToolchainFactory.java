@@ -18,14 +18,41 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.Optional;
+
+import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
+ * Factory interface for creating toolchain instances from configuration models.
+ *
+ * <p>This factory is responsible for instantiating concrete toolchain implementations
+ * based on toolchain model configurations or default settings.</p>
+ *
  * @since 4.0.0
  */
 @Experimental
 @Consumer
 public interface ToolchainFactory {
-    // TODO: implement ToolchainFactory
+    /**
+     * Creates a toolchain instance from the provided model configuration.
+     *
+     * @param model The toolchain configuration model
+     * @return A configured toolchain instance
+     * @throws ToolchainFactoryException if toolchain creation fails
+     */
+    @Nonnull
+    Toolchain createToolchain(@Nonnull ToolchainModel model) throws ToolchainFactoryException;
+
+    /**
+     * Creates a default toolchain instance using system defaults.
+     *
+     * @return Optional containing the default toolchain if available
+     * @throws ToolchainFactoryException if default toolchain creation fails
+     */
+    @Nonnull
+    Optional<Toolchain> createDefaultToolchain() throws ToolchainFactoryException;
 }

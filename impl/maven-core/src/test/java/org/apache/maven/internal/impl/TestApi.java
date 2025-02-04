@@ -47,6 +47,7 @@ import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilder;
+import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -57,8 +58,6 @@ import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.session.scope.internal.SessionScope;
-import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
-import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.testing.PlexusTest;
@@ -89,7 +88,7 @@ class TestApi {
     MavenRepositorySystem mavenRepositorySystem;
 
     @Inject
-    DefaultToolchainManagerPrivate toolchainManagerPrivate;
+    DefaultToolchainManager toolchainManagerPrivate;
 
     @Inject
     PlexusContainer plexusContainer;
