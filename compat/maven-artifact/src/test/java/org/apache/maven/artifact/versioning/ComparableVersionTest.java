@@ -251,13 +251,13 @@ class ComparableVersionTest {
     void testLexicographicOrder() {
         ComparableVersion aardvark = new ComparableVersion("aardvark");
         ComparableVersion zebra = new ComparableVersion("zebra");
-        assertTrue(zebra.compareTo( aardvark ) > 0);
+        assertTrue(zebra.compareTo(aardvark) > 0);
         assertTrue(aardvark.compareTo(zebra) < 0);
 
         // Greek zebra
-        ComparableVersion ζέβρα = new ComparableVersion( "ζέβρα" );
-        assertTrue(ζέβρα.compareTo( zebra ) > 0);
-        assertTrue(zebra.compareTo( ζέβρα ) < 0);
+        ComparableVersion ζέβρα = new ComparableVersion("ζέβρα");
+        assertTrue(ζέβρα.compareTo(zebra) > 0);
+        assertTrue(zebra.compareTo(ζέβρα) < 0);
     }
 
     /**
