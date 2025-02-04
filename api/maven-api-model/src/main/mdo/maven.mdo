@@ -1354,7 +1354,7 @@
      */
     public String getManagementKey() {
         if (managementKey == null) {
-            managementKey = getGroupId() + ":" + getArtifactId() + ":" + getType() + (getClassifier() != null ? ":" + getClassifier() : "");
+            managementKey = (getGroupId() + ":" + getArtifactId() + ":" + getType() + (getClassifier() != null ? ":" + getClassifier() : "")).intern();
         }
         return managementKey;
     }
