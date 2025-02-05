@@ -85,7 +85,8 @@ public class DefaultPrompter implements Prompter {
         }
     }
 
-    private String doPrompt(String message, List<?> possibleValues, String defaultReply, boolean password) throws IOException {
+    private String doPrompt(String message, List<?> possibleValues, String defaultReply, boolean password)
+            throws IOException {
         String formattedMessage = formatMessage(message, possibleValues, defaultReply);
         String line;
         do {
