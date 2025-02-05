@@ -1275,6 +1275,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .path(modelSource.getPath())
                             .rootDirectory(rootDirectory)
                             .inputStream(is)
+                            .transformer(new InliningTransformer())
                             .build());
                 } catch (XmlReaderException e) {
                     if (!strict) {
@@ -1287,6 +1288,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 .path(modelSource.getPath())
                                 .rootDirectory(rootDirectory)
                                 .inputStream(is)
+                                .transformer(new InliningTransformer())
                                 .build());
                     } catch (XmlReaderException ne) {
                         // still unreadable even in non-strict mode, rethrow original error
@@ -2029,4 +2031,23 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     record GAKey(String groupId, String artifactId) {}
+
+    static class InliningTransformer implements XmlReaderRequest.Transformer {
+        static final Set<String> CONTEXTS = Set.of(
+                "groupId",
+                "artifactId",
+                "version",
+                "namespaceUri",
+                "packaging",
+                "scope",
+                "phase",
+                "layout",
+                "policy",
+                "checksumPolicy",
+                "updatePolicy");
+
+        public String transform(String input, String context) {
+            return CONTEXTS.contains(context) ? input.intern() : input;
+        }
+    }
 }
