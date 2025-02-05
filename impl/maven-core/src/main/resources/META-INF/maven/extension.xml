@@ -137,9 +137,6 @@ under the License.
     <exportedPackage>org.slf4j.spi.*</exportedPackage>
     <exportedPackage>org.slf4j.helpers.*</exportedPackage>
     <exportedPackage>org.slf4j.event.*</exportedPackage>
-
-    <!-- JAnsi -->
-    <exportedPackage>org.fusesource.jansi.*</exportedPackage>
   </exportedPackages>
 
   <exportedArtifacts>
@@ -198,7 +195,10 @@ under the License.
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
     <exportedArtifact>javax.annotation:javax.annotation-api</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
+
+    <!-- core provides these now -->
     <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
+    <exportedArtifact>org.codehaus.plexus:plexus-interactivity-api</exportedArtifact>
 
     <!--
       | We must also filter out the old Aether or NoClassDefFoundErrors will surface
