@@ -60,7 +60,32 @@ public class DefaultPrompter implements Prompter {
         }
     }
 
-    String doPrompt(String message, List<?> possibleValues, String defaultReply, boolean password) throws IOException {
+    /**
+     * Used by {@link LegacyPlexusInteractivity}
+     */
+    String doPrompt(String message, boolean password) throws IOException {
+        try {
+            if (message != null) {
+                if (!message.endsWith("\n")) {
+                    if (message.endsWith(":")) {
+                        message += " ";
+                    } else if (!message.endsWith(": ")) {
+                        message += ": ";
+                    }
+                }
+                int lastNl = message.lastIndexOf('\n');
+                String begin = message.substring(0, lastNl + 1);
+                message = message.substring(lastNl + 1);
+                MessageUtils.terminal.writer().print(begin);
+                MessageUtils.terminal.flush();
+            }
+            return MessageUtils.reader.readLine(message, password ? '*' : null);
+        } catch (Exception e) {
+            throw new IOException("Unable to prompt user", e);
+        }
+    }
+
+    private String doPrompt(String message, List<?> possibleValues, String defaultReply, boolean password) throws IOException {
         String formattedMessage = formatMessage(message, possibleValues, defaultReply);
         String line;
         do {
@@ -98,34 +123,12 @@ public class DefaultPrompter implements Prompter {
         return formatted.toString();
     }
 
-    public void doDisplay(String message) throws IOException {
+    private void doDisplay(String message) throws IOException {
         try {
             MessageUtils.terminal.writer().print(message);
             MessageUtils.terminal.flush();
         } catch (Exception e) {
             throw new IOException("Unable to display message", e);
-        }
-    }
-
-    public String doPrompt(String message, boolean password) throws IOException {
-        try {
-            if (message != null) {
-                if (!message.endsWith("\n")) {
-                    if (message.endsWith(":")) {
-                        message += " ";
-                    } else if (!message.endsWith(": ")) {
-                        message += ": ";
-                    }
-                }
-                int lastNl = message.lastIndexOf('\n');
-                String begin = message.substring(0, lastNl + 1);
-                message = message.substring(lastNl + 1);
-                MessageUtils.terminal.writer().print(begin);
-                MessageUtils.terminal.flush();
-            }
-            return MessageUtils.reader.readLine(message, password ? '*' : null);
-        } catch (Exception e) {
-            throw new IOException("Unable to prompt user", e);
         }
     }
 }

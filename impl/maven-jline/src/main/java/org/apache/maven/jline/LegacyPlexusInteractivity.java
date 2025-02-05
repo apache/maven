@@ -67,13 +67,13 @@ public class LegacyPlexusInteractivity implements Prompter, InputHandler, Output
     }
 
     @Override
-    public void write(String line) throws IOException {
-        defaultPrompter.doDisplay(line);
+    public void write(String line) {
+        defaultPrompter.showMessage(line);
     }
 
     @Override
-    public void writeLine(String line) throws IOException {
-        defaultPrompter.doDisplay(line + System.lineSeparator());
+    public void writeLine(String line) {
+        defaultPrompter.showMessage(line + System.lineSeparator());
     }
 
     @Override
