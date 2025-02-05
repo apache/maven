@@ -117,7 +117,7 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * Creates a new instance for the given directory and scope. The language is assumed Java.
+     * Creates a new instance for the given directory and scope.
      *
      * @param scope scope of source code (main or test)
      * @param language language of the source code
@@ -125,10 +125,35 @@ public final class DefaultSourceRoot implements SourceRoot {
      */
     public DefaultSourceRoot(final ProjectScope scope, final Language language, final Path directory) {
         this.scope = Objects.requireNonNull(scope);
-        this.language = language;
+        this.language = Objects.requireNonNull(language);
         this.directory = Objects.requireNonNull(directory);
         includes = List.of();
         excludes = List.of();
+        moduleName = null;
+        targetVersion = null;
+        targetPath = null;
+        stringFiltering = false;
+        enabled = true;
+    }
+
+    /**
+     * Creates a new instance for the given directory and scope.
+     *
+     * @param scope scope of source code (main or test)
+     * @param language language of the source code
+     * @param directory directory of the source code
+     */
+    public DefaultSourceRoot(
+            final ProjectScope scope,
+            final Language language,
+            final Path directory,
+            List<PathMatcher> includes,
+            List<PathMatcher> excludes) {
+        this.scope = Objects.requireNonNull(scope);
+        this.language = language;
+        this.directory = Objects.requireNonNull(directory);
+        this.includes = includes != null ? List.copyOf(includes) : List.of();
+        this.excludes = excludes != null ? List.copyOf(excludes) : List.of();
         moduleName = null;
         targetVersion = null;
         targetPath = null;
@@ -162,11 +187,21 @@ public final class DefaultSourceRoot implements SourceRoot {
     private static List<PathMatcher> matchers(FileSystem fs, List<String> patterns) {
         final var matchers = new PathMatcher[patterns.size()];
         for (int i = 0; i < matchers.length; i++) {
-            String pattern = patterns.get(i);
-            if (pattern.indexOf(':') < 0) {
-                pattern = "glob:" + pattern;
-            }
-            matchers[i] = fs.getPathMatcher(pattern);
+            String rawPattern = patterns.get(i);
+            String pattern = rawPattern.contains(":") ? rawPattern : "glob:" + rawPattern;
+            matchers[i] = new PathMatcher() {
+                final PathMatcher delegate = fs.getPathMatcher(pattern);
+
+                @Override
+                public boolean matches(Path path) {
+                    return delegate.matches(path);
+                }
+
+                @Override
+                public String toString() {
+                    return pattern;
+                }
+            };
         }
         return List.of(matchers);
     }
