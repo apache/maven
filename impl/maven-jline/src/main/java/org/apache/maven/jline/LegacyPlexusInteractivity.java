@@ -18,18 +18,20 @@
  */
 package org.apache.maven.jline;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.di.Inject;
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Priority;
-import org.apache.maven.api.di.Singleton;
 import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.components.interactivity.OutputHandler;
 import org.codehaus.plexus.components.interactivity.Prompter;
+import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.eclipse.sisu.Priority;
 
 /**
  * This class is injected into any legacy component that would want to use legacy "Plexus Interactivity API".
@@ -67,42 +69,66 @@ public class LegacyPlexusInteractivity implements Prompter, InputHandler, Output
     }
 
     @Override
-    public void write(String line) {
-        defaultPrompter.showMessage(line);
+    public void write(String line) throws IOException {
+        defaultPrompter.doDisplay(line);
     }
 
     @Override
-    public void writeLine(String line) {
-        defaultPrompter.showMessage(line + System.lineSeparator());
+    public void writeLine(String line) throws IOException {
+        defaultPrompter.doDisplay(line + System.lineSeparator());
     }
 
     @Override
-    public String prompt(String message) {
-        return defaultPrompter.prompt(message, null, null);
+    public String prompt(String message) throws PrompterException {
+        try {
+            return defaultPrompter.prompt(message, null, null);
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new PrompterException("Unable to prompt", e);
+        }
     }
 
     @Override
-    public String prompt(String message, String defaultReply) {
-        return defaultPrompter.prompt(message, null, defaultReply);
+    public String prompt(String message, String defaultReply) throws PrompterException {
+        try {
+            return defaultPrompter.prompt(message, null, defaultReply);
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new PrompterException("Unable to prompt", e);
+        }
     }
 
     @Override
-    public String prompt(String message, List possibleValues) {
-        return defaultPrompter.prompt(message, possibleValues, null);
+    public String prompt(String message, List possibleValues) throws PrompterException {
+        try {
+            return defaultPrompter.prompt(message, possibleValues, null);
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new PrompterException("Unable to prompt", e);
+        }
     }
 
     @Override
-    public String prompt(String message, List possibleValues, String defaultReply) {
-        return defaultPrompter.prompt(message, possibleValues, defaultReply);
+    public String prompt(String message, List possibleValues, String defaultReply) throws PrompterException {
+        try {
+            return defaultPrompter.prompt(message, possibleValues, defaultReply);
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new PrompterException("Unable to prompt", e);
+        }
     }
 
     @Override
-    public String promptForPassword(String message) {
-        return defaultPrompter.promptForPassword(message);
+    public String promptForPassword(String message) throws PrompterException {
+        try {
+            return defaultPrompter.promptForPassword(message);
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new PrompterException("Unable to promptForPassword", e);
+        }
     }
 
     @Override
-    public void showMessage(String message) {
-        defaultPrompter.showMessage(message);
+    public void showMessage(String message) throws PrompterException {
+        try {
+            defaultPrompter.showMessage(message);
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new PrompterException("Unable to showMessage", e);
+        }
     }
 }

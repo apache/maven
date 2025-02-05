@@ -85,6 +85,18 @@ public class DefaultPrompter implements Prompter {
         }
     }
 
+    /**
+     * Used by {@link LegacyPlexusInteractivity}
+     */
+    void doDisplay(String message) throws IOException {
+        try {
+            MessageUtils.terminal.writer().print(message);
+            MessageUtils.terminal.flush();
+        } catch (Exception e) {
+            throw new IOException("Unable to display message", e);
+        }
+    }
+
     private String doPrompt(String message, List<?> possibleValues, String defaultReply, boolean password)
             throws IOException {
         String formattedMessage = formatMessage(message, possibleValues, defaultReply);
@@ -122,14 +134,5 @@ public class DefaultPrompter implements Prompter {
             formatted.append(' ').append(defaultReply).append(": ");
         }
         return formatted.toString();
-    }
-
-    private void doDisplay(String message) throws IOException {
-        try {
-            MessageUtils.terminal.writer().print(message);
-            MessageUtils.terminal.flush();
-        } catch (Exception e) {
-            throw new IOException("Unable to display message", e);
-        }
     }
 }
