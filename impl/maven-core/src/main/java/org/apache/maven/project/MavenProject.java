@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -770,7 +771,26 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getResources() {
-        return getBuild().getResources();
+        return new AbstractList<>() {
+            @Override
+            public Resource get(int index) {
+                return toResource(getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
+                        .toList()
+                        .get(index));
+            }
+
+            @Override
+            public int size() {
+                return (int) getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
+                        .count();
+            }
+
+            @Override
+            public boolean add(Resource resource) {
+                addResource(resource);
+                return true;
+            }
+        };
     }
 
     /**
@@ -778,7 +798,35 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getTestResources() {
-        return getBuild().getTestResources();
+        return new AbstractList<>() {
+            @Override
+            public Resource get(int index) {
+                return toResource(getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
+                        .toList()
+                        .get(index));
+            }
+
+            @Override
+            public int size() {
+                return (int) getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
+                        .count();
+            }
+
+            @Override
+            public boolean add(Resource resource) {
+                addTestResource(resource);
+                return true;
+            }
+        };
+    }
+
+    private Resource toResource(SourceRoot sourceRoot) {
+        return new Resource(org.apache.maven.api.model.Resource.newBuilder()
+                .directory(sourceRoot.directory().toString())
+                .includes(sourceRoot.includes().stream().map(Object::toString).toList())
+                .excludes(sourceRoot.excludes().stream().map(Object::toString).toList())
+                .filtering(Boolean.toString(sourceRoot.stringFiltering()))
+                .build());
     }
 
     /**
@@ -786,7 +834,6 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public void addResource(Resource resource) {
-        getBuild().addResource(resource);
         addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), ProjectScope.MAIN, resource.getDelegate()));
     }
 
@@ -795,7 +842,6 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public void addTestResource(Resource testResource) {
-        getBuild().addTestResource(testResource);
         addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), ProjectScope.TEST, testResource.getDelegate()));
     }
 
