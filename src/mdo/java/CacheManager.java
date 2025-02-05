@@ -216,8 +216,9 @@ class CacheManager {
             if (oldList == null) {
                 oldList = new ArrayList<>();
             }
-            oldList.removeIf(ref -> ref.get() == null);
-            return oldList;
+            List<CacheReference> newList = new ArrayList<>(oldList); // Copy first
+            newList.removeIf(ref -> ref.get() == null); // Safe to modify copy
+            return newList;
         });
 
         synchronized (refs) {
