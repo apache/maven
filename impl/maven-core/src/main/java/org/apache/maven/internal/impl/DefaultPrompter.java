@@ -22,32 +22,25 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import org.apache.maven.api.services.Prompter;
 import org.apache.maven.api.services.PrompterException;
-import org.codehaus.plexus.PlexusContainer;
 
 @Named
 @Singleton
 public class DefaultPrompter implements Prompter {
-
-    private static final String PROMPTER_CLASS = "org.codehaus.plexus.components.interactivity.Prompter";
-    private final PlexusContainer container;
+    private final org.codehaus.plexus.components.interactivity.Prompter prompter;
 
     @Inject
-    public DefaultPrompter(PlexusContainer container) {
-        this.container = container;
+    public DefaultPrompter(org.codehaus.plexus.components.interactivity.Prompter prompter) {
+        this.prompter = prompter;
     }
 
     @Override
     public String prompt(String message, List<String> possibleValues, String defaultReply) throws PrompterException {
         try {
-            Class<?> clazz = container.getContainerRealm().loadClass(PROMPTER_CLASS);
-            Object instance = container.lookup(clazz);
-            Method method = clazz.getMethod("prompt", String.class, List.class, String.class);
-            return (String) method.invoke(instance, message, possibleValues, defaultReply);
+            return prompter.prompt(message, possibleValues, defaultReply);
         } catch (Exception e) {
             throw new PrompterException("Unable to call prompter", e);
         }
@@ -56,10 +49,7 @@ public class DefaultPrompter implements Prompter {
     @Override
     public String promptForPassword(String message) throws PrompterException {
         try {
-            Class<?> clazz = container.getContainerRealm().loadClass(PROMPTER_CLASS);
-            Object instance = container.lookup(clazz);
-            Method method = clazz.getMethod("promptForPassword", String.class);
-            return (String) method.invoke(instance, message);
+            return prompter.promptForPassword(message);
         } catch (Exception e) {
             throw new PrompterException("Unable to call prompter", e);
         }
@@ -68,10 +58,7 @@ public class DefaultPrompter implements Prompter {
     @Override
     public void showMessage(String message) throws PrompterException {
         try {
-            Class<?> clazz = container.getContainerRealm().loadClass(PROMPTER_CLASS);
-            Object instance = container.lookup(clazz);
-            Method method = clazz.getMethod("showMessage", String.class);
-            method.invoke(instance, message);
+            prompter.showMessage(message);
         } catch (Exception e) {
             throw new PrompterException("Unable to call prompter", e);
         }
