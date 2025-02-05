@@ -20,59 +20,56 @@ package org.apache.maven.api.model;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Class InputLocation.
  */
-public class InputLocation implements Serializable, InputLocationTracker {
+public class InputLocation implements Serializable, InputLocationTracker, Cacheable {
     private final int lineNumber;
     private final int columnNumber;
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
-    private final InputLocation importedFrom;
+    private final int cacheHash;
 
-    public InputLocation(InputSource source) {
-        this.lineNumber = -1;
-        this.columnNumber = -1;
-        this.source = source;
-        this.locations = Collections.singletonMap(0, this);
-        this.importedFrom = null;
+    public static InputLocation location(InputSource source) {
+        return CacheManager.getInstance().cached(new InputLocation(-1, -1, source, 0));
     }
 
-    public InputLocation(int lineNumber, int columnNumber) {
-        this(lineNumber, columnNumber, null, null);
+    public static InputLocation location(int lineNumber, int columnNumber) {
+        return CacheManager.getInstance().cached(new InputLocation(lineNumber, columnNumber, null, null));
     }
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source) {
-        this(lineNumber, columnNumber, source, null);
+    public static InputLocation location(int lineNumber, int columnNumber, InputSource source) {
+        return CacheManager.getInstance().cached(new InputLocation(lineNumber, columnNumber, source, null));
     }
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+    public static InputLocation location(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+        return CacheManager.getInstance().cached(new InputLocation(lineNumber, columnNumber, source, selfLocationKey));
+    }
+
+    InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-        this.locations =
-                selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
-        this.importedFrom = null;
+        this.locations = selfLocationKey != null
+                ? ImmutableCollections.singletonMap(selfLocationKey, this)
+                : ImmutableCollections.emptyMap();
+        this.cacheHash = CacheManager.getInstance().computeCacheHash(this);
     }
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
+    InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
         this.locations = ImmutableCollections.copy(locations);
-        this.importedFrom = null;
+        this.cacheHash = CacheManager.getInstance().computeCacheHash(this);
     }
 
-    public InputLocation(InputLocation original) {
-        this.lineNumber = original.lineNumber;
-        this.columnNumber = original.columnNumber;
-        this.source = original.source;
-        this.locations = original.locations;
-        this.importedFrom = original.importedFrom;
+    @Override
+    public int cacheIdentityHash() {
+        return cacheHash;
     }
 
     public int getLineNumber() {
@@ -103,7 +100,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
      * @since 4.0.0
      */
     public InputLocation getImportedFrom() {
-        return importedFrom;
+        return null;
     }
 
     /**

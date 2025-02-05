@@ -41,6 +41,12 @@
   #end
 #MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/ImmutableCollections.java
 #parse ( "java/ImmutableCollections.java" )
+#if ( $caching )
+#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/Cacheable.java
+#parse ( "java/Cacheable.java" )
+#MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/CacheManager.java
+#parse ( "java/CacheManager.java" )
+#end
   #if ( $class.name != "InputLocation" && $class.name != "InputSource" )
 #MODELLO-VELOCITY#SAVE-OUTPUT-TO ${package.replace('.','/')}/${className}.java
     #set ( $types = { } )
@@ -120,10 +126,18 @@ public class ${class.name}
     #if ( $class.superClass )
     extends ${class.superClass}
     #end
-    #if ( $locationTracking )
-    implements Serializable, InputLocationTracker
+    #if ( $caching )
+      #if ( $locationTracking )
+    implements Cacheable, Serializable, InputLocationTracker
+      #else
+    implements Cacheable, Serializable
+      #end
     #else
+      #if ( $locationTracking )
+    implements Serializable, InputLocationTracker
+      #else
     implements Serializable
+      #end
     #end
 {
     #if ( $class == $root )
@@ -149,6 +163,11 @@ public class ${class.name}
     final InputLocation importedFrom;
     #end
 
+    #if ( $caching )
+    /** Pre-computed cache identity hash code */
+    private final int cacheHash;
+
+    #end
     /**
       * Constructor for this class, to be called from its subclasses and {@link Builder}.
       * @see Builder#build()
@@ -179,6 +198,11 @@ public class ${class.name}
         this.locations = Map.of();
       #end
         this.importedFrom = builder.importedFrom;
+    #end
+    #if ( $caching )
+
+        // Compute cache identity hash code once during construction
+        this.cacheHash = computeCacheHash();
     #end
     }
 
@@ -296,6 +320,18 @@ public class ${class.name}
     }
 
     #end
+    #if ( $caching )
+    @Override
+    public int cacheIdentityHash() {
+        return cacheHash;
+    }
+
+    /** Computes the cache identity hash code during construction */
+    private int computeCacheHash() {
+        return CacheManager.getInstance().computeCacheHash(this);
+    }
+    #end
+
     /**
      * Creates a new builder with this object as the basis.
      *
@@ -529,7 +565,11 @@ public class ${class.name}
             ) {
                 return base;
             }
+    #if ( $caching )
+            return CacheManager.getInstance().cached(new ${class.name}(this));
+    #else
             return new ${class.name}(this);
+    #end
         }
 
     #if ( $locationTracking && ! $class.superClass )

@@ -19,7 +19,6 @@
 package org.apache.maven.api.model;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,29 +27,42 @@ import java.util.stream.Stream;
 /**
  * Class InputSource.
  */
-public class InputSource implements Serializable {
+public class InputSource implements Serializable, Cacheable {
 
     private final String modelId;
     private final String location;
     private final List<InputSource> inputs;
     private final InputLocation importedFrom;
+    private final int hashCache;
 
-    public InputSource(String modelId, String location) {
-        this(modelId, location, null);
+    public static InputSource source(String modelId, String location) {
+        return CacheManager.getInstance().cached(new InputSource(modelId, location, null, null));
     }
 
-    public InputSource(String modelId, String location, InputLocation importedFrom) {
+    public static InputSource source(String modelId, String location, InputLocation importedFrom) {
+        return CacheManager.getInstance().cached(new InputSource(modelId, location, null, importedFrom));
+    }
+
+    public static InputSource source(List<InputSource> inputs) {
+        return CacheManager.getInstance().cached(new InputSource(null, null, inputs, null));
+    }
+
+    public static InputSource source(
+            String modelId, String location, List<InputSource> inputs, InputLocation importedFrom) {
+        return CacheManager.getInstance().cached(new InputSource(modelId, location, inputs, importedFrom));
+    }
+
+    InputSource(String modelId, String location, List<InputSource> inputs, InputLocation importedFrom) {
         this.modelId = modelId;
         this.location = location;
-        this.inputs = null;
+        this.inputs = inputs != null ? ImmutableCollections.copy(inputs) : null;
         this.importedFrom = importedFrom;
+        this.hashCache = CacheManager.getInstance().computeCacheHash(this);
     }
 
-    public InputSource(Collection<InputSource> inputs) {
-        this.modelId = null;
-        this.location = null;
-        this.inputs = ImmutableCollections.copy(inputs);
-        this.importedFrom = null;
+    @Override
+    public int cacheIdentityHash() {
+        return hashCache;
     }
 
     /**
@@ -114,6 +126,10 @@ public class InputSource implements Serializable {
     }
 
     public static InputSource merge(InputSource src1, InputSource src2) {
-        return new InputSource(Stream.concat(src1.sources(), src2.sources()).collect(Collectors.toSet()));
+        return new InputSource(
+                null,
+                null,
+                Stream.concat(src1.sources(), src2.sources()).distinct().toList(),
+                null);
     }
 }

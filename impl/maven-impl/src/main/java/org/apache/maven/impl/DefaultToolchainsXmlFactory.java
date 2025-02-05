@@ -55,7 +55,7 @@ public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
         try {
             InputSource source = null;
             if (request.getModelId() != null || request.getLocation() != null) {
-                source = new InputSource(request.getLocation());
+                source = InputSource.source(request.getLocation());
             }
             MavenToolchainsStaxReader xml = new MavenToolchainsStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());

@@ -18,34 +18,28 @@
  */
 package ${package};
 
-import java.io.Serializable;
-
 /**
- * Class InputSource.
+ * Interface for objects that can be cached in the CacheManager.
+ * Implementing classes should ensure that cacheEquals() and cacheIdentityHash()
+ * use all relevant fields for determining cache identity.
  */
-public class InputSource implements Serializable {
-
-    private final String location;
-
-    public static InputSource source(String location) {
-        return new InputSource(location);
-    }
-
-    InputSource(String location) {
-        this.location = location;
+public interface Cacheable {
+    /**
+     * Returns true if this object should be considered equal to another for caching purposes.
+     * This is separate from equals() to allow different equality semantics.
+     *
+     * @param other the object to compare with
+     * @return true if the objects are equal for caching purposes
+     */
+    default boolean cacheEquals(Object other) {
+        return CacheManager.getInstance().cacheEquals(this, other);
     }
 
     /**
-     * Get the path/URL of the settings definition or {@code null} if unknown.
+     * Returns a hash code for cache identity purposes.
+     * This is separate from hashCode() to allow different hashing semantics.
      *
-     * @return the location
+     * @return the cache identity hash code
      */
-    public String getLocation() {
-        return this.location;
-    }
-
-    @Override
-    public String toString() {
-        return getLocation();
-    }
+    int cacheIdentityHash();
 }

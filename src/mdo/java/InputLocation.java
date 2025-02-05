@@ -33,30 +33,32 @@ public class InputLocation implements Serializable, InputLocationTracker {
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
 
-    public InputLocation(InputSource source) {
-        this.lineNumber = -1;
-        this.columnNumber = -1;
-        this.source = source;
-        this.locations = Collections.singletonMap(0, this);
+    public static InputLocation location(InputSource source) {
+        return new InputLocation(-1, -1, source, 0);
     }
 
-    public InputLocation(int lineNumber, int columnNumber) {
-        this(lineNumber, columnNumber, null, null);
+    public static InputLocation location(int lineNumber, int columnNumber) {
+        return new InputLocation(lineNumber, columnNumber, null, null);
     }
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source) {
-        this(lineNumber, columnNumber, source, null);
+    public static InputLocation location(int lineNumber, int columnNumber, InputSource source) {
+        return new InputLocation(lineNumber, columnNumber, source, null);
     }
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+    public static InputLocation location(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+        return new InputLocation(lineNumber, columnNumber, source, selfLocationKey);
+    }
+
+    InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-        this.locations =
-                selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
+        this.locations = selfLocationKey != null
+                ? ImmutableCollections.singletonMap(selfLocationKey, this)
+                : ImmutableCollections.emptyMap();
     }
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
+    InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;

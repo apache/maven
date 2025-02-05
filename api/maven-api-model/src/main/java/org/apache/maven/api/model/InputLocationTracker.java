@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.model;
 
+import org.apache.maven.api.annotations.Nullable;
+
 public interface InputLocationTracker {
     InputLocation getLocation(Object field);
 
@@ -28,5 +30,6 @@ public interface InputLocationTracker {
      * @return InputLocation
      * @since 4.0.0
      */
+    @Nullable
     InputLocation getImportedFrom();
 }

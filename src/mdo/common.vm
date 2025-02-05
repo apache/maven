@@ -29,5 +29,6 @@
   #end
 #end
 #set ( $locationTracking = true )
+#set ( $caching = true )
 #end
 #

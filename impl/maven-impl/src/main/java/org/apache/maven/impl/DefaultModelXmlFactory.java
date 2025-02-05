@@ -60,7 +60,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         try {
             InputSource source = null;
             if (request.getModelId() != null || request.getLocation() != null) {
-                source = new InputSource(
+                source = InputSource.source(
                         request.getModelId(), path != null ? path.toUri().toString() : null);
             }
             MavenStaxReader xml = new MavenStaxReader();
