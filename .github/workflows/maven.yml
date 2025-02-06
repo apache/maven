@@ -146,6 +146,13 @@ jobs:
         shell: bash
         run: mvn site -e -B -V -Preporting -Dmaven.repo.local=$HOME/.m2/repository/cached
 
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
+          path: '**/target/surefire-reports/*'
+
   integration-tests:
     needs: initial-build
     runs-on: ${{ matrix.os }}
