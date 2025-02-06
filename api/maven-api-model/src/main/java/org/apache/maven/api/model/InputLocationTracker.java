@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Nullable;
  * <pre>
  * public class ModelElement implements InputLocationTracker {
  *     private InputLocation location;
- *     private Map<Object, InputLocation> locations;
+ *     private Map&lt;Object, InputLocation&gt; locations;
  *
  *     public InputLocation getLocation(Object field) {
  *         return locations.get(field);
