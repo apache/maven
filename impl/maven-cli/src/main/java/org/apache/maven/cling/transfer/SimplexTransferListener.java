@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import org.eclipse.aether.transfer.AbstractTransferListener;
@@ -42,7 +43,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @since 4.0.0
  */
-public final class SimplexTransferListener extends AbstractTransferListener {
+public final class SimplexTransferListener extends AbstractTransferListener implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplexTransferListener.class);
     private static final int QUEUE_SIZE = 1024;
     private static final int BATCH_MAX_SIZE = 500;
@@ -50,6 +51,8 @@ public final class SimplexTransferListener extends AbstractTransferListener {
     private final int batchMaxSize;
     private final boolean blockOnLastEvent;
     private final ArrayBlockingQueue<Exchange> eventQueue;
+    private final AtomicBoolean closed;
+    private final Thread updater;
 
     /**
      * Constructor that makes passed in delegate run on single thread, and will block on last event.
@@ -76,9 +79,17 @@ public final class SimplexTransferListener extends AbstractTransferListener {
         this.blockOnLastEvent = blockOnLastEvent;
 
         this.eventQueue = new ArrayBlockingQueue<>(queueSize);
-        Thread updater = new Thread(this::feedConsumer);
+        this.closed = new AtomicBoolean(false);
+        this.updater = new Thread(this::feedConsumer, "simplex-transfer-listener");
         updater.setDaemon(true);
         updater.start();
+    }
+
+    @Override
+    public void close() {
+        if (closed.compareAndSet(false, true)) {
+            updater.interrupt();
+        }
     }
 
     public TransferListener getDelegate() {
@@ -95,8 +106,8 @@ public final class SimplexTransferListener extends AbstractTransferListener {
                 }
                 demux(batch);
             }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (InterruptedException ignored) {
+            // silent
         }
     }
 

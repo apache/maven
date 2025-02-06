@@ -62,21 +62,21 @@ class SimplexTransferListenerTest {
             public void transferFailed(TransferEvent event) {}
         };
 
-        SimplexTransferListener listener = new SimplexTransferListener(delegate);
+        try (SimplexTransferListener listener = new SimplexTransferListener(delegate)) {
+            TransferResource resource =
+                    new TransferResource(null, null, "http://maven.org/test/test-resource", new File("file"), null);
+            DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle
 
-        TransferResource resource =
-                new TransferResource(null, null, "http://maven.org/test/test-resource", new File("file"), null);
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle
+            // for technical reasons we cannot throw here, even if delegate does cancel transfer
+            listener.transferInitiated(event(session, resource, TransferEvent.EventType.INITIATED));
 
-        // for technical reasons we cannot throw here, even if delegate does cancel transfer
-        listener.transferInitiated(event(session, resource, TransferEvent.EventType.INITIATED));
+            Thread.sleep(500); // to make sure queue is processed, cancellation applied
 
-        Thread.sleep(500); // to make sure queue is processed, cancellation applied
-
-        // subsequent call will cancel
-        assertThrows(
-                TransferCancelledException.class,
-                () -> listener.transferStarted(event(session, resource, TransferEvent.EventType.STARTED)));
+            // subsequent call will cancel
+            assertThrows(
+                    TransferCancelledException.class,
+                    () -> listener.transferStarted(event(session, resource, TransferEvent.EventType.STARTED)));
+        }
     }
 
     @Test
@@ -85,24 +85,24 @@ class SimplexTransferListenerTest {
 
         RepositorySystemSession session = Mockito.mock(RepositorySystemSession.class);
         TransferListener delegate = Mockito.mock(TransferListener.class);
-        SimplexTransferListener listener = new SimplexTransferListener(delegate);
+        try (SimplexTransferListener listener = new SimplexTransferListener(delegate)) {
+            TransferEvent transferInitiatedEvent = event(session, resource, TransferEvent.EventType.INITIATED);
+            TransferEvent transferStartedEvent = event(session, resource, TransferEvent.EventType.STARTED);
+            TransferEvent transferProgressedEvent = event(session, resource, TransferEvent.EventType.PROGRESSED);
+            TransferEvent transferSucceededEvent = event(session, resource, TransferEvent.EventType.SUCCEEDED);
 
-        TransferEvent transferInitiatedEvent = event(session, resource, TransferEvent.EventType.INITIATED);
-        TransferEvent transferStartedEvent = event(session, resource, TransferEvent.EventType.STARTED);
-        TransferEvent transferProgressedEvent = event(session, resource, TransferEvent.EventType.PROGRESSED);
-        TransferEvent transferSucceededEvent = event(session, resource, TransferEvent.EventType.SUCCEEDED);
+            listener.transferInitiated(transferInitiatedEvent);
+            listener.transferStarted(transferStartedEvent);
+            listener.transferProgressed(transferProgressedEvent);
+            listener.transferSucceeded(transferSucceededEvent);
 
-        listener.transferInitiated(transferInitiatedEvent);
-        listener.transferStarted(transferStartedEvent);
-        listener.transferProgressed(transferProgressedEvent);
-        listener.transferSucceeded(transferSucceededEvent);
+            Thread.sleep(500); // to make sure queue is processed, cancellation applied
 
-        Thread.sleep(500); // to make sure queue is processed, cancellation applied
-
-        Mockito.verify(delegate).transferInitiated(transferInitiatedEvent);
-        Mockito.verify(delegate).transferStarted(transferStartedEvent);
-        Mockito.verify(delegate).transferProgressed(transferProgressedEvent);
-        Mockito.verify(delegate).transferSucceeded(transferSucceededEvent);
+            Mockito.verify(delegate).transferInitiated(transferInitiatedEvent);
+            Mockito.verify(delegate).transferStarted(transferStartedEvent);
+            Mockito.verify(delegate).transferProgressed(transferProgressedEvent);
+            Mockito.verify(delegate).transferSucceeded(transferSucceededEvent);
+        }
     }
 
     private static TransferEvent event(
