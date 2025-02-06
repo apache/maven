@@ -61,9 +61,9 @@ public class DefaultPrompter implements Prompter {
     }
 
     /**
-     * Used by {@link LegacyPlexusInteractivity}
+     * Used by {@code LegacyPlexusInteractivity}
      */
-    String doPrompt(String message, boolean password) throws IOException {
+    public String doPrompt(String message, boolean password) throws IOException {
         try {
             if (message != null) {
                 if (!message.endsWith("\n")) {
@@ -86,9 +86,9 @@ public class DefaultPrompter implements Prompter {
     }
 
     /**
-     * Used by {@link LegacyPlexusInteractivity}
+     * Used by {@code LegacyPlexusInteractivity}
      */
-    void doDisplay(String message) throws IOException {
+    public void doDisplay(String message) throws IOException {
         try {
             MessageUtils.terminal.writer().print(message);
             MessageUtils.terminal.flush();

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.jline;
+package org.apache.maven.internal.compat.interactivity;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.jline.DefaultPrompter;
 import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.components.interactivity.OutputHandler;
 import org.codehaus.plexus.components.interactivity.Prompter;
