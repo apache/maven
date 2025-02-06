@@ -99,9 +99,6 @@ public class MavenParser extends BaseParser {
                 context.systemProperties,
                 context.topDirectory,
                 context.rootDirectory,
-                context.parserRequest.in(),
-                context.parserRequest.out(),
-                context.parserRequest.err(),
                 context.extensions,
                 (MavenOptions) context.options);
     }

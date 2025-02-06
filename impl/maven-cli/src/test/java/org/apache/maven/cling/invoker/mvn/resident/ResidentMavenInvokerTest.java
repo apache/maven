@@ -20,7 +20,7 @@ package org.apache.maven.cling.invoker.mvn.resident;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.List;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
@@ -59,14 +59,14 @@ public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
-        invoke(cwd, userHome, Arrays.asList("clean", "verify"));
+        invoke(cwd, userHome, List.of("verify"), List.of());
     }
 
     @Disabled("Until we move off fully from File")
     @Test
     void jimFs() throws Exception {
         try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
-            invoke(fs.getPath("/cwd"), fs.getPath("/home"), Arrays.asList("clean", "verify"));
+            invoke(fs.getPath("/cwd"), fs.getPath("/home"), List.of("verify"), List.of());
         }
     }
 }

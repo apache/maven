@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -121,9 +122,10 @@ class SourcesTest {
         Files.writeString(testFile, content);
 
         Source source = Sources.fromPath(testFile);
-        String readContent = new String(source.openStream().readAllBytes());
-
-        assertEquals(content, readContent);
+        try (InputStream inputStream = source.openStream()) {
+            String readContent = new String(inputStream.readAllBytes());
+            assertEquals(content, readContent);
+        }
     }
 
     @Test
