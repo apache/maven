@@ -60,6 +60,7 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.ReportPlugin;
+import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -616,7 +617,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 /*
                  * `sourceDirectory`, `testSourceDirectory` and `scriptSourceDirectory`
                  * are ignored if the POM file contains at least one <source> element
-                 * for the corresponding scope and langiage. This rule exists because
+                 * for the corresponding scope and language. This rule exists because
                  * Maven provides default values for those elements which may conflict
                  * with user's configuration.
                  */
@@ -628,6 +629,12 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 }
                 if (!hasTest) {
                     project.addTestCompileSourceRoot(build.getTestSourceDirectory());
+                }
+                for (Resource resource : project.getBuild().getDelegate().getResources()) {
+                    project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.MAIN, resource));
+                }
+                for (Resource resource : project.getBuild().getDelegate().getTestResources()) {
+                    project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.TEST, resource));
                 }
             }
 

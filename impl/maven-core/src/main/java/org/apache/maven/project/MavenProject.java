@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -144,39 +146,9 @@ public class MavenProject implements Cloneable {
     private List<MavenProject> collectedProjects;
 
     /**
-     * A tuple of {@link SourceRoot} properties for which we decide that no duplicated value should exist in a project.
-     * The set of properties that we choose to put in this record may be modified in any future Maven version.
-     * The intent is to detect some configuration errors.
-     */
-    private record SourceKey(ProjectScope scope, Language language, Path directory) {
-        /**
-         * Converts this key into a source root.
-         * Used for adding a new source when no other information is available.
-         *
-         * @return the source root for the properties of this key.
-         */
-        SourceRoot createSource() {
-            return new DefaultSourceRoot(scope, language, directory);
-        }
-
-        /**
-         * {@return an error message to report when a conflict is detected}.
-         *
-         * @param baseDir value of {@link #getBaseDirectory()}, in order to make the message shorter
-         */
-        String conflictMessage(Path baseDir) {
-            return "Directory " + baseDir.relativize(directory)
-                    + " is specified twice for the scope \"" + scope.id()
-                    + "\" and language \"" + language.id() + "\".";
-        }
-    }
-
-    /**
      * All sources of this project. The map includes main and test codes for all languages.
-     * However, we put some restrictions on what information can be repeated.
-     * Those restrictions are expressed in {@link SourceKey}.
      */
-    private HashMap<SourceKey, SourceRoot> sources = new LinkedHashMap<>(); // Need access to the `clone()` method.
+    private List<SourceRoot> sources = new CopyOnWriteArrayList<>();
 
     @Deprecated
     private ArtifactRepository releaseArtifactRepository;
@@ -358,10 +330,8 @@ public class MavenProject implements Cloneable {
      * @since 4.0.0
      */
     public void addSourceRoot(SourceRoot source) {
-        var key = new SourceKey(source.scope(), source.language(), source.directory());
-        SourceRoot current = sources.putIfAbsent(key, source);
-        if (current != null && !current.equals(source)) {
-            throw new IllegalArgumentException(key.conflictMessage(getBaseDirectory()));
+        if (!sources.contains(source)) {
+            sources.add(source);
         }
     }
 
@@ -381,8 +351,7 @@ public class MavenProject implements Cloneable {
      */
     public void addSourceRoot(ProjectScope scope, Language language, Path directory) {
         directory = getBaseDirectory().resolve(directory).normalize();
-        var key = new SourceKey(scope, language, directory);
-        sources.computeIfAbsent(key, SourceKey::createSource);
+        addSourceRoot(new DefaultSourceRoot(scope, language, directory));
     }
 
     /**
@@ -402,8 +371,7 @@ public class MavenProject implements Cloneable {
             directory = directory.trim();
             if (!directory.isBlank()) {
                 Path path = getBaseDirectory().resolve(directory).normalize();
-                var key = new SourceKey(scope, language, path);
-                sources.computeIfAbsent(key, SourceKey::createSource);
+                addSourceRoot(scope, language, path);
             }
         }
     }
@@ -432,7 +400,7 @@ public class MavenProject implements Cloneable {
      * @see #addSourceRoot(SourceRoot)
      */
     public Collection<SourceRoot> getSourceRoots() {
-        return Collections.unmodifiableCollection(sources.values());
+        return Collections.unmodifiableCollection(sources);
     }
 
     /**
@@ -449,14 +417,14 @@ public class MavenProject implements Cloneable {
      * @since 4.0.0
      */
     public Stream<SourceRoot> getEnabledSourceRoots(ProjectScope scope, Language language) {
-        Stream<SourceRoot> s = sources.values().stream().filter(SourceRoot::enabled);
+        Stream<SourceRoot> stream = sources.stream().filter(SourceRoot::enabled);
         if (scope != null) {
-            s = s.filter((source) -> scope.equals(source.scope()));
+            stream = stream.filter(source -> scope.equals(source.scope()));
         }
         if (language != null) {
-            s = s.filter((source) -> language.equals(source.language()));
+            stream = stream.filter(source -> language.equals(source.language()));
         }
-        return s;
+        return stream;
     }
 
     /**
@@ -770,7 +738,26 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getResources() {
-        return getBuild().getResources();
+        return new AbstractList<>() {
+            @Override
+            public Resource get(int index) {
+                return toResource(getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
+                        .toList()
+                        .get(index));
+            }
+
+            @Override
+            public int size() {
+                return (int) getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
+                        .count();
+            }
+
+            @Override
+            public boolean add(Resource resource) {
+                addResource(resource);
+                return true;
+            }
+        };
     }
 
     /**
@@ -778,7 +765,35 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getTestResources() {
-        return getBuild().getTestResources();
+        return new AbstractList<>() {
+            @Override
+            public Resource get(int index) {
+                return toResource(getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
+                        .toList()
+                        .get(index));
+            }
+
+            @Override
+            public int size() {
+                return (int) getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
+                        .count();
+            }
+
+            @Override
+            public boolean add(Resource resource) {
+                addTestResource(resource);
+                return true;
+            }
+        };
+    }
+
+    private Resource toResource(SourceRoot sourceRoot) {
+        return new Resource(org.apache.maven.api.model.Resource.newBuilder()
+                .directory(sourceRoot.directory().toString())
+                .includes(sourceRoot.includes().stream().map(Object::toString).toList())
+                .excludes(sourceRoot.excludes().stream().map(Object::toString).toList())
+                .filtering(Boolean.toString(sourceRoot.stringFiltering()))
+                .build());
     }
 
     /**
@@ -786,7 +801,6 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public void addResource(Resource resource) {
-        getBuild().addResource(resource);
         addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), ProjectScope.MAIN, resource.getDelegate()));
     }
 
@@ -795,7 +809,6 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public void addTestResource(Resource testResource) {
-        getBuild().addTestResource(testResource);
         addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), ProjectScope.TEST, testResource.getDelegate()));
     }
 
@@ -1238,7 +1251,7 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated
     private void setSourceRootDirs(ProjectScope scope, Language language, List<String> roots) {
-        sources.values().removeIf((source) -> scope.equals(source.scope()) && language.equals(source.language()));
+        sources.removeIf((source) -> scope.equals(source.scope()) && language.equals(source.language()));
         Path directory = getBaseDirectory();
         for (String root : roots) {
             addSourceRoot(new DefaultSourceRoot(scope, language, directory.resolve(root)));
@@ -1324,7 +1337,7 @@ public class MavenProject implements Cloneable {
         // This property is not handled like others as we don't use public API.
         // The whole implementation of this `deepCopy` method may need revision,
         // but it would be the topic for a separated commit.
-        sources = (HashMap<SourceKey, SourceRoot>) project.sources.clone();
+        sources = new CopyOnWriteArrayList<>(project.sources);
 
         if (project.getModel() != null) {
             setModel(project.getModel().clone());
