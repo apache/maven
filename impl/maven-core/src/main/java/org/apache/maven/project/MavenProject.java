@@ -417,14 +417,14 @@ public class MavenProject implements Cloneable {
      * @since 4.0.0
      */
     public Stream<SourceRoot> getEnabledSourceRoots(ProjectScope scope, Language language) {
-        Stream<SourceRoot> s = sources.stream().filter(SourceRoot::enabled);
+        Stream<SourceRoot> stream = sources.stream().filter(SourceRoot::enabled);
         if (scope != null) {
-            s = s.filter((source) -> scope.equals(source.scope()));
+            stream = stream.filter(source -> scope.equals(source.scope()));
         }
         if (language != null) {
-            s = s.filter((source) -> language.equals(source.language()));
+            stream = stream.filter(source -> language.equals(source.language()));
         }
-        return s;
+        return stream;
     }
 
     /**
