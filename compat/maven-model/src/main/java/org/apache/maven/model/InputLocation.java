@@ -332,17 +332,17 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
     public org.apache.maven.api.model.InputLocation toApiLocation() {
         if (locations != null && locations.values().contains(this)) {
             if (locations.size() == 1 && locations.values().iterator().next() == this) {
-                return new org.apache.maven.api.model.InputLocation(
+                return org.apache.maven.api.model.InputLocation.location(
                         lineNumber,
                         columnNumber,
                         source != null ? source.toApiSource() : null,
                         locations.keySet().iterator().next());
             } else {
-                return new org.apache.maven.api.model.InputLocation(
+                return org.apache.maven.api.model.InputLocation.location(
                         lineNumber, columnNumber, source != null ? source.toApiSource() : null);
             }
         } else {
-            return new org.apache.maven.api.model.InputLocation(
+            return org.apache.maven.api.model.InputLocation.location(
                     lineNumber,
                     columnNumber,
                     source != null ? source.toApiSource() : null,

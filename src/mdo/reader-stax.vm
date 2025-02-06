@@ -551,7 +551,7 @@ public class ${className} {
         ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder(true);
   #if ( $locationTracking )
         if (addLocationInformation) {
-            ${classLcapName}.location("", new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
+            ${classLcapName}.location("", InputLocation.location(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
         }
   #end
         for (int i = parser.getAttributeCount() - 1; i >= 0; i--) {
@@ -574,7 +574,7 @@ public class ${className} {
             } else if ("$fieldTagName".equals(name)) {
       #if ( $locationTracking )
                 if (addLocationInformation) {
-                    ${classLcapName}.location(name, new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
+                    ${classLcapName}.location(name, InputLocation.location(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
                 }
       #end
       #if ( $field.type == "String" )
@@ -646,7 +646,7 @@ public class ${className} {
                         if ("${Helper.singular($fieldTagName)}".equals(parser.getLocalName())) {
         #if ( $locationTracking )
                             if (addLocationInformation) {
-                                locations.put(Integer.valueOf(locations.size()), new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
+                                locations.put(Integer.valueOf(locations.size()), InputLocation.location(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
                             }
         #end
                             ${field.name}.add(interpolatedTrimmed(nextText(parser, strict), "${fieldTagName}"));
@@ -666,7 +666,7 @@ public class ${className} {
                         String value = nextText(parser, strict).trim();
         #if ( $locationTracking )
                         if (addLocationInformation) {
-                            locations.put(key, new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
+                            locations.put(key, InputLocation.location(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
                         }
         #end
                         ${field.name}.put(key, value);
@@ -723,7 +723,7 @@ public class ${className} {
             }
   #if ( $locationTracking )
             if (addLocationInformation) {
-                ${classLcapName}.location(childName, new InputLocation(line, column, inputSrc, locations));
+                ${classLcapName}.location(childName, InputLocation.location(line, column, inputSrc, locations));
             }
   #end
         }
@@ -926,7 +926,7 @@ public class ${className} {
     private XmlNode buildXmlNode(XMLStreamReader parser, InputSource inputSrc) throws XMLStreamException {
         return XmlNodeStaxBuilder.build(parser,
                 addLocationInformation
-                        ? p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc)
+                        ? p -> InputLocation.location(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc)
                         : null);
     }
 #else

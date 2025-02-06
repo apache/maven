@@ -28,6 +28,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
 
         private final boolean debugEnabled;
         private final LinkedList<Object> interpolationTargets;
+        private final IdentityHashMap<Object, Boolean> doneTargets = new IdentityHashMap<>();
         private final StringSearchModelInterpolator modelInterpolator;
         private final Logger logger;
         private final List<ValueSource> valueSources;
@@ -123,11 +125,12 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
         public ModelInterpolationException run() {
             while (!interpolationTargets.isEmpty()) {
                 Object obj = interpolationTargets.removeFirst();
-
-                try {
-                    traverseObjectWithParents(obj.getClass(), obj);
-                } catch (ModelInterpolationException e) {
-                    return e;
+                if (doneTargets.put(obj, true) == null) {
+                    try {
+                        traverseObjectWithParents(obj.getClass(), obj);
+                    } catch (ModelInterpolationException e) {
+                        return e;
+                    }
                 }
             }
 
