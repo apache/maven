@@ -27,11 +27,7 @@ public class InputSource implements Serializable {
 
     private final String location;
 
-    public static InputSource source(String location) {
-        return new InputSource(location);
-    }
-
-    InputSource(String location) {
+    public InputSource(String location) {
         this.location = location;
     }
 

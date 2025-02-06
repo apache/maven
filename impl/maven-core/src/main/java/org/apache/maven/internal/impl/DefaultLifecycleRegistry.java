@@ -89,7 +89,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
             + ":default-lifecycle-bindings";
 
     public static final InputLocation DEFAULT_LIFECYCLE_INPUT_LOCATION =
-            InputLocation.location(InputSource.source(DEFAULT_LIFECYCLE_MODELID, null));
+            new InputLocation(new InputSource(DEFAULT_LIFECYCLE_MODELID, null));
 
     private final List<LifecycleProvider> providers;
 

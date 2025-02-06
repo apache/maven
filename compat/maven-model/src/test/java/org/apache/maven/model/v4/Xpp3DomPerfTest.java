@@ -73,7 +73,7 @@ public class Xpp3DomPerfTest {
             try (InputStream is = Files.newInputStream(pom)) {
                 MavenStaxReader reader = new MavenStaxReader();
                 reader.setAddLocationInformation(false);
-                reader.read(is, true, InputSource.source("id", pom.toString()));
+                reader.read(is, true, new InputSource("id", pom.toString()));
                 i++;
             } catch (XMLStreamException e) {
                 throw new RuntimeException("Error parsing: " + pom, e);

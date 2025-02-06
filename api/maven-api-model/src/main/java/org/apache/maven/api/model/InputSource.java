@@ -19,112 +19,38 @@
 package org.apache.maven.api.model;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Represents the source of input for Maven model elements, typically a POM file.
- * This class maintains information about both the physical location (file path or URL)
- * and the logical identity (groupId:artifactId:version) of the source.
- *
- * <p>InputSource instances can represent either:</p>
- * <ul>
- *   <li>A single source file with its location and model ID</li>
- *   <li>A merged set of multiple input sources (e.g., from parent POMs)</li>
- * </ul>
- *
- * <p>The class is immutable and supports caching for performance optimization.
- * It provides factory methods for creating instances and utilities for merging
- * multiple sources.</p>
- *
- * <p>Usage example:</p>
- * <pre>
- * // Create a simple source
- * InputSource source = InputSource.source(
- *     "com.example:myproject:1.0",
- *     "path/to/pom.xml"
- * );
- *
- * // Create a merged source
- * InputSource merged = InputSource.merge(parentSource, childSource);
- * </pre>
- *
- * @see InputLocation
+ * Class InputSource.
  */
-public class InputSource implements Serializable, Cacheable {
+public class InputSource implements Serializable {
 
     private final String modelId;
     private final String location;
     private final List<InputSource> inputs;
     private final InputLocation importedFrom;
-    private final int hashCache;
 
-    /**
-     * Creates a new InputSource with model identification and location information.
-     * This is the most common factory method for creating a simple input source.
-     *
-     * @param modelId the model identifier in the format "groupId:artifactId:version"
-     * @param location the file path or URL where the model is located
-     * @return a cached instance of InputSource
-     */
-    public static InputSource source(String modelId, String location) {
-        return CacheManager.getInstance().cached(new InputSource(modelId, location, null, null));
+    public InputSource(String modelId, String location) {
+        this(modelId, location, null);
     }
 
-    /**
-     * Creates a new InputSource with model identification, location, and import information.
-     * This factory method is useful when tracking sources that have been imported from other files.
-     *
-     * @param modelId the model identifier in the format "groupId:artifactId:version"
-     * @param location the file path or URL where the model is located
-     * @param importedFrom the location from which this source was imported
-     * @return a cached instance of InputSource
-     */
-    public static InputSource source(String modelId, String location, InputLocation importedFrom) {
-        return CacheManager.getInstance().cached(new InputSource(modelId, location, null, importedFrom));
-    }
-
-    /**
-     * Creates a new InputSource representing a merged set of input sources.
-     * This factory method is used when combining multiple sources, such as when
-     * dealing with parent POMs or aggregated models.
-     *
-     * @param inputs the list of input sources to merge
-     * @return a cached instance of InputSource representing the merged sources
-     */
-    public static InputSource source(List<InputSource> inputs) {
-        return CacheManager.getInstance().cached(new InputSource(null, null, inputs, null));
-    }
-
-    /**
-     * Creates a new InputSource with complete information including model ID, location,
-     * input sources, and import information. This is the most flexible factory method
-     * that allows specifying all possible source attributes.
-     *
-     * @param modelId the model identifier in the format "groupId:artifactId:version"
-     * @param location the file path or URL where the model is located
-     * @param inputs the list of input sources to merge
-     * @param importedFrom the location from which this source was imported
-     * @return a cached instance of InputSource
-     */
-    public static InputSource source(
-            String modelId, String location, List<InputSource> inputs, InputLocation importedFrom) {
-        return CacheManager.getInstance().cached(new InputSource(modelId, location, inputs, importedFrom));
-    }
-
-    InputSource(String modelId, String location, List<InputSource> inputs, InputLocation importedFrom) {
+    public InputSource(String modelId, String location, InputLocation importedFrom) {
         this.modelId = modelId;
         this.location = location;
-        this.inputs = inputs != null ? ImmutableCollections.copy(inputs) : null;
+        this.inputs = null;
         this.importedFrom = importedFrom;
-        this.hashCache = CacheManager.getInstance().computeCacheHash(this);
     }
 
-    @Override
-    public int cacheIdentityHash() {
-        return hashCache;
+    public InputSource(Collection<InputSource> inputs) {
+        this.modelId = null;
+        this.location = null;
+        this.inputs = ImmutableCollections.copy(inputs);
+        this.importedFrom = null;
     }
 
     /**
@@ -187,32 +113,7 @@ public class InputSource implements Serializable, Cacheable {
         return getModelId() + " " + getLocation();
     }
 
-    /**
-     * Merges two InputSource instances in a null-safe manner.
-     *
-     * @param src1 the first source
-     * @param src2 the second source
-     * @return merged InputSource, or one of the sources if the other is null
-     */
     public static InputSource merge(InputSource src1, InputSource src2) {
-        // If either source is null, return the other source
-        if (src1 == null) {
-            return src2;
-        }
-        if (src2 == null) {
-            return src1;
-        }
-
-        // Create streams from both sources
-        Stream<InputSource> stream1 = src1.sources();
-        Stream<InputSource> stream2 = src2.sources();
-
-        // Merge the streams and create a new InputSource
-        List<InputSource> mergedSources = Stream.concat(stream1, stream2)
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toList());
-
-        return new InputSource(null, null, mergedSources.isEmpty() ? null : mergedSources, null);
+        return new InputSource(Stream.concat(src1.sources(), src2.sources()).collect(Collectors.toSet()));
     }
 }

@@ -50,7 +50,7 @@ public class DefaultToolchainsReader implements ToolchainsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = Files.newInputStream(input.toPath())) {
-            InputSource source = InputSource.source(input.toString());
+            InputSource source = new InputSource(input.toString());
             return new PersistedToolchains(new MavenToolchainsStaxReader().read(in, isStrict(options), source));
         } catch (XMLStreamException e) {
             throw new ToolchainsParseException(
