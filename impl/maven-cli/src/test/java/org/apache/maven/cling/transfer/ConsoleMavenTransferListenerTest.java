@@ -45,79 +45,85 @@ class ConsoleMavenTransferListenerTest {
     void testTransferProgressedWithPrintResourceNames() throws Exception {
         int size = 1000;
         ExecutorService service = Executors.newFixedThreadPool(size * 2);
-        startLatch = new CountDownLatch(size);
-        endLatch = new CountDownLatch(size);
-        Map<String, String> output = new ConcurrentHashMap<String, String>();
+        try {
+            startLatch = new CountDownLatch(size);
+            endLatch = new CountDownLatch(size);
+            Map<String, String> output = new ConcurrentHashMap<String, String>();
 
-        TransferListener listener = new SimplexTransferListener(new ConsoleMavenTransferListener(
-                new JLineMessageBuilderFactory(),
-                new PrintWriter(System.out) {
+            try (SimplexTransferListener listener = new SimplexTransferListener(new ConsoleMavenTransferListener(
+                    new JLineMessageBuilderFactory(),
+                    new PrintWriter(System.out) {
 
-                    @Override
-                    public void print(Object o) {
+                        @Override
+                        public void print(Object o) {
 
-                        String string = o.toString();
-                        int i = string.length() - 1;
-                        while (i >= 0) {
-                            char c = string.charAt(i);
-                            if (c == '\n' || c == '\r' || c == ' ') i--;
-                            else break;
+                            String string = o.toString();
+                            int i = string.length() - 1;
+                            while (i >= 0) {
+                                char c = string.charAt(i);
+                                if (c == '\n' || c == '\r' || c == ' ') i--;
+                                else break;
+                            }
+
+                            string = string.substring(0, i + 1).trim();
+                            output.put(string, string);
+                            System.out.print(o);
                         }
+                    },
+                    true))) {
+                TransferResource resource =
+                        new TransferResource(null, null, "http://maven.org/test/test-resource", new File(""), null);
+                resource.setContentLength(size - 1);
 
-                        string = string.substring(0, i + 1).trim();
-                        output.put(string, string);
-                        System.out.print(o);
+                DefaultRepositorySystemSession session =
+                        new DefaultRepositorySystemSession(h -> false); // no close handle
+
+                // warm up
+                test(listener, session, resource, 0);
+
+                for (int i = 1; i < size; i++) {
+                    final int bytes = i;
+
+                    service.execute(() -> {
+                        test(listener, session, resource, bytes);
+                    });
+                }
+
+                // start all threads at once
+                try {
+                    startLatch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                // wait for all thread to end
+                try {
+                    endLatch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                // despite all are back, we need to make sure all the events are processed (are async)
+                // this one should block until all processed
+                listener.transferSucceeded(new TransferEvent.Builder(session, resource)
+                        .setType(TransferEvent.EventType.SUCCEEDED)
+                        .build());
+
+                StringBuilder message = new StringBuilder("Messages [");
+                boolean test = true;
+                for (int i = 0; i < 999; i++) {
+                    boolean ok = output.containsKey("Progress (1): test-resource (" + i + "/999 B)");
+                    if (!ok) {
+                        System.out.println("false : " + i);
+                        message.append(i + ",");
                     }
-                },
-                true));
-        TransferResource resource =
-                new TransferResource(null, null, "http://maven.org/test/test-resource", new File(""), null);
-        resource.setContentLength(size - 1);
-
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(h -> false); // no close handle
-
-        // warm up
-        test(listener, session, resource, 0);
-
-        for (int i = 1; i < size; i++) {
-            final int bytes = i;
-
-            service.execute(() -> {
-                test(listener, session, resource, bytes);
-            });
-        }
-
-        // start all threads at once
-        try {
-            startLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // wait for all thread to end
-        try {
-            endLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // despite all are back, we need to make sure all the events are processed (are async)
-        // this one should block until all processed
-        listener.transferSucceeded(new TransferEvent.Builder(session, resource)
-                .setType(TransferEvent.EventType.SUCCEEDED)
-                .build());
-
-        StringBuilder message = new StringBuilder("Messages [");
-        boolean test = true;
-        for (int i = 0; i < 999; i++) {
-            boolean ok = output.containsKey("Progress (1): test-resource (" + i + "/999 B)");
-            if (!ok) {
-                System.out.println("false : " + i);
-                message.append(i + ",");
+                    test = test & ok;
+                }
+                assertTrue(test, message + "] are missing in " + output);
             }
-            test = test & ok;
+        } finally {
+            service.shutdown();
         }
-        assertTrue(test, message + "] are missing in " + output);
     }
 
     private void test(

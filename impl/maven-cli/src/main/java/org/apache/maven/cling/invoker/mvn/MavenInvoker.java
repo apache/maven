@@ -364,10 +364,12 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         if (quiet || noTransferProgress || quietCI) {
             delegate = new QuietMavenTransferListener();
         } else if (context.interactive && !logFile) {
-            delegate = new SimplexTransferListener(new ConsoleMavenTransferListener(
+            SimplexTransferListener simplex = new SimplexTransferListener(new ConsoleMavenTransferListener(
                     context.invokerRequest.messageBuilderFactory(),
                     context.terminal.writer(),
                     context.invokerRequest.options().verbose().orElse(false)));
+            context.closeables.add(simplex);
+            delegate = simplex;
         } else {
             delegate = new Slf4jMavenTransferListener();
         }
