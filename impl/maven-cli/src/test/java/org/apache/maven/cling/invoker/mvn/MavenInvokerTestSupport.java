@@ -99,7 +99,8 @@ public abstract class MavenInvokerTestSupport {
         Parser parser = createParser();
         try (Invoker invoker = createInvoker()) {
             for (String goal : goals) {
-                Path logFile = cwd.resolve(goal + "-build.log").toAbsolutePath();
+                Path logFile =
+                        cwd.resolve(goal.replace(':', '-') + "-build.log").toAbsolutePath();
                 List<String> mvnArgs = new ArrayList<>(args);
                 mvnArgs.addAll(List.of("-l", logFile.toString(), goal));
                 int exitCode = invoker.invoke(
