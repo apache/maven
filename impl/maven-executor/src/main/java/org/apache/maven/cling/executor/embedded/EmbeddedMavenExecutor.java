@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +72,7 @@ public class EmbeddedMavenExecutor implements Executor {
         private final Set<String> originalClassRealmIds;
         private final ClassLoader tccl;
         private final Function<ExecutorRequest, Integer> exec;
+        private final Collection<Object> keepAlive;
 
         private Context(
                 URLClassLoader bootClassLoader,
@@ -78,13 +80,15 @@ public class EmbeddedMavenExecutor implements Executor {
                 Object classWorld,
                 Set<String> originalClassRealmIds,
                 ClassLoader tccl,
-                Function<ExecutorRequest, Integer> exec) {
+                Function<ExecutorRequest, Integer> exec,
+                Collection<Object> keepAlive) {
             this.bootClassLoader = bootClassLoader;
             this.version = version;
             this.classWorld = classWorld;
             this.originalClassRealmIds = originalClassRealmIds;
             this.tccl = tccl;
             this.exec = exec;
+            this.keepAlive = keepAlive;
         }
     }
 
@@ -262,6 +266,7 @@ public class EmbeddedMavenExecutor implements Executor {
                     (Class<?>) launcherClass.getMethod("getMainClass").invoke(launcher);
             String version = getMavenVersion(cliClass);
             Function<ExecutorRequest, Integer> exec;
+            ArrayList<Object> keepAlive = new ArrayList<>();
 
             if (version.startsWith("3.")) {
                 // 3.x
@@ -269,6 +274,7 @@ public class EmbeddedMavenExecutor implements Executor {
                     throw new IllegalArgumentException(getClass().getSimpleName() + "w/ mvn3 does not support command "
                             + executorRequest.command());
                 }
+                keepAlive.add(cliClass.getClassLoader().loadClass("org.fusesource.jansi.internal.JansiLoader"));
                 Constructor<?> newMavenCli = cliClass.getConstructor(classWorld.getClass());
                 Object mavenCli = newMavenCli.newInstance(classWorld);
                 Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
@@ -293,6 +299,7 @@ public class EmbeddedMavenExecutor implements Executor {
                 };
             } else {
                 // assume 4.x
+                keepAlive.add(cliClass.getClassLoader().loadClass("org.jline.nativ.JLineNativeLoader"));
                 Method mainMethod = cliClass.getMethod(
                         "main",
                         String[].class,
@@ -319,7 +326,13 @@ public class EmbeddedMavenExecutor implements Executor {
             }
 
             return new Context(
-                    bootClassLoader, version, classWorld, originalClassRealmIds, cliClass.getClassLoader(), exec);
+                    bootClassLoader,
+                    version,
+                    classWorld,
+                    originalClassRealmIds,
+                    cliClass.getClassLoader(),
+                    exec,
+                    keepAlive);
         } catch (Exception e) {
             throw new ExecutorException("Failed to create executor", e);
         } finally {
