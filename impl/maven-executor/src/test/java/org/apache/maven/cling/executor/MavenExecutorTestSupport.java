@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
+import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
+import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -366,7 +368,7 @@ public abstract class MavenExecutorTestSupport {
 
     protected final Executor createAndMemoizeExecutor() {
         if (executor == null) {
-            executor = doCreateExecutor();
+            executor = doSelectExecutor();
         }
         return executor;
     }
@@ -374,10 +376,15 @@ public abstract class MavenExecutorTestSupport {
     @AfterAll
     static void afterAll() {
         if (executor != null) {
-            executor.close();
             executor = null;
         }
     }
 
-    protected abstract Executor doCreateExecutor();
+    // NOTE: we keep these instances alive to make sure JVM (running tests) loads JAnsi/JLine native library ONLY once
+    // in real life you'd anyway keep these alive as long needed, but here, we repeat a series of tests against same
+    // instance, to prevent them attempting native load more than once.
+    public static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
+    public static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
+
+    protected abstract Executor doSelectExecutor();
 }

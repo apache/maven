@@ -27,7 +27,7 @@ import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 public class EmbeddedMavenExecutorTest extends MavenExecutorTestSupport {
 
     @Override
-    protected Executor doCreateExecutor() {
-        return new EmbeddedMavenExecutor();
+    protected Executor doSelectExecutor() {
+        return EMBEDDED_MAVEN_EXECUTOR;
     }
 }

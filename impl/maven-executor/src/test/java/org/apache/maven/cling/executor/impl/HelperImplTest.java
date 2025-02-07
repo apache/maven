@@ -25,8 +25,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.maven.cling.executor.ExecutorHelper;
-import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
-import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
+import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
@@ -40,9 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelperImplTest {
-    private static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
-    private static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
-
     @TempDir
     private static Path userHome;
 
@@ -54,8 +50,8 @@ public class HelperImplTest {
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         Map<String, String> dump = helper.dump(helper.executorRequest());
         assertEquals(System.getProperty("maven3version"), dump.get("maven.version"));
     }
@@ -68,8 +64,8 @@ public class HelperImplTest {
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         Map<String, String> dump = helper.dump(helper.executorRequest());
         assertEquals(System.getProperty("maven4version"), dump.get("maven.version"));
     }
@@ -82,8 +78,8 @@ public class HelperImplTest {
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         assertEquals(System.getProperty("maven3version"), helper.mavenVersion());
     }
 
@@ -95,8 +91,8 @@ public class HelperImplTest {
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         assertEquals(System.getProperty("maven4version"), helper.mavenVersion());
     }
 
@@ -108,8 +104,8 @@ public class HelperImplTest {
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         String localRepository = helper.localRepository(helper.executorRequest());
         Path local = Paths.get(localRepository);
         assertTrue(Files.isDirectory(local));
@@ -124,8 +120,8 @@ public class HelperImplTest {
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         String localRepository = helper.localRepository(helper.executorRequest());
         Path local = Paths.get(localRepository);
         assertTrue(Files.isDirectory(local));
@@ -139,8 +135,8 @@ public class HelperImplTest {
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(
@@ -157,8 +153,8 @@ public class HelperImplTest {
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         String path = helper.artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(
@@ -175,8 +171,8 @@ public class HelperImplTest {
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
@@ -190,8 +186,8 @@ public class HelperImplTest {
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                EMBEDDED_MAVEN_EXECUTOR,
-                FORKED_MAVEN_EXECUTOR);
+                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
+                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         String path = helper.metadataPath(helper.executorRequest(), "aopalliance", "someremote");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
