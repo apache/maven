@@ -230,7 +230,8 @@ public class EmbeddedMavenExecutor implements Executor {
 
         Properties properties = prepareProperties(executorRequest);
         // set ahead of time, if the mavenHome points to Maven4, as ClassWorld Launcher needs this property
-        properties.setProperty("maven.mainClass", requireNonNull(MVN4_MAIN_CLASSES.get(ExecutorRequest.MVN), "mainClass"));
+        properties.setProperty(
+                "maven.mainClass", requireNonNull(MVN4_MAIN_CLASSES.get(ExecutorRequest.MVN), "mainClass"));
         System.setProperties(properties);
         URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());
         Thread.currentThread().setContextClassLoader(bootClassLoader);
