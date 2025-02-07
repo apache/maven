@@ -129,6 +129,10 @@ public class EmbeddedMavenExecutor implements Executor {
         Context context = mayCreate(executorRequest);
         String command = executorRequest.command();
         Function<ExecutorRequest, Integer> exec = context.commands.get(command);
+        if (exec == null) {
+            throw new IllegalArgumentException(
+                    "Unknown command: " + command + " for " + executorRequest.installationDirectory());
+        }
 
         Thread.currentThread().setContextClassLoader(context.tccl);
         try {
