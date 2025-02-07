@@ -18,9 +18,11 @@
  */
 package org.apache.maven.cling.invoker.mvn;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -99,18 +101,34 @@ public abstract class MavenInvokerTestSupport {
         Parser parser = createParser();
         try (Invoker invoker = createInvoker()) {
             for (String goal : goals) {
-                Path logFile =
-                        cwd.resolve(goal.replace(':', '-') + "-build.log").toAbsolutePath();
+                ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+                ByteArrayOutputStream stderr = new ByteArrayOutputStream();
                 List<String> mvnArgs = new ArrayList<>(args);
-                mvnArgs.addAll(List.of("-l", logFile.toString(), goal));
+                mvnArgs.add(goal);
                 int exitCode = invoker.invoke(
                         parser.parseInvocation(ParserRequest.mvn(mvnArgs, new JLineMessageBuilderFactory())
                                 .cwd(cwd)
                                 .userHome(userHome)
+                                .stdOut(stdout)
+                                .stdErr(stderr)
+                                .embedded(true)
                                 .build()));
-                String log = Files.readString(logFile);
-                logs.put(goal, log);
-                assertEquals(0, exitCode, log);
+
+                // dump things out
+                System.out.println("===================================================");
+                System.out.println("args: " + Arrays.toString(mvnArgs.toArray()));
+                System.out.println("===================================================");
+                System.out.println("stdout: " + stdout);
+                System.out.println("===================================================");
+
+                System.err.println("===================================================");
+                System.err.println("args: " + Arrays.toString(mvnArgs.toArray()));
+                System.err.println("===================================================");
+                System.err.println("stderr: " + stderr);
+                System.err.println("===================================================");
+
+                logs.put(goal, stdout.toString());
+                assertEquals(0, exitCode, "OUT:" + stdout + "\nERR:" + stderr);
             }
         }
         return logs;

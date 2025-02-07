@@ -20,6 +20,8 @@ package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -136,10 +138,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             } catch (Exception e) {
                 // other exceptions (including InvokerException but sans Exit, see above): we need to inform user
                 throw handleException(context, e);
-            } finally {
-                if (context.terminal != null) {
-                    context.terminal.writer().flush();
-                }
             }
         } finally {
             Thread.currentThread().setContextClassLoader(oldCL);
@@ -308,14 +306,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (context.terminal == null) {
             MessageUtils.systemInstall(
                     builder -> {
-                        builder.streams(
-                                context.invokerRequest.stdIn().orElse(null),
-                                context.invokerRequest.stdOut().orElse(null));
-                        builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
-                        // The exec builder suffers from https://github.com/jline/jline3/issues/1098
-                        // We could re-enable it when fixed to provide support for non-standard architectures,
-                        // for which JLine does not provide any native library.
-                        builder.exec(false);
+                        if (context.invokerRequest.embedded()) {
+                            InputStream in = context.invokerRequest.stdIn().orElse(InputStream.nullInputStream());
+                            OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
+                            builder.streams(in, out);
+                            builder.provider("exec");
+                            context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
+                            context.closeables.add(out::flush);
+                        } else {
+                            builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+                        }
                         if (context.coloredOutput != null) {
                             builder.color(context.coloredOutput);
                         }
