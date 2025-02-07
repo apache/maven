@@ -34,10 +34,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,7 +71,7 @@ public class EmbeddedMavenExecutor implements Executor {
         private final Object classWorld;
         private final Set<String> originalClassRealmIds;
         private final ClassLoader tccl;
-        private final Function<ExecutorRequest, Integer> exec;
+        private final Map<String, Function<ExecutorRequest, Integer>> commands;
         private final Collection<Object> keepAlive;
 
         private Context(
@@ -80,40 +80,15 @@ public class EmbeddedMavenExecutor implements Executor {
                 Object classWorld,
                 Set<String> originalClassRealmIds,
                 ClassLoader tccl,
-                Function<ExecutorRequest, Integer> exec,
+                Map<String, Function<ExecutorRequest, Integer>> commands,
                 Collection<Object> keepAlive) {
             this.bootClassLoader = bootClassLoader;
             this.version = version;
             this.classWorld = classWorld;
             this.originalClassRealmIds = originalClassRealmIds;
             this.tccl = tccl;
-            this.exec = exec;
+            this.commands = commands;
             this.keepAlive = keepAlive;
-        }
-    }
-
-    protected static class Key {
-        private final Path installationDirectory;
-        private final String command;
-
-        private Key(Path installationDirectory, String command) {
-            this.installationDirectory = installationDirectory;
-            this.command = command;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Key key = (Key) o;
-            return Objects.equals(installationDirectory, key.installationDirectory)
-                    && Objects.equals(command, key.command);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(installationDirectory, command);
         }
     }
 
@@ -125,7 +100,7 @@ public class EmbeddedMavenExecutor implements Executor {
     protected final PrintStream originalStderr;
     protected final Properties originalProperties;
     protected final ClassLoader originalClassLoader;
-    protected final ConcurrentHashMap<Key, Context> contexts;
+    protected final ConcurrentHashMap<Path, Context> contexts;
 
     public EmbeddedMavenExecutor() {
         this(true, true);
@@ -152,10 +127,12 @@ public class EmbeddedMavenExecutor implements Executor {
         }
         validate(executorRequest);
         Context context = mayCreate(executorRequest);
+        String command = executorRequest.command();
+        Function<ExecutorRequest, Integer> exec = context.commands.get(command);
 
         Thread.currentThread().setContextClassLoader(context.tccl);
         try {
-            return context.exec.apply(executorRequest);
+            return exec.apply(executorRequest);
         } catch (Exception e) {
             throw new ExecutorException("Failed to execute", e);
         } finally {
@@ -202,10 +179,8 @@ public class EmbeddedMavenExecutor implements Executor {
 
     protected Context mayCreate(ExecutorRequest executorRequest) {
         Path mavenHome = ExecutorRequest.getCanonicalPath(executorRequest.installationDirectory());
-        String command = executorRequest.command();
-        Key key = new Key(mavenHome, command);
         if (cacheContexts) {
-            return contexts.computeIfAbsent(key, k -> doCreate(mavenHome, executorRequest));
+            return contexts.computeIfAbsent(mavenHome, k -> doCreate(mavenHome, executorRequest));
         } else {
             return doCreate(mavenHome, executorRequest);
         }
@@ -241,6 +216,8 @@ public class EmbeddedMavenExecutor implements Executor {
         }
 
         Properties properties = prepareProperties(executorRequest);
+        // set ahead of time, if the mavenHome points to Maven4, as ClassWorld Launcher needs this property
+        properties.setProperty("maven.mainClass", requireNonNull(MAIN_CLASSES.get(ExecutorRequest.MVN), "mainClass"));
         System.setProperties(properties);
         URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());
         Thread.currentThread().setContextClassLoader(bootClassLoader);
@@ -265,13 +242,13 @@ public class EmbeddedMavenExecutor implements Executor {
             Class<?> cliClass =
                     (Class<?>) launcherClass.getMethod("getMainClass").invoke(launcher);
             String version = getMavenVersion(cliClass);
-            Function<ExecutorRequest, Integer> exec;
+            Map<String, Function<ExecutorRequest, Integer>> commands = new HashMap<>();
             ArrayList<Object> keepAlive = new ArrayList<>();
 
             if (version.startsWith("3.")) {
                 // 3.x
                 if (!ExecutorRequest.MVN.equals(executorRequest.command())) {
-                    throw new IllegalArgumentException(getClass().getSimpleName() + "w/ mvn3 does not support command "
+                    throw new IllegalArgumentException(getClass().getSimpleName() + " w/ mvn3 does not support command "
                             + executorRequest.command());
                 }
                 keepAlive.add(cliClass.getClassLoader().loadClass("org.fusesource.jansi.internal.JansiLoader"));
@@ -279,7 +256,7 @@ public class EmbeddedMavenExecutor implements Executor {
                 Object mavenCli = newMavenCli.newInstance(classWorld);
                 Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
                 Method doMain = cliClass.getMethod("doMain", parameterTypes);
-                exec = r -> {
+                commands.put(ExecutorRequest.MVN, r -> {
                     System.setProperties(prepareProperties(r));
                     try {
                         ArrayList<String> args = new ArrayList<>(mavenArgs);
@@ -296,33 +273,36 @@ public class EmbeddedMavenExecutor implements Executor {
                     } catch (Exception e) {
                         throw new ExecutorException("Failed to execute", e);
                     }
-                };
+                });
             } else {
                 // assume 4.x
                 keepAlive.add(cliClass.getClassLoader().loadClass("org.jline.nativ.JLineNativeLoader"));
-                Method mainMethod = cliClass.getMethod(
-                        "main",
-                        String[].class,
-                        classWorld.getClass(),
-                        InputStream.class,
-                        OutputStream.class,
-                        OutputStream.class);
-                exec = r -> {
-                    System.setProperties(prepareProperties(r));
-                    try {
-                        ArrayList<String> args = new ArrayList<>(mavenArgs);
-                        args.addAll(r.arguments());
-                        return (int) mainMethod.invoke(
-                                null,
-                                args.toArray(new String[0]),
-                                classWorld,
-                                r.stdIn().orElse(null),
-                                r.stdOut().orElse(null),
-                                r.stdErr().orElse(null));
-                    } catch (Exception e) {
-                        throw new ExecutorException("Failed to execute", e);
-                    }
-                };
+                for (Map.Entry<String, String> cmdEntry : MAIN_CLASSES.entrySet()) {
+                    Class<?> cmdClass = cliClass.getClassLoader().loadClass(cmdEntry.getValue());
+                    Method mainMethod = cmdClass.getMethod(
+                            "main",
+                            String[].class,
+                            classWorld.getClass(),
+                            InputStream.class,
+                            OutputStream.class,
+                            OutputStream.class);
+                    commands.put(cmdEntry.getKey(), r -> {
+                        System.setProperties(prepareProperties(r));
+                        try {
+                            ArrayList<String> args = new ArrayList<>(mavenArgs);
+                            args.addAll(r.arguments());
+                            return (int) mainMethod.invoke(
+                                    null,
+                                    args.toArray(new String[0]),
+                                    classWorld,
+                                    r.stdIn().orElse(null),
+                                    r.stdOut().orElse(null),
+                                    r.stdErr().orElse(null));
+                        } catch (Exception e) {
+                            throw new ExecutorException("Failed to execute", e);
+                        }
+                    });
+                }
             }
 
             return new Context(
@@ -331,7 +311,7 @@ public class EmbeddedMavenExecutor implements Executor {
                     classWorld,
                     originalClassRealmIds,
                     cliClass.getClassLoader(),
-                    exec,
+                    commands,
                     keepAlive);
         } catch (Exception e) {
             throw new ExecutorException("Failed to create executor", e);
@@ -362,7 +342,6 @@ public class EmbeddedMavenExecutor implements Executor {
         // Maven 4.x
         properties.setProperty(
                 "library.jline.path", mavenHome.resolve("lib/jline-native").toString());
-        properties.setProperty("maven.mainClass", requireNonNull(MAIN_CLASSES.get(request.command()), "mainClass"));
 
         if (request.jvmSystemProperties().isPresent()) {
             properties.putAll(request.jvmSystemProperties().get());
