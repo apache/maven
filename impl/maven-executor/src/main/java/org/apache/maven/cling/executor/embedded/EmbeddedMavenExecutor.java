@@ -56,8 +56,13 @@ import static java.util.Objects.requireNonNull;
  * long as instance of this class is not closed. Subsequent execution requests over same installation home are cached.
  */
 public class EmbeddedMavenExecutor implements Executor {
-    protected static final Map<String, String> MAIN_CLASSES =
-            Map.of("mvn", "org.apache.maven.cling.MavenCling", "mvnenc", "org.apache.maven.cling.MavenEncCling");
+    protected static final Map<String, String> MAIN_CLASSES = Map.of(
+            "mvn",
+            "org.apache.maven.cling.MavenCling",
+            "mvnenc",
+            "org.apache.maven.cling.MavenEncCling",
+            "mvnsh",
+            "org.apache.maven.cling.MavenShellCling");
 
     protected static final class Context {
         private final URLClassLoader bootClassLoader;
@@ -235,7 +240,6 @@ public class EmbeddedMavenExecutor implements Executor {
         }
 
         Properties properties = prepareProperties(executorRequest);
-
         System.setProperties(properties);
         URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());
         Thread.currentThread().setContextClassLoader(bootClassLoader);
@@ -334,12 +338,17 @@ public class EmbeddedMavenExecutor implements Executor {
         properties.setProperty("maven.home", mavenHome.toString());
         properties.setProperty(
                 "maven.multiModuleProjectDirectory", request.cwd().toString());
-        String mainClass = requireNonNull(MAIN_CLASSES.get(request.command()), "mainClass");
-        properties.setProperty("maven.mainClass", mainClass);
+
+        // Maven 3.x
+        properties.setProperty(
+                "library.jansi.path", mavenHome.resolve("lib/jansi-native").toString());
+
+        // Maven 4.x
         properties.setProperty(
                 "library.jline.path", mavenHome.resolve("lib/jline-native").toString());
         // TODO: is this needed?
         properties.setProperty("org.jline.terminal.provider", "dumb");
+        properties.setProperty("maven.mainClass", requireNonNull(MAIN_CLASSES.get(request.command()), "mainClass"));
 
         if (request.jvmSystemProperties().isPresent()) {
             properties.putAll(request.jvmSystemProperties().get());

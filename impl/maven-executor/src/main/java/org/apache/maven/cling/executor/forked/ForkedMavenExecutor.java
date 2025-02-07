@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -42,6 +43,16 @@ import static org.apache.maven.api.cli.ExecutorRequest.getCanonicalPath;
  * but provides the best isolation.
  */
 public class ForkedMavenExecutor implements Executor {
+    protected final boolean useMavenArgsEnv;
+
+    public ForkedMavenExecutor() {
+        this(true);
+    }
+
+    public ForkedMavenExecutor(boolean useMavenArgsEnv) {
+        this.useMavenArgsEnv = useMavenArgsEnv;
+    }
+
     @Override
     public int execute(ExecutorRequest executorRequest) throws ExecutorException {
         requireNonNull(executorRequest);
@@ -114,6 +125,13 @@ public class ForkedMavenExecutor implements Executor {
                 .resolve(IS_WINDOWS ? executorRequest.command() + ".cmd" : executorRequest.command())
                 .toString());
 
+        String mavenArgsEnv = System.getenv("MAVEN_ARGS");
+        if (useMavenArgsEnv && mavenArgsEnv != null && !mavenArgsEnv.isEmpty()) {
+            Arrays.stream(mavenArgsEnv.split(" "))
+                    .filter(s -> !s.trim().isEmpty())
+                    .forEach(cmdAndArguments::add);
+        }
+
         cmdAndArguments.addAll(executorRequest.arguments());
 
         ArrayList<String> jvmArgs = new ArrayList<>();
@@ -141,6 +159,7 @@ public class ForkedMavenExecutor implements Executor {
             mavenOpts += String.join(" ", jvmArgs);
             env.put("MAVEN_OPTS", mavenOpts);
         }
+        env.remove("MAVEN_ARGS"); // we already used it if configured to do so
 
         try {
             ProcessBuilder pb = new ProcessBuilder()

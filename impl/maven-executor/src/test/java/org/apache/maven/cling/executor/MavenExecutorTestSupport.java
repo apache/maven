@@ -25,16 +25,19 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class MavenExecutorTestSupport {
+    @Timeout(15)
     @Test
     void mvnenc(
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
@@ -55,6 +58,7 @@ public abstract class MavenExecutorTestSupport {
     }
 
     @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
+    @Timeout(15)
     @Test
     void dump3(
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
@@ -73,6 +77,7 @@ public abstract class MavenExecutorTestSupport {
         System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
+    @Timeout(15)
     @Test
     void dump4(
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
@@ -91,6 +96,7 @@ public abstract class MavenExecutorTestSupport {
         System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
+    @Timeout(15)
     @Test
     void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
@@ -99,12 +105,14 @@ public abstract class MavenExecutorTestSupport {
                 tempDir.resolve(logfile),
                 List.of(mvn4ExecutorRequestBuilder()
                         .cwd(tempDir)
+                        .argument("-V")
                         .argument("verify")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
     }
 
+    @Timeout(15)
     @Test
     void version() throws Exception {
         assertEquals(
@@ -113,6 +121,7 @@ public abstract class MavenExecutorTestSupport {
     }
 
     @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
+    @Timeout(15)
     @Test
     void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
@@ -121,12 +130,14 @@ public abstract class MavenExecutorTestSupport {
                 tempDir.resolve(logfile),
                 List.of(mvn3ExecutorRequestBuilder()
                         .cwd(tempDir)
+                        .argument("-V")
                         .argument("verify")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
     }
 
+    @Timeout(15)
     @Test
     void version3x() throws Exception {
         assertEquals(
@@ -180,12 +191,12 @@ public abstract class MavenExecutorTestSupport {
             }
             """;
 
-    protected void execute(Path logFile, Collection<ExecutorRequest> requests) throws Exception {
+    protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
         try (Executor invoker = createExecutor()) {
             for (ExecutorRequest request : requests) {
                 int exitCode = invoker.execute(request);
                 if (exitCode != 0) {
-                    throw new FailedExecution(request, exitCode, Files.readString(logFile));
+                    throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));
                 }
             }
         }

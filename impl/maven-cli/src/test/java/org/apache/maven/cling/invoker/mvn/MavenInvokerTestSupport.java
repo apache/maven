@@ -34,6 +34,12 @@ import org.apache.maven.jline.JLineMessageBuilderFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class MavenInvokerTestSupport {
+    static {
+        System.setProperty(
+                "library.jline.path",
+                Path.of("target/dependency/org/jline/nativ").toAbsolutePath().toString());
+    }
+
     public static final String POM_STRING =
             """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -79,10 +85,6 @@ public abstract class MavenInvokerTestSupport {
                 }
             }
             """;
-
-    protected void invoke(Path cwd, Path userHome, Collection<String> goals) throws Exception {
-        invoke(cwd, userHome, goals, List.of());
-    }
 
     protected Map<String, String> invoke(Path cwd, Path userHome, Collection<String> goals, Collection<String> args)
             throws Exception {

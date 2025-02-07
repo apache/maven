@@ -323,24 +323,25 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     terminal -> doConfigureWithTerminal(context, terminal));
 
             context.terminal = MessageUtils.getTerminal();
-            // JLine is quite slow to start due to the native library unpacking and loading
-            // so boot it asynchronously
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
-            if (context.coloredOutput != null) {
-                MessageUtils.setColorEnabled(context.coloredOutput);
-            }
         } else {
-            if (context.coloredOutput != null) {
-                MessageUtils.setColorEnabled(context.coloredOutput);
-            }
+            doConfigureWithTerminal(context, context.terminal);
         }
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
         context.terminal = terminal;
         Options options = context.invokerRequest.options();
-        if (options.rawStreams().isEmpty() || !options.rawStreams().get()) {
+        // tricky thing: align what JLine3 detected and Maven thinks:
+        // if embedded, we default to context.coloredOutput=false unless overridden (see above)
+        // if not embedded, JLine3 may detect redirection and will create dumb terminal.
+        // To align Maven with outcomes, we set here color enabled based on these premises.
+        // Note: Maven3 suffers from similar thing: if you do `mvn3 foo > log.txt`, the output will
+        // not be not colored (good), but Maven will print out "Message scheme: color".
+        MessageUtils.setColorEnabled(
+                context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
+        if (!options.rawStreams().orElse(false)) {
             MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
             MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
             stdout.setLogLevel(LocationAwareLogger.INFO_INT);
