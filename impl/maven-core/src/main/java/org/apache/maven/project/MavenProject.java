@@ -147,7 +147,7 @@ public class MavenProject implements Cloneable {
     private List<MavenProject> collectedProjects;
 
     /**
-     * All sources of this project. The map includes main and test codes for all languages.
+     * All sources of this project, in the order they were added.
      */
     private List<SourceRoot> sources = new CopyOnWriteArrayList<>();
 
@@ -318,13 +318,9 @@ public class MavenProject implements Cloneable {
     // ----------------------------------------------------------------------
 
     /**
-     * Adds the given source. If a source already exists for the given scope, language and directory,
-     * then this method either does nothing if all other properties are equal, or thrown
-     * {@linkplain IllegalArgumentException} otherwise.
+     * Adds the given source if not already present.
      *
      * @param source the source to add
-     * @throws IllegalArgumentException if a source exists for the given language, scope and directory
-     *         but with different values for the other properties.
      *
      * @see #getSourceRoots()
      *
