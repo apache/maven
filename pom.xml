@@ -690,7 +690,7 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.5.2</version>
           <configuration>
-            <argLine>-Xmx256m</argLine>
+            <argLine>-Xmx256m -Djava.library.path=${basedir}</argLine>
           </configuration>
         </plugin>
         <plugin>
@@ -874,7 +874,7 @@ under the License.</licenseText>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-surefire-plugin</artifactId>
               <configuration>
-                <argLine>-Xmx256m -javaagent:${org.mockito:mockito-core:jar}</argLine>
+                <argLine>-Xmx256m -javaagent:${org.mockito:mockito-core:jar} -Djava.library.path=${basedir}</argLine>
               </configuration>
             </plugin>
           </plugins>
