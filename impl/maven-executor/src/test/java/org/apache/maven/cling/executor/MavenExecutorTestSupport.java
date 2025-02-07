@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -306,20 +307,17 @@ public abstract class MavenExecutorTestSupport {
             """;
 
     protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
-        try (Executor invoker = createExecutor()) {
-            for (ExecutorRequest request : requests) {
-                int exitCode = invoker.execute(request);
-                if (exitCode != 0) {
-                    throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));
-                }
+        Executor invoker = createAndMemoizeExecutor();
+        for (ExecutorRequest request : requests) {
+            int exitCode = invoker.execute(request);
+            if (exitCode != 0) {
+                throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));
             }
         }
     }
 
     protected String mavenVersion(ExecutorRequest request) throws Exception {
-        try (Executor invoker = createExecutor()) {
-            return invoker.mavenVersion(request);
-        }
+        return createAndMemoizeExecutor().mavenVersion(request);
     }
 
     public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
@@ -364,5 +362,22 @@ public abstract class MavenExecutorTestSupport {
         }
     }
 
-    protected abstract Executor createExecutor();
+    private static Executor executor;
+
+    protected final Executor createAndMemoizeExecutor() {
+        if (executor == null) {
+            executor = doCreateExecutor();
+        }
+        return executor;
+    }
+
+    @AfterAll
+    static void afterAll() {
+        if (executor != null) {
+            executor.close();
+            executor = null;
+        }
+    }
+
+    protected abstract Executor doCreateExecutor();
 }

@@ -27,7 +27,7 @@ import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 public class ForkedMavenExecutorTest extends MavenExecutorTestSupport {
 
     @Override
-    protected Executor createExecutor() {
+    protected Executor doCreateExecutor() {
         return new ForkedMavenExecutor();
     }
 }
