@@ -144,11 +144,11 @@ public class EmbeddedMavenExecutor implements Executor {
 
         Thread.currentThread().setContextClassLoader(context.tccl);
         try {
-            if (executorRequest.stdoutConsumer().isPresent()) {
-                System.setOut(new PrintStream(executorRequest.stdoutConsumer().get(), true));
+            if (executorRequest.stdOut().isPresent()) {
+                System.setOut(new PrintStream(executorRequest.stdOut().get(), true));
             }
-            if (executorRequest.stderrConsumer().isPresent()) {
-                System.setErr(new PrintStream(executorRequest.stderrConsumer().get(), true));
+            if (executorRequest.stdErr().isPresent()) {
+                System.setErr(new PrintStream(executorRequest.stdErr().get(), true));
             }
             return context.exec.apply(executorRequest);
         } catch (Exception e) {
@@ -294,16 +294,14 @@ public class EmbeddedMavenExecutor implements Executor {
                     System.setProperties(prepareProperties(r));
                     try {
                         try {
-                            if (r.stdoutConsumer().isPresent()
-                                    || r.stderrConsumer().isPresent()) {
+                            if (r.stdOut().isPresent() || r.stdErr().isPresent()) {
                                 ansiConsoleInstalled.set(null, 1);
                             }
                             ArrayList<String> args = new ArrayList<>(mavenArgs);
                             args.addAll(r.arguments());
                             return (int) mainMethod.invoke(null, args.toArray(new String[0]), classWorld);
                         } finally {
-                            if (r.stdoutConsumer().isPresent()
-                                    || r.stderrConsumer().isPresent()) {
+                            if (r.stdOut().isPresent() || r.stdErr().isPresent()) {
                                 ansiConsoleInstalled.set(null, 0);
                             }
                         }
