@@ -20,6 +20,8 @@ package org.apache.maven.cling.executor.forked;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,9 +30,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.concurrent.CountDownLatch;
 
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
@@ -58,7 +59,7 @@ public class ForkedMavenExecutor implements Executor {
         requireNonNull(executorRequest);
         validate(executorRequest);
 
-        return doExecute(executorRequest, wrapStdouterrConsumer(executorRequest));
+        return doExecute(executorRequest);
     }
 
     @Override
@@ -96,28 +97,7 @@ public class ForkedMavenExecutor implements Executor {
 
     protected void validate(ExecutorRequest executorRequest) throws ExecutorException {}
 
-    @Nullable
-    protected Consumer<Process> wrapStdouterrConsumer(ExecutorRequest executorRequest) {
-        if (executorRequest.stdOut().isEmpty() && executorRequest.stdErr().isEmpty()) {
-            return null;
-        } else {
-            return p -> {
-                try {
-                    if (executorRequest.stdOut().isPresent()) {
-                        p.getInputStream().transferTo(executorRequest.stdOut().get());
-                    }
-                    if (executorRequest.stdErr().isPresent()) {
-                        p.getErrorStream().transferTo(executorRequest.stdErr().get());
-                    }
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            };
-        }
-    }
-
-    protected int doExecute(ExecutorRequest executorRequest, Consumer<Process> processConsumer)
-            throws ExecutorException {
+    protected int doExecute(ExecutorRequest executorRequest) throws ExecutorException {
         ArrayList<String> cmdAndArguments = new ArrayList<>();
         cmdAndArguments.add(executorRequest
                 .installationDirectory()
@@ -170,14 +150,57 @@ public class ForkedMavenExecutor implements Executor {
             }
 
             Process process = pb.start();
-            if (processConsumer != null) {
-                processConsumer.accept(process);
-            }
+            pump(process, executorRequest).await();
             return process.waitFor();
         } catch (IOException e) {
             throw new ExecutorException("IO problem while executing command: " + cmdAndArguments, e);
         } catch (InterruptedException e) {
             throw new ExecutorException("Interrupted while executing command: " + cmdAndArguments, e);
         }
+    }
+
+    protected CountDownLatch pump(Process p, ExecutorRequest executorRequest) {
+        CountDownLatch latch = new CountDownLatch(3);
+        String suffix = "-pump-" + p.pid();
+        Thread stdoutPump = new Thread(() -> {
+            try {
+                OutputStream stdout = executorRequest.stdOut().orElse(OutputStream.nullOutputStream());
+                p.getInputStream().transferTo(stdout);
+                stdout.flush();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            } finally {
+                latch.countDown();
+            }
+        });
+        stdoutPump.setName("stdout" + suffix);
+        stdoutPump.start();
+        Thread stderrPump = new Thread(() -> {
+            try {
+                OutputStream stderr = executorRequest.stdErr().orElse(OutputStream.nullOutputStream());
+                p.getErrorStream().transferTo(stderr);
+                stderr.flush();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            } finally {
+                latch.countDown();
+            }
+        });
+        stderrPump.setName("stderr" + suffix);
+        stderrPump.start();
+        Thread stdinPump = new Thread(() -> {
+            try {
+                OutputStream in = p.getOutputStream();
+                executorRequest.stdIn().orElse(InputStream.nullInputStream()).transferTo(in);
+                in.flush();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            } finally {
+                latch.countDown();
+            }
+        });
+        stdinPump.setName("stdin" + suffix);
+        stdinPump.start();
+        return latch;
     }
 }
