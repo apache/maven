@@ -57,7 +57,10 @@ import static java.util.Objects.requireNonNull;
  * long as instance of this class is not closed. Subsequent execution requests over same installation home are cached.
  */
 public class EmbeddedMavenExecutor implements Executor {
-    protected static final Map<String, String> MAIN_CLASSES = Map.of(
+    /**
+     * Maven4 supports multiple commands from same installation directory.
+     */
+    protected static final Map<String, String> MVN4_MAIN_CLASSES = Map.of(
             "mvn",
             "org.apache.maven.cling.MavenCling",
             "mvnenc",
@@ -65,14 +68,17 @@ public class EmbeddedMavenExecutor implements Executor {
             "mvnsh",
             "org.apache.maven.cling.MavenShellCling");
 
+    /**
+     * Context holds things loaded up from given Maven Installation Directory.
+     */
     protected static final class Context {
         private final URLClassLoader bootClassLoader;
         private final String version;
         private final Object classWorld;
         private final Set<String> originalClassRealmIds;
         private final ClassLoader tccl;
-        private final Map<String, Function<ExecutorRequest, Integer>> commands;
-        private final Collection<Object> keepAlive;
+        private final Map<String, Function<ExecutorRequest, Integer>> commands; // the commands
+        private final Collection<Object> keepAlive; // refs things to make sure no GC takes it away
 
         private Context(
                 URLClassLoader bootClassLoader,
@@ -131,7 +137,7 @@ public class EmbeddedMavenExecutor implements Executor {
         Function<ExecutorRequest, Integer> exec = context.commands.get(command);
         if (exec == null) {
             throw new IllegalArgumentException(
-                    "Unknown command: " + command + " for " + executorRequest.installationDirectory());
+                    "Unknown command: '" + command + "' for '" + executorRequest.installationDirectory() + "'");
         }
 
         Thread.currentThread().setContextClassLoader(context.tccl);
@@ -155,6 +161,9 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
+    /**
+     * Unloads dynamically loaded things, like extensions created realms. Makes sure we go back to "initial state".
+     */
     protected void disposeRuntimeCreatedRealms(Context context) {
         try {
             Method getRealms = context.classWorld.getClass().getMethod("getRealms");
@@ -194,7 +203,7 @@ public class EmbeddedMavenExecutor implements Executor {
         if (!Files.isDirectory(mavenHome)) {
             throw new IllegalArgumentException("Installation directory must point to existing directory: " + mavenHome);
         }
-        if (!MAIN_CLASSES.containsKey(executorRequest.command())) {
+        if (!MVN4_MAIN_CLASSES.containsKey(executorRequest.command())) {
             throw new IllegalArgumentException(
                     getClass().getSimpleName() + " does not support command " + executorRequest.command());
         }
@@ -221,7 +230,7 @@ public class EmbeddedMavenExecutor implements Executor {
 
         Properties properties = prepareProperties(executorRequest);
         // set ahead of time, if the mavenHome points to Maven4, as ClassWorld Launcher needs this property
-        properties.setProperty("maven.mainClass", requireNonNull(MAIN_CLASSES.get(ExecutorRequest.MVN), "mainClass"));
+        properties.setProperty("maven.mainClass", requireNonNull(MVN4_MAIN_CLASSES.get(ExecutorRequest.MVN), "mainClass"));
         System.setProperties(properties);
         URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());
         Thread.currentThread().setContextClassLoader(bootClassLoader);
@@ -281,7 +290,7 @@ public class EmbeddedMavenExecutor implements Executor {
             } else {
                 // assume 4.x
                 keepAlive.add(cliClass.getClassLoader().loadClass("org.jline.nativ.JLineNativeLoader"));
-                for (Map.Entry<String, String> cmdEntry : MAIN_CLASSES.entrySet()) {
+                for (Map.Entry<String, String> cmdEntry : MVN4_MAIN_CLASSES.entrySet()) {
                     Class<?> cmdClass = cliClass.getClassLoader().loadClass(cmdEntry.getValue());
                     Method mainMethod = cmdClass.getMethod(
                             "main",
