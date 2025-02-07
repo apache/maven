@@ -690,6 +690,7 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.5.2</version>
           <configuration>
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
             <argLine>-Xmx256m</argLine>
           </configuration>
         </plugin>
