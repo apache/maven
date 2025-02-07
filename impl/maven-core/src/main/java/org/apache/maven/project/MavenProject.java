@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
-import java.util.AbstractList;
+import java.util.AbstractSequentialList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -738,26 +739,7 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getResources() {
-        return new AbstractList<>() {
-            @Override
-            public Resource get(int index) {
-                return toResource(getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
-                        .toList()
-                        .get(index));
-            }
-
-            @Override
-            public int size() {
-                return (int) getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
-                        .count();
-            }
-
-            @Override
-            public boolean add(Resource resource) {
-                addResource(resource);
-                return true;
-            }
-        };
+        return getResources(ProjectScope.MAIN);
     }
 
     /**
@@ -765,29 +747,34 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getTestResources() {
-        return new AbstractList<>() {
+        return getResources(ProjectScope.TEST);
+    }
+
+    private List<Resource> getResources(final ProjectScope scope) {
+        return new AbstractSequentialList<>() {
             @Override
-            public Resource get(int index) {
-                return toResource(getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
+            public ListIterator<Resource> listIterator(int index) {
+                return getEnabledSourceRoots(scope, Language.RESOURCES)
+                        .map(MavenProject::toResource)
                         .toList()
-                        .get(index));
+                        .listIterator(index);
             }
 
             @Override
             public int size() {
-                return (int) getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
-                        .count();
+                return Math.toIntExact(
+                        getEnabledSourceRoots(scope, Language.RESOURCES).count());
             }
 
             @Override
             public boolean add(Resource resource) {
-                addTestResource(resource);
+                addResource(scope, resource);
                 return true;
             }
         };
     }
 
-    private Resource toResource(SourceRoot sourceRoot) {
+    private static Resource toResource(SourceRoot sourceRoot) {
         return new Resource(org.apache.maven.api.model.Resource.newBuilder()
                 .directory(sourceRoot.directory().toString())
                 .includes(sourceRoot.includes().stream().map(Object::toString).toList())
@@ -796,12 +783,16 @@ public class MavenProject implements Cloneable {
                 .build());
     }
 
+    private void addResource(ProjectScope scope, Resource resource) {
+        addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), scope, resource.getDelegate()));
+    }
+
     /**
      * @deprecated {@link Resource} is replaced by {@link SourceRoot}.
      */
     @Deprecated(since = "4.0.0")
     public void addResource(Resource resource) {
-        addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), ProjectScope.MAIN, resource.getDelegate()));
+        addResource(ProjectScope.MAIN, resource);
     }
 
     /**
@@ -809,7 +800,7 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public void addTestResource(Resource testResource) {
-        addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), ProjectScope.TEST, testResource.getDelegate()));
+        addResource(ProjectScope.TEST, testResource);
     }
 
     public void setLicenses(List<License> licenses) {
