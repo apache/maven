@@ -54,6 +54,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
+import org.apache.maven.impl.DefaultToolchainManager;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
 import org.apache.maven.rtinfo.RuntimeInformation;

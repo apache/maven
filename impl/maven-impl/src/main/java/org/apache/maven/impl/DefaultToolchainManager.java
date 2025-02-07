@@ -16,11 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.apache.maven.impl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +30,9 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ToolchainFactory;
 import org.apache.maven.api.services.ToolchainFactoryException;
@@ -51,13 +50,15 @@ public class DefaultToolchainManager implements ToolchainManager {
 
     @Inject
     public DefaultToolchainManager(Map<String, ToolchainFactory> factories) {
-        this.factories = factories;
-        this.logger = LoggerFactory.getLogger(DefaultToolchainManager.class);
+        this(factories, null);
     }
 
+    /**
+     * Used for tests only
+     */
     protected DefaultToolchainManager(Map<String, ToolchainFactory> factories, Logger logger) {
         this.factories = factories;
-        this.logger = logger;
+        this.logger = logger != null ? logger : LoggerFactory.getLogger(DefaultToolchainManager.class);
     }
 
     @Nonnull

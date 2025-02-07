@@ -18,24 +18,20 @@
  */
 package org.apache.maven.coreit.toolchain;
 
-import java.util.Optional;
-
-import org.apache.maven.api.Toolchain;
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.services.ToolchainFactory;
-import org.apache.maven.api.toolchain.ToolchainModel;
+import org.apache.maven.toolchain.ToolchainFactory;
+import org.apache.maven.toolchain.ToolchainPrivate;
+import org.apache.maven.toolchain.model.ToolchainModel;
 
 /**
  * @author Benjamin Bentmann
  */
-@Named
 public class CoreItToolchainFactory implements ToolchainFactory {
 
-    public Optional<Toolchain> createDefaultToolchain() {
-        return Optional.empty();
+    public ToolchainPrivate createDefaultToolchain() {
+        return null;
     }
 
-    public Toolchain createToolchain(ToolchainModel model) {
+    public ToolchainPrivate createToolchain(ToolchainModel model) {
         if (model == null) {
             return null;
         }

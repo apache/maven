@@ -20,13 +20,14 @@ package org.apache.maven.coreit.toolchain;
 
 import java.util.Map;
 
-import org.apache.maven.api.Toolchain;
-import org.apache.maven.api.toolchain.ToolchainModel;
+import org.apache.maven.toolchain.Toolchain;
+import org.apache.maven.toolchain.ToolchainPrivate;
+import org.apache.maven.toolchain.model.ToolchainModel;
 
 /**
  * @author Benjamin Bentmann
  */
-public class CoreItToolchain implements Toolchain {
+public class CoreItToolchain implements Toolchain, ToolchainPrivate {
 
     private ToolchainModel model;
 
