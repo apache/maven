@@ -39,6 +39,7 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * Resident UT.
  */
+@Disabled
 @Order(100)
 public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
 

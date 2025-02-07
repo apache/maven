@@ -44,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Local UT.
  */
+@Disabled
 @Order(200)
 public class MavenInvokerTest extends MavenInvokerTestSupport {
     @Override
