@@ -36,11 +36,11 @@ import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
-import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
