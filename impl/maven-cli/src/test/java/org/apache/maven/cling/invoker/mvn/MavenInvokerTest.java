@@ -21,7 +21,6 @@ package org.apache.maven.cling.invoker.mvn;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +63,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
-        invoke(cwd, userHome, Arrays.asList("clean", "verify"));
+        invoke(cwd, userHome, List.of("verify"), List.of());
     }
 
     @Test
@@ -93,7 +92,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path userExtensions = userConf.resolve("extensions.xml");
         Files.writeString(userExtensions, extensionsXml);
 
-        assertThrows(InvokerException.class, () -> invoke(cwd, userHome, Arrays.asList("clean", "verify")));
+        assertThrows(InvokerException.class, () -> invoke(cwd, userHome, List.of("validate"), List.of()));
     }
 
     @Test
@@ -106,6 +105,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
 <?xml version="1.0"?>
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <interactiveMode>false</interactiveMode>
   <profiles>
     <profile>
       <id>oss-development</id>
@@ -151,9 +151,14 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path userExtensions = userConf.resolve("settings.xml");
         Files.writeString(userExtensions, settingsXml);
 
-        Map<String, String> logs = invoke(cwd, userHome, List.of("verify"), List.of("--force-interactive"));
+        // we just execute a Mojo for downloading it only and to assert from which URL it came
+        Map<String, String> logs = invoke(
+                cwd,
+                userHome,
+                List.of("eu.maveniverse.maven.plugins:toolbox:0.6.1:help"),
+                List.of("--force-interactive"));
 
-        String log = logs.get("verify");
+        String log = logs.get("eu.maveniverse.maven.plugins:toolbox:0.6.1:help");
         assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
         assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
     }
@@ -162,7 +167,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
     @Test
     void jimFs() throws Exception {
         try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
-            invoke(fs.getPath("/cwd"), fs.getPath("/home"), Arrays.asList("clean", "verify"));
+            invoke(fs.getPath("/cwd"), fs.getPath("/home"), List.of("verify"), List.of());
         }
     }
 }

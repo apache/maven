@@ -474,6 +474,11 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.jline</groupId>
+        <artifactId>jline-native</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
         <artifactId>jansi-core</artifactId>
         <version>${jlineVersion}</version>
       </dependency>
@@ -685,6 +690,7 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.5.2</version>
           <configuration>
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
             <argLine>-Xmx256m</argLine>
           </configuration>
         </plugin>
@@ -839,10 +845,43 @@ under the License.</licenseText>
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>prepare-for-mockito-agent</id>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
   <profiles>
+    <profile>
+      <id>mockito</id>
+      <activation>
+        <property>
+          <name>org.mockito:mockito-core:jar</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <argLine>-Xmx256m -javaagent:${org.mockito:mockito-core:jar}</argLine>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
     <profile>
       <id>graph</id>
       <activation>
