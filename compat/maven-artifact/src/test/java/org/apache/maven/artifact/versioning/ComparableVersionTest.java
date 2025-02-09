@@ -239,25 +239,6 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testCompareDigitToLetter() { // These should not be treated as digits.
-        ComparableVersion c1 = new ComparableVersion("1");
-        ComparableVersion c2 = new ComparableVersion("J");
-        assertTrue(c1.compareTo(c2) < 0, "expected " + "1" + " < " + "J");
-        assertTrue(c2.compareTo(c1) > 0, "expected " + "J" + " > " + "1");
-    }
-
-    @Test
-    void testNonAsciiDigits() { // These should not be treated as digits.
-        ComparableVersion asciiOne = new ComparableVersion("1");
-        ComparableVersion arabicEight = new ComparableVersion("\u0668");
-        ComparableVersion asciiNine = new ComparableVersion("9");
-        assertTrue(asciiOne.compareTo(arabicEight) < 0, "expected " + "1" + " < " + "\u0668");
-        assertTrue(arabicEight.compareTo(asciiOne) > 0, "expected " + "\u0668" + " > " + "1");
-        assertTrue(asciiNine.compareTo(arabicEight) < 0, "expected " + "9" + " < " + "\u0668");
-        assertTrue(arabicEight.compareTo(asciiNine) > 0, "expected " + "\u0668" + " > " + "9");
-    }
-
-    @Test
     void testGetCanonical() {
         // MNG-7700
         newComparable("0.x");
@@ -273,13 +254,25 @@ class ComparableVersionTest {
 
     @Test
     void testCompareDigitToLetter() {
-        ComparableVersion c1 = new ComparableVersion("7");
-        ComparableVersion c2 = new ComparableVersion("J");
-        ComparableVersion c3 = new ComparableVersion("c");
-        assertTrue(c1.compareTo(c2) > 0, "expected 7 > J");
-        assertTrue(c2.compareTo(c1) < 0, "expected J < 1");
-        assertTrue(c1.compareTo(c3) > 0, "expected 7 > c");
-        assertTrue(c3.compareTo(c1) < 0, "expected c < 7");
+        ComparableVersion seven = new ComparableVersion("7");
+        ComparableVersion capitalJ = new ComparableVersion("J");
+        ComparableVersion lowerCaseC = new ComparableVersion("c");
+        // Digits are greater than letters
+        assertTrue(seven.compareTo(capitalJ) > 0, "expected 7 > J");
+        assertTrue(capitalJ.compareTo(seven) < 0, "expected J < 1");
+        assertTrue(seven.compareTo(lowerCaseC) > 0, "expected 7 > c");
+        assertTrue(lowerCaseC.compareTo(seven) < 0, "expected c < 7");
+    }
+
+    @Test
+    void testNonAsciiDigits() { // These should not be treated as digits.
+        ComparableVersion asciiOne = new ComparableVersion("1");
+        ComparableVersion arabicEight = new ComparableVersion("\u0668");
+        ComparableVersion asciiNine = new ComparableVersion("9");
+        assertTrue(asciiOne.compareTo(arabicEight) > 0, "expected " + "1" + " > " + "\u0668");
+        assertTrue(arabicEight.compareTo(asciiOne) < 0, "expected " + "\u0668" + " < " + "1");
+        assertTrue(asciiNine.compareTo(arabicEight) > 0, "expected " + "9" + " > " + "\u0668");
+        assertTrue(arabicEight.compareTo(asciiNine) < 0, "expected " + "\u0668" + " < " + "9");
     }
 
     @Test
