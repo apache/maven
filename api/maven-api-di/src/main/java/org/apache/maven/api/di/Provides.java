@@ -26,7 +26,25 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Can be used on a static method to provide a bean.
+ * Marks a method as a provider of beans for dependency injection.
+ * <p>
+ * This annotation can be used on static methods to programmatically create and configure
+ * beans that will be managed by the dependency injection container. It's particularly
+ * useful when the bean creation requires complex logic or when the bean needs to be
+ * configured based on runtime conditions.
+ * <p>
+ * Example usage:
+ * <pre>
+ * public class Providers {
+ *     {@literal @}Provides
+ *     {@literal @}Singleton
+ *     public static Configuration provideConfiguration() {
+ *         return Configuration.load();
+ *     }
+ * }
+ * </pre>
+ *
+ * @since 4.0.0
  */
 @Target(METHOD)
 @Retention(RUNTIME)

@@ -52,7 +52,11 @@ public class DefaultVersionResolver implements VersionResolver {
     public VersionResolverResult resolve(VersionResolverRequest request) throws VersionResolverException {
         nonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
+        return session.request(request, this::doResolve);
+    }
 
+    protected VersionResolverResult doResolve(VersionResolverRequest request) throws VersionResolverException {
+        InternalSession session = InternalSession.from(request.getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             VersionRequest req = new VersionRequest(

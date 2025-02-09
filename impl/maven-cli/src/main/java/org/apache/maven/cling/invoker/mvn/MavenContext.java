@@ -35,7 +35,7 @@ public class MavenContext extends LookupContext {
     public Maven maven;
 
     @Override
-    public void doCloseContainer() {
+    public void doCloseContainer() throws Exception {
         try {
             super.doCloseContainer();
         } finally {

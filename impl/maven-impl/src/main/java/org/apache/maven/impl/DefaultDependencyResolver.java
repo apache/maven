@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
-import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Node;
@@ -207,10 +206,13 @@ public class DefaultDependencyResolver implements DependencyResolver {
                     ArtifactResolverResult artifactResolverResult =
                             session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
                     for (Node node : nodes) {
-                        Dependency d = node.getDependency();
-                        Path path = (d != null) ? artifactResolverResult.getPath(d) : null;
+                        Path path = (node.getArtifact() != null)
+                                ? artifactResolverResult
+                                        .getResult(node.getArtifact().toCoordinates())
+                                        .getPath()
+                                : null;
                         try {
-                            resolverResult.addDependency(node, d, filter, path);
+                            resolverResult.addDependency(node, node.getDependency(), filter, path);
                         } catch (IOException e) {
                             throw cannotReadModuleInfo(path, e);
                         }

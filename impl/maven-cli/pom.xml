@@ -114,13 +114,30 @@ under the License.
       <artifactId>maven-resolver-transport-jdk</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-native</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-jline-native</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>jline-native</includeArtifactIds>
+              <includes>org/jline/nativ/**</includes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
@@ -169,7 +186,7 @@ under the License.
           </properties>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
-            <maven.home>${maven.home}</maven.home>
+            <maven.home>${basedir}/src/test/resources/mavenHome</maven.home>
           </systemPropertyVariables>
         </configuration>
       </plugin>

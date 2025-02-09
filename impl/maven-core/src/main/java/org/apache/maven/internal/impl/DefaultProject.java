@@ -122,6 +122,7 @@ public class DefaultProject implements Project {
         return nonNull(project.getFile(), "pomPath").toPath();
     }
 
+    @Nonnull
     @Override
     public Path getBasedir() {
         return nonNull(project.getBasedir(), "basedir").toPath();

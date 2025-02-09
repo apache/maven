@@ -30,6 +30,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -124,113 +125,108 @@ public interface ParserRequest {
 
     /**
      * Returns the input stream to be used for the Maven execution.
-     * If not set, System.in will be used by default.
+     * If not set, {@link System#in} will be used by default.
      *
      * @return the input stream, or null if not set
      */
     @Nullable
-    InputStream in();
+    InputStream stdIn();
 
     /**
      * Returns the output stream to be used for the Maven execution.
-     * If not set, System.out will be used by default.
+     * If not set, {@link System#out} will be used by default.
      *
      * @return the output stream, or null if not set
      */
     @Nullable
-    OutputStream out();
+    OutputStream stdOut();
 
     /**
      * Returns the error stream to be used for the Maven execution.
-     * If not set, System.err will be used by default.
+     * If not set, {@link System#err} will be used by default.
      *
      * @return the error stream, or null if not set
      */
     @Nullable
-    OutputStream err();
+    OutputStream stdErr();
+
+    /**
+     * Returns {@code true} if this call happens in "embedded" mode, for example by another application that
+     * embeds Maven. When running in "embedded" mode, Maven will not try to grab system terminal and will use
+     * provided {@link #stdIn()} or {@link InputStream#nullInputStream()} as standard in stream.
+     */
+    boolean embedded();
 
     /**
      * Creates a new Builder instance for constructing a Maven ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvn(
-            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return mvn(Arrays.asList(args), logger, messageBuilderFactory);
+    static Builder mvn(@Nonnull String[] args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvn(Arrays.asList(args), messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvn(
-            @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return builder(Tools.MVN_CMD, Tools.MVN_NAME, args, logger, messageBuilderFactory);
+    static Builder mvn(@Nonnull List<String> args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(Tools.MVN_CMD, Tools.MVN_NAME, args, messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven Encrypting Tool ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvnenc(
-            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return mvnenc(Arrays.asList(args), logger, messageBuilderFactory);
+    static Builder mvnenc(@Nonnull String[] args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvnenc(Arrays.asList(args), messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven Encrypting Tool ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvnenc(
-            @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return builder(Tools.MVNENC_CMD, Tools.MVNENC_NAME, args, logger, messageBuilderFactory);
+    static Builder mvnenc(@Nonnull List<String> args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(Tools.MVNENC_CMD, Tools.MVNENC_NAME, args, messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven Shell Tool ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvnsh(
-            @Nonnull String[] args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return mvnsh(Arrays.asList(args), logger, messageBuilderFactory);
+    static Builder mvnsh(@Nonnull String[] args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvnsh(Arrays.asList(args), messageBuilderFactory);
     }
 
     /**
      * Creates a new Builder instance for constructing a Maven Shell Tool ParserRequest.
      *
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
     @Nonnull
-    static Builder mvnsh(
-            @Nonnull List<String> args, @Nonnull Logger logger, @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return builder(Tools.MVNSHELL_CMD, Tools.MVNSHELL_NAME, args, logger, messageBuilderFactory);
+    static Builder mvnsh(@Nonnull List<String> args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(Tools.MVNSHELL_CMD, Tools.MVNSHELL_NAME, args, messageBuilderFactory);
     }
 
     /**
@@ -239,7 +235,6 @@ public interface ParserRequest {
      * @param command the Maven command to be executed
      * @param commandName the Maven command Name to be executed
      * @param args the command-line arguments
-     * @param logger the logger to be used during parsing
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
      */
@@ -248,36 +243,33 @@ public interface ParserRequest {
             @Nonnull String command,
             @Nonnull String commandName,
             @Nonnull List<String> args,
-            @Nonnull Logger logger,
             @Nonnull MessageBuilderFactory messageBuilderFactory) {
-        return new Builder(command, commandName, args, logger, messageBuilderFactory);
+        return new Builder(command, commandName, args, messageBuilderFactory);
     }
 
     class Builder {
         private final String command;
         private final String commandName;
         private final List<String> args;
-        private final Logger logger;
         private final MessageBuilderFactory messageBuilderFactory;
+
+        private final Logger logger;
         private Lookup lookup = EMPTY_LOOKUP;
         private Path cwd;
         private Path mavenHome;
         private Path userHome;
-        private InputStream in;
-        private OutputStream out;
-        private OutputStream err;
+        private InputStream stdIn;
+        private OutputStream stdOut;
+        private OutputStream stdErr;
+        private boolean embedded = false;
 
         private Builder(
-                String command,
-                String commandName,
-                List<String> args,
-                Logger logger,
-                MessageBuilderFactory messageBuilderFactory) {
+                String command, String commandName, List<String> args, MessageBuilderFactory messageBuilderFactory) {
             this.command = requireNonNull(command, "command");
             this.commandName = requireNonNull(commandName, "commandName");
             this.args = requireNonNull(args, "args");
-            this.logger = requireNonNull(logger, "logger");
             this.messageBuilderFactory = requireNonNull(messageBuilderFactory, "messageBuilderFactory");
+            this.logger = new AccumulatingLogger();
         }
 
         public Builder lookup(@Nonnull Lookup lookup) {
@@ -300,18 +292,23 @@ public interface ParserRequest {
             return this;
         }
 
-        public Builder in(InputStream in) {
-            this.in = in;
+        public Builder stdIn(InputStream stdIn) {
+            this.stdIn = stdIn;
             return this;
         }
 
-        public Builder out(OutputStream out) {
-            this.out = out;
+        public Builder stdOut(OutputStream stdOut) {
+            this.stdOut = stdOut;
             return this;
         }
 
-        public Builder err(OutputStream err) {
-            this.err = err;
+        public Builder stdErr(OutputStream stdErr) {
+            this.stdErr = stdErr;
+            return this;
+        }
+
+        public Builder embedded(boolean embedded) {
+            this.embedded = embedded;
             return this;
         }
 
@@ -319,16 +316,17 @@ public interface ParserRequest {
             return new ParserRequestImpl(
                     command,
                     commandName,
-                    args,
+                    List.copyOf(args),
                     logger,
                     messageBuilderFactory,
                     lookup,
                     cwd,
                     mavenHome,
                     userHome,
-                    in,
-                    out,
-                    err);
+                    stdIn,
+                    stdOut,
+                    stdErr,
+                    embedded);
         }
 
         @SuppressWarnings("ParameterNumber")
@@ -342,9 +340,10 @@ public interface ParserRequest {
             private final Path cwd;
             private final Path mavenHome;
             private final Path userHome;
-            private final InputStream in;
-            private final OutputStream out;
-            private final OutputStream err;
+            private final InputStream stdIn;
+            private final OutputStream stdOut;
+            private final OutputStream stdErr;
+            private final boolean embedded;
 
             private ParserRequestImpl(
                     String command,
@@ -356,9 +355,10 @@ public interface ParserRequest {
                     Path cwd,
                     Path mavenHome,
                     Path userHome,
-                    InputStream in,
-                    OutputStream out,
-                    OutputStream err) {
+                    InputStream stdIn,
+                    OutputStream stdOut,
+                    OutputStream stdErr,
+                    boolean embedded) {
                 this.command = requireNonNull(command, "command");
                 this.commandName = requireNonNull(commandName, "commandName");
                 this.args = List.copyOf(requireNonNull(args, "args"));
@@ -368,9 +368,10 @@ public interface ParserRequest {
                 this.cwd = cwd;
                 this.mavenHome = mavenHome;
                 this.userHome = userHome;
-                this.in = in;
-                this.out = out;
-                this.err = err;
+                this.stdIn = stdIn;
+                this.stdOut = stdOut;
+                this.stdErr = stdErr;
+                this.embedded = embedded;
             }
 
             @Override
@@ -419,18 +420,23 @@ public interface ParserRequest {
             }
 
             @Override
-            public InputStream in() {
-                return in;
+            public InputStream stdIn() {
+                return stdIn;
             }
 
             @Override
-            public OutputStream out() {
-                return out;
+            public OutputStream stdOut() {
+                return stdOut;
             }
 
             @Override
-            public OutputStream err() {
-                return err;
+            public OutputStream stdErr() {
+                return stdErr;
+            }
+
+            @Override
+            public boolean embedded() {
+                return embedded;
             }
         }
 

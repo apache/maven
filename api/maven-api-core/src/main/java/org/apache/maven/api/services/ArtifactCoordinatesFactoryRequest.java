@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.Objects;
+
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -233,6 +235,23 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
 
             public String getCoordinatesString() {
                 return coordinatesString;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultArtifactFactoryRequestArtifact that
+                        && Objects.equals(groupId, that.groupId)
+                        && Objects.equals(artifactId, that.artifactId)
+                        && Objects.equals(version, that.version)
+                        && Objects.equals(classifier, that.classifier)
+                        && Objects.equals(extension, that.extension)
+                        && Objects.equals(type, that.type)
+                        && Objects.equals(coordinatesString, that.coordinatesString);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(groupId, artifactId, version, classifier, extension, type, coordinatesString);
             }
 
             @Override

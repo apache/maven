@@ -536,7 +536,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <annotations>
-            <annotation>@Deprecated</annotation>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
           </annotations>
         </field>
         <field xdoc.separator="blank">
@@ -630,6 +630,9 @@
             @deprecated Now ignored by Maven.
           </description>
           <type>DOM</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>reporting</name>
@@ -775,7 +778,6 @@
           <type>String</type>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "main" scope and "resources" language -->
           <name>resources</name>
           <version>3.0.0+</version>
           <description>
@@ -783,25 +785,34 @@
             files associated with a project. These resources are often included in the final
             package.
             The default value is {@code src/main/resources}.
+
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code main} scope and {@code resources} language.
           </description>
           <association>
             <type>Resource</type>
             <multiplicity>*</multiplicity>
           </association>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "test" scope and "resources" language -->
           <name>testResources</name>
           <version>4.0.0+</version>
           <description>
             This element describes all the classpath resources such as properties
             files associated with a project's unit tests.
             The default value is {@code src/test/resources}.
+
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code test} scope and {@code resources} language.
           </description>
           <association>
             <type>Resource</type>
             <multiplicity>*</multiplicity>
           </association>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>directory</name>
@@ -874,7 +885,6 @@
           </association>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "main" scope. -->
           <name>sourceDirectory</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -883,11 +893,15 @@
             generated build system will compile the sources from this directory when the project is
             built. The path given is relative to the project descriptor.
             The default value is {@code src/main/java}.
+
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code main} scope.
           </description>
           <type>String</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "script" language -->
           <name>scriptSourceDirectory</name>
           <version>4.0.0+</version>
           <required>true</required>
@@ -897,11 +911,15 @@
             contents will be copied to the output directory in most cases (since scripts are
             interpreted rather than compiled).
             The default value is {@code src/main/scripts}.
+
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code script} language.
           </description>
           <type>String</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
-          <!-- TODO: replaced by <Source> with "test" scope. -->
           <name>testSourceDirectory</name>
           <version>4.0.0+</version>
           <required>true</required>
@@ -910,8 +928,13 @@
             project. The generated build system will compile these directories when the project is
             being tested. The path given is relative to the project descriptor.
             The default value is {@code src/test/java}.
+
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code test} scope.
           </description>
           <type>String</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>outputDirectory</name>
@@ -1044,6 +1067,9 @@
           <description>
             @deprecated Where to send the notification to - eg email address.
           </description>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>configuration</name>
@@ -1328,7 +1354,7 @@
      */
     public String getManagementKey() {
         if (managementKey == null) {
-            managementKey = getGroupId() + ":" + getArtifactId() + ":" + getType() + (getClassifier() != null ? ":" + getClassifier() : "");
+            managementKey = (getGroupId() + ":" + getArtifactId() + ":" + getType() + (getClassifier() != null ? ":" + getClassifier() : "")).intern();
         }
         return managementKey;
     }
@@ -2041,7 +2067,7 @@
             ]]>
           </description>
           <type>String</type>
-          <defaultValue>main</defaultValue>
+          <defaultValue>java</defaultValue>
         </field>
         <field>
           <name>module</name>
@@ -2143,7 +2169,6 @@
       </fields>
     </class>
     <class>
-      <!-- TODO: Replaced by <Source> with "resources" language. -->
       <name>Resource</name>
       <description>This element describes all of the classpath resources associated with a project
         or unit tests.</description>
@@ -2161,8 +2186,13 @@
             element with this value: {@code org/apache/maven/messages}.
             This is not required if you simply put the resources in that directory
             structure at the source, however.
+
+            @deprecated Replaced by {@code &lt;Source&gt;} with {@code resources} language.
           </description>
           <type>String</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>filtering</name>
@@ -2561,6 +2591,9 @@
             @deprecated Unused by Maven.
           </description>
           <type>DOM</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
         <field>
           <name>dependencies</name>

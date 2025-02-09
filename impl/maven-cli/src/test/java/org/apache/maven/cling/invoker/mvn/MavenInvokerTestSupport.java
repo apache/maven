@@ -18,10 +18,11 @@
  */
 package org.apache.maven.cling.invoker.mvn;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -30,13 +31,17 @@ import java.util.Map;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
-import org.junit.jupiter.api.Assumptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class MavenInvokerTestSupport {
+    static {
+        System.setProperty(
+                "library.jline.path",
+                Path.of("target/dependency/org/jline/nativ").toAbsolutePath().toString());
+    }
+
     public static final String POM_STRING =
             """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -83,19 +88,8 @@ public abstract class MavenInvokerTestSupport {
             }
             """;
 
-    protected void invoke(Path cwd, Path userHome, Collection<String> goals) throws Exception {
-        invoke(cwd, userHome, goals, List.of());
-    }
-
     protected Map<String, String> invoke(Path cwd, Path userHome, Collection<String> goals, Collection<String> args)
             throws Exception {
-        // works only in recent Maven4
-        Assumptions.assumeTrue(
-                Files.isRegularFile(Paths.get(System.getProperty("maven.home"))
-                        .resolve("conf")
-                        .resolve("maven.properties")),
-                "${maven.home}/conf/maven.properties must be a file");
-
         Files.createDirectories(cwd.resolve(".mvn"));
         Path pom = cwd.resolve("pom.xml").toAbsolutePath();
         Files.writeString(pom, POM_STRING);
@@ -107,17 +101,34 @@ public abstract class MavenInvokerTestSupport {
         Parser parser = createParser();
         try (Invoker invoker = createInvoker()) {
             for (String goal : goals) {
-                Path logFile = cwd.resolve(goal + "-build.log").toAbsolutePath();
+                ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+                ByteArrayOutputStream stderr = new ByteArrayOutputStream();
                 List<String> mvnArgs = new ArrayList<>(args);
-                mvnArgs.addAll(List.of("-l", logFile.toString(), goal));
-                int exitCode = invoker.invoke(parser.parseInvocation(
-                        ParserRequest.mvn(mvnArgs, new ProtoLogger(), new JLineMessageBuilderFactory())
+                mvnArgs.add(goal);
+                int exitCode = invoker.invoke(
+                        parser.parseInvocation(ParserRequest.mvn(mvnArgs, new JLineMessageBuilderFactory())
                                 .cwd(cwd)
                                 .userHome(userHome)
+                                .stdOut(stdout)
+                                .stdErr(stderr)
+                                .embedded(true)
                                 .build()));
-                String log = Files.readString(logFile);
-                logs.put(goal, log);
-                assertEquals(0, exitCode, log);
+
+                // dump things out
+                System.out.println("===================================================");
+                System.out.println("args: " + Arrays.toString(mvnArgs.toArray()));
+                System.out.println("===================================================");
+                System.out.println("stdout: " + stdout);
+                System.out.println("===================================================");
+
+                System.err.println("===================================================");
+                System.err.println("args: " + Arrays.toString(mvnArgs.toArray()));
+                System.err.println("===================================================");
+                System.err.println("stderr: " + stderr);
+                System.err.println("===================================================");
+
+                logs.put(goal, stdout.toString());
+                assertEquals(0, exitCode, "OUT:" + stdout + "\nERR:" + stderr);
             }
         }
         return logs;

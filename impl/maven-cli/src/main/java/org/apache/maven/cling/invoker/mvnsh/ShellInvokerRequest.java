@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cling.invoker.mvnsh;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +36,7 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
     @SuppressWarnings("ParameterNumber")
     public ShellInvokerRequest(
             ParserRequest parserRequest,
+            boolean parsingFailed,
             Path cwd,
             Path installationDirectory,
             Path userHomeDirectory,
@@ -45,14 +44,11 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
             Map<String, String> systemProperties,
             Path topDirectory,
             Path rootDirectory,
-            InputStream in,
-            OutputStream out,
-            OutputStream err,
             List<CoreExtension> coreExtensions,
-            List<String> jvmArguments,
             ShellOptions options) {
         super(
                 parserRequest,
+                parsingFailed,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
@@ -60,11 +56,7 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
                 systemProperties,
                 topDirectory,
                 rootDirectory,
-                in,
-                out,
-                err,
-                coreExtensions,
-                jvmArguments);
+                coreExtensions);
         this.options = requireNonNull(options);
     }
 

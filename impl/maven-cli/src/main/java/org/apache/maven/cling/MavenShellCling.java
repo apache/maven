@@ -19,16 +19,16 @@
 package org.apache.maven.cling;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
-import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.ParserException;
+import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.cling.invoker.ProtoLogger;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvnsh.ShellInvoker;
 import org.apache.maven.cling.invoker.mvnsh.ShellParser;
-import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
@@ -40,7 +40,7 @@ public class MavenShellCling extends ClingSupport {
      * circumstances.
      */
     public static void main(String[] args) throws IOException {
-        int exitCode = new MavenShellCling().run(args);
+        int exitCode = new MavenShellCling().run(args, null, null, null, false);
         System.exit(exitCode);
     }
 
@@ -48,7 +48,20 @@ public class MavenShellCling extends ClingSupport {
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
     public static int main(String[] args, ClassWorld world) throws IOException {
-        return new MavenShellCling(world).run(args);
+        return new MavenShellCling().run(args, null, null, null, false);
+    }
+
+    /**
+     * ClassWorld Launcher "embedded" entry point: returning exitCode and accepts Class World and streams.
+     */
+    public static int main(
+            String[] args,
+            ClassWorld world,
+            @Nullable InputStream stdIn,
+            @Nullable OutputStream stdOut,
+            @Nullable OutputStream stdErr)
+            throws IOException {
+        return new MavenShellCling(world).run(args, stdIn, stdOut, stdErr, true);
     }
 
     public MavenShellCling() {
@@ -66,9 +79,12 @@ public class MavenShellCling extends ClingSupport {
     }
 
     @Override
-    protected InvokerRequest parseArguments(String[] args) throws ParserException, IOException {
-        return new ShellParser()
-                .parseInvocation(ParserRequest.mvnsh(args, new ProtoLogger(), new JLineMessageBuilderFactory())
-                        .build());
+    protected Parser createParser() {
+        return new ShellParser();
+    }
+
+    @Override
+    protected ParserRequest.Builder createParserRequestBuilder(String[] args) {
+        return ParserRequest.mvnsh(args, createMessageBuilderFactory());
     }
 }

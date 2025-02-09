@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cling.invoker.mvn;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +39,7 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
     @SuppressWarnings("ParameterNumber")
     public MavenInvokerRequest(
             ParserRequest parserRequest,
+            boolean parseFailed,
             Path cwd,
             Path installationDirectory,
             Path userHomeDirectory,
@@ -48,14 +47,11 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
             Map<String, String> systemProperties,
             Path topDirectory,
             Path rootDirectory,
-            InputStream in,
-            OutputStream out,
-            OutputStream err,
             List<CoreExtension> coreExtensions,
-            List<String> jvmArguments,
             MavenOptions options) {
         super(
                 parserRequest,
+                parseFailed,
                 cwd,
                 installationDirectory,
                 userHomeDirectory,
@@ -63,11 +59,7 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
                 systemProperties,
                 topDirectory,
                 rootDirectory,
-                in,
-                out,
-                err,
-                coreExtensions,
-                jvmArguments);
+                coreExtensions);
         this.options = requireNonNull(options);
     }
 

@@ -20,6 +20,7 @@ package org.apache.maven.impl;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
@@ -28,10 +29,14 @@ import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Repository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.WorkspaceRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -53,7 +58,30 @@ public interface InternalSession extends Session {
         }
     }
 
+    /**
+     * Executes and optionally caches a request using the provided supplier function. If caching is enabled
+     * for this session, the result will be cached and subsequent identical requests will return the cached
+     * value without re-executing the supplier.
+     *
+     * @param <REQ> The request type
+     * @param <REP> The response type
+     * @param req The request object used as the cache key
+     * @param supplier The function to execute and cache the result
+     * @return The result from the supplier (either fresh or cached)
+     * @throws RuntimeException Any exception thrown by the supplier will be cached and re-thrown on subsequent calls
+     */
+    <REQ extends Request<?>, REP extends Result<REQ>> REP request(REQ req, Function<REQ, REP> supplier);
+
+    <REQ extends Request<?>, REP extends Result<REQ>> List<REP> requests(
+            List<REQ> req, Function<List<REQ>, List<REP>> supplier);
+
     RemoteRepository getRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository);
+
+    LocalRepository getLocalRepository(org.eclipse.aether.repository.LocalRepository repository);
+
+    WorkspaceRepository getWorkspaceRepository(org.eclipse.aether.repository.WorkspaceRepository repository);
+
+    Repository getRepository(org.eclipse.aether.repository.ArtifactRepository repository);
 
     Node getNode(org.eclipse.aether.graph.DependencyNode node);
 

@@ -47,6 +47,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Qualifier;
 import org.apache.maven.api.di.Singleton;
@@ -65,26 +66,29 @@ public class InjectorImpl implements Injector {
         bindScope(Singleton.class, new SingletonScope());
     }
 
+    @Nonnull
     @Override
-    public <T> T getInstance(Class<T> key) {
+    public <T> T getInstance(@Nonnull Class<T> key) {
         return getInstance(Key.of(key));
     }
 
+    @Nonnull
     @Override
-    public <T> T getInstance(Key<T> key) {
+    public <T> T getInstance(@Nonnull Key<T> key) {
         return getCompiledBinding(new Dependency<>(key, false)).get();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> void injectInstance(T instance) {
+    public <T> void injectInstance(@Nonnull T instance) {
         ReflectionUtils.generateInjectingInitializer(Key.of((Class<T>) instance.getClass()))
                 .compile(this::getCompiledBinding)
                 .accept(instance);
     }
 
+    @Nonnull
     @Override
-    public Injector discover(ClassLoader classLoader) {
+    public Injector discover(@Nonnull ClassLoader classLoader) {
         try {
             Enumeration<URL> enumeration = classLoader.getResources("META-INF/maven/org.apache.maven.api.di.Inject");
             while (enumeration.hasMoreElements()) {
@@ -107,13 +111,15 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
+    @Nonnull
     @Override
-    public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Scope scope) {
+    public Injector bindScope(@Nonnull Class<? extends Annotation> scopeAnnotation, @Nonnull Scope scope) {
         return bindScope(scopeAnnotation, () -> scope);
     }
 
+    @Nonnull
     @Override
-    public Injector bindScope(Class<? extends Annotation> scopeAnnotation, Supplier<Scope> scope) {
+    public Injector bindScope(@Nonnull Class<? extends Annotation> scopeAnnotation, @Nonnull Supplier<Scope> scope) {
         if (scopes.put(scopeAnnotation, scope) != null) {
             throw new DIException(
                     "Cannot rebind scope annotation class to a different implementation: " + scopeAnnotation);
@@ -121,15 +127,17 @@ public class InjectorImpl implements Injector {
         return this;
     }
 
+    @Nonnull
     @Override
-    public <U> Injector bindInstance(Class<U> clazz, U instance) {
+    public <U> Injector bindInstance(@Nonnull Class<U> clazz, @Nonnull U instance) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
         Binding<U> binding = Binding.toInstance(instance);
         return doBind(key, binding);
     }
 
+    @Nonnull
     @Override
-    public Injector bindImplicit(Class<?> clazz) {
+    public Injector bindImplicit(@Nonnull Class<?> clazz) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
         if (clazz.isInterface()) {
             bindings.computeIfAbsent(key, $ -> new HashSet<>());
@@ -382,9 +390,11 @@ public class InjectorImpl implements Injector {
     private static class SingletonScope implements Scope {
         Map<Key<?>, java.util.function.Supplier<?>> cache = new ConcurrentHashMap<>();
 
+        @Nonnull
         @SuppressWarnings("unchecked")
         @Override
-        public <T> java.util.function.Supplier<T> scope(Key<T> key, java.util.function.Supplier<T> unscoped) {
+        public <T> java.util.function.Supplier<T> scope(
+                @Nonnull Key<T> key, @Nonnull java.util.function.Supplier<T> unscoped) {
             return (java.util.function.Supplier<T>)
                     cache.computeIfAbsent(key, k -> new java.util.function.Supplier<T>() {
                         volatile T instance;

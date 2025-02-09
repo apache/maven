@@ -41,7 +41,7 @@ public interface Invoker extends AutoCloseable {
      *
      * @param invokerRequest the request containing all necessary information for the invocation
      * @return an integer representing the exit code of the invocation (0 typically indicates success)
-     * @throws InvokerException if an error occurs during the invocation process
+     * @throws InvokerException if an error occurs during the invocation process.
      */
     int invoke(@Nonnull InvokerRequest invokerRequest) throws InvokerException;
 

@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -60,8 +61,11 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.WorkspaceRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.RequestCache;
+import org.apache.maven.api.cache.RequestCacheFactory;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.ArtifactDeployer;
@@ -84,7 +88,9 @@ import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.services.ProjectScopeRegistry;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
@@ -94,6 +100,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.transfer.TransferResource;
 
 import static org.apache.maven.impl.Utils.map;
@@ -115,6 +122,7 @@ public abstract class AbstractSession implements InternalSession {
             Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
             Collections.synchronizedMap(new WeakHashMap<>());
+    private volatile RequestCache requestCache;
 
     static {
         TransferResource.setClock(MonotonicClock.get());
@@ -133,8 +141,69 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
+    public <REQ extends Request<?>, REP extends Result<REQ>> REP request(REQ req, Function<REQ, REP> supplier) {
+        return getRequestCache().request(req, supplier);
+    }
+
+    @Override
+    public <REQ extends Request<?>, REP extends Result<REQ>> List<REP> requests(
+            List<REQ> reqs, Function<List<REQ>, List<REP>> supplier) {
+        return getRequestCache().requests(reqs, supplier);
+    }
+
+    private RequestCache getRequestCache() {
+        RequestCache cache = requestCache;
+        if (cache == null) {
+            synchronized (this) {
+                cache = requestCache;
+                if (cache == null) {
+                    RequestCacheFactory factory = lookup.lookup(RequestCacheFactory.class);
+                    requestCache = factory.createCache();
+                    cache = requestCache;
+                }
+            }
+        }
+        return cache;
+    }
+
+    @Override
     public RemoteRepository getRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository) {
         return allRepositories.computeIfAbsent(repository, DefaultRemoteRepository::new);
+    }
+
+    @Override
+    public LocalRepository getLocalRepository(org.eclipse.aether.repository.LocalRepository repository) {
+        return new DefaultLocalRepository(repository);
+    }
+
+    @Override
+    public WorkspaceRepository getWorkspaceRepository(org.eclipse.aether.repository.WorkspaceRepository repository) {
+        return new WorkspaceRepository() {
+            @Nonnull
+            @Override
+            public String getId() {
+                return repository.getId();
+            }
+
+            @Nonnull
+            @Override
+            public String getType() {
+                return repository.getContentType();
+            }
+        };
+    }
+
+    @Override
+    public org.apache.maven.api.Repository getRepository(ArtifactRepository repository) {
+        if (repository instanceof org.eclipse.aether.repository.RemoteRepository remote) {
+            return getRemoteRepository(remote);
+        } else if (repository instanceof org.eclipse.aether.repository.LocalRepository local) {
+            return getLocalRepository(local);
+        } else if (repository instanceof org.eclipse.aether.repository.WorkspaceRepository workspace) {
+            return getWorkspaceRepository(workspace);
+        } else {
+            throw new IllegalArgumentException("Unsupported repository type: " + repository.getClass());
+        }
     }
 
     @Override
@@ -548,9 +617,11 @@ public abstract class AbstractSession implements InternalSession {
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates) {
         return getService(ArtifactResolver.class)
                 .resolve(this, Collections.singletonList(coordinates))
-                .getArtifacts()
+                .getResults()
+                .values()
                 .iterator()
-                .next();
+                .next()
+                .getArtifact();
     }
 
     /**
@@ -563,9 +634,11 @@ public abstract class AbstractSession implements InternalSession {
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates, List<RemoteRepository> repositories) {
         return getService(ArtifactResolver.class)
                 .resolve(this, Collections.singletonList(coordinates), repositories)
-                .getArtifacts()
+                .getResults()
+                .values()
                 .iterator()
-                .next();
+                .next()
+                .getArtifact();
     }
 
     /**

@@ -20,6 +20,8 @@ package org.apache.maven.cling.invoker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +45,7 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Lookup;
@@ -64,6 +67,8 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.cling.invoker.logging.Slf4jLogger;
+import org.apache.maven.cling.invoker.logging.SystemLogger;
 import org.apache.maven.cling.invoker.spi.PropertyContributorsHolder;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
@@ -108,7 +113,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     @Override
-    public int invoke(InvokerRequest invokerRequest) throws InvokerException {
+    public final int invoke(InvokerRequest invokerRequest) {
         requireNonNull(invokerRequest);
 
         Properties oldProps = new Properties();
@@ -128,8 +133,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 }
                 return doInvoke(context);
             } catch (InvokerException.ExitException e) {
-                return e.getExitCode();
+                // contract of ExitException is that nothing needed by us
+                throw e;
             } catch (Exception e) {
+                // other exceptions (including InvokerException but sans Exit, see above): we need to inform user
                 throw handleException(context, e);
             }
         } finally {
@@ -139,6 +146,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int doInvoke(C context) throws Exception {
+        validate(context);
         pushCoreProperties(context);
         pushUserProperties(context);
         configureLogging(context);
@@ -156,23 +164,59 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         return execute(context);
     }
 
-    protected InvokerException handleException(C context, Exception e) throws InvokerException {
-        boolean showStackTrace = context.invokerRequest.options().showErrors().orElse(false);
-        if (showStackTrace) {
-            context.logger.error(
-                    "Error executing " + context.invokerRequest.parserRequest().commandName() + ".", e);
-        } else {
-            context.logger.error(
-                    "Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
-            context.logger.error(e.getMessage());
-            for (Throwable cause = e.getCause(); cause != null && cause != cause.getCause(); cause = cause.getCause()) {
-                context.logger.error("Caused by: " + cause.getMessage());
-            }
-        }
-        return new InvokerException(e.getMessage(), e);
+    protected InvokerException.ExitException handleException(C context, Exception e) {
+        printErrors(
+                context,
+                context.invokerRequest.options().showErrors().orElse(false),
+                List.of(new Logger.Entry(Logger.Level.ERROR, e.getMessage(), e.getCause())),
+                context.logger);
+        return new InvokerException.ExitException(2);
     }
 
-    protected abstract C createContext(InvokerRequest invokerRequest) throws InvokerException;
+    protected void printErrors(C context, boolean showStackTrace, List<Logger.Entry> entries, Logger logger) {
+        // if accumulating logger passed, this is "early failure", swap logger for stdErr and use that to emit log
+        if (logger instanceof AccumulatingLogger) {
+            logger = new SystemLogger(context.invokerRequest.stdErr().orElse(null));
+        }
+        // this is important message; many Maven IT assert for presence of this message
+        logger.error("Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
+        for (Logger.Entry entry : entries) {
+            if (showStackTrace) {
+                logger.log(entry.level(), entry.message(), entry.error());
+            } else {
+                logger.error(entry.message());
+                for (Throwable cause = entry.error();
+                        cause != null && cause != cause.getCause();
+                        cause = cause.getCause()) {
+                    logger.log(entry.level(), "Caused by: " + cause.getMessage());
+                }
+            }
+        }
+    }
+
+    protected abstract C createContext(InvokerRequest invokerRequest);
+
+    protected void validate(C context) throws Exception {
+        if (context.invokerRequest.parsingFailed()) {
+            // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
+            List<Logger.Entry> entries = context.logger.drain();
+            printErrors(
+                    context,
+                    context.invokerRequest
+                            .parserRequest()
+                            .args()
+                            .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG),
+                    entries,
+                    context.logger);
+            // we skip handleException above as we did output
+            throw new InvokerException.ExitException(1);
+        }
+
+        // warn about deprecated options
+        context.invokerRequest
+                .options()
+                .warnAboutDeprecatedOptions(context.invokerRequest.parserRequest(), context.logger::warn);
+    }
 
     protected void pushCoreProperties(C context) throws Exception {
         System.setProperty(
@@ -210,7 +254,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         String styleColor = mavenOptions
                 .color()
                 .orElse(userProperties.getOrDefault(
-                        Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")));
+                        Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")))
+                .toLowerCase(Locale.ENGLISH);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
             context.coloredOutput = true;
         } else if ("never".equals(styleColor) || "no".equals(styleColor) || "none".equals(styleColor)) {
@@ -261,14 +306,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (context.terminal == null) {
             MessageUtils.systemInstall(
                     builder -> {
-                        builder.streams(
-                                context.invokerRequest.in().orElse(null),
-                                context.invokerRequest.out().orElse(null));
-                        builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
-                        // The exec builder suffers from https://github.com/jline/jline3/issues/1098
-                        // We could re-enable it when fixed to provide support for non-standard architectures,
-                        // for which JLine does not provide any native library.
-                        builder.exec(false);
+                        if (context.invokerRequest.embedded()) {
+                            InputStream in = context.invokerRequest.stdIn().orElse(InputStream.nullInputStream());
+                            OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
+                            builder.streams(in, out);
+                            builder.provider("exec");
+                            context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
+                            context.closeables.add(out::flush);
+                        } else {
+                            builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+                        }
                         if (context.coloredOutput != null) {
                             builder.color(context.coloredOutput);
                         }
@@ -276,24 +323,25 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     terminal -> doConfigureWithTerminal(context, terminal));
 
             context.terminal = MessageUtils.getTerminal();
-            // JLine is quite slow to start due to the native library unpacking and loading
-            // so boot it asynchronously
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
-            if (context.coloredOutput != null) {
-                MessageUtils.setColorEnabled(context.coloredOutput);
-            }
         } else {
-            if (context.coloredOutput != null) {
-                MessageUtils.setColorEnabled(context.coloredOutput);
-            }
+            doConfigureWithTerminal(context, context.terminal);
         }
     }
 
     protected void doConfigureWithTerminal(C context, Terminal terminal) {
         context.terminal = terminal;
         Options options = context.invokerRequest.options();
-        if (options.rawStreams().isEmpty() || !options.rawStreams().get()) {
+        // tricky thing: align what JLine3 detected and Maven thinks:
+        // if embedded, we default to context.coloredOutput=false unless overridden (see above)
+        // if not embedded, JLine3 may detect redirection and will create dumb terminal.
+        // To align Maven with outcomes, we set here color enabled based on these premises.
+        // Note: Maven3 suffers from similar thing: if you do `mvn3 foo > log.txt`, the output will
+        // not be not colored (good), but Maven will print out "Message scheme: color".
+        MessageUtils.setColorEnabled(
+                context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
+        if (!options.rawStreams().orElse(false)) {
             MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
             MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
             stdout.setLogLevel(LocationAwareLogger.INFO_INT);
@@ -338,11 +386,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         Options mavenOptions = invokerRequest.options();
 
         context.slf4jConfiguration.activate();
-        org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
-        context.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
-                .setCause(error)
-                .log(message);
-
         if (mavenOptions.failOnSeverity().isPresent()) {
             String logLevelThreshold = mavenOptions.failOnSeverity().get();
             if (context.loggerFactory instanceof LogLevelRecorder recorder) {
@@ -363,6 +406,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                         + "The --fail-on-severity flag will not take effect.");
             }
         }
+
+        // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
+        Logger logger =
+                new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
+        context.logger.drain().forEach(e -> logger.log(e.level(), e.message(), e.error()));
+        context.logger = logger;
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {

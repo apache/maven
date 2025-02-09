@@ -18,10 +18,6 @@
  */
 package org.apache.maven.jline;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,10 +28,6 @@ import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.codehaus.plexus.components.interactivity.InputHandler;
-import org.codehaus.plexus.components.interactivity.OutputHandler;
-import org.codehaus.plexus.components.interactivity.Prompter;
-import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.StyleResolver;
@@ -44,8 +36,7 @@ import org.jline.utils.StyleResolver;
 @Named
 @Singleton
 @Priority(10)
-public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompter, InputHandler, OutputHandler {
-
+public class JLineMessageBuilderFactory implements MessageBuilderFactory {
     private final StyleResolver resolver;
 
     public JLineMessageBuilderFactory() {
@@ -54,7 +45,7 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompt
 
     @Override
     public boolean isColorEnabled() {
-        return false;
+        return MessageUtils.isColorEnabled();
     }
 
     @Override
@@ -64,171 +55,27 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompt
 
     @Override
     public MessageBuilder builder() {
-        return new JlineMessageBuilder();
+        return builder(64);
     }
 
     @Override
     public MessageBuilder builder(int size) {
-        return new JlineMessageBuilder(size);
+        return new JlineMessageBuilder(resolver, size);
     }
 
-    @Override
-    public String readLine() throws IOException {
-        return doPrompt(null, false);
-    }
+    private static class JlineMessageBuilder implements MessageBuilder {
+        private final StyleResolver styleResolver;
+        private final AttributedStringBuilder builder;
 
-    @Override
-    public String readPassword() throws IOException {
-        return doPrompt(null, true);
-    }
-
-    @Override
-    public List<String> readMultipleLines() throws IOException {
-        List<String> lines = new ArrayList<>();
-        for (String line = this.readLine(); line != null && !line.isEmpty(); line = readLine()) {
-            lines.add(line);
-        }
-        return lines;
-    }
-
-    @Override
-    public void write(String line) throws IOException {
-        doDisplay(line);
-    }
-
-    @Override
-    public void writeLine(String line) throws IOException {
-        doDisplay(line + System.lineSeparator());
-    }
-
-    @Override
-    public String prompt(String message) throws PrompterException {
-        return prompt(message, null, null);
-    }
-
-    @Override
-    public String prompt(String message, String defaultReply) throws PrompterException {
-        return prompt(message, null, defaultReply);
-    }
-
-    @Override
-    public String prompt(String message, List possibleValues) throws PrompterException {
-        return prompt(message, possibleValues, null);
-    }
-
-    @Override
-    public String prompt(String message, List possibleValues, String defaultReply) throws PrompterException {
-        return doPrompt(message, possibleValues, defaultReply, false);
-    }
-
-    @Override
-    public String promptForPassword(String message) throws PrompterException {
-        return doPrompt(message, null, null, true);
-    }
-
-    @Override
-    public void showMessage(String message) throws PrompterException {
-        try {
-            doDisplay(message);
-        } catch (IOException e) {
-            throw new PrompterException("Failed to present prompt", e);
-        }
-    }
-
-    String doPrompt(String message, List<Object> possibleValues, String defaultReply, boolean password)
-            throws PrompterException {
-        String formattedMessage = formatMessage(message, possibleValues, defaultReply);
-        String line;
-        do {
-            try {
-                line = doPrompt(formattedMessage, password);
-                if (line == null && defaultReply == null) {
-                    throw new IOException("EOF");
-                }
-            } catch (IOException e) {
-                throw new PrompterException("Failed to prompt user", e);
-            }
-            if (line == null || line.isEmpty()) {
-                line = defaultReply;
-            }
-            if (line != null && (possibleValues != null && !possibleValues.contains(line))) {
-                try {
-                    doDisplay("Invalid selection.\n");
-                } catch (IOException e) {
-                    throw new PrompterException("Failed to present feedback", e);
-                }
-            }
-        } while (line == null || (possibleValues != null && !possibleValues.contains(line)));
-        return line;
-    }
-
-    private String formatMessage(String message, List<Object> possibleValues, String defaultReply) {
-        StringBuilder formatted = new StringBuilder(message.length() * 2);
-        formatted.append(message);
-        if (possibleValues != null && !possibleValues.isEmpty()) {
-            formatted.append(" (");
-            for (Iterator<?> it = possibleValues.iterator(); it.hasNext(); ) {
-                String possibleValue = String.valueOf(it.next());
-                formatted.append(possibleValue);
-                if (it.hasNext()) {
-                    formatted.append('/');
-                }
-            }
-            formatted.append(')');
-        }
-        if (defaultReply != null) {
-            formatted.append(' ').append(defaultReply).append(": ");
-        }
-        return formatted.toString();
-    }
-
-    private void doDisplay(String message) throws IOException {
-        try {
-            MessageUtils.terminal.writer().print(message);
-            MessageUtils.terminal.flush();
-        } catch (Exception e) {
-            throw new IOException("Unable to display message", e);
-        }
-    }
-
-    private String doPrompt(String message, boolean password) throws IOException {
-        try {
-            if (message != null) {
-                if (!message.endsWith("\n")) {
-                    if (message.endsWith(":")) {
-                        message += " ";
-                    } else if (!message.endsWith(": ")) {
-                        message += ": ";
-                    }
-                }
-                int lastNl = message.lastIndexOf('\n');
-                String begin = message.substring(0, lastNl + 1);
-                message = message.substring(lastNl + 1);
-                MessageUtils.terminal.writer().print(begin);
-                MessageUtils.terminal.flush();
-            }
-            return MessageUtils.reader.readLine(message, password ? '*' : null);
-        } catch (Exception e) {
-            throw new IOException("Unable to prompt user", e);
-        }
-    }
-
-    class JlineMessageBuilder implements MessageBuilder {
-
-        final AttributedStringBuilder builder;
-
-        JlineMessageBuilder() {
-            builder = new AttributedStringBuilder();
-        }
-
-        JlineMessageBuilder(int size) {
-            builder = new AttributedStringBuilder(size);
+        private JlineMessageBuilder(StyleResolver styleResolver, int size) {
+            this.styleResolver = styleResolver;
+            this.builder = new AttributedStringBuilder(size);
         }
 
         @Override
         public MessageBuilder style(String style) {
             if (MessageUtils.isColorEnabled()) {
-                builder.style(resolver.resolve(style));
+                builder.style(styleResolver.resolve(style));
             }
             return this;
         }
@@ -274,11 +121,10 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory, Prompt
         }
     }
 
-    static class MavenStyleResolver extends StyleResolver {
-
+    private static class MavenStyleResolver extends StyleResolver {
         private final Map<String, AttributedStyle> styles = new ConcurrentHashMap<>();
 
-        MavenStyleResolver() {
+        private MavenStyleResolver() {
             super(key -> {
                 String v = System.getProperty(Constants.MAVEN_STYLE_PREFIX + key);
                 if (v == null) {

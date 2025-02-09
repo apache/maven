@@ -23,7 +23,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Dependency;
@@ -52,11 +51,10 @@ class DefaultModelResolverTest {
         Path basedir = Paths.get(System.getProperty("basedir", ""));
         Path localRepoPath = basedir.resolve("target/local-repo");
         Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
-        Session s = ApiRunner.createSession();
-        LocalRepository localRepository = s.createLocalRepository(localRepoPath);
+        Session s = ApiRunner.createSession(null, localRepoPath);
         RemoteRepository remoteRepository = s.createRemoteRepository(
                 RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
-        session = s.withLocalRepository(localRepository).withRemoteRepositories(List.of(remoteRepository));
+        session = s.withRemoteRepositories(List.of(remoteRepository));
     }
 
     @Test

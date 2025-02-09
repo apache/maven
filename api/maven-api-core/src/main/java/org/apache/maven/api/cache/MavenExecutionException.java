@@ -16,18 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.impl.model;
+package org.apache.maven.api.cache;
 
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.services.model.ModelCache;
-import org.apache.maven.api.services.model.ModelCacheFactory;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.services.MavenException;
 
-@Named
-@Singleton
-public class DefaultModelCacheFactory implements ModelCacheFactory {
-    @Override
-    public ModelCache newInstance() {
-        return new DefaultModelCache();
+/**
+ * Exception thrown when an error occurs during Maven execution.
+ * This exception wraps the original cause of the execution failure.
+ *
+ * @since 4.0.0
+ */
+@Experimental
+public class MavenExecutionException extends MavenException {
+
+    /**
+     * Constructs a new MavenExecutionException with the specified cause.
+     *
+     * @param cause The underlying exception that caused the execution failure
+     */
+    public MavenExecutionException(Throwable cause) {
+        super(cause);
     }
 }

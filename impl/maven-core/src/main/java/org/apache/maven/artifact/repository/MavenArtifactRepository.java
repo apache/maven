@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.repository;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +42,8 @@ public class MavenArtifactRepository implements ArtifactRepository {
     private String url;
 
     private String basedir;
+
+    private Path basedirPath;
 
     private String protocol;
 
@@ -85,6 +88,25 @@ public class MavenArtifactRepository implements ArtifactRepository {
         //
         this.protocol = protocol(url);
         this.basedir = basedir(url);
+    }
+
+    public MavenArtifactRepository(
+            String id,
+            Path path,
+            ArtifactRepositoryLayout layout,
+            ArtifactRepositoryPolicy snapshots,
+            ArtifactRepositoryPolicy releases) {
+        this.id = id;
+        this.url = path.toUri().toString();
+        this.layout = layout;
+        this.snapshots = snapshots;
+        this.releases = releases;
+        //
+        // Derive these from the URL
+        //
+        this.protocol = path.toUri().toString();
+        this.basedir = path.toString();
+        this.basedirPath = path;
     }
 
     public String pathOf(Artifact artifact) {
@@ -181,6 +203,11 @@ public class MavenArtifactRepository implements ArtifactRepository {
 
     public String getBasedir() {
         return basedir;
+    }
+
+    @Override
+    public Path getBasedirPath() {
+        return basedirPath;
     }
 
     public String getProtocol() {

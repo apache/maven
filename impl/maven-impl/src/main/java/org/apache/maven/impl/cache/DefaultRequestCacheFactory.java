@@ -16,25 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services.model;
+package org.apache.maven.impl.cache;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cache.RequestCache;
+import org.apache.maven.api.cache.RequestCacheFactory;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 
-/**
- * Factory for creating model caches.
- * <p>
- * The model cache is meant for exclusive consumption by the model builder and is opaque to the cache implementation.
- * The cache is created once per session and is valid through the lifetime of the session.
- * <p>
- * The cache implementation could be annotated with {@code SessionScoped} to be created once per session, but
- * this would make tests more complicated to write as they would all need to enter the session scope.
- *
- * @since 4.0.0
- */
-@Experimental
-public interface ModelCacheFactory {
+@Named
+@Singleton
+public class DefaultRequestCacheFactory implements RequestCacheFactory {
 
-    @Nonnull
-    ModelCache newInstance();
+    public RequestCache createCache() {
+        return new DefaultRequestCache();
+    }
 }

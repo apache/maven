@@ -21,7 +21,6 @@ package org.apache.maven.cling.invoker;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.services.Lookup;
 
 /**
@@ -49,5 +48,5 @@ public interface ContainerCapsule extends AutoCloseable {
      * Performs a clean shutdown of backing container.
      */
     @Override
-    void close() throws InvokerException;
+    void close() throws Exception;
 }

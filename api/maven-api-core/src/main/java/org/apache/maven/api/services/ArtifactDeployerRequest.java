@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.RemoteRepository;
@@ -142,6 +143,19 @@ public interface ArtifactDeployerRequest extends Request<Session> {
             @Override
             public int getRetryFailedDeploymentCount() {
                 return retryFailedDeploymentCount;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultArtifactDeployerRequest that
+                        && retryFailedDeploymentCount == that.retryFailedDeploymentCount
+                        && Objects.equals(repository, that.repository)
+                        && Objects.equals(artifacts, that.artifacts);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(repository, artifacts, retryFailedDeploymentCount);
             }
 
             @Override

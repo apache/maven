@@ -45,11 +45,11 @@ public class ResidentMavenInvoker extends MavenInvoker {
 
     @Override
     public void close() throws InvokerException {
-        ArrayList<InvokerException> exceptions = new ArrayList<>();
+        ArrayList<Exception> exceptions = new ArrayList<>();
         for (MavenContext context : residentContext.values()) {
             try {
                 context.doCloseContainer();
-            } catch (InvokerException e) {
+            } catch (Exception e) {
                 exceptions.add(e);
             }
         }

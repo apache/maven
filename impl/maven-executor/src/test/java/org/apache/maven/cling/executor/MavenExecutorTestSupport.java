@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cling.executor;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,16 +26,24 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
+import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
+import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class MavenExecutorTestSupport {
+    @Timeout(15)
     @Test
     void mvnenc(
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
@@ -55,6 +64,7 @@ public abstract class MavenExecutorTestSupport {
     }
 
     @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
+    @Timeout(15)
     @Test
     void dump3(
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
@@ -73,6 +83,7 @@ public abstract class MavenExecutorTestSupport {
         System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
+    @Timeout(15)
     @Test
     void dump4(
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
@@ -91,6 +102,7 @@ public abstract class MavenExecutorTestSupport {
         System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
+    @Timeout(15)
     @Test
     void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
@@ -99,12 +111,14 @@ public abstract class MavenExecutorTestSupport {
                 tempDir.resolve(logfile),
                 List.of(mvn4ExecutorRequestBuilder()
                         .cwd(tempDir)
+                        .argument("-V")
                         .argument("verify")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
     }
 
+    @Timeout(15)
     @Test
     void version() throws Exception {
         assertEquals(
@@ -113,6 +127,7 @@ public abstract class MavenExecutorTestSupport {
     }
 
     @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
+    @Timeout(15)
     @Test
     void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
@@ -121,17 +136,130 @@ public abstract class MavenExecutorTestSupport {
                 tempDir.resolve(logfile),
                 List.of(mvn3ExecutorRequestBuilder()
                         .cwd(tempDir)
+                        .argument("-V")
                         .argument("verify")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
     }
 
+    @Timeout(15)
     @Test
     void version3x() throws Exception {
         assertEquals(
                 System.getProperty("maven3version"),
                 mavenVersion(mvn3ExecutorRequestBuilder().build()));
+    }
+
+    @Timeout(15)
+    @Test
+    void defaultFsCaptureOutput(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .stdOut(stdout)
+                        .build()));
+        assertFalse(stdout.toString().contains("[\u001B["), "By default no ANSI color codes");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
+    }
+
+    @Timeout(15)
+    @Test
+    void defaultFsCaptureOutputWithForcedColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
+            throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("--color=yes")
+                        .stdOut(stdout)
+                        .build()));
+        assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
+    }
+
+    @Timeout(15)
+    @Test
+    void defaultFsCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
+            throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("--color=no")
+                        .stdOut(stdout)
+                        .build()));
+        assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
+    }
+
+    @Timeout(15)
+    @Test
+    void defaultFs3xCaptureOutput(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .stdOut(stdout)
+                        .build()));
+        // Note: we do not validate ANSI as Maven3 is weird in this respect (thinks is color but is not)
+        // assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
+    }
+
+    @Timeout(15)
+    @Test
+    void defaultFs3xCaptureOutputWithForcedColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
+            throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("--color=yes")
+                        .stdOut(stdout)
+                        .build()));
+        assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
+    }
+
+    @Timeout(15)
+    @Test
+    void defaultFs3xCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
+            throws Exception {
+        layDownFiles(tempDir);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        execute(
+                null,
+                List.of(mvn3ExecutorRequestBuilder()
+                        .cwd(tempDir)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("--color=no")
+                        .stdOut(stdout)
+                        .build()));
+        assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
+        assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
     public static final String POM_STRING =
@@ -180,21 +308,18 @@ public abstract class MavenExecutorTestSupport {
             }
             """;
 
-    protected void execute(Path logFile, Collection<ExecutorRequest> requests) throws Exception {
-        try (Executor invoker = createExecutor()) {
-            for (ExecutorRequest request : requests) {
-                int exitCode = invoker.execute(request);
-                if (exitCode != 0) {
-                    throw new FailedExecution(request, exitCode, Files.readString(logFile));
-                }
+    protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
+        Executor invoker = createAndMemoizeExecutor();
+        for (ExecutorRequest request : requests) {
+            int exitCode = invoker.execute(request);
+            if (exitCode != 0) {
+                throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));
             }
         }
     }
 
     protected String mavenVersion(ExecutorRequest request) throws Exception {
-        try (Executor invoker = createExecutor()) {
-            return invoker.mavenVersion(request);
-        }
+        return createAndMemoizeExecutor().mavenVersion(request);
     }
 
     public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
@@ -239,5 +364,27 @@ public abstract class MavenExecutorTestSupport {
         }
     }
 
-    protected abstract Executor createExecutor();
+    private static Executor executor;
+
+    protected final Executor createAndMemoizeExecutor() {
+        if (executor == null) {
+            executor = doSelectExecutor();
+        }
+        return executor;
+    }
+
+    @AfterAll
+    static void afterAll() {
+        if (executor != null) {
+            executor = null;
+        }
+    }
+
+    // NOTE: we keep these instances alive to make sure JVM (running tests) loads JAnsi/JLine native library ONLY once
+    // in real life you'd anyway keep these alive as long needed, but here, we repeat a series of tests against same
+    // instance, to prevent them attempting native load more than once.
+    public static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
+    public static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
+
+    protected abstract Executor doSelectExecutor();
 }

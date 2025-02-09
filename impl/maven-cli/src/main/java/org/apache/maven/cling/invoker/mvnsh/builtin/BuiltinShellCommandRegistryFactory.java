@@ -143,11 +143,9 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
 
         private void mvn(CommandInput input) {
             try {
-                shellMavenInvoker.invoke(mavenParser.parseInvocation(ParserRequest.mvn(
-                                input.args(),
-                                shellContext.invokerRequest.logger(),
-                                shellContext.invokerRequest.messageBuilderFactory())
-                        .build()));
+                shellMavenInvoker.invoke(mavenParser.parseInvocation(
+                        ParserRequest.mvn(input.args(), shellContext.invokerRequest.messageBuilderFactory())
+                                .build()));
             } catch (Exception e) {
                 saveException(e);
             }
@@ -164,11 +162,9 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
 
         private void mvnenc(CommandInput input) {
             try {
-                shellEncryptInvoker.invoke(encryptParser.parseInvocation(ParserRequest.mvnenc(
-                                input.args(),
-                                shellContext.invokerRequest.logger(),
-                                shellContext.invokerRequest.messageBuilderFactory())
-                        .build()));
+                shellEncryptInvoker.invoke(encryptParser.parseInvocation(
+                        ParserRequest.mvnenc(input.args(), shellContext.invokerRequest.messageBuilderFactory())
+                                .build()));
             } catch (Exception e) {
                 saveException(e);
             }

@@ -30,6 +30,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.Scope;
 import org.apache.maven.di.impl.Types;
@@ -85,8 +86,9 @@ public class SessionScope implements Scope {
         seed(clazz, (Supplier<T>) () -> value);
     }
 
+    @Nonnull
     @Override
-    public <T> Supplier<T> scope(Key<T> key, Supplier<T> unscoped) {
+    public <T> Supplier<T> scope(@Nonnull Key<T> key, @Nonnull Supplier<T> unscoped) {
         // Lazy evaluating provider
         return () -> {
             if (values.isEmpty()) {

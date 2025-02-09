@@ -33,6 +33,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.DefaultRepositoryFactory;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.cache.DefaultRequestCacheFactory;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuilder;
@@ -80,8 +81,10 @@ public class ModelBuilderTest {
                 repositorySystem,
                 null,
                 mavenRepositorySystem,
-                new SimpleLookup(List.of(new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
-                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
+                new SimpleLookup(List.of(
+                        new DefaultRequestCacheFactory(),
+                        new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
+                                new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())))),
                 null);
         InternalSession.associate(rsession, session);
 

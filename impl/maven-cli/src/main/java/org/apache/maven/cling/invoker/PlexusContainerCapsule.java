@@ -46,10 +46,6 @@ public class PlexusContainerCapsule implements ContainerCapsule {
     @Override
     public void updateLogging(LookupContext context) {
         plexusContainer.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
-        org.slf4j.Logger l = context.loggerFactory.getLogger(this.getClass().getName());
-        context.logger = (level, message, error) -> l.atLevel(org.slf4j.event.Level.valueOf(level.name()))
-                .setCause(error)
-                .log(message);
     }
 
     @Override
