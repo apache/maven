@@ -700,9 +700,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     stack.push(list);
                 }
                 isCombination = false;
-                // TODO we might not want to use isDigit here; just check for ASCII digits only
-            } else if (Character.isDigit( c )) {
-         //   } else if (c >= '0' && c <= '9') {
+            } else if (c >= '0' && c <= '9') { // Check for ASCII digits only
                 if (!isDigit && i > startIndex) {
                     // X1
                     isCombination = true;

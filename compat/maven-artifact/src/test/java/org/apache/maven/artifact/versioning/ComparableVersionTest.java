@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test ComparableVersion.
- *
  */
 @SuppressWarnings("unchecked")
 class ComparableVersionTest {
@@ -249,14 +248,13 @@ class ComparableVersionTest {
 
     @Test
     void testNonAsciiDigits() { // These should not be treated as digits.
-        ComparableVersion c1 = new ComparableVersion("1");
-        // ArabicIndicEight
-        ComparableVersion c2 = new ComparableVersion("\u0668");
-        ComparableVersion c3 = new ComparableVersion("9");
-        assertTrue(c1.compareTo(c2) < 0, "expected " + "1" + " < " + "\u0668");
-        assertTrue(c2.compareTo(c1) > 0, "expected " + "\u0668" + " > " + "1");
-        assertTrue(c3.compareTo(c2) < 0, "expected " + "9" + " > " + "\u0668");
-        assertTrue(c2.compareTo(c3) > 0, "expected " + "\u0668" + " < " + "9");
+        ComparableVersion asciiOne = new ComparableVersion("1");
+        ComparableVersion arabicEight = new ComparableVersion("\u0668");
+        ComparableVersion asciiNine = new ComparableVersion("9");
+        assertTrue(asciiOne.compareTo(arabicEight) < 0, "expected " + "1" + " < " + "\u0668");
+        assertTrue(arabicEight.compareTo(asciiOne) > 0, "expected " + "\u0668" + " > " + "1");
+        assertTrue(asciiNine.compareTo(arabicEight) < 0, "expected " + "9" + " < " + "\u0668");
+        assertTrue(arabicEight.compareTo(asciiNine) > 0, "expected " + "\u0668" + " > " + "9");
     }
 
     @Test
