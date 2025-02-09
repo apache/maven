@@ -42,7 +42,7 @@ import java.util.Properties;
  * <li>unlimited number of version components,</li>
  * <li>version components in the text can be digits or strings,</li>
  * <li>strings are checked for well-known qualifiers and the qualifier ordering is used for version ordering.
- *     Well-known qualifiers (case insensitive) are:<ul>
+ *     Well-known qualifiers (case-insensitive) are:<ul>
  *     <li><code>alpha</code> or <code>a</code></li>
  *     <li><code>beta</code> or <code>b</code></li>
  *     <li><code>milestone</code> or <code>m</code></li>
@@ -51,9 +51,9 @@ import java.util.Properties;
  *     <li><code>(the empty string)</code> or <code>ga</code> or <code>final</code></li>
  *     <li><code>sp</code></li>
  *     </ul>
- *     Unknown qualifiers are considered after known qualifiers, with lexical order (always case insensitive),
+ *     Unknown qualifiers are considered after known qualifiers, with lexical order (always case-insensitive),
  *   </li>
- * <li>a hyphen usually precedes a qualifier, and is always less important than digits/number, for example
+ * <li>A hyphen usually precedes a qualifier, and is always less important than digits/number. For example
  *   {@code 1.0.RC2 < 1.0-RC3 < 1.0.1}; but prefer {@code 1.0.0-RC1} over {@code 1.0.0.RC1}, and more
  *   generally: {@code 1.0.X2 < 1.0-X3 < 1.0.1} for any string {@code X}; but prefer {@code 1.0.0-X1}
  *   over {@code 1.0.0.X1}.</li>
