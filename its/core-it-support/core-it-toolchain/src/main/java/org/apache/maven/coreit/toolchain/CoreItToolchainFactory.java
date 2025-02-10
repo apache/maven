@@ -18,6 +18,8 @@
  */
 package org.apache.maven.coreit.toolchain;
 
+import javax.inject.Named;
+
 import org.apache.maven.toolchain.ToolchainFactory;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.model.ToolchainModel;
@@ -25,6 +27,7 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 /**
  * @author Benjamin Bentmann
  */
+@Named
 public class CoreItToolchainFactory implements ToolchainFactory {
 
     public ToolchainPrivate createDefaultToolchain() {

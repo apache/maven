@@ -87,7 +87,7 @@ public class DefaultToolchainManager implements ToolchainManager {
             throws ToolchainManagerException {
         Map<String, Object> context = retrieveContext(session);
         ToolchainModel model = (ToolchainModel) context.get("toolchain-" + type);
-        return model != null ? createToolchain(model) : Optional.empty();
+        return Optional.ofNullable(model).flatMap(this::createToolchain);
     }
 
     @Override
