@@ -181,9 +181,7 @@ public class SisuDiBridgeModule extends AbstractModule {
             // Add Plexus bindings
             for (var bean : locator.get().locate(toGuiceKey(key))) {
                 if (isPlexusBean(bean)) {
-                    list.add(new BindingToBeanEntry<>(key)
-                            .toBeanEntry(bean)
-                            .prioritize(bean.getRank()));
+                    list.add(new BindingToBeanEntry<>(key).toBeanEntry(bean).prioritize(bean.getRank()));
                 }
             }
             if (!list.isEmpty()) {
