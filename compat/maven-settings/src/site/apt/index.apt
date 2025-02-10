@@ -34,9 +34,9 @@ Maven Settings Model
    * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser, <<<ToAPiV3()>>> and <<<ToApiV4()>>> transformers, and <<<v4>>> package
      for Merger and v4 Reader and Writers for the Xpp3 XML parser,
 
-   * A {{{./settings.html}Descriptor Reference}}
+   * A {{{../../api/maven-api-settings/settings.html}Descriptor Reference}}
 
-   * An {{{https://maven.apache.org/xsd/settings-1.2.0.xsd}XSD}}
+   * An {{{https://maven.apache.org/xsd/settings-2.0.0-rc-2.xsd}XSD}}
 
 * See Also User Documentation
 
@@ -46,6 +46,6 @@ Maven Settings Model
 
   * {{{https://maven.apache.org/guides/mini/guide-deployment-security-settings.html} Security and Deployment Settings}},
 
-  * {{{https://maven.apache.org/guides/mini/guide-encryption.html} Password Encryption}},
+  * {{{https://maven.apache.org/guides/mini/guide-encryption-4.html} Password Encryption}},
 
   * {{{https://maven.apache.org/guides/mini/guide-proxies.html} Configuring a proxy}}.

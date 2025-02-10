@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.impl.model.profile;
+package org.apache.maven.impl.util;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.stream.Stream;
 
@@ -117,6 +118,11 @@ public class Os {
     private static final String FAMILY_OS400 = "os/400";
 
     /**
+     * Unrecognized OS family. {@value}
+     */
+    private static final String FAMILY_UNKNOWN = "unknown";
+
+    /**
      * OpenJDK is reported to call MacOS X "Darwin"
      *
      * @see <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=44889">bugzilla issue</a>
@@ -127,7 +133,7 @@ public class Os {
     /**
      * The path separator.
      */
-    private static final String PATH_SEP = System.getProperty("path.separator");
+    private static final String PATH_SEP = File.pathSeparator;
 
     static {
         // Those two public constants are initialized here, as they need all the private constants
@@ -212,7 +218,8 @@ public class Os {
                         FAMILY_UNIX,
                         FAMILY_WIN9X,
                         FAMILY_WINDOWS,
-                        FAMILY_ZOS)
+                        FAMILY_ZOS,
+                        FAMILY_UNKNOWN)
                 .filter(Os::isFamily)
                 .findFirst()
                 .orElse(null);
