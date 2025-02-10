@@ -745,18 +745,23 @@ public class MavenProject implements Cloneable {
 
     private List<Resource> getResources(final ProjectScope scope) {
         return new AbstractSequentialList<>() {
+            private Stream<SourceRoot> sources() {
+                return getEnabledSourceRoots(scope, Language.RESOURCES);
+            }
+
             @Override
             public ListIterator<Resource> listIterator(int index) {
-                return getEnabledSourceRoots(scope, Language.RESOURCES)
-                        .map(MavenProject::toResource)
-                        .toList()
-                        .listIterator(index);
+                return sources().map(MavenProject::toResource).toList().listIterator(index);
             }
 
             @Override
             public int size() {
-                return Math.toIntExact(
-                        getEnabledSourceRoots(scope, Language.RESOURCES).count());
+                return Math.toIntExact(sources().count());
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return sources().findAny().isEmpty();
             }
 
             @Override
