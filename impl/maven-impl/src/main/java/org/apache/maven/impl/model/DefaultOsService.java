@@ -19,7 +19,6 @@
 package org.apache.maven.impl.model;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.OsService;
@@ -46,7 +45,7 @@ public class DefaultOsService implements OsService {
         return Os.OS_VERSION;
     }
 
-    @Nullable
+    @Nonnull
     @Override
     public String family() {
         return Os.OS_FAMILY;
