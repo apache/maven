@@ -27,7 +27,7 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 /**
  * @author Benjamin Bentmann
  */
-@Named
+@Named("coreit")
 public class CoreItToolchainFactory implements ToolchainFactory {
 
     public ToolchainPrivate createDefaultToolchain() {
