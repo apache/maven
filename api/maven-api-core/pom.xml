@@ -37,6 +37,10 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-di</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-model</artifactId>
     </dependency>
     <dependency>
@@ -54,10 +58,6 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-xml</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-di</artifactId>
     </dependency>
 
     <dependency>
