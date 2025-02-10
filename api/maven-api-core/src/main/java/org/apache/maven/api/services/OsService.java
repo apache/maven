@@ -54,7 +54,7 @@ public interface OsService extends Service {
     String family();
 
     /**
-     * Returns {@code true} if you need to make extra hoops and loops.
+     * Returns {@code true} if OS belongs to Windows family.
      */
     boolean isWindows();
 }
