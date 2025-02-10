@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -149,7 +148,7 @@ public class MavenProject implements Cloneable {
     /**
      * All sources of this project, in the order they were added.
      */
-    private List<SourceRoot> sources = new CopyOnWriteArrayList<>();
+    private Set<SourceRoot> sources = new LinkedHashSet<>();
 
     @Deprecated
     private ArtifactRepository releaseArtifactRepository;
@@ -327,9 +326,7 @@ public class MavenProject implements Cloneable {
      * @since 4.0.0
      */
     public void addSourceRoot(SourceRoot source) {
-        if (!sources.contains(source)) {
-            sources.add(source);
-        }
+        sources.add(source);
     }
 
     /**
@@ -1324,7 +1321,7 @@ public class MavenProject implements Cloneable {
         // This property is not handled like others as we don't use public API.
         // The whole implementation of this `deepCopy` method may need revision,
         // but it would be the topic for a separated commit.
-        sources = new CopyOnWriteArrayList<>(project.sources);
+        sources = new LinkedHashSet<>(project.sources);
 
         if (project.getModel() != null) {
             setModel(project.getModel().clone());
