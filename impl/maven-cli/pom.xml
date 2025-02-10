@@ -148,11 +148,6 @@ under the License.
       <artifactId>plexus-sec-dispatcher</artifactId>
     </dependency>
 
-    <!-- TODO: remove this; only in CLIReportingUtils -->
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
