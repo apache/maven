@@ -48,6 +48,6 @@ public class DefaultOsService implements OsService {
 
     @Override
     public boolean isWindows() {
-        return Os.isFamily("windows");
+        return Os.IS_WINDOWS;
     }
 }
