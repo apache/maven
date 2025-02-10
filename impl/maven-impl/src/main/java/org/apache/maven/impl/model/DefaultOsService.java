@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl.model;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.OsService;
@@ -26,21 +28,25 @@ import org.apache.maven.impl.util.Os;
 @Named
 @Singleton
 public class DefaultOsService implements OsService {
+    @Nonnull
     @Override
     public String name() {
         return Os.OS_NAME;
     }
 
+    @Nonnull
     @Override
     public String arch() {
         return Os.OS_ARCH;
     }
 
+    @Nonnull
     @Override
     public String version() {
         return Os.OS_VERSION;
     }
 
+    @Nullable
     @Override
     public String family() {
         return Os.OS_FAMILY;
