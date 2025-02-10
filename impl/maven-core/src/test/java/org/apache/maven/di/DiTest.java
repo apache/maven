@@ -277,7 +277,8 @@ public class DiTest {
 
         @BeforeEach
         void setup() throws Exception {
-            container = new DefaultPlexusContainer(new DefaultContainerConfiguration(),
+            container = new DefaultPlexusContainer(
+                    new DefaultContainerConfiguration(),
                     new AbstractModule() {
                         @Override
                         protected void configure() {
@@ -285,12 +286,12 @@ public class DiTest {
                         }
                     },
                     new SisuDiBridgeModule(false) {
-                @Override
-                protected void configure() {
-                    super.configure();
-                    injector.bindImplicit(TestModelParserDi.class);
-                }
-            });
+                        @Override
+                        protected void configure() {
+                            super.configure();
+                            injector.bindImplicit(TestModelParserDi.class);
+                        }
+                    });
         }
 
         @Test
@@ -348,7 +349,7 @@ public class DiTest {
             }
         }
 
-        //@org.apache.maven.api.di.Named("di")
+        // @org.apache.maven.api.di.Named("di")
         static class TestModelParserDi implements ModelParser {
             @Override
             public Optional<Source> locate(Path dir) {
