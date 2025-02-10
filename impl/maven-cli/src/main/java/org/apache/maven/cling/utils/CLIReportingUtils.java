@@ -26,7 +26,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.maven.impl.model.profile.Os;
+import org.apache.maven.impl.util.Os;
 import org.apache.maven.jline.MessageUtils;
 import org.slf4j.Logger;
 
