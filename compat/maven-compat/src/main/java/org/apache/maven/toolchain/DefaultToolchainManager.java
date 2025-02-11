@@ -32,12 +32,10 @@ import org.apache.maven.api.services.ToolchainFactoryException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.eclipse.sisu.Priority;
 import org.slf4j.Logger;
 
 @Named
 @Singleton
-@Priority(10)
 public class DefaultToolchainManager implements ToolchainManager, ToolchainManagerPrivate {
 
     private final Lookup lookup;
