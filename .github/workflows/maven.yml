@@ -138,14 +138,8 @@ jobs:
             maven-${{ runner.os }}-full-
             maven-${{ runner.os }}-
 
-      - name: Get IP Addresses
-        id: ip
-        uses: candidob/get-runner-ip@v1.0.0
-
-      - name: See IP Addresses
-        run: |
-            echo ${{ steps.ip.outputs.ipv4 }}
-            echo ${{ steps.ip.outputs.ipv6 }}
+      - name: Show IP
+        run: curl https://api.ipify.org
 
       - name: Build with downloaded Maven
         shell: bash
@@ -218,14 +212,8 @@ jobs:
             maven-${{ runner.os }}-its
             maven-${{ runner.os }}-
 
-      - name: Get IP Addresses
-        id: ip
-        uses: candidob/get-runner-ip@v1.0.0
-
-      - name: See IP Addresses
-        run: |
-          echo ${{ steps.ip.outputs.ipv4 }}
-          echo ${{ steps.ip.outputs.ipv6 }}
+      - name: Show IP
+        run: curl https://api.ipify.org
 
       # we use two steps so that we can cache artifacts downloaded from Maven Central repository
       # without installing any local artifacts to not pollute the cache
