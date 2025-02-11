@@ -139,6 +139,7 @@ jobs:
             maven-${{ runner.os }}-
 
       - name: Show IP
+        shell: bash
         run: curl https://api.ipify.org
 
       - name: Build with downloaded Maven
@@ -213,6 +214,7 @@ jobs:
             maven-${{ runner.os }}-
 
       - name: Show IP
+        shell: bash
         run: curl https://api.ipify.org
 
       # we use two steps so that we can cache artifacts downloaded from Maven Central repository
