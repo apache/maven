@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -33,27 +32,22 @@ import static java.util.stream.Collectors.toSet;
  * build if those projects do not exist.
  */
 public class ProjectActivation {
-    private static class ProjectActivationSettings {
-        /**
-         * The selector of a project. This can be the project directory, [groupId]:[artifactId] or :[artifactId].
-         */
-        final String selector;
 
-        /**
-         * This describes how/when to active or deactivate the project.
-         */
-        final ActivationSettings activationSettings;
-
-        ProjectActivationSettings(String selector, ActivationSettings activationSettings) {
-            this.selector = selector;
-            this.activationSettings = activationSettings;
-        }
-    }
+    /**
+     * ProjectActivationSettings
+     * @param selector the selector of a project, which can be the project directory, [groupId]:[artifactId] or :[artifactId]
+     * @param activationSettings describes how/when to active or deactivate the project
+     */
+    public record ProjectActivationSettings(String selector, ActivationSettings activationSettings) {}
 
     /**
      * List of activated and deactivated projects.
      */
     private final List<ProjectActivationSettings> activations = new ArrayList<>();
+
+    public List<ProjectActivationSettings> getActivations() {
+        return Collections.unmodifiableList(activations);
+    }
 
     /**
      * Adds a project activation to the request.
@@ -78,28 +72,28 @@ public class ProjectActivation {
      * @return Required active project selectors, never {@code null}.
      */
     public Set<String> getRequiredActiveProjectSelectors() {
-        return getProjectSelectors(pa -> !pa.optional && pa.active);
+        return getProjectSelectors(pa -> !pa.optional() && pa.active());
     }
 
     /**
      * @return Optional active project selectors, never {@code null}.
      */
     public Set<String> getOptionalActiveProjectSelectors() {
-        return getProjectSelectors(pa -> pa.optional && pa.active);
+        return getProjectSelectors(pa -> pa.optional() && pa.active());
     }
 
     /**
      * @return Required inactive project selectors, never {@code null}.
      */
     public Set<String> getRequiredInactiveProjectSelectors() {
-        return getProjectSelectors(pa -> !pa.optional && !pa.active);
+        return getProjectSelectors(pa -> !pa.optional() && !pa.active());
     }
 
     /**
      * @return Optional inactive project selectors, never {@code null}.
      */
     public Set<String> getOptionalInactiveProjectSelectors() {
-        return getProjectSelectors(pa -> pa.optional && !pa.active);
+        return getProjectSelectors(pa -> pa.optional() && !pa.active());
     }
 
     /**
@@ -109,7 +103,7 @@ public class ProjectActivation {
      */
     @Deprecated
     public List<String> getSelectedProjects() {
-        return Collections.unmodifiableList(new ArrayList<>(getProjectSelectors(pa -> pa.active)));
+        return Collections.unmodifiableList(new ArrayList<>(getProjectSelectors(pa -> pa.active())));
     }
 
     /**
@@ -119,7 +113,7 @@ public class ProjectActivation {
      */
     @Deprecated
     public List<String> getExcludedProjects() {
-        return Collections.unmodifiableList(new ArrayList<>(getProjectSelectors(pa -> !pa.active)));
+        return Collections.unmodifiableList(new ArrayList<>(getProjectSelectors(pa -> !pa.active())));
     }
 
     /**
@@ -129,7 +123,8 @@ public class ProjectActivation {
      */
     @Deprecated
     public void overwriteActiveProjects(List<String> activeProjectSelectors) {
-        List<ProjectActivationSettings> projects = getProjects(pa -> pa.active).collect(Collectors.toList());
+        List<ProjectActivationSettings> projects =
+                getProjects(pa -> pa.active()).toList();
         this.activations.removeAll(projects);
         activeProjectSelectors.forEach(this::activateOptionalProject);
     }
@@ -141,7 +136,8 @@ public class ProjectActivation {
      */
     @Deprecated
     public void overwriteInactiveProjects(List<String> inactiveProjectSelectors) {
-        List<ProjectActivationSettings> projects = getProjects(pa -> !pa.active).collect(Collectors.toList());
+        List<ProjectActivationSettings> projects =
+                getProjects(pa -> !pa.active()).toList();
         this.activations.removeAll(projects);
         inactiveProjectSelectors.forEach(this::deactivateOptionalProject);
     }
@@ -151,7 +147,7 @@ public class ProjectActivation {
      * @param selector The selector of the project.
      */
     public void activateRequiredProject(String selector) {
-        this.activations.add(new ProjectActivationSettings(selector, ActivationSettings.ACTIVATION_REQUIRED));
+        this.activations.add(new ProjectActivationSettings(selector, ActivationSettings.activated()));
     }
 
     /**
@@ -159,7 +155,15 @@ public class ProjectActivation {
      * @param selector The selector of the project.
      */
     public void activateOptionalProject(String selector) {
-        this.activations.add(new ProjectActivationSettings(selector, ActivationSettings.ACTIVATION_OPTIONAL));
+        this.activations.add(new ProjectActivationSettings(selector, ActivationSettings.activatedOpt()));
+    }
+
+    /**
+     * Mark a project as optional and activated.
+     * @param selector The selector of the project.
+     */
+    public void activateOptionalProjectNonRecursive(String selector) {
+        this.activations.add(new ProjectActivationSettings(selector, ActivationSettings.of(true, true, false)));
     }
 
     /**
@@ -167,7 +171,7 @@ public class ProjectActivation {
      * @param selector The selector of the project.
      */
     public void deactivateRequiredProject(String selector) {
-        this.activations.add(new ProjectActivationSettings(selector, ActivationSettings.DEACTIVATION_REQUIRED));
+        this.activations.add(new ProjectActivationSettings(selector, ActivationSettings.deactivated()));
     }
 
     /**
@@ -175,7 +179,7 @@ public class ProjectActivation {
      * @param selector The selector of the project.
      */
     public void deactivateOptionalProject(String selector) {
-        this.activations.add(new ProjectActivationSettings(selector, ActivationSettings.DEACTIVATION_OPTIONAL));
+        this.activations.add(new ProjectActivationSettings(selector, ActivationSettings.deactivatedOpt()));
     }
 
     public boolean isEmpty() {
