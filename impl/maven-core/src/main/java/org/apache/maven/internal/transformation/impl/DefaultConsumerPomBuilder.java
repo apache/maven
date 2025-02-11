@@ -40,6 +40,7 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -244,7 +245,15 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                     .developers(null)
                     .contributors(null)
                     .mailingLists(null)
-                    .issueManagement(null);
+                    .issueManagement(null)
+                    .scm(
+                            model.getScm() != null
+                                    ? Scm.newBuilder(model.getScm(), true)
+                                            .childScmConnectionInheritAppendPath(null)
+                                            .childScmUrlInheritAppendPath(null)
+                                            .childScmDeveloperConnectionInheritAppendPath(null)
+                                            .build()
+                                    : null);
             builder.profiles(prune(model.getProfiles()));
 
             model = builder.build();
