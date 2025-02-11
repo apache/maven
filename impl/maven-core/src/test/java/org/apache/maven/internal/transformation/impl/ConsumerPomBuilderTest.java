@@ -31,6 +31,7 @@ import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ModelBuilder;
@@ -51,6 +52,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
@@ -137,5 +139,23 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         assertNotNull(model);
         assertTrue(model.getProfiles().isEmpty());
+    }
+
+    @Test
+    void testScmInheritance() throws Exception {
+        Model model = Model.newBuilder()
+                .scm(Scm.newBuilder()
+                        .connection("scm:git:https://github.com/apache/maven-project.git")
+                        .developerConnection("scm:git:https://github.com/apache/maven-project.git")
+                        .url("https://github.com/apache/maven-project")
+                        .childScmConnectionInheritAppendPath("true")
+                        .childScmUrlInheritAppendPath("true")
+                        .childScmDeveloperConnectionInheritAppendPath("true")
+                        .build())
+                .build();
+        Model transformed = DefaultConsumerPomBuilder.transform(model, null);
+        assertNull(transformed.getScm().getChildScmConnectionInheritAppendPath());
+        assertNull(transformed.getScm().getChildScmUrlInheritAppendPath());
+        assertNull(transformed.getScm().getChildScmDeveloperConnectionInheritAppendPath());
     }
 }
