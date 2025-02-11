@@ -20,32 +20,34 @@ package org.apache.maven.execution;
 
 /**
  * Describes whether a target should be activated or not, and if that is required or optional.
+ *
+ * @param active Should the target be active?
+ * @param optional Should the build continue if the target is not present?
+ * @param recurse Should the target be activated and its children be activated?
  */
-enum ActivationSettings {
-    ACTIVATION_OPTIONAL(true, true),
-    ACTIVATION_REQUIRED(true, false),
-    DEACTIVATION_OPTIONAL(false, true),
-    DEACTIVATION_REQUIRED(false, false);
-
-    /**
-     * Should the target be active?
-     */
-    final boolean active;
-    /**
-     * Should the build continue if the target is not present?
-     */
-    final boolean optional;
-
-    ActivationSettings(final boolean active, final boolean optional) {
-        this.active = active;
-        this.optional = optional;
-    }
+public record ActivationSettings(boolean active, boolean optional, boolean recurse) {
 
     static ActivationSettings of(final boolean active, final boolean optional) {
-        if (optional) {
-            return active ? ACTIVATION_OPTIONAL : DEACTIVATION_OPTIONAL;
-        } else {
-            return active ? ACTIVATION_REQUIRED : DEACTIVATION_REQUIRED;
-        }
+        return of(active, optional, true);
+    }
+
+    static ActivationSettings of(final boolean active, final boolean optional, final boolean recursive) {
+        return new ActivationSettings(active, optional, recursive);
+    }
+
+    static ActivationSettings activated() {
+        return new ActivationSettings(true, false, true);
+    }
+
+    static ActivationSettings activatedOpt() {
+        return new ActivationSettings(true, true, true);
+    }
+
+    static ActivationSettings deactivated() {
+        return new ActivationSettings(false, false, false);
+    }
+
+    static ActivationSettings deactivatedOpt() {
+        return new ActivationSettings(false, true, false);
     }
 }

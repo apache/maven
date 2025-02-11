@@ -25,9 +25,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,53 @@ import org.slf4j.LoggerFactory;
 public final class ProjectSelector {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSelector.class);
 
+    public Set<MavenProject> getActiveProjects(
+            MavenExecutionRequest request,
+            List<MavenProject> projects,
+            List<ProjectActivation.ProjectActivationSettings> projectSelectors)
+            throws MavenExecutionException {
+
+        Set<MavenProject> resolvedOptionalProjects = new LinkedHashSet<>();
+        Set<ProjectActivation.ProjectActivationSettings> unresolvedSelectors = new HashSet<>();
+        File baseDirectory = getBaseDirectoryFromRequest(request);
+        for (ProjectActivation.ProjectActivationSettings activation : projectSelectors) {
+            if (activation.activationSettings().active()) {
+                String selector = activation.selector();
+                Optional<MavenProject> optSelectedProject =
+                        findOptionalProjectBySelector(projects, baseDirectory, selector);
+                if (optSelectedProject.isPresent()) {
+                    resolvedOptionalProjects.add(optSelectedProject.get());
+                    if (activation.activationSettings().recurse()) {
+                        resolvedOptionalProjects.addAll(getChildProjects(optSelectedProject.get(), request));
+                    }
+                } else {
+                    unresolvedSelectors.add(activation);
+                }
+            }
+        }
+        if (!unresolvedSelectors.isEmpty()) {
+            String requiredSelectors = unresolvedSelectors.stream()
+                    .filter(pas -> !pas.activationSettings().optional())
+                    .map(ProjectActivation.ProjectActivationSettings::selector)
+                    .collect(Collectors.joining(", "));
+            if (!requiredSelectors.isEmpty()) {
+                throw new MavenExecutionException(
+                        "The requested required projects " + requiredSelectors + " do not exist.", request.getPom());
+            } else {
+                String optionalSelectors = unresolvedSelectors.stream()
+                        .map(ProjectActivation.ProjectActivationSettings::selector)
+                        .collect(Collectors.joining(", "));
+                LOGGER.info("The requested optional projects {} do not exist.", optionalSelectors);
+            }
+        }
+
+        return resolvedOptionalProjects;
+    }
+
+    /**
+     * @deprecated use {@link #getActiveProjects(MavenExecutionRequest, List, List)}
+     */
+    @Deprecated(since = "4.0.0")
     public Set<MavenProject> getRequiredProjectsBySelectors(
             MavenExecutionRequest request, List<MavenProject> projects, Set<String> projectSelectors)
             throws MavenExecutionException {
@@ -61,6 +110,10 @@ public final class ProjectSelector {
         return selectedProjects;
     }
 
+    /**
+     * @deprecated use {@link #getActiveProjects(MavenExecutionRequest, List, List)}
+     */
+    @Deprecated(since = "4.0.0")
     public Set<MavenProject> getOptionalProjectsBySelectors(
             MavenExecutionRequest request, List<MavenProject> projects, Set<String> projectSelectors) {
         Set<MavenProject> resolvedOptionalProjects = new LinkedHashSet<>();

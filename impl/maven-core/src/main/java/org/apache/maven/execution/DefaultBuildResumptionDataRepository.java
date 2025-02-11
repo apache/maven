@@ -112,8 +112,8 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
         if (properties.containsKey(REMAINING_PROJECTS) && !(str1 != null && !str1.isEmpty())) {
             String propertyValue = properties.getProperty(REMAINING_PROJECTS);
             Stream.of(propertyValue.split(PROPERTY_DELIMITER))
-                    .filter(str -> str != null && !str.isEmpty())
-                    .forEach(request.getProjectActivation()::activateOptionalProject);
+                    .filter(str -> !str.isEmpty())
+                    .forEach(request.getProjectActivation()::activateOptionalProjectNonRecursive);
             LOGGER.info("Resuming from {} due to the --resume / -r feature.", propertyValue);
         }
     }

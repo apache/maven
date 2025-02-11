@@ -192,7 +192,7 @@ class DefaultGraphBuilderTest {
                 scenario("Selected missing project as required and as optional")
                         .activeRequiredProjects("non-existing-module")
                         .activeOptionalProjects("non-existing-module")
-                        .expectResult(MavenExecutionException.class, "not find the selected project"),
+                        .expectResult(MavenExecutionException.class, "do not exist"),
                 scenario("Resuming from project")
                         .resumeFrom(MODULE_B)
                         .expectResult(MODULE_B, MODULE_C_2, INDEPENDENT_MODULE),
