@@ -72,7 +72,7 @@ public final class ProjectSelector {
                     .collect(Collectors.joining(", "));
             if (!requiredSelectors.isEmpty()) {
                 throw new MavenExecutionException(
-                        "The requested required projects " + requiredSelectors + " do not exists.", request.getPom());
+                        "The requested required projects " + requiredSelectors + " do not exist.", request.getPom());
             } else {
                 String optionalSelectors = unresolvedSelectors.stream()
                         .map(ProjectActivation.ProjectActivationSettings::selector)
