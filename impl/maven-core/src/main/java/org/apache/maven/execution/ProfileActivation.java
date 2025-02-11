@@ -41,7 +41,7 @@ public class ProfileActivation {
      */
     @Deprecated
     public List<String> getActiveProfiles() {
-        return Collections.unmodifiableList(new ArrayList<>(getProfileIds(pa -> pa.active)));
+        return Collections.unmodifiableList(new ArrayList<>(getProfileIds(pa -> pa.active())));
     }
 
     /**
@@ -50,7 +50,7 @@ public class ProfileActivation {
      */
     @Deprecated
     public List<String> getInactiveProfiles() {
-        return Collections.unmodifiableList(new ArrayList<>(getProfileIds(pa -> !pa.active)));
+        return Collections.unmodifiableList(new ArrayList<>(getProfileIds(pa -> !pa.active())));
     }
 
     /**
@@ -80,7 +80,7 @@ public class ProfileActivation {
      * @param id The identifier of the profile.
      */
     public void activateRequiredProfile(String id) {
-        this.activations.put(id, ActivationSettings.ACTIVATION_REQUIRED);
+        this.activations.put(id, ActivationSettings.activated());
     }
 
     /**
@@ -88,7 +88,7 @@ public class ProfileActivation {
      * @param id The identifier of the profile.
      */
     public void activateOptionalProfile(String id) {
-        this.activations.put(id, ActivationSettings.ACTIVATION_OPTIONAL);
+        this.activations.put(id, ActivationSettings.activatedOpt());
     }
 
     /**
@@ -96,7 +96,7 @@ public class ProfileActivation {
      * @param id The identifier of the profile.
      */
     public void deactivateRequiredProfile(String id) {
-        this.activations.put(id, ActivationSettings.DEACTIVATION_REQUIRED);
+        this.activations.put(id, ActivationSettings.deactivated());
     }
 
     /**
@@ -104,7 +104,7 @@ public class ProfileActivation {
      * @param id The identifier of the profile.
      */
     public void deactivateOptionalProfile(String id) {
-        this.activations.put(id, ActivationSettings.DEACTIVATION_OPTIONAL);
+        this.activations.put(id, ActivationSettings.deactivatedOpt());
     }
 
     /**
@@ -129,27 +129,27 @@ public class ProfileActivation {
      * @return Required active profile identifiers, never {@code null}.
      */
     public Set<String> getRequiredActiveProfileIds() {
-        return getProfileIds(pa -> !pa.optional && pa.active);
+        return getProfileIds(pa -> !pa.optional() && pa.active());
     }
 
     /**
      * @return Optional active profile identifiers, never {@code null}.
      */
     public Set<String> getOptionalActiveProfileIds() {
-        return getProfileIds(pa -> pa.optional && pa.active);
+        return getProfileIds(pa -> pa.optional() && pa.active());
     }
 
     /**
      * @return Required inactive profile identifiers, never {@code null}.
      */
     public Set<String> getRequiredInactiveProfileIds() {
-        return getProfileIds(pa -> !pa.optional && !pa.active);
+        return getProfileIds(pa -> !pa.optional() && !pa.active());
     }
 
     /**
      * @return Optional inactive profile identifiers, never {@code null}.
      */
     public Set<String> getOptionalInactiveProfileIds() {
-        return getProfileIds(pa -> pa.optional && !pa.active);
+        return getProfileIds(pa -> pa.optional() && !pa.active());
     }
 }
