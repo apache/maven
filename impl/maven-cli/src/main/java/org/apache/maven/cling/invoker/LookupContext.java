@@ -34,6 +34,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.logging.BuildEventListener;
@@ -106,6 +107,7 @@ public class LookupContext implements AutoCloseable {
     public boolean interactive;
     public Path localRepositoryPath;
     public Settings effectiveSettings;
+    public PersistedToolchains effectiveToolchains;
 
     public final List<AutoCloseable> closeables = new ArrayList<>();
 

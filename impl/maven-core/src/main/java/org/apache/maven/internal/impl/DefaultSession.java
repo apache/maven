@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
@@ -110,6 +112,15 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     @Override
     public Settings getSettings() {
         return getMavenSession().getSettings().getDelegate();
+    }
+
+    @Nonnull
+    @Override
+    public Collection<ToolchainModel> getToolchains() {
+        return getMavenSession().getRequest().getToolchains().values().stream()
+                .flatMap(Collection::stream)
+                .map(org.apache.maven.toolchain.model.ToolchainModel::getDelegate)
+                .toList();
     }
 
     @Nonnull

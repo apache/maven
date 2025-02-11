@@ -25,9 +25,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
@@ -44,6 +46,7 @@ import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
 import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.api.services.model.ModelProcessor;
+import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
@@ -58,7 +61,6 @@ import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
@@ -67,6 +69,7 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logging.LoggingExecutionListener;
 import org.apache.maven.logging.MavenTransferListener;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.toolchain.model.ToolchainModel;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
 
@@ -197,12 +200,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
         context.eventSpyDispatcher.onEvent(toolchainsResult);
 
-        context.lookup
-                .lookup(MavenExecutionRequestPopulator.class)
-                .populateFromToolchains(
-                        request,
-                        new org.apache.maven.toolchain.model.PersistedToolchains(
-                                toolchainsResult.getEffectiveToolchains()));
+        context.effectiveToolchains = toolchainsResult.getEffectiveToolchains();
 
         if (toolchainsResult.getProblems().hasWarningProblems()) {
             int totalProblems = toolchainsResult.getProblems().totalProblemsReported();
@@ -232,6 +230,12 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                     context.invokerRequest.topDirectory().toFile());
             request.setRootDirectory(context.invokerRequest.topDirectory());
         }
+
+        request.setToolchains(
+                Optional.ofNullable(context.effectiveToolchains).map(PersistedToolchains::getToolchains).stream()
+                        .flatMap(List::stream)
+                        .map(ToolchainModel::new)
+                        .collect(Collectors.groupingBy(ToolchainModel::getType)));
 
         MavenOptions options = (MavenOptions) context.invokerRequest.options();
         request.setNoSnapshotUpdates(options.suppressSnapshotUpdates().orElse(false));

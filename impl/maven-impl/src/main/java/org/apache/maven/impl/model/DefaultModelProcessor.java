@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -71,7 +72,7 @@ public class DefaultModelProcessor implements ModelProcessor {
     private final List<ModelParser> modelParsers;
 
     @Inject
-    public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, List<ModelParser> modelParsers) {
+    public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, @Nullable List<ModelParser> modelParsers) {
         this.modelXmlFactory = modelXmlFactory;
         this.modelParsers = modelParsers;
     }
