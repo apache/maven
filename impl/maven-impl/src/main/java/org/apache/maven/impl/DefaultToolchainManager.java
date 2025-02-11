@@ -23,10 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
@@ -111,8 +113,15 @@ public class DefaultToolchainManager implements ToolchainManager {
         return Optional.empty();
     }
 
+    private static final SessionData.Key<ConcurrentHashMap<Project, ConcurrentHashMap<String, Object>>>
+            TOOLCHAIN_CONTEXT_KEY = (SessionData.Key) SessionData.key(ConcurrentHashMap.class, "toolchain-context");
+
     protected Map<String, Object> retrieveContext(Session session) {
         Optional<Project> current = session.getService(Lookup.class).lookupOptional(Project.class);
-        return current.map(session::getPluginContext).orElseGet(HashMap::new);
+        if (current.isPresent()) {
+            var map = session.getData().computeIfAbsent(TOOLCHAIN_CONTEXT_KEY, ConcurrentHashMap::new);
+            return map.computeIfAbsent(current.get(), p -> new ConcurrentHashMap<>());
+        }
+        return new HashMap<>();
     }
 }
