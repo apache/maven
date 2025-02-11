@@ -18,13 +18,14 @@
  */
 package org.apache.maven.impl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ToolchainFactory;
@@ -88,11 +89,13 @@ class DefaultToolchainManagerTest {
 
     @Test
     void storeAndRetrieveToolchainFromBuildContext() {
-        Map<String, Object> context = new HashMap<>();
+        Map<String, Object> context = new ConcurrentHashMap<>();
+        SessionData data = mock(SessionData.class);
         toolchainModel = ToolchainModel.newBuilder().type("jdk").build();
         when(session.getService(Lookup.class)).thenReturn(lookup);
         when(lookup.lookupOptional(Project.class)).thenReturn(Optional.of(project));
-        when(session.getPluginContext(project)).thenReturn(context);
+        when(session.getData()).thenReturn(data);
+        when(data.computeIfAbsent(any(), any())).thenReturn(context);
         when(mockToolchain.getType()).thenReturn("jdk");
         when(mockToolchain.getModel()).thenReturn(toolchainModel);
         when(jdkFactory.createToolchain(any(ToolchainModel.class))).thenReturn(mockToolchain);
