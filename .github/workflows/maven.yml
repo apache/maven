@@ -138,6 +138,10 @@ jobs:
             maven-${{ runner.os }}-full-
             maven-${{ runner.os }}-
 
+      - name: Show IP
+        shell: bash
+        run: curl --silent https://api.ipify.org
+
       - name: Build with downloaded Maven
         shell: bash
         run: mvn verify -e -B -V -Dmaven.repo.local=$HOME/.m2/repository/cached
@@ -208,6 +212,10 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-its
             maven-${{ runner.os }}-
+
+      - name: Show IP
+        shell: bash
+        run: curl --silent https://api.ipify.org
 
       # we use two steps so that we can cache artifacts downloaded from Maven Central repository
       # without installing any local artifacts to not pollute the cache
