@@ -54,7 +54,7 @@ class DefaultToolchainManagerTest {
     @Mock
     private Logger logger;
 
-    private DefaultToolchainManager toolchainManager;
+    private ToolchainManagerFactory.DefaultToolchainManagerV3 toolchainManager;
 
     @Mock
     private ToolchainFactory toolchainFactory_basicType;
@@ -77,7 +77,7 @@ class DefaultToolchainManagerTest {
         when(lookup.lookupMap(org.apache.maven.toolchain.ToolchainFactory.class))
                 .thenReturn(Map.of());
 
-        toolchainManager = new DefaultToolchainManager(lookup, logger);
+        toolchainManager = new ToolchainManagerFactory(lookup, logger).v3Manager();
     }
 
     @Test

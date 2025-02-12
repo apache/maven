@@ -27,7 +27,9 @@ import org.apache.maven.execution.MavenSession;
  * Public API for a toolchain-aware plugin to get expected toolchain instance.
  *
  * @since 2.0.9
+ * @deprecated Use {@link org.apache.maven.api.services.ToolchainManager} instead.
  */
+@Deprecated(since = "4.0.0")
 public interface ToolchainManager {
 
     // NOTE: Some plugins like Surefire access this field directly!

@@ -23,12 +23,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Priority;
+import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.di.Typed;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ToolchainFactoryException;
+import org.apache.maven.api.services.ToolchainManagerException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.toolchain.model.ToolchainModel;
@@ -36,19 +42,34 @@ import org.slf4j.Logger;
 
 @Named
 @Singleton
-public class DefaultToolchainManager implements ToolchainManager, ToolchainManagerPrivate {
+@Deprecated(since = "4.0.0")
+public class ToolchainManagerFactory {
 
     private final Lookup lookup;
     private final Logger logger;
 
     @Inject
-    public DefaultToolchainManager(Lookup lookup) {
+    ToolchainManagerFactory(Lookup lookup) {
         this(lookup, null);
     }
 
-    protected DefaultToolchainManager(Lookup lookup, Logger logger) {
+    protected ToolchainManagerFactory(Lookup lookup, Logger logger) {
         this.lookup = lookup;
         this.logger = logger;
+    }
+
+    @Provides
+    @Typed({ToolchainManager.class, ToolchainManagerPrivate.class})
+    @Named // qualifier is required for SiduDIBridge to work
+    DefaultToolchainManagerV3 v3Manager() {
+        return new DefaultToolchainManagerV3();
+    }
+
+    @Provides
+    @Priority(10)
+    @Typed(org.apache.maven.api.services.ToolchainManager.class)
+    DefaultToolchainManagerV4 v4Manager() {
+        return new DefaultToolchainManagerV4();
     }
 
     private org.apache.maven.impl.DefaultToolchainManager getDelegate() {
@@ -86,7 +107,7 @@ public class DefaultToolchainManager implements ToolchainManager, ToolchainManag
                 public Optional<org.apache.maven.api.Toolchain> createDefaultToolchain()
                         throws ToolchainFactoryException {
                     return Optional.ofNullable(v3Factory.createDefaultToolchain())
-                            .map(DefaultToolchainManager.this::getToolchainV4);
+                            .map(ToolchainManagerFactory.this::getToolchainV4);
                 }
             });
         }
@@ -94,35 +115,72 @@ public class DefaultToolchainManager implements ToolchainManager, ToolchainManag
         return new org.apache.maven.impl.DefaultToolchainManager(allFactories, logger) {};
     }
 
-    @Override
-    public Toolchain getToolchainFromBuildContext(String type, MavenSession session) {
-        return getDelegate()
-                .getToolchainFromBuildContext(session.getSession(), type)
-                .map(this::getToolchainV3)
-                .orElse(null);
-    }
+    public class DefaultToolchainManagerV4 implements org.apache.maven.api.services.ToolchainManager {
+        @Nonnull
+        @Override
+        public List<org.apache.maven.api.Toolchain> getToolchains(
+                @Nonnull Session session, @Nonnull String type, @Nullable Map<String, String> requirements)
+                throws ToolchainManagerException {
+            return getDelegate().getToolchains(session, type, requirements);
+        }
 
-    @Override
-    public List<Toolchain> getToolchains(MavenSession session, String type, Map<String, String> requirements) {
-        return new MappedList<>(
-                getDelegate().getToolchains(session.getSession(), type, requirements), this::getToolchainV3);
-    }
+        @Nonnull
+        @Override
+        public Optional<org.apache.maven.api.Toolchain> getToolchainFromBuildContext(
+                @Nonnull Session session, @Nonnull String type) throws ToolchainManagerException {
+            return getDelegate().getToolchainFromBuildContext(session, type);
+        }
 
-    @Override
-    public ToolchainPrivate[] getToolchainsForType(String type, MavenSession session)
-            throws MisconfiguredToolchainException {
-        try {
-            List<org.apache.maven.api.Toolchain> toolchains = getDelegate().getToolchains(session.getSession(), type);
-            return toolchains.stream().map(this::getToolchainV3).toArray(ToolchainPrivate[]::new);
-        } catch (org.apache.maven.api.services.ToolchainManagerException e) {
-            throw new MisconfiguredToolchainException(e.getMessage(), e);
+        @Override
+        public void storeToolchainToBuildContext(
+                @Nonnull Session session, @Nonnull org.apache.maven.api.Toolchain toolchain) {
+            getDelegate().storeToolchainToBuildContext(session, toolchain);
+        }
+
+        @Nonnull
+        @Override
+        public List<org.apache.maven.api.Toolchain> getToolchains(@Nonnull Session session, @Nonnull String type)
+                throws ToolchainManagerException {
+            return getDelegate().getToolchains(session, type);
         }
     }
 
-    @Override
-    public void storeToolchainToBuildContext(ToolchainPrivate toolchain, MavenSession session) {
-        org.apache.maven.api.Toolchain tc = getToolchainV4(toolchain);
-        getDelegate().storeToolchainToBuildContext(session.getSession(), tc);
+    public class DefaultToolchainManagerV3 implements ToolchainManager, ToolchainManagerPrivate {
+
+        @Override
+        public Toolchain getToolchainFromBuildContext(String type, MavenSession session) {
+            return getDelegate()
+                    .getToolchainFromBuildContext(session.getSession(), type)
+                    .map(ToolchainManagerFactory.this::getToolchainV3)
+                    .orElse(null);
+        }
+
+        @Override
+        public List<Toolchain> getToolchains(MavenSession session, String type, Map<String, String> requirements) {
+            return new MappedList<>(
+                    getDelegate().getToolchains(session.getSession(), type, requirements),
+                    ToolchainManagerFactory.this::getToolchainV3);
+        }
+
+        @Override
+        public ToolchainPrivate[] getToolchainsForType(String type, MavenSession session)
+                throws MisconfiguredToolchainException {
+            try {
+                List<org.apache.maven.api.Toolchain> toolchains =
+                        getDelegate().getToolchains(session.getSession(), type);
+                return toolchains.stream()
+                        .map(ToolchainManagerFactory.this::getToolchainV3)
+                        .toArray(ToolchainPrivate[]::new);
+            } catch (org.apache.maven.api.services.ToolchainManagerException e) {
+                throw new MisconfiguredToolchainException(e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public void storeToolchainToBuildContext(ToolchainPrivate toolchain, MavenSession session) {
+            org.apache.maven.api.Toolchain tc = getToolchainV4(toolchain);
+            getDelegate().storeToolchainToBuildContext(session.getSession(), tc);
+        }
     }
 
     private org.apache.maven.api.Toolchain getToolchainV4(ToolchainPrivate toolchain) {

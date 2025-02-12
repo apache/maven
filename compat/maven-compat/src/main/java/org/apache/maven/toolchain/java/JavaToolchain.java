@@ -24,7 +24,9 @@ import org.apache.maven.toolchain.Toolchain;
  * JDK toolchain interface.
  *
  * @since 2.0.9, renamed from JavaToolChain in 3.2.4
+ * @deprecated Use {@link org.apache.maven.api.JavaToolchain} instead.
  */
+@Deprecated(since = "4.0.0")
 public interface JavaToolchain extends Toolchain {
     //    /**
     //     * Returns a list of {@link java.io.File}s which represents the bootstrap libraries for the

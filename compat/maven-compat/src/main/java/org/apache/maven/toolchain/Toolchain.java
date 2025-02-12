@@ -22,7 +22,9 @@ package org.apache.maven.toolchain;
  * Toolchain interface.
  *
  * @since 2.0.9
+ * @deprecated Use {@link org.apache.maven.api.Toolchain} instead.
  */
+@Deprecated(since = "4.0.0")
 public interface Toolchain {
 
     /**

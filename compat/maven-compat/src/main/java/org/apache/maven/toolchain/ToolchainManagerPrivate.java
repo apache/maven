@@ -29,7 +29,9 @@ import org.apache.maven.execution.MavenSession;
  *
  * @since 2.0.9
  * @see ToolchainManager#getToolchainFromBuildContext(String, MavenSession)
+ * @deprecated Use {@link org.apache.maven.api.services.ToolchainManager} instead.
  */
+@Deprecated(since = "4.0.0")
 public interface ToolchainManagerPrivate {
 
     /**

@@ -21,6 +21,7 @@ package org.apache.maven.toolchain;
 /**
  *
  */
+@Deprecated(since = "4.0.0")
 public class MisconfiguredToolchainException extends Exception {
 
     public MisconfiguredToolchainException(String message) {
