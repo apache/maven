@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -346,8 +347,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
             stdout.setLogLevel(LocationAwareLogger.INFO_INT);
             stderr.setLogLevel(LocationAwareLogger.INFO_INT);
-            System.setOut(new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream());
-            System.setErr(new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream());
+            PrintStream psOut = new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream();
+            context.closeables.add(() -> LoggingOutputStream.forceFlush(psOut));
+            PrintStream psErr = new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream();
+            context.closeables.add(() -> LoggingOutputStream.forceFlush(psErr));
+            System.setOut(psOut);
+            System.setErr(psErr);
             // no need to set them back, this is already handled by MessageUtils.systemUninstall() above
         }
     }
