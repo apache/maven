@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 @Named
 @Singleton
 @Deprecated(since = "4.0.0")
-class ToolchainManagerFactory {
+public class ToolchainManagerFactory {
 
     private final Lookup lookup;
     private final Logger logger;
