@@ -31,7 +31,9 @@ import org.slf4j.Logger;
  * JDK toolchain implementation.
  *
  * @since 2.0.9, renamed from DefaultJavaToolChain in 3.2.4
+ * @deprecated Use {@link org.apache.maven.api.services.ToolchainFactory} instead.
  */
+@Deprecated(since = "4.0.0")
 public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain {
     private String javaHome;
 

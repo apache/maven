@@ -24,7 +24,9 @@ import org.apache.maven.toolchain.model.ToolchainModel;
  * Internal toolchain factory, to prepare toolchains instances.
  *
  * @since 2.0.9
+ * @deprecated Use {@link org.apache.maven.api.services.ToolchainFactory} instead.
  */
+@Deprecated(since = "4.0.0")
 public interface ToolchainFactory {
     /**
      * Create instance of toolchain.

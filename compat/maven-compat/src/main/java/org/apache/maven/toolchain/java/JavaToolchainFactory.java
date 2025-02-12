@@ -18,9 +18,6 @@
  */
 package org.apache.maven.toolchain.java;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,9 +40,9 @@ import org.slf4j.LoggerFactory;
  * <code>jdk</code> hint.
  *
  * @since 2.0.9, renamed from <code>DefaultJavaToolchainFactory</code> in 3.2.4
+ * @deprecated Use {@link org.apache.maven.api.services.ToolchainFactory} instead.
  */
-@Named("jdk")
-@Singleton
+@Deprecated(since = "4.0.0")
 public class JavaToolchainFactory implements ToolchainFactory {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

@@ -25,6 +25,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 /**
  *
  */
+@Deprecated(since = "4.0.0")
 public final class RequirementMatcherFactory {
     private RequirementMatcherFactory() {}
 

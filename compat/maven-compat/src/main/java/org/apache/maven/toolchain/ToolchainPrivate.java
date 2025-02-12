@@ -24,7 +24,10 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 
 /**
  * a private contract between the toolchains plugin and the components.
+ *
+ * @deprecated Use {@link org.apache.maven.api.Toolchain} instead.
  */
+@Deprecated(since = "4.0.0")
 public interface ToolchainPrivate extends Toolchain {
 
     /**

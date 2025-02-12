@@ -32,7 +32,9 @@ import org.slf4j.Logger;
  * to avoid rewriting usual code.
  *
  * @since 2.0.9
+ * @deprecated Use {@link org.apache.maven.api.Toolchain} instead.
  */
+@Deprecated(since = "4.0.0")
 public abstract class DefaultToolchain // should have been AbstractToolchain...
 implements Toolchain, ToolchainPrivate {
     private final Logger logger;
