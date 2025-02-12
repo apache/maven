@@ -60,6 +60,7 @@ class ToolchainManagerFactory {
 
     @Provides
     @Typed({ToolchainManager.class, ToolchainManagerPrivate.class})
+    @Named // qualifier is required for SiduDIBridge to work
     DefaultToolchainManagerV3 v3Manager() {
         return new DefaultToolchainManagerV3();
     }
