@@ -115,7 +115,7 @@ public class ToolchainManagerFactory {
         return new org.apache.maven.impl.DefaultToolchainManager(allFactories, logger) {};
     }
 
-    class DefaultToolchainManagerV4 implements org.apache.maven.api.services.ToolchainManager {
+    public class DefaultToolchainManagerV4 implements org.apache.maven.api.services.ToolchainManager {
         @Nonnull
         @Override
         public List<org.apache.maven.api.Toolchain> getToolchains(
@@ -145,7 +145,7 @@ public class ToolchainManagerFactory {
         }
     }
 
-    class DefaultToolchainManagerV3 implements ToolchainManager, ToolchainManagerPrivate {
+    public class DefaultToolchainManagerV3 implements ToolchainManager, ToolchainManagerPrivate {
 
         @Override
         public Toolchain getToolchainFromBuildContext(String type, MavenSession session) {
