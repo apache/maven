@@ -27,15 +27,15 @@ import java.util.function.Function;
  * @param <REQ> The request type
  * @param <REP> The response type
  */
-class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
-    final Function<REQ, REP> supplier;
-    volatile Object value;
+public class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
+    protected final Function<REQ, REP> supplier;
+    protected volatile Object value;
 
-    CachingSupplier(Function<REQ, REP> supplier) {
+    public CachingSupplier(Function<REQ, REP> supplier) {
         this.supplier = supplier;
     }
 
-    Object getValue() {
+    public Object getValue() {
         return value;
     }
 
@@ -55,7 +55,7 @@ class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
             }
         }
         if (v instanceof AltRes altRes) {
-            DefaultRequestCache.uncheckedThrow(altRes.t);
+            DefaultRequestCache.uncheckedThrow(altRes.throwable);
         }
         return (REP) v;
     }
@@ -64,16 +64,20 @@ class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
      * Special holder class for exceptions that occur during supplier execution.
      * Allows caching and re-throwing of exceptions on subsequent calls.
      */
-    static class AltRes {
-        final Throwable t;
+    public static class AltRes {
+        protected final Throwable throwable;
 
         /**
          * Creates a new AltRes with the given throwable.
          *
-         * @param t The throwable to store
+         * @param throwable The throwable to store
          */
-        AltRes(Throwable t) {
-            this.t = t;
+        public AltRes(Throwable throwable) {
+            this.throwable = throwable;
+        }
+
+        public Throwable getThrowable() {
+            return throwable;
         }
     }
 }

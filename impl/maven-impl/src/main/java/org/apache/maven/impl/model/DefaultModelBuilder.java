@@ -1773,124 +1773,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
-        record RgavCacheKey(
-                Session session,
-                RequestTrace trace,
-                List<RemoteRepository> repositories,
-                String groupId,
-                String artifactId,
-                String version,
-                String classifier,
-                String tag)
-                implements Request<Session> {
-            @Nonnull
-            @Override
-            public Session getSession() {
-                return session;
-            }
-
-            @Nullable
-            @Override
-            public RequestTrace getTrace() {
-                return trace;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                return o instanceof RgavCacheKey that
-                        && Objects.equals(tag, that.tag)
-                        && Objects.equals(groupId, that.groupId)
-                        && Objects.equals(version, that.version)
-                        && Objects.equals(artifactId, that.artifactId)
-                        && Objects.equals(classifier, that.classifier)
-                        && Objects.equals(repositories, that.repositories);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(repositories, groupId, artifactId, version, classifier, tag);
-            }
-
-            @Override
-            public String toString() {
-                StringBuilder sb = new StringBuilder();
-                sb.append(getClass().getSimpleName()).append("[").append("gav='");
-                if (groupId != null) {
-                    sb.append(groupId);
-                }
-                sb.append(":");
-                if (artifactId != null) {
-                    sb.append(artifactId);
-                }
-                sb.append(":");
-                if (version != null) {
-                    sb.append(version);
-                }
-                sb.append(":");
-                if (classifier != null) {
-                    sb.append(classifier);
-                }
-                sb.append("', tag='");
-                sb.append(tag);
-                sb.append("']");
-                return sb.toString();
-            }
-        }
-
-        record SourceCacheKey(Session session, RequestTrace trace, Source source, String tag)
-                implements Request<Session>, CacheMetadata {
-            @Nonnull
-            @Override
-            public Session getSession() {
-                return session;
-            }
-
-            @Nullable
-            @Override
-            public RequestTrace getTrace() {
-                return trace;
-            }
-
-            @Override
-            public CacheRetention getCacheRetention() {
-                return source instanceof CacheMetadata cacheMetadata ? cacheMetadata.getCacheRetention() : null;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                return o instanceof SourceCacheKey that
-                        && Objects.equals(tag, that.tag)
-                        && Objects.equals(source, that.source);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(source, tag);
-            }
-
-            @Override
-            public String toString() {
-                return getClass().getSimpleName() + "[" + "location=" + source.getLocation() + ", tag=" + tag
-                        + ", path=" + source.getPath() + ']';
-            }
-        }
-
-        static class SourceResponse<R extends Request<?>, T> implements Result<R> {
-            private final R request;
-            private final T response;
-
-            SourceResponse(R request, T response) {
-                this.request = request;
-                this.response = response;
-            }
-
-            @Nonnull
-            @Override
-            public R getRequest() {
-                return request;
-            }
-        }
-
         private <T> T cache(
                 List<RemoteRepository> repositories,
                 String groupId,
@@ -2069,6 +1951,124 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     record GAKey(String groupId, String artifactId) {}
+
+    public record RgavCacheKey(
+            Session session,
+            RequestTrace trace,
+            List<RemoteRepository> repositories,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String tag)
+            implements Request<Session> {
+        @Nonnull
+        @Override
+        public Session getSession() {
+            return session;
+        }
+
+        @Nullable
+        @Override
+        public RequestTrace getTrace() {
+            return trace;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof RgavCacheKey that
+                    && Objects.equals(tag, that.tag)
+                    && Objects.equals(groupId, that.groupId)
+                    && Objects.equals(version, that.version)
+                    && Objects.equals(artifactId, that.artifactId)
+                    && Objects.equals(classifier, that.classifier)
+                    && Objects.equals(repositories, that.repositories);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(repositories, groupId, artifactId, version, classifier, tag);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(getClass().getSimpleName()).append("[").append("gav='");
+            if (groupId != null) {
+                sb.append(groupId);
+            }
+            sb.append(":");
+            if (artifactId != null) {
+                sb.append(artifactId);
+            }
+            sb.append(":");
+            if (version != null) {
+                sb.append(version);
+            }
+            sb.append(":");
+            if (classifier != null) {
+                sb.append(classifier);
+            }
+            sb.append("', tag='");
+            sb.append(tag);
+            sb.append("']");
+            return sb.toString();
+        }
+    }
+
+    public record SourceCacheKey(Session session, RequestTrace trace, Source source, String tag)
+            implements Request<Session>, CacheMetadata {
+        @Nonnull
+        @Override
+        public Session getSession() {
+            return session;
+        }
+
+        @Nullable
+        @Override
+        public RequestTrace getTrace() {
+            return trace;
+        }
+
+        @Override
+        public CacheRetention getCacheRetention() {
+            return source instanceof CacheMetadata cacheMetadata ? cacheMetadata.getCacheRetention() : null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof SourceCacheKey that
+                    && Objects.equals(tag, that.tag)
+                    && Objects.equals(source, that.source);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(source, tag);
+        }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "[" + "location=" + source.getLocation() + ", tag=" + tag + ", path="
+                    + source.getPath() + ']';
+        }
+    }
+
+    public static class SourceResponse<R extends Request<?>, T> implements Result<R> {
+        private final R request;
+        private final T response;
+
+        SourceResponse(R request, T response) {
+            this.request = request;
+            this.response = response;
+        }
+
+        @Nonnull
+        @Override
+        public R getRequest() {
+            return request;
+        }
+    }
 
     static class InliningTransformer implements XmlReaderRequest.Transformer {
         static final Set<String> CONTEXTS = Set.of(
