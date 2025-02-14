@@ -311,7 +311,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                             InputStream in = context.invokerRequest.stdIn().orElse(InputStream.nullInputStream());
                             OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
                             builder.streams(in, out);
-                            builder.provider("exec");
+                            builder.provider(TerminalBuilder.PROP_PROVIDER_EXEC);
                             context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
                             context.closeables.add(out::flush);
                         } else {
