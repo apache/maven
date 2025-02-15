@@ -284,11 +284,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
-
-        // Create the build log appender; also sets MavenSimpleLogger sink
-        ProjectBuildLogAppender projectBuildLogAppender =
-                new ProjectBuildLogAppender(determineBuildEventListener(context));
-        context.closeables.add(projectBuildLogAppender);
     }
 
     protected BuildEventListener determineBuildEventListener(C context) {
@@ -305,6 +300,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void createTerminal(C context) {
         if (context.terminal == null) {
+            // Create the build log appender; also sets MavenSimpleLogger sink
+            ProjectBuildLogAppender projectBuildLogAppender =
+                    new ProjectBuildLogAppender(determineBuildEventListener(context));
+            context.closeables.add(projectBuildLogAppender);
+
             MessageUtils.systemInstall(
                     builder -> {
                         if (context.invokerRequest.embedded()) {
