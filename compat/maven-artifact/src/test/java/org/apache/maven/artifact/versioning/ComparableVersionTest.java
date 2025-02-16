@@ -253,6 +253,34 @@ class ComparableVersionTest {
     }
 
     @Test
+    void testLexicographicASCIISortOrder() { // Required by Semver 1.0
+        ComparableVersion lower = new ComparableVersion("1.0.0-alpha1");
+        ComparableVersion upper = new ComparableVersion("1.0.0-ALPHA1");
+        // Lower case is equal to upper case. This is *NOT* what Semver 1.0
+        // specifies. Here we are explicitly deviating from Semver 1.0.
+        assertTrue(upper.compareTo(lower) == 0, "expected 1.0.0-ALPHA1 == 1.0.0-alpha1");
+        assertTrue(lower.compareTo(upper) == 0, "expected 1.0.0-alpha1 == 1.0.0-ALPHA1");
+    }
+
+    @Test
+    void testCompareLowerCaseToUpperCaseASCII() {
+        ComparableVersion lower = new ComparableVersion("1.a");
+        ComparableVersion upper = new ComparableVersion("1.A");
+        // Lower case is equal to upper case
+        assertTrue(upper.compareTo(lower) == 0, "expected 1.A == 1.a");
+        assertTrue(lower.compareTo(upper) == 0, "expected 1.a == 1.A");
+    }
+
+    @Test
+    void testCompareLowerCaseToUpperCaseNonASCII() {
+        ComparableVersion lower = new ComparableVersion("1.é");
+        ComparableVersion upper = new ComparableVersion("1.É");
+        // Lower case is equal to upper case
+        assertTrue(upper.compareTo(lower) == 0, "expected 1.É < 1.é");
+        assertTrue(lower.compareTo(upper) == 0, "expected 1.é > 1.É");
+    }
+
+    @Test
     void testCompareDigitToLetter() {
         ComparableVersion seven = new ComparableVersion("7");
         ComparableVersion capitalJ = new ComparableVersion("J");
