@@ -352,6 +352,22 @@ public abstract class BaseParser implements Parser {
         String mavenVersion = buildProperties.getProperty(CLIReportingUtils.BUILD_VERSION_PROPERTY);
         systemProperties.setProperty("maven.version", mavenVersion);
 
+        boolean snapshot = mavenVersion.endsWith("SNAPSHOT");
+        if (snapshot) {
+            mavenVersion = mavenVersion.substring(0, mavenVersion.length() - "SNAPSHOT".length());
+            if (mavenVersion.endsWith("-")) {
+                mavenVersion = mavenVersion.substring(0, mavenVersion.length() - 1);
+            }
+        }
+        String[] versionElements = mavenVersion.split("\\.");
+        if (versionElements.length != 3) {
+            throw new IllegalStateException("Maven version is expected to have 3 segments: '" + mavenVersion + "'");
+        }
+        systemProperties.setProperty("maven.version.major", versionElements[0]);
+        systemProperties.setProperty("maven.version.minor", versionElements[1]);
+        systemProperties.setProperty("maven.version.patch", versionElements[2]);
+        systemProperties.setProperty("maven.version.snapshot", Boolean.toString(snapshot));
+
         String mavenBuildVersion = CLIReportingUtils.createMavenVersionString(buildProperties);
         systemProperties.setProperty("maven.build.version", mavenBuildVersion);
 
