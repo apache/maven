@@ -66,8 +66,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
     @Override
     protected int execute(LookupContext context) throws Exception {
         // set up JLine built-in commands
-        ConfigurationPath configPath =
-                new ConfigurationPath(context.cwdDirectory.get(), context.cwdDirectory.get());
+        ConfigurationPath configPath = new ConfigurationPath(context.cwdDirectory.get(), context.cwdDirectory.get());
         Builtins builtins = new Builtins(context.cwdDirectory, configPath, null);
         builtins.rename(Builtins.Command.TTOP, "top");
         builtins.alias("zle", "widget");
