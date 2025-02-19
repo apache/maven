@@ -80,7 +80,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             this.shellEncryptInvoker = new EncryptInvoker(shellContext.invokerRequest.lookup(), contextCopier());
             this.encryptParser = new EncryptParser();
             Map<String, CommandMethods> commandExecute = new HashMap<>();
-            commandExecute.put("sh", new CommandMethods(this::shell, this::defaultCompleter));
+            commandExecute.put("!", new CommandMethods(this::shell, this::defaultCompleter));
             commandExecute.put("cd", new CommandMethods(this::cd, this::cdCompleter));
             commandExecute.put("ls", new CommandMethods(this::ls, this::defaultCompleter));
             commandExecute.put("pwd", new CommandMethods(this::pwd, this::defaultCompleter));
@@ -162,25 +162,12 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         }
 
         private void shell(CommandInput input) {
-            final String[] usage = {
-                "!<command> -  execute shell command",
-                "Usage: !<command>",
-                "  -? --help                       Displays command help"
-            };
-            if (input.args().length == 1 && (input.args()[0].equals("-?") || input.args()[0].equals("--help"))) {
+            List<String> argv = new ArrayList<>(Arrays.asList(input.args()));
+            if (!argv.isEmpty()) {
                 try {
-                    parseOptions(usage, input.args());
+                    executeCmnd(argv);
                 } catch (Exception e) {
                     saveException(e);
-                }
-            } else {
-                List<String> argv = new ArrayList<>(Arrays.asList(input.args()));
-                if (!argv.isEmpty()) {
-                    try {
-                        executeCmnd(argv);
-                    } catch (Exception e) {
-                        saveException(e);
-                    }
                 }
             }
         }

@@ -35,7 +35,6 @@ import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.MaskingCallback;
-import org.jline.reader.Parser;
 import org.jline.reader.Reference;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.DefaultHighlighter;
@@ -84,7 +83,8 @@ public class ShellInvoker extends LookupInvoker<ShellContext> {
             holder.addCommandRegistry(entry.getValue().createShellCommandRegistry(context));
         }
 
-        Parser parser = new DefaultParser();
+        DefaultParser parser = new DefaultParser();
+        parser.setRegexCommand("[:]{0,1}[a-zA-Z!]{1,}\\S*"); // change default regex to support shell commands
 
         String banner =
                 """
@@ -104,7 +104,12 @@ public class ShellInvoker extends LookupInvoker<ShellContext> {
 
         try (holder) {
             SimpleSystemRegistryImpl systemRegistry =
-                    new SimpleSystemRegistryImpl(parser, context.terminal, context.workingDirectory, configPath);
+                    new SimpleSystemRegistryImpl(parser, context.terminal, context.workingDirectory, configPath) {
+                        @Override
+                        public boolean isCommandOrScript(String command) {
+                            return command.startsWith("!") || super.isCommandOrScript(command);
+                        }
+                    };
             systemRegistry.setCommandRegistries(holder.getCommandRegistries());
 
             Path history = context.userResolver.apply(".mvnsh_history");
