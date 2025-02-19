@@ -311,7 +311,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected Path determinePom(MavenContext context, Lookup lookup) {
-        Path current = context.invokerRequest.cwd();
+        Path current = context.cwdDirectory.get();
         MavenOptions options = (MavenOptions) context.invokerRequest.options();
         if (options.alternatePomFile().isPresent()) {
             current = context.cwdDirectory.apply(options.alternatePomFile().get());

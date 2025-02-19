@@ -507,10 +507,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void init(C context) throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
         Map<String, Object> data = new HashMap<>();
         data.put("plexus", context.lookup.lookup(PlexusContainer.class));
-        data.put("workingDirectory", invokerRequest.cwd().toString());
+        data.put("workingDirectory", context.cwdDirectory.get().toString());
         data.put("systemProperties", toProperties(context.protoSession.getSystemProperties()));
         data.put("userProperties", toProperties(context.protoSession.getUserProperties()));
         data.put("versionProperties", CLIReportingUtils.getBuildProperties());
