@@ -45,7 +45,7 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("VisibilityModifier")
 public class LookupContext implements AutoCloseable {
     public final InvokerRequest invokerRequest;
-    public final Directory.MutableDirectory cwdDirectory;
+    public final Directory.MutableDirectory cwd;
     public final Directory installationDirectory;
     public final Directory userDirectory;
     public final boolean containerCapsuleManaged;
@@ -56,7 +56,7 @@ public class LookupContext implements AutoCloseable {
 
     public LookupContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
         this.invokerRequest = requireNonNull(invokerRequest);
-        this.cwdDirectory = new Directory.MutableDirectory(invokerRequest.cwd());
+        this.cwd = new Directory.MutableDirectory(invokerRequest.cwd());
         this.installationDirectory = new Directory(invokerRequest.installationDirectory());
         this.userDirectory = new Directory(invokerRequest.userHomeDirectory());
         this.containerCapsuleManaged = containerCapsuleManaged;

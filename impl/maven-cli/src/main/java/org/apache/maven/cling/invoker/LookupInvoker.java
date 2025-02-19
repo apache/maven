@@ -367,7 +367,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected Consumer<String> doDetermineWriter(C context) {
         Options options = context.invokerRequest.options();
         if (options.logFile().isPresent()) {
-            Path logFile = context.cwdDirectory.apply(options.logFile().get());
+            Path logFile = context.cwd.apply(options.logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
@@ -509,7 +509,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected void init(C context) throws Exception {
         Map<String, Object> data = new HashMap<>();
         data.put("plexus", context.lookup.lookup(PlexusContainer.class));
-        data.put("workingDirectory", context.cwdDirectory.get().toString());
+        data.put("workingDirectory", context.cwd.get().toString());
         data.put("systemProperties", toProperties(context.protoSession.getSystemProperties()));
         data.put("userProperties", toProperties(context.protoSession.getUserProperties()));
         data.put("versionProperties", CLIReportingUtils.getBuildProperties());
@@ -565,8 +565,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
         Path userSettingsFile = null;
         if (mavenOptions.altUserSettings().isPresent()) {
-            userSettingsFile =
-                    context.cwdDirectory.apply(mavenOptions.altUserSettings().get());
+            userSettingsFile = context.cwd.apply(mavenOptions.altUserSettings().get());
 
             if (!Files.isRegularFile(userSettingsFile)) {
                 throw new FileNotFoundException("The specified user settings file does not exist: " + userSettingsFile);
@@ -582,7 +581,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         Path projectSettingsFile = null;
         if (mavenOptions.altProjectSettings().isPresent()) {
             projectSettingsFile =
-                    context.cwdDirectory.apply(mavenOptions.altProjectSettings().get());
+                    context.cwd.apply(mavenOptions.altProjectSettings().get());
 
             if (!Files.isRegularFile(projectSettingsFile)) {
                 throw new FileNotFoundException(
@@ -592,14 +591,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             String projectSettingsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
             if (projectSettingsFileStr != null) {
-                projectSettingsFile = context.cwdDirectory.apply(projectSettingsFileStr);
+                projectSettingsFile = context.cwd.apply(projectSettingsFileStr);
             }
         }
 
         Path installationSettingsFile = null;
         if (mavenOptions.altInstallationSettings().isPresent()) {
-            installationSettingsFile = context.cwdDirectory.apply(
-                    mavenOptions.altInstallationSettings().get());
+            installationSettingsFile =
+                    context.cwd.apply(mavenOptions.altInstallationSettings().get());
 
             if (!Files.isRegularFile(installationSettingsFile)) {
                 throw new FileNotFoundException(
@@ -715,7 +714,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
         if (userDefinedLocalRepo != null) {
-            return context.cwdDirectory.apply(userDefinedLocalRepo);
+            return context.cwd.apply(userDefinedLocalRepo);
         }
         // settings
         userDefinedLocalRepo = context.effectiveSettings.getLocalRepository();

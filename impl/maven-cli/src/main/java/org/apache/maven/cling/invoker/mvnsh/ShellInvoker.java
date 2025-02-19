@@ -66,8 +66,8 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
     @Override
     protected int execute(LookupContext context) throws Exception {
         // set up JLine built-in commands
-        ConfigurationPath configPath = new ConfigurationPath(context.cwdDirectory.get(), context.cwdDirectory.get());
-        Builtins builtins = new Builtins(context.cwdDirectory, configPath, null);
+        ConfigurationPath configPath = new ConfigurationPath(context.cwd.get(), context.cwd.get());
+        Builtins builtins = new Builtins(context.cwd, configPath, null);
         builtins.rename(Builtins.Command.TTOP, "top");
         builtins.alias("zle", "widget");
         builtins.alias("bindkey", "keymap");
@@ -103,7 +103,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
 
         try (holder) {
             SimpleSystemRegistryImpl systemRegistry =
-                    new SimpleSystemRegistryImpl(parser, context.terminal, context.cwdDirectory, configPath) {
+                    new SimpleSystemRegistryImpl(parser, context.terminal, context.cwd, configPath) {
                         @Override
                         public boolean isCommandOrScript(String command) {
                             return command.startsWith("!") || super.isCommandOrScript(command);
@@ -137,7 +137,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
                 try {
                     systemRegistry.cleanUp();
                     line = reader.readLine(
-                            context.cwdDirectory.get().getFileName().toString() + " mvnsh> ",
+                            context.cwd.get().getFileName().toString() + " mvnsh> ",
                             null,
                             (MaskingCallback) null,
                             null);

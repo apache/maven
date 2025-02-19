@@ -142,7 +142,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected void toolchains(MavenContext context, MavenExecutionRequest request) throws Exception {
         Path userToolchainsFile = null;
         if (context.invokerRequest.options().altUserToolchains().isPresent()) {
-            userToolchainsFile = context.cwdDirectory.apply(
+            userToolchainsFile = context.cwd.apply(
                     context.invokerRequest.options().altUserToolchains().get());
 
             if (!Files.isRegularFile(userToolchainsFile)) {
@@ -153,13 +153,13 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             String userToolchainsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_USER_TOOLCHAINS);
             if (userToolchainsFileStr != null) {
-                userToolchainsFile = context.cwdDirectory.apply(userToolchainsFileStr);
+                userToolchainsFile = context.cwd.apply(userToolchainsFileStr);
             }
         }
 
         Path installationToolchainsFile = null;
         if (context.invokerRequest.options().altInstallationToolchains().isPresent()) {
-            installationToolchainsFile = context.cwdDirectory.apply(
+            installationToolchainsFile = context.cwd.apply(
                     context.invokerRequest.options().altInstallationToolchains().get());
 
             if (!Files.isRegularFile(installationToolchainsFile)) {
@@ -170,7 +170,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             String installationToolchainsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
             if (installationToolchainsFileStr != null) {
-                installationToolchainsFile = context.cwdDirectory.apply(installationToolchainsFileStr);
+                installationToolchainsFile = context.cwd.apply(installationToolchainsFileStr);
             }
         }
 
@@ -311,10 +311,10 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected Path determinePom(MavenContext context, Lookup lookup) {
-        Path current = context.cwdDirectory.get();
+        Path current = context.cwd.get();
         MavenOptions options = (MavenOptions) context.invokerRequest.options();
         if (options.alternatePomFile().isPresent()) {
-            current = context.cwdDirectory.apply(options.alternatePomFile().get());
+            current = context.cwd.apply(options.alternatePomFile().get());
         }
         ModelProcessor modelProcessor =
                 lookup.lookupOptional(ModelProcessor.class).orElse(null);
