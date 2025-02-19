@@ -42,8 +42,6 @@ import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
 import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
 import org.apache.maven.cling.invoker.mvnenc.Goal;
 import org.apache.maven.cling.invoker.mvnsh.ShellCommandRegistryFactory;
-import org.apache.maven.cling.invoker.mvnsh.ShellContext;
-import org.apache.maven.cling.invoker.mvnsh.WorkingDirectory;
 import org.apache.maven.impl.util.Os;
 import org.jline.builtins.Completers;
 import org.jline.console.CmdDesc;
@@ -60,21 +58,19 @@ import static java.util.Objects.requireNonNull;
 @Named("builtin")
 @Singleton
 public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryFactory {
-    public CommandRegistry createShellCommandRegistry(ShellContext context) {
+    public CommandRegistry createShellCommandRegistry(LookupContext context) {
         return new BuiltinShellCommandRegistry(context);
     }
 
     private static class BuiltinShellCommandRegistry extends JlineCommandRegistry implements AutoCloseable {
-        private final ShellContext shellContext;
-        private final WorkingDirectory workingDirectory;
+        private final LookupContext shellContext;
         private final MavenInvoker shellMavenInvoker;
         private final MavenParser mavenParser;
         private final EncryptInvoker shellEncryptInvoker;
         private final EncryptParser encryptParser;
 
-        private BuiltinShellCommandRegistry(ShellContext shellContext) {
+        private BuiltinShellCommandRegistry(LookupContext shellContext) {
             this.shellContext = requireNonNull(shellContext, "shellContext");
-            this.workingDirectory = requireNonNull(shellContext.workingDirectory, "workingDirectory");
             this.shellMavenInvoker = new MavenInvoker(shellContext.invokerRequest.lookup(), contextCopier());
             this.mavenParser = new MavenParser();
             this.shellEncryptInvoker = new EncryptInvoker(shellContext.invokerRequest.lookup(), contextCopier());
@@ -145,7 +141,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             }
             processArgs.add(String.join(" ", args));
             builder.command(processArgs);
-            builder.directory(workingDirectory.get().toFile());
+            builder.directory(shellContext.cwdDirectory.get().toFile());
             Process process = builder.start();
             StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
             Thread th = new Thread(streamGobbler);
@@ -175,7 +171,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         private void cd(CommandInput input) {
             try {
                 if (input.args().length == 1) {
-                    workingDirectory.changeDirectory(input.args()[0]);
+                    shellContext.cwdDirectory.changeDirectory(input.args()[0]);
                 } else {
                     shellContext.writer.accept("Error: 'cd' accepts only one argument");
                 }
@@ -185,12 +181,12 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         }
 
         private List<Completer> cdCompleter(String name) {
-            return List.of(new ArgumentCompleter(new Completers.DirectoriesCompleter(workingDirectory)));
+            return List.of(new ArgumentCompleter(new Completers.DirectoriesCompleter(shellContext.cwdDirectory)));
         }
 
         private void ls(CommandInput input) {
             try {
-                try (Stream<Path> list = Files.list(workingDirectory.get())) {
+                try (Stream<Path> list = Files.list(shellContext.cwdDirectory.get())) {
                     list.forEach(file -> {
                         if (Files.isDirectory(file)) {
                             shellContext.writer.accept(file.getFileName().toString() + "/");
@@ -206,7 +202,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
 
         private void pwd(CommandInput input) {
             try {
-                shellContext.writer.accept(workingDirectory.get().toString());
+                shellContext.writer.accept(shellContext.cwdDirectory.get().toString());
             } catch (Exception e) {
                 saveException(e);
             }
@@ -216,7 +212,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             try {
                 shellMavenInvoker.invoke(mavenParser.parseInvocation(
                         ParserRequest.mvn(input.args(), shellContext.invokerRequest.messageBuilderFactory())
-                                .cwd(workingDirectory.get())
+                                .cwd(shellContext.cwdDirectory.get())
                                 .build()));
             } catch (Exception e) {
                 saveException(e);
@@ -240,7 +236,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             try {
                 shellEncryptInvoker.invoke(encryptParser.parseInvocation(
                         ParserRequest.mvnenc(input.args(), shellContext.invokerRequest.messageBuilderFactory())
-                                .cwd(workingDirectory.get())
+                                .cwd(shellContext.cwdDirectory.get())
                                 .build()));
             } catch (Exception e) {
                 saveException(e);

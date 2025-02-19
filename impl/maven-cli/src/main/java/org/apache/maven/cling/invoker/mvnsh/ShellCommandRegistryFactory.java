@@ -18,8 +18,9 @@
  */
 package org.apache.maven.cling.invoker.mvnsh;
 
+import org.apache.maven.cling.invoker.LookupContext;
 import org.jline.console.CommandRegistry;
 
 public interface ShellCommandRegistryFactory {
-    CommandRegistry createShellCommandRegistry(ShellContext context);
+    CommandRegistry createShellCommandRegistry(LookupContext context);
 }

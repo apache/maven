@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cli.InvokerException;
@@ -46,9 +45,9 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("VisibilityModifier")
 public class LookupContext implements AutoCloseable {
     public final InvokerRequest invokerRequest;
-    public final Function<String, Path> cwdResolver;
-    public final Function<String, Path> installationResolver;
-    public final Function<String, Path> userResolver;
+    public final Directory.MutableDirectory cwdDirectory;
+    public final Directory installationDirectory;
+    public final Directory userDirectory;
     public final boolean containerCapsuleManaged;
 
     public LookupContext(InvokerRequest invokerRequest) {
@@ -57,11 +56,9 @@ public class LookupContext implements AutoCloseable {
 
     public LookupContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
         this.invokerRequest = requireNonNull(invokerRequest);
-        this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
-        this.installationResolver = s ->
-                invokerRequest.installationDirectory().resolve(s).normalize().toAbsolutePath();
-        this.userResolver =
-                s -> invokerRequest.userHomeDirectory().resolve(s).normalize().toAbsolutePath();
+        this.cwdDirectory = new Directory.MutableDirectory(invokerRequest.cwd());
+        this.installationDirectory = new Directory(invokerRequest.installationDirectory());
+        this.userDirectory = new Directory(invokerRequest.userHomeDirectory());
         this.containerCapsuleManaged = containerCapsuleManaged;
         this.logger = invokerRequest.parserRequest().logger();
 

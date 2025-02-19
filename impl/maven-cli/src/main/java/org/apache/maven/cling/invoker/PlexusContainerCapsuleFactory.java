@@ -194,7 +194,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         ArrayList<Path> jars = new ArrayList<>();
         if (extClassPath != null && !extClassPath.isEmpty()) {
             for (String jar : extClassPath.split(File.pathSeparator)) {
-                Path file = context.cwdResolver.apply(jar);
+                Path file = context.cwdDirectory.apply(jar);
                 context.logger.debug("  included '" + file + "'");
                 jars.add(file);
             }

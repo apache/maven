@@ -367,7 +367,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected Consumer<String> doDetermineWriter(C context) {
         Options options = context.invokerRequest.options();
         if (options.logFile().isPresent()) {
-            Path logFile = context.cwdResolver.apply(options.logFile().get());
+            Path logFile = context.cwdDirectory.apply(options.logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
@@ -567,7 +567,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         Path userSettingsFile = null;
         if (mavenOptions.altUserSettings().isPresent()) {
             userSettingsFile =
-                    context.cwdResolver.apply(mavenOptions.altUserSettings().get());
+                    context.cwdDirectory.apply(mavenOptions.altUserSettings().get());
 
             if (!Files.isRegularFile(userSettingsFile)) {
                 throw new FileNotFoundException("The specified user settings file does not exist: " + userSettingsFile);
@@ -576,14 +576,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             String userSettingsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_USER_SETTINGS);
             if (userSettingsFileStr != null) {
-                userSettingsFile = context.userResolver.apply(userSettingsFileStr);
+                userSettingsFile = context.userDirectory.apply(userSettingsFileStr);
             }
         }
 
         Path projectSettingsFile = null;
         if (mavenOptions.altProjectSettings().isPresent()) {
             projectSettingsFile =
-                    context.cwdResolver.apply(mavenOptions.altProjectSettings().get());
+                    context.cwdDirectory.apply(mavenOptions.altProjectSettings().get());
 
             if (!Files.isRegularFile(projectSettingsFile)) {
                 throw new FileNotFoundException(
@@ -593,13 +593,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             String projectSettingsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
             if (projectSettingsFileStr != null) {
-                projectSettingsFile = context.cwdResolver.apply(projectSettingsFileStr);
+                projectSettingsFile = context.cwdDirectory.apply(projectSettingsFileStr);
             }
         }
 
         Path installationSettingsFile = null;
         if (mavenOptions.altInstallationSettings().isPresent()) {
-            installationSettingsFile = context.cwdResolver.apply(
+            installationSettingsFile = context.cwdDirectory.apply(
                     mavenOptions.altInstallationSettings().get());
 
             if (!Files.isRegularFile(installationSettingsFile)) {
@@ -610,7 +610,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             String installationSettingsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
             if (installationSettingsFileStr != null) {
-                installationSettingsFile = context.installationResolver.apply(installationSettingsFileStr);
+                installationSettingsFile = context.installationDirectory.apply(installationSettingsFileStr);
             }
         }
 
@@ -716,15 +716,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
         if (userDefinedLocalRepo != null) {
-            return context.cwdResolver.apply(userDefinedLocalRepo);
+            return context.cwdDirectory.apply(userDefinedLocalRepo);
         }
         // settings
         userDefinedLocalRepo = context.effectiveSettings.getLocalRepository();
         if (userDefinedLocalRepo != null && !userDefinedLocalRepo.isEmpty()) {
-            return context.userResolver.apply(userDefinedLocalRepo);
+            return context.userDirectory.apply(userDefinedLocalRepo);
         }
         // defaults
-        return context.userResolver
+        return context.userDirectory
                 .apply(context.protoSession.getUserProperties().get(Constants.MAVEN_USER_CONF))
                 .resolve("repository");
     }
