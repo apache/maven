@@ -18,14 +18,19 @@
  */
 package org.apache.maven.cling.invoker.mvnsh.builtin;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.di.Named;
@@ -35,55 +40,53 @@ import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
 import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
+import org.apache.maven.cling.invoker.mvnenc.Goal;
 import org.apache.maven.cling.invoker.mvnsh.ShellCommandRegistryFactory;
+import org.apache.maven.cling.invoker.mvnsh.ShellContext;
+import org.apache.maven.cling.invoker.mvnsh.WorkingDirectory;
+import org.apache.maven.impl.util.Os;
 import org.jline.builtins.Completers;
-import org.jline.builtins.Options;
 import org.jline.console.CmdDesc;
 import org.jline.console.CommandInput;
 import org.jline.console.CommandMethods;
 import org.jline.console.CommandRegistry;
-import org.jline.console.impl.AbstractCommandRegistry;
+import org.jline.console.impl.JlineCommandRegistry;
 import org.jline.reader.Completer;
 import org.jline.reader.impl.completer.ArgumentCompleter;
-import org.jline.reader.impl.completer.NullCompleter;
+import org.jline.reader.impl.completer.StringsCompleter;
 
 import static java.util.Objects.requireNonNull;
-import static org.jline.console.impl.JlineCommandRegistry.compileCommandOptions;
 
 @Named("builtin")
 @Singleton
 public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryFactory {
-    public CommandRegistry createShellCommandRegistry(LookupContext context) {
+    public CommandRegistry createShellCommandRegistry(ShellContext context) {
         return new BuiltinShellCommandRegistry(context);
     }
 
-    private static class BuiltinShellCommandRegistry extends AbstractCommandRegistry implements AutoCloseable {
-        public enum Command {
-            MVN,
-            MVNENC
-        }
-
-        private final LookupContext shellContext;
+    private static class BuiltinShellCommandRegistry extends JlineCommandRegistry implements AutoCloseable {
+        private final ShellContext shellContext;
+        private final WorkingDirectory workingDirectory;
         private final MavenInvoker shellMavenInvoker;
         private final MavenParser mavenParser;
         private final EncryptInvoker shellEncryptInvoker;
         private final EncryptParser encryptParser;
 
-        private BuiltinShellCommandRegistry(LookupContext shellContext) {
+        private BuiltinShellCommandRegistry(ShellContext shellContext) {
             this.shellContext = requireNonNull(shellContext, "shellContext");
+            this.workingDirectory = requireNonNull(shellContext.workingDirectory, "workingDirectory");
             this.shellMavenInvoker = new MavenInvoker(shellContext.invokerRequest.lookup(), contextCopier());
             this.mavenParser = new MavenParser();
             this.shellEncryptInvoker = new EncryptInvoker(shellContext.invokerRequest.lookup(), contextCopier());
             this.encryptParser = new EncryptParser();
-            Set<Command> commands = new HashSet<>(EnumSet.allOf(Command.class));
-            Map<Command, String> commandName = new HashMap<>();
-            Map<Command, CommandMethods> commandExecute = new HashMap<>();
-            for (Command c : commands) {
-                commandName.put(c, c.name().toLowerCase());
-            }
-            commandExecute.put(Command.MVN, new CommandMethods(this::mvn, this::mvnCompleter));
-            commandExecute.put(Command.MVNENC, new CommandMethods(this::mvnenc, this::mvnencCompleter));
-            registerCommands(commandName, commandExecute);
+            Map<String, CommandMethods> commandExecute = new HashMap<>();
+            commandExecute.put("sh", new CommandMethods(this::shell, this::defaultCompleter));
+            commandExecute.put("cd", new CommandMethods(this::cd, this::cdCompleter));
+            commandExecute.put("ls", new CommandMethods(this::ls, this::defaultCompleter));
+            commandExecute.put("pwd", new CommandMethods(this::pwd, this::defaultCompleter));
+            commandExecute.put("mvn", new CommandMethods(this::mvn, this::mvnCompleter));
+            commandExecute.put("mvnenc", new CommandMethods(this::mvnenc, this::mvnencCompleter));
+            registerCommands(commandExecute);
         }
 
         private Consumer<LookupContext> contextCopier() {
@@ -130,21 +133,103 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             return "Builtin Maven Shell commands";
         }
 
-        private List<Completers.OptDesc> commandOptions(String command) {
-            try {
-                invoke(new CommandSession(), command, "--help");
-            } catch (Options.HelpException e) {
-                return compileCommandOptions(e.getMessage());
-            } catch (Exception e) {
-                // ignore
+        private void executeCmnd(List<String> args) throws Exception {
+            ProcessBuilder builder = new ProcessBuilder();
+            List<String> processArgs = new ArrayList<>();
+            if (Os.IS_WINDOWS) {
+                processArgs.add("cmd.exe");
+                processArgs.add("/c");
+            } else {
+                processArgs.add("sh");
+                processArgs.add("-c");
             }
-            return null;
+            processArgs.add(String.join(" ", args));
+            builder.command(processArgs);
+            builder.directory(workingDirectory.get().toFile());
+            Process process = builder.start();
+            StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+            Thread th = new Thread(streamGobbler);
+            th.start();
+            int exitCode = process.waitFor();
+            th.join();
+            if (exitCode != 0) {
+                streamGobbler = new StreamGobbler(process.getErrorStream(), System.out::println);
+                th = new Thread(streamGobbler);
+                th.start();
+                th.join();
+                throw new Exception("Error occurred in shell!");
+            }
+        }
+
+        private void shell(CommandInput input) {
+            final String[] usage = {
+                "!<command> -  execute shell command",
+                "Usage: !<command>",
+                "  -? --help                       Displays command help"
+            };
+            if (input.args().length == 1 && (input.args()[0].equals("-?") || input.args()[0].equals("--help"))) {
+                try {
+                    parseOptions(usage, input.args());
+                } catch (Exception e) {
+                    saveException(e);
+                }
+            } else {
+                List<String> argv = new ArrayList<>(Arrays.asList(input.args()));
+                if (!argv.isEmpty()) {
+                    try {
+                        executeCmnd(argv);
+                    } catch (Exception e) {
+                        saveException(e);
+                    }
+                }
+            }
+        }
+
+        private void cd(CommandInput input) {
+            try {
+                if (input.args().length == 1) {
+                    workingDirectory.changeDirectory(input.args()[0]);
+                } else {
+                    shellContext.writer.accept("Error: 'cd' accepts only one argument");
+                }
+            } catch (Exception e) {
+                saveException(e);
+            }
+        }
+
+        private List<Completer> cdCompleter(String name) {
+            return List.of(new ArgumentCompleter(new Completers.DirectoriesCompleter(workingDirectory)));
+        }
+
+        private void ls(CommandInput input) {
+            try {
+                try (Stream<Path> list = Files.list(workingDirectory.get())) {
+                    list.forEach(file -> {
+                        if (Files.isDirectory(file)) {
+                            shellContext.writer.accept(file.getFileName().toString() + "/");
+                        } else {
+                            shellContext.writer.accept(file.getFileName().toString());
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                saveException(e);
+            }
+        }
+
+        private void pwd(CommandInput input) {
+            try {
+                shellContext.writer.accept(workingDirectory.get().toString());
+            } catch (Exception e) {
+                saveException(e);
+            }
         }
 
         private void mvn(CommandInput input) {
             try {
                 shellMavenInvoker.invoke(mavenParser.parseInvocation(
                         ParserRequest.mvn(input.args(), shellContext.invokerRequest.messageBuilderFactory())
+                                .cwd(workingDirectory.get())
                                 .build()));
             } catch (Exception e) {
                 saveException(e);
@@ -152,18 +237,23 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         }
 
         private List<Completer> mvnCompleter(String name) {
-            List<Completer> completers = new ArrayList<>();
-            completers.add(new ArgumentCompleter(
-                    NullCompleter.INSTANCE,
-                    new Completers.OptionCompleter(
-                            new Completers.FilesCompleter(shellContext.invokerRequest::cwd), this::commandOptions, 1)));
-            return completers;
+            return List.of(new ArgumentCompleter(new StringsCompleter(
+                    "clean",
+                    "validate",
+                    "compile",
+                    "test",
+                    "package",
+                    "verify",
+                    "install",
+                    "deploy",
+                    "wrapper:wrapper")));
         }
 
         private void mvnenc(CommandInput input) {
             try {
                 shellEncryptInvoker.invoke(encryptParser.parseInvocation(
                         ParserRequest.mvnenc(input.args(), shellContext.invokerRequest.messageBuilderFactory())
+                                .cwd(workingDirectory.get())
                                 .build()));
             } catch (Exception e) {
                 saveException(e);
@@ -171,12 +261,25 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         }
 
         private List<Completer> mvnencCompleter(String name) {
-            List<Completer> completers = new ArrayList<>();
-            completers.add(new ArgumentCompleter(
-                    NullCompleter.INSTANCE,
-                    new Completers.OptionCompleter(
-                            new Completers.FilesCompleter(shellContext.invokerRequest::cwd), this::commandOptions, 1)));
-            return completers;
+            return List.of(new ArgumentCompleter(new StringsCompleter(
+                    shellContext.lookup.lookupMap(Goal.class).keySet())));
+        }
+    }
+
+    private static class StreamGobbler implements Runnable {
+        private final InputStream inputStream;
+        private final Consumer<String> consumer;
+
+        private StreamGobbler(InputStream inputStream, Consumer<String> consumer) {
+            this.inputStream = inputStream;
+            this.consumer = consumer;
+        }
+
+        @Override
+        public void run() {
+            new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                    .lines()
+                    .forEach(consumer);
         }
     }
 }

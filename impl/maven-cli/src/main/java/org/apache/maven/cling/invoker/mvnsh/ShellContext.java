@@ -18,8 +18,14 @@
  */
 package org.apache.maven.cling.invoker.mvnsh;
 
-import org.jline.console.CommandRegistry;
+import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.cling.invoker.LookupContext;
 
-public interface ShellCommandRegistryFactory {
-    CommandRegistry createShellCommandRegistry(ShellContext context);
+@SuppressWarnings("VisibilityModifier")
+public class ShellContext extends LookupContext {
+    public ShellContext(InvokerRequest invokerRequest) {
+        super(invokerRequest, true);
+    }
+
+    public WorkingDirectory workingDirectory;
 }

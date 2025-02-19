@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.services.Lookup;
-import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.jline.builtins.ConfigurationPath;
@@ -50,26 +49,27 @@ import org.jline.widget.TailTipWidgets;
 /**
  * mvnsh invoker implementation.
  */
-public class ShellInvoker extends LookupInvoker<LookupContext> {
+public class ShellInvoker extends LookupInvoker<ShellContext> {
 
     public ShellInvoker(Lookup protoLookup) {
         super(protoLookup, null);
     }
 
     @Override
-    protected LookupContext createContext(InvokerRequest invokerRequest) {
-        return new LookupContext(invokerRequest);
+    protected ShellContext createContext(InvokerRequest invokerRequest) {
+        return new ShellContext(invokerRequest);
     }
 
     public static final int OK = 0; // OK
     public static final int ERROR = 1; // "generic" error
 
     @Override
-    protected int execute(LookupContext context) throws Exception {
+    protected int execute(ShellContext context) throws Exception {
+        context.workingDirectory = new WorkingDirectory(context.invokerRequest.cwd());
         // set up JLine built-in commands
         ConfigurationPath configPath =
                 new ConfigurationPath(context.invokerRequest.cwd(), context.invokerRequest.cwd());
-        Builtins builtins = new Builtins(context.invokerRequest::cwd, configPath, null);
+        Builtins builtins = new Builtins(context.workingDirectory, configPath, null);
         builtins.rename(Builtins.Command.TTOP, "top");
         builtins.alias("zle", "widget");
         builtins.alias("bindkey", "keymap");
@@ -104,7 +104,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
 
         try (holder) {
             SimpleSystemRegistryImpl systemRegistry =
-                    new SimpleSystemRegistryImpl(parser, context.terminal, context.invokerRequest::cwd, configPath);
+                    new SimpleSystemRegistryImpl(parser, context.terminal, context.workingDirectory, configPath);
             systemRegistry.setCommandRegistries(holder.getCommandRegistries());
 
             Path history = context.userResolver.apply(".mvnsh_history");
@@ -127,15 +127,12 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
             KeyMap<Binding> keyMap = reader.getKeyMaps().get("main");
             keyMap.bind(new Reference("tailtip-toggle"), KeyMap.alt("s"));
 
-            String prompt = "mvnsh> ";
-            String rightPrompt = null;
-
             // start the shell and process input until the user quits with Ctrl-D
             String line;
             while (true) {
                 try {
                     systemRegistry.cleanUp();
-                    line = reader.readLine(prompt, rightPrompt, (MaskingCallback) null, null);
+                    line = reader.readLine(context.workingDirectory.prompt(), null, (MaskingCallback) null, null);
                     systemRegistry.execute(line);
                 } catch (UserInterruptException e) {
                     // Ignore
