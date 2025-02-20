@@ -129,6 +129,8 @@ under the License.
 
   <properties>
     <javaVersion>17</javaVersion>
+　　<sonar.organization>knakamura5626-test</sonar.organization>
+  　<sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <maven.compiler.source>${javaVersion}</maven.compiler.source>
     <maven.compiler.target>${javaVersion}</maven.compiler.target>
     <maven.compiler.release>${javaVersion}</maven.compiler.release>
