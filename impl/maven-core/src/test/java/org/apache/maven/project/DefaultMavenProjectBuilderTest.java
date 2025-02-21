@@ -29,6 +29,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.model.Profile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -343,6 +344,61 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         project = projectBuilder.build(pom.toFile(), buildingRequest).getProject();
         assertThat(project.getName(), is("PROJECT NAME"));
+    }
+
+    @Test
+    void testActivatedProfileBySource() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setActiveProfileIds(List.of("profile1"));
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
+        assertTrue(
+                project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("active-by-default"::equals));
+    }
+
+    @Test
+    void testActivatedDefaultProfileBySource() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("active-by-default"::equals));
+    }
+
+    @Test
+    void testActivatedExternalProfileBySource() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        final Profile externalProfile = new Profile();
+        externalProfile.setId("external-profile");
+        request.addProfile(externalProfile);
+        request.setActiveProfileIds(List.of(externalProfile.getId()));
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        assertTrue(project.getInjectedProfileIds().get("external").stream().anyMatch("external-profile"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("active-by-default"::equals));
     }
 
     @Test
