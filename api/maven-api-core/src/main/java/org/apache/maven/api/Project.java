@@ -20,6 +20,7 @@ package org.apache.maven.api;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -237,4 +238,17 @@ public interface Project {
      */
     @Nonnull
     Optional<Project> getParent();
+
+    /**
+     * Gets the identifiers of all profiles that contributed to this project's effective model. This includes active
+     * profiles from the project's POM and all its parent POMs as well as from external sources like the
+     * {@code settings.xml}. The profile identifiers are grouped by the identifier of their source, e.g.
+     * {@code <groupId>:<artifactId>:<version>} for a POM profile or {@code external} for profiles from the
+     * {@code settings.xml}.
+     *
+     * @return The identifiers of all activated profiles, indexed by the source from which the profiles originated, never
+     *         {@code null}.
+     */
+    @Nonnull
+    Map<String, List<String>> getActivatedProfileIdsBySource();
 }
