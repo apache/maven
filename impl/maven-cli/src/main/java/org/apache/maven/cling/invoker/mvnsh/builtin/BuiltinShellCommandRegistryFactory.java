@@ -171,7 +171,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         private void cd(CommandInput input) {
             try {
                 if (input.args().length == 1) {
-                    shellContext.cwd.changeDirectory(input.args()[0]);
+                    shellContext.cwd.change(input.args()[0]);
                 } else {
                     shellContext.writer.accept("Error: 'cd' accepts only one argument");
                 }

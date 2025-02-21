@@ -111,7 +111,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
                     };
             systemRegistry.setCommandRegistries(holder.getCommandRegistries());
 
-            Path history = context.userDirectory.apply(".mvnsh_history");
+            Path history = context.userDirectory.resolve(".mvnsh_history");
             LineReader reader = LineReaderBuilder.builder()
                     .terminal(context.terminal)
                     .history(new DefaultHistory())
