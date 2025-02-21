@@ -345,6 +345,37 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertThat(project.getName(), is("PROJECT NAME"));
     }
 
+    @Test
+    void testActivatedProfileIsResolved() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setActiveProfileIds(List.of("profile1"));
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertEquals(1, project.getActiveProfiles().size());
+        assertTrue(project.getActiveProfiles().stream().anyMatch(p -> "profile1".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "profile2".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "active-by-default".equals(p.getId())));
+    }
+
+    @Test
+    void testActivatedProfileByDefaultIsResolved() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertEquals(1, project.getActiveProfiles().size());
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "profile1".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "profile2".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().anyMatch(p -> "active-by-default".equals(p.getId())));
+    }
+
     /**
      * Tests whether external version range parent references are build correctly.
      *
