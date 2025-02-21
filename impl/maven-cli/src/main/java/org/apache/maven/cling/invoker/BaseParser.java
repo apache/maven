@@ -46,6 +46,7 @@ import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cling.props.MavenPropertiesLoader;
 import org.apache.maven.cling.utils.CLIReportingUtils;
+import org.apache.maven.impl.DefaultModelVersionParser;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 
@@ -352,7 +353,7 @@ public abstract class BaseParser implements Parser {
         String mavenVersion = buildProperties.getProperty(CLIReportingUtils.BUILD_VERSION_PROPERTY);
         systemProperties.setProperty(Constants.MAVEN_VERSION, mavenVersion);
 
-        boolean snapshot = mavenVersion.endsWith("SNAPSHOT");
+        boolean snapshot = DefaultModelVersionParser.checkSnapshot(mavenVersion);
         if (snapshot) {
             mavenVersion = mavenVersion.substring(0, mavenVersion.length() - "SNAPSHOT".length());
             if (mavenVersion.endsWith("-")) {
