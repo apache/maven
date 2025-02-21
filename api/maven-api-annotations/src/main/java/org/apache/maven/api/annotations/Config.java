@@ -38,8 +38,21 @@ public @interface Config {
 
     boolean readOnly() default false;
 
+    /**
+     * Property source.
+     */
     enum Source {
+        /**
+         * Maven system properties.
+         */
+        SYSTEM_PROPERTIES,
+        /**
+         * Maven user properties.
+         */
         USER_PROPERTIES,
+        /**
+         * Project properties.
+         */
         MODEL
     }
 }
