@@ -68,8 +68,7 @@ public final class CWD implements Supplier<Path> {
      * @throws IllegalArgumentException if {@code seg} leads to non-existent directory.
      */
     public void change(String seg) {
-        requireNonNull(seg, "seg");
-        Path newCwd = directory.resolve(seg);
+        Path newCwd = resolve(seg);
         if (Files.isDirectory(newCwd)) {
             this.directory = newCwd;
         } else {
