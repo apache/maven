@@ -350,10 +350,26 @@ public abstract class BaseParser implements Parser {
         Properties buildProperties = CLIReportingUtils.getBuildProperties();
 
         String mavenVersion = buildProperties.getProperty(CLIReportingUtils.BUILD_VERSION_PROPERTY);
-        systemProperties.setProperty("maven.version", mavenVersion);
+        systemProperties.setProperty(Constants.MAVEN_VERSION, mavenVersion);
+
+        boolean snapshot = mavenVersion.endsWith("SNAPSHOT");
+        if (snapshot) {
+            mavenVersion = mavenVersion.substring(0, mavenVersion.length() - "SNAPSHOT".length());
+            if (mavenVersion.endsWith("-")) {
+                mavenVersion = mavenVersion.substring(0, mavenVersion.length() - 1);
+            }
+        }
+        String[] versionElements = mavenVersion.split("\\.");
+        if (versionElements.length != 3) {
+            throw new IllegalStateException("Maven version is expected to have 3 segments: '" + mavenVersion + "'");
+        }
+        systemProperties.setProperty(Constants.MAVEN_VERSION_MAJOR, versionElements[0]);
+        systemProperties.setProperty(Constants.MAVEN_VERSION_MINOR, versionElements[1]);
+        systemProperties.setProperty(Constants.MAVEN_VERSION_PATCH, versionElements[2]);
+        systemProperties.setProperty(Constants.MAVEN_VERSION_SNAPSHOT, Boolean.toString(snapshot));
 
         String mavenBuildVersion = CLIReportingUtils.createMavenVersionString(buildProperties);
-        systemProperties.setProperty("maven.build.version", mavenBuildVersion);
+        systemProperties.setProperty(Constants.MAVEN_BUILD_VERSION, mavenBuildVersion);
 
         Map<String, String> result = toMap(systemProperties);
         result.putAll(context.systemPropertiesOverrides);

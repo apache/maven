@@ -26,11 +26,12 @@ under the License.
 | Key | Type | Description | Default Value | Since | Source |
 | --- | --- | --- | --- | --- | --- |
 | `maven.build.timestamp.format` | `String` | Build timestamp format. |  `yyyy-MM-dd'T'HH:mm:ssXXX`  | 3.0.0 | Model properties |
+| `maven.build.version` | `String` | Maven build version: a human-readable string containing this Maven version, buildnumber, and time of its build. |  -  | 3.0.0 | system_properties |
 | `maven.builder.maxProblems` | `Integer` | Max number of problems for each severity level retained by the model builder. |  `100`  | 4.0.0 | User properties |
 | `maven.consumer.pom` | `Boolean` | User property for enabling/disabling the consumer POM feature. |  `true`  | 4.0.0 | User properties |
 | `maven.deploy.snapshot.buildNumber` | `Integer` | User property for overriding calculated "build number" for snapshot deploys. Caution: this property should be RARELY used (if used at all). It may help in special cases like "aligning" a reactor build subprojects build numbers to perform a "snapshot lock down". Value given here must be <code>maxRemoteBuildNumber + 1</code> or greater, otherwise build will fail. How the number to be obtained is left to user (ie by inspecting snapshot repository metadata or alike). Note: this feature is present in Maven 3.9.7 but with different key: <code>maven.buildNumber</code>. In Maven 4 as part of cleanup effort this key was renamed to properly reflect its purpose. |  -  | 4.0.0 | User properties |
 | `maven.ext.class.path` | `String` | Extensions class path. |  -  |  | User properties |
-| `maven.home` | `String` | Maven home. |  -  | 3.0.0 | User properties |
+| `maven.home` | `String` | Maven home. |  -  | 3.0.0 | system_properties |
 | `maven.installation.conf` | `String` | Maven installation configuration directory. |  `${maven.home}/conf`  | 4.0.0 | User properties |
 | `maven.installation.extensions` | `String` | Maven installation extensions. |  `${maven.installation.conf}/extensions.xml`  | 4.0.0 | User properties |
 | `maven.installation.settings` | `String` | Maven installation settings. |  `${maven.installation.conf}/settings.xml`  | 4.0.0 | User properties |
@@ -80,5 +81,10 @@ under the License.
 | `maven.user.extensions` | `String` | Maven user extensions. |  `${maven.user.conf}/extensions.xml`  | 4.0.0 | User properties |
 | `maven.user.settings` | `String` | Maven user settings. |  `${maven.user.conf}/settings.xml`  | 4.0.0 | User properties |
 | `maven.user.toolchains` | `String` | Maven user toolchains. |  `${maven.user.conf}/toolchains.xml`  | 4.0.0 | User properties |
+| `maven.version` | `String` | Maven version. |  -  | 3.0.0 | system_properties |
+| `maven.version.major` | `String` | Maven major version: contains the major segment of this Maven version. |  -  | 4.0.0 | system_properties |
+| `maven.version.minor` | `String` | Maven minor version: contains the minor segment of this Maven version. |  -  | 4.0.0 | system_properties |
+| `maven.version.patch` | `String` | Maven patch version: contains the patch segment of this Maven version. |  -  | 4.0.0 | system_properties |
+| `maven.version.snapshot` | `String` | Maven snapshot: contains "true" if this Maven is a snapshot version. |  -  | 4.0.0 | system_properties |
 | `maven.versionResolver.noCache` | `Boolean` | User property for disabling version resolver cache. |  `false`  | 3.0.0 | User properties |
 

@@ -23,6 +23,12 @@ props:
       defaultValue: yyyy-MM-dd'T'HH:mm:ssXXX
       since: 3.0.0
       configurationSource: Model properties
+    - key: maven.build.version
+      configurationType: String
+      description: "Maven build version: a human-readable string containing this Maven version, buildnumber, and time of its build."
+      defaultValue: 
+      since: 3.0.0
+      configurationSource: system_properties
     - key: maven.builder.maxProblems
       configurationType: Integer
       description: "Max number of problems for each severity level retained by the model builder."
@@ -51,7 +57,7 @@ props:
       description: "Maven home."
       defaultValue: 
       since: 3.0.0
-      configurationSource: User properties
+      configurationSource: system_properties
     - key: maven.installation.conf
       configurationType: String
       description: "Maven installation configuration directory."
@@ -345,6 +351,36 @@ props:
       defaultValue: ${maven.user.conf}/toolchains.xml
       since: 4.0.0
       configurationSource: User properties
+    - key: maven.version
+      configurationType: String
+      description: "Maven version."
+      defaultValue: 
+      since: 3.0.0
+      configurationSource: system_properties
+    - key: maven.version.major
+      configurationType: String
+      description: "Maven major version: contains the major segment of this Maven version."
+      defaultValue: 
+      since: 4.0.0
+      configurationSource: system_properties
+    - key: maven.version.minor
+      configurationType: String
+      description: "Maven minor version: contains the minor segment of this Maven version."
+      defaultValue: 
+      since: 4.0.0
+      configurationSource: system_properties
+    - key: maven.version.patch
+      configurationType: String
+      description: "Maven patch version: contains the patch segment of this Maven version."
+      defaultValue: 
+      since: 4.0.0
+      configurationSource: system_properties
+    - key: maven.version.snapshot
+      configurationType: String
+      description: "Maven snapshot: contains \"true\" if this Maven is a snapshot version."
+      defaultValue: 
+      since: 4.0.0
+      configurationSource: system_properties
     - key: maven.versionResolver.noCache
       configurationType: Boolean
       description: "User property for disabling version resolver cache."
