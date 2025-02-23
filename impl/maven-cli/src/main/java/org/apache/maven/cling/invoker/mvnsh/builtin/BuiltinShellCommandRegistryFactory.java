@@ -129,39 +129,32 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             return "Builtin Maven Shell commands";
         }
 
-        private void executeCmnd(List<String> args) throws Exception {
-            ProcessBuilder builder = new ProcessBuilder();
-            List<String> processArgs = new ArrayList<>();
-            if (Os.IS_WINDOWS) {
-                processArgs.add("cmd.exe");
-                processArgs.add("/c");
-            } else {
-                processArgs.add("sh");
-                processArgs.add("-c");
-            }
-            processArgs.add(String.join(" ", args));
-            builder.command(processArgs);
-            builder.directory(shellContext.cwd.get().toFile());
-            Process process = builder.start();
-            StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
-            Thread th = new Thread(streamGobbler);
-            th.start();
-            int exitCode = process.waitFor();
-            th.join();
-            if (exitCode != 0) {
-                streamGobbler = new StreamGobbler(process.getErrorStream(), System.out::println);
-                th = new Thread(streamGobbler);
-                th.start();
-                th.join();
-                throw new Exception("Error occurred in shell!");
-            }
-        }
-
         private void shell(CommandInput input) {
-            List<String> argv = new ArrayList<>(Arrays.asList(input.args()));
-            if (!argv.isEmpty()) {
+            if (input.args().length > 0) {
                 try {
-                    executeCmnd(argv);
+                    ProcessBuilder builder = new ProcessBuilder();
+                    List<String> processArgs = new ArrayList<>();
+                    if (Os.IS_WINDOWS) {
+                        processArgs.add("cmd.exe");
+                        processArgs.add("/c");
+                    } else {
+                        processArgs.add("sh");
+                        processArgs.add("-c");
+                    }
+                    processArgs.add(String.join(" ", Arrays.asList(input.args())));
+                    builder.command(processArgs);
+                    builder.directory(shellContext.cwd.get().toFile());
+                    Process process = builder.start();
+                    Thread out = new Thread(new StreamGobbler(process.getInputStream(), shellContext.logger::info));
+                    Thread err = new Thread(new StreamGobbler(process.getErrorStream(), shellContext.logger::error));
+                    out.start();
+                    err.start();
+                    int exitCode = process.waitFor();
+                    out.join();
+                    err.join();
+                    if (exitCode != 0) {
+                        shellContext.logger.error("Shell command exited with code " + exitCode);
+                    }
                 } catch (Exception e) {
                     saveException(e);
                 }
