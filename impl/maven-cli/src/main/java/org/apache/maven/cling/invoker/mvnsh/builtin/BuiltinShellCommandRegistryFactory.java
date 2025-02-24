@@ -167,7 +167,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                 if (input.args().length == 1) {
                     shellContext.cwd.change(input.args()[0]);
                 } else {
-                    shellContext.writer.accept("Error: 'cd' accepts only one argument");
+                    shellContext.logger.error("Command accepts only one argument");
                 }
             } catch (Exception e) {
                 saveException(e);
