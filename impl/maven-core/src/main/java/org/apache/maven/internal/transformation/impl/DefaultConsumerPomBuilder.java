@@ -242,8 +242,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                                     .parent(null)
                                     .build(null),
                             model)
-                    .developers(null)
-                    .contributors(null)
                     .mailingLists(null)
                     .issueManagement(null)
                     .scm(
