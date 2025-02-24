@@ -154,7 +154,7 @@ under the License.
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
     <jlineVersion>3.29.0</jlineVersion>
-    <junitVersion>5.11.4</junitVersion>
+    <junitVersion>5.12.0</junitVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <logbackClassicVersion>1.5.16</logbackClassicVersion>
     <mockitoVersion>5.15.2</mockitoVersion>
