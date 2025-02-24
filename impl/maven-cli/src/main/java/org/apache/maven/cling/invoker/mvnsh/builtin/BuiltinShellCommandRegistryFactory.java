@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -210,6 +211,10 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                         ParserRequest.mvn(input.args(), shellContext.invokerRequest.messageBuilderFactory())
                                 .cwd(shellContext.cwd.get())
                                 .build()));
+            } catch (InvokerException.ExitException e) {
+                if (e.getExitCode() != 0) {
+                    saveException(e);
+                }
             } catch (Exception e) {
                 saveException(e);
             }
@@ -246,6 +251,10 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                         ParserRequest.mvnenc(input.args(), shellContext.invokerRequest.messageBuilderFactory())
                                 .cwd(shellContext.cwd.get())
                                 .build()));
+            } catch (InvokerException.ExitException e) {
+                if (e.getExitCode() != 0) {
+                    saveException(e);
+                }
             } catch (Exception e) {
                 saveException(e);
             }

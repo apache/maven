@@ -158,7 +158,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
                     context.writer.accept(context.invokerRequest
                             .messageBuilderFactory()
                             .builder()
-                            .error("Error:" + e.getMessage())
+                            .error("Error: " + e.getMessage())
                             .build());
                     if (context.invokerRequest.options().showErrors().orElse(false)) {
                         e.printStackTrace(context.terminal.writer());
