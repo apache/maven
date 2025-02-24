@@ -20,6 +20,7 @@ package org.apache.maven.cling.invoker.mvnsh;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.services.Lookup;
@@ -41,6 +42,7 @@ import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.DefaultHighlighter;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.reader.impl.history.DefaultHistory;
+import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.InfoCmp;
@@ -132,16 +134,28 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
             keyMap.bind(new Reference("tailtip-toggle"), KeyMap.alt("s"));
 
             // start the shell and process input until the user quits with Ctrl-D
-            String line;
+            AtomicReference<Exception> failure = new AtomicReference<>();
             while (true) {
                 try {
+                    failure.set(null);
                     systemRegistry.cleanUp();
-                    line = reader.readLine(
-                            context.cwd.get().getFileName().toString() + " mvnsh> ",
-                            null,
-                            (MaskingCallback) null,
-                            null);
-                    systemRegistry.execute(line);
+                    Thread commandThread = new Thread(() -> {
+                        try {
+                            systemRegistry.execute(reader.readLine(
+                                    context.cwd.get().getFileName().toString() + " mvnsh> ",
+                                    null,
+                                    (MaskingCallback) null,
+                                    null));
+                        } catch (Exception e) {
+                            failure.set(e);
+                        }
+                    });
+                    context.terminal.handle(Terminal.Signal.INT, signal -> commandThread.interrupt());
+                    commandThread.start();
+                    commandThread.join();
+                    if (failure.get() != null) {
+                        throw failure.get();
+                    }
                 } catch (UserInterruptException e) {
                     // Ignore
                     // return CANCELED;
