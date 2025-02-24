@@ -193,9 +193,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                                 .cwd(shellContext.cwd.get())
                                 .build()));
             } catch (InvokerException.ExitException e) {
-                if (e.getExitCode() != 0) {
-                    saveException(e);
-                }
+                shellContext.logger.error("mvn command exited with exit code " + e.getExitCode());
             } catch (Exception e) {
                 saveException(e);
             }
@@ -233,9 +231,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                                 .cwd(shellContext.cwd.get())
                                 .build()));
             } catch (InvokerException.ExitException e) {
-                if (e.getExitCode() != 0) {
-                    saveException(e);
-                }
+                shellContext.logger.error("mvnenc command exited with exit code " + e.getExitCode());
             } catch (Exception e) {
                 saveException(e);
             }

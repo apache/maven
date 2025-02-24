@@ -200,7 +200,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected void validate(C context) throws Exception {
         if (context.invokerRequest.parsingFailed()) {
             // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
-            List<Logger.Entry> entries = context.logger.drain();
+            // in case of mvnsh the context.logger != context.invokerRequest.parserRequest.logger
+            List<Logger.Entry> entries =
+                    context.invokerRequest.parserRequest().logger().drain();
             printErrors(
                     context,
                     context.invokerRequest
