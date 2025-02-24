@@ -39,7 +39,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * Handles normalization of a model.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton

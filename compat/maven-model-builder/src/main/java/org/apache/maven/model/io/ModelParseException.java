@@ -23,7 +23,7 @@ import java.io.IOException;
 /**
  * Signals a failure to parse the POM due to invalid syntax (e.g. non well formed XML or unknown elements).
  *
- * @deprecated use {@link org.apache.maven.api.services.xml.ModelXmlFactory} instead
+ * @deprecated use {@code org.apache.maven.api.services.xml.ModelXmlFactory} instead
  */
 @Deprecated(since = "4.0.0")
 public class ModelParseException extends IOException {

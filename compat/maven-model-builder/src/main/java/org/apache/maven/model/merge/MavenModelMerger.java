@@ -51,7 +51,7 @@ import org.codehaus.plexus.util.StringUtils;
  * The domain-specific model merger for the Maven POM, overriding generic code from parent class when necessary with
  * more adapted algorithms.
  *
- * @deprecated use {@link org.apache.maven.impl.model.MavenModelMerger} instead
+ * @deprecated use {@code org.apache.maven.impl.model.MavenModelMerger} instead
  */
 @Deprecated(since = "4.0.0")
 public class MavenModelMerger extends ModelMerger {

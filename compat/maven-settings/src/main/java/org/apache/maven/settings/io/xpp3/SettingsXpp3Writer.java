@@ -60,7 +60,7 @@ public class SettingsXpp3Writer {
         try {
             delegate.write(writer, settings.getDelegate());
         } catch (XMLStreamException e) {
-            throw new IOException(e);
+            throw new IOException("Error writing settings to " + writer, e);
         }
     }
 

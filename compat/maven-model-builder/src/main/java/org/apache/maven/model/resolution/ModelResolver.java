@@ -28,7 +28,7 @@ import org.apache.maven.model.building.ModelSource;
  * {@link org.apache.maven.model.building.ModelBuilder} will add any relevant repositories to the model resolver. In
  * other words, the model resolver is stateful and should not be reused across multiple model building requests.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public interface ModelResolver {

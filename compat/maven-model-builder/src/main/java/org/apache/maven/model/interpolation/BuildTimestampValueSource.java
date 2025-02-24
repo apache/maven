@@ -24,7 +24,7 @@ import java.util.Properties;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
 /**
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 class BuildTimestampValueSource extends AbstractValueSource {

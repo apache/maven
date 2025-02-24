@@ -30,7 +30,7 @@ import org.apache.maven.model.Model;
  * before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to query the
  * details of the failure.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public class ModelBuildingException extends Exception {
