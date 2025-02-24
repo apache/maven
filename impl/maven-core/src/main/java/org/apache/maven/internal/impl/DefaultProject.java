@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.RepositoryUtils;
@@ -163,6 +164,11 @@ public class DefaultProject implements Project {
     public Optional<Project> getParent() {
         MavenProject parent = project.getParent();
         return Optional.ofNullable(session.getProject(parent));
+    }
+
+    @Override
+    public Map<String, List<String>> getActivatedProfileIdsBySource() {
+        return project.getInjectedProfileIds();
     }
 
     @Nonnull
