@@ -58,6 +58,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
@@ -310,6 +311,10 @@ public class MavenProject implements Cloneable {
 
     public DependencyManagement getDependencyManagement() {
         return getModel().getDependencyManagement();
+    }
+
+    public List<Exclusion> getExclusions() {
+        return getModel().getExclusions();
     }
 
     // ----------------------------------------------------------------------

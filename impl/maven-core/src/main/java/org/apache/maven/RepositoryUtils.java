@@ -29,6 +29,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -65,11 +67,13 @@ import org.eclipse.aether.util.repository.AuthenticationBuilder;
  */
 public class RepositoryUtils {
 
-    private static String nullify(String string) {
+    @Nullable
+    private static String nullify(@Nullable String string) {
         return (string == null || string.isEmpty()) ? null : string;
     }
 
-    public static org.apache.maven.artifact.Artifact toArtifact(Dependency dependency) {
+    @Nullable
+    public static org.apache.maven.artifact.Artifact toArtifact(@Nullable Dependency dependency) {
         if (dependency == null) {
             return null;
         }
@@ -81,7 +85,8 @@ public class RepositoryUtils {
         return result;
     }
 
-    public static org.apache.maven.artifact.Artifact toArtifact(Artifact artifact) {
+    @Nullable
+    public static org.apache.maven.artifact.Artifact toArtifact(@Nullable Artifact artifact) {
         if (artifact == null) {
             return null;
         }
@@ -112,10 +117,10 @@ public class RepositoryUtils {
     }
 
     public static void toArtifacts(
-            Collection<org.apache.maven.artifact.Artifact> artifacts,
-            Collection<? extends DependencyNode> nodes,
-            List<String> trail,
-            DependencyFilter filter) {
+            @Nonnull Collection<org.apache.maven.artifact.Artifact> artifacts,
+            @Nonnull Collection<? extends DependencyNode> nodes,
+            @Nonnull List<String> trail,
+            @Nullable DependencyFilter filter) {
         for (DependencyNode node : nodes) {
             org.apache.maven.artifact.Artifact artifact = toArtifact(node.getDependency());
 
@@ -132,7 +137,8 @@ public class RepositoryUtils {
         }
     }
 
-    public static Artifact toArtifact(org.apache.maven.artifact.Artifact artifact) {
+    @Nullable
+    public static Artifact toArtifact(@Nullable org.apache.maven.artifact.Artifact artifact) {
         if (artifact == null) {
             return null;
         }
@@ -162,7 +168,8 @@ public class RepositoryUtils {
     }
 
     public static Dependency toDependency(
-            org.apache.maven.artifact.Artifact artifact, Collection<org.apache.maven.model.Exclusion> exclusions) {
+            @Nullable org.apache.maven.artifact.Artifact artifact,
+            @Nullable Collection<org.apache.maven.model.Exclusion> exclusions) {
         if (artifact == null) {
             return null;
         }
@@ -175,13 +182,15 @@ public class RepositoryUtils {
         return new Dependency(result, artifact.getScope(), artifact.isOptional(), excl);
     }
 
-    public static List<RemoteRepository> toRepos(List<ArtifactRepository> repos) {
+    @Nonnull
+    public static List<RemoteRepository> toRepos(@Nullable List<ArtifactRepository> repos) {
         return Optional.ofNullable(repos).orElse(Collections.emptyList()).stream()
                 .map(RepositoryUtils::toRepo)
                 .collect(Collectors.toList());
     }
 
-    public static RemoteRepository toRepo(ArtifactRepository repo) {
+    @Nullable
+    public static RemoteRepository toRepo(@Nullable ArtifactRepository repo) {
         RemoteRepository result = null;
         if (repo != null) {
             RemoteRepository.Builder builder =
@@ -197,7 +206,8 @@ public class RepositoryUtils {
         return result;
     }
 
-    public static String getLayout(ArtifactRepository repo) {
+    @Nonnull
+    public static String getLayout(@Nonnull ArtifactRepository repo) {
         try {
             return repo.getLayout().getId();
         } catch (LinkageError e) {
@@ -216,7 +226,8 @@ public class RepositoryUtils {
         }
     }
 
-    private static RepositoryPolicy toPolicy(ArtifactRepositoryPolicy policy) {
+    @Nullable
+    private static RepositoryPolicy toPolicy(@Nullable ArtifactRepositoryPolicy policy) {
         RepositoryPolicy result = null;
         if (policy != null) {
             result = new RepositoryPolicy(policy.isEnabled(), policy.getUpdatePolicy(), policy.getChecksumPolicy());
@@ -224,7 +235,8 @@ public class RepositoryUtils {
         return result;
     }
 
-    private static Authentication toAuthentication(org.apache.maven.artifact.repository.Authentication auth) {
+    @Nullable
+    private static Authentication toAuthentication(@Nullable org.apache.maven.artifact.repository.Authentication auth) {
         Authentication result = null;
         if (auth != null) {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
@@ -235,7 +247,8 @@ public class RepositoryUtils {
         return result;
     }
 
-    private static Proxy toProxy(org.apache.maven.repository.Proxy proxy) {
+    @Nullable
+    private static Proxy toProxy(@Nullable org.apache.maven.repository.Proxy proxy) {
         Proxy result = null;
         if (proxy != null) {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
@@ -245,7 +258,8 @@ public class RepositoryUtils {
         return result;
     }
 
-    public static ArtifactHandler newHandler(Artifact artifact) {
+    @Nonnull
+    public static ArtifactHandler newHandler(@Nonnull Artifact artifact) {
         String type = artifact.getProperty(ArtifactProperties.TYPE, artifact.getExtension());
         return new DefaultArtifactHandler(
                 type,
@@ -258,7 +272,8 @@ public class RepositoryUtils {
                 Boolean.parseBoolean(artifact.getProperty(MavenArtifactProperties.CONSTITUTES_BUILD_PATH, "")));
     }
 
-    public static ArtifactType newArtifactType(String id, ArtifactHandler handler) {
+    @Nonnull
+    public static ArtifactType newArtifactType(@Nonnull String id, @Nonnull ArtifactHandler handler) {
         return new DefaultArtifactType(
                 id,
                 handler.getExtension(),
@@ -268,8 +283,9 @@ public class RepositoryUtils {
                 handler.isIncludesDependencies());
     }
 
+    @Nonnull
     public static Dependency toDependency(
-            org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes) {
+            @Nonnull org.apache.maven.model.Dependency dependency, @Nonnull ArtifactTypeRegistry stereotypes) {
         ArtifactType stereotype = stereotypes.get(dependency.getType());
         if (stereotype == null) {
             stereotype = new DefaultArtifactType(dependency.getType());
@@ -303,38 +319,46 @@ public class RepositoryUtils {
                 exclusions);
     }
 
-    private static Exclusion toExclusion(org.apache.maven.model.Exclusion exclusion) {
+    @Nonnull
+    public static Exclusion toExclusion(@Nonnull org.apache.maven.model.Exclusion exclusion) {
         return new Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*");
     }
 
-    public static ArtifactTypeRegistry newArtifactTypeRegistry(ArtifactHandlerManager handlerManager) {
+    @Nonnull
+    public static ArtifactTypeRegistry newArtifactTypeRegistry(@Nonnull ArtifactHandlerManager handlerManager) {
         return new MavenArtifactTypeRegistry(handlerManager);
     }
 
     static class MavenArtifactTypeRegistry implements ArtifactTypeRegistry {
 
+        @Nonnull
         private final ArtifactHandlerManager handlerManager;
 
-        MavenArtifactTypeRegistry(ArtifactHandlerManager handlerManager) {
+        MavenArtifactTypeRegistry(@Nonnull ArtifactHandlerManager handlerManager) {
             this.handlerManager = handlerManager;
         }
 
-        public ArtifactType get(String stereotypeId) {
+        @Nullable
+        @Override
+        public ArtifactType get(@Nonnull String stereotypeId) {
             ArtifactHandler handler = handlerManager.getArtifactHandler(stereotypeId);
             return newArtifactType(stereotypeId, handler);
         }
     }
 
-    public static Collection<Artifact> toArtifacts(Collection<org.apache.maven.artifact.Artifact> artifactsToConvert) {
+    @Nonnull
+    public static Collection<Artifact> toArtifacts(
+            @Nonnull Collection<org.apache.maven.artifact.Artifact> artifactsToConvert) {
         return artifactsToConvert.stream().map(RepositoryUtils::toArtifact).collect(Collectors.toList());
     }
 
-    public static WorkspaceRepository getWorkspace(RepositorySystemSession session) {
+    @Nullable
+    public static WorkspaceRepository getWorkspace(@Nonnull RepositorySystemSession session) {
         WorkspaceReader reader = session.getWorkspaceReader();
         return (reader != null) ? reader.getRepository() : null;
     }
 
-    public static boolean repositoriesEquals(List<RemoteRepository> r1, List<RemoteRepository> r2) {
+    public static boolean repositoriesEquals(@Nonnull List<RemoteRepository> r1, @Nonnull List<RemoteRepository> r2) {
         if (r1.size() != r2.size()) {
             return false;
         }
@@ -348,7 +372,7 @@ public class RepositoryUtils {
         return true;
     }
 
-    public static int repositoriesHashCode(List<RemoteRepository> repositories) {
+    public static int repositoriesHashCode(@Nonnull List<RemoteRepository> repositories) {
         int result = 17;
         for (RemoteRepository repository : repositories) {
             result = 31 * result + repositoryHashCode(repository);
@@ -356,8 +380,11 @@ public class RepositoryUtils {
         return result;
     }
 
+    @Nullable
     public static RepositorySystemSession overlay(
-            ArtifactRepository repository, RepositorySystemSession session, RepositorySystem system) {
+            @Nullable ArtifactRepository repository,
+            @Nullable RepositorySystemSession session,
+            @Nonnull RepositorySystem system) {
         if (repository == null || repository.getBasedir() == null) {
             return session;
         }
@@ -379,14 +406,14 @@ public class RepositoryUtils {
         return newSession;
     }
 
-    private static int repositoryHashCode(RemoteRepository repository) {
+    private static int repositoryHashCode(@Nonnull RemoteRepository repository) {
         int result = 17;
         Object obj = repository.getUrl();
         result = 31 * result + (obj != null ? obj.hashCode() : 0);
         return result;
     }
 
-    private static boolean policyEquals(RepositoryPolicy p1, RepositoryPolicy p2) {
+    private static boolean policyEquals(@Nonnull RepositoryPolicy p1, @Nonnull RepositoryPolicy p2) {
         if (p1 == p2) {
             return true;
         }
@@ -394,7 +421,7 @@ public class RepositoryUtils {
         return p1.isEnabled() == p2.isEnabled() && Objects.equals(p1.getChecksumPolicy(), p2.getChecksumPolicy());
     }
 
-    private static boolean repositoryEquals(RemoteRepository r1, RemoteRepository r2) {
+    private static boolean repositoryEquals(@Nonnull RemoteRepository r1, @Nonnull RemoteRepository r2) {
         if (r1 == r2) {
             return true;
         }
