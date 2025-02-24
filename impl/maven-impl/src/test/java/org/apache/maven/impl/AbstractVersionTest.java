@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository.internal;
+package org.apache.maven.impl;
 
 import org.apache.maven.api.Version;
 

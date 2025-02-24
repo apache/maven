@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository.internal;
+package org.apache.maven.impl;
 
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.services.VersionParserException;
-import org.apache.maven.api.services.model.ModelVersionParser;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class ModelVersionParserTest {
 
-    private final ModelVersionParser versionParser = new DefaultModelVersionParser(new GenericVersionScheme());
+    private final DefaultModelVersionParser versionParser = new DefaultModelVersionParser(new GenericVersionScheme());
 
     private VersionParserException parseInvalid(String constraint) {
         try {
