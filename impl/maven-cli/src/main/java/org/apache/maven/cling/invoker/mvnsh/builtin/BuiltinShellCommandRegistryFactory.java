@@ -22,8 +22,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -82,7 +80,6 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             Map<String, CommandMethods> commandExecute = new HashMap<>();
             commandExecute.put("!", new CommandMethods(this::shell, this::defaultCompleter));
             commandExecute.put("cd", new CommandMethods(this::cd, this::cdCompleter));
-            commandExecute.put("ls", new CommandMethods(this::ls, this::defaultCompleter));
             commandExecute.put("pwd", new CommandMethods(this::pwd, this::defaultCompleter));
             commandExecute.put("mvn", new CommandMethods(this::mvn, this::mvnCompleter));
             commandExecute.put("mvnenc", new CommandMethods(this::mvnenc, this::mvnencCompleter));
@@ -179,22 +176,6 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
 
         private List<Completer> cdCompleter(String name) {
             return List.of(new ArgumentCompleter(new Completers.DirectoriesCompleter(shellContext.cwd)));
-        }
-
-        private void ls(CommandInput input) {
-            try {
-                try (Stream<Path> list = Files.list(shellContext.cwd.get())) {
-                    list.forEach(file -> {
-                        if (Files.isDirectory(file)) {
-                            shellContext.writer.accept(file.getFileName().toString() + "/");
-                        } else {
-                            shellContext.writer.accept(file.getFileName().toString());
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                saveException(e);
-            }
         }
 
         private void pwd(CommandInput input) {
