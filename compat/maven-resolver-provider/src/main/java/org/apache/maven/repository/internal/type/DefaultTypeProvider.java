@@ -18,8 +18,6 @@
  */
 package org.apache.maven.repository.internal.type;
 
-import javax.inject.Named;
-
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -28,7 +26,6 @@ import org.apache.maven.api.Language;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.spi.TypeProvider;
 
-@Named
 @Deprecated(since = "4.0.0")
 public class DefaultTypeProvider implements TypeProvider {
     @SuppressWarnings({"rawtypes", "unchecked"})
