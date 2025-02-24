@@ -32,9 +32,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.services.LifecycleRegistry;
+import org.apache.maven.api.services.LookupException;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
@@ -213,16 +216,28 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         }
 
         private List<Completer> mvnCompleter(String name) {
-            return List.of(new ArgumentCompleter(new StringsCompleter(
-                    "clean",
-                    "validate",
-                    "compile",
-                    "test",
-                    "package",
-                    "verify",
-                    "install",
-                    "deploy",
-                    "wrapper:wrapper")));
+            List<String> names;
+            try {
+                List<String> phases = shellContext.lookup.lookup(LifecycleRegistry.class).stream()
+                        .flatMap(Lifecycle::allPhases)
+                        .map(Lifecycle.Phase::name)
+                        .toList();
+                // TODO: add goals dynamically
+                List<String> goals = List.of("wrapper:wrapper");
+                names = Stream.concat(phases.stream(), goals.stream()).toList();
+            } catch (LookupException e) {
+                names = List.of(
+                        "clean",
+                        "validate",
+                        "compile",
+                        "test",
+                        "package",
+                        "verify",
+                        "install",
+                        "deploy",
+                        "wrapper:wrapper");
+            }
+            return List.of(new ArgumentCompleter(new StringsCompleter(names)));
         }
 
         private void mvnenc(CommandInput input) {
