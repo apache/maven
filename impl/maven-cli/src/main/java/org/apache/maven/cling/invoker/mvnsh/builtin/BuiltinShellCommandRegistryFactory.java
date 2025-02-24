@@ -146,7 +146,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                     builder.command(processArgs);
                     builder.directory(shellContext.cwd.get().toFile());
                     Process process = builder.start();
-                    Thread out = new Thread(new StreamGobbler(process.getInputStream(), shellContext.logger::info));
+                    Thread out = new Thread(new StreamGobbler(process.getInputStream(), shellContext.writer));
                     Thread err = new Thread(new StreamGobbler(process.getErrorStream(), shellContext.logger::error));
                     out.start();
                     err.start();
