@@ -603,6 +603,16 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>exclusions</name>
+          <version>4.0.0+</version>
+          <description>Lists a set of artifacts that should be excluded from this repo's
+            dependency list when it comes to calculating transitive dependencies.</description>
+          <association>
+            <type>Exclusion</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
         <field xdoc.separator="blank">
           <name>repositories</name>
           <version>4.0.0+</version>
@@ -1809,6 +1819,16 @@
             Specify either the {@code relativePath} or the {@code groupId}/{@code artifactId}, not both.
           </description>
           <type>String</type>
+        </field>
+        <field>
+          <name>exclusions</name>
+          <version>4.0.0+</version>
+          <description>Lists a set of artifacts that should be excluded from this repo's
+            dependency list when it comes to calculating transitive dependencies.</description>
+          <association>
+            <type>Exclusion</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
       <codeSegments>
