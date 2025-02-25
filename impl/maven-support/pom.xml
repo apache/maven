@@ -9,6 +9,8 @@
   </parent>
 
   <artifactId>maven-support</artifactId>
+  <name>Maven 4 Model Support</name>
+  <description>Provides the Maven 4 Model Support</description>
 
   <dependencies>
     <dependency>
