@@ -38,7 +38,7 @@ import org.apache.maven.model.profile.ProfileActivationContext;
  * Determines profile activation based on the version of the current Java runtime.
  *
  * @see Activation#getJdk()
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("jdk-version")
 @Singleton

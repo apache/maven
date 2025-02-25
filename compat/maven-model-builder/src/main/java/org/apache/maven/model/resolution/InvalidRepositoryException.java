@@ -23,7 +23,7 @@ import org.apache.maven.model.Repository;
 /**
  * Signals an error when adding a repository to the model resolver.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public class InvalidRepositoryException extends Exception {

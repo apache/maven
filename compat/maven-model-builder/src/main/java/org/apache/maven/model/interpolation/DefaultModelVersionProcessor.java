@@ -29,7 +29,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
  * Maven default implementation of the {@link ModelVersionProcessor} to support
  * <a href="https://maven.apache.org/maven-ci-friendly.html">CI Friendly Versions</a>
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton

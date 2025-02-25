@@ -34,7 +34,7 @@ import org.apache.maven.model.building.ModelProcessor;
 /**
  * Provides the super POM that all models implicitly inherit from.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton

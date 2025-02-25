@@ -30,7 +30,7 @@ import org.apache.maven.model.Profile;
 /**
  * Collects the output of the model builder.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 class DefaultModelBuildingResult implements ModelBuildingResult {

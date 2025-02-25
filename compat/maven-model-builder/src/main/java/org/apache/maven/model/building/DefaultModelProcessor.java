@@ -58,7 +58,7 @@ import org.eclipse.sisu.Typed;
  * of the same interface. Since we want to allow overriding this doesn't matter in this case.
  * (if it did we could add @Priority of 0 to match the priority given to default components.)
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("core-default")
 @Singleton

@@ -32,7 +32,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 /**
  * Collects settings that control building of effective models.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public class DefaultModelBuildingRequest implements ModelBuildingRequest {

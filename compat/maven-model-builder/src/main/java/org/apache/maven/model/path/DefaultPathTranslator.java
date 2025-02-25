@@ -26,7 +26,7 @@ import java.io.File;
 /**
  * Resolves relative paths against a specific base directory.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton

@@ -25,7 +25,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 /**
  * Handles injection of dependency management into the model.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public interface DependencyManagementInjector {

@@ -30,7 +30,7 @@ import java.net.URI;
  * ModelSource2 instances are cached in {@link ModelBuildingRequest#getModelCache()}. Implementations must guarantee
  * that the connection to the backing store remains active until request's {@link ModelCache} is discarded or flushed.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public interface ModelSource2 extends ModelSource {

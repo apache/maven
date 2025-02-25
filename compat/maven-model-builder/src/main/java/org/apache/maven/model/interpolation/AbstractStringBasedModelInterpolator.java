@@ -46,7 +46,7 @@ import org.codehaus.plexus.interpolation.ValueSource;
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator {

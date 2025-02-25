@@ -81,7 +81,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * StringVisitorModelInterpolator
  *
  * @since 3.6.2
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton

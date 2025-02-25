@@ -29,7 +29,7 @@ import org.apache.maven.model.Model;
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
- * @deprecated use {@link org.apache.maven.api.services.xml.ModelXmlFactory} instead
+ * @deprecated use {@code org.apache.maven.api.services.xml.ModelXmlFactory} instead
  */
 @Deprecated(since = "4.0.0")
 public interface ModelReader {

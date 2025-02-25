@@ -25,7 +25,7 @@ package org.apache.maven.model.building;
  * it delegates to other components that potentially encounter problems. Then, the problem reporter can focus on
  * providing a simple error message, leaving the donkey work of creating a nice model problem to this component.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public interface ModelProblemCollector {
