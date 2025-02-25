@@ -212,7 +212,6 @@ under the License.
           <name>requiresDependencyResolution</name>
           <version>1.0.0/1.1.0</version>
           <type>String</type>
-          <defaultValue>runtime</defaultValue>
           <description>
             Flags this Mojo as requiring the dependencies in the specified class path to be resolved before it can
             execute: {@code compile}, {@code runtime}, {@code test},
@@ -223,7 +222,6 @@ under the License.
           <name>dependencyResolution</name>
           <version>2.0.0+</version>
           <type>String</type>
-          <defaultValue>runtime</defaultValue>
           <description>
             Flags this Mojo as requiring the dependencies in the specified class path to be resolved before it can
             execute: {@code compile}, {@code runtime}, {@code test},
