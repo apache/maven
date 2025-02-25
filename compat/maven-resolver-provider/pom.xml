@@ -29,7 +29,7 @@ under the License.
   <artifactId>maven-resolver-provider</artifactId>
 
   <name>Maven Artifact Resolver Provider (deprecated)</name>
-  <description>Extensions to Maven Resolver for utilizing Maven POM and repository metadata.</description>
+  <description>Components completing Maven Resolver for utilizing Maven POM and repository metadata.</description>
 
   <dependencies>
     <dependency>
@@ -160,23 +160,53 @@ under the License.
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-impl</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/package-info.java</exclude>
-          </excludes>
-        </configuration>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>prepare-sisu</id>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <phase>prepare-package</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/jar-sisu</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.outputDirectory}</directory>
+                </resource>
+                <resource>
+                  <directory>${project.build.testOutputDirectory}</directory>
+                  <includes>
+                    <include>META-INF/sisu/**</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>package-sisu</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <classifier>sisu</classifier>
+              <classesDirectory>${project.build.directory}/jar-sisu</classesDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
