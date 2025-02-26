@@ -45,7 +45,7 @@ public class MavenParser extends BaseParser {
             if (Files.isRegularFile(file)) {
                 result.add(parseMavenAtFileOptions(file));
             } else {
-                throw new IllegalArgumentException("Specified atFile does not exists (" + file + ")");
+                throw new IllegalArgumentException("Specified file does not exists (" + file + ")");
             }
         }
         // maven.config; if exists

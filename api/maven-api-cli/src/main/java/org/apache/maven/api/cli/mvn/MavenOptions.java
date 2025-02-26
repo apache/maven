@@ -208,7 +208,9 @@ public interface MavenOptions extends Options {
     Optional<Boolean> ignoreTransitiveRepositories();
 
     /**
-     * Allows {@code @filename} to read options from file.
+     * Specifies "@file"-like file, to load up command line from. It may contain goals as well. Format is one parameter
+     * per line (similar to {@code maven.conf}) and {@code '#'} (hash) marked comment lines are allowed. Goals, if
+     * present, are appended, to those specified on CLI input, if any.
      */
     Optional<String> atFile();
 
