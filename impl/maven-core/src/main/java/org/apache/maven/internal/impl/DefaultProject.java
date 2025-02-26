@@ -168,11 +168,42 @@ public class DefaultProject implements Project {
 
     @Override
     @Nonnull
+    public List<Profile> getProfiles() {
+        return getModel().getProfiles();
+    }
+
+    @Override
+    @Nonnull
+    public List<Profile> getAllProfiles() {
+        List<org.apache.maven.model.Profile> activeProfiles = new ArrayList<>();
+        for (MavenProject project = this.project; project != null; project = project.getParent()) {
+            activeProfiles.addAll(project.getModel().getProfiles());
+        }
+        return activeProfiles.stream()
+                .map(org.apache.maven.model.Profile::getDelegate)
+                .toList();
+    }
+
+    @Override
+    @Nonnull
     public List<Profile> getActiveProfiles() {
-        List<org.apache.maven.model.Profile> activeProfiles = project.getActiveProfiles();
-        return activeProfiles != null
-                ? new MappedList<>(activeProfiles, org.apache.maven.model.Profile::getDelegate)
-                : List.of();
+        List<org.apache.maven.model.Profile> activeProfiles =
+                project.getActiveProfiles() != null ? project.getActiveProfiles() : List.of();
+        return activeProfiles.stream()
+                .map(org.apache.maven.model.Profile::getDelegate)
+                .toList();
+    }
+
+    @Override
+    @Nonnull
+    public List<Profile> getAllActiveProfiles() {
+        List<org.apache.maven.model.Profile> activeProfiles = new ArrayList<>();
+        for (MavenProject project = this.project; project != null; project = project.getParent()) {
+            activeProfiles.addAll(project.getActiveProfiles());
+        }
+        return activeProfiles.stream()
+                .map(org.apache.maven.model.Profile::getDelegate)
+                .toList();
     }
 
     @Nonnull

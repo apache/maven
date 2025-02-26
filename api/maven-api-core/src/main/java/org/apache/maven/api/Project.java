@@ -240,6 +240,33 @@ public interface Project {
     Optional<Project> getParent();
 
     /**
+     * Returns all profiles defined in this project.
+     * <p>
+     * This method returns only the profiles defined directly in the current project's POM
+     * and does not include profiles from parent projects.
+     *
+     * @return a non-null, possibly empty list of profiles defined in this project
+     * @see Profile
+     * @see #getAllProfiles()
+     */
+    @Nonnull
+    List<Profile> getProfiles();
+
+    /**
+     * Returns all profiles defined in this project and all of its parent projects.
+     * <p>
+     * This method traverses the parent hierarchy and includes profiles defined in parent POMs.
+     * The returned list contains profiles from the current project and all of its ancestors in
+     * the project inheritance chain.
+     *
+     * @return a non-null, possibly empty list of all profiles from this project and its parents
+     * @see Profile
+     * @see #getProfiles()
+     */
+    @Nonnull
+    List<Profile> getAllProfiles();
+
+    /**
      * Returns all active profiles for the current project build.
      * <p>
      * Active profiles are those that have been explicitly activated through one of the following means:
@@ -254,9 +281,25 @@ public interface Project {
      * limited to dependencies, plugins, properties, and build resources.
      *
      * @return a non-null, possibly empty list of active profiles for this project
-     * @since 4.0.0
      * @see Profile
      */
     @Nonnull
     List<Profile> getActiveProfiles();
+
+    /**
+     * Returns all active profiles for this project and all of its parent projects.
+     * <p>
+     * This method traverses the parent hierarchy and collects all active profiles from
+     * the current project and its ancestors. Active profiles are those that meet the
+     * activation criteria through explicit activation or automatic conditions.
+     * <p>
+     * The combined set of active profiles from the entire project hierarchy affects
+     * the effective build configuration.
+     *
+     * @return a non-null, possibly empty list of all active profiles from this project and its parents
+     * @see Profile
+     * @see #getActiveProfiles()
+     */
+    @Nonnull
+    List<Profile> getAllActiveProfiles();
 }
