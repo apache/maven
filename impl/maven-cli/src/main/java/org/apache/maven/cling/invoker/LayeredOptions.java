@@ -181,7 +181,9 @@ public abstract class LayeredOptions<O extends Options> implements Options {
             Optional<Map<String, String>> up = getter.apply(option);
             if (up.isPresent()) {
                 had++;
-                items.putAll(up.get());
+                for (Map.Entry<String, String> entry : up.get().entrySet()) {
+                    items.putIfAbsent(entry.getKey(), entry.getValue());
+                }
             }
         }
         return had == 0 ? Optional.empty() : Optional.of(Map.copyOf(items));
