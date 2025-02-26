@@ -208,6 +208,11 @@ public interface MavenOptions extends Options {
     Optional<Boolean> ignoreTransitiveRepositories();
 
     /**
+     * Allows {@code @filename} to read options from file.
+     */
+    Optional<String> atFile();
+
+    /**
      * Returns the list of goals and phases to execute.
      *
      * @return an {@link Optional} containing the list of goals and phases to execute, or empty if not specified

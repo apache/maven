@@ -37,7 +37,17 @@ public class MavenParser extends BaseParser {
     protected List<Options> parseCliOptions(LocalContext context) {
         ArrayList<Options> result = new ArrayList<>();
         // CLI args
-        result.add(parseMavenCliOptions(context.parserRequest.args()));
+        MavenOptions cliOptions = parseMavenCliOptions(context.parserRequest.args());
+        result.add(cliOptions);
+        // atFile option
+        if (cliOptions.atFile().isPresent()) {
+            Path file = context.cwd.resolve(cliOptions.atFile().orElseThrow());
+            if (Files.isRegularFile(file)) {
+                result.add(parseMavenAtFileOptions(file));
+            } else {
+                throw new IllegalArgumentException("Specified atFile does not exists (" + file + ")");
+            }
+        }
         // maven.config; if exists
         Path mavenConfig = context.rootDirectory != null ? context.rootDirectory.resolve(".mvn/maven.config") : null;
         if (mavenConfig != null && Files.isRegularFile(mavenConfig)) {
@@ -51,6 +61,19 @@ public class MavenParser extends BaseParser {
             return parseArgs(Options.SOURCE_CLI, args);
         } catch (ParseException e) {
             throw new IllegalArgumentException("Failed to parse CLI arguments: " + e.getMessage(), e.getCause());
+        }
+    }
+
+    protected MavenOptions parseMavenAtFileOptions(Path atFile) {
+        try (Stream<String> lines = Files.lines(atFile, Charset.defaultCharset())) {
+            List<String> args =
+                    lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toList();
+            return parseArgs("atFile", args);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(
+                    "Failed to parse arguments from file (" + atFile + "): " + e.getMessage(), e.getCause());
+        } catch (IOException e) {
+            throw new IllegalStateException("Error reading config file: " + atFile, e);
         }
     }
 
