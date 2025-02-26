@@ -20,13 +20,13 @@ package org.apache.maven.api;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 
 /**
  * Interface representing a Maven project which can be created using the
@@ -240,15 +240,23 @@ public interface Project {
     Optional<Project> getParent();
 
     /**
-     * Gets the identifiers of all profiles that contributed to this project's effective model. This includes active
-     * profiles from the project's POM and all its parent POMs as well as from external sources like the
-     * {@code settings.xml}. The profile identifiers are grouped by the identifier of their source, e.g.
-     * {@code <groupId>:<artifactId>:<version>} for a POM profile or {@code external} for profiles from the
-     * {@code settings.xml}.
+     * Returns all active profiles for the current project build.
+     * <p>
+     * Active profiles are those that have been explicitly activated through one of the following means:
+     * <ul>
+     *   <li>Command line activation using the -P flag</li>
+     *   <li>Maven settings activation in settings.xml via &lt;activeProfiles&gt;</li>
+     *   <li>Automatic activation via &lt;activation&gt; conditions</li>
+     *   <li>The default active profile (marked with &lt;activeByDefault&gt;true&lt;/activeByDefault&gt;)</li>
+     * </ul>
+     * <p>
+     * The active profiles control various aspects of the build configuration including but not
+     * limited to dependencies, plugins, properties, and build resources.
      *
-     * @return The identifiers of all activated profiles, indexed by the source from which the profiles originated, never
-     *         {@code null}.
+     * @return a non-null, possibly empty list of active profiles for this project
+     * @since 4.0.0
+     * @see Profile
      */
     @Nonnull
-    Map<String, List<String>> getActivatedProfileIdsBySource();
+    List<Profile> getActiveProfiles();
 }

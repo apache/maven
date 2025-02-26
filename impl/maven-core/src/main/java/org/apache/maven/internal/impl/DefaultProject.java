@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.RepositoryUtils;
@@ -39,6 +38,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.impl.MappedCollection;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.project.MavenProject;
@@ -167,8 +167,12 @@ public class DefaultProject implements Project {
     }
 
     @Override
-    public Map<String, List<String>> getActivatedProfileIdsBySource() {
-        return project.getInjectedProfileIds();
+    @Nonnull
+    public List<Profile> getActiveProfiles() {
+        List<org.apache.maven.model.Profile> activeProfiles = project.getActiveProfiles();
+        return activeProfiles != null
+                ? new MappedList<>(activeProfiles, org.apache.maven.model.Profile::getDelegate)
+                : List.of();
     }
 
     @Nonnull
