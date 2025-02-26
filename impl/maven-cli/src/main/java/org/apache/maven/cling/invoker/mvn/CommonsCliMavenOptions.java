@@ -387,7 +387,8 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
             options.addOption(Option.builder(AT_FILE)
                     .longOpt("at-file")
                     .hasArg()
-                    .desc("If set, Maven will load command line options from the specified file and merge with CLI specified ones.")
+                    .desc(
+                            "If set, Maven will load command line options from the specified file and merge with CLI specified ones.")
                     .build());
         }
     }
