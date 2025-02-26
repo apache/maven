@@ -386,7 +386,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
         List<org.apache.maven.api.model.Profile> activeProfiles =
-                new DefaultProject(session, project).getActiveProfiles();
+                new DefaultProject(session, project).getDeclaredActiveProfiles();
         assertEquals(1, activeProfiles.size());
         org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
         assertEquals("active-by-default", profile.getId());
@@ -424,7 +424,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
         List<org.apache.maven.api.model.Profile> activeProfiles =
-                new DefaultProject(session, project).getActiveProfiles();
+                new DefaultProject(session, project).getDeclaredActiveProfiles();
         assertEquals(2, activeProfiles.size());
         org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
         assertEquals("active-by-default", profile.getId());

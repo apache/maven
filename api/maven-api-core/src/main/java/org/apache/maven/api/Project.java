@@ -247,10 +247,10 @@ public interface Project {
      *
      * @return a non-null, possibly empty list of profiles defined in this project
      * @see Profile
-     * @see #getAllProfiles()
+     * @see #getEffectiveProfiles()
      */
     @Nonnull
-    List<Profile> getProfiles();
+    List<Profile> getDeclaredProfiles();
 
     /**
      * Returns all profiles defined in this project and all of its parent projects.
@@ -261,10 +261,10 @@ public interface Project {
      *
      * @return a non-null, possibly empty list of all profiles from this project and its parents
      * @see Profile
-     * @see #getProfiles()
+     * @see #getDeclaredProfiles()
      */
     @Nonnull
-    List<Profile> getAllProfiles();
+    List<Profile> getEffectiveProfiles();
 
     /**
      * Returns all active profiles for the current project build.
@@ -282,9 +282,10 @@ public interface Project {
      *
      * @return a non-null, possibly empty list of active profiles for this project
      * @see Profile
+     * @see #getEffectiveActiveProfiles()
      */
     @Nonnull
-    List<Profile> getActiveProfiles();
+    List<Profile> getDeclaredActiveProfiles();
 
     /**
      * Returns all active profiles for this project and all of its parent projects.
@@ -298,8 +299,8 @@ public interface Project {
      *
      * @return a non-null, possibly empty list of all active profiles from this project and its parents
      * @see Profile
-     * @see #getActiveProfiles()
+     * @see #getDeclaredActiveProfiles()
      */
     @Nonnull
-    List<Profile> getAllActiveProfiles();
+    List<Profile> getEffectiveActiveProfiles();
 }

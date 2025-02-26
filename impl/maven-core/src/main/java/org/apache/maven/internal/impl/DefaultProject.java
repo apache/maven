@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyCoordinates;
@@ -168,40 +170,31 @@ public class DefaultProject implements Project {
 
     @Override
     @Nonnull
-    public List<Profile> getProfiles() {
+    public List<Profile> getDeclaredProfiles() {
         return getModel().getProfiles();
     }
 
     @Override
     @Nonnull
-    public List<Profile> getAllProfiles() {
-        List<org.apache.maven.model.Profile> profiles = new ArrayList<>();
-        for (MavenProject project = this.project; project != null; project = project.getParent()) {
-            profiles.addAll(project.getModel().getProfiles());
-        }
-        return profiles.stream()
+    public List<Profile> getEffectiveProfiles() {
+        return Stream.iterate(this.project, Objects::nonNull, MavenProject::getParent)
+                .flatMap(project -> project.getModel().getDelegate().getProfiles().stream())
+                .toList();
+    }
+
+    @Override
+    @Nonnull
+    public List<Profile> getDeclaredActiveProfiles() {
+        return project.getActiveProfiles().stream()
                 .map(org.apache.maven.model.Profile::getDelegate)
                 .toList();
     }
 
     @Override
     @Nonnull
-    public List<Profile> getActiveProfiles() {
-        List<org.apache.maven.model.Profile> activeProfiles =
-                project.getActiveProfiles() != null ? project.getActiveProfiles() : List.of();
-        return activeProfiles.stream()
-                .map(org.apache.maven.model.Profile::getDelegate)
-                .toList();
-    }
-
-    @Override
-    @Nonnull
-    public List<Profile> getAllActiveProfiles() {
-        List<org.apache.maven.model.Profile> activeProfiles = new ArrayList<>();
-        for (MavenProject project = this.project; project != null; project = project.getParent()) {
-            activeProfiles.addAll(project.getActiveProfiles());
-        }
-        return activeProfiles.stream()
+    public List<Profile> getEffectiveActiveProfiles() {
+        return Stream.iterate(this.project, Objects::nonNull, MavenProject::getParent)
+                .flatMap(project -> project.getActiveProfiles().stream())
                 .map(org.apache.maven.model.Profile::getDelegate)
                 .toList();
     }
