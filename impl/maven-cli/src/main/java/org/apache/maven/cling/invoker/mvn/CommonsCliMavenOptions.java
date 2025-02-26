@@ -239,6 +239,14 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
+    public Optional<String> atFile() {
+        if (commandLine.hasOption(CLIManager.AT_FILE)) {
+            return Optional.of(commandLine.getOptionValue(CLIManager.AT_FILE));
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<List<String>> goals() {
         if (!commandLine.getArgList().isEmpty()) {
             return Optional.of(commandLine.getArgList());
@@ -273,6 +281,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String CACHE_ARTIFACT_NOT_FOUND = "canf";
         public static final String STRICT_ARTIFACT_DESCRIPTOR_POLICY = "sadp";
         public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
+        public static final String AT_FILE = "af";
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
@@ -374,6 +383,12 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
             options.addOption(Option.builder(IGNORE_TRANSITIVE_REPOSITORIES)
                     .longOpt("ignore-transitive-repositories")
                     .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
+                    .build());
+            options.addOption(Option.builder(AT_FILE)
+                    .longOpt("at-file")
+                    .hasArg()
+                    .desc(
+                            "If set, Maven will load command line options from the specified file and merge with CLI specified ones.")
                     .build());
         }
     }

@@ -155,6 +155,11 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     }
 
     @Override
+    public Optional<String> atFile() {
+        return returnFirstPresentOrEmpty(MavenOptions::atFile);
+    }
+
+    @Override
     public Optional<List<String>> goals() {
         return collectListIfPresentOrEmpty(MavenOptions::goals);
     }
