@@ -175,11 +175,11 @@ public class DefaultProject implements Project {
     @Override
     @Nonnull
     public List<Profile> getAllProfiles() {
-        List<org.apache.maven.model.Profile> activeProfiles = new ArrayList<>();
+        List<org.apache.maven.model.Profile> profiles = new ArrayList<>();
         for (MavenProject project = this.project; project != null; project = project.getParent()) {
-            activeProfiles.addAll(project.getModel().getProfiles());
+            profiles.addAll(project.getModel().getProfiles());
         }
-        return activeProfiles.stream()
+        return profiles.stream()
                 .map(org.apache.maven.model.Profile::getDelegate)
                 .toList();
     }
