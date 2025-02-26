@@ -24,7 +24,7 @@ subject to the terms and conditions of the following licenses:
 ##
 #set ( $apacheMavenGroupIds = [ "org.apache.maven", "org.apache.maven.wagon", "org.apache.maven.resolver",
                                 "org.apache.maven.shared" ] )
-#set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License" ] )
+#set ( $MITLicenseNames = [ "MIT License", "MIT license", "The MIT License", "MIT" ] )
 #foreach ( $project in $projects )
 #**##foreach ( $license in $project.licenses )
 #*  *##set ( $groupId = $project.artifact.groupId )
