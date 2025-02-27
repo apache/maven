@@ -25,20 +25,26 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputSource;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.internal.impl.DefaultProject;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.model.Profile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
 
 import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -343,6 +349,130 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         project = projectBuilder.build(pom.toFile(), buildingRequest).getProject();
         assertThat(project.getName(), is("PROJECT NAME"));
+    }
+
+    @Test
+    void testActivatedProfileBySource() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setActiveProfileIds(List.of("profile1"));
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
+        assertTrue(
+                project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("active-by-default"::equals));
+    }
+
+    @Test
+    void testActivatedDefaultProfileBySource() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("active-by-default"::equals));
+
+        InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
+        List<org.apache.maven.api.model.Profile> activeProfiles =
+                new DefaultProject(session, project).getDeclaredActiveProfiles();
+        assertEquals(1, activeProfiles.size());
+        org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
+        assertEquals("active-by-default", profile.getId());
+        InputLocation location = profile.getLocation("");
+        assertNotNull(location);
+        assertThat(location.getLineNumber(), greaterThan(0));
+        assertThat(location.getColumnNumber(), greaterThan(0));
+        assertNotNull(location.getSource());
+        assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
+    }
+
+    @Test
+    void testActivatedExternalProfileBySource() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        final Profile externalProfile = new Profile();
+        externalProfile.setLocation(
+                "",
+                new org.apache.maven.model.InputLocation(
+                        1, 1, new org.apache.maven.model.InputSource(new InputSource(null, "settings.xml", null))));
+        externalProfile.setId("external-profile");
+        request.addProfile(externalProfile);
+        request.setActiveProfileIds(List.of(externalProfile.getId()));
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        assertTrue(project.getInjectedProfileIds().get("external").stream().anyMatch("external-profile"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("active-by-default"::equals));
+
+        InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
+        List<org.apache.maven.api.model.Profile> activeProfiles =
+                new DefaultProject(session, project).getDeclaredActiveProfiles();
+        assertEquals(2, activeProfiles.size());
+        org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
+        assertEquals("active-by-default", profile.getId());
+        InputLocation location = profile.getLocation("");
+        assertNotNull(location);
+        assertThat(location.getLineNumber(), greaterThan(0));
+        assertThat(location.getColumnNumber(), greaterThan(0));
+        assertNotNull(location.getSource());
+        assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
+        profile = activeProfiles.get(1);
+        assertEquals("external-profile", profile.getId());
+        location = profile.getLocation("");
+        assertNotNull(location);
+        assertThat(location.getLineNumber(), greaterThan(0));
+        assertThat(location.getColumnNumber(), greaterThan(0));
+        assertNotNull(location.getSource());
+        assertThat(location.getSource().getLocation(), containsString("settings.xml"));
+    }
+
+    @Test
+    void testActivatedProfileIsResolved() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setActiveProfileIds(List.of("profile1"));
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertEquals(1, project.getActiveProfiles().size());
+        assertTrue(project.getActiveProfiles().stream().anyMatch(p -> "profile1".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "profile2".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "active-by-default".equals(p.getId())));
+    }
+
+    @Test
+    void testActivatedProfileByDefaultIsResolved() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertEquals(1, project.getActiveProfiles().size());
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "profile1".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "profile2".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().anyMatch(p -> "active-by-default".equals(p.getId())));
     }
 
     /**
