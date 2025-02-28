@@ -354,15 +354,24 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // not be not colored (good), but Maven will print out "Message scheme: color".
         MessageUtils.setColorEnabled(
                 context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
-        if (!options.rawStreams().orElse(false)) {
-            doConfigureWithTerminalRawStreams(context);
+
+        // handle rawStreams: some would like to act on true, some on false
+        if (options.rawStreams().orElse(false)) {
+            doConfigureWithTerminalWithRawStreamsEnabled(context);
+        } else {
+            doConfigureWithTerminalWithRawStreamsDisabled(context);
         }
     }
 
     /**
-     * Override this method to add some special handling for "raw streams" option.
+     * Override this method to add some special handling for "raw streams" <em>enabled</em> option.
      */
-    protected void doConfigureWithTerminalRawStreams(C context) {
+    protected void doConfigureWithTerminalWithRawStreamsEnabled(C context) {}
+
+    /**
+     * Override this method to add some special handling for "raw streams" <em>disabled</em> option.
+     */
+    protected void doConfigureWithTerminalWithRawStreamsDisabled(C context) {
         MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
         MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
         stdout.setLogLevel(LocationAwareLogger.INFO_INT);
