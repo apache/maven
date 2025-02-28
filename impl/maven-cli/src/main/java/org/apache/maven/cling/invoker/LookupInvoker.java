@@ -300,7 +300,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         return new SimpleBuildEventListener(writer);
     }
 
-    protected void createTerminal(C context) {
+    protected final void createTerminal(C context) {
         if (context.terminal == null) {
             // Create the build log appender; also sets MavenSimpleLogger sink
             ProjectBuildLogAppender projectBuildLogAppender =
@@ -308,21 +308,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.closeables.add(projectBuildLogAppender);
 
             MessageUtils.systemInstall(
-                    builder -> {
-                        if (context.invokerRequest.embedded()) {
-                            InputStream in = context.invokerRequest.stdIn().orElse(InputStream.nullInputStream());
-                            OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
-                            builder.streams(in, out);
-                            builder.provider(TerminalBuilder.PROP_PROVIDER_EXEC);
-                            context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
-                            context.closeables.add(out::flush);
-                        } else {
-                            builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
-                        }
-                        if (context.coloredOutput != null) {
-                            builder.color(context.coloredOutput);
-                        }
-                    },
+                    builder -> doCreateTerminal(context, builder),
                     terminal -> doConfigureWithTerminal(context, terminal));
 
             context.terminal = MessageUtils.getTerminal();
@@ -333,7 +319,31 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
     }
 
-    protected void doConfigureWithTerminal(C context, Terminal terminal) {
+    /**
+     * Override this method to create Terminal as you want.
+     *
+     * @see #createTerminal(LookupContext)
+     */
+    protected void doCreateTerminal(C context, TerminalBuilder builder) {
+        if (context.invokerRequest.embedded()) {
+            InputStream in = context.invokerRequest.stdIn().orElse(InputStream.nullInputStream());
+            OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
+            builder.streams(in, out);
+            builder.provider(TerminalBuilder.PROP_PROVIDER_EXEC);
+            context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
+            context.closeables.add(out::flush);
+        } else {
+            builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+        }
+        if (context.coloredOutput != null) {
+            builder.color(context.coloredOutput);
+        }
+    }
+
+    /**
+     * Called from {@link #createTerminal(LookupContext)} when Terminal was built.
+     */
+    protected final void doConfigureWithTerminal(C context, Terminal terminal) {
         context.terminal = terminal;
         Options options = context.invokerRequest.options();
         // tricky thing: align what JLine3 detected and Maven thinks:
@@ -344,19 +354,35 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // not be not colored (good), but Maven will print out "Message scheme: color".
         MessageUtils.setColorEnabled(
                 context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
-        if (!options.rawStreams().orElse(false)) {
-            MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
-            MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
-            stdout.setLogLevel(LocationAwareLogger.INFO_INT);
-            stderr.setLogLevel(LocationAwareLogger.INFO_INT);
-            PrintStream psOut = new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream();
-            context.closeables.add(() -> LoggingOutputStream.forceFlush(psOut));
-            PrintStream psErr = new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream();
-            context.closeables.add(() -> LoggingOutputStream.forceFlush(psErr));
-            System.setOut(psOut);
-            System.setErr(psErr);
-            // no need to set them back, this is already handled by MessageUtils.systemUninstall() above
+
+        // handle rawStreams: some would like to act on true, some on false
+        if (options.rawStreams().orElse(false)) {
+            doConfigureWithTerminalWithRawStreamsEnabled(context);
+        } else {
+            doConfigureWithTerminalWithRawStreamsDisabled(context);
         }
+    }
+
+    /**
+     * Override this method to add some special handling for "raw streams" <em>enabled</em> option.
+     */
+    protected void doConfigureWithTerminalWithRawStreamsEnabled(C context) {}
+
+    /**
+     * Override this method to add some special handling for "raw streams" <em>disabled</em> option.
+     */
+    protected void doConfigureWithTerminalWithRawStreamsDisabled(C context) {
+        MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
+        MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
+        stdout.setLogLevel(LocationAwareLogger.INFO_INT);
+        stderr.setLogLevel(LocationAwareLogger.INFO_INT);
+        PrintStream psOut = new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream();
+        context.closeables.add(() -> LoggingOutputStream.forceFlush(psOut));
+        PrintStream psErr = new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream();
+        context.closeables.add(() -> LoggingOutputStream.forceFlush(psErr));
+        System.setOut(psOut);
+        System.setErr(psErr);
+        // no need to set them back, this is already handled by MessageUtils.systemUninstall() above
     }
 
     protected Consumer<String> determineWriter(C context) {
