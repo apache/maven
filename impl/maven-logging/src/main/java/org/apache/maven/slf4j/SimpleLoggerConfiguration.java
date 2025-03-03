@@ -231,7 +231,7 @@ public class SimpleLoggerConfiguration {
             return new OutputChoice(cacheOutputStream ? OutputChoiceType.CACHED_SYS_OUT : OutputChoiceType.SYS_OUT);
         } else {
             try {
-                FileOutputStream fos = new FileOutputStream(logFile);
+                FileOutputStream fos = new FileOutputStream(logFile, true);
                 PrintStream printStream = new PrintStream(fos);
                 return new OutputChoice(printStream);
             } catch (FileNotFoundException e) {
