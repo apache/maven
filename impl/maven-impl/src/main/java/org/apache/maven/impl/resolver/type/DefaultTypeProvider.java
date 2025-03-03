@@ -54,6 +54,7 @@ public class DefaultTypeProvider implements TypeProvider {
                         false,
                         JavaPathType.CLASSES,
                         JavaPathType.PATCH_MODULE),
+                new DefaultType(Type.TEST_JAVA_SOURCE, Language.JAVA_FAMILY, "jar", "test-sources", false),
                 new DefaultType(Type.MODULAR_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.MODULES),
                 new DefaultType(Type.CLASSPATH_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES),
                 // j2ee types

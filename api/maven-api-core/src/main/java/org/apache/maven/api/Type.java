@@ -123,6 +123,11 @@ public interface Type extends ExtensibleEnum {
     String TEST_JAR = "test-jar";
 
     /**
+     * Artifact type name for a JAR file containing test sources.
+     */
+    String TEST_JAVA_SOURCE = "test-java-source";
+
+    /**
      * Returns the dependency type id.
      * The id uniquely identifies this <i>dependency type</i>.
      *
