@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,6 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Dependency;
-import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
@@ -75,8 +73,12 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         Model model = project.getModel().getDelegate();
         String packaging = model.getPackaging();
         String originalPackaging = project.getOriginalModel().getPackaging();
-        if (POM_PACKAGING.equals(packaging) && !BOM_PACKAGING.equals(originalPackaging)) {
-            return buildPom(session, project, src);
+        if (POM_PACKAGING.equals(packaging)) {
+            if (BOM_PACKAGING.equals(originalPackaging)) {
+                return buildBom(session, project, src);
+            } else {
+                return buildPom(session, project, src);
+            }
         } else {
             return buildNonPom(session, project, src);
         }
@@ -86,13 +88,20 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
             throws ModelBuilderException {
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getRawModel();
-        return transform(model, project);
+        return transformPom(model, project);
+    }
+
+    protected Model buildBom(RepositorySystemSession session, MavenProject project, Path src)
+            throws ModelBuilderException {
+        ModelBuilderResult result = buildModel(session, src);
+        Model model = result.getEffectiveModel();
+        return transformBom(model, project);
     }
 
     protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src)
             throws ModelBuilderException {
         Model model = buildEffectiveModel(session, src);
-        return transform(model, project);
+        return transformNonPom(model, project);
     }
 
     private Model buildEffectiveModel(RepositorySystemSession session, Path src) throws ModelBuilderException {
@@ -193,72 +202,72 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         return result;
     }
 
-    static Model transform(Model model, MavenProject project) {
-        String packaging = model.getPackaging();
+    static Model transformNonPom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
-        if (POM_PACKAGING.equals(packaging)) {
-            // raw to consumer transform
-            model = model.withRoot(false).withModules(null).withSubprojects(null);
-            if (model.getParent() != null) {
-                model = model.withParent(model.getParent().withRelativePath(null));
-            }
 
-            if (!preserveModelVersion) {
-                model = model.withPreserveModelVersion(false);
-                String modelVersion = new MavenModelVersion().getModelVersion(model);
-                model = model.withModelVersion(modelVersion);
-            }
-        } else if (BOM_PACKAGING.equals(packaging)) {
-            DependencyManagement dependencyManagement =
-                    project.getOriginalModel().getDependencyManagement().getDelegate();
-            List<Dependency> dependencies = new ArrayList<>();
-            String version = model.getVersion();
+        Model.Builder builder = prune(
+                        Model.newBuilder(model, true)
+                                .preserveModelVersion(false)
+                                .root(false)
+                                .parent(null)
+                                .build(null),
+                        model)
+                .mailingLists(null)
+                .issueManagement(null)
+                .scm(
+                        model.getScm() != null
+                                ? Scm.newBuilder(model.getScm(), true)
+                                        .childScmConnectionInheritAppendPath(null)
+                                        .childScmUrlInheritAppendPath(null)
+                                        .childScmDeveloperConnectionInheritAppendPath(null)
+                                        .build()
+                                : null);
+        builder.profiles(prune(model.getProfiles()));
 
-            dependencyManagement
-                    .getDependencies()
-                    .forEach((dependency) -> dependencies.add(dependency.withVersion(version)));
-            Model.Builder builder = prune(
-                    Model.newBuilder(model, true)
-                            .preserveModelVersion(false)
-                            .root(false)
-                            .parent(null)
-                            .dependencyManagement(dependencyManagement.withDependencies(dependencies))
-                            .build(null),
-                    model);
-            builder.packaging(POM_PACKAGING);
-            builder.profiles(prune(model.getProfiles()));
+        model = builder.build();
+        String modelVersion = new MavenModelVersion().getModelVersion(model);
+        if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
+            warnNotDowngraded(project);
+        }
+        model = model.withModelVersion(modelVersion);
+        return model;
+    }
 
-            model = builder.build();
+    static Model transformBom(Model model, MavenProject project) {
+        boolean preserveModelVersion = model.isPreserveModelVersion();
+
+        Model.Builder builder = prune(
+                Model.newBuilder(model, true)
+                        .preserveModelVersion(false)
+                        .root(false)
+                        .parent(null)
+                        // .dependencyManagement(dependencyManagement.withDependencies(dependencies))
+                        .build(null),
+                model);
+        builder.packaging(POM_PACKAGING);
+        builder.profiles(prune(model.getProfiles()));
+
+        model = builder.build();
+        String modelVersion = new MavenModelVersion().getModelVersion(model);
+        if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
+            warnNotDowngraded(project);
+        }
+        model = model.withModelVersion(modelVersion);
+        return model;
+    }
+
+    static Model transformPom(Model model, MavenProject project) {
+        boolean preserveModelVersion = model.isPreserveModelVersion();
+
+        // raw to consumer transform
+        model = model.withRoot(false).withModules(null).withSubprojects(null);
+        if (model.getParent() != null) {
+            model = model.withParent(model.getParent().withRelativePath(null));
+        }
+
+        if (!preserveModelVersion) {
+            model = model.withPreserveModelVersion(false);
             String modelVersion = new MavenModelVersion().getModelVersion(model);
-            if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
-                warnNotDowngraded(project);
-            }
-            model = model.withModelVersion(modelVersion);
-        } else {
-            Model.Builder builder = prune(
-                            Model.newBuilder(model, true)
-                                    .preserveModelVersion(false)
-                                    .root(false)
-                                    .parent(null)
-                                    .build(null),
-                            model)
-                    .mailingLists(null)
-                    .issueManagement(null)
-                    .scm(
-                            model.getScm() != null
-                                    ? Scm.newBuilder(model.getScm(), true)
-                                            .childScmConnectionInheritAppendPath(null)
-                                            .childScmUrlInheritAppendPath(null)
-                                            .childScmDeveloperConnectionInheritAppendPath(null)
-                                            .build()
-                                    : null);
-            builder.profiles(prune(model.getProfiles()));
-
-            model = builder.build();
-            String modelVersion = new MavenModelVersion().getModelVersion(model);
-            if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
-                warnNotDowngraded(project);
-            }
             model = model.withModelVersion(modelVersion);
         }
         return model;

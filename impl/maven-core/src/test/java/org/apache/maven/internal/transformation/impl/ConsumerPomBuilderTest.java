@@ -153,7 +153,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                         .childScmDeveloperConnectionInheritAppendPath("true")
                         .build())
                 .build();
-        Model transformed = DefaultConsumerPomBuilder.transform(model, null);
+        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, null);
         assertNull(transformed.getScm().getChildScmConnectionInheritAppendPath());
         assertNull(transformed.getScm().getChildScmUrlInheritAppendPath());
         assertNull(transformed.getScm().getChildScmDeveloperConnectionInheritAppendPath());
