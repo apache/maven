@@ -241,7 +241,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                         .preserveModelVersion(false)
                         .root(false)
                         .parent(null)
-                        // .dependencyManagement(dependencyManagement.withDependencies(dependencies))
                         .build(null),
                 model);
         builder.packaging(POM_PACKAGING);
