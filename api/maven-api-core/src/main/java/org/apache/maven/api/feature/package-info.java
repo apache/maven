@@ -18,10 +18,8 @@
  */
 
 /**
- * Provides an immutable XML processing API for Maven, offering classes and interfaces
- * for reading, manipulating, and writing XML documents in a thread-safe manner.
- * This package is used extensively for POM, settings, and other Maven configuration files.
+ * Provides feature flag management and configuration capabilities for Maven core functionality.
  *
  * @since 4.0.0
  */
-package org.apache.maven.api.xml;
+package org.apache.maven.api.feature;

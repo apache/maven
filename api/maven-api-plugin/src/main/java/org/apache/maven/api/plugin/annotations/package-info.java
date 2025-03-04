@@ -18,10 +18,10 @@
  */
 
 /**
- * Provides an immutable XML processing API for Maven, offering classes and interfaces
- * for reading, manipulating, and writing XML documents in a thread-safe manner.
- * This package is used extensively for POM, settings, and other Maven configuration files.
+ * Provides annotations for Maven plugin development, including mojo configuration,
+ * parameter definitions, and lifecycle bindings. These annotations are used to
+ * generate plugin descriptors and configure plugin behavior.
  *
  * @since 4.0.0
  */
-package org.apache.maven.api.xml;
+package org.apache.maven.api.plugin.annotations;
