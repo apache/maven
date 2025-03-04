@@ -19,8 +19,6 @@
 
 /**
  * Provides feature flag management and configuration capabilities for Maven core functionality.
- * This package allows for controlled enablement and management of Maven features across
- * different execution contexts and environments.
  *
  * @since 4.0.0
  */

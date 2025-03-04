@@ -44,8 +44,8 @@
  * <p>{@link org.apache.maven.api.Artifact} instances are the pointed artifacts in the repository.
  * They are created when <dfn>resolving</dfn> an {@code ArtifactCoordinates}. Resolving is the process
  * that selects a particular version and downloads the artifact in the local repository.
- * There are two sub-interfaces, {@link org.apache.maven.api.DownloadedArtifact} which is used when
- * an artifact has been resolved and {@link org.apache.maven.api.ProducedArtifact} which is used when
+ * The {@link org.apache.maven.api.DownloadedArtifact} sub-interface is used when
+ * an artifact has been resolved and {@link org.apache.maven.api.ProducedArtifact} when
  * an artifact is being produced by a project.</p>
  *
  * <p>{@link org.apache.maven.api.DependencyCoordinates} instances are used to express a dependency.
