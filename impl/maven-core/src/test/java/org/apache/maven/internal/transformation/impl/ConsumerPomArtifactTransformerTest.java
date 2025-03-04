@@ -56,7 +56,7 @@ class ConsumerPomArtifactTransformerTest {
             project.setOriginalModel(model);
             DefaultConsumerPomArtifactTransformer t = new DefaultConsumerPomArtifactTransformer((s, p, f) -> {
                 try (InputStream is = Files.newInputStream(f)) {
-                    return DefaultConsumerPomBuilder.transform(new MavenStaxReader().read(is), project);
+                    return DefaultConsumerPomBuilder.transformPom(new MavenStaxReader().read(is), project);
                 }
             });
 
@@ -83,7 +83,7 @@ class ConsumerPomArtifactTransformerTest {
             project.setOriginalModel(model);
             DefaultConsumerPomArtifactTransformer t = new DefaultConsumerPomArtifactTransformer((s, p, f) -> {
                 try (InputStream is = Files.newInputStream(f)) {
-                    return DefaultConsumerPomBuilder.transform(new MavenStaxReader().read(is), project);
+                    return DefaultConsumerPomBuilder.transformNonPom(new MavenStaxReader().read(is), project);
                 }
             });
 
