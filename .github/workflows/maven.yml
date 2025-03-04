@@ -41,10 +41,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Put extension.xml in place
+      - name: Put extensions.xml in place
         shell: bash
         run: |
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
+          mkdir ~/.mimir
 
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -107,10 +108,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Put extension.xml in place
+      - name: Put extensions.xml in place
         shell: bash
         run: |
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
+          mkdir ~/.mimir
 
       - name: Download Maven distribution
         uses: actions/download-artifact@v4
@@ -187,10 +189,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Put extension.xml in place
+      - name: Put extensions.xml in place
         shell: bash
         run: |
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
+          mkdir ~/.mimir
 
       - name: Download Maven distribution
         uses: actions/download-artifact@v4
