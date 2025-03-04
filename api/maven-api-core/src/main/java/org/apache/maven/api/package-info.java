@@ -20,6 +20,21 @@
 /**
  * <h2>Maven Core API</h2>
  *
+ * <h3>Session</h3>
+ *
+ * <p>The {@link org.apache.maven.api.Session} interface is the main entry point for Maven operations.
+ * It maintains the state of a Maven execution and provides access to all core services and components.
+ * Sessions are thread-safe and can be obtained in session-scoped components using the
+ * {@link org.apache.maven.api.di.SessionScoped} annotation.</p>
+ *
+ * <p>Key capabilities provided through the Session include:</p>
+ * <ul>
+ *   <li>Access to the current {@link org.apache.maven.api.Project}</li>
+ *   <li>Access to the {@link org.apache.maven.api.LocalRepository} and {@link org.apache.maven.api.RemoteRepository} configurations</li>
+ *   <li>Access to Maven services through {@link org.apache.maven.api.Session#getService(Class)}</li>
+ *   <li>Build configuration and settings</li>
+ * </ul>
+ *
  * <h3>Dependency management</h3>
  *
  * <p>{@link org.apache.maven.api.ArtifactCoordinates} instances are used to locate artifacts in a repository.
@@ -30,7 +45,8 @@
  * They are created when <dfn>resolving</dfn> an {@code ArtifactCoordinates}. Resolving is the process
  * that selects a particular version and downloads the artifact in the local repository.
  * There are two sub-interfaces, {@link org.apache.maven.api.DownloadedArtifact} which is used when
- * an artifact has been resolved</p>
+ * an artifact has been resolved and {@link org.apache.maven.api.ProducedArtifact} which is used when
+ * an artifact is being produced by a project.</p>
  *
  * <p>{@link org.apache.maven.api.DependencyCoordinates} instances are used to express a dependency.
  * They are a {@code ArtifactCoordinates} completed with information about how the artifact will be used:

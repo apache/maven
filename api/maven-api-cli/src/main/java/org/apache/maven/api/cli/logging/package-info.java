@@ -18,10 +18,17 @@
  */
 
 /**
- * Provides an immutable XML processing API for Maven, offering classes and interfaces
- * for reading, manipulating, and writing XML documents in a thread-safe manner.
- * This package is used extensively for POM, settings, and other Maven configuration files.
+ * Provides early-stage logging capabilities for Maven CLI operations.
+ * These logging facilities are used during Maven startup before the full logging
+ * system is initialized.
+ *
+ * <p>This package includes:</p>
+ * <ul>
+ *   <li>Basic logging interfaces and implementations</li>
+ *   <li>Support for different logging levels (DEBUG, INFO, WARN, ERROR)</li>
+ *   <li>Accumulating loggers for deferred output</li>
+ * </ul>
  *
  * @since 4.0.0
  */
-package org.apache.maven.api.xml;
+package org.apache.maven.api.cli.logging;
