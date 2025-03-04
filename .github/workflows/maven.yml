@@ -41,21 +41,20 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Put extensions.xml in place
+      - name: Prepare Mimir
         shell: bash
         run: |
           mkdir -p ~/.m2
-          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
-      - name: Cache Maven packages
+      - name: Handle Mimir caches
         uses: actions/cache@v4
         with:
-          path: ~/.m2/repository/cached
-          key: maven-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}
+          path: ~/.mimir/local
+          key: mimir-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            maven-${{ runner.os }}-initial-
-            maven-${{ runner.os }}-
+            mimir-${{ runner.os }}-initial-
+            mimir-${{ runner.os }}-
 
       - name: Set up Maven
         shell: bash
@@ -63,7 +62,7 @@ jobs:
 
       - name: Build Maven distributions
         shell: bash
-        run: ./mvnw verify -e -B -V -Dmaven.repo.local=$HOME/.m2/repository/cached
+        run: ./mvnw verify -e -B -V
 
       - name: List contents of target directory
         shell: bash
@@ -109,12 +108,20 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Put extensions.xml in place
+      - name: Prepare Mimir
         shell: bash
         run: |
           mkdir -p ~/.m2
-          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
+
+      - name: Handle Mimir caches
+        uses: actions/cache@v4
+        with:
+          path: ~/.mimir/local
+          key: mimir-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            mimir-${{ runner.os }}-full-
+            mimir-${{ runner.os }}-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@v4
@@ -143,26 +150,17 @@ jobs:
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
 
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository/cached
-          key: maven-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ runner.os }}-full-
-            maven-${{ runner.os }}-
-
       - name: Show IP
         shell: bash
         run: curl --silent https://api.ipify.org
 
       - name: Build with downloaded Maven
         shell: bash
-        run: mvn verify -e -B -V -Dmaven.repo.local=$HOME/.m2/repository/cached
+        run: mvn verify -e -B -V
 
       - name: Build site with downloaded Maven
         shell: bash
-        run: mvn site -e -B -V -Preporting -Dmaven.repo.local=$HOME/.m2/repository/cached
+        run: mvn site -e -B -V -Preporting
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
@@ -191,12 +189,20 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Put extensions.xml in place
+      - name: Prepare Mimir
         shell: bash
         run: |
           mkdir -p ~/.m2
-          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
+
+      - name: Handle Mimir caches
+        uses: actions/cache@v4
+        with:
+          path: ~/.mimir/local
+          key: mimir-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            mimir-${{ runner.os }}-its-
+            mimir-${{ runner.os }}-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@v4
@@ -225,29 +231,13 @@ jobs:
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
 
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository/cached
-          key: maven-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ runner.os }}-its
-            maven-${{ runner.os }}-
-
       - name: Show IP
         shell: bash
         run: curl --silent https://api.ipify.org
 
-      # we use two steps so that we can cache artifacts downloaded from Maven Central repository
-      # without installing any local artifacts to not pollute the cache
-      - name: Build maven and ITs
+      - name: Build Maven and ITs and run them
         shell: bash
-        run: mvn package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.m2/repository/cached
-
-      # Now run tests and ITs using a separate local repo (using the previous filled repo as tail)
-      - name: Run integration tests
-        shell: bash
-        run: mvn install -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.m2/repository/local -Dmaven.repo.local.tail=$HOME/.m2/repository/cached
+        run: mvn install -DskipTests -e -B -V -Prun-its
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
