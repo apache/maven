@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extensions>
+  <extension>
+    <groupId>eu.maveniverse.maven.mimir</groupId>
+    <artifactId>extension3</artifactId>
+    <version>0.3.4</version>
+  </extension>
+</extensions>
