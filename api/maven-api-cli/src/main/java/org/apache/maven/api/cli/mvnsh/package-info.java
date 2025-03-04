@@ -18,10 +18,22 @@
  */
 
 /**
- * Provides an immutable XML processing API for Maven, offering classes and interfaces
- * for reading, manipulating, and writing XML documents in a thread-safe manner.
- * This package is used extensively for POM, settings, and other Maven configuration files.
+ * Provides the API for the Maven Shell tool ({@code mvnsh}).
  *
+ * <p>This package contains interfaces and classes for the interactive Maven shell,
+ * which provides a command-line interface for executing Maven commands and
+ * managing build environments.</p>
+ *
+ * <p>Key features include:</p>
+ * <ul>
+ *   <li>Interactive command-line interface</li>
+ *   <li>Command history and completion</li>
+ *   <li>Built-in shell commands</li>
+ *   <li>Project navigation and management</li>
+ * </ul>
+ *
+ * @see org.apache.maven.api.cli.Tools#MVNSHELL_CMD
+ * @see org.apache.maven.api.cli.Tools#MVNSHELL_NAME
  * @since 4.0.0
  */
-package org.apache.maven.api.xml;
+package org.apache.maven.api.cli.mvnsh;

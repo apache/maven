@@ -18,10 +18,20 @@
  */
 
 /**
- * Provides an immutable XML processing API for Maven, offering classes and interfaces
- * for reading, manipulating, and writing XML documents in a thread-safe manner.
- * This package is used extensively for POM, settings, and other Maven configuration files.
+ * Provides the API for the Maven Password Encryption tool ({@code mvnenc}).
  *
+ * <p>This package contains interfaces and classes for the password encryption tool,
+ * which helps secure sensitive information in Maven settings and configuration files.</p>
+ *
+ * <p>Key features include:</p>
+ * <ul>
+ *   <li>Password encryption and decryption</li>
+ *   <li>Master password management</li>
+ *   <li>Security settings configuration</li>
+ * </ul>
+ *
+ * @see org.apache.maven.api.cli.Tools#MVNENC_CMD
+ * @see org.apache.maven.api.cli.Tools#MVNENC_NAME
  * @since 4.0.0
  */
-package org.apache.maven.api.xml;
+package org.apache.maven.api.cli.mvnenc;

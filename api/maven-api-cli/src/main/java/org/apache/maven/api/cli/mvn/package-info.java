@@ -18,10 +18,21 @@
  */
 
 /**
- * Provides an immutable XML processing API for Maven, offering classes and interfaces
- * for reading, manipulating, and writing XML documents in a thread-safe manner.
- * This package is used extensively for POM, settings, and other Maven configuration files.
+ * Provides the API for the Maven build tool ({@code mvn}).
  *
+ * <p>This package contains interfaces and classes specific to the main Maven build
+ * tool, which is responsible for project build lifecycle execution and dependency management.</p>
+ *
+ * <p>Key features include:</p>
+ * <ul>
+ *   <li>Build lifecycle execution control</li>
+ *   <li>Project-specific configuration</li>
+ *   <li>Goal execution and phase mapping</li>
+ *   <li>Multi-module build coordination</li>
+ * </ul>
+ *
+ * @see org.apache.maven.api.cli.Tools#MVN_CMD
+ * @see org.apache.maven.api.cli.Tools#MVN_NAME
  * @since 4.0.0
  */
-package org.apache.maven.api.xml;
+package org.apache.maven.api.cli.mvn;

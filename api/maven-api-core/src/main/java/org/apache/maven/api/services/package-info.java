@@ -18,10 +18,10 @@
  */
 
 /**
- * Provides an immutable XML processing API for Maven, offering classes and interfaces
- * for reading, manipulating, and writing XML documents in a thread-safe manner.
- * This package is used extensively for POM, settings, and other Maven configuration files.
+ * Defines core service interfaces that provide essential Maven functionality such as
+ * artifact resolution, dependency management, and build execution. These services
+ * form the backbone of Maven's extensible architecture.
  *
  * @since 4.0.0
  */
-package org.apache.maven.api.xml;
+package org.apache.maven.api.services;

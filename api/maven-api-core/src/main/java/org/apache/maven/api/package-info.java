@@ -20,16 +20,32 @@
 /**
  * <h2>Maven Core API</h2>
  *
+ * <h3>Session</h3>
+ *
+ * <p>The {@link org.apache.maven.api.Session} interface is the main entry point for Maven operations.
+ * It maintains the state of a Maven execution and provides access to all core services and components.
+ * Sessions are thread-safe and can be obtained in session-scoped components using the
+ * {@link org.apache.maven.api.di.SessionScoped} annotation.</p>
+ *
+ * <p>Key capabilities provided through the Session include:</p>
+ * <ul>
+ *   <li>Access to the current {@link org.apache.maven.api.Project}</li>
+ *   <li>Access to the {@link org.apache.maven.api.LocalRepository} and {@link org.apache.maven.api.RemoteRepository} configurations</li>
+ *   <li>Access to Maven services through {@link org.apache.maven.api.Session#getService(Class)}</li>
+ *   <li>Build configuration and settings</li>
+ * </ul>
+ *
  * <h3>Dependency management</h3>
  *
  * <p>{@link org.apache.maven.api.ArtifactCoordinates} instances are used to locate artifacts in a repository.
  * Each instance identifies an artifact or version range of artifacts in the Maven repository system.</p>
  *
  * <p>{@link org.apache.maven.api.Artifact} instances represent artifacts in the repository.
- * They are created when <dfn>resolving</dfn> an {@code ArtifactCoordinates}. Resolving is the process
- * that selects a particular version and downloads the artifact to the local repository.
- * The sub-interface {@link org.apache.maven.api.DownloadedArtifact} represents an artifact
- * that has been downloaded to and installed in the local repository.</p>
+ * They are created when <dfn>resolving</dfn> an {@code ArtifactCoordinates} object. Resolving is the process
+ * that selects a particular version and downloads the artifact into the local repository.
+ * The {@link org.apache.maven.api.DownloadedArtifact} sub-interface is used when
+ * an artifact has been resolved and the {@link org.apache.maven.api.ProducedArtifact} sub-interface when
+ * an artifact is being produced by a project.</p>
  *
  * <p>{@link org.apache.maven.api.DependencyCoordinates} instances represent a dependency element in a POM.
  * A {@code DependencyCoordinates} extends {@code ArtifactCoordinates} with additional information about how

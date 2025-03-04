@@ -18,10 +18,17 @@
  */
 
 /**
- * Provides an immutable XML processing API for Maven, offering classes and interfaces
- * for reading, manipulating, and writing XML documents in a thread-safe manner.
- * This package is used extensively for POM, settings, and other Maven configuration files.
+ * Provides support for Maven core extensions configuration and management.
+ * Core extensions can be configured through {@code .mvn/extensions.xml} in the project
+ * base directory to enhance Maven's capabilities during build execution.
+ *
+ * <p>This package contains classes for:</p>
+ * <ul>
+ *   <li>Extension configuration model</li>
+ *   <li>Extension loading and validation</li>
+ *   <li>Extension lifecycle management</li>
+ * </ul>
  *
  * @since 4.0.0
  */
-package org.apache.maven.api.xml;
+package org.apache.maven.api.cli.extensions;
