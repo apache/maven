@@ -31,12 +31,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WeakIdentityMapTest {
-    private WeakIdentityMap<Object, String> map;
+class SoftIdentityMapTest {
+    private SoftIdentityMap<Object, String> map;
 
     @BeforeEach
     void setUp() {
-        map = new WeakIdentityMap<>();
+        map = new SoftIdentityMap<>();
     }
 
     @Test
@@ -160,7 +160,7 @@ class WeakIdentityMapTest {
     }
 
     @Test
-    void shouldHandleWeakReferences() throws InterruptedException {
+    void shouldHandleSoftReferences() throws InterruptedException {
         AtomicInteger computeCount = new AtomicInteger(0);
 
         // Use a block to ensure the key can be garbage collected

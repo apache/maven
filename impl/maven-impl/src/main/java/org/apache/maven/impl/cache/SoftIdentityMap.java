@@ -20,7 +20,7 @@ package org.apache.maven.impl.cache;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -29,22 +29,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
- * A Map implementation that uses weak references for both keys and values,
+ * A Map implementation that uses soft references for both keys and values,
  * and compares keys using identity (==) rather than equals().
  *
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
-public class WeakIdentityMap<K, V> implements Map<K, V> {
+public class SoftIdentityMap<K, V> implements Map<K, V> {
 
     private final ReferenceQueue<K> keyQueue = new ReferenceQueue<>();
     private final ReferenceQueue<V> valueQueue = new ReferenceQueue<>();
-    private final ConcurrentHashMap<WeakIdentityReference<K>, ComputeReference<V>> map = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<SoftIdentityReference<K>, ComputeReference<V>> map = new ConcurrentHashMap<>();
 
-    private static class WeakIdentityReference<T> extends WeakReference<T> {
+    private static class SoftIdentityReference<T> extends SoftReference<T> {
         private final int hash;
 
-        WeakIdentityReference(T referent, ReferenceQueue<T> queue) {
+        SoftIdentityReference(T referent, ReferenceQueue<T> queue) {
             super(referent, queue);
             this.hash = referent.hashCode();
         }
@@ -54,7 +54,7 @@ public class WeakIdentityMap<K, V> implements Map<K, V> {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof WeakIdentityReference<?> other)) {
+            if (!(obj instanceof SoftIdentityReference<?> other)) {
                 return false;
             }
             T thisRef = this.get();
@@ -68,7 +68,7 @@ public class WeakIdentityMap<K, V> implements Map<K, V> {
         }
     }
 
-    private static class ComputeReference<V> extends WeakReference<V> {
+    private static class ComputeReference<V> extends SoftReference<V> {
         private final boolean computing;
 
         ComputeReference(V value, ReferenceQueue<V> queue) {
@@ -94,37 +94,37 @@ public class WeakIdentityMap<K, V> implements Map<K, V> {
         while (true) {
             expungeStaleEntries();
 
-            WeakIdentityReference<K> weakKey = new WeakIdentityReference<>(key, keyQueue);
+            SoftIdentityReference<K> softKey = new SoftIdentityReference<>(key, keyQueue);
 
             // Try to get existing value
-            ComputeReference<V> valueRef = map.get(weakKey);
+            ComputeReference<V> valueRef = map.get(softKey);
             if (valueRef != null && !valueRef.computing) {
                 V value = valueRef.get();
                 if (value != null) {
                     return value;
                 }
                 // Value was GC'd, remove it
-                map.remove(weakKey, valueRef);
+                map.remove(softKey, valueRef);
             }
 
             // Try to claim computation
             ComputeReference<V> computingRef = ComputeReference.computing(valueQueue);
-            valueRef = map.putIfAbsent(weakKey, computingRef);
+            valueRef = map.putIfAbsent(softKey, computingRef);
 
             if (valueRef == null) {
                 // We claimed the computation
                 try {
                     V newValue = mappingFunction.apply(key);
                     if (newValue == null) {
-                        map.remove(weakKey, computingRef);
+                        map.remove(softKey, computingRef);
                         return null;
                     }
 
                     ComputeReference<V> newValueRef = new ComputeReference<>(newValue, valueQueue);
-                    map.replace(weakKey, computingRef, newValueRef);
+                    map.replace(softKey, computingRef, newValueRef);
                     return newValue;
                 } catch (Throwable t) {
-                    map.remove(weakKey, computingRef);
+                    map.remove(softKey, computingRef);
                     throw t;
                 }
             } else if (!valueRef.computing) {
@@ -134,7 +134,7 @@ public class WeakIdentityMap<K, V> implements Map<K, V> {
                     return value;
                 }
                 // Value was GC'd
-                if (map.remove(weakKey, valueRef)) {
+                if (map.remove(softKey, valueRef)) {
                     continue;
                 }
             }
@@ -167,13 +167,13 @@ public class WeakIdentityMap<K, V> implements Map<K, V> {
     @Override
     public boolean containsKey(Object key) {
         expungeStaleEntries();
-        return map.containsKey(new WeakIdentityReference<>((K) key, null));
+        return map.containsKey(new SoftIdentityReference<>((K) key, null));
     }
 
     @Override
     public boolean containsValue(Object value) {
         expungeStaleEntries();
-        for (WeakReference<V> ref : map.values()) {
+        for (Reference<V> ref : map.values()) {
             V v = ref.get();
             if (v != null && v == value) {
                 return true;
@@ -185,7 +185,7 @@ public class WeakIdentityMap<K, V> implements Map<K, V> {
     @Override
     public V get(Object key) {
         expungeStaleEntries();
-        WeakReference<V> ref = map.get(new WeakIdentityReference<>((K) key, null));
+        Reference<V> ref = map.get(new SoftIdentityReference<>((K) key, null));
         return ref != null ? ref.get() : null;
     }
 
@@ -195,8 +195,8 @@ public class WeakIdentityMap<K, V> implements Map<K, V> {
         Objects.requireNonNull(value);
         expungeStaleEntries();
 
-        WeakReference<V> oldValueRef =
-                map.put(new WeakIdentityReference<>(key, keyQueue), new ComputeReference<>(value, valueQueue));
+        Reference<V> oldValueRef =
+                map.put(new SoftIdentityReference<>(key, keyQueue), new ComputeReference<>(value, valueQueue));
 
         return oldValueRef != null ? oldValueRef.get() : null;
     }
@@ -204,7 +204,7 @@ public class WeakIdentityMap<K, V> implements Map<K, V> {
     @Override
     public V remove(Object key) {
         expungeStaleEntries();
-        WeakReference<V> valueRef = map.remove(new WeakIdentityReference<>((K) key, null));
+        Reference<V> valueRef = map.remove(new SoftIdentityReference<>((K) key, null));
         return valueRef != null ? valueRef.get() : null;
     }
 

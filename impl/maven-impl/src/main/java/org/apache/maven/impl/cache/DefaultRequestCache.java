@@ -53,7 +53,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
             Object key = retention == CacheRetention.REQUEST_SCOPED ? doGetOuterRequest(req) : ROOT;
             Map<Object, Map<Object, CachingSupplier<?, ?>>> caches =
                     session.getData().computeIfAbsent(KEY, ConcurrentHashMap::new);
-            cache = caches.computeIfAbsent(key, k -> new WeakIdentityMap<>());
+            cache = caches.computeIfAbsent(key, k -> new SoftIdentityMap<>());
         } else if (retention == CacheRetention.PERSISTENT) {
             cache = forever;
         }
