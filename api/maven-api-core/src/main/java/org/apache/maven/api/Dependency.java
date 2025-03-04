@@ -23,12 +23,12 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A result of collecting, flattening and resolving {@link DependencyCoordinates}s.
+ * A result of collecting, flattening, and resolving {@link DependencyCoordinates}s.
  * Dependency is the output of the <dfn>collection</dfn> process, which builds the graph of dependencies,
  * followed by <dfn>flattening</dfn> and <dfn>resolution</dfn>.
  * The version selection is done for each dependency during the collection phase.
- * The flatten phase will keep only a single version per ({@code groupId}, {@code artifactId}) pair.
- * The resolution will actually download the dependencies (or artifacts) that have been computed.
+ * The flatten phase keeps only a single version per ({@code groupId}, {@code artifactId}) pair.
+ * The resolution phase actually downloads the dependencies (or artifacts) that have been computed.
  *
  * @since 4.0.0
  */
@@ -48,7 +48,7 @@ public interface Dependency extends Artifact {
 
     /**
      * {@return the time at which the dependency will be used}
-     * If may be, for example, at compile time only, at run time or at test time.
+     * It may be, for example, at compile time only, at run time or at test time.
      *
      * @see DependencyCoordinates#getScope()
      */
@@ -57,7 +57,7 @@ public interface Dependency extends Artifact {
 
     /**
      * Returns whether the dependency is optional or mandatory.
-     * Contrarily to {@link DependencyCoordinates}, the obligation of a {@code Dependency} is always present.
+     * Contrary to {@link DependencyCoordinates}, the obligation of a {@code Dependency} is always present.
      * The value is computed during the dependencies collection phase.
      *
      * @return {@code true} if the dependency is optional, or {@code false} if mandatory
