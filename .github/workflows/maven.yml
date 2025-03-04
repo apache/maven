@@ -42,10 +42,9 @@ jobs:
           persist-credentials: false
 
       - name: Put extension.xml in place
-        uses: canastro/copy-file-action@master
-        with:
-          source: .github/ci-extensions.xml
-          target: ~/.m2/extensions.xml
+        shell: bash
+        run: |
+          cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Cache Maven packages
         uses: actions/cache@v4
@@ -109,10 +108,9 @@ jobs:
           persist-credentials: false
 
       - name: Put extension.xml in place
-        uses: canastro/copy-file-action@master
-        with:
-          source: .github/ci-extensions.xml
-          target: ~/.m2/extensions.xml
+        shell: bash
+        run: |
+          cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Download Maven distribution
         uses: actions/download-artifact@v4
@@ -190,10 +188,9 @@ jobs:
           persist-credentials: false
 
       - name: Put extension.xml in place
-        uses: canastro/copy-file-action@master
-        with:
-          source: .github/ci-extensions.xml
-          target: ~/.m2/extensions.xml
+        shell: bash
+        run: |
+          cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Download Maven distribution
         uses: actions/download-artifact@v4
