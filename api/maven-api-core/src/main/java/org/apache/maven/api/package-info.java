@@ -65,8 +65,8 @@
  * all the dependencies.</p>
  *
  * <p>The <dfn>Dependency graph flattening</dfn> process in Maven reduces a complex,
- * multi-level dependency graph to an ordered list that can be turned into a classpath.
- * During this process where only the most relevant version of each artifact
+ * multi-level dependency graph to a map of ordered lists that can be turned into classpaths.
+ * During this process only the most relevant version of each artifact
  * (based on group ID and artifact ID) is retained, resolving conflicts and eliminating duplicates to ensure
  * that each dependency is included only once in the final build.</p>
  *

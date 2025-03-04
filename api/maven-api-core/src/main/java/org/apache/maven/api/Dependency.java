@@ -57,7 +57,7 @@ public interface Dependency extends Artifact {
 
     /**
      * Returns whether the dependency is optional or mandatory.
-     * Contrary to {@link DependencyCoordinates}, the obligation of a {@code Dependency} is always present.
+     * Unlike {@link DependencyCoordinates}, the obligation of a {@code Dependency} is always present.
      * The value is computed during the dependencies collection phase.
      *
      * @return {@code true} if the dependency is optional, or {@code false} if mandatory

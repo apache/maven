@@ -57,7 +57,7 @@ public interface DependencyCoordinates extends ArtifactCoordinates {
     /**
      * Returns whether the dependency is optional, mandatory, or of unspecified obligation.
      *
-     * @return true if optional, false if mandatory, or {@code null} if unspecified
+     * @return {@code Boolean.TRUE} and {@code Boolean.FALSE} if optional, or {@code null} if unspecified
      */
     @Nullable
     Boolean getOptional();
