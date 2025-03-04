@@ -767,9 +767,6 @@ under the License.</licenseText>
             <!-- Include generated sources in the sources JAR -->
             <excludeResources>false</excludeResources>
             <includePom>true</includePom>
-            <sources>
-              <source>${project.build.directory}/generated-sources/modello</source>
-            </sources>
           </configuration>
         </plugin>
       </plugins>
