@@ -49,7 +49,6 @@
  *
  * <p>{@link org.apache.maven.api.DependencyCoordinates} instances represent a dependency element in a POM.
  * A {@code DependencyCoordinates} extends {@code ArtifactCoordinates} with additional information about how
- * A {@code DependencyCoordinates} extends {@code ArtifactCoordinates} with additional information about how
  * the artifact will be used: type, scope and obligation (whether the dependency is optional or mandatory).
  * The version and the obligation may not be defined precisely.</p>
  *
