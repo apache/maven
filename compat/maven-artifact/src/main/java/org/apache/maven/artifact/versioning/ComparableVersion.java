@@ -51,8 +51,9 @@ import java.util.Properties;
  *     <li><code>ga</code> or <code>final</code></li>
  *     <li><code>sp</code></li>
  *     </ol>
- *     Unknown qualifiers are considered after known qualifiers, with lexical order (always case-insensitive).
- *     <code>ga</code> or <code>final</code> sort the same as not having a qualifier.
+ *     Unknown qualifiers are considered after known qualifiers,
+ *     with lexical order (case-insensitive in the English locale).
+ *     <code>ga</code> and <code>final</code> sort the same as not having a qualifier.
  *   </li>
  * <li>A hyphen usually precedes a qualifier, and is always less important than digits/number. For example
  *   {@code 1.0.RC2 < 1.0-RC3 < 1.0.1}; but prefer {@code 1.0.0-RC2} over {@code 1.0.0.RC2}, and more
