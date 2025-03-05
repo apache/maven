@@ -156,7 +156,7 @@ jobs:
 
       - name: Build with downloaded Maven
         shell: bash
-        run: mvn verify -e -B -V
+        run: mvn verify -Papache-release -Dgpg.skip=true -e -B -V
 
       - name: Build site with downloaded Maven
         shell: bash
