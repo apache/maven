@@ -132,7 +132,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                     new ExtensionConfigurationModule(extension, extensionSource));
         }
         if (!throwables.isEmpty()) {
-            IllegalStateException mavenDiFailed = new IllegalStateException("Maven DI failed");
+            IllegalStateException mavenDiFailed = new IllegalStateException("Maven dependency injection failed for at least one of the registered core extension");
             throwables.forEach(mavenDiFailed::addSuppressed);
             throw mavenDiFailed;
         }
