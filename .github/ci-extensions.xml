@@ -20,7 +20,7 @@ under the License.
 <extensions>
   <extension>
     <groupId>eu.maveniverse.maven.mimir</groupId>
-    <artifactId>extension3</artifactId>
-    <version>0.3.6</version>
+    <artifactId>extension</artifactId>
+    <version>0.4.0</version>
   </extension>
 </extensions>
