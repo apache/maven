@@ -100,9 +100,9 @@ public interface Node {
     String asString();
 
     /**
-     * Obtain a Stream containing this node and all its descendant.
+     * Obtain a Stream containing this node and all its descendants.
      *
-     * @return a stream containing this node and its descendant
+     * @return a stream containing this node and its descendants
      */
     @Nonnull
     default Stream<Node> stream() {
