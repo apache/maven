@@ -144,7 +144,7 @@ jobs:
 
       - name: Build with downloaded Maven
         shell: bash
-        run: mvn verify -Papache-release -e -B -V -Dmaven.repo.local=$HOME/.m2/repository/cached
+        run: mvn verify -Papache-release -Dgpg.skip=true -e -B -V -Dmaven.repo.local=$HOME/.m2/repository/cached
 
       - name: Build site with downloaded Maven
         shell: bash
