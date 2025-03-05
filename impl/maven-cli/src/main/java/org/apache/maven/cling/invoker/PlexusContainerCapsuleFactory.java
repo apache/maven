@@ -113,6 +113,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             }
             return value;
         };
+        ArrayList<Throwable> throwables = new ArrayList<>();
         for (CoreExtensionEntry extension : extensions) {
             container.discoverComponents(
                     extension.getClassRealm(),
@@ -122,7 +123,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                             try {
                                 container.lookup(Injector.class).discover(extension.getClassRealm());
                             } catch (Throwable e) {
-                                context.logger.warn("Maven DI failure", e);
+                                throwables.add(e);
                             }
                         }
                     },
@@ -130,7 +131,11 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                     new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
                     new ExtensionConfigurationModule(extension, extensionSource));
         }
-
+        if (!throwables.isEmpty()) {
+            IllegalStateException mavenDiFailed = new IllegalStateException("Maven DI failed");
+            throwables.forEach(mavenDiFailed::addSuppressed);
+            throw mavenDiFailed;
+        }
         container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
         customizeContainer(context, container);
 
