@@ -90,7 +90,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                 .session(requireNonNull(session, "session cannot be null"))
                 .groupId(requireNonNull(dependency, "dependency").getGroupId())
                 .artifactId(dependency.getArtifactId())
-                .version(dependency.getVersion().asString())
+                .version(dependency.getVersion().toString())
                 .classifier(dependency.getClassifier())
                 .extension(dependency.getExtension())
                 .type(dependency.getType().id())

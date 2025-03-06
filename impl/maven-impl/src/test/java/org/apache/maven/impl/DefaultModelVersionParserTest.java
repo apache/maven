@@ -30,6 +30,6 @@ class DefaultModelVersionParserTest {
     void parseVersion() {
         Version v = new DefaultModelVersionParser(new GenericVersionScheme()).parseVersion("");
         assertNotNull(v);
-        assertEquals("", v.asString());
+        assertEquals("", v.toString());
     }
 }

@@ -97,7 +97,7 @@ public interface Node {
      * @return the string representation
      */
     @Nonnull
-    String asString();
+    String toString();
 
     /**
      * Obtain a Stream containing this node and all its descendants.
