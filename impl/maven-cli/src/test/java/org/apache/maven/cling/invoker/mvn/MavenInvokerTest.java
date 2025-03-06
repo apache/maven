@@ -144,8 +144,10 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path userExtensions = userConf.resolve("extensions.xml");
         Files.writeString(userExtensions, extensionsXml);
 
+        // this should not throw
         assertDoesNotThrow(() -> invoke(cwd, userHome, List.of("validate"), List.of()));
-        // TODO: but warns
+        // but warn
+
         // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - Found 1 extension conflict(s):
         // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - * Conflicting extension
         // eu.maveniverse.maven.mimir:extension3: /tmp/junit-191051426131307150/.mvn/extensions.xml:3 vs
