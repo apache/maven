@@ -461,7 +461,7 @@ public abstract class BaseParser implements Parser {
             result.add(new CoreExtensions(file, loaded));
         }
 
-        return result.isEmpty() ? null : result;
+        return result.isEmpty() ? null : List.copyOf(result);
     }
 
     protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile) {
@@ -470,9 +470,9 @@ public abstract class BaseParser implements Parser {
                 try (InputStream is = Files.newInputStream(extensionsFile)) {
                     return validateCoreExtensionsDescriptorFromFile(
                             extensionsFile,
-                            new CoreExtensionsStaxReader()
+                            List.copyOf(new CoreExtensionsStaxReader()
                                     .read(is, true, new InputSource(extensionsFile.toString()))
-                                    .getExtensions());
+                                    .getExtensions()));
                 }
             }
             return List.of();
