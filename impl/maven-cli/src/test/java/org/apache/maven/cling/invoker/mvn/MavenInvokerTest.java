@@ -80,14 +80,14 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
-                        <groupId>eu.maveniverse.maven.mimir</groupId>
-                        <artifactId>extension3</artifactId>
-                        <version>0.3.4</version>
+                        <groupId>io.takari.maven</groupId>
+                        <artifactId>takari-smart-builder</artifactId>
+                        <version>1.0.2</version>
                     </extension>
                     <extension>
-                        <groupId>eu.maveniverse.maven.mimir</groupId>
-                        <artifactId>extension3</artifactId>
-                        <version>0.3.3</version>
+                        <groupId>io.takari.maven</groupId>
+                        <artifactId>takari-smart-builder</artifactId>
+                        <version>1.0.1</version>
                     </extension>
                 </extensions>
                 """;
@@ -101,9 +101,9 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
-                        <groupId>eu.maveniverse.maven.mimir</groupId>
-                        <artifactId>extension3</artifactId>
-                        <version>0.3.4</version>
+                        <groupId>io.takari.maven</groupId>
+                        <artifactId>takari-smart-builder</artifactId>
+                        <version>1.0.2</version>
                     </extension>
                 </extensions>
                 """;
@@ -128,9 +128,9 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
-                        <groupId>eu.maveniverse.maven.mimir</groupId>
-                        <artifactId>extension3</artifactId>
-                        <version>0.3.4</version>
+                        <groupId>io.takari.maven</groupId>
+                        <artifactId>takari-smart-builder</artifactId>
+                        <version>1.0.2</version>
                     </extension>
                 </extensions>
                 """;
