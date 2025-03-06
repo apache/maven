@@ -67,6 +67,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.slf4j.ILoggerFactory;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
 
 /**
@@ -77,12 +78,14 @@ import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
 public class PlexusContainerCapsuleFactory<C extends LookupContext> implements ContainerCapsuleFactory<C> {
     @Override
     public ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws Exception {
+        requireNonNull(invoker, "invoker");
+        requireNonNull(context, "context");
         return new PlexusContainerCapsule(
                 context, Thread.currentThread().getContextClassLoader(), container(invoker, context));
     }
 
     protected DefaultPlexusContainer container(LookupInvoker<C> invoker, C context) throws Exception {
-        ClassWorld classWorld = invoker.protoLookup.lookup(ClassWorld.class);
+        ClassWorld classWorld = requireNonNull(invoker.protoLookup.lookup(ClassWorld.class), "classWorld");
         ClassRealm coreRealm = classWorld.getClassRealm("plexus.core");
         List<Path> extClassPath = parseExtClasspath(context);
         CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom(coreRealm);

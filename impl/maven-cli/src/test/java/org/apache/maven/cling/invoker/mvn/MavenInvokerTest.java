@@ -48,10 +48,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Order(200)
 public class MavenInvokerTest extends MavenInvokerTestSupport {
     @Override
-    protected Invoker createInvoker() {
-        return new MavenInvoker(ProtoLookup.builder()
-                .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
-                .build());
+    protected Invoker createInvoker(ClassWorld classWorld) {
+        return new MavenInvoker(
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
     }
 
     @Override
