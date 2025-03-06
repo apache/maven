@@ -273,6 +273,9 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             Set<String> providedArtifacts,
             List<CoreExtension> extensions)
             throws Exception {
+        if (extensions.isEmpty()) {
+            return List.of();
+        }
         ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld(containerRealm.getWorld())
                 .setRealm(containerRealm)
