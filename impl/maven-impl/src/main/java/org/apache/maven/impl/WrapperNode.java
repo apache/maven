@@ -71,7 +71,7 @@ class WrapperNode extends AbstractNode {
 
     @Override
     @Nonnull
-    public String asString() {
-        return delegate.asString();
+    public String toString() {
+        return delegate.toString();
     }
 }

@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -95,7 +96,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
             if (o instanceof DefaultVersion defaultVersion) {
                 return delegate.compareTo(defaultVersion.delegate);
             } else {
-                return compareTo(new DefaultVersion(versionScheme, o.asString()));
+                return compareTo(new DefaultVersion(versionScheme, o.toString()));
             }
         }
 
@@ -117,13 +118,9 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         }
 
         @Override
-        public String asString() {
-            return delegate.toString();
-        }
-
-        @Override
+        @Nonnull
         public String toString() {
-            return asString();
+            return delegate.toString();
         }
     }
 
@@ -150,7 +147,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
             if (version instanceof DefaultVersion defaultVersion) {
                 return delegate.containsVersion(defaultVersion.delegate);
             } else {
-                return contains(new DefaultVersion(versionScheme, version.asString()));
+                return contains(new DefaultVersion(versionScheme, version.toString()));
             }
         }
 
@@ -238,7 +235,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
             if (version instanceof DefaultVersion defaultVersion) {
                 return delegate.containsVersion(defaultVersion.delegate);
             } else {
-                return contains(new DefaultVersion(versionScheme, version.asString()));
+                return contains(new DefaultVersion(versionScheme, version.toString()));
             }
         }
 

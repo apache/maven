@@ -77,8 +77,9 @@ public class DefaultNode extends AbstractNode {
     }
 
     @Override
-    public String asString() {
-        String nodeString = super.asString();
+    @Nonnull
+    public String toString() {
+        String nodeString = super.toString();
 
         if (!verbose) {
             return nodeString;

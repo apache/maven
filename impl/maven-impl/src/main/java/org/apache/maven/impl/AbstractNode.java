@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.Node;
 import org.apache.maven.api.NodeVisitor;
+import org.apache.maven.api.annotations.Nonnull;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
@@ -53,7 +54,8 @@ public abstract class AbstractNode implements Node {
     }
 
     @Override
-    public String asString() {
+    @Nonnull
+    public String toString() {
         StringBuilder sb = new StringBuilder();
 
         DependencyNode node = getDependencyNode();
@@ -66,10 +68,5 @@ public abstract class AbstractNode implements Node {
         }
 
         return sb.toString();
-    }
-
-    @Override
-    public String toString() {
-        return getDependencyNode().toString();
     }
 }
