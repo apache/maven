@@ -18,18 +18,21 @@
  */
 package org.apache.maven.cling.invoker;
 
+import java.util.List;
+
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.extensions.CoreExtension;
 
 /**
- * Container capsule factory.
+ * Core extension selector: selects which entries to load from {@link InvokerRequest#coreExtensions()}.
  *
  * @param <C> The context type.
  */
-public interface ContainerCapsuleFactory<C extends LookupContext> {
+public interface CoreExtensionSelector<C extends LookupContext> {
     /**
-     * Creates container capsule.
+     * Selects core extensions to be loaded from list of all sources detected.
      */
     @Nonnull
-    ContainerCapsule createContainerCapsule(
-            LookupInvoker<C> invoker, C context, CoreExtensionSelector<C> coreExtensionSelector) throws Exception;
+    List<CoreExtension> selectCoreExtensions(LookupInvoker<C> invoker, C context);
 }

@@ -27,7 +27,8 @@ import org.apache.maven.api.cli.extensions.CoreExtension;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Represents the list of core extensions, that may be configured in various places.
+ * Represents the list of core extensions configured at one source. The list is validated (are GA unique), but no
+ * other logic than that is applied.
  *
  * @since 4.0.0
  * @param source The source of core extensions, is never {@code null}.

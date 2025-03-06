@@ -23,23 +23,16 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
-import org.apache.maven.api.cli.CoreExtensions;
-import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.extensions.CoreExtension;
-import org.apache.maven.api.cli.extensions.InputLocation;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.cling.extensions.BootstrapCoreExtensionManager;
@@ -77,20 +70,29 @@ import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
  */
 public class PlexusContainerCapsuleFactory<C extends LookupContext> implements ContainerCapsuleFactory<C> {
     @Override
-    public ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws Exception {
+    public ContainerCapsule createContainerCapsule(
+            LookupInvoker<C> invoker, C context, CoreExtensionSelector<C> coreExtensionSelector) throws Exception {
         requireNonNull(invoker, "invoker");
         requireNonNull(context, "context");
+        requireNonNull(coreExtensionSelector, "coreExtensionSelector");
         return new PlexusContainerCapsule(
-                context, Thread.currentThread().getContextClassLoader(), container(invoker, context));
+                context,
+                Thread.currentThread().getContextClassLoader(),
+                container(invoker, context, coreExtensionSelector));
     }
 
-    protected DefaultPlexusContainer container(LookupInvoker<C> invoker, C context) throws Exception {
+    protected DefaultPlexusContainer container(
+            LookupInvoker<C> invoker, C context, CoreExtensionSelector<C> coreExtensionSelector) throws Exception {
         ClassWorld classWorld = requireNonNull(invoker.protoLookup.lookup(ClassWorld.class), "classWorld");
         ClassRealm coreRealm = classWorld.getClassRealm("plexus.core");
         List<Path> extClassPath = parseExtClasspath(context);
         CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom(coreRealm);
-        List<LoadedCoreExtension> loadedExtensions =
-                loadCoreExtensions(invoker, context, coreRealm, coreEntry.getExportedArtifacts());
+        List<LoadedCoreExtension> loadedExtensions = loadCoreExtensions(
+                invoker,
+                context,
+                coreRealm,
+                coreEntry.getExportedArtifacts(),
+                coreExtensionSelector.selectCoreExtensions(invoker, context));
         List<CoreExtensionEntry> loadedExtensionsEntries =
                 loadedExtensions.stream().map(LoadedCoreExtension::entry).toList();
         ClassRealm containerRealm =
@@ -264,74 +266,13 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         return coreRealm;
     }
 
-    /**
-     * Selects extensions to load discovered from various sources. Also reports conflicts.
-     */
-    protected List<CoreExtension> selectCoreExtensions(C context, List<CoreExtensions> configuredCoreExtensions) {
-        context.logger.debug("Configured core extensions:");
-        for (CoreExtensions source : configuredCoreExtensions) {
-            context.logger.debug("* " + source.source() + ":");
-            for (CoreExtension extension : source.coreExtensions()) {
-                context.logger.debug("  - " + extension.getId() + " -> " + formatLocation(extension.getLocation("")));
-            }
-        }
-
-        Map<CoreExtensions.Source, CoreExtensions> coreExtensionsBySource = configuredCoreExtensions.stream()
-                .collect(Collectors.toMap(CoreExtensions::source, Function.identity()));
-        LinkedHashMap<String, CoreExtension> selectedExtensions = new LinkedHashMap<>();
-        List<String> conflicts = new ArrayList<>();
-        for (CoreExtensions.Source source : CoreExtensions.Source.values()) {
-            CoreExtensions coreExtensions = coreExtensionsBySource.get(source);
-            if (coreExtensions != null) {
-                for (CoreExtension coreExtension : coreExtensions.coreExtensions()) {
-                    String key = coreExtension.getGroupId() + ":" + coreExtension.getArtifactId();
-                    CoreExtension conflict = selectedExtensions.putIfAbsent(key, coreExtension);
-                    if (conflict != null) {
-                        conflicts.add(String.format(
-                                "Conflicting extension %s: %s vs %s",
-                                key,
-                                formatLocation(conflict.getLocation("")),
-                                formatLocation(coreExtension.getLocation(""))));
-                    }
-                }
-            }
-        }
-        if (!conflicts.isEmpty()) {
-            context.logger.warn("Found " + conflicts.size() + " extension conflict(s):");
-            for (String conflict : conflicts) {
-                context.logger.warn("* " + conflict);
-            }
-            context.logger.warn("");
-            context.logger.warn(
-                    "Order of core extensions precedence is project > user > installation. Selected extensions are:");
-            for (CoreExtension extension : selectedExtensions.values()) {
-                context.logger.warn(
-                        "* " + extension.getId() + " configured in " + formatLocation(extension.getLocation("")));
-            }
-        }
-
-        context.logger.debug("Selected core extensions:");
-        for (CoreExtension source : selectedExtensions.values()) {
-            context.logger.debug("* " + source.getId() + ": " + formatLocation(source.getLocation("")));
-        }
-        return List.copyOf(selectedExtensions.values());
-    }
-
-    private String formatLocation(InputLocation location) {
-        return location.getSource().getLocation() + ":" + location.getLineNumber();
-    }
-
     protected List<LoadedCoreExtension> loadCoreExtensions(
-            LookupInvoker<C> invoker, C context, ClassRealm containerRealm, Set<String> providedArtifacts)
+            LookupInvoker<C> invoker,
+            C context,
+            ClassRealm containerRealm,
+            Set<String> providedArtifacts,
+            List<CoreExtension> extensions)
             throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
-        if (invokerRequest.coreExtensions().isEmpty()
-                || invokerRequest.coreExtensions().get().isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<CoreExtension> extensions =
-                selectCoreExtensions(context, invokerRequest.coreExtensions().get());
         ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld(containerRealm.getWorld())
                 .setRealm(containerRealm)
