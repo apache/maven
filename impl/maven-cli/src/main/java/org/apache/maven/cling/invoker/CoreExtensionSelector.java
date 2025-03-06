@@ -16,17 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cling.invoker;
+
+import java.util.List;
+
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.extensions.CoreExtension;
 
 /**
- * Provides support for Maven core extensions configuration and management.
+ * Core extension selector: selects which entries to load from {@link InvokerRequest#coreExtensions()}.
  *
- * <p>This package contains classes for:</p>
- * <ul>
- *   <li>Extension configuration model</li>
- *   <li>Extension loading and validation</li>
- *   <li>Extension lifecycle management</li>
- * </ul>
- *
- * @since 4.0.0
+ * @param <C> The context type.
  */
-package org.apache.maven.api.cli.extensions;
+public interface CoreExtensionSelector<C extends LookupContext> {
+    /**
+     * Selects core extensions to be loaded from list of all sources detected.
+     */
+    @Nonnull
+    List<CoreExtension> selectCoreExtensions(LookupInvoker<C> invoker, C context);
+}

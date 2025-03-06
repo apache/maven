@@ -31,13 +31,13 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
-import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.cling.extensions.BootstrapCoreExtensionManager;
 import org.apache.maven.cling.extensions.ExtensionConfigurationModule;
+import org.apache.maven.cling.extensions.LoadedCoreExtension;
 import org.apache.maven.cling.logging.Slf4jLoggerManager;
 import org.apache.maven.di.Injector;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -60,6 +60,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.slf4j.ILoggerFactory;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
 
 /**
@@ -69,20 +70,33 @@ import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
  */
 public class PlexusContainerCapsuleFactory<C extends LookupContext> implements ContainerCapsuleFactory<C> {
     @Override
-    public ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws Exception {
+    public ContainerCapsule createContainerCapsule(
+            LookupInvoker<C> invoker, C context, CoreExtensionSelector<C> coreExtensionSelector) throws Exception {
+        requireNonNull(invoker, "invoker");
+        requireNonNull(context, "context");
+        requireNonNull(coreExtensionSelector, "coreExtensionSelector");
         return new PlexusContainerCapsule(
-                context, Thread.currentThread().getContextClassLoader(), container(invoker, context));
+                context,
+                Thread.currentThread().getContextClassLoader(),
+                container(invoker, context, coreExtensionSelector));
     }
 
-    protected DefaultPlexusContainer container(LookupInvoker<C> invoker, C context) throws Exception {
-        ClassWorld classWorld = invoker.protoLookup.lookup(ClassWorld.class);
+    protected DefaultPlexusContainer container(
+            LookupInvoker<C> invoker, C context, CoreExtensionSelector<C> coreExtensionSelector) throws Exception {
+        ClassWorld classWorld = requireNonNull(invoker.protoLookup.lookup(ClassWorld.class), "classWorld");
         ClassRealm coreRealm = classWorld.getClassRealm("plexus.core");
         List<Path> extClassPath = parseExtClasspath(context);
         CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom(coreRealm);
-        List<CoreExtensionEntry> extensions =
-                loadCoreExtensions(invoker, context, coreRealm, coreEntry.getExportedArtifacts());
+        List<LoadedCoreExtension> loadedExtensions = loadCoreExtensions(
+                invoker,
+                context,
+                coreRealm,
+                coreEntry.getExportedArtifacts(),
+                coreExtensionSelector.selectCoreExtensions(invoker, context));
+        List<CoreExtensionEntry> loadedExtensionsEntries =
+                loadedExtensions.stream().map(LoadedCoreExtension::entry).toList();
         ClassRealm containerRealm =
-                setupContainerRealm(context.logger, classWorld, coreRealm, extClassPath, extensions);
+                setupContainerRealm(context.logger, classWorld, coreRealm, extClassPath, loadedExtensionsEntries);
         ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld(classWorld)
                 .setRealm(containerRealm)
@@ -95,8 +109,8 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
 
         CoreExports exports = new CoreExports(
                 containerRealm,
-                collectExportedArtifacts(coreEntry, extensions),
-                collectExportedPackages(coreEntry, extensions));
+                collectExportedArtifacts(coreEntry, loadedExtensionsEntries),
+                collectExportedPackages(coreEntry, loadedExtensionsEntries));
         Thread.currentThread().setContextClassLoader(containerRealm);
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, getCustomModule(context, exports));
 
@@ -113,24 +127,35 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             }
             return value;
         };
-        for (CoreExtensionEntry extension : extensions) {
+        List<Throwable> failures = new ArrayList<>();
+        for (LoadedCoreExtension extension : loadedExtensions) {
             container.discoverComponents(
-                    extension.getClassRealm(),
+                    extension.entry().getClassRealm(),
                     new AbstractModule() {
                         @Override
                         protected void configure() {
                             try {
-                                container.lookup(Injector.class).discover(extension.getClassRealm());
+                                container
+                                        .lookup(Injector.class)
+                                        .discover(extension.entry().getClassRealm());
                             } catch (Throwable e) {
-                                context.logger.warn("Maven DI failure", e);
+                                failures.add(new IllegalStateException(
+                                        "Injection failure in "
+                                                + extension.coreExtension().getId(),
+                                        e));
                             }
                         }
                     },
                     new SessionScopeModule(container.lookup(SessionScope.class)),
                     new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
-                    new ExtensionConfigurationModule(extension, extensionSource));
+                    new ExtensionConfigurationModule(extension.entry(), extensionSource));
         }
-
+        if (!failures.isEmpty()) {
+            IllegalStateException mavenDiFailed = new IllegalStateException(
+                    "Maven dependency injection failed for at least one of the registered core extension");
+            failures.forEach(mavenDiFailed::addSuppressed);
+            throw mavenDiFailed;
+        }
         container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
         customizeContainer(context, container);
 
@@ -241,16 +266,16 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         return coreRealm;
     }
 
-    protected List<CoreExtensionEntry> loadCoreExtensions(
-            LookupInvoker<C> invoker, C context, ClassRealm containerRealm, Set<String> providedArtifacts)
+    protected List<LoadedCoreExtension> loadCoreExtensions(
+            LookupInvoker<C> invoker,
+            C context,
+            ClassRealm containerRealm,
+            Set<String> providedArtifacts,
+            List<CoreExtension> extensions)
             throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
-        if (invokerRequest.coreExtensions().isEmpty()
-                || invokerRequest.coreExtensions().get().isEmpty()) {
-            return Collections.emptyList();
+        if (extensions.isEmpty()) {
+            return List.of();
         }
-
-        List<CoreExtension> extensions = invokerRequest.coreExtensions().get();
         ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld(containerRealm.getWorld())
                 .setRealm(containerRealm)

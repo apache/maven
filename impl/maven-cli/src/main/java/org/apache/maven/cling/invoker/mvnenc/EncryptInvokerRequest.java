@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cli.CoreExtensions;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.BaseInvokerRequest;
 
@@ -44,7 +44,7 @@ public class EncryptInvokerRequest extends BaseInvokerRequest {
             Map<String, String> systemProperties,
             Path topDirectory,
             Path rootDirectory,
-            List<CoreExtension> coreExtensions,
+            List<CoreExtensions> coreExtensions,
             EncryptOptions options) {
         super(
                 parserRequest,

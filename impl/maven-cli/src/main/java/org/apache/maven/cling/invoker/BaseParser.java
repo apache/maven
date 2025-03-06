@@ -34,14 +34,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.CoreExtensions;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.cli.extensions.InputLocation;
+import org.apache.maven.api.cli.extensions.InputSource;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cling.props.MavenPropertiesLoader;
@@ -79,7 +83,9 @@ public abstract class BaseParser implements Parser {
         @Nullable
         public Path rootDirectory;
 
-        public List<CoreExtension> extensions;
+        @Nullable
+        public List<CoreExtensions> extensions;
+
         public Options options;
 
         public Map<String, String> extraInterpolationSource() {
@@ -425,59 +431,73 @@ public abstract class BaseParser implements Parser {
 
     protected abstract Options assembleOptions(List<Options> parsedOptions);
 
-    protected List<CoreExtension> readCoreExtensionsDescriptor(LocalContext context) {
-        String installationExtensionsFile = context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS);
-        ArrayList<CoreExtension> installationExtensions = new ArrayList<>(readCoreExtensionsDescriptorFromFile(
-                context.installationDirectory.resolve(installationExtensionsFile)));
+    /**
+     * Important: This method must return list of {@link CoreExtensions} in precedence order.
+     */
+    protected List<CoreExtensions> readCoreExtensionsDescriptor(LocalContext context) {
+        ArrayList<CoreExtensions> result = new ArrayList<>();
+        Path file;
+        List<CoreExtension> loaded;
 
-        String userExtensionsFile = context.userProperties.get(Constants.MAVEN_USER_EXTENSIONS);
-        ArrayList<CoreExtension> userExtensions = new ArrayList<>(
-                readCoreExtensionsDescriptorFromFile(context.userHomeDirectory.resolve(userExtensionsFile)));
-
-        String projectExtensionsFile = context.userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS);
-        ArrayList<CoreExtension> projectExtensions =
-                new ArrayList<>(readCoreExtensionsDescriptorFromFile(context.cwd.resolve(projectExtensionsFile)));
-
-        // merge these 3 but check for GA uniqueness; we don't want to load up same extension w/ different Vs
-        HashMap<String, String> gas = new HashMap<>();
-        ArrayList<String> conflicts = new ArrayList<>();
-
-        ArrayList<CoreExtension> coreExtensions =
-                new ArrayList<>(installationExtensions.size() + userExtensions.size() + projectExtensions.size());
-        coreExtensions.addAll(mergeExtensions(installationExtensions, installationExtensionsFile, gas, conflicts));
-        coreExtensions.addAll(mergeExtensions(userExtensions, userExtensionsFile, gas, conflicts));
-        coreExtensions.addAll(mergeExtensions(projectExtensions, projectExtensionsFile, gas, conflicts));
-
-        if (!conflicts.isEmpty()) {
-            throw new IllegalStateException("Extension conflicts: " + String.join("; ", conflicts));
+        // project
+        file = context.cwd.resolve(context.userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS));
+        loaded = readCoreExtensionsDescriptorFromFile(file);
+        if (!loaded.isEmpty()) {
+            result.add(new CoreExtensions(file, loaded));
         }
 
-        return coreExtensions;
-    }
-
-    private List<CoreExtension> mergeExtensions(
-            List<CoreExtension> extensions, String extensionsSource, Map<String, String> gas, List<String> conflicts) {
-        for (CoreExtension extension : extensions) {
-            String ga = extension.getGroupId() + ":" + extension.getArtifactId();
-            if (gas.containsKey(ga)) {
-                conflicts.add(ga + " from " + extensionsSource + " already specified in " + gas.get(ga));
-            } else {
-                gas.put(ga, extensionsSource);
-            }
+        // user
+        file = context.userHomeDirectory.resolve(context.userProperties.get(Constants.MAVEN_USER_EXTENSIONS));
+        loaded = readCoreExtensionsDescriptorFromFile(file);
+        if (!loaded.isEmpty()) {
+            result.add(new CoreExtensions(file, loaded));
         }
-        return extensions;
+
+        // installation
+        file = context.installationDirectory.resolve(
+                context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
+        loaded = readCoreExtensionsDescriptorFromFile(file);
+        if (!loaded.isEmpty()) {
+            result.add(new CoreExtensions(file, loaded));
+        }
+
+        return result.isEmpty() ? null : List.copyOf(result);
     }
 
     protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile) {
         try {
             if (extensionsFile != null && Files.exists(extensionsFile)) {
                 try (InputStream is = Files.newInputStream(extensionsFile)) {
-                    return new CoreExtensionsStaxReader().read(is, true).getExtensions();
+                    return validateCoreExtensionsDescriptorFromFile(
+                            extensionsFile,
+                            List.copyOf(new CoreExtensionsStaxReader()
+                                    .read(is, true, new InputSource(extensionsFile.toString()))
+                                    .getExtensions()));
                 }
             }
             return List.of();
         } catch (XMLStreamException | IOException e) {
             throw new IllegalArgumentException("Failed to parse extensions file: " + extensionsFile, e);
         }
+    }
+
+    protected List<CoreExtension> validateCoreExtensionsDescriptorFromFile(
+            Path extensionFile, List<CoreExtension> coreExtensions) {
+        Map<String, List<InputLocation>> gasLocations = new HashMap<>();
+        for (CoreExtension coreExtension : coreExtensions) {
+            String ga = coreExtension.getGroupId() + ":" + coreExtension.getArtifactId();
+            InputLocation location = coreExtension.getLocation("");
+            gasLocations.computeIfAbsent(ga, k -> new ArrayList<>()).add(location);
+        }
+        if (gasLocations.values().stream().noneMatch(l -> l.size() > 1)) {
+            return coreExtensions;
+        }
+        throw new IllegalStateException("Extension conflicts in file " + extensionFile + ": "
+                + gasLocations.entrySet().stream()
+                        .map(e -> e.getKey() + " defined on lines "
+                                + e.getValue().stream()
+                                        .map(l -> String.valueOf(l.getLineNumber()))
+                                        .collect(Collectors.joining(", ")))
+                        .collect(Collectors.joining("; ")));
     }
 }

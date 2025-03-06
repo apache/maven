@@ -60,6 +60,7 @@ import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.cli.extensions.InputSource;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.building.FileSource;
@@ -858,7 +859,9 @@ public class MavenCli {
             Path extensionsPath = Path.of(extensionsFile);
             if (Files.exists(extensionsPath)) {
                 try (InputStream is = Files.newInputStream(extensionsPath)) {
-                    return new CoreExtensionsStaxReader().read(is, true).getExtensions();
+                    return new CoreExtensionsStaxReader()
+                            .read(is, true, new InputSource(extensionsFile))
+                            .getExtensions();
                 }
             }
         }

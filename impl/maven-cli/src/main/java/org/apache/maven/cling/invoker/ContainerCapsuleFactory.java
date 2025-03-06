@@ -30,5 +30,6 @@ public interface ContainerCapsuleFactory<C extends LookupContext> {
      * Creates container capsule.
      */
     @Nonnull
-    ContainerCapsule createContainerCapsule(LookupInvoker<C> invoker, C context) throws Exception;
+    ContainerCapsule createContainerCapsule(
+            LookupInvoker<C> invoker, C context, CoreExtensionSelector<C> coreExtensionSelector) throws Exception;
 }

@@ -261,6 +261,7 @@ under the License.
           <params>
             <param>packageModelV4=org.apache.maven.api.cli.extensions</param>
             <param>packageToolV4=org.apache.maven.cling.internal.extension.io</param>
+            <param>locationTracking=true</param>
           </params>
           <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
         </configuration>

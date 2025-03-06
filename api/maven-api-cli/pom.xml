@@ -59,6 +59,8 @@
             <template>model.vm</template>
           </templates>
           <params>
+            <param>locationTracking=true</param>
+            <param>generateLocationClasses=true</param>
             <param>packageModelV4=org.apache.maven.api.cli.extensions</param>
             <param>packageToolV4=org.apache.maven.cli.internal.extension.io</param>
           </params>

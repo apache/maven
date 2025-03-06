@@ -503,12 +503,17 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void container(C context) throws Exception {
         if (context.lookup == null) {
-            context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
+            context.containerCapsule = createContainerCapsuleFactory()
+                    .createContainerCapsule(this, context, createCoreExtensionSelector());
             context.closeables.add(context::closeContainer);
             context.lookup = context.containerCapsule.getLookup();
         } else {
             context.containerCapsule.updateLogging(context);
         }
+    }
+
+    protected CoreExtensionSelector<C> createCoreExtensionSelector() {
+        return new PrecedenceCoreExtensionSelector<>();
     }
 
     protected ContainerCapsuleFactory<C> createContainerCapsuleFactory() {

@@ -317,7 +317,7 @@ public interface ParserRequest {
                     command,
                     commandName,
                     List.copyOf(args),
-                    logger,
+                    lookup.lookupOptional(Logger.class).orElse(logger),
                     messageBuilderFactory,
                     lookup,
                     cwd,

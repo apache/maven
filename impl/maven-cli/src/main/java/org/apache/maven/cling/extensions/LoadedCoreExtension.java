@@ -16,17 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cling.extensions;
+
+import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.extension.internal.CoreExtensionEntry;
 
 /**
- * Provides support for Maven core extensions configuration and management.
- *
- * <p>This package contains classes for:</p>
- * <ul>
- *   <li>Extension configuration model</li>
- *   <li>Extension loading and validation</li>
- *   <li>Extension lifecycle management</li>
- * </ul>
- *
- * @since 4.0.0
+ * Represents a core extension that has been selected to be loaded.
+ * @param coreExtension The extension configuration entry with location tracking.
+ * @param entry The loaded entry with descriptor.
  */
-package org.apache.maven.api.cli.extensions;
+public record LoadedCoreExtension(CoreExtension coreExtension, CoreExtensionEntry entry) {}
