@@ -38,7 +38,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class XmlNodeBuilder {
     private static final boolean DEFAULT_TRIM = true;
 
-    public static XmlNodeImpl build(Reader reader) throws XmlPullParserException, IOException {
+    public static XmlNode build(Reader reader) throws XmlPullParserException, IOException {
         return build(reader, (InputLocationBuilder) null);
     }
 
@@ -50,23 +50,23 @@ public class XmlNodeBuilder {
      * @throws XmlPullParserException XML well-formedness error
      * @throws IOException I/O error reading file or stream
      */
-    public static XmlNodeImpl build(Reader reader, InputLocationBuilder locationBuilder)
+    public static XmlNode build(Reader reader, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
         return build(reader, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static XmlNodeImpl build(InputStream is, String encoding) throws XmlPullParserException, IOException {
+    public static XmlNode build(InputStream is, String encoding) throws XmlPullParserException, IOException {
         return build(is, encoding, DEFAULT_TRIM);
     }
 
-    public static XmlNodeImpl build(InputStream is, String encoding, boolean trim)
+    public static XmlNode build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
         XmlPullParser parser = new MXParser();
         parser.setInput(is, encoding);
         return build(parser, trim);
     }
 
-    public static XmlNodeImpl build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
+    public static XmlNode build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
         return build(reader, trim, null);
     }
 
@@ -79,18 +79,18 @@ public class XmlNodeBuilder {
      * @throws XmlPullParserException XML well-formedness error
      * @throws IOException I/O error reading file or stream
      */
-    public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
+    public static XmlNode build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
         XmlPullParser parser = new MXParser();
         parser.setInput(reader);
         return build(parser, trim, locationBuilder);
     }
 
-    public static XmlNodeImpl build(XmlPullParser parser) throws XmlPullParserException, IOException {
+    public static XmlNode build(XmlPullParser parser) throws XmlPullParserException, IOException {
         return build(parser, DEFAULT_TRIM);
     }
 
-    public static XmlNodeImpl build(XmlPullParser parser, boolean trim) throws XmlPullParserException, IOException {
+    public static XmlNode build(XmlPullParser parser, boolean trim) throws XmlPullParserException, IOException {
         return build(parser, trim, null);
     }
 
@@ -103,7 +103,7 @@ public class XmlNodeBuilder {
      * @throws XmlPullParserException XML well-formedness error
      * @throws IOException I/O error reading file or stream
      */
-    public static XmlNodeImpl build(XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder)
+    public static XmlNode build(XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
         boolean spacePreserve = false;
         String name = null;
@@ -143,7 +143,7 @@ public class XmlNodeBuilder {
                 }
                 value = value != null ? value + text : text;
             } else if (eventType == XmlPullParser.END_TAG) {
-                return new XmlNodeImpl(
+                return XmlNode.newInstance(
                         name,
                         children == null ? (value != null ? value : emptyTag ? null : "") : null,
                         attrs,
