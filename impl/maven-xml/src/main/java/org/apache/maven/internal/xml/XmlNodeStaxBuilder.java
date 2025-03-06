@@ -38,27 +38,27 @@ import org.apache.maven.api.xml.XmlNode;
 public class XmlNodeStaxBuilder {
     private static final boolean DEFAULT_TRIM = true;
 
-    public static XmlNodeImpl build(InputStream stream, InputLocationBuilderStax locationBuilder)
+    public static XmlNode build(InputStream stream, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
         XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(stream);
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static XmlNodeImpl build(Reader reader, InputLocationBuilderStax locationBuilder) throws XMLStreamException {
+    public static XmlNode build(Reader reader, InputLocationBuilderStax locationBuilder) throws XMLStreamException {
         XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(reader);
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static XmlNodeImpl build(XMLStreamReader parser) throws XMLStreamException {
+    public static XmlNode build(XMLStreamReader parser) throws XMLStreamException {
         return build(parser, DEFAULT_TRIM, null);
     }
 
-    public static XmlNodeImpl build(XMLStreamReader parser, InputLocationBuilderStax locationBuilder)
+    public static XmlNode build(XMLStreamReader parser, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static XmlNodeImpl build(XMLStreamReader parser, boolean trim, InputLocationBuilderStax locationBuilder)
+    public static XmlNode build(XMLStreamReader parser, boolean trim, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
         boolean spacePreserve = false;
         String lPrefix = null;
@@ -116,14 +116,15 @@ public class XmlNodeStaxBuilder {
                 if (lValue != null && trim && !spacePreserve) {
                     lValue = lValue.trim();
                 }
-                return new XmlNodeImpl(
-                        lPrefix,
-                        lNamespaceUri,
-                        lName,
-                        children == null ? (lValue != null ? lValue : emptyTag ? null : "") : null,
-                        attrs,
-                        children,
-                        location);
+                return XmlNode.newBuilder()
+                        .prefix(lPrefix)
+                        .namespaceUri(lNamespaceUri)
+                        .name(lName)
+                        .value(children == null ? (lValue != null ? lValue : emptyTag ? null : "") : null)
+                        .attributes(attrs)
+                        .children(children)
+                        .inputLocation(location)
+                        .build();
             }
             eventType = parser.next();
         }

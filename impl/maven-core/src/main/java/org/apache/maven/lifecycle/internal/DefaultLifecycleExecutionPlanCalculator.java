@@ -36,8 +36,8 @@ import java.util.Set;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Execution;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Phase;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
@@ -286,7 +286,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 ? mojoExecution.getConfiguration().getDom()
                 : null;
         if (executionConfiguration == null) {
-            executionConfiguration = new XmlNodeImpl("configuration");
+            executionConfiguration = XmlNode.newInstance("configuration");
         }
 
         XmlNode defaultConfiguration = getMojoConfiguration(mojoDescriptor);
@@ -303,7 +303,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
 
                 if (parameterConfiguration != null) {
-                    parameterConfiguration = parameterConfiguration.merge(parameterDefaults, Boolean.TRUE);
+                    parameterConfiguration = XmlService.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 } else {
                     parameterConfiguration = parameterDefaults;
                 }
@@ -318,7 +318,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                         attributes.put("implementation", parameter.getImplementation());
                     }
 
-                    parameterConfiguration = new XmlNodeImpl(
+                    parameterConfiguration = XmlNode.newInstance(
                             parameter.getName(),
                             parameterConfiguration.getValue(),
                             attributes,
@@ -329,7 +329,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 }
             }
         }
-        XmlNode finalConfiguration = new XmlNodeImpl("configuration", null, null, children, null);
+        XmlNode finalConfiguration = XmlNode.newInstance("configuration", children);
 
         mojoExecution.setConfiguration(finalConfiguration);
     }
@@ -516,7 +516,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                         if (config != null) {
                             XmlNode forkedConfiguration = config.getDom();
 
-                            forkedConfiguration = phaseConfiguration.merge(forkedConfiguration);
+                            forkedConfiguration = XmlService.merge(phaseConfiguration, forkedConfiguration);
 
                             forkedExecution.setConfiguration(forkedConfiguration);
                         }
