@@ -431,27 +431,36 @@ public abstract class BaseParser implements Parser {
 
     protected abstract Options assembleOptions(List<Options> parsedOptions);
 
+    /**
+     * Important: This method must return list of {@link CoreExtensions} in precedence order.
+     */
     protected List<CoreExtensions> readCoreExtensionsDescriptor(LocalContext context) {
         ArrayList<CoreExtensions> result = new ArrayList<>();
+        Path file;
         List<CoreExtension> loaded;
 
-        loaded = readCoreExtensionsDescriptorFromFile(context.installationDirectory.resolve(
-                context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS)));
+        // project
+        file = context.cwd.resolve(context.userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS));
+        loaded = readCoreExtensionsDescriptorFromFile(file);
         if (!loaded.isEmpty()) {
-            result.add(new CoreExtensions(CoreExtensions.Source.INSTALLATION, loaded));
+            result.add(new CoreExtensions(file, loaded));
         }
 
-        loaded = readCoreExtensionsDescriptorFromFile(
-                context.userHomeDirectory.resolve(context.userProperties.get(Constants.MAVEN_USER_EXTENSIONS)));
+        // user
+        file = context.userHomeDirectory.resolve(context.userProperties.get(Constants.MAVEN_USER_EXTENSIONS));
+        loaded = readCoreExtensionsDescriptorFromFile(file);
         if (!loaded.isEmpty()) {
-            result.add(new CoreExtensions(CoreExtensions.Source.USER, loaded));
+            result.add(new CoreExtensions(file, loaded));
         }
 
-        loaded = readCoreExtensionsDescriptorFromFile(
-                context.cwd.resolve(context.userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS)));
+        // installation
+        file = context.installationDirectory.resolve(
+                context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
+        loaded = readCoreExtensionsDescriptorFromFile(file);
         if (!loaded.isEmpty()) {
-            result.add(new CoreExtensions(CoreExtensions.Source.PROJECT, loaded));
+            result.add(new CoreExtensions(file, loaded));
         }
+
         return result.isEmpty() ? null : result;
     }
 

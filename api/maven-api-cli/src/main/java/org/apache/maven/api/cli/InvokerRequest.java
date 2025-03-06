@@ -174,6 +174,8 @@ public interface InvokerRequest {
      * Returns a list of core extensions from all sources, that were discovered and loaded. Each instance of
      * {@link CoreExtensions} is validated, but the list elements may have overlapping elements, that requires
      * some logic to sort out (like precedence).
+     * <p>
+     * The list of {@link CoreExtensions} if present, is in precedence order.
      *
      * @return an {@link Optional} containing the {@link CoreExtensions}, or empty if not configured
      */

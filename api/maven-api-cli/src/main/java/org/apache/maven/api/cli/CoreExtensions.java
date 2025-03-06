@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.cli;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.maven.api.Constants;
@@ -31,30 +32,16 @@ import static java.util.Objects.requireNonNull;
  * other logic than that is applied.
  *
  * @since 4.0.0
- * @param source The source of core extensions, is never {@code null}.
+ * @param source The source file of core extensions, is never {@code null}.
  * @param coreExtensions The configured core extensions, is never {@code null}. Contents of list is guaranteed to be unique by GA.
+ *
+ * @see Constants#MAVEN_PROJECT_EXTENSIONS
+ * @see Constants#MAVEN_USER_EXTENSIONS
+ * @see Constants#MAVEN_INSTALLATION_EXTENSIONS
  */
 @Experimental
-public record CoreExtensions(Source source, List<CoreExtension> coreExtensions) {
-    /**
-     * Represents the source of configured core extensions and their precedence.
-     */
-    public enum Source {
-        /**
-         * Value indicating that the source is project {@link Constants#MAVEN_PROJECT_EXTENSIONS}
-         */
-        PROJECT,
-        /**
-         * Value indicating that the source is user env {@link Constants#MAVEN_USER_EXTENSIONS}
-         */
-        USER,
-        /**
-         * Value indicating that the source is user env {@link Constants#MAVEN_INSTALLATION_EXTENSIONS}
-         */
-        INSTALLATION;
-    }
-
-    public CoreExtensions(Source source, List<CoreExtension> coreExtensions) {
+public record CoreExtensions(Path source, List<CoreExtension> coreExtensions) {
+    public CoreExtensions(Path source, List<CoreExtension> coreExtensions) {
         this.source = requireNonNull(source, "source");
         this.coreExtensions = requireNonNull(coreExtensions, "coreExtensions");
     }

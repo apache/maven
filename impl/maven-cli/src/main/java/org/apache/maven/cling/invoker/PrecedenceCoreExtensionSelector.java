@@ -21,9 +21,7 @@ package org.apache.maven.cling.invoker;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.apache.maven.api.cli.CoreExtensions;
 import org.apache.maven.api.cli.InvokerRequest;
@@ -33,9 +31,8 @@ import org.apache.maven.api.cli.extensions.InputLocation;
 public class PrecedenceCoreExtensionSelector<C extends LookupContext> implements CoreExtensionSelector<C> {
     @Override
     public List<CoreExtension> selectCoreExtensions(LookupInvoker<C> invoker, C context) {
-        InvokerRequest invokerRequest = context.invokerRequest;
-        if (invokerRequest.coreExtensions().isEmpty()
-                || invokerRequest.coreExtensions().get().isEmpty()) {
+        Optional<List<CoreExtensions>> coreExtensions = context.invokerRequest.coreExtensions();
+        if (coreExtensions.isEmpty() || coreExtensions.get().isEmpty()) {
             return List.of();
         }
 
@@ -44,34 +41,31 @@ public class PrecedenceCoreExtensionSelector<C extends LookupContext> implements
     }
 
     /**
-     * Selects extensions to load discovered from various sources. Also reports conflicts.
+     * Selects extensions to load discovered from various sources by precedence ("first wins"), as
+     * {@link InvokerRequest#coreExtensions()} is in precedence order. Also reports conflicts, if any.
+     * Finally, at DEBUG level reports configured vs selected extensions.
      */
     protected List<CoreExtension> selectCoreExtensions(C context, List<CoreExtensions> configuredCoreExtensions) {
-        context.logger.debug("Configured core extensions:");
+        context.logger.debug("Configured core extensions (in precedence order):");
         for (CoreExtensions source : configuredCoreExtensions) {
-            context.logger.debug("* " + source.source() + ":");
+            context.logger.debug("* Source file: " + source.source());
             for (CoreExtension extension : source.coreExtensions()) {
                 context.logger.debug("  - " + extension.getId() + " -> " + formatLocation(extension.getLocation("")));
             }
         }
 
-        Map<CoreExtensions.Source, CoreExtensions> coreExtensionsBySource = configuredCoreExtensions.stream()
-                .collect(Collectors.toMap(CoreExtensions::source, Function.identity()));
         LinkedHashMap<String, CoreExtension> selectedExtensions = new LinkedHashMap<>();
         List<String> conflicts = new ArrayList<>();
-        for (CoreExtensions.Source source : CoreExtensions.Source.values()) {
-            CoreExtensions coreExtensions = coreExtensionsBySource.get(source);
-            if (coreExtensions != null) {
-                for (CoreExtension coreExtension : coreExtensions.coreExtensions()) {
-                    String key = coreExtension.getGroupId() + ":" + coreExtension.getArtifactId();
-                    CoreExtension conflict = selectedExtensions.putIfAbsent(key, coreExtension);
-                    if (conflict != null) {
-                        conflicts.add(String.format(
-                                "Conflicting extension %s: %s vs %s",
-                                key,
-                                formatLocation(conflict.getLocation("")),
-                                formatLocation(coreExtension.getLocation(""))));
-                    }
+        for (CoreExtensions coreExtensions : configuredCoreExtensions) {
+            for (CoreExtension coreExtension : coreExtensions.coreExtensions()) {
+                String key = coreExtension.getGroupId() + ":" + coreExtension.getArtifactId();
+                CoreExtension conflict = selectedExtensions.putIfAbsent(key, coreExtension);
+                if (conflict != null) {
+                    conflicts.add(String.format(
+                            "Conflicting extension %s: %s vs %s",
+                            key,
+                            formatLocation(conflict.getLocation("")),
+                            formatLocation(coreExtension.getLocation(""))));
                 }
             }
         }
@@ -89,7 +83,7 @@ public class PrecedenceCoreExtensionSelector<C extends LookupContext> implements
             }
         }
 
-        context.logger.debug("Selected core extensions:");
+        context.logger.debug("Selected core extensions (in loading order):");
         for (CoreExtension source : selectedExtensions.values()) {
             context.logger.debug("* " + source.getId() + ": " + formatLocation(source.getLocation("")));
         }
