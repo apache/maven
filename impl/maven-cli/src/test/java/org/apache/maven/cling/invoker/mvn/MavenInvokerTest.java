@@ -112,9 +112,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path userExtensions = userConf.resolve("extensions.xml");
         Files.writeString(userExtensions, userExtensionsXml);
 
-        InvokerException e =
-                assertThrows(InvokerException.class, () -> invoke(cwd, userHome, List.of("validate"), List.of()));
-        System.out.println(e.getMessage());
+        assertThrows(InvokerException.class, () -> invoke(cwd, userHome, List.of("validate"), List.of()));
     }
 
     /**
