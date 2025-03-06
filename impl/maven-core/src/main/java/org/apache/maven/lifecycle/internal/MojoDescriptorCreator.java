@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -95,7 +94,7 @@ public class MojoDescriptorCreator {
     public static XmlNode convert(org.apache.maven.api.plugin.descriptor.MojoDescriptor mojoDescriptor) {
         List<XmlNode> children = mojoDescriptor.getParameters().stream()
                 .filter(p -> p.getDefaultValue() != null || p.getExpression() != null)
-                .map(p -> new XmlNodeImpl(
+                .map(p -> XmlNode.newInstance(
                         p.getName(),
                         p.getExpression(),
                         p.getDefaultValue() != null
@@ -104,7 +103,7 @@ public class MojoDescriptorCreator {
                         null,
                         null))
                 .collect(Collectors.toList());
-        return new XmlNodeImpl("configuration", null, null, children, null);
+        return XmlNode.newInstance("configuration", children);
     }
 
     public static org.codehaus.plexus.util.xml.Xpp3Dom convert(MojoDescriptor mojoDescriptor) {
@@ -117,7 +116,7 @@ public class MojoDescriptorCreator {
                 String value = ce.getValue(null);
                 String defaultValue = ce.getAttribute("default-value", null);
                 if (value != null || defaultValue != null) {
-                    XmlNodeImpl e = new XmlNodeImpl(
+                    XmlNode e = XmlNode.newInstance(
                             ce.getName(),
                             value,
                             defaultValue != null ? Collections.singletonMap("default-value", defaultValue) : null,
@@ -128,7 +127,7 @@ public class MojoDescriptorCreator {
             }
         }
 
-        XmlNodeImpl dom = new XmlNodeImpl("configuration", null, null, children, null);
+        XmlNode dom = XmlNode.newInstance("configuration", children);
         return new org.codehaus.plexus.util.xml.Xpp3Dom(dom);
     }
 

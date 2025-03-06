@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.maven.internal.xml.XmlNodeImpl;
+import org.apache.maven.api.xml.XmlNode;
 
 /**
  * An attribute iterator for JXPath to support <code>Xpp3Dom</code>.
@@ -35,7 +35,7 @@ class Xpp3DomAttributeIterator implements NodeIterator {
 
     private NodePointer parent;
 
-    private XmlNodeImpl node;
+    private XmlNode node;
 
     private List<Map.Entry<String, String>> attributes;
 
@@ -45,7 +45,7 @@ class Xpp3DomAttributeIterator implements NodeIterator {
 
     public Xpp3DomAttributeIterator(NodePointer parent, QName qname) {
         this.parent = parent;
-        this.node = (XmlNodeImpl) parent.getNode();
+        this.node = (XmlNode) parent.getNode();
 
         this.attributes = this.node.getAttributes().entrySet().stream()
                 .filter(a -> a.getKey().equals(qname.getName()) || "*".equals(qname.getName()))

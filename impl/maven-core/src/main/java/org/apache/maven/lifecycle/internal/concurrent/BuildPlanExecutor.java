@@ -46,6 +46,7 @@ import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
@@ -58,7 +59,6 @@ import org.apache.maven.impl.util.PhasingExecutor;
 import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -830,7 +830,7 @@ public class BuildPlanExecutor {
                 ? mojoExecution.getConfiguration().getDom()
                 : null;
         if (executionConfiguration == null) {
-            executionConfiguration = new XmlNodeImpl("configuration");
+            executionConfiguration = XmlNode.newInstance("configuration");
         }
 
         XmlNode defaultConfiguration = getMojoConfiguration(mojoDescriptor);
@@ -847,7 +847,7 @@ public class BuildPlanExecutor {
                 XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
 
                 if (parameterConfiguration != null) {
-                    parameterConfiguration = parameterConfiguration.merge(parameterDefaults, Boolean.TRUE);
+                    parameterConfiguration = XmlService.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 } else {
                     parameterConfiguration = parameterDefaults;
                 }
@@ -862,7 +862,7 @@ public class BuildPlanExecutor {
                         attributes.put("implementation", parameter.getImplementation());
                     }
 
-                    parameterConfiguration = new XmlNodeImpl(
+                    parameterConfiguration = XmlNode.newInstance(
                             parameter.getName(),
                             parameterConfiguration.getValue(),
                             attributes,
@@ -873,7 +873,7 @@ public class BuildPlanExecutor {
                 }
             }
         }
-        XmlNode finalConfiguration = new XmlNodeImpl("configuration", null, null, children, null);
+        XmlNode finalConfiguration = XmlNode.newInstance("configuration", children);
 
         mojoExecution.setConfiguration(finalConfiguration);
     }

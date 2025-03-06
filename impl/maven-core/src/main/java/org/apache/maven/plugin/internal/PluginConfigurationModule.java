@@ -23,7 +23,6 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
@@ -40,7 +39,7 @@ class PluginConfigurationModule implements Module {
         if (plugin.getKey() != null) {
             XmlNode configuration = plugin.getConfiguration();
             if (configuration == null) {
-                configuration = new XmlNodeImpl("configuration");
+                configuration = XmlNode.newInstance("configuration");
             }
             binder.bind(XmlNode.class)
                     .annotatedWith(Names.named(plugin.getKey()))

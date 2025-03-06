@@ -71,6 +71,7 @@ import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
 
@@ -794,9 +795,10 @@ public class DefaultModelValidator implements ModelValidator {
     private void validateXmlNode(
             ModelProblemCollector problems, String fieldPathPrefix, InputLocationTracker tracker, XmlNode xmlNode) {
         String childrenCombinationModeAttribute = xmlNode.getAttributes()
-                .getOrDefault(XmlNode.CHILDREN_COMBINATION_MODE_ATTRIBUTE, XmlNode.DEFAULT_CHILDREN_COMBINATION_MODE);
-        if (!(XmlNode.CHILDREN_COMBINATION_APPEND.equals(childrenCombinationModeAttribute)
-                || XmlNode.CHILDREN_COMBINATION_MERGE.equals(childrenCombinationModeAttribute))) {
+                .getOrDefault(
+                        XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE, XmlService.DEFAULT_CHILDREN_COMBINATION_MODE);
+        if (!(XmlService.CHILDREN_COMBINATION_APPEND.equals(childrenCombinationModeAttribute)
+                || XmlService.CHILDREN_COMBINATION_MERGE.equals(childrenCombinationModeAttribute))) {
             addViolation(
                     problems,
                     Severity.ERROR,
@@ -806,16 +808,16 @@ public class DefaultModelValidator implements ModelValidator {
                             ? xmlNode.getInputLocation().toString()
                             : null,
                     "Unsupported value '" + childrenCombinationModeAttribute + "' for "
-                            + XmlNode.CHILDREN_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
-                            + XmlNode.CHILDREN_COMBINATION_APPEND + ", and " + XmlNode.CHILDREN_COMBINATION_MERGE
-                            + " (default is: " + XmlNode.DEFAULT_SELF_COMBINATION_MODE + ")",
+                            + XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
+                            + XmlService.CHILDREN_COMBINATION_APPEND + ", and " + XmlService.CHILDREN_COMBINATION_MERGE
+                            + " (default is: " + XmlService.DEFAULT_SELF_COMBINATION_MODE + ")",
                     tracker);
         }
         String selfCombinationModeAttribute = xmlNode.getAttributes()
-                .getOrDefault(XmlNode.SELF_COMBINATION_MODE_ATTRIBUTE, XmlNode.DEFAULT_SELF_COMBINATION_MODE);
-        if (!(XmlNode.SELF_COMBINATION_OVERRIDE.equals(selfCombinationModeAttribute)
-                || XmlNode.SELF_COMBINATION_MERGE.equals(selfCombinationModeAttribute)
-                || XmlNode.SELF_COMBINATION_REMOVE.equals(selfCombinationModeAttribute))) {
+                .getOrDefault(XmlService.SELF_COMBINATION_MODE_ATTRIBUTE, XmlService.DEFAULT_SELF_COMBINATION_MODE);
+        if (!(XmlService.SELF_COMBINATION_OVERRIDE.equals(selfCombinationModeAttribute)
+                || XmlService.SELF_COMBINATION_MERGE.equals(selfCombinationModeAttribute)
+                || XmlService.SELF_COMBINATION_REMOVE.equals(selfCombinationModeAttribute))) {
             addViolation(
                     problems,
                     Severity.ERROR,
@@ -825,10 +827,10 @@ public class DefaultModelValidator implements ModelValidator {
                             ? xmlNode.getInputLocation().toString()
                             : null,
                     "Unsupported value '" + selfCombinationModeAttribute + "' for "
-                            + XmlNode.SELF_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
-                            + XmlNode.SELF_COMBINATION_OVERRIDE + ", " + XmlNode.SELF_COMBINATION_MERGE + ", and "
-                            + XmlNode.SELF_COMBINATION_REMOVE
-                            + " (default is: " + XmlNode.DEFAULT_SELF_COMBINATION_MODE + ")",
+                            + XmlService.SELF_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
+                            + XmlService.SELF_COMBINATION_OVERRIDE + ", " + XmlService.SELF_COMBINATION_MERGE + ", and "
+                            + XmlService.SELF_COMBINATION_REMOVE
+                            + " (default is: " + XmlService.DEFAULT_SELF_COMBINATION_MODE + ")",
                     tracker);
         }
     }
