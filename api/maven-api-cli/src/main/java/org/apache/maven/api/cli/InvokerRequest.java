@@ -28,7 +28,6 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilderFactory;
 
@@ -172,12 +171,12 @@ public interface InvokerRequest {
     }
 
     /**
-     * Returns a list of core extensions, if configured in the .mvn/extensions.xml file.
+     * Returns a list of core extensions.
      *
-     * @return an {@link Optional} containing the list of core extensions, or empty if not configured
+     * @return an {@link Optional} containing the {@link CoreExtensions}, or empty if not configured
      */
     @Nonnull
-    Optional<List<CoreExtension>> coreExtensions();
+    Optional<List<CoreExtensions>> coreExtensions();
 
     /**
      * Returns the options associated with this invocation request.

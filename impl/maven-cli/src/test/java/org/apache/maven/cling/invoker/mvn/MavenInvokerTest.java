@@ -37,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -66,8 +67,61 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         invoke(cwd, userHome, List.of("verify"), List.of());
     }
 
+    /**
+     * Same source (user or project extensions.xml) must not contain same GA with different V.
+     */
     @Test
-    void conflictingExtensions(
+    void conflictingExtensionsFromSameSource(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String projectExtensionsXml =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <extensions>
+                    <extension>
+                        <groupId>eu.maveniverse.maven.mimir</groupId>
+                        <artifactId>extension3</artifactId>
+                        <version>0.3.4</version>
+                    </extension>
+                    <extension>
+                        <groupId>eu.maveniverse.maven.mimir</groupId>
+                        <artifactId>extension3</artifactId>
+                        <version>0.3.3</version>
+                    </extension>
+                </extensions>
+                """;
+        Path dotMvn = cwd.resolve(".mvn");
+        Files.createDirectories(dotMvn);
+        Path projectExtensions = dotMvn.resolve("extensions.xml");
+        Files.writeString(projectExtensions, projectExtensionsXml);
+
+        String userExtensionsXml =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <extensions>
+                    <extension>
+                        <groupId>eu.maveniverse.maven.mimir</groupId>
+                        <artifactId>extension3</artifactId>
+                        <version>0.3.4</version>
+                    </extension>
+                </extensions>
+                """;
+        Path userConf = userHome.resolve(".m2");
+        Files.createDirectories(userConf);
+        Path userExtensions = userConf.resolve("extensions.xml");
+        Files.writeString(userExtensions, userExtensionsXml);
+
+        InvokerException e =
+                assertThrows(InvokerException.class, () -> invoke(cwd, userHome, List.of("validate"), List.of()));
+        System.out.println(e.getMessage());
+    }
+
+    /**
+     * In case of conflict spanning different sources, precedence is applied: project > user > installation.
+     */
+    @Test
+    void conflictingExtensionsFromDifferentSource(
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
@@ -92,7 +146,17 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path userExtensions = userConf.resolve("extensions.xml");
         Files.writeString(userExtensions, extensionsXml);
 
-        assertThrows(InvokerException.class, () -> invoke(cwd, userHome, List.of("validate"), List.of()));
+        assertDoesNotThrow(() -> invoke(cwd, userHome, List.of("validate"), List.of()));
+        // TODO: but warns
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - Found 1 extension conflict(s):
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - * Conflicting extension
+        // eu.maveniverse.maven.mimir:extension3: /tmp/junit-191051426131307150/.mvn/extensions.xml:3 vs
+        // /tmp/junit-16591192886395443631/.m2/extensions.xml:3
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory -
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - Order of core extensions
+        // precedence is project > user > installation. Selected extensions are:
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - *
+        // eu.maveniverse.maven.mimir:extension3:0.3.4 configured in /tmp/junit-191051426131307150/.mvn/extensions.xml:3
     }
 
     @Test
