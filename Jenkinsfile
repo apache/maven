@@ -21,11 +21,11 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 
 def buildOs = 'linux'
 def buildJdk = '17'
-def buildMvn = '3.8.x'
+def buildMvn = '4.0.0-rc-2'
 def runITsOses = ['linux']
 def runITsJdks = ['17', '21']
-def runITsMvn = '3.8.x'
-def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
+def runITsMvn = '4.0.0-rc-2'
+def runITscommand = "mvn clean install -Prun-its -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
 try {
@@ -41,19 +41,19 @@ node(jenkinsEnv.nodeSelection(osNode)) {
         def MAVEN_GOAL='verify'
 
         stage('Configure deploy') {
-           if (env.BRANCH_NAME in ['master', 'maven-3.8.x', 'maven-3.9.x']){
+           if (env.BRANCH_NAME in ['master', 'maven-3.9.x']){
                MAVEN_GOAL='deploy'
            }
         }
 
         stage('Build / Unit Test') {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
-            String mvnName = jenkinsEnv.mvnFromVersion(buildOs, buildMvn)
             try {
                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
-                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
-                         "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {                   
-                    sh "mvn clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -PversionlessMavenDist -Dmaven.repo.local=${WORK_DIR}/.repository"
+                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool 'maven_latest'}/bin",
+                         "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
+                    sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
+                    sh "./mvnw clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -Dmaven.repo.local=${WORK_DIR}/.repository"
                 }
             } finally {
                 junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml', allowEmptyResults: true
@@ -67,7 +67,6 @@ for (String os in runITsOses) {
     for (def jdk in runITsJdks) {
         String osLabel = jenkinsEnv.labelForOS(os);
         String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
-        String mvnName = jenkinsEnv.mvnFromVersion(os, "${runITsMvn}")
         echo "OS: ${os} JDK: ${jdk} => Label: ${osLabel} JDK: ${jdkName}"
 
         String stageId = "${os}-jdk${jdk}"
@@ -85,13 +84,15 @@ for (String os in runITsOses) {
                             dir ('maven') {
                                 checkout scm
                                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
-                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
+                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool 'maven_latest'}/bin",
                                          "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
-                                    sh "mvn clean install -B -U -e -DskipTests -V -PversionlessMavenDist -Dmaven.repo.local=${WORK_DIR}/.repository"
+                                    sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
+                                    sh "./mvnw clean install -B -U -e -DskipTests -PversionlessMavenDist -V -DdistributionTargetDir=${WORK_DIR}/.apache-maven-master -Dmaven.repo.local=${WORK_DIR}/.repository"
                                 }
                             }
                             dir ('its') {
-                                def ITS_BRANCH = env.CHANGE_BRANCH != null ? env.CHANGE_BRANCH :  env.BRANCH_NAME;
+                                //def ITS_BRANCH = env.CHANGE_BRANCH != null ? env.CHANGE_BRANCH :  env.BRANCH_NAME;
+                                def ITS_BRANCH = "maven-4.x "
                                 try {
                                   echo "Checkout ITs from branch: ${ITS_BRANCH}"
                                   checkout([$class: 'GitSCM',
@@ -108,9 +109,13 @@ for (String os in runITsOses) {
 
                                 try {
                                     withEnv(["JAVA_HOME=${ tool "$jdkName" }",
-                                                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
+                                                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool 'maven_latest'}/bin",
                                                 "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
-                                        String cmd = "${runITscommand} -Dmaven.repo.local=$WORK_DIR/.repository -DmavenDistro=$WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip -Dmaven.test.failure.ignore"
+                                        sh "echo build dist"
+                                        sh "ls -lrt $WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip"
+                                        sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
+                                        sh "mvn package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.repository/cached"
+                                        String cmd = "${runITscommand} -Dmaven.repo.local=$HOME/.repository/local -Dmaven.repo.local.tail=$HOME/.repository/cached -DmavenDistro=$WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip -Dmaven.test.failure.ignore"
 
                                         if (isUnix()) {
                                             sh 'df -hT'
