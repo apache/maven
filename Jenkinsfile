@@ -50,7 +50,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
             try {
                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
-                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool maven_latest}/bin",
+                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool 'maven_latest'}/bin",
                          "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
                     sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
                     sh "./mvnw clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -Dmaven.repo.local=${WORK_DIR}/.repository"
@@ -84,7 +84,7 @@ for (String os in runITsOses) {
                             dir ('maven') {
                                 checkout scm
                                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
-                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool maven_latest}/bin",
+                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool 'maven_latest'}/bin",
                                          "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
                                     sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
                                     sh "./mvnw clean install -B -U -e -DskipTests -V -PversionlessMavenDist -Dmaven.repo.local=${WORK_DIR}/.repository"
@@ -109,7 +109,7 @@ for (String os in runITsOses) {
 
                                 try {
                                     withEnv(["JAVA_HOME=${ tool "$jdkName" }",
-                                                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool maven_latest}/bin",
+                                                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool 'maven_latest'}/bin",
                                                 "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
                                         sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
                                         String cmd = "${runITscommand} -Dmaven.repo.local=$WORK_DIR/.repository -DmavenDistro=$WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip -Dmaven.test.failure.ignore"
