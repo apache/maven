@@ -114,7 +114,8 @@ for (String os in runITsOses) {
                                         sh "echo build dist"
                                         sh "ls -lrt $WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip"
                                         sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
-                                        String cmd = "${runITscommand} -Dmaven.repo.local=$WORK_DIR/.repository -DmavenDistro=$WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip -Dmaven.test.failure.ignore"
+                                        sh "mvn package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.repository/cached"
+                                        String cmd = "${runITscommand} -Dmaven.repo.local=$HOME/.repository/local -Dmaven.repo.local.tail=$HOME/.repository/cached -DmavenDistro=$WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip -Dmaven.test.failure.ignore"
 
                                         if (isUnix()) {
                                             sh 'df -hT'
