@@ -25,7 +25,7 @@ def buildMvn = 'maven3'
 def runITsOses = ['linux']
 def runITsJdks = ['17', '21']
 def runITsMvn = 'maven3'
-def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
+def runITscommand = "mvn clean install -Prun-its -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
 try {
