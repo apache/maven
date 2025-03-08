@@ -21,10 +21,10 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 
 def buildOs = 'linux'
 def buildJdk = '17'
-def buildMvn = '3.8.x'
+def buildMvn = 'maven3'
 def runITsOses = ['linux']
 def runITsJdks = ['17', '21']
-def runITsMvn = '3.8.x'
+def runITsMvn = 'maven3'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
@@ -41,7 +41,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
         def MAVEN_GOAL='verify'
 
         stage('Configure deploy') {
-           if (env.BRANCH_NAME in ['master', 'maven-3.8.x', 'maven-3.9.x']){
+           if (env.BRANCH_NAME in ['master', 'maven-3.9.x']){
                MAVEN_GOAL='deploy'
            }
         }
