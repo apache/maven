@@ -87,7 +87,7 @@ for (String os in runITsOses) {
                                          "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool 'maven_latest'}/bin",
                                          "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
                                     sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
-                                    sh "./mvnw clean install -B -U -e -DskipTests -V -DdistributionTargetDir=${WORK_DIR}/.apache-maven-master -Dmaven.repo.local=${WORK_DIR}/.repository"
+                                    sh "./mvnw clean install -B -U -e -DskipTests -PversionlessMavenDist -V -DdistributionTargetDir=${WORK_DIR}/.apache-maven-master -Dmaven.repo.local=${WORK_DIR}/.repository"
                                 }
                             }
                             dir ('its') {
