@@ -25,7 +25,7 @@ def buildMvn = '4.0.0-rc-2'
 def runITsOses = ['linux']
 def runITsJdks = ['17', '21']
 def runITsMvn = '4.0.0-rc-2'
-def runITscommand = "mvnw clean install -Prun-its -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
+def runITscommand = "mvn clean install -Prun-its -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
 try {
