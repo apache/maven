@@ -91,7 +91,8 @@ for (String os in runITsOses) {
                                 }
                             }
                             dir ('its') {
-                                def ITS_BRANCH = env.CHANGE_BRANCH != null ? env.CHANGE_BRANCH :  env.BRANCH_NAME;
+                                //def ITS_BRANCH = env.CHANGE_BRANCH != null ? env.CHANGE_BRANCH :  env.BRANCH_NAME;
+                                def ITS_BRANCH = "maven-4.x "
                                 try {
                                   echo "Checkout ITs from branch: ${ITS_BRANCH}"
                                   checkout([$class: 'GitSCM',
