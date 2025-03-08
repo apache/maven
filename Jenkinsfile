@@ -53,7 +53,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                          "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
                          "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {                   
-                    sh "mvn clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -PversionlessMavenDist -Dmaven.repo.local=${WORK_DIR}/.repository"
+                    sh "mvn clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -Dmaven.repo.local=${WORK_DIR}/.repository"
                 }
             } finally {
                 junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml', allowEmptyResults: true
