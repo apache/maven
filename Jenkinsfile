@@ -116,7 +116,7 @@ for (String os in runITsOses) {
                                         sh "ls -lrt ${WORK_DIR}/.apache-maven-master/"
                                         sh "mvn package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.repository/cached"
                                         String cmd = "mvn clean install -Prun-its -B -U -V -Dmaven.repo.local=$HOME/.repository/local -Dmaven.repo.local.tail=$HOME/.repository/cached -Dmaven.test.failure.ignore"
-                                        sh "running its "
+                                        sh "echo running its "
                                         if (isUnix()) {
                                             sh 'df -hT'
                                             sh "${cmd}"
