@@ -21,11 +21,10 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 
 def buildOs = 'linux'
 def buildJdk = '17'
-def buildMvn = '4.0.0-rc-2'
+def buildMvn = '3.9.9'
 def runITsOses = ['linux']
 def runITsJdks = ['17', '21']
-def runITsMvn = '4.0.0-rc-2'
-def runITscommand = "mvn clean install -Prun-its -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
+def runITsMvn = '3.9.9'
 def tests
 
 try {
@@ -109,13 +108,14 @@ for (String os in runITsOses) {
 
                                 try {
                                     withEnv(["JAVA_HOME=${ tool "$jdkName" }",
-                                                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool 'maven_latest'}/bin",
+                                                "PATH+MAVEN=${ tool "$jdkName" }/bin:${WORK_DIR}/.apache-maven-master/bin",
+                                                "MAVEN_HOME=${WORK_DIR}/.apache-maven-master/bin",
                                                 "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
                                         sh "echo build dist"
                                         sh "ls -lrt $WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip"
                                         sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
                                         sh "mvn package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.repository/cached"
-                                        String cmd = "${runITscommand} -Dmaven.repo.local=$HOME/.repository/local -Dmaven.repo.local.tail=$HOME/.repository/cached -DmavenDistro=$WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip -Dmaven.test.failure.ignore"
+                                        String cmd = "mvn clean install -Prun-its -B -U -V -Dmaven.repo.local=$HOME/.repository/local -Dmaven.repo.local.tail=$HOME/.repository/cached -Dmaven.test.failure.ignore"
 
                                         if (isUnix()) {
                                             sh 'df -hT'
