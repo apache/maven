@@ -113,10 +113,10 @@ for (String os in runITsOses) {
                                                 "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
                                         sh "echo build dist"
                                         sh "ls -lrt $WORK_DIR/maven/apache-maven/target/apache-maven-bin.zip"
-                                        sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${buildMvn}"
+                                        sh "ls -lrt ${WORK_DIR}/.apache-maven-master/"
                                         sh "mvn package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=$HOME/.repository/cached"
                                         String cmd = "mvn clean install -Prun-its -B -U -V -Dmaven.repo.local=$HOME/.repository/local -Dmaven.repo.local.tail=$HOME/.repository/cached -Dmaven.test.failure.ignore"
-
+                                        sh "running its "
                                         if (isUnix()) {
                                             sh 'df -hT'
                                             sh "${cmd}"
