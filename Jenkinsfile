@@ -18,7 +18,7 @@ pipeline {
           steps {
               timeout(time: 210, unit: 'MINUTES') {
                   checkout scm
-                  mavenBuild("jdk_17_latest", "", "3.9.9") // javadoc:javadoc
+                  mavenBuild("jdk_17_latest", "") // javadoc:javadoc
         //              recordIssues id: "analysis-jdk17", name: "Static Analysis jdk17", aggregatingResults: true, enabledForFailure: true,
         //                            tools: [mavenConsole(), java(), checkStyle(), errorProne(), spotBugs(), javaDoc()],
         //                            skipPublishingChecks: true, skipBlames: true
@@ -36,7 +36,7 @@ pipeline {
                 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME == 'master' ? '30' : '5'))])
               }
               checkout scm
-              mavenBuild("jdk_21_latest", "-Dspotbugs.skip=true -Djacoco.skip=true", "maven3")
+              mavenBuild("jdk_21_latest", "-Dspotbugs.skip=true -Djacoco.skip=true")
             }
           }
         }
@@ -53,13 +53,13 @@ pipeline {
  * @param jdk the jdk tool name (in jenkins) to use for this build
  * @param extraArgs extra command line args
  */
-def mavenBuild(jdk, extraArgs, mvnVersion) {
+def mavenBuild(jdk, extraArgs) {
   script {
     try {
       withEnv(["JAVA_HOME=${tool "$jdk"}",
                "PATH+MAVEN=${ tool "$jdk" }/bin:${tool "maven_3_latest"}/bin",
                "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
-        sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${mvnVersion}"
+        sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=3.9.9"
         sh "./mvnw clean install -B -U -e -DskipTests -PversionlessMavenDist -V -DdistributionTargetDir=${env.WORKSPACE}/.apache-maven-master"
         sh "./mvnw package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/cached"
         sh "./mvnw install -Dmaven.home=${env.WORKSPACE}/.apache-maven-master -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/local -Dmaven.repo.local.tail=${WORKDIR}/.repository/cached"
