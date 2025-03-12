@@ -17,7 +17,7 @@
  * under the License.
  */
 
-properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'5':'1'))])
+properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'10':'5'))])
 
 def buildOs = 'linux'
 def buildJdk = '17'
