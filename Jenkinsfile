@@ -60,9 +60,9 @@ def mavenBuild(jdk, extraArgs, mvnVersion) {
                "PATH+MAVEN=${ tool "$jdk" }/bin:${tool "maven_3_latest"}/bin",
                "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
         sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${mvnVersion}"
-        sh "./mvnw clean install -B -U -e -DskipTests -PversionlessMavenDist -V -DdistributionTargetDir=${WORK_DIR}/.apache-maven-master"
-        sh "./mvnw package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=${WORKDIR}/.repository/cached"
-        sh "./mvnw install -Dmaven.home=${WORK_DIR}/.apache-maven-master -e -B -V -Prun-its -Dmaven.repo.local=${WORKDIR}/.repository/local -Dmaven.repo.local.tail=${WORKDIR}/.repository/cached"
+        sh "./mvnw clean install -B -U -e -DskipTests -PversionlessMavenDist -V -DdistributionTargetDir=${env.WORKSPACE}/.apache-maven-master"
+        sh "./mvnw package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/cached"
+        sh "./mvnw install -Dmaven.home=${env.WORKSPACE}/.apache-maven-master -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/local -Dmaven.repo.local.tail=${WORKDIR}/.repository/cached"
       }
     }
     finally {
