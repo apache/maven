@@ -18,7 +18,7 @@ pipeline {
           steps {
               timeout(time: 210, unit: 'MINUTES') {
                   checkout scm
-                  mavenBuild("jdk17", "", "3.9.9") // javadoc:javadoc
+                  mavenBuild("jdk_17_latest", "", "3.9.9") // javadoc:javadoc
         //              recordIssues id: "analysis-jdk17", name: "Static Analysis jdk17", aggregatingResults: true, enabledForFailure: true,
         //                            tools: [mavenConsole(), java(), checkStyle(), errorProne(), spotBugs(), javaDoc()],
         //                            skipPublishingChecks: true, skipBlames: true
@@ -36,7 +36,7 @@ pipeline {
                 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME == 'master' ? '30' : '5'))])
               }
               checkout scm
-              mavenBuild("jdk21", "-Dspotbugs.skip=true -Djacoco.skip=true", "maven3")
+              mavenBuild("jdk_21_latest", "-Dspotbugs.skip=true -Djacoco.skip=true", "maven3")
             }
           }
         }
