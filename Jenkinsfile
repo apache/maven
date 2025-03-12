@@ -61,7 +61,11 @@ def mavenBuild(jdk, extraArgs) {
                "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
         sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=3.9.9"
         sh "./mvnw clean install -B -U -e -DskipTests -PversionlessMavenDist -V -DdistributionTargetDir=${env.WORKSPACE}/.apache-maven-master"
+        // we use two steps so that we can cache artifacts downloaded from Maven Central repository
+        // without installing any local artifacts to not pollute the cache
+        sh "echo install Its"
         sh "./mvnw package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/cached"
+        sh "echo run Its"
         sh "./mvnw install -Dmaven.home=${env.WORKSPACE}/.apache-maven-master -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/local -Dmaven.repo.local.tail=${WORKDIR}/.repository/cached"
       }
     }
