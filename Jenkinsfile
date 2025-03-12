@@ -56,8 +56,8 @@ pipeline {
 def mavenBuild(jdk, extraArgs, mvnVersion) {
   script {
     try {
-
       withEnv(["JAVA_HOME=${tool "$jdk"}",
+               "PATH+MAVEN=${ tool "$jdk" }/bin:${tool "maven_3_latest"}/bin",
                "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
         sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=${mvnVersion}"
         sh "./mvnw clean install -B -U -e -DskipTests -PversionlessMavenDist -V -DdistributionTargetDir=${WORK_DIR}/.apache-maven-master"
