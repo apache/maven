@@ -795,6 +795,7 @@ under the License.</licenseText>
             <inherited>false</inherited>
             <configuration>
               <excludes>
+                <exclude>Jenkinsfile</exclude>
                 <exclude>**/.gitattributes</exclude>
                 <exclude>src/test/resources*/**</exclude>
                 <exclude>src/test/projects/**</exclude>
