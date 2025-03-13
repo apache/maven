@@ -132,7 +132,7 @@ public class BootstrapCoreExtensionManager {
         this.interpolator = interpolator;
     }
 
-    public List<CoreExtensionEntry> loadCoreExtensions(
+    public List<LoadedCoreExtension> loadCoreExtensions(
             MavenExecutionRequest request, Set<String> providedArtifacts, List<CoreExtension> extensions)
             throws Exception {
         try (CloseableSession repoSession = repositorySystemSessionFactory
@@ -150,14 +150,14 @@ public class BootstrapCoreExtensionManager {
         }
     }
 
-    private List<CoreExtensionEntry> resolveCoreExtensions(
+    private List<LoadedCoreExtension> resolveCoreExtensions(
             RepositorySystemSession repoSession,
             List<RemoteRepository> repositories,
             Set<String> providedArtifacts,
             List<CoreExtension> configuration,
             UnaryOperator<String> interpolator)
             throws Exception {
-        List<CoreExtensionEntry> extensions = new ArrayList<>();
+        List<LoadedCoreExtension> extensions = new ArrayList<>();
 
         DependencyFilter dependencyFilter = new ExclusionsDependencyFilter(providedArtifacts);
 
@@ -165,7 +165,7 @@ public class BootstrapCoreExtensionManager {
             List<Artifact> artifacts =
                     resolveExtension(extension, repoSession, repositories, dependencyFilter, interpolator);
             if (!artifacts.isEmpty()) {
-                extensions.add(createExtension(extension, artifacts));
+                extensions.add(new LoadedCoreExtension(extension, createExtension(extension, artifacts)));
             }
         }
 

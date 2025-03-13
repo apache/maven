@@ -32,6 +32,7 @@ import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
+import org.codehaus.plexus.classworlds.ClassWorld;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -99,7 +100,8 @@ public abstract class MavenInvokerTestSupport {
 
         HashMap<String, String> logs = new HashMap<>();
         Parser parser = createParser();
-        try (Invoker invoker = createInvoker()) {
+        try (ClassWorld classWorld = createClassWorld();
+                Invoker invoker = createInvoker(classWorld)) {
             for (String goal : goals) {
                 ByteArrayOutputStream stdout = new ByteArrayOutputStream();
                 ByteArrayOutputStream stderr = new ByteArrayOutputStream();
@@ -134,7 +136,11 @@ public abstract class MavenInvokerTestSupport {
         return logs;
     }
 
-    protected abstract Invoker createInvoker();
+    protected ClassWorld createClassWorld() {
+        return new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader());
+    }
+
+    protected abstract Invoker createInvoker(ClassWorld classWorld);
 
     protected abstract Parser createParser();
 }

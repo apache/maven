@@ -43,10 +43,9 @@ import org.junit.jupiter.api.io.TempDir;
 public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
 
     @Override
-    protected Invoker createInvoker() {
-        return new ResidentMavenInvoker(ProtoLookup.builder()
-                .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
-                .build());
+    protected Invoker createInvoker(ClassWorld classWorld) {
+        return new ResidentMavenInvoker(
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
     }
 
     @Override

@@ -25,9 +25,9 @@ import java.util.Optional;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.CoreExtensions;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.extensions.CoreExtension;
 
 import static java.util.Objects.requireNonNull;
 
@@ -41,7 +41,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     private final Map<String, String> systemProperties;
     private final Path topDirectory;
     private final Path rootDirectory;
-    private final List<CoreExtension> coreExtensions;
+    private final List<CoreExtensions> coreExtensions;
 
     @SuppressWarnings("ParameterNumber")
     public BaseInvokerRequest(
@@ -54,7 +54,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
             @Nonnull Map<String, String> systemProperties,
             @Nonnull Path topDirectory,
             @Nullable Path rootDirectory,
-            @Nullable List<CoreExtension> coreExtensions) {
+            @Nullable List<CoreExtensions> coreExtensions) {
         this.parserRequest = requireNonNull(parserRequest);
         this.parsingFailed = parsingFailed;
         this.cwd = requireNonNull(cwd);
@@ -114,7 +114,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     }
 
     @Override
-    public Optional<List<CoreExtension>> coreExtensions() {
+    public Optional<List<CoreExtensions>> coreExtensions() {
         return Optional.ofNullable(coreExtensions);
     }
 }
