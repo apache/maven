@@ -701,7 +701,7 @@ under the License.
           <version>3.5.2</version>
           <configuration>
             <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
-            <argLine>-Xmx256m</argLine>
+            <argLine>-Xmx256m ${jacocoArgLine}</argLine>
           </configuration>
         </plugin>
         <plugin>
@@ -1101,6 +1101,9 @@ under the License.</licenseText>
                   <goal>prepare-agent</goal>
                 </goals>
                 <phase>initialize</phase>
+                <configuration>
+                  <propertyName>jacocoArgLine</propertyName>
+                </configuration>
               </execution>
               <!--              <execution>-->
               <!--                <id>jacoco-setup-m-invoker-p</id>-->
