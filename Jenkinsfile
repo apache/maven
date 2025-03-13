@@ -25,13 +25,14 @@ pipeline {
                   recordCoverage id: "coverage-jdk17", name: "Coverage jdk17", tools: [[parser: 'JACOCO']], sourceCodeRetention: 'MODIFIED',
                                  sourceDirectories: [[path: 'src/main/java']]
                 script {
-                  //if (env.BRANCH_NAME == 'master') {
-                  withEnv(["JAVA_HOME=${tool "jdk_17_latest"}",
-                           "PATH+MAVEN=${ tool "jdk_17_latest" }/bin:${tool "maven_3_latest"}/bin",
-                           "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
-                    sh "mvn clean deploy -DdeployAtEnd=true -B"
+                  properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME == 'master' ? '30' : '5'))])
+                  if (env.BRANCH_NAME == 'master') {
+                    withEnv(["JAVA_HOME=${tool "jdk_17_latest"}",
+                             "PATH+MAVEN=${ tool "jdk_17_latest" }/bin:${tool "maven_3_latest"}/bin",
+                             "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
+                      sh "mvn clean deploy -DdeployAtEnd=true -B"
+                    }
                   }
-                  //}
                 }
               }
           }
@@ -41,9 +42,6 @@ pipeline {
           agent { node { label 'ubuntu' } }
           steps {
             timeout(time: 210, unit: 'MINUTES') {
-              script {
-                properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME == 'master' ? '30' : '5'))])
-              }
               checkout scm
               mavenBuild("jdk_21_latest", "-Dspotbugs.skip=true -Djacoco.skip=true")
             }
