@@ -75,6 +75,7 @@ under the License.
 
     <maven-version>4.0.0-rc-3-SNAPSHOT</maven-version>
     <maven-plugin-tools-version>3.15.1</maven-plugin-tools-version>
+    <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
   <dependencyManagement>
