@@ -18,12 +18,12 @@ pipeline {
           steps {
               timeout(time: 210, unit: 'MINUTES') {
                   checkout scm
-                  mavenBuild("jdk_17_latest", "") // javadoc:javadoc
+                  mavenBuild("jdk_17_latest", "-Pjacoco") // javadoc:javadoc
         //              recordIssues id: "analysis-jdk17", name: "Static Analysis jdk17", aggregatingResults: true, enabledForFailure: true,
         //                            tools: [mavenConsole(), java(), checkStyle(), errorProne(), spotBugs(), javaDoc()],
         //                            skipPublishingChecks: true, skipBlames: true
-                    recordCoverage id: "coverage-jdk17", name: "Coverage jdk17", tools: [[parser: 'JACOCO']], sourceCodeRetention: 'MODIFIED',
-                                   sourceDirectories: [[path: 'src/main/java']]
+                  recordCoverage id: "coverage-jdk17", name: "Coverage jdk17", tools: [[parser: 'JACOCO']], sourceCodeRetention: 'MODIFIED',
+                                 sourceDirectories: [[path: 'src/main/java']]
               }
           }
         }
@@ -66,7 +66,7 @@ def mavenBuild(jdk, extraArgs) {
         sh "echo install Its"
         sh "./mvnw package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/cached"
         sh "echo run Its"
-        sh "./mvnw install -Dmaven.home=${env.WORKSPACE}/.apache-maven-master -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/local -Dmaven.repo.local.tail=${env.WORKSPACE}/.repository/cached"
+        sh "./mvnw install $extraArgs -Dmaven.home=${env.WORKSPACE}/.apache-maven-master -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/local -Dmaven.repo.local.tail=${env.WORKSPACE}/.repository/cached"
       }
     }
     finally {

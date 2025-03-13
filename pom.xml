@@ -769,6 +769,11 @@ under the License.</licenseText>
             <includePom>true</includePom>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.12</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -1067,6 +1072,50 @@ under the License.</licenseText>
       <modules>
         <module>its</module>
       </modules>
+    </profile>
+    <profile>
+      <id>jacoco</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <configuration>
+            <executions>
+              <execution>
+                <id>jacoco-initialize</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+                <phase>initialize</phase>
+              </execution>
+<!--              <execution>-->
+<!--                <id>jacoco-setup-m-invoker-p</id>-->
+<!--                <goals>-->
+<!--                  <goal>prepare-agent</goal>-->
+<!--                </goals>-->
+<!--                <phase>initialize</phase>-->
+<!--                <configuration>-->
+<!--                  &lt;!&ndash; Enable recording of coverage during execution of maven-invoker-plugin &ndash;&gt;-->
+<!--                  <propertyName>invoker.mavenOpts</propertyName>-->
+<!--                </configuration>-->
+<!--              </execution>-->
+              <execution>
+                <id>jacoco-site</id>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <includes>
+                    <include>**/org/apache/maven/**</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
