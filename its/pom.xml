@@ -60,6 +60,10 @@ under the License.
     <url>https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven/</url>
   </ciManagement>
   <distributionManagement>
+    <snapshotRepository>
+      <id>local</id>
+      <url>file:///${basedir}/target/repo-null</url>
+    </snapshotRepository>
     <site>
       <id>apache.website</id>
       <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
