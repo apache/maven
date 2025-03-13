@@ -702,7 +702,7 @@ under the License.
           <version>3.5.2</version>
           <configuration>
             <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
-            <argLine>-Xmx256m ${jacocoArgLine}</argLine>
+            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
           </configuration>
         </plugin>
         <plugin>
