@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-rc-3-SNAPSHOT</version>
+    <version>4.0.0-rc-4-SNAPSHOT</version>
   </parent>
 
   <groupId>org.apache.maven.its</groupId>
@@ -60,10 +60,6 @@ under the License.
     <url>https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven/</url>
   </ciManagement>
   <distributionManagement>
-    <snapshotRepository>
-      <id>local</id>
-      <url>file:///${basedir}/target/repo-null</url>
-    </snapshotRepository>
     <site>
       <id>apache.website</id>
       <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
@@ -77,9 +73,8 @@ under the License.
     <!--    <maven.compiler.source>8</maven.compiler.source>-->
     <!--    <maven.compiler.target>8</maven.compiler.target>-->
 
-    <maven-version>4.0.0-rc-3-SNAPSHOT</maven-version>
+    <maven-version>4.0.0-rc-4-SNAPSHOT</maven-version>
     <maven-plugin-tools-version>3.15.1</maven-plugin-tools-version>
-    <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
   <dependencyManagement>
