@@ -77,7 +77,7 @@ def mavenBuild(jdk, extraArgs) {
       }
     }
     finally {
-      junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
+      junit testResults: '**/target/test-results-surefire/*.xml', allowEmptyResults: true
     }
   }
 }
