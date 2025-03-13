@@ -1080,7 +1080,6 @@ under the License.</licenseText>
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
-            <configuration>
             <executions>
               <execution>
                 <id>jacoco-initialize</id>
