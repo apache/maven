@@ -29,7 +29,7 @@ pipeline {
                   withEnv(["JAVA_HOME=${tool "jdk_17_latest"}",
                            "PATH+MAVEN=${ tool "jdk_17_latest" }/bin:${tool "maven_3_latest"}/bin",
                            "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
-                    sh "mvn clean deploy -DdeployAtEnd=true"
+                    sh "mvn clean deploy -DdeployAtEnd=true -B"
                   }
                   //}
                 }
