@@ -781,6 +781,16 @@ under the License.</licenseText>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>0.8.12</version>
+          <configuration>
+            <excludes>
+              <exclude>**/org/apache/maven/it/**</exclude>
+              <exclude>**/org/apache/maven/its/**</exclude>
+              <exclude>**/org/apache/maven/coreit/**</exclude>
+              <exclude>**/org/apache/maven/plugin/coreit/**</exclude>
+              <exclude>**/org/apache/maven/wagon/providers/coreit/**</exclude>
+              <exclude>**/org/apache/maven/coreits/**</exclude>
+            </excludes>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
