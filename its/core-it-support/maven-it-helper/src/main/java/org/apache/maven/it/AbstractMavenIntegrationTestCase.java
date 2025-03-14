@@ -262,12 +262,14 @@ public abstract class AbstractMavenIntegrationTestCase {
         Verifier verifier = new Verifier(basedir);
 
         // try to get jacoco arg from command line if any then use it to start IT to populate jacoco data
+        // we use a different file than the main one
         ProcessHandle.current()
                 .info()
                 .arguments()
                 .flatMap(strings -> Arrays.stream(strings)
                         .filter(s -> s.contains("-javaagent:") && s.contains("org.jacoco.agent"))
                         .findFirst())
+                .map(s -> s.replace("jacoco.exec", "jacoco-its.exec"))
                 .ifPresent(verifier::addJvmArgument);
 
         verifier.setAutoclean(false);
