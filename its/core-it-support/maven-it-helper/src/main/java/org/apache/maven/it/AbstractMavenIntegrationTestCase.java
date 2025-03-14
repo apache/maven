@@ -23,6 +23,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -259,6 +260,15 @@ public abstract class AbstractMavenIntegrationTestCase {
 
     protected Verifier newVerifier(String basedir, String settings, boolean debug) throws VerificationException {
         Verifier verifier = new Verifier(basedir);
+
+        // try to get jacoco arg from command line if any then use it to start IT to populate jacoco data
+        ProcessHandle.current()
+                .info()
+                .arguments()
+                .flatMap(strings -> Arrays.stream(strings)
+                        .filter(s -> s.contains("-javaagent:") && s.contains("org.jacoco.agent"))
+                        .findFirst())
+                .ifPresent(verifier::addJvmArgument);
 
         verifier.setAutoclean(false);
 
