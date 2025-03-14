@@ -18,7 +18,7 @@ pipeline {
           steps {
               timeout(time: 210, unit: 'MINUTES') {
                   checkout scm
-                  mavenBuild("jdk_17_latest", "-Pjacoco") // javadoc:javadoc
+                  mavenBuild("jdk_17_latest", "-Dspotbugs.skip=true -Djacoco.skip=true")
         //              recordIssues id: "analysis-jdk17", name: "Static Analysis jdk17", aggregatingResults: true, enabledForFailure: true,
         //                            tools: [mavenConsole(), java(), checkStyle(), errorProne(), spotBugs(), javaDoc()],
         //                            skipPublishingChecks: true, skipBlames: true
@@ -43,7 +43,12 @@ pipeline {
           steps {
             timeout(time: 210, unit: 'MINUTES') {
               checkout scm
-              mavenBuild("jdk_21_latest", "-Dspotbugs.skip=true -Djacoco.skip=true")
+              mavenBuild("jdk_21_latest", "-Pjacoco jacoco-aggregator:report-aggregate-all")
+              //              recordIssues id: "analysis-jdk17", name: "Static Analysis jdk17", aggregatingResults: true, enabledForFailure: true,
+              //                            tools: [mavenConsole(), java(), checkStyle(), errorProne(), spotBugs(), javaDoc()],
+              //                            skipPublishingChecks: true, skipBlames: true
+              recordCoverage id: "coverage-jdk21", name: "Coverage jdk21", tools: [[parser: 'JACOCO']], sourceCodeRetention: 'MODIFIED',
+                  sourceDirectories: [[path: 'src/main/java']]
             }
           }
         }
