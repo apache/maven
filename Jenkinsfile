@@ -18,7 +18,7 @@ pipeline {
           steps {
               timeout(time: 210, unit: 'MINUTES') {
                 checkout scm
-                mavenBuild("jdk_17_latest", "-Dspotbugs.skip=true -Djacoco.skip=true")
+                mavenBuild("jdk_17_latest", "-Djacoco.skip=true")
                 script {
                   properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME == 'master' ? '30' : '5'))])
                   if (env.BRANCH_NAME == 'master') {
@@ -38,12 +38,13 @@ pipeline {
           steps {
             timeout(time: 210, unit: 'MINUTES') {
               checkout scm
-              mavenBuild("jdk_21_latest", "-Pjacoco jacoco-aggregator:report-aggregate-all")
+              // jacoco is definitely too slow
+              mavenBuild("jdk_21_latest", "") // "-Pjacoco jacoco-aggregator:report-aggregate-all"
               //              recordIssues id: "analysis-jdk17", name: "Static Analysis jdk17", aggregatingResults: true, enabledForFailure: true,
               //                            tools: [mavenConsole(), java(), checkStyle(), errorProne(), spotBugs(), javaDoc()],
               //                            skipPublishingChecks: true, skipBlames: true
-              recordCoverage id: "coverage-jdk21", name: "Coverage jdk21", tools: [[parser: 'JACOCO']], sourceCodeRetention: 'MODIFIED',
-                  sourceDirectories: [[path: 'src/main/java']]
+              // recordCoverage id: "coverage-jdk21", name: "Coverage jdk21", tools: [[parser: 'JACOCO',pattern: 'target/site/jacoco-aggregate/jacoco.xml']],
+              //    sourceCodeRetention: 'MODIFIED', sourceDirectories: [[path: 'src/main/java']]
             }
           }
         }
