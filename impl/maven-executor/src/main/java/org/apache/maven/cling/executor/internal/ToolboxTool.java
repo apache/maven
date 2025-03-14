@@ -59,8 +59,8 @@ public class ToolboxTool implements ExecutorTool {
         doExecute(builder);
         try {
             Properties properties = new Properties();
-            properties.load(
-                    new ByteArrayInputStream(validateOutput(false, stdout, stderr).getBytes()));
+            properties.load(new ByteArrayInputStream(
+                    validateOutput(false, stdout, stderr).getBytes()));
             return properties.entrySet().stream()
                     .collect(Collectors.toMap(
                             e -> String.valueOf(e.getKey()),
