@@ -1116,17 +1116,6 @@ under the License.</licenseText>
                   <propertyName>jacocoArgLine</propertyName>
                 </configuration>
               </execution>
-              <!--              <execution>-->
-              <!--                <id>jacoco-setup-m-invoker-p</id>-->
-              <!--                <goals>-->
-              <!--                  <goal>prepare-agent</goal>-->
-              <!--                </goals>-->
-              <!--                <phase>initialize</phase>-->
-              <!--                <configuration>-->
-              <!--                  &lt;!&ndash; Enable recording of coverage during execution of maven-invoker-plugin &ndash;&gt;-->
-              <!--                  <propertyName>invoker.mavenOpts</propertyName>-->
-              <!--                </configuration>-->
-              <!--              </execution>-->
               <execution>
                 <id>jacoco-site</id>
                 <goals>
