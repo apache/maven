@@ -792,14 +792,14 @@ under the License.</licenseText>
             </excludes>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>io.github.olamy.maven.plugins</groupId>
-          <artifactId>jacoco-aggregator-maven-plugin</artifactId>
-          <version>1.0.0</version>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>io.github.olamy.maven.plugins</groupId>
+        <artifactId>jacoco-aggregator-maven-plugin</artifactId>
+        <version>1.0.0</version>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-doap-plugin</artifactId>
