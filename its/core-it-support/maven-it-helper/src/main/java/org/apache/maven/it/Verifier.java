@@ -106,6 +106,8 @@ public class Verifier {
 
     private final List<String> cliArguments = new ArrayList<>();
 
+    private final List<String> jvmArguments = new ArrayList<>();
+
     private Path userHomeDirectory; // the user home
 
     private String executable = ExecutorRequest.MVN;
@@ -218,6 +220,7 @@ public class Verifier {
                     .command(executable)
                     .cwd(basedir)
                     .userHomeDirectory(userHomeDirectory)
+                    .jvmArguments(jvmArguments)
                     .arguments(args);
             if (!systemProperties.isEmpty()) {
                 builder.jvmSystemProperties(new HashMap(systemProperties));
@@ -267,6 +270,15 @@ public class Verifier {
      */
     public void addCliArgument(String cliArgument) {
         cliArguments.add(cliArgument);
+    }
+
+    /**
+     * Add a jvm argument, each argument must be set separately one by one.
+     *
+     * @param jvmArgument an argument to add
+     */
+    public void addJvmArgument(String jvmArgument) {
+        jvmArguments.add(jvmArgument);
     }
 
     /**
