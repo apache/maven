@@ -74,7 +74,7 @@ def mavenBuild(jdk, extraArgs) {
         sh "echo package Its"
         sh "./mvnw package -DskipTests -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/cached"
         sh "echo run Its"
-        sh "./mvnw install $extraArgs -Dmaven.home=${env.WORKSPACE}/.apache-maven-master -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/local -Dmaven.repo.local.tail=${env.WORKSPACE}/.repository/cached"
+        sh "./mvnw install -Pci $extraArgs -Dmaven.home=${env.WORKSPACE}/.apache-maven-master -e -B -V -Prun-its -Dmaven.repo.local=${env.WORKSPACE}/.repository/local -Dmaven.repo.local.tail=${env.WORKSPACE}/.repository/cached"
       }
     }
     finally {

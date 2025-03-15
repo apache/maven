@@ -1097,6 +1097,22 @@ under the License.</licenseText>
       </modules>
     </profile>
     <profile>
+      <id>ci</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <reportsDirectory>${project.build.directory}/test-results-surefire</reportsDirectory>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <id>jacoco</id>
       <build>
         <plugins>
