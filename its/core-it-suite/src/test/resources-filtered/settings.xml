@@ -51,7 +51,7 @@ own test repos or can employ the local repository (after bootstrapping). This co
             <enabled>true</enabled>
           </releases>
           <snapshots>
-            <enabled>true</enabled>
+            <enabled>false</enabled>
           </snapshots>
         </pluginRepository>
       </pluginRepositories>
