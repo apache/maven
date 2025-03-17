@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl.standalone;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Nullable;
@@ -252,12 +254,12 @@ public class RepositorySystemSupplier {
     }
 
     @Provides
-    static Map<String, ValidatorFactory> newValidatorFactories() {
-        return Map.of("maven", new MavenValidatorFactory());
+    static List<ValidatorFactory> newValidatorFactories() {
+        return List.of(new MavenValidatorFactory());
     }
 
     @Provides
-    static RepositorySystemValidator newRepositorySystemValidator(Map<String, ValidatorFactory> validatorFactories) {
+    static RepositorySystemValidator newRepositorySystemValidator(List<ValidatorFactory> validatorFactories) {
         return new DefaultRepositorySystemValidator(validatorFactories);
     }
 
