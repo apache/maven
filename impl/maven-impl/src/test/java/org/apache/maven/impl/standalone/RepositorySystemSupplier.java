@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl.standalone;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
