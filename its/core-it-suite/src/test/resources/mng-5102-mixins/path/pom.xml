@@ -32,12 +32,6 @@ under the License.
     <module>child</module>
   </modules>
 
-  <mixins>
-    <mixin>
-      <relativePath>mixins/mixin-1.xml</relativePath>
-    </mixin>
-  </mixins>
-
   <build>
     <plugins>
       <plugin>
@@ -61,4 +55,10 @@ under the License.
       </plugin>
     </plugins>
   </build>
+
+  <mixins>
+    <mixin>
+      <relativePath>mixins/mixin-1.xml</relativePath>
+    </mixin>
+  </mixins>
 </project>

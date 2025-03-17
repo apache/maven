@@ -26,14 +26,6 @@ under the License.
   <name>Maven Integration Test :: MNG-5102</name>
   <description>Mixins tests.</description>
 
-  <mixins>
-    <mixin>
-      <groupId>org.apache.maven.its.mng5102</groupId>
-      <artifactId>mixin-2</artifactId>
-      <version>0.1</version>
-    </mixin>
-  </mixins>
-
   <build>
     <plugins>
       <plugin>
@@ -57,4 +49,12 @@ under the License.
       </plugin>
     </plugins>
   </build>
+
+  <mixins>
+    <mixin>
+      <groupId>org.apache.maven.its.mng5102</groupId>
+      <artifactId>mixin-2</artifactId>
+      <version>0.1</version>
+    </mixin>
+  </mixins>
 </project>
