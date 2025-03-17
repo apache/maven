@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.impl.resolver.validator.MavenValidatorFactory;
 import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
@@ -40,11 +41,40 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.RepositoryConnectorProvider;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.impl.RepositorySystemLifecycle;
+import org.eclipse.aether.impl.RepositorySystemValidator;
 import org.eclipse.aether.impl.UpdateCheckManager;
 import org.eclipse.aether.impl.UpdatePolicyAnalyzer;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
-import org.eclipse.aether.internal.impl.*;
+import org.eclipse.aether.internal.impl.DefaultArtifactPredicateFactory;
+import org.eclipse.aether.internal.impl.DefaultArtifactResolver;
+import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
+import org.eclipse.aether.internal.impl.DefaultChecksumProcessor;
+import org.eclipse.aether.internal.impl.DefaultDeployer;
+import org.eclipse.aether.internal.impl.DefaultInstaller;
+import org.eclipse.aether.internal.impl.DefaultLocalPathComposer;
+import org.eclipse.aether.internal.impl.DefaultLocalPathPrefixComposerFactory;
+import org.eclipse.aether.internal.impl.DefaultLocalRepositoryProvider;
+import org.eclipse.aether.internal.impl.DefaultMetadataResolver;
+import org.eclipse.aether.internal.impl.DefaultOfflineController;
+import org.eclipse.aether.internal.impl.DefaultPathProcessor;
+import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultRepositoryConnectorProvider;
+import org.eclipse.aether.internal.impl.DefaultRepositoryEventDispatcher;
+import org.eclipse.aether.internal.impl.DefaultRepositoryLayoutProvider;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystemLifecycle;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystemValidator;
+import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
+import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
+import org.eclipse.aether.internal.impl.DefaultUpdateCheckManager;
+import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
+import org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory;
+import org.eclipse.aether.internal.impl.LocalPathComposer;
+import org.eclipse.aether.internal.impl.LocalPathPrefixComposerFactory;
+import org.eclipse.aether.internal.impl.Maven2RepositoryLayoutFactory;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.internal.impl.TrackingFileManager;
 import org.eclipse.aether.internal.impl.checksum.DefaultChecksumAlgorithmFactorySelector;
 import org.eclipse.aether.internal.impl.checksum.Md5ChecksumAlgorithmFactory;
 import org.eclipse.aether.internal.impl.checksum.Sha1ChecksumAlgorithmFactory;
@@ -94,6 +124,7 @@ import org.eclipse.aether.spi.io.PathProcessor;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
 import org.eclipse.aether.spi.resolution.ArtifactResolverPostProcessor;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
+import org.eclipse.aether.spi.validator.ValidatorFactory;
 import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 
@@ -221,6 +252,16 @@ public class RepositorySystemSupplier {
     }
 
     @Provides
+    static Map<String, ValidatorFactory> newValidatorFactories() {
+        return Map.of("maven", new MavenValidatorFactory());
+    }
+
+    @Provides
+    static RepositorySystemValidator newRepositorySystemValidator(Map<String, ValidatorFactory> validatorFactories) {
+        return new DefaultRepositorySystemValidator(validatorFactories);
+    }
+
+    @Provides
     static RepositorySystem newRepositorySystem(
             VersionResolver versionResolver,
             VersionRangeResolver versionRangeResolver,
@@ -234,7 +275,8 @@ public class RepositorySystemSupplier {
             SyncContextFactory syncContextFactory,
             RemoteRepositoryManager remoteRepositoryManager,
             RepositorySystemLifecycle repositorySystemLifecycle,
-            @Nullable Map<String, ArtifactDecoratorFactory> artifactDecoratorFactories) {
+            @Nullable Map<String, ArtifactDecoratorFactory> artifactDecoratorFactories,
+            RepositorySystemValidator repositorySystemValidator) {
         return new DefaultRepositorySystem(
                 versionResolver,
                 versionRangeResolver,
@@ -248,7 +290,8 @@ public class RepositorySystemSupplier {
                 syncContextFactory,
                 remoteRepositoryManager,
                 repositorySystemLifecycle,
-                artifactDecoratorFactories != null ? artifactDecoratorFactories : Map.of());
+                artifactDecoratorFactories != null ? artifactDecoratorFactories : Map.of(),
+                repositorySystemValidator);
     }
 
     @Provides
