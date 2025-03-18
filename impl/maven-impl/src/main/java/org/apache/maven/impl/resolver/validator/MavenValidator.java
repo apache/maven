@@ -35,7 +35,7 @@ public class MavenValidator implements Validator {
     }
 
     @Override
-    public void isValidArtifact(Artifact artifact) throws IllegalArgumentException {
+    public void validateArtifact(Artifact artifact) throws IllegalArgumentException {
         if (containsPlaceholder(artifact.getGroupId())
                 || containsPlaceholder(artifact.getArtifactId())
                 || containsPlaceholder(artifact.getVersion())
@@ -46,7 +46,7 @@ public class MavenValidator implements Validator {
     }
 
     @Override
-    public void isValidMetadata(Metadata metadata) throws IllegalArgumentException {
+    public void validateMetadata(Metadata metadata) throws IllegalArgumentException {
         if (containsPlaceholder(metadata.getGroupId())
                 || containsPlaceholder(metadata.getArtifactId())
                 || containsPlaceholder(metadata.getVersion())
@@ -56,7 +56,7 @@ public class MavenValidator implements Validator {
     }
 
     @Override
-    public void isValidDependency(Dependency dependency) throws IllegalArgumentException {
+    public void validateDependency(Dependency dependency) throws IllegalArgumentException {
         Artifact artifact = dependency.getArtifact();
         if (containsPlaceholder(artifact.getGroupId())
                 || containsPlaceholder(artifact.getArtifactId())
@@ -74,7 +74,7 @@ public class MavenValidator implements Validator {
     }
 
     @Override
-    public void isValidLocalRepository(LocalRepository localRepository) throws IllegalArgumentException {
+    public void validateLocalRepository(LocalRepository localRepository) throws IllegalArgumentException {
         if (containsPlaceholder(localRepository.getBasePath().toString())
                 || containsPlaceholder(localRepository.getContentType())
                 || containsPlaceholder(localRepository.getId())) {
@@ -83,7 +83,7 @@ public class MavenValidator implements Validator {
     }
 
     @Override
-    public void isValidRemoteRepository(RemoteRepository remoteRepository) throws IllegalArgumentException {
+    public void validateRemoteRepository(RemoteRepository remoteRepository) throws IllegalArgumentException {
         if (containsPlaceholder(remoteRepository.getUrl())
                 || containsPlaceholder(remoteRepository.getContentType())
                 || containsPlaceholder(remoteRepository.getId())) {
