@@ -967,7 +967,11 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public DependencyScope requireDependencyScope(String id) {
-        return DependencyScope.forId(nonNull(id, "id"));
+        DependencyScope scope = DependencyScope.forId(nonNull(id, "id"));
+        if (scope == null) {
+            throw new IllegalArgumentException("Invalid dependency scope: " + id);
+        }
+        return scope;
     }
 
     @Override
