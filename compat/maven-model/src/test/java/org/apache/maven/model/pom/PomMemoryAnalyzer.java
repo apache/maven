@@ -127,24 +127,23 @@ public class PomMemoryAnalyzer {
                 try {
                     field.setAccessible(true);
                     Object value = field.get(node);
-                    if (value == null) continue;
+                    if (value == null) {
+                        continue;
+                    }
 
                     String fullPath = currentPath + "/" + field.getName();
 
-                    if (value instanceof String) {
-                        String strValue = (String) value;
+                    if (value instanceof String strValue) {
                         recordString(fullPath, strValue);
                         globalStringFrequency.merge(strValue, 1, Integer::sum);
-                    } else if (value instanceof List) {
-                        List<?> list = (List<?>) value;
+                    } else if (value instanceof List<?> list) {
                         for (Object item : list) {
                             if (item != null) {
                                 String itemName = getSingular(field.getName());
                                 processModelNode(item, fullPath + "/" + itemName, itemName, visited);
                             }
                         }
-                    } else if (value instanceof Map) {
-                        Map<?, ?> map = (Map<?, ?>) value;
+                    } else if (value instanceof Map<?, ?> map) {
                         for (Map.Entry<?, ?> entry : map.entrySet()) {
                             if (entry.getValue() != null) {
                                 processModelNode(
@@ -183,7 +182,7 @@ public class PomMemoryAnalyzer {
                 .recordOccurrence(value);
     }
 
-    public List<PathAnalysis> getPathAnalysisSorted() {
+    List<PathAnalysis> getPathAnalysisSorted() {
         List<PathAnalysis> analysis = new ArrayList<>();
 
         for (Map.Entry<String, Map<String, StringStats>> entry : pathStats.entrySet()) {
@@ -220,7 +219,7 @@ public class PomMemoryAnalyzer {
                 .map(e -> new ValueFrequency(e.getKey(), e.getValue().getOccurrences()))
                 .sorted((a, b) -> Long.compare(b.frequency, a.frequency))
                 .limit(limit)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void printAnalysis() {
@@ -271,7 +270,7 @@ public class PomMemoryAnalyzer {
                             groupName, paths, totalUnique, totalOccurrences, totalMemory, totalSavings, topValues);
                 })
                 .sorted((a, b) -> Long.compare(b.totalSavings, a.totalSavings))
-                .collect(Collectors.toList());
+                .toList();
 
         // Print each group
         for (GroupAnalysis group : sortedGroups) {
@@ -291,7 +290,7 @@ public class PomMemoryAnalyzer {
             System.out.println("----------------------------------------");
             for (PathAnalysis path : group.paths.stream()
                     .sorted((a, b) -> Long.compare(b.potentialSavings, a.potentialSavings))
-                    .collect(Collectors.toList())) {
+                    .toList()) {
                 System.out.printf(
                         "%-90s %6dKB %6dKB%n", path.path, path.totalMemory / 1024, path.potentialSavings / 1024);
             }
@@ -299,34 +298,7 @@ public class PomMemoryAnalyzer {
         }
     }
 
-    private static class GroupAnalysis {
-        final String name;
-        final List<PathAnalysis> paths;
-        final long totalUnique;
-        final long totalOccurrences;
-        final long totalMemory;
-        final long totalSavings;
-        final List<ValueFrequency> mostFrequentValues;
-
-        GroupAnalysis(
-                String name,
-                List<PathAnalysis> paths,
-                long totalUnique,
-                long totalOccurrences,
-                long totalMemory,
-                long totalSavings,
-                List<ValueFrequency> mostFrequentValues) {
-            this.name = name;
-            this.paths = paths;
-            this.totalUnique = totalUnique;
-            this.totalOccurrences = totalOccurrences;
-            this.totalMemory = totalMemory;
-            this.totalSavings = totalSavings;
-            this.mostFrequentValues = mostFrequentValues;
-        }
-    }
-
-    private static class StringStats {
+    static class StringStats {
         private long occurrences = 0;
 
         public void recordOccurrence(String value) {
@@ -338,40 +310,23 @@ public class PomMemoryAnalyzer {
         }
     }
 
-    public static class PathAnalysis {
-        public final String path;
-        public final long uniqueStrings;
-        public final long totalOccurrences;
-        public final long totalMemory;
-        public final long potentialSavings;
-        public final double duplicationRatio;
-        public final List<ValueFrequency> mostFrequentValues;
+    record GroupAnalysis(
+            String name,
+            List<PathAnalysis> paths,
+            long totalUnique,
+            long totalOccurrences,
+            long totalMemory,
+            long totalSavings,
+            List<ValueFrequency> mostFrequentValues) {}
 
-        public PathAnalysis(
-                String path,
-                long uniqueStrings,
-                long totalOccurrences,
-                long totalMemory,
-                long potentialSavings,
-                double duplicationRatio,
-                List<ValueFrequency> mostFrequentValues) {
-            this.path = path;
-            this.uniqueStrings = uniqueStrings;
-            this.totalOccurrences = totalOccurrences;
-            this.totalMemory = totalMemory;
-            this.potentialSavings = potentialSavings;
-            this.duplicationRatio = duplicationRatio;
-            this.mostFrequentValues = mostFrequentValues;
-        }
-    }
+    record PathAnalysis(
+            String path,
+            long uniqueStrings,
+            long totalOccurrences,
+            long totalMemory,
+            long potentialSavings,
+            double duplicationRatio,
+            List<ValueFrequency> mostFrequentValues) {}
 
-    public static class ValueFrequency {
-        public final String value;
-        public final long frequency;
-
-        public ValueFrequency(String value, long frequency) {
-            this.value = value;
-            this.frequency = frequency;
-        }
-    }
+    record ValueFrequency(String value, long frequency) {}
 }

@@ -27,6 +27,7 @@ import org.apache.maven.artifact.Artifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Deprecated
@@ -90,5 +91,6 @@ class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
     @Test
     void testLookup() throws Exception {
         ArtifactResolver resolver = getContainer().lookup(ArtifactResolver.class, "default");
+        assertNotNull(resolver);
     }
 }

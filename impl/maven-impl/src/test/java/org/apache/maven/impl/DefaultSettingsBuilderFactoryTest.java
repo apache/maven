@@ -21,7 +21,6 @@ package org.apache.maven.impl;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.SettingsBuilder;
@@ -49,12 +48,11 @@ class DefaultSettingsBuilderFactoryTest {
 
     @BeforeEach
     void setup() {
-        Map<String, String> map = System.getProperties().entrySet().stream()
-                .collect(Collectors.toMap(
-                        e -> e.getKey().toString(), e -> e.getValue().toString()));
+        //        Map<String, String> map = System.getProperties().entrySet().stream()
+        //                .collect(Collectors.toMap(
+        //                        e -> e.getKey().toString(), e -> e.getValue().toString()));
         //        lenient().when(session.getSystemProperties()).thenReturn(map);
         //        lenient().when(session.getUserProperties()).thenReturn(Collections.emptyMap());
-
         Mockito.lenient()
                 .when(session.getService(SettingsXmlFactory.class))
                 .thenReturn(new DefaultSettingsXmlFactory());

@@ -61,7 +61,7 @@ class MavenBaseLoggerTimestampTest {
     }
 
     @Test
-    void whenShowDateTimeIsFalse_shouldNotIncludeTimestamp() {
+    void whenShowDateTimeIsFalseShouldNotIncludeTimestamp() {
         // Given
         System.setProperty(Constants.MAVEN_LOGGER_SHOW_DATE_TIME, "false");
         initializeLogger();
@@ -76,7 +76,7 @@ class MavenBaseLoggerTimestampTest {
     }
 
     @Test
-    void whenShowDateTimeIsTrue_withoutFormat_shouldShowElapsedTime() { // Changed test name and expectation
+    void whenShowDateTimeIsTrueWithoutFormatShouldShowElapsedTime() { // Changed test name and expectation
         // Given
         System.setProperty(Constants.MAVEN_LOGGER_SHOW_DATE_TIME, "true");
         initializeLogger();
@@ -94,7 +94,7 @@ class MavenBaseLoggerTimestampTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"yyyy-MM-dd HH:mm:ss", "dd/MM/yyyy HH:mm:ss.SSS", "HH:mm:ss"})
-    void whenCustomDateFormat_shouldFormatCorrectly(String dateFormat) {
+    void whenCustomDateFormatShouldFormatCorrectly(String dateFormat) {
         // Given
         System.setProperty(Constants.MAVEN_LOGGER_SHOW_DATE_TIME, "true");
         System.setProperty(Constants.MAVEN_LOGGER_DATE_TIME_FORMAT, dateFormat);
@@ -123,7 +123,7 @@ class MavenBaseLoggerTimestampTest {
     }
 
     @Test
-    void whenInvalidDateFormat_shouldUseElapsedMillis() {
+    void whenInvalidDateFormatShouldUseElapsedMillis() {
         // Given
         System.setProperty(Constants.MAVEN_LOGGER_SHOW_DATE_TIME, "true");
         System.setProperty(Constants.MAVEN_LOGGER_DATE_TIME_FORMAT, "invalid-format");

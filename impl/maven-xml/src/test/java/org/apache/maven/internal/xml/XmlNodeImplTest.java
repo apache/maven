@@ -693,7 +693,7 @@ class XmlNodeImplTest {
     private static class FixedInputLocationBuilder implements XmlNodeStaxBuilder.InputLocationBuilderStax {
         private final Object location;
 
-        public FixedInputLocationBuilder(Object location) {
+        FixedInputLocationBuilder(Object location) {
             this.location = location;
         }
 

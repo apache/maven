@@ -29,7 +29,6 @@ import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.impl.model.DefaultPathTranslator;
 import org.apache.maven.impl.model.DefaultProfileActivationContext;
 import org.apache.maven.impl.model.profile.ConditionParser.ExpressionFunction;
-import org.apache.maven.impl.model.rootlocator.DefaultRootLocator;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,6 @@ class ConditionParserTest {
         ProfileActivationContext context = createMockContext();
         DefaultVersionParser versionParser =
                 new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()));
-        DefaultRootLocator rootLocator = new DefaultRootLocator();
 
         ConditionProfileActivator activator = new ConditionProfileActivator(versionParser, new DefaultInterpolator());
         functions = activator.registerFunctions(context, versionParser);
@@ -267,7 +265,9 @@ class ConditionParserTest {
     @Test
     void testNestedPropertyAlias() {
         functions.put("property", args -> {
-            if (args.get(0).equals("project.rootDirectory")) return "/home/user/project";
+            if (args.get(0).equals("project.rootDirectory")) {
+                return "/home/user/project";
+            }
             return null;
         });
         functions.put("exists", args -> true); // Mock implementation

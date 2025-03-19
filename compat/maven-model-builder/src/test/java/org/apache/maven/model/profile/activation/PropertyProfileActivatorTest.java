@@ -68,7 +68,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     }
 
     @Test
-    void testWithNameOnly_UserProperty() throws Exception {
+    void testWithNameOnlyUserProperty() throws Exception {
         Profile profile = newProfile("prop", null);
 
         assertActivation(true, profile, newContext(newProperties("prop", "value"), null));
@@ -79,7 +79,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     }
 
     @Test
-    void testWithNameOnly_SystemProperty() throws Exception {
+    void testWithNameOnlySystemProperty() throws Exception {
         Profile profile = newProfile("prop", null);
 
         assertActivation(true, profile, newContext(null, newProperties("prop", "value")));
@@ -90,7 +90,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     }
 
     @Test
-    void testWithNegatedNameOnly_UserProperty() throws Exception {
+    void testWithNegatedNameOnlyUserProperty() throws Exception {
         Profile profile = newProfile("!prop", null);
 
         assertActivation(false, profile, newContext(newProperties("prop", "value"), null));
@@ -101,7 +101,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     }
 
     @Test
-    void testWithNegatedNameOnly_SystemProperty() throws Exception {
+    void testWithNegatedNameOnlySystemProperty() throws Exception {
         Profile profile = newProfile("!prop", null);
 
         assertActivation(false, profile, newContext(null, newProperties("prop", "value")));
@@ -112,7 +112,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     }
 
     @Test
-    void testWithValue_UserProperty() throws Exception {
+    void testWithValueUserProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 
         assertActivation(true, profile, newContext(newProperties("prop", "value"), null));
@@ -123,7 +123,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     }
 
     @Test
-    void testWithValue_SystemProperty() throws Exception {
+    void testWithValueSystemProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 
         assertActivation(true, profile, newContext(null, newProperties("prop", "value")));
@@ -134,7 +134,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     }
 
     @Test
-    void testWithNegatedValue_UserProperty() throws Exception {
+    void testWithNegatedValueUserProperty() throws Exception {
         Profile profile = newProfile("prop", "!value");
 
         assertActivation(false, profile, newContext(newProperties("prop", "value"), null));
@@ -145,7 +145,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     }
 
     @Test
-    void testWithNegatedValue_SystemProperty() throws Exception {
+    void testWithNegatedValueSystemProperty() throws Exception {
         Profile profile = newProfile("prop", "!value");
 
         assertActivation(false, profile, newContext(null, newProperties("prop", "value")));
@@ -156,7 +156,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     }
 
     @Test
-    void testWithValue_UserPropertyDominantOverSystemProperty() throws Exception {
+    void testWithValueUserPropertyDominantOverSystemProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 
         Properties props1 = newProperties("prop", "value");

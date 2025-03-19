@@ -70,6 +70,7 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
                 createMavenExecutionRequest(getProject("simple")).setGoals(asList("validate"));
 
         MavenExecutionResult result = maven.execute(request);
+        assertNotNull(result);
 
         Class<?> wsrClass = wsrClassCatcher.wsrClassRef.get();
         assertNotNull(wsrClass, "wsr cannot be null");

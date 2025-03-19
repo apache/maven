@@ -52,7 +52,6 @@ public class GraphTest {
         }
         Collections.shuffle(data);
 
-        long t0 = System.nanoTime();
         Graph g = new Graph();
         data.parallelStream().forEach(s -> {
             try {
@@ -61,6 +60,5 @@ public class GraphTest {
                 throw new RuntimeException(e);
             }
         });
-        long t1 = System.nanoTime();
     }
 }
