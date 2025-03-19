@@ -48,8 +48,37 @@ import static org.apache.maven.impl.Utils.nonNull;
 @Singleton
 public class DefaultModelXmlFactory implements ModelXmlFactory {
     @Override
+    @Nonnull
     public Model read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
         nonNull(request, "request");
+        Model model = doRead(request);
+        if (isModelVersionGreaterThan400(model)
+                && !model.getNamespaceUri().startsWith("http://maven.apache.org/POM/")) {
+            throw new XmlReaderException(
+                    "Invalid namespace '" + model.getNamespaceUri() + "' for model version " + model.getModelVersion(),
+                    null,
+                    null);
+        }
+        return model;
+    }
+
+    private boolean isModelVersionGreaterThan400(Model model) {
+        String version = model.getModelVersion();
+        if (version == null) {
+            return false;
+        }
+        try {
+            String[] parts = version.split("\\.");
+            int major = Integer.parseInt(parts[0]);
+            int minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+            return major > 4 || (major == 4 && minor > 0);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            return false;
+        }
+    }
+
+    @Nonnull
+    private Model doRead(XmlReaderRequest request) throws XmlReaderException {
         Path path = request.getPath();
         URL url = request.getURL();
         Reader reader = request.getReader();
