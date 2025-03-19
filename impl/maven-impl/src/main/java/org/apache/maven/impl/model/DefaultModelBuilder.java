@@ -937,7 +937,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (parent.getGroupId() != null && (groupId == null || !groupId.equals(parent.getGroupId()))
                     || parent.getArtifactId() != null
                             && (artifactId == null || !artifactId.equals(parent.getArtifactId()))) {
-                mismatchRelativePathAndGA(childModel, groupId, artifactId);
+                mismatchRelativePathAndGA(childModel, parent, groupId, artifactId);
                 return null;
             }
 
@@ -976,8 +976,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return candidateModel;
         }
 
-        private void mismatchRelativePathAndGA(Model childModel, String groupId, String artifactId) {
-            Parent parent = childModel.getParent();
+        private void mismatchRelativePathAndGA(Model childModel, Parent parent, String groupId, String artifactId) {
             StringBuilder buffer = new StringBuilder(256);
             buffer.append("'parent.relativePath'");
             if (childModel != getRootModel()) {
@@ -1381,7 +1380,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                         .version(parentVersion)
                                         .build());
                             } else {
-                                mismatchRelativePathAndGA(model, parentGroupId, parentArtifactId);
+                                mismatchRelativePathAndGA(model, parent, parentGroupId, parentArtifactId);
                             }
                         } else {
                             if (!MODEL_VERSION_4_0_0.equals(model.getModelVersion()) && path != null) {
