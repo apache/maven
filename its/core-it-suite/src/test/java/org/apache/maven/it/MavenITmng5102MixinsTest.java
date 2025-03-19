@@ -108,4 +108,40 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
                 "target/project-local-repo/org.apache.maven.its.mng5102/child/0.1/child-0.1-consumer.pom");
         assertTrue(lines.stream().anyMatch(l -> l.contains("<mixin>")));
     }
+
+    /**
+     * Verify that mixins can be loaded from the repositories with a classifier.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testWithClassifier() throws Exception {
+        File testDir = extractResources("/mng-5102-mixins/classifier");
+
+        Verifier verifier = newVerifier(new File(testDir, "mixin-4").getAbsolutePath());
+
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng5102");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        verifier = newVerifier(new File(testDir, "project").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        verifier.verifyFilePresent("project/target/model.properties");
+        Properties props = verifier.loadProperties("project/target/model.properties");
+        assertEquals("true", props.getProperty("project.properties.mixin4"));
+
+        verifier.verifyFilePresent(
+                "project/target/project-local-repo/org.apache.maven.its.mng5102/gav/0.1/gav-0.1-consumer.pom");
+        List<String> lines = verifier.loadLines(
+                "target/project-local-repo/org.apache.maven.its.mng5102/child/0.1/child-0.1-consumer.pom");
+        assertTrue(lines.stream().anyMatch(l -> l.contains("<mixin>")));
+    }
 }

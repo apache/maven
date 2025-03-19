@@ -66,6 +66,7 @@ import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.model.Mixin;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
@@ -887,6 +888,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throws ModelBuilderException {
             ModelSource candidateSource;
 
+            boolean isParentOrSimpleMixin =
+                    !(parent instanceof Mixin mixin) || (mixin.getClassifier() == null && mixin.getExtension() == null);
             String parentPath = parent.getRelativePath();
             if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
                 if (parentPath != null && !parentPath.isEmpty()) {
@@ -895,14 +898,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                         wrongParentRelativePath(childModel);
                         return null;
                     }
-                } else {
+                } else if (isParentOrSimpleMixin) {
                     candidateSource =
                             resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
                     if (candidateSource == null && parentPath == null) {
                         candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, "..");
                     }
+                } else {
+                    candidateSource = null;
                 }
-            } else {
+            } else if (isParentOrSimpleMixin) {
                 candidateSource = resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
                 if (candidateSource == null) {
                     if (parentPath == null) {
@@ -912,6 +917,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                         candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
                     }
                 }
+            } else {
+                candidateSource = null;
             }
 
             if (candidateSource == null) {
@@ -1010,6 +1017,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             String groupId = parent.getGroupId();
             String artifactId = parent.getArtifactId();
             String version = parent.getVersion();
+            String classifier = parent instanceof Mixin mixin ? mixin.getClassifier() : null;
+            String extension = parent instanceof Mixin mixin ? mixin.getExtension() : null;
 
             // add repositories specified by the current model so that we can resolve the parent
             if (!childModel.getRepositories().isEmpty()) {
@@ -1027,12 +1036,23 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             ModelSource modelSource;
             try {
-                modelSource = resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
+                modelSource = classifier == null && extension == null
+                        ? resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion())
+                        : null;
                 if (modelSource == null) {
-                    AtomicReference<Parent> modified = new AtomicReference<>();
-                    modelSource = modelResolver.resolveModel(request.getSession(), repositories, parent, modified);
-                    if (modified.get() != null) {
-                        parent = modified.get();
+                    ModelResolver.ModelResolverRequest req = new ModelResolver.ModelResolverRequest(
+                            request.getSession(),
+                            null,
+                            repositories,
+                            parent.getGroupId(),
+                            parent.getArtifactId(),
+                            parent.getVersion(),
+                            classifier,
+                            extension != null ? extension : "pom");
+                    ModelResolver.ModelResolverResult result = modelResolver.resolveModel(req);
+                    modelSource = result.source();
+                    if (result.version() != null) {
+                        parent = parent.withVersion(result.version());
                     }
                 }
             } catch (ModelResolverException e) {
@@ -1172,7 +1192,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
 
             // Mixins
-            for (Parent mixin : model.getMixins()) {
+            for (Mixin mixin : model.getMixins()) {
                 Model parent = resolveParent(model, mixin, profileActivationContext);
                 model = inheritanceAssembler.assembleModelInheritance(model, parent, request, this);
             }

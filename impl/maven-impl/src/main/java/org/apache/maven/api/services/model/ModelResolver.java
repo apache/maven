@@ -85,7 +85,8 @@ public interface ModelResolver extends Service {
             @Nonnull String groupId,
             @Nonnull String artifactId,
             @Nonnull String version,
-            @Nullable String classifier)
+            @Nullable String classifier,
+            @Nullable String extension)
             implements Request<Session> {
         public ModelResolverRequest {
             Objects.requireNonNull(session, "session cannot be null");
@@ -113,12 +114,13 @@ public interface ModelResolver extends Service {
                     && Objects.equals(groupId, that.groupId)
                     && Objects.equals(artifactId, that.artifactId)
                     && Objects.equals(version, that.version)
-                    && Objects.equals(classifier, that.classifier);
+                    && Objects.equals(classifier, that.classifier)
+                    && Objects.equals(extension, that.extension);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(repositories, groupId, artifactId, version, classifier);
+            return Objects.hash(repositories, groupId, artifactId, version, classifier, extension);
         }
 
         @Override
@@ -130,6 +132,7 @@ public interface ModelResolver extends Service {
                     + ", artifactId=" + artifactId
                     + ", version=" + version
                     + ", classifier=" + classifier
+                    + ", extension=" + extension
                     + ']';
         }
     }
