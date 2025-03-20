@@ -83,7 +83,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: ['17', '21']
+        java: ['17', '21', '24']
     steps:
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v4
