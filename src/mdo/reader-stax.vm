@@ -113,8 +113,6 @@ public class ${className} {
         }
     }
 
-    private static final String MODEL_NAMESPACE = "${namespace}";
-
     private boolean addDefaultEntities = true;
 #if ( $locationTracking )
     private boolean addLocationInformation = true;
@@ -571,22 +569,6 @@ public class ${className} {
             throw new XMLStreamException("Unknown attribute '" + attribute + "' for tag '" + tagName + "'", parser.getLocation(), null);
         }
     } //-- void checkUnknownAttribute(XMLStreamReader, String, String, boolean)
-
-    /**
-     * In strict mode, ensure the namespace is the expected one.
-     *
-     * @param parser a parser object.
-     * @param strict a strict object.
-     * @throws XMLStreamException XMLStreamException if any.
-     * @throws IOException IOException if any.
-     */
-    private void checkNamespace(XMLStreamReader parser, boolean strict)
-        throws XMLStreamException, IOException {
-        String ns = parser.getNamespaceURI();
-        if (strict && ns != null && !ns.isEmpty() && !MODEL_NAMESPACE.equals(ns)) {
-            checkUnknownElement(parser, strict);
-        }
-    }
 
     /**
      * Method checkUnknownElement.
