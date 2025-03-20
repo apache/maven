@@ -223,7 +223,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals(expr, value);
     }
 
-    public void testPOMPropertyExtractionWithMissingProject_WithDotNotation() throws Exception {
+    public void testPOMPropertyExtractionWithMissingProjectWithDotNotation() throws Exception {
         String key = "m2.name";
         String checkValue = "value";
 
@@ -306,7 +306,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertNull(value);
     }
 
-    public void testValueExtractionFromSystemPropertiesWithMissingProject_WithDotNotation() throws Exception {
+    public void testValueExtractionFromSystemPropertiesWithMissingProjectWithDotNotation() throws Exception {
         String sysprop = "PPEET.sysprop2";
 
         Properties executionProperties = new Properties();

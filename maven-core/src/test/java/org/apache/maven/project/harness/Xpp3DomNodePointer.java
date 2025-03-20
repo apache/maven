@@ -36,12 +36,12 @@ class Xpp3DomNodePointer extends NodePointer {
 
     private Xpp3Dom node;
 
-    public Xpp3DomNodePointer(Xpp3Dom node) {
+    Xpp3DomNodePointer(Xpp3Dom node) {
         super(null);
         this.node = node;
     }
 
-    public Xpp3DomNodePointer(NodePointer parent, Xpp3Dom node) {
+    Xpp3DomNodePointer(NodePointer parent, Xpp3Dom node) {
         super(parent);
         this.node = node;
     }

@@ -50,10 +50,10 @@ public class DefaultToolchainManagerPrivateTest {
     private DefaultToolchainManagerPrivate toolchainManager;
 
     @Mock
-    private ToolchainFactory toolchainFactory_basicType;
+    private ToolchainFactory toolchainFactoryBasicType;
 
     @Mock
-    private ToolchainFactory toolchainFactory_rareType;
+    private ToolchainFactory toolchainFactoryRareType;
 
     @Before
     public void setUp() {
@@ -62,8 +62,8 @@ public class DefaultToolchainManagerPrivateTest {
         MockitoAnnotations.initMocks(this);
 
         toolchainManager.factories = new HashMap<>();
-        toolchainManager.factories.put("basic", toolchainFactory_basicType);
-        toolchainManager.factories.put("rare", toolchainFactory_rareType);
+        toolchainManager.factories.put("basic", toolchainFactoryBasicType);
+        toolchainManager.factories.put("rare", toolchainFactoryRareType);
     }
 
     @Test
@@ -74,9 +74,9 @@ public class DefaultToolchainManagerPrivateTest {
         when(session.getRequest()).thenReturn(req);
 
         ToolchainPrivate basicToolchain = mock(ToolchainPrivate.class);
-        when(toolchainFactory_basicType.createDefaultToolchain()).thenReturn(basicToolchain);
+        when(toolchainFactoryBasicType.createDefaultToolchain()).thenReturn(basicToolchain);
         ToolchainPrivate rareToolchain = mock(ToolchainPrivate.class);
-        when(toolchainFactory_rareType.createDefaultToolchain()).thenReturn(rareToolchain);
+        when(toolchainFactoryRareType.createDefaultToolchain()).thenReturn(rareToolchain);
 
         // execute
         ToolchainPrivate[] toolchains = toolchainManager.getToolchainsForType("basic", session);
@@ -94,9 +94,9 @@ public class DefaultToolchainManagerPrivateTest {
         when(session.getRequest()).thenReturn(req);
 
         ToolchainPrivate basicToolchain = mock(ToolchainPrivate.class);
-        when(toolchainFactory_basicType.createDefaultToolchain()).thenReturn(basicToolchain);
+        when(toolchainFactoryBasicType.createDefaultToolchain()).thenReturn(basicToolchain);
         ToolchainPrivate rareToolchain = mock(ToolchainPrivate.class);
-        when(toolchainFactory_rareType.createDefaultToolchain()).thenReturn(rareToolchain);
+        when(toolchainFactoryRareType.createDefaultToolchain()).thenReturn(rareToolchain);
 
         // execute
         ToolchainPrivate[] toolchains = toolchainManager.getToolchainsForType("unknown", session);

@@ -55,7 +55,7 @@ public class ClasspathArtifactResolver implements ArtifactResolver {
 
                 try {
                     artifact = artifact.setFile(ProjectClasspathTest.getFileForClasspathResource(
-                            ProjectClasspathTest.dir + "transitive-" + scope + "-dep.xml"));
+                            ProjectClasspathTest.DIR + "transitive-" + scope + "-dep.xml"));
                     result.setArtifact(artifact);
                 } catch (FileNotFoundException | URISyntaxException e) {
                     throw new IllegalStateException("Missing test POM for " + artifact, e);

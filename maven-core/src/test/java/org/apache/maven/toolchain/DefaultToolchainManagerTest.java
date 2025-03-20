@@ -51,10 +51,10 @@ public class DefaultToolchainManagerTest {
     private DefaultToolchainManager toolchainManager;
 
     @Mock
-    private ToolchainFactory toolchainFactory_basicType;
+    private ToolchainFactory toolchainFactoryBasicType;
 
     @Mock
-    private ToolchainFactory toolchainFactory_rareType;
+    private ToolchainFactory toolchainFactoryRareType;
 
     @Before
     public void onSetup() throws Exception {
@@ -63,8 +63,8 @@ public class DefaultToolchainManagerTest {
         MockitoAnnotations.initMocks(this);
 
         toolchainManager.factories = new HashMap<>();
-        toolchainManager.factories.put("basic", toolchainFactory_basicType);
-        toolchainManager.factories.put("rare", toolchainFactory_rareType);
+        toolchainManager.factories.put("basic", toolchainFactoryBasicType);
+        toolchainManager.factories.put("rare", toolchainFactoryRareType);
     }
 
     @Test
@@ -136,7 +136,7 @@ public class DefaultToolchainManagerTest {
         when(basicPrivate.matchesRequirements(ArgumentMatchers.<String, String>anyMap()))
                 .thenReturn(false)
                 .thenReturn(true);
-        when(toolchainFactory_basicType.createToolchain(isA(ToolchainModel.class)))
+        when(toolchainFactoryBasicType.createToolchain(isA(ToolchainModel.class)))
                 .thenReturn(basicPrivate);
 
         List<Toolchain> toolchains =

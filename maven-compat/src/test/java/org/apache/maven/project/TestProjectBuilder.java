@@ -38,7 +38,7 @@ public class TestProjectBuilder extends DefaultProjectBuilder {
 
             try {
                 artifact.setFile(ProjectClasspathTest.getFileForClasspathResource(
-                        ProjectClasspathTest.dir + "transitive-" + scope + "-dep.xml"));
+                        ProjectClasspathTest.DIR + "transitive-" + scope + "-dep.xml"));
             } catch (FileNotFoundException | URISyntaxException e) {
                 throw new IllegalStateException("Missing test POM for " + artifact);
             }

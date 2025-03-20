@@ -119,11 +119,11 @@ public abstract class AbstractConflictResolverTest extends PlexusTestCase {
                 GROUP_ID, id, versionRange, "jar", null, scope, inheritedScope, optional);
     }
 
-    protected ResolutionNode createResolutionNode(Artifact Artifact) {
-        return new ResolutionNode(Artifact, Collections.<ArtifactRepository>emptyList());
+    protected ResolutionNode createResolutionNode(Artifact artifact) {
+        return new ResolutionNode(artifact, Collections.<ArtifactRepository>emptyList());
     }
 
-    protected ResolutionNode createResolutionNode(Artifact Artifact, ResolutionNode parent) {
-        return new ResolutionNode(Artifact, Collections.<ArtifactRepository>emptyList(), parent);
+    protected ResolutionNode createResolutionNode(Artifact artifact, ResolutionNode parent) {
+        return new ResolutionNode(artifact, Collections.<ArtifactRepository>emptyList(), parent);
     }
 }

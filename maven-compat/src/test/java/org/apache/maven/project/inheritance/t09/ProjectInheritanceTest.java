@@ -62,7 +62,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         File pom1 = new File(pom0Basedir, "p1/pom.xml");
 
         // load the child project, which inherits from p0...
-        MavenProject project0 = getProjectWithDependencies(pom0);
+        getProjectWithDependencies(pom0);
         MavenProject project1 = getProjectWithDependencies(pom1);
 
         assertNotNull("Parent is null", project1.getParent());
@@ -96,7 +96,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         File pom2 = new File(pom0Basedir, "p2/pom.xml");
 
         // load the child project, which inherits from p0...
-        MavenProject project0 = getProjectWithDependencies(pom0);
+        getProjectWithDependencies(pom0);
         MavenProject project2 = getProjectWithDependencies(pom2);
 
         assertEquals(pom0Basedir, project2.getParent().getBasedir());

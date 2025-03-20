@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings("checkstyle:LocalVariableName")
 public class FileSizeFormatTest {
 
     @Test(expected = IllegalArgumentException.class)
@@ -268,7 +269,7 @@ public class FileSizeFormatTest {
 
         long _500_kilobytes = 500000L;
         long _1000_kilobytes = 2L * _500_kilobytes;
-        ;
+
         long _5000_kilobytes = 5L * _1000_kilobytes;
         long _15_megabytes = 3L * _5000_kilobytes;
         assertEquals("0/5.0 MB", format.formatProgress(_0_bytes, _5000_kilobytes));

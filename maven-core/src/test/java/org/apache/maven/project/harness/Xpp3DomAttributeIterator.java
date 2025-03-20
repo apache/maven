@@ -45,7 +45,7 @@ class Xpp3DomAttributeIterator implements NodeIterator {
 
     private int position;
 
-    public Xpp3DomAttributeIterator(NodePointer parent, QName qname) {
+    Xpp3DomAttributeIterator(NodePointer parent, QName qname) {
         this.parent = parent;
         this.node = (Xpp3Dom) parent.getNode();
 

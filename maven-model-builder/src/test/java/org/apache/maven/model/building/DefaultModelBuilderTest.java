@@ -95,8 +95,9 @@ public class DefaultModelBuilderTest {
                     return new StringModelSource(BASE1);
                 case BASE2_ID:
                     return new StringModelSource(BASE2);
+                default:
+                    return null;
             }
-            return null;
         }
     }
 
@@ -109,8 +110,9 @@ public class DefaultModelBuilderTest {
                     return new StringModelSource(BASE1);
                 case BASE2_ID2:
                     return new StringModelSource(BASE2);
+                default:
+                    return null;
             }
-            return null;
         }
 
         @Override

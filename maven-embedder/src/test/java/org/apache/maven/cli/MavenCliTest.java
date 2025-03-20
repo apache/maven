@@ -403,7 +403,7 @@ public class MavenCliTest {
 
         private final String value;
 
-        public ConcurrencyCalculator(String value) {
+        ConcurrencyCalculator(String value) {
             this.value = value;
         }
 

@@ -211,7 +211,7 @@ public class DefaultSettingsValidatorTest extends TestCase {
 
     private static class SimpleProblemCollector implements SettingsProblemCollector {
 
-        public List<String> messages = new ArrayList<>();
+        private final List<String> messages = new ArrayList<>();
 
         public void add(Severity severity, String message, int line, int column, Exception cause) {
             messages.add(message);

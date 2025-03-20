@@ -30,6 +30,8 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
  *
+ * @param <T> the type of {@link ProfileActivator} being tested
+ *
  * @author Benjamin Bentmann
  */
 public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> extends TestCase {
@@ -40,7 +42,6 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> e
 
     public AbstractProfileActivatorTest(Class<T> activatorClass) {
         this.activatorClass = Objects.requireNonNull(activatorClass, "activatorClass cannot be null");
-        ;
     }
 
     @Override
