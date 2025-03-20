@@ -772,6 +772,15 @@ public class ${className} {
             entry("ocirc",  "\u00f4"), entry("otilde", "\u00f5"), entry("ouml",   "\u00f6"), entry("divide", "\u00f7"),
             entry("oslash", "\u00f8"), entry("ugrave", "\u00f9"), entry("uacute", "\u00fa"), entry("ucirc",  "\u00fb"),
             entry("uuml",   "\u00fc"), entry("yacute", "\u00fd"), entry("thorn",  "\u00fe"), entry("yuml",   "\u00ff"),
+            // Special entities
+            entry("OElig",  "\u0152"), entry("oelig",  "\u0153"), entry("Scaron", "\u0160"), entry("scaron", "\u0161"),
+            entry("Yuml",   "\u0178"), entry("circ",   "\u02c6"), entry("tilde",  "\u02dc"), entry("ensp",   "\u2002"),
+            entry("emsp",   "\u2003"), entry("thinsp", "\u2009"), entry("zwnj",   "\u200c"), entry("zwj",    "\u200d"),
+            entry("lrm",    "\u200e"), entry("rlm",    "\u200f"), entry("ndash",  "\u2013"), entry("mdash",  "\u2014"),
+            entry("lsquo",  "\u2018"), entry("rsquo",  "\u2019"), entry("sbquo",  "\u201a"), entry("ldquo",  "\u201c"),
+            entry("rdquo",  "\u201d"), entry("bdquo",  "\u201e"), entry("dagger", "\u2020"), entry("Dagger", "\u2021"),
+            entry("permil", "\u2030"), entry("lsaquo", "\u2039"), entry("rsaquo", "\u203a"), entry("euro",   "\u20ac"),
+            // Symbol entities
             entry("fnof",   "\u0192"), entry("Alpha",  "\u0391"), entry("Beta",   "\u0392"), entry("Gamma",  "\u0393"),
             entry("Delta",  "\u0394"), entry("Epsilon","\u0395"), entry("Zeta",   "\u0396"), entry("Eta",    "\u0397"),
             entry("Theta",  "\u0398"), entry("Iota",   "\u0399"), entry("Kappa",  "\u039a"), entry("Lambda", "\u039b"),
