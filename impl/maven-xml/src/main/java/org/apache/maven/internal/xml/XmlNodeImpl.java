@@ -88,6 +88,12 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         this.location = location;
     }
 
+    @Override
+    @Deprecated
+    public XmlNode merge(XmlNode source, Boolean childMergeOverride) {
+        return XmlService.merge(this, source, childMergeOverride);
+    }
+
     // ----------------------------------------------------------------------
     // Name handling
     // ----------------------------------------------------------------------
@@ -169,6 +175,11 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     // ----------------------------------------------------------------------
     // Helpers
     // ----------------------------------------------------------------------
+
+    @SuppressWarnings("checkstyle:MethodLength")
+    public static XmlNode merge(XmlNode dominant, XmlNode recessive, Boolean childMergeOverride) {
+        return XmlService.merge(dominant, recessive, childMergeOverride);
+    }
 
     /**
      * Merge two DOMs, with one having dominance in the case of collision. Merge mechanisms (vs. override for nodes, or
