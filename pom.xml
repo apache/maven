@@ -138,7 +138,7 @@ under the License.
     <version.plexus-utils>3.6.0</version.plexus-utils>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.4.0-jre</guavaVersion>
-    <guavafailureaccessVersion>1.0.2</guavafailureaccessVersion>
+    <guavafailureaccessVersion>1.0.3</guavafailureaccessVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
