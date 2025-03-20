@@ -32,7 +32,7 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.XmlNodeBuilder;
+import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
 import org.apache.maven.repository.internal.PluginsMetadata.PluginInfo;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -135,7 +135,7 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                             // as it would pull in dependency on:
                             // - maven-plugin-api (for model)
                             // - Plexus Container (for model supporting classes and exceptions)
-                            XmlNode root = XmlNodeBuilder.build(is, null);
+                            XmlNode root = XmlNodeStaxBuilder.build(is, null);
                             String groupId = mayGetChild(root, "groupId");
                             String artifactId = mayGetChild(root, "artifactId");
                             String goalPrefix = mayGetChild(root, "goalPrefix");

@@ -88,8 +88,8 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         this.location = location;
     }
 
+    @SuppressWarnings("removal")
     @Override
-    @Deprecated
     public XmlNode merge(XmlNode source, Boolean childMergeOverride) {
         return XmlService.merge(this, source, childMergeOverride);
     }

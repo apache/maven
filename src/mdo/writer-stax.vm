@@ -67,7 +67,6 @@ import ${packageModelV4}.InputLocation;
 import ${packageModelV4}.InputLocationTracker;
 #end
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.XmlNodeBuilder;
 #foreach ( $class in $model.allClasses )
   #if ( $class.name != "InputLocation" )
 import ${packageModelV4}.${class.name};
