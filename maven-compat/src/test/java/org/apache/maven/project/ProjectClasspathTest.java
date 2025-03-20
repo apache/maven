@@ -27,7 +27,7 @@ import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
 
 public class ProjectClasspathTest extends AbstractMavenProjectTestCase {
-    static final String dir = "projects/scope/";
+    static final String DIR = "projects/scope/";
 
     public void setUp() throws Exception {
         ArtifactResolver resolver = lookup(ArtifactResolver.class, "classpath");
@@ -49,7 +49,7 @@ public class ProjectClasspathTest extends AbstractMavenProjectTestCase {
     }
 
     public void testProjectClasspath() throws Exception {
-        File f = getFileForClasspathResource(dir + "project-with-scoped-dependencies.xml");
+        File f = getFileForClasspathResource(DIR + "project-with-scoped-dependencies.xml");
 
         MavenProject project = getProjectWithDependencies(f);
 

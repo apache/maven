@@ -32,7 +32,7 @@ class Xpp3DomAttributePointer extends NodePointer {
 
     private Map.Entry<String, String> attrib;
 
-    public Xpp3DomAttributePointer(NodePointer parent, Map.Entry<String, String> attrib) {
+    Xpp3DomAttributePointer(NodePointer parent, Map.Entry<String, String> attrib) {
         super(parent);
         this.attrib = attrib;
     }

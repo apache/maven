@@ -416,19 +416,19 @@ public class DefaultModelValidatorTest extends TestCase {
                 result.getWarnings().get(0),
                 "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path");
 
-        SimpleProblemCollector result_31 =
+        SimpleProblemCollector result31 =
                 validateRaw("hard-coded-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1);
 
-        assertViolations(result_31, 0, 0, 3);
+        assertViolations(result31, 0, 0, 3);
 
         assertContains(
-                result_31.getWarnings().get(0),
+                result31.getWarnings().get(0),
                 "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope");
         assertContains(
-                result_31.getWarnings().get(1),
+                result31.getWarnings().get(1),
                 "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path");
         assertContains(
-                result_31.getWarnings().get(2),
+                result31.getWarnings().get(2),
                 "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope");
     }
 
@@ -554,9 +554,9 @@ public class DefaultModelValidatorTest extends TestCase {
 
         // MNG-3832: Aether (part of M3+) supports wildcard expressions for exclusions
 
-        SimpleProblemCollector result_30 = validate("bad-dependency-exclusion-id.xml");
+        SimpleProblemCollector result30 = validate("bad-dependency-exclusion-id.xml");
 
-        assertViolations(result_30, 0, 0, 0);
+        assertViolations(result30, 0, 0, 0);
     }
 
     public void testMissingDependencyExclusionId() throws Exception {
@@ -604,22 +604,22 @@ public class DefaultModelValidatorTest extends TestCase {
                 result.getWarnings().get(1),
                 "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory");
 
-        SimpleProblemCollector result_31 =
+        SimpleProblemCollector result31 =
                 validateRaw("basedir-system-path.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1);
 
-        assertViolations(result_31, 0, 0, 4);
+        assertViolations(result31, 0, 0, 4);
 
         assertContains(
-                result_31.getWarnings().get(0),
+                result31.getWarnings().get(0),
                 "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope");
         assertContains(
-                result_31.getWarnings().get(1),
+                result31.getWarnings().get(1),
                 "'dependencies.dependency.systemPath' for test:a:jar should not point at files within the project directory");
         assertContains(
-                result_31.getWarnings().get(2),
+                result31.getWarnings().get(2),
                 "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope");
         assertContains(
-                result_31.getWarnings().get(3),
+                result31.getWarnings().get(3),
                 "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory");
     }
 

@@ -177,6 +177,7 @@ public class VersionRangeTest extends TestCase {
         checkInvalidRange("(1.1,1.2],[1.0,1.1)");
     }
 
+    @SuppressWarnings("checkstyle:MethodLength")
     public void testIntersections() throws InvalidVersionSpecificationException {
         VersionRange range1 = VersionRange.createFromVersionSpec("1.0");
         VersionRange range2 = VersionRange.createFromVersionSpec("1.1");

@@ -85,7 +85,7 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
         wagon.addExpectedContent(repos.get(1).getLayout().pathOf(artifact), "expected");
 
         class TransferListener extends AbstractTransferListener {
-            public List<TransferEvent> events = new ArrayList<>();
+            private List<TransferEvent> events = new ArrayList<>();
 
             @Override
             public void transferInitiated(TransferEvent transferEvent) {

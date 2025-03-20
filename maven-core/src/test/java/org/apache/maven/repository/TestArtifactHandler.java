@@ -31,11 +31,11 @@ class TestArtifactHandler implements ArtifactHandler {
 
     private String extension;
 
-    public TestArtifactHandler(String type) {
+    TestArtifactHandler(String type) {
         this(type, type);
     }
 
-    public TestArtifactHandler(String type, String extension) {
+    TestArtifactHandler(String type, String extension) {
         this.type = type;
         this.extension = extension;
     }

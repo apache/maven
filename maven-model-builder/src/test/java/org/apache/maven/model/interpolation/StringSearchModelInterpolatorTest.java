@@ -464,7 +464,7 @@ public class StringSearchModelInterpolatorTest extends AbstractModelInterpolator
     private static final class ObjectWithStringArrayField {
         private final String[] values;
 
-        public ObjectWithStringArrayField(String[] values) {
+        ObjectWithStringArrayField(String[] values) {
             this.values = values;
         }
     }
@@ -472,7 +472,7 @@ public class StringSearchModelInterpolatorTest extends AbstractModelInterpolator
     private static final class ObjectWithListField {
         private final List<?> values;
 
-        public ObjectWithListField(List<?> values) {
+        ObjectWithListField(List<?> values) {
             this.values = values;
         }
     }
@@ -480,7 +480,7 @@ public class StringSearchModelInterpolatorTest extends AbstractModelInterpolator
     private static final class ObjectWithMapField {
         private final Map<?, ?> values;
 
-        public ObjectWithMapField(Map<?, ?> values) {
+        ObjectWithMapField(Map<?, ?> values) {
             this.values = values;
         }
     }

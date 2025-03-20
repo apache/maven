@@ -89,6 +89,6 @@ public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCa
     }
 
     public void testLookup() throws Exception {
-        ArtifactResolver resolver = lookup(ArtifactResolver.class, "default");
+        lookup(ArtifactResolver.class, "default");
     }
 }

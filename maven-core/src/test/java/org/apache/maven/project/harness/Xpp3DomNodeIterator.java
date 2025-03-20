@@ -53,7 +53,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
 
     private int position;
 
-    public Xpp3DomNodeIterator(NodePointer parent, NodeTest test, boolean reverse, NodePointer startWith) {
+    Xpp3DomNodeIterator(NodePointer parent, NodeTest test, boolean reverse, NodePointer startWith) {
         this.parent = parent;
         this.node = (Xpp3Dom) parent.getNode();
         this.children = this.node.getChildren();

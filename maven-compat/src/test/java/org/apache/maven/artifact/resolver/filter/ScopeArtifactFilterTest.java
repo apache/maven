@@ -33,7 +33,7 @@ public class ScopeArtifactFilterTest extends TestCase {
         return new DefaultArtifact("g", "a", "1.0", scope, "jar", "", null);
     }
 
-    public void testInclude_Compile() {
+    public void testIncludeCompile() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -43,7 +43,7 @@ public class ScopeArtifactFilterTest extends TestCase {
         assertFalse(filter.include(newArtifact(Artifact.SCOPE_TEST)));
     }
 
-    public void testInclude_CompilePlusRuntime() {
+    public void testIncludeCompilePlusRuntime() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE_PLUS_RUNTIME);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -53,7 +53,7 @@ public class ScopeArtifactFilterTest extends TestCase {
         assertFalse(filter.include(newArtifact(Artifact.SCOPE_TEST)));
     }
 
-    public void testInclude_Runtime() {
+    public void testIncludeRuntime() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -63,7 +63,7 @@ public class ScopeArtifactFilterTest extends TestCase {
         assertFalse(filter.include(newArtifact(Artifact.SCOPE_TEST)));
     }
 
-    public void testInclude_RuntimePlusSystem() {
+    public void testIncludeRuntimePlusSystem() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME_PLUS_SYSTEM);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -73,7 +73,7 @@ public class ScopeArtifactFilterTest extends TestCase {
         assertFalse(filter.include(newArtifact(Artifact.SCOPE_TEST)));
     }
 
-    public void testInclude_Test() {
+    public void testIncludeTest() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_TEST);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));

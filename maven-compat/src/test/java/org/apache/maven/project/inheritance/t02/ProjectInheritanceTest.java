@@ -69,12 +69,12 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         System.out.println("Location of project-4's POM: " + pom4.getPath());
 
         // load everything...
-        MavenProject project0 = getProject(pom0);
-        MavenProject project1 = getProject(pom1);
-        MavenProject project2 = getProject(pom2);
-        MavenProject project3 = getProject(pom3);
+        getProject(pom0);
+        getProject(pom1);
+        getProject(pom2);
+        getProject(pom3);
         MavenProject project4 = getProject(pom4);
-        MavenProject project5 = getProject(pom5);
+        getProject(pom5);
 
         assertEquals("p4", project4.getName());
 
