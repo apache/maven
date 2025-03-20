@@ -833,7 +833,11 @@ public interface Session extends ProtoSession {
     /**
      * Obtain the {@link DependencyScope} from the specified {@code id}.
      * <p>
-     * Shortcut for {@code DependencyScope.forId(...)}.
+     * Shortcut for {@code DependencyScope.forId(...)} with a verification that the given identifier exists.
+     *
+     * @param id the identifier of the scope (case-sensitive)
+     * @return the scope for the given identifier (never null)
+     * @throws IllegalArgumentException if the given identifier is not a known scope
      *
      * @see org.apache.maven.api.DependencyScope#forId(String)
      */

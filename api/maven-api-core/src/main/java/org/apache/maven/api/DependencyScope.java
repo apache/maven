@@ -99,6 +99,13 @@ public enum DependencyScope {
     private static final Map<String, DependencyScope> IDS = Collections.unmodifiableMap(
             Stream.of(DependencyScope.values()).collect(Collectors.toMap(s -> s.id, s -> s)));
 
+    /**
+     * {@return the dependency scope for the given identifier, or {@code null} if none}.
+     * The identifiers are usually in lower cases with {@code '-'} instead of {@code '_'}
+     * as word separator.
+     *
+     * @param id the identifier of the scope (case-sensitive)
+     */
     public static DependencyScope forId(String id) {
         return IDS.get(id);
     }
