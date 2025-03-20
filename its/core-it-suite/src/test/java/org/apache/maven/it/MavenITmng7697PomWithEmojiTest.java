@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng7697PomWithEmojiTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7697PomWithEmojiTest() {
+    MavenITmng7697PomWithEmojiTest() {
         // affected Maven versions: 3.9.0, 4.0.0-alpha-4
         super("(,3.9.0),(3.9.0,4.0.0-alpha-4),(4.0.0-alpha-4,)");
     }

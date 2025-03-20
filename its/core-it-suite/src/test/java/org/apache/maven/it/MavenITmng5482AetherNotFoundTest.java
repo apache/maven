@@ -65,8 +65,7 @@ public class MavenITmng5482AetherNotFoundTest extends AbstractMavenIntegrationTe
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
-        VerificationException exception =
-                assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
+        assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
         List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
 

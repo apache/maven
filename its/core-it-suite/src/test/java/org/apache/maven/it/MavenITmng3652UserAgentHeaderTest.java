@@ -41,7 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3652">MNG-3652</a>.
  */
-public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase {
+@SuppressWarnings("checkstyle:UnusedLocalVariable")
+class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase {
     private Server server;
 
     private int port;
@@ -50,7 +51,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
 
     private String customHeader;
 
-    public MavenITmng3652UserAgentHeaderTest() {
+    MavenITmng3652UserAgentHeaderTest() {
         super("[3.0-beta-3,)");
     }
 
@@ -102,7 +103,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
      * @throws Exception in case of failure
      */
     @Test
-    public void testmng3652_UnConfiguredHttp() throws Exception {
+    public void testmng3652UnConfiguredHttp() throws Exception {
         File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");
@@ -145,7 +146,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
     }
 
     @Test
-    public void testmng3652_UnConfiguredDAV() throws Exception {
+    public void testmng3652UnConfiguredDAV() throws Exception {
         File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");
@@ -190,7 +191,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
     }
 
     @Test
-    public void testmng3652_ConfigurationInSettingsWithoutUserAgent() throws Exception {
+    public void testmng3652ConfigurationInSettingsWithoutUserAgent() throws Exception {
         File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");
@@ -237,7 +238,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
     }
 
     @Test
-    public void testmng3652_UserAgentConfiguredInSettings() throws Exception {
+    public void testmng3652UserAgentConfiguredInSettings() throws Exception {
         File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");
@@ -269,7 +270,7 @@ public class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationT
     }
 
     @Test
-    public void testmng3652_AdditionnalHttpHeaderConfiguredInSettings() throws Exception {
+    public void testmng3652AdditionnalHttpHeaderConfiguredInSettings() throws Exception {
         File testDir = extractResources("/mng-3652");
         File pluginDir = new File(testDir, "test-plugin");
         File projectDir = new File(testDir, "test-project");

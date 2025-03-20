@@ -36,9 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase {
+class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3843PomInheritanceTest() {
+    MavenITmng3843PomInheritanceTest() {
         super(ALL_MAVEN_VERSIONS);
     }
 
@@ -48,6 +48,7 @@ public class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTe
      * @throws Exception in case of failure
      */
     @Test
+    @SuppressWarnings("checkstyle:MethodLength")
     public void testitMNG3843() throws Exception {
         File testDir = extractResources("/mng-3843");
 

@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng7629SubtreeBuildTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7629SubtreeBuildTest() {
+    MavenITmng7629SubtreeBuildTest() {
         super("[4.0.0-alpha-4,)");
     }
 

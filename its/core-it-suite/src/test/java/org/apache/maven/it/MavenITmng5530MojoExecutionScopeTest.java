@@ -22,13 +22,13 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5530MojoExecutionScopeTest() {
+class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestCase {
+    MavenITmng5530MojoExecutionScopeTest() {
         super("[3.2.1,)");
     }
 
     @Test
-    public void test_copyfiles() throws Exception {
+    public void testCopyfiles() throws Exception {
         File testDir = extractResources("/mng-5530-mojo-execution-scope");
         File pluginDir = new File(testDir, "plugin");
         File projectDir = new File(testDir, "basic");
@@ -53,7 +53,7 @@ public class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrati
     }
 
     @Test
-    public void test_copyfiles_multithreaded() throws Exception {
+    public void testCopyfilesMultithreaded() throws Exception {
         File testDir = extractResources("/mng-5530-mojo-execution-scope");
         File pluginDir = new File(testDir, "plugin");
         File projectDir = new File(testDir, "basic");
