@@ -804,9 +804,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Severity.ERROR,
                     Version.V40,
                     fieldPathPrefix + "." + xmlNode.name(),
-                    xmlNode.inputLocation() != null
-                            ? xmlNode.inputLocation().toString()
-                            : null,
+                    xmlNode.inputLocation() != null ? xmlNode.inputLocation().toString() : null,
                     "Unsupported value '" + childrenCombinationModeAttribute + "' for "
                             + XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
                             + XmlService.CHILDREN_COMBINATION_APPEND + ", and " + XmlService.CHILDREN_COMBINATION_MERGE
@@ -823,9 +821,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Severity.ERROR,
                     Version.V40,
                     fieldPathPrefix + "." + xmlNode.name(),
-                    xmlNode.inputLocation() != null
-                            ? xmlNode.inputLocation().toString()
-                            : null,
+                    xmlNode.inputLocation() != null ? xmlNode.inputLocation().toString() : null,
                     "Unsupported value '" + selfCombinationModeAttribute + "' for "
                             + XmlService.SELF_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
                             + XmlService.SELF_COMBINATION_OVERRIDE + ", " + XmlService.SELF_COMBINATION_MERGE + ", and "

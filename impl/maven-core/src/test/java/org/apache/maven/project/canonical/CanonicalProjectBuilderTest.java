@@ -78,8 +78,7 @@ class CanonicalProjectBuilderTest extends AbstractMavenProjectTestCase {
                 "src/conf/plexus.properties",
                 configuration.child("plexusConfigurationPropertiesFile").value());
 
-        assertEquals(
-                "Continuum", configuration.child("plexusApplicationName").value());
+        assertEquals("Continuum", configuration.child("plexusApplicationName").value());
 
         // ----------------------------------------------------------------------
         // Goal specific configuration
