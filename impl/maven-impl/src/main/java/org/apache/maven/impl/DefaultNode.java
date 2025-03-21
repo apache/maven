@@ -154,7 +154,9 @@ public class DefaultNode extends AbstractNode {
         if (!details.isEmpty()) {
             sb.append(included ? " (" : " - ");
             appendDetails(sb, details);
-            sb.append(')');
+            if (included) {
+                sb.append(')');
+            }
         }
 
         if (!included) {
