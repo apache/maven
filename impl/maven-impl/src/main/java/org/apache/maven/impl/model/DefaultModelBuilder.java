@@ -69,7 +69,6 @@ import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
-import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.Interpolator;
@@ -498,9 +497,21 @@ public class DefaultModelBuilder implements ModelBuilder {
             return new ModelBuilderException(result);
         }
 
-        public void mergeRepositories(List<Repository> toAdd, boolean replace) {
-            List<RemoteRepository> repos =
-                    toAdd.stream().map(session::createRemoteRepository).toList();
+        public void mergeRepositories(Model model, boolean replace) {
+            if (model.getRepositories().isEmpty()) {
+                return;
+            }
+            // We need to interpolate the repositories before we can use them
+            Model interpolatedModel = interpolateModel(
+                    Model.newBuilder()
+                            .pomFile(model.getPomFile())
+                            .repositories(model.getRepositories())
+                            .build(),
+                    request,
+                    this);
+            List<RemoteRepository> repos = interpolatedModel.getRepositories().stream()
+                    .map(session::createRemoteRepository)
+                    .toList();
             if (replace) {
                 Set<String> ids = repos.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
                 repositories = repositories.stream()
@@ -1016,7 +1027,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // add repositories specified by the current model so that we can resolve the parent
             if (!childModel.getRepositories().isEmpty()) {
                 var previousRepositories = repositories;
-                mergeRepositories(childModel.getRepositories(), false);
+                mergeRepositories(childModel, false);
                 if (!Objects.equals(previousRepositories, repositories)) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Merging repositories from " + childModel.getId() + "\n"
@@ -1196,7 +1207,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (!resultModel.getRepositories().isEmpty()) {
                 List<String> oldRepos =
                         repositories.stream().map(Object::toString).toList();
-                mergeRepositories(resultModel.getRepositories(), true);
+                mergeRepositories(resultModel, true);
                 List<String> newRepos =
                         repositories.stream().map(Object::toString).toList();
                 if (!Objects.equals(oldRepos, newRepos)) {
