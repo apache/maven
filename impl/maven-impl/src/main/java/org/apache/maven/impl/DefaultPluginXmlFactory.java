@@ -40,7 +40,7 @@ import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
 
 import static org.apache.maven.impl.StaxLocation.getLocation;
 import static org.apache.maven.impl.StaxLocation.getMessage;
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 @Named
 @Singleton

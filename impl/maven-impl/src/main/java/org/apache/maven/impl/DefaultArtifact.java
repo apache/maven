@@ -25,7 +25,7 @@ import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 /**
  * A wrapper class around a maven resolver artifact.

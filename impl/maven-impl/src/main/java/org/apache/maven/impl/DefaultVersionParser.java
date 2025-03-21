@@ -27,7 +27,7 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.model.ModelVersionParser;
 
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 /**
  * A wrapper class around a resolver version that works as model version parser as well.

@@ -40,7 +40,7 @@ import org.apache.maven.api.services.Result;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
-import static org.apache.maven.impl.Utils.cast;
+import static org.apache.maven.impl.ImplUtils.cast;
 
 public interface InternalSession extends Session {
 
