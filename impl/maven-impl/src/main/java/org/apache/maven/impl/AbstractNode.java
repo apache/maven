@@ -25,9 +25,6 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.Node;
 import org.apache.maven.api.NodeVisitor;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.graph.DependencyNode;
 
 public abstract class AbstractNode implements Node {
 
@@ -50,22 +47,6 @@ public abstract class AbstractNode implements Node {
         List<Node> children =
                 getChildren().stream().filter(filter).map(n -> n.filter(filter)).collect(Collectors.toList());
         return new WrapperNode(this, Collections.unmodifiableList(children));
-    }
-
-    @Override
-    public String asString() {
-        StringBuilder sb = new StringBuilder();
-
-        DependencyNode node = getDependencyNode();
-        Artifact artifact = node.getArtifact();
-        sb.append(artifact);
-
-        Dependency dependency = node.getDependency();
-        if (dependency != null) {
-            sb.append(":").append(dependency.getScope());
-        }
-
-        return sb.toString();
     }
 
     @Override

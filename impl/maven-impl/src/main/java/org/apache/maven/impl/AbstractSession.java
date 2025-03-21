@@ -556,7 +556,7 @@ public abstract class AbstractSession implements InternalSession {
                         this,
                         artifact.getGroupId(),
                         artifact.getArtifactId(),
-                        artifact.getVersion().asString(),
+                        artifact.getVersion().toString(),
                         artifact.getClassifier(),
                         artifact.getExtension(),
                         null);

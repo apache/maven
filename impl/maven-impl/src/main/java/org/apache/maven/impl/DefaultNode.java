@@ -76,18 +76,44 @@ public class DefaultNode extends AbstractNode {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
+    /**
+     * Returns a detailed string representation of this dependency node.
+     * <p>
+     * When verbose mode is disabled, returns the basic string representation in the format:
+     * {@code groupId:artifactId:version[:scope]}
+     * <p>
+     * When verbose mode is enabled, additional details are included with the following format:
+     * <ul>
+     *   <li>For included dependencies: {@code groupId:artifactId:version[:scope] (details)}</li>
+     *   <li>For omitted dependencies: {@code (groupId:artifactId:version[:scope] - details)}</li>
+     * </ul>
+     * Where details may include:
+     * <ul>
+     *   <li>Version management information (if the version was managed from a different version)</li>
+     *   <li>Scope management information (if the scope was managed from a different scope)</li>
+     *   <li>Scope updates (if the scope was changed during resolution)</li>
+     *   <li>Conflict resolution information (if the dependency was omitted due to conflicts or duplicates)</li>
+     * </ul>
+     *
+     * @return a string representation of this dependency node with optional detailed information
+     */
+    @Nonnull
     @Override
     public String asString() {
-        String nodeString = super.asString();
+        StringBuilder sb = new StringBuilder();
+        DependencyNode node = getDependencyNode();
+        org.eclipse.aether.artifact.Artifact artifact = node.getArtifact();
+        org.eclipse.aether.graph.Dependency dependency = node.getDependency();
 
         if (!verbose) {
-            return nodeString;
+            sb.append(artifact);
+            if (dependency != null) {
+                sb.append(":").append(dependency.getScope());
+            }
+            return sb.toString();
         }
 
-        org.eclipse.aether.graph.DependencyNode node = getDependencyNode();
-
         List<String> details = new ArrayList<>();
-
         org.eclipse.aether.graph.DependencyNode winner =
                 (org.eclipse.aether.graph.DependencyNode) node.getData().get(ConflictResolver.NODE_DATA_WINNER);
         String winnerVersion = winner != null ? winner.getArtifact().getBaseVersion() : null;
@@ -104,47 +130,49 @@ public class DefaultNode extends AbstractNode {
         }
 
         String originalScope = (String) node.getData().get(ConflictResolver.NODE_DATA_ORIGINAL_SCOPE);
-        if (originalScope != null && !originalScope.equals(node.getDependency().getScope())) {
+        if (originalScope != null && !originalScope.equals(dependency.getScope())) {
             details.add("scope updated from " + originalScope);
         }
 
         if (!included) {
-            if (Objects.equals(winnerVersion, node.getArtifact().getVersion())) {
+            if (Objects.equals(winnerVersion, artifact.getVersion())) {
                 details.add("omitted for duplicate");
             } else {
                 details.add("omitted for conflict with " + winnerVersion);
             }
         }
 
-        StringBuilder buffer = new StringBuilder();
-        if (included) {
-            buffer.append(nodeString);
-            if (!details.isEmpty()) {
-                buffer.append(" (");
-                join(buffer, details, "; ");
-                buffer.append(")");
-            }
-        } else {
-            buffer.append("(");
-            buffer.append(nodeString);
-            if (!details.isEmpty()) {
-                buffer.append(" - ");
-                join(buffer, details, "; ");
-            }
-            buffer.append(")");
+        if (!included) {
+            sb.append('(');
         }
-        return buffer.toString();
+
+        sb.append(artifact);
+        if (dependency != null) {
+            sb.append(":").append(dependency.getScope());
+        }
+
+        if (!details.isEmpty()) {
+            sb.append(included ? " (" : " - ");
+            appendDetails(sb, details);
+            sb.append(')');
+        }
+
+        if (!included) {
+            sb.append(')');
+        }
+
+        return sb.toString();
     }
 
-    private static void join(StringBuilder buffer, List<String> details, String separator) {
+    private static void appendDetails(StringBuilder sb, List<String> details) {
         boolean first = true;
         for (String detail : details) {
             if (first) {
                 first = false;
             } else {
-                buffer.append(separator);
+                sb.append("; ");
             }
-            buffer.append(detail);
+            sb.append(detail);
         }
     }
 }
