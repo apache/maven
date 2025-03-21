@@ -50,7 +50,7 @@ import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.Utils;
+import org.apache.maven.cling.invoker.CliUtils;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
@@ -257,7 +257,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
             // project present, but we could not determine rootDirectory: extra work needed
             if (context.invokerRequest.rootDirectory().isEmpty()) {
-                Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
+                Path rootDirectory = CliUtils.findMandatoryRoot(context.invokerRequest.topDirectory());
                 request.setMultiModuleProjectDirectory(rootDirectory.toFile());
                 request.setRootDirectory(rootDirectory);
             }
