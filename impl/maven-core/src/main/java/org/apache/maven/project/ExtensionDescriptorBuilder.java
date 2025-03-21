@@ -111,8 +111,8 @@ public class ExtensionDescriptorBuilder {
         if (dom != null) {
             strings = new ArrayList<>();
 
-            for (XmlNode child : dom.getChildren()) {
-                String string = child.getValue();
+            for (XmlNode child : dom.children()) {
+                String string = child.value();
                 if (string != null) {
                     string = string.trim();
                     if (!string.isEmpty()) {

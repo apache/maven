@@ -47,7 +47,7 @@ class Xpp3DomAttributeIterator implements NodeIterator {
         this.parent = parent;
         this.node = (XmlNode) parent.getNode();
 
-        this.attributes = this.node.getAttributes().entrySet().stream()
+        this.attributes = this.node.attributes().entrySet().stream()
                 .filter(a -> a.getKey().equals(qname.getName()) || "*".equals(qname.getName()))
                 .collect(Collectors.toList());
     }
