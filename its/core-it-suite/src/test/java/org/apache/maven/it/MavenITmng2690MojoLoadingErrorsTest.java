@@ -37,9 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author jdcasey
  */
-public class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCase {
+@SuppressWarnings("checkstyle:UnusedLocalVariable")
+class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2690MojoLoadingErrorsTest() {
+    MavenITmng2690MojoLoadingErrorsTest() {
         super("(2.1.0-M1,)");
     }
 

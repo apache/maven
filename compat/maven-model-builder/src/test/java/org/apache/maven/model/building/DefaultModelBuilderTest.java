@@ -91,13 +91,11 @@ public class DefaultModelBuilderTest {
     static class CycleInImportsResolver extends BaseModelResolver {
         @Override
         public ModelSource resolveModel(Dependency dependency) throws UnresolvableModelException {
-            switch (dependency.getManagementKey()) {
-                case BASE1_ID:
-                    return new StringModelSource(BASE1);
-                case BASE2_ID:
-                    return new StringModelSource(BASE2);
-            }
-            return null;
+            return switch (dependency.getManagementKey()) {
+                case BASE1_ID -> new StringModelSource(BASE1);
+                case BASE2_ID -> new StringModelSource(BASE2);
+                default -> null;
+            };
         }
     }
 
@@ -105,13 +103,11 @@ public class DefaultModelBuilderTest {
         @Override
         public ModelSource resolveModel(String groupId, String artifactId, String version)
                 throws UnresolvableModelException {
-            switch (groupId + ":" + artifactId + ":" + version) {
-                case BASE1_ID2:
-                    return new StringModelSource(BASE1);
-                case BASE2_ID2:
-                    return new StringModelSource(BASE2);
-            }
-            return null;
+            return switch (groupId + ":" + artifactId + ":" + version) {
+                case BASE1_ID2 -> new StringModelSource(BASE1);
+                case BASE2_ID2 -> new StringModelSource(BASE2);
+                default -> null;
+            };
         }
 
         @Override

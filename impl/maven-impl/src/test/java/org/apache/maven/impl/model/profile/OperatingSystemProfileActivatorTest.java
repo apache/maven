@@ -133,7 +133,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    public void testCapitalOsName() {
+    void testCapitalOsName() {
         Profile profile = newProfile(ActivationOS.newBuilder()
                 .family("Mac")
                 .name("Mac OS X")

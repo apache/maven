@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * inherit == false are not inherited to the child POM.
  */
 @Deprecated
+@SuppressWarnings("checkstyle:UnusedLocalVariable")
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //

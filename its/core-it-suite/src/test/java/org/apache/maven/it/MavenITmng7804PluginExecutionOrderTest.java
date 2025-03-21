@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITmng7804PluginExecutionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7804PluginExecutionOrderTest() {
+    MavenITmng7804PluginExecutionOrderTest() {
         super("[4.0.0-alpha-6,)");
     }
 

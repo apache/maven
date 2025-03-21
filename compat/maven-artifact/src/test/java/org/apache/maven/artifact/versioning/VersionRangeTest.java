@@ -181,6 +181,7 @@ class VersionRangeTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:MethodLength")
     void testIntersections() throws InvalidVersionSpecificationException {
         VersionRange range1 = VersionRange.createFromVersionSpec("1.0");
         VersionRange range2 = VersionRange.createFromVersionSpec("1.1");

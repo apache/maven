@@ -36,7 +36,7 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
     }
 
     @Test
-    public void testitMNG3746_UsingDefaultSystemProperty() throws Exception {
+    public void testitMNG3746UsingDefaultSystemProperty() throws Exception {
         // The testdir is computed from the location of this
         // file.
         File testDir = extractResources("/mng-3746");
@@ -59,7 +59,7 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
     }
 
     @Test
-    public void testitMNG3746_UsingCLIProperty() throws Exception {
+    public void testitMNG3746UsingCLIProperty() throws Exception {
         // The testdir is computed from the location of this
         // file.
         File testDir = extractResources("/mng-3746");

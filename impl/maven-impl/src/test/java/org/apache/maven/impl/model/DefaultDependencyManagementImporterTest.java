@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultDependencyManagementImporterTest {
     @Test
-    void testUpdateWithImportedFrom_dependencyLocationAndBomLocationAreNull_dependencyReturned() {
+    void testUpdateWithImportedFromDependencyLocationAndBomLocationAreNullDependencyReturned() {
         final Dependency dependency = Dependency.newBuilder().build();
         final DependencyManagement depMgmt = DependencyManagement.newBuilder().build();
         final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, depMgmt);
@@ -37,7 +37,7 @@ class DefaultDependencyManagementImporterTest {
     }
 
     @Test
-    void testUpdateWithImportedFrom_dependencyManagementAndDependencyHaveSameSource_dependencyImportedFromSameSource() {
+    void testUpdateWithImportedFromDependencyManagementAndDependencyHaveSameSourceDependencyImportedFromSameSource() {
         final InputSource source = new InputSource("SINGLE_SOURCE", "");
         final Dependency dependency = Dependency.newBuilder()
                 .location("", new InputLocation(1, 1, source))
@@ -54,7 +54,7 @@ class DefaultDependencyManagementImporterTest {
     }
 
     @Test
-    public void testUpdateWithImportedFrom_singleLevel_importedFromSet() {
+    public void testUpdateWithImportedFromSingleLevelImportedFromSet() {
         // Arrange
         final InputSource dependencySource = new InputSource("DEPENDENCY", "DEPENDENCY");
         final InputSource bomSource = new InputSource("BOM", "BOM");
@@ -75,7 +75,7 @@ class DefaultDependencyManagementImporterTest {
     }
 
     @Test
-    public void testUpdateWithImportedFrom_multiLevel_importedFromSetChanged() {
+    public void testUpdateWithImportedFromMultiLevelImportedFromSetChanged() {
         // Arrange
         final InputSource bomSource = new InputSource("BOM", "BOM");
         final InputSource intermediateSource =
@@ -99,7 +99,7 @@ class DefaultDependencyManagementImporterTest {
     }
 
     @Test
-    public void testUpdateWithImportedFrom_multiLevelAlreadyFoundInDifferentSource_importedFromSetMaintained() {
+    public void testUpdateWithImportedFromMultiLevelAlreadyFoundInDifferentSourceImportedFromSetMaintained() {
         // Arrange
         final InputSource bomSource = new InputSource("BOM", "BOM");
         final InputSource intermediateSource =

@@ -28,7 +28,7 @@ class MavenArtifactRepositoryTest {
     private static class MavenArtifactRepositorySubclass extends MavenArtifactRepository {
         String id;
 
-        public MavenArtifactRepositorySubclass(String id) {
+        MavenArtifactRepositorySubclass(String id) {
             this.id = id;
         }
 

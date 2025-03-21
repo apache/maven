@@ -44,4 +44,14 @@ under the License.
     <module>core-it-javaagent</module>
   </modules>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven.plugin-tools</groupId>
+        <artifactId>maven-plugin-annotations</artifactId>
+        <version>3.15.1</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
 </project>

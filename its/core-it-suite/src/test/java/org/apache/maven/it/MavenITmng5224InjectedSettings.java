@@ -36,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  *
  */
-public class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5224InjectedSettings() {
+class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTestCase {
+    MavenITmng5224InjectedSettings() {
         // olamy probably doesn't work with 3.x before 3.0.4
         super("[2.0.3,3.0-alpha-1),[3.0.4,)");
     }
@@ -47,7 +47,7 @@ public class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTest
      * @throws Exception in case of failure
      */
     @Test
-    public void testmng5224_ReadSettings() throws Exception {
+    public void testmng5224ReadSettings() throws Exception {
         File testDir = extractResources("/mng-5224");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());

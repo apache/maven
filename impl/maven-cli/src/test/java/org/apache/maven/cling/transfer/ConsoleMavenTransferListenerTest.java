@@ -61,8 +61,11 @@ class ConsoleMavenTransferListenerTest {
                             int i = string.length() - 1;
                             while (i >= 0) {
                                 char c = string.charAt(i);
-                                if (c == '\n' || c == '\r' || c == ' ') i--;
-                                else break;
+                                if (c == '\n' || c == '\r' || c == ' ') {
+                                    i--;
+                                } else {
+                                    break;
+                                }
                             }
 
                             string = string.substring(0, i + 1).trim();

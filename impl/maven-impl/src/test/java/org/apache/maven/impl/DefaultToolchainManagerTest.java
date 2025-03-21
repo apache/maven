@@ -36,9 +36,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultToolchainManagerTest {
@@ -68,7 +71,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void getToolchains_WithValidTypeAndRequirements() {
+    void getToolchainsWithValidTypeAndRequirements() {
         toolchainModel = ToolchainModel.newBuilder().type("jdk").build();
         when(session.getToolchains()).thenReturn(List.of(toolchainModel));
         when(jdkFactory.createToolchain(toolchainModel)).thenReturn(mockToolchain);
@@ -82,7 +85,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void getToolchains_WithInvalidType() {
+    void getToolchainsWithInvalidType() {
         List<Toolchain> result = manager.getToolchains(session, "invalid", null);
         assertTrue(result.isEmpty());
     }
@@ -108,7 +111,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void retrieveContext_WithoutProject() {
+    void retrieveContextWithoutProject() {
         when(session.getService(Lookup.class)).thenReturn(lookup);
         when(lookup.lookupOptional(Project.class)).thenReturn(Optional.empty());
 
@@ -116,7 +119,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void getToolchains_WithNullType() {
+    void getToolchainsWithNullType() {
         assertThrows(NullPointerException.class, () -> manager.getToolchains(session, null, null));
     }
 }

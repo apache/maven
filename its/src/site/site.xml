@@ -19,13 +19,11 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project xmlns="https://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="https://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd"
-  name="Core ITs">
-  <bannerLeft>
-    <name>${project.name}</name>
-    <src>https://maven.apache.org/images/apache-maven-project.png</src>
-    <href>https://maven.apache.org/</href>
+<site xmlns="http://maven.apache.org/SITE/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd"
+      name="Core ITs">
+  <bannerLeft name="${project.name}" href="https://maven.apache.org/">
+    <image src="https://maven.apache.org/images/apache-maven-project.png" />
   </bannerLeft>
 
   <edit>${project.scm.url}</edit>
@@ -41,4 +39,4 @@ under the License.
     <menu ref="modules"/>
     <menu ref="reports"/>
   </body>
-</project>
+</site>

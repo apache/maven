@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 class FarthestConflictResolverTest extends AbstractConflictResolverTest {
     // constructors -----------------------------------------------------------
 
-    public FarthestConflictResolverTest() throws Exception {
+    FarthestConflictResolverTest() throws Exception {
         super("farthest");
     }
 

@@ -324,7 +324,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
      * @throws Exception in case of issue
      */
     @Test
-    void rereadPom_mng7063() throws Exception {
+    void rereadPomMng7063() throws Exception {
         final Path pom = projectRoot.resolve("pom.xml");
         final ProjectBuildingRequest buildingRequest = newBuildingRequest();
 
@@ -559,7 +559,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         MavenProject p1 = results.get(0).getProject();
         MavenProject p2 = results.get(1).getProject();
         MavenProject parent = p1.getArtifactId().equals("parent") ? p1 : p2;
-        MavenProject child = p1.getArtifactId().equals("parent") ? p2 : p1;
+        // MavenProject child = p1.getArtifactId().equals("parent") ? p2 : p1;
         assertEquals(List.of("child"), parent.getModel().getDelegate().getSubprojects());
     }
 }
