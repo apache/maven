@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project>
+<project xmlns="http://maven.apache.org/POM/4.999">
     <modelVersion>4.999.999</modelVersion>
     <!-- this should be a fake "future" version that only has modelVersion understood by us -->
     <coordinates>tests.project:future-model-version</coordinates>

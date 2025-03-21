@@ -33,6 +33,12 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-xml</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -147,6 +153,7 @@
                 <param>packageModelV4=org.apache.maven.api.model</param>
                 <param>packageToolV4=org.apache.maven.model.v4</param>
                 <param>isMavenModel=true</param>
+                <param>enforceNamespace=true</param>
                 <param>minimalVersion=4.0.0</param>
               </params>
             </configuration>
