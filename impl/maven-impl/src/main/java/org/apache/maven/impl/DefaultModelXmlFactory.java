@@ -40,9 +40,9 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
+import static org.apache.maven.impl.ImplUtils.nonNull;
 import static org.apache.maven.impl.StaxLocation.getLocation;
 import static org.apache.maven.impl.StaxLocation.getMessage;
-import static org.apache.maven.impl.ImplUtils.nonNull;
 
 @Named
 @Singleton
