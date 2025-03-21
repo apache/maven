@@ -34,7 +34,18 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 
 /**
- * An immutable xml node.
+ * An immutable XML node representation that provides a clean API for working with XML data structures.
+ * This interface represents a single node in an XML document tree, containing information about
+ * the node's name, value, attributes, and child nodes.
+ *
+ * <p>Example usage:</p>
+ * <pre>
+ * XmlNode node = XmlNode.newBuilder()
+ *     .name("configuration")
+ *     .attribute("version", "1.0")
+ *     .child(XmlNode.newInstance("property", "value"))
+ *     .build();
+ * </pre>
  *
  * @since 4.0.0
  */
@@ -94,30 +105,79 @@ public interface XmlNode {
     @Deprecated(since = "4.0.0", forRemoval = true)
     String DEFAULT_SELF_COMBINATION_MODE = XmlService.DEFAULT_SELF_COMBINATION_MODE;
 
+    /**
+     * Returns the local name of this XML node.
+     *
+     * @return the node name, never {@code null}
+     */
     @Nonnull
     String name();
 
+    /**
+     * Returns the namespace URI of this XML node.
+     *
+     * @return the namespace URI, never {@code null} (empty string if no namespace)
+     */
     @Nonnull
     String namespaceUri();
 
+    /**
+     * Returns the namespace prefix of this XML node.
+     *
+     * @return the namespace prefix, never {@code null} (empty string if no prefix)
+     */
     @Nonnull
     String prefix();
 
+    /**
+     * Returns the text content of this XML node.
+     *
+     * @return the node's text value, or {@code null} if none exists
+     */
     @Nullable
     String value();
 
+    /**
+     * Returns an immutable map of all attributes defined on this XML node.
+     *
+     * @return map of attribute names to values, never {@code null}
+     */
     @Nonnull
     Map<String, String> attributes();
 
+    /**
+     * Returns the value of a specific attribute.
+     *
+     * @param name the name of the attribute to retrieve
+     * @return the attribute value, or {@code null} if the attribute doesn't exist
+     * @throws NullPointerException if name is null
+     */
     @Nullable
     String attribute(@Nonnull String name);
 
+    /**
+     * Returns an immutable list of all child nodes.
+     *
+     * @return list of child nodes, never {@code null}
+     */
     @Nonnull
     List<XmlNode> children();
 
+    /**
+     * Returns the first child node with the specified name.
+     *
+     * @param name the name of the child node to find
+     * @return the first matching child node, or {@code null} if none found
+     */
     @Nullable
     XmlNode child(String name);
 
+    /**
+     * Returns the input location information for this node, if available.
+     * This can be useful for error reporting and debugging.
+     *
+     * @return the input location object, or {@code null} if not available
+     */
     @Nullable
     Object inputLocation();
 
@@ -215,18 +275,52 @@ public interface XmlNode {
         return XmlService.merge(dominant, recessive, childMergeOverride);
     }
 
+    /**
+     * Creates a new XmlNode instance with the specified name.
+     *
+     * @param name the name for the new node
+     * @return a new XmlNode instance
+     * @throws NullPointerException if name is null
+     */
     static XmlNode newInstance(String name) {
         return newBuilder().name(name).build();
     }
 
+    /**
+     * Creates a new XmlNode instance with the specified name and value.
+     *
+     * @param name the name for the new node
+     * @param value the value for the new node
+     * @return a new XmlNode instance
+     * @throws NullPointerException if name is null
+     */
     static XmlNode newInstance(String name, String value) {
         return newBuilder().name(name).value(value).build();
     }
 
+    /**
+     * Creates a new XmlNode instance with the specified name and children.
+     *
+     * @param name the name for the new node
+     * @param children the list of child nodes
+     * @return a new XmlNode instance
+     * @throws NullPointerException if name is null
+     */
     static XmlNode newInstance(String name, List<XmlNode> children) {
         return newBuilder().name(name).children(children).build();
     }
 
+    /**
+     * Creates a new XmlNode instance with all properties specified.
+     *
+     * @param name the name for the new node
+     * @param value the value for the new node
+     * @param attrs the attributes for the new node
+     * @param children the list of child nodes
+     * @param location the input location information
+     * @return a new XmlNode instance
+     * @throws NullPointerException if name is null
+     */
     static XmlNode newInstance(
             String name, String value, Map<String, String> attrs, List<XmlNode> children, Object location) {
         return newBuilder()
@@ -238,6 +332,11 @@ public interface XmlNode {
                 .build();
     }
 
+    /**
+     * Returns a new builder for creating XmlNode instances.
+     *
+     * @return a new Builder instance
+     */
     static Builder newBuilder() {
         return new Builder();
     }
