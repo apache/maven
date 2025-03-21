@@ -82,7 +82,7 @@ public interface ArtifactCoordinatesFactory extends Service {
                 session,
                 artifact.getGroupId(),
                 artifact.getArtifactId(),
-                artifact.getVersion().asString(),
+                artifact.getVersion().toString(),
                 artifact.getClassifier(),
                 artifact.getExtension(),
                 null));
