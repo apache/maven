@@ -172,21 +172,21 @@ public class ${className} {
 
     protected XmlNode transform(XmlNode node) {
         if (node != null) {
-            String oldValue = node.getValue();
+            String oldValue = node.value();
             String newValue = transform(oldValue);
-            Map<String, String> oldAttrs = node.getAttributes();
+            Map<String, String> oldAttrs = node.attributes();
             Map<String, String> newAttrs = transform(oldAttrs, this::transform);
-            List<XmlNode> oldChildren = node.getChildren();
+            List<XmlNode> oldChildren = node.children();
             List<XmlNode> newChildren = transform(oldChildren, this::transform);
             if (oldValue != newValue || oldAttrs != newAttrs || oldChildren != newChildren) {
                 return XmlNode.newBuilder()
-                                .name(node.getName())
-                                .prefix(node.getPrefix())
-                                .namespaceUri(node.getNamespaceUri())
+                                .name(node.name())
+                                .prefix(node.prefix())
+                                .namespaceUri(node.namespaceUri())
                                 .value(newValue)
                                 .attributes(newAttrs)
                                 .children(newChildren)
-                                .inputLocation(node.getInputLocation())
+                                .inputLocation(node.inputLocation())
                                 .build();
             }
         }

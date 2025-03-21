@@ -24,10 +24,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
@@ -48,8 +44,7 @@ public class XmlNodeStaxBuilder {
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static XmlNode build(Reader reader, InputLocationBuilderStax locationBuilder) 
-            throws XMLStreamException {
+    public static XmlNode build(Reader reader, InputLocationBuilderStax locationBuilder) throws XMLStreamException {
         XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(reader);
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }

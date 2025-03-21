@@ -36,6 +36,7 @@ import org.apache.maven.api.xml.XmlService;
  *  NOTE: remove all the util code in here when separated, this class should be pure data.
  */
 @Deprecated
+@SuppressWarnings("removal")
 public class XmlNodeImpl implements Serializable, XmlNode {
     @Serial
     private static final long serialVersionUID = 2567894443061173996L;
@@ -105,28 +106,56 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     @Override
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public String getPrefix() {
         return prefix;
     }
 
     @Override
     @Nonnull
+    public String prefix() {
+        return getPrefix();
+    }
+
+    @Override
+    @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public String getNamespaceUri() {
         return namespaceUri;
     }
 
     @Override
     @Nonnull
+    public String namespaceUri() {
+        return getNamespaceUri();
+    }
+
+    @Override
+    @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public String getName() {
         return name;
+    }
+
+    @Override
+    @Nonnull
+    public String name() {
+        return getName();
     }
 
     // ----------------------------------------------------------------------
     // Value handling
     // ----------------------------------------------------------------------
 
+    @Override
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public String value() {
+        return getValue();
     }
 
     // ----------------------------------------------------------------------
@@ -135,19 +164,33 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     @Override
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public Map<String, String> getAttributes() {
         return attributes;
     }
 
     @Override
+    @Nonnull
+    public Map<String, String> attributes() {
+        return getAttributes();
+    }
+
+    @Override
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public String getAttribute(@Nonnull String name) {
         return attributes.get(name);
+    }
+
+    @Override
+    public String attribute(@Nonnull String name) {
+        return getAttribute(name);
     }
 
     // ----------------------------------------------------------------------
     // Child handling
     // ----------------------------------------------------------------------
 
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public XmlNode getChild(String name) {
         if (name != null) {
             ListIterator<XmlNode> it = children.listIterator(children.size());
@@ -162,11 +205,24 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     }
 
     @Override
+    public XmlNode child(String name) {
+        return getChild(name);
+    }
+
+    @Override
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public List<XmlNode> getChildren() {
         return children;
     }
 
+    @Override
+    @Nonnull
+    public List<XmlNode> children() {
+        return getChildren();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public int getChildCount() {
         return children.size();
     }
@@ -179,8 +235,14 @@ public class XmlNodeImpl implements Serializable, XmlNode {
      * @since 3.2.0
      * @return input location
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     public Object getInputLocation() {
         return location;
+    }
+
+    @Override
+    public Object inputLocation() {
+        return getInputLocation();
     }
 
     // ----------------------------------------------------------------------

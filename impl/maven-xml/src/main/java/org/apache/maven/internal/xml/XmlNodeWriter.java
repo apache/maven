@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.xml;
 
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -28,7 +27,6 @@ import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
-import org.codehaus.stax2.util.StreamWriterDelegate;
 
 /**
  *
@@ -47,14 +45,14 @@ public class XmlNodeWriter {
     @Deprecated
     public static void write(XMLStreamWriter xmlWriter, XmlNode node) throws XMLStreamException {
         // Keep the old direct implementation for backward compatibility
-        xmlWriter.writeStartElement(node.getPrefix(), node.getName(), node.getNamespaceUri());
-        for (Map.Entry<String, String> attr : node.getAttributes().entrySet()) {
+        xmlWriter.writeStartElement(node.prefix(), node.name(), node.namespaceUri());
+        for (Map.Entry<String, String> attr : node.attributes().entrySet()) {
             xmlWriter.writeAttribute(attr.getKey(), attr.getValue());
         }
-        for (XmlNode child : node.getChildren()) {
+        for (XmlNode child : node.children()) {
             write(xmlWriter, child);
         }
-        String value = node.getValue();
+        String value = node.value();
         if (value != null) {
             xmlWriter.writeCharacters(value);
         }

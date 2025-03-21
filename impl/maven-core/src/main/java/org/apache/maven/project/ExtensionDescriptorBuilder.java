@@ -94,13 +94,13 @@ public class ExtensionDescriptorBuilder {
             throw new IOException(e.getMessage(), e);
         }
 
-        if (!"extension".equals(dom.getName())) {
-            throw new IOException("Unexpected root element \"" + dom.getName() + "\", expected \"extension\"");
+        if (!"extension".equals(dom.name())) {
+            throw new IOException("Unexpected root element \"" + dom.name() + "\", expected \"extension\"");
         }
 
-        extensionDescriptor.setExportedPackages(parseStrings(dom.getChild("exportedPackages")));
+        extensionDescriptor.setExportedPackages(parseStrings(dom.child("exportedPackages")));
 
-        extensionDescriptor.setExportedArtifacts(parseStrings(dom.getChild("exportedArtifacts")));
+        extensionDescriptor.setExportedArtifacts(parseStrings(dom.child("exportedArtifacts")));
 
         return extensionDescriptor;
     }

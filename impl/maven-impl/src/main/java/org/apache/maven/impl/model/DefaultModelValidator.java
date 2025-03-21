@@ -787,14 +787,14 @@ public class DefaultModelValidator implements ModelValidator {
     private void validateXmlNodeRecursively(
             ModelProblemCollector problems, String fieldPathPrefix, InputLocationTracker tracker, XmlNode xmlNode) {
         validateXmlNode(problems, fieldPathPrefix, tracker, xmlNode);
-        for (XmlNode child : xmlNode.getChildren()) {
-            validateXmlNodeRecursively(problems, fieldPathPrefix + "." + xmlNode.getName(), tracker, child);
+        for (XmlNode child : xmlNode.children()) {
+            validateXmlNodeRecursively(problems, fieldPathPrefix + "." + xmlNode.name(), tracker, child);
         }
     }
 
     private void validateXmlNode(
             ModelProblemCollector problems, String fieldPathPrefix, InputLocationTracker tracker, XmlNode xmlNode) {
-        String childrenCombinationModeAttribute = xmlNode.getAttributes()
+        String childrenCombinationModeAttribute = xmlNode.attributes()
                 .getOrDefault(
                         XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE, XmlService.DEFAULT_CHILDREN_COMBINATION_MODE);
         if (!(XmlService.CHILDREN_COMBINATION_APPEND.equals(childrenCombinationModeAttribute)
@@ -803,9 +803,9 @@ public class DefaultModelValidator implements ModelValidator {
                     problems,
                     Severity.ERROR,
                     Version.V40,
-                    fieldPathPrefix + "." + xmlNode.getName(),
-                    xmlNode.getInputLocation() != null
-                            ? xmlNode.getInputLocation().toString()
+                    fieldPathPrefix + "." + xmlNode.name(),
+                    xmlNode.inputLocation() != null
+                            ? xmlNode.inputLocation().toString()
                             : null,
                     "Unsupported value '" + childrenCombinationModeAttribute + "' for "
                             + XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
@@ -813,7 +813,7 @@ public class DefaultModelValidator implements ModelValidator {
                             + " (default is: " + XmlService.DEFAULT_SELF_COMBINATION_MODE + ")",
                     tracker);
         }
-        String selfCombinationModeAttribute = xmlNode.getAttributes()
+        String selfCombinationModeAttribute = xmlNode.attributes()
                 .getOrDefault(XmlService.SELF_COMBINATION_MODE_ATTRIBUTE, XmlService.DEFAULT_SELF_COMBINATION_MODE);
         if (!(XmlService.SELF_COMBINATION_OVERRIDE.equals(selfCombinationModeAttribute)
                 || XmlService.SELF_COMBINATION_MERGE.equals(selfCombinationModeAttribute)
@@ -822,9 +822,9 @@ public class DefaultModelValidator implements ModelValidator {
                     problems,
                     Severity.ERROR,
                     Version.V40,
-                    fieldPathPrefix + "." + xmlNode.getName(),
-                    xmlNode.getInputLocation() != null
-                            ? xmlNode.getInputLocation().toString()
+                    fieldPathPrefix + "." + xmlNode.name(),
+                    xmlNode.inputLocation() != null
+                            ? xmlNode.inputLocation().toString()
                             : null,
                     "Unsupported value '" + selfCombinationModeAttribute + "' for "
                             + XmlService.SELF_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "

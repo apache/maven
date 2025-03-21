@@ -95,31 +95,86 @@ public interface XmlNode {
     String DEFAULT_SELF_COMBINATION_MODE = XmlService.DEFAULT_SELF_COMBINATION_MODE;
 
     @Nonnull
-    String getName();
+    String name();
 
     @Nonnull
-    String getNamespaceUri();
+    String namespaceUri();
 
     @Nonnull
-    String getPrefix();
+    String prefix();
 
     @Nullable
-    String getValue();
+    String value();
 
     @Nonnull
-    Map<String, String> getAttributes();
+    Map<String, String> attributes();
 
     @Nullable
-    String getAttribute(@Nonnull String name);
+    String attribute(@Nonnull String name);
 
     @Nonnull
-    List<XmlNode> getChildren();
+    List<XmlNode> children();
 
     @Nullable
-    XmlNode getChild(String name);
+    XmlNode child(String name);
 
     @Nullable
-    Object getInputLocation();
+    Object inputLocation();
+
+    // Deprecated methods that delegate to new ones
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default String getName() {
+        return name();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default String getNamespaceUri() {
+        return namespaceUri();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default String getPrefix() {
+        return prefix();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default String getValue() {
+        return value();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Map<String, String> getAttributes() {
+        return attributes();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default String getAttribute(@Nonnull String name) {
+        return attribute(name);
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default List<XmlNode> getChildren() {
+        return children();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default XmlNode getChild(String name) {
+        return child(name);
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default Object getInputLocation() {
+        return inputLocation();
+    }
 
     /**
      * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
@@ -235,100 +290,42 @@ public interface XmlNode {
             return new Impl(prefix, namespaceUri, name, value, attributes, children, inputLocation);
         }
 
-        private static class Impl implements XmlNode, Serializable {
-            @Nonnull
-            private final String prefix;
+        private record Impl(
+                String prefix,
+                String namespaceUri,
+                @Nonnull String name,
+                String value,
+                @Nonnull Map<String, String> attributes,
+                @Nonnull List<XmlNode> children,
+                Object inputLocation)
+                implements XmlNode, Serializable {
 
-            @Nonnull
-            private final String namespaceUri;
-
-            @Nonnull
-            private final String name;
-
-            private final String value;
-
-            @Nonnull
-            private final Map<String, String> attributes;
-
-            @Nonnull
-            private final List<XmlNode> children;
-
-            private final Object location;
-
-            private Impl(
-                    String prefix,
-                    String namespaceUri,
-                    String name,
-                    String value,
-                    Map<String, String> attributes,
-                    List<XmlNode> children,
-                    Object location) {
-                this.prefix = prefix == null ? "" : prefix;
-                this.namespaceUri = namespaceUri == null ? "" : namespaceUri;
-                this.name = Objects.requireNonNull(name);
-                this.value = value;
-                this.attributes = ImmutableCollections.copy(attributes);
-                this.children = ImmutableCollections.copy(children);
-                this.location = location;
+            private Impl {
+                // Validation and normalization from the original constructor
+                prefix = prefix == null ? "" : prefix;
+                namespaceUri = namespaceUri == null ? "" : namespaceUri;
+                name = Objects.requireNonNull(name);
+                attributes = ImmutableCollections.copy(attributes);
+                children = ImmutableCollections.copy(children);
             }
 
             @Override
-            @Nonnull
-            public String getPrefix() {
-                return prefix;
-            }
-
-            @Override
-            @Nonnull
-            public String getNamespaceUri() {
-                return namespaceUri;
-            }
-
-            @Override
-            @Nonnull
-            public String getName() {
-                return name;
-            }
-
-            @Override
-            public String getValue() {
-                return value;
-            }
-
-            @Override
-            @Nonnull
-            public Map<String, String> getAttributes() {
-                return attributes;
-            }
-
-            @Override
-            public String getAttribute(@Nonnull String name) {
+            public String attribute(@Nonnull String name) {
                 return attributes.get(name);
             }
 
             @Override
-            public XmlNode getChild(String name) {
+            public XmlNode child(String name) {
                 if (name != null) {
                     ListIterator<XmlNode> it = children.listIterator(children.size());
                     while (it.hasPrevious()) {
                         XmlNode child = it.previous();
-                        if (name.equals(child.getName())) {
+                        if (name.equals(child.name())) {
                             return child;
                         }
                     }
                 }
                 return null;
-            }
-
-            @Override
-            @Nonnull
-            public List<XmlNode> getChildren() {
-                return children;
-            }
-
-            @Override
-            public Object getInputLocation() {
-                return location;
             }
 
             @Override
@@ -372,7 +369,7 @@ public interface XmlNode {
                 w = addToStringField(sb, value, o -> !o.isEmpty(), "value", w);
                 w = addToStringField(sb, attributes, o -> !o.isEmpty(), "attributes", w);
                 w = addToStringField(sb, children, o -> !o.isEmpty(), "children", w);
-                w = addToStringField(sb, location, Objects::nonNull, "location", w);
+                w = addToStringField(sb, inputLocation, Objects::nonNull, "inputLocation", w);
                 sb.append("]");
                 return sb.toString();
             }

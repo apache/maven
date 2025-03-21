@@ -52,8 +52,8 @@ class XmlNodeBuilderTest {
         StringReader r = new StringReader(doc);
         XMLStreamReader xsr = XMLInputFactory.newFactory().createXMLStreamReader(r);
         XmlNode node = XmlService.read(xsr);
-        assertEquals("doc", node.getName());
-        assertEquals(1, node.getAttributes().size());
-        assertEquals("foo:bar", node.getAttribute("xmlns"));
+        assertEquals("doc", node.name());
+        assertEquals(1, node.attributes().size());
+        assertEquals("foo:bar", node.attribute("xmlns"));
     }
 }
