@@ -18,7 +18,7 @@
  */
 
 /**
- * This package contains the core classes for CLIng (CLI "new-gen"), 
+ * This package contains the core classes for CLIng (CLI "new-gen"),
  * the next generation command-line interface for Maven.
  */
 package org.apache.maven.cling;
