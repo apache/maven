@@ -59,7 +59,8 @@ public class ToolboxTool implements ExecutorTool {
         doExecute(builder);
         try {
             Properties properties = new Properties();
-            properties.load(new ByteArrayInputStream(stdout.toByteArray()));
+            properties.load(new ByteArrayInputStream(
+                    validateOutput(false, stdout, stderr).getBytes()));
             return properties.entrySet().stream()
                     .collect(Collectors.toMap(
                             e -> String.valueOf(e.getKey()),
@@ -79,7 +80,7 @@ public class ToolboxTool implements ExecutorTool {
                 .stdOut(stdout)
                 .stdErr(stderr);
         doExecute(builder);
-        return shaveStdout(stdout);
+        return validateOutput(true, stdout, stderr);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class ToolboxTool implements ExecutorTool {
             builder.argument("-Drepository=" + repositoryId + "::unimportant");
         }
         doExecute(builder);
-        return shaveStdout(stdout);
+        return validateOutput(true, stdout, stderr);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class ToolboxTool implements ExecutorTool {
             builder.argument("-Drepository=" + repositoryId + "::unimportant");
         }
         doExecute(builder);
-        return shaveStdout(stdout);
+        return validateOutput(true, stdout, stderr);
     }
 
     private ExecutorRequest.Builder mojo(ExecutorRequest.Builder builder, String mojo) {
@@ -131,7 +132,19 @@ public class ToolboxTool implements ExecutorTool {
         }
     }
 
-    private String shaveStdout(ByteArrayOutputStream stdout) {
-        return stdout.toString().replace("\n", "").replace("\r", "");
+    /**
+     * Performs "sanity check" for output, making sure no insane values like empty strings are returned.
+     */
+    private String validateOutput(boolean shave, ByteArrayOutputStream stdout, ByteArrayOutputStream stderr) {
+        String result = stdout.toString();
+        if (shave) {
+            result = result.replace("\n", "").replace("\r", "");
+        }
+        // sanity checks: stderr has any OR result is empty string (no method should emit empty string)
+        if (stderr.size() > 0 || result.trim().isEmpty()) {
+            throw new ExecutorException(
+                    "Unexpected stdout[" + stdout.size() + "]=" + stdout + "; stderr[" + stderr.size() + "]=" + stderr);
+        }
+        return result;
     }
 }
