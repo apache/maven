@@ -76,6 +76,8 @@ public class SimpleProblemCollector implements ModelProblemCollector {
                     warnings.add(req.getMessage());
                 }
                 break;
+            default:
+                throw new IllegalArgumentException("Unknown severity: " + req.getSeverity());
         }
     }
 }

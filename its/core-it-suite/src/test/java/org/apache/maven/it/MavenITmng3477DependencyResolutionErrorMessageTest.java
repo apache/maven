@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3477DependencyResolutionErrorMessageTest() {
+    MavenITmng3477DependencyResolutionErrorMessageTest() {
         super("[4.0.0-beta-4,)");
     }
 

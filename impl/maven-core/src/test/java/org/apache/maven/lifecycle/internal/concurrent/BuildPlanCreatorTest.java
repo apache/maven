@@ -30,6 +30,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BuildPlanCreatorTest {
@@ -85,8 +86,10 @@ class BuildPlanCreatorTest {
         Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(p1, Collections.emptyList());
 
         BuildPlan plan = calculateLifecycleMappings(projects, "generate-resources");
+        assertNotNull(plan);
     }
 
+    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     private BuildPlan calculateLifecycleMappings(Map<MavenProject, List<MavenProject>> projects, String phase) {
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
         BuildPlanExecutor builder = new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles);

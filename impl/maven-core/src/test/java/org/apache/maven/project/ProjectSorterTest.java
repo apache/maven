@@ -247,7 +247,7 @@ class ProjectSorterTest {
     }
 
     @Test
-    void testPluginDependenciesInfluenceSorting_DeclarationInParent() throws Exception {
+    void testPluginDependenciesInfluenceSortingDeclarationInParent() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
 
         MavenProject parentProject = createProject("groupId", "parent-declarer", "1.0");

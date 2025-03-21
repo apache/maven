@@ -43,7 +43,7 @@ import org.apache.maven.project.MavenProject;
  */
 public class MojoExecutorStub extends MojoExecutor { // This is being lazy instead of making interface
 
-    public final List<MojoExecution> executions = Collections.synchronizedList(new ArrayList<>());
+    protected final List<MojoExecution> executions = Collections.synchronizedList(new ArrayList<>());
 
     public MojoExecutorStub() {
         super(null, null, null, null, null, null);

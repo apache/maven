@@ -660,7 +660,9 @@ class MavenCliTest {
     @MethodSource("activateBatchModeArguments")
     public void activateBatchMode(boolean ciEnv, String[] cliArgs, boolean isBatchMode) throws Exception {
         CliRequest request = new CliRequest(cliArgs, null);
-        if (ciEnv) request.getSystemProperties().put("env.CI", "true");
+        if (ciEnv) {
+            request.getSystemProperties().put("env.CI", "true");
+        }
         cli.cli(request);
 
         boolean batchMode = !cli.populateRequest(request).isInteractiveMode();
@@ -686,7 +688,9 @@ class MavenCliTest {
     public void calculateTransferListener(boolean ciEnv, String[] cliArgs, Class<TransferListener> expectedSubClass)
             throws Exception {
         CliRequest request = new CliRequest(cliArgs, null);
-        if (ciEnv) request.getSystemProperties().put("env.CI", "true");
+        if (ciEnv) {
+            request.getSystemProperties().put("env.CI", "true");
+        }
         cli.cli(request);
         cli.logging(request);
 

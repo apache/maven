@@ -38,15 +38,14 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
     }
 
     @Test
-    public void testitMNG4091_InvalidDescriptor() throws Exception {
+    public void testitMNG4091InvalidDescriptor() throws Exception {
         File testDir = extractResources("/mng-4091/invalid");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
-        VerificationException exception =
-                assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
+        assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
         List<String> logFile = verifier.loadLogLines();
 
@@ -64,7 +63,7 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
     }
 
     @Test
-    public void testitMNG4091_PluginDependency() throws Exception {
+    public void testitMNG4091PluginDependency() throws Exception {
         File testDir = extractResources("/mng-4091/plugin-dependency");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());

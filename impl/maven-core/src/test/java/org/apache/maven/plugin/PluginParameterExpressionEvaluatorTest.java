@@ -45,7 +45,6 @@ import org.apache.maven.impl.model.reflection.IntrospectionException;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -247,7 +246,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testPOMPropertyExtractionWithMissingProject_WithDotNotation() throws Exception {
+    void testPOMPropertyExtractionWithMissingProjectWithDotNotation() throws Exception {
         String key = "m2.name";
         String checkValue = "value";
 
@@ -321,7 +320,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testValueExtractionFromSystemPropertiesWithMissingProject_WithDotNotation() throws Exception {
+    void testValueExtractionFromSystemPropertiesWithMissingProjectWithDotNotation() throws Exception {
         String sysprop = "PPEET.sysprop2";
 
         Properties executionProperties = new Properties();
@@ -455,7 +454,6 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         MavenSession mavenSession = createMavenSession(null);
         mavenSession.getRequest().setTopDirectory(path);
         mavenSession.getRequest().setRootDirectory(path);
-        DefaultModelBuildingRequest mbr = new DefaultModelBuildingRequest();
 
         PluginParameterExpressionEvaluator evaluator =
                 new PluginParameterExpressionEvaluator(mavenSession, new MojoExecution(null));

@@ -108,8 +108,11 @@ class ComparableVersionTest {
 
     private void checkVersionsArrayEqual(String[] array) {
         // compare against each other (including itself)
-        for (int i = 0; i < array.length; ++i)
-            for (int j = i; j < array.length; ++j) checkVersionsEqual(array[i], array[j]);
+        for (int i = 0; i < array.length; ++i) {
+            for (int j = i; j < array.length; ++j) {
+                checkVersionsEqual(array[i], array[j]);
+            }
+        }
     }
 
     private void checkVersionsOrder(String v1, String v2) {
@@ -311,9 +314,9 @@ class ComparableVersionTest {
         assertTrue(aardvark.compareTo(zebra) < 0);
 
         // Greek zebra
-        ComparableVersion ζέβρα = new ComparableVersion("ζέβρα");
-        assertTrue(ζέβρα.compareTo(zebra) > 0);
-        assertTrue(zebra.compareTo(ζέβρα) < 0);
+        ComparableVersion greek = new ComparableVersion("ζέβρα");
+        assertTrue(greek.compareTo(zebra) > 0);
+        assertTrue(zebra.compareTo(greek) < 0);
     }
 
     /**

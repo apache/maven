@@ -81,7 +81,7 @@ public class TunnelingProxyServer implements Runnable {
 
         private Socket client;
 
-        public ClientHandler(Socket client) {
+        ClientHandler(Socket client) {
             this.client = client;
         }
 
@@ -162,7 +162,7 @@ public class TunnelingProxyServer implements Runnable {
 
         private final OutputStream os;
 
-        public StreamPumper(InputStream is, OutputStream os) {
+        StreamPumper(InputStream is, OutputStream os) {
             this.is = is;
             this.os = os;
         }

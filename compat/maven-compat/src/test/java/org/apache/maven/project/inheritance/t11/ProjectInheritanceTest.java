@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @see <a href="https://issues.apache.org/jira/browse/MNG-2919">MNG-2919</a>
  */
 @Deprecated
+@SuppressWarnings("checkstyle:UnusedLocalVariable")
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //

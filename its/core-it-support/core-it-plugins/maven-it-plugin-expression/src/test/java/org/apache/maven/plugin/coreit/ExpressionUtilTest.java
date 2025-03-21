@@ -121,6 +121,7 @@ public class ExpressionUtilTest {
         }
     }
 
+    @SuppressWarnings("checkstyle:VisibilityModifier")
     public static class BeanTwo {
         public String field = "field";
 
