@@ -67,7 +67,6 @@ import ${packageModelV4}.InputLocation;
 import ${packageModelV4}.InputLocationTracker;
 #end
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.XmlNodeBuilder;
 #foreach ( $class in $model.allClasses )
   #if ( $class.name != "InputLocation" )
 import ${packageModelV4}.${class.name};
@@ -366,8 +365,8 @@ public class ${className} {
 
     private void writeDom(XmlNode dom, XMLStreamWriter serializer) throws IOException, XMLStreamException {
         if (dom != null) {
-            serializer.writeStartElement(namespace, dom.getName());
-            for (Map.Entry<String, String> attr : dom.getAttributes().entrySet()) {
+            serializer.writeStartElement(namespace, dom.name());
+            for (Map.Entry<String, String> attr : dom.attributes().entrySet()) {
                 if (attr.getKey().startsWith("xml:")) {
                     serializer.writeAttribute("http://www.w3.org/XML/1998/namespace",
                     attr.getKey().substring(4), attr.getValue());
@@ -375,16 +374,16 @@ public class ${className} {
                     serializer.writeAttribute(attr.getKey(), attr.getValue());
                 }
             }
-            for (XmlNode child : dom.getChildren()) {
+            for (XmlNode child : dom.children()) {
                 writeDom(child, serializer);
             }
-            String value = dom.getValue();
+            String value = dom.value();
             if (value != null) {
                 serializer.writeCharacters(value);
             }
             serializer.writeEndElement();
 #if ( $locationTracking )
-            if (addLocationInformation && dom.getInputLocation() instanceof InputLocation inputLocation && dom.getChildren().isEmpty()) {
+            if (addLocationInformation && dom.inputLocation() instanceof InputLocation inputLocation && dom.children().isEmpty()) {
                 serializer.writeComment(toString(inputLocation));
             }
 #end

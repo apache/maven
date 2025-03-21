@@ -74,14 +74,14 @@ class ModelXmlTest {
         Plugin plugin = model.getBuild().getPlugins().get(0);
         XmlNode node = plugin.getConfiguration();
         assertNotNull(node);
-        assertEquals("http://maven.apache.org/POM/4.0.0", node.getNamespaceUri());
-        assertEquals("m", node.getPrefix());
-        assertEquals("configuration", node.getName());
-        assertEquals(1, node.getChildren().size());
-        XmlNode myConfig = node.getChildren().get(0);
-        assertEquals("http://fabric8.io/fabric8-maven-plugin", myConfig.getNamespaceUri());
-        assertEquals("", myConfig.getPrefix());
-        assertEquals("myConfig", myConfig.getName());
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.namespaceUri());
+        assertEquals("m", node.prefix());
+        assertEquals("configuration", node.name());
+        assertEquals(1, node.children().size());
+        XmlNode myConfig = node.children().get(0);
+        assertEquals("http://fabric8.io/fabric8-maven-plugin", myConfig.namespaceUri());
+        assertEquals("", myConfig.prefix());
+        assertEquals("myConfig", myConfig.name());
         String config = node.toString();
         assertFalse(config.isEmpty());
     }

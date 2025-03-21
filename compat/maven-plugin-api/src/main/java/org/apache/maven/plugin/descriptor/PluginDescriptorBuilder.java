@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.codehaus.plexus.component.repository.ComponentDependency;
@@ -145,7 +145,7 @@ public class PluginDescriptorBuilder {
                     new PluginDescriptorStaxReader().read(xsr, true);
             return new PluginDescriptor(pd);
         } else {
-            XmlNode node = XmlNodeStaxBuilder.build(xsr, true, null);
+            XmlNode node = XmlService.read(xsr);
             PlexusConfiguration cfg = XmlPlexusConfiguration.toPlexusConfiguration(node);
             return build(source, cfg);
         }
@@ -471,7 +471,7 @@ public class PluginDescriptorBuilder {
     public PlexusConfiguration buildConfiguration(Reader configuration) throws PlexusConfigurationException {
         try {
             XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(configuration);
-            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeStaxBuilder.build(reader, true, null));
+            return XmlPlexusConfiguration.toPlexusConfiguration(XmlService.read(reader));
         } catch (XMLStreamException e) {
             throw new PlexusConfigurationException(e.getMessage(), e);
         }
@@ -480,7 +480,7 @@ public class PluginDescriptorBuilder {
     public PlexusConfiguration buildConfiguration(InputStream configuration) throws PlexusConfigurationException {
         try {
             XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(configuration);
-            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeStaxBuilder.build(reader, true, null));
+            return XmlPlexusConfiguration.toPlexusConfiguration(XmlService.read(reader));
         } catch (XMLStreamException e) {
             throw new PlexusConfigurationException(e.getMessage(), e);
         }

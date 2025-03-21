@@ -34,8 +34,8 @@ import java.util.zip.ZipEntry;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.impl.resolver.PluginsMetadata.PluginInfo;
-import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.deployment.DeployRequest;
@@ -134,7 +134,7 @@ class PluginsMetadataGenerator implements MetadataGenerator {
                             // as it would pull in dependency on:
                             // - maven-plugin-api (for model)
                             // - Plexus Container (for model supporting classes and exceptions)
-                            XmlNode root = XmlNodeStaxBuilder.build(is, null);
+                            XmlNode root = XmlService.read(is, null);
                             String groupId = mayGetChild(root, "groupId");
                             String artifactId = mayGetChild(root, "artifactId");
                             String goalPrefix = mayGetChild(root, "goalPrefix");
@@ -167,9 +167,9 @@ class PluginsMetadataGenerator implements MetadataGenerator {
     }
 
     private static String mayGetChild(XmlNode node, String child) {
-        XmlNode c = node.getChild(child);
+        XmlNode c = node.child(child);
         if (c != null) {
-            return c.getValue();
+            return c.value();
         }
         return null;
     }

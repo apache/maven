@@ -24,117 +24,46 @@ import javax.xml.stream.XMLStreamReader;
 
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 
 /**
  * All methods in this class attempt to fully parse the XML.
  * The caller is responsible for closing {@code InputStream} and {@code Reader} arguments.
+ *
+ * @deprecated use {@code org.apache.maven.api.xml.XmlService} instead
  */
+@Deprecated
 public class XmlNodeStaxBuilder {
     private static final boolean DEFAULT_TRIM = true;
 
-    public static XmlNodeImpl build(InputStream stream, InputLocationBuilderStax locationBuilder)
+    public static XmlNode build(InputStream stream, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
         XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(stream);
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static XmlNodeImpl build(Reader reader, InputLocationBuilderStax locationBuilder) throws XMLStreamException {
+    public static XmlNode build(Reader reader, InputLocationBuilderStax locationBuilder) throws XMLStreamException {
         XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(reader);
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static XmlNodeImpl build(XMLStreamReader parser) throws XMLStreamException {
+    public static XmlNode build(XMLStreamReader parser) throws XMLStreamException {
         return build(parser, DEFAULT_TRIM, null);
     }
 
-    public static XmlNodeImpl build(XMLStreamReader parser, InputLocationBuilderStax locationBuilder)
+    public static XmlNode build(XMLStreamReader parser, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static XmlNodeImpl build(XMLStreamReader parser, boolean trim, InputLocationBuilderStax locationBuilder)
+    public static XmlNode build(XMLStreamReader parser, boolean trim, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
-        boolean spacePreserve = false;
-        String lPrefix = null;
-        String lNamespaceUri = null;
-        String lName = null;
-        String lValue = null;
-        Object location = null;
-        Map<String, String> attrs = null;
-        List<XmlNode> children = null;
-        int eventType = parser.getEventType();
-        int lastStartTag = -1;
-        while (eventType != XMLStreamReader.END_DOCUMENT) {
-            if (eventType == XMLStreamReader.START_ELEMENT) {
-                lastStartTag = parser.getLocation().getLineNumber() * 1000
-                        + parser.getLocation().getColumnNumber();
-                if (lName == null) {
-                    int namespacesSize = parser.getNamespaceCount();
-                    lPrefix = parser.getPrefix();
-                    lNamespaceUri = parser.getNamespaceURI();
-                    lName = parser.getLocalName();
-                    location = locationBuilder != null ? locationBuilder.toInputLocation(parser) : null;
-                    int attributesSize = parser.getAttributeCount();
-                    if (attributesSize > 0 || namespacesSize > 0) {
-                        attrs = new HashMap<>();
-                        for (int i = 0; i < namespacesSize; i++) {
-                            String nsPrefix = parser.getNamespacePrefix(i);
-                            String nsUri = parser.getNamespaceURI(i);
-                            attrs.put(nsPrefix != null && !nsPrefix.isEmpty() ? "xmlns:" + nsPrefix : "xmlns", nsUri);
-                        }
-                        for (int i = 0; i < attributesSize; i++) {
-                            String aName = parser.getAttributeLocalName(i);
-                            String aValue = parser.getAttributeValue(i);
-                            String aPrefix = parser.getAttributePrefix(i);
-                            if (aPrefix != null && !aPrefix.isEmpty()) {
-                                aName = aPrefix + ":" + aName;
-                            }
-                            attrs.put(aName, aValue);
-                            spacePreserve = spacePreserve || ("xml:space".equals(aName) && "preserve".equals(aValue));
-                        }
-                    }
-                } else {
-                    if (children == null) {
-                        children = new ArrayList<>();
-                    }
-                    XmlNode child = build(parser, trim, locationBuilder);
-                    children.add(child);
-                }
-            } else if (eventType == XMLStreamReader.CHARACTERS || eventType == XMLStreamReader.CDATA) {
-                String text = parser.getText();
-                lValue = lValue != null ? lValue + text : text;
-            } else if (eventType == XMLStreamReader.END_ELEMENT) {
-                boolean emptyTag = lastStartTag
-                        == parser.getLocation().getLineNumber() * 1000
-                                + parser.getLocation().getColumnNumber();
-                if (lValue != null && trim && !spacePreserve) {
-                    lValue = lValue.trim();
-                }
-                return new XmlNodeImpl(
-                        lPrefix,
-                        lNamespaceUri,
-                        lName,
-                        children == null ? (lValue != null ? lValue : emptyTag ? null : "") : null,
-                        attrs,
-                        children,
-                        location);
-            }
-            eventType = parser.next();
-        }
-        throw new IllegalStateException("End of document found before returning to 0 depth");
+        return XmlService.read(parser, locationBuilder != null ? locationBuilder::toInputLocation : null);
     }
 
-    /**
-     * Input location builder interface, to be implemented to choose how to store data.
-     *
-     * @since 3.2.0
-     */
+    @Deprecated
     public interface InputLocationBuilderStax {
         Object toInputLocation(XMLStreamReader parser);
     }

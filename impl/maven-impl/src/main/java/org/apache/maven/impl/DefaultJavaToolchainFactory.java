@@ -76,12 +76,12 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
 
         // compute and normalize the java home
         XmlNode dom = model.getConfiguration();
-        XmlNode javahome = dom != null ? dom.getChild(KEY_JAVAHOME) : null;
-        if (javahome == null || javahome.getValue() == null) {
+        XmlNode javahome = dom != null ? dom.child(KEY_JAVAHOME) : null;
+        if (javahome == null || javahome.value() == null) {
             throw new ToolchainFactoryException(
                     "Java toolchain without the " + KEY_JAVAHOME + " configuration element.");
         }
-        Path normal = Paths.get(javahome.getValue()).normalize();
+        Path normal = Paths.get(javahome.value()).normalize();
         if (!Files.exists(normal)) {
             throw new ToolchainFactoryException("Non-existing JDK home configuration at " + normal.toAbsolutePath());
         }
