@@ -132,9 +132,25 @@ public abstract class XmlService {
      * Reads an XML node from a reader.
      */
     @Nonnull
+    public static XmlNode read(Reader reader) throws XMLStreamException {
+        return read(reader, null);
+    }
+
+    /**
+     * Reads an XML node from a reader.
+     */
+    @Nonnull
     public static XmlNode read(Reader reader, @Nullable InputLocationBuilder locationBuilder)
             throws XMLStreamException {
         return getService().doRead(reader, locationBuilder);
+    }
+
+    /**
+     * Reads an XML node from an XMLStreamReader.
+     */
+    @Nonnull
+    public static XmlNode read(XMLStreamReader reader) throws XMLStreamException {
+        return read(reader, null);
     }
 
     /**

@@ -40,16 +40,21 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     @Serial
     private static final long serialVersionUID = 2567894443061173996L;
 
+    @Nonnull
     protected final String prefix;
 
+    @Nonnull
     protected final String namespaceUri;
 
+    @Nonnull
     protected final String name;
 
     protected final String value;
 
+    @Nonnull
     protected final Map<String, String> attributes;
 
+    @Nonnull
     protected final List<XmlNode> children;
 
     protected final Object location;
@@ -99,11 +104,13 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     // ----------------------------------------------------------------------
 
     @Override
+    @Nonnull
     public String getPrefix() {
         return prefix;
     }
 
     @Override
+    @Nonnull
     public String getNamespaceUri() {
         return namespaceUri;
     }
@@ -127,11 +134,13 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     // ----------------------------------------------------------------------
 
     @Override
+    @Nonnull
     public Map<String, String> getAttributes() {
         return attributes;
     }
 
-    public String getAttribute(String name) {
+    @Override
+    public String getAttribute(@Nonnull String name) {
         return attributes.get(name);
     }
 
@@ -152,6 +161,8 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         return null;
     }
 
+    @Override
+    @Nonnull
     public List<XmlNode> getChildren() {
         return children;
     }

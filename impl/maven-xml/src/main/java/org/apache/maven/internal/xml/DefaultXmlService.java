@@ -21,6 +21,8 @@ package org.apache.maven.internal.xml;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +45,7 @@ import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
 
 public class DefaultXmlService extends XmlService {
+    private static final boolean DEFAULT_TRIM = true;
 
     @Nonnull
     @Override
@@ -64,17 +67,110 @@ public class DefaultXmlService extends XmlService {
     @Override
     public XmlNode doRead(XMLStreamReader parser, @Nullable XmlService.InputLocationBuilder locationBuilder)
             throws XMLStreamException {
-        return XmlNodeStaxBuilder.build(
-                parser, true, locationBuilder != null ? locationBuilder::toInputLocation : null);
+        return doBuild(parser, DEFAULT_TRIM, locationBuilder);
+    }
+
+    private XmlNode doBuild(XMLStreamReader parser, boolean trim, InputLocationBuilder locationBuilder)
+            throws XMLStreamException {
+        boolean spacePreserve = false;
+        String lPrefix = null;
+        String lNamespaceUri = null;
+        String lName = null;
+        String lValue = null;
+        Object location = null;
+        Map<String, String> attrs = null;
+        List<XmlNode> children = null;
+        int eventType = parser.getEventType();
+        int lastStartTag = -1;
+        
+        while (eventType != XMLStreamReader.END_DOCUMENT) {
+            if (eventType == XMLStreamReader.START_ELEMENT) {
+                lastStartTag = parser.getLocation().getLineNumber() * 1000
+                        + parser.getLocation().getColumnNumber();
+                if (lName == null) {
+                    int namespacesSize = parser.getNamespaceCount();
+                    lPrefix = parser.getPrefix();
+                    lNamespaceUri = parser.getNamespaceURI();
+                    lName = parser.getLocalName();
+                    location = locationBuilder != null ? locationBuilder.toInputLocation(parser) : null;
+                    int attributesSize = parser.getAttributeCount();
+                    if (attributesSize > 0) {
+                        attrs = new HashMap<>();
+                        for (int i = 0; i < attributesSize; i++) {
+                            String aName = parser.getAttributeLocalName(i);
+                            String aValue = parser.getAttributeValue(i);
+                            String aPrefix = parser.getAttributePrefix(i);
+                            if (aPrefix != null && !aPrefix.isEmpty()) {
+                                aName = aPrefix + ":" + aName;
+                            }
+                            attrs.put(aName, aValue);
+                            spacePreserve = spacePreserve || ("xml:space".equals(aName) && "preserve".equals(aValue));
+                        }
+                    }
+                } else {
+                    if (children == null) {
+                        children = new ArrayList<>();
+                    }
+                    XmlNode child = doBuild(parser, trim, locationBuilder);
+                    children.add(child);
+                }
+            } else if (eventType == XMLStreamReader.CHARACTERS || eventType == XMLStreamReader.CDATA) {
+                String text = parser.getText();
+                lValue = lValue != null ? lValue + text : text;
+            } else if (eventType == XMLStreamReader.END_ELEMENT) {
+                boolean emptyTag = lastStartTag
+                        == parser.getLocation().getLineNumber() * 1000
+                                + parser.getLocation().getColumnNumber();
+                if (lValue != null && trim && !spacePreserve) {
+                    lValue = lValue.trim();
+                }
+                return XmlNode.newBuilder()
+                        .prefix(lPrefix)
+                        .namespaceUri(lNamespaceUri)
+                        .name(lName)
+                        .value(children == null ? (lValue != null ? lValue : emptyTag ? null : "") : null)
+                        .attributes(attrs)
+                        .children(children)
+                        .inputLocation(location)
+                        .build();
+            }
+            eventType = parser.next();
+        }
+        throw new IllegalStateException("End of document found before returning to 0 depth");
     }
 
     @Override
     public void doWrite(XmlNode node, Writer writer) throws IOException {
         try {
-            XmlNodeWriter.write(writer, node);
+            XMLOutputFactory factory = new com.ctc.wstx.stax.WstxOutputFactory();
+            factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+            factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_USE_DOUBLE_QUOTES_IN_XML_DECL, true);
+            factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_ADD_SPACE_AFTER_EMPTY_ELEM, true);
+            XMLStreamWriter serializer = new IndentingXMLStreamWriter(factory.createXMLStreamWriter(writer));
+            writeNode(serializer, node);
+            serializer.close();
         } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
+            throw new IOException(e);
         }
+    }
+
+    private void writeNode(XMLStreamWriter xmlWriter, XmlNode node) throws XMLStreamException {
+        xmlWriter.writeStartElement(node.getPrefix(), node.getName(), node.getNamespaceUri());
+        
+        for (Map.Entry<String, String> attr : node.getAttributes().entrySet()) {
+            xmlWriter.writeAttribute(attr.getKey(), attr.getValue());
+        }
+        
+        for (XmlNode child : node.getChildren()) {
+            writeNode(xmlWriter, child);
+        }
+        
+        String value = node.getValue();
+        if (value != null) {
+            xmlWriter.writeCharacters(value);
+        }
+        
+        xmlWriter.writeEndElement();
     }
 
     /**

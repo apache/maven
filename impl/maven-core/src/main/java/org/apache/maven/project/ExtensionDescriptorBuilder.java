@@ -32,7 +32,7 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
+import org.apache.maven.api.xml.XmlService;
 
 /**
  * Creates an extension descriptor from some XML stream.
@@ -89,7 +89,7 @@ public class ExtensionDescriptorBuilder {
         XmlNode dom;
         try {
             XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(is);
-            dom = XmlNodeStaxBuilder.build(reader);
+            dom = XmlService.read(reader);
         } catch (XMLStreamException e) {
             throw new IOException(e.getMessage(), e);
         }

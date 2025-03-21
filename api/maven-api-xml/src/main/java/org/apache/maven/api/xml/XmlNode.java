@@ -236,12 +236,23 @@ public interface XmlNode {
         }
 
         private static class Impl implements XmlNode, Serializable {
+            @Nonnull
             private final String prefix;
+
+            @Nonnull
             private final String namespaceUri;
+
+            @Nonnull
             private final String name;
+
             private final String value;
+
+            @Nonnull
             private final Map<String, String> attributes;
+
+            @Nonnull
             private final List<XmlNode> children;
+
             private final Object location;
 
             private Impl(
@@ -262,11 +273,13 @@ public interface XmlNode {
             }
 
             @Override
+            @Nonnull
             public String getPrefix() {
                 return prefix;
             }
 
             @Override
+            @Nonnull
             public String getNamespaceUri() {
                 return namespaceUri;
             }
@@ -283,12 +296,13 @@ public interface XmlNode {
             }
 
             @Override
+            @Nonnull
             public Map<String, String> getAttributes() {
                 return attributes;
             }
 
             @Override
-            public String getAttribute(String name) {
+            public String getAttribute(@Nonnull String name) {
                 return attributes.get(name);
             }
 
@@ -307,6 +321,7 @@ public interface XmlNode {
             }
 
             @Override
+            @Nonnull
             public List<XmlNode> getChildren() {
                 return children;
             }
