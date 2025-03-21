@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 class NewestConflictResolverTest extends AbstractConflictResolverTest {
     // constructors -----------------------------------------------------------
 
-    public NewestConflictResolverTest() throws Exception {
+    NewestConflictResolverTest() throws Exception {
         super("newest");
     }
 

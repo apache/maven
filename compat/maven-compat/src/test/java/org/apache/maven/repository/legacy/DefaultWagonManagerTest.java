@@ -91,7 +91,7 @@ class DefaultWagonManagerTest {
                 repos.get(1).getLayout().pathOf(artifact) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac");
 
         class TransferListener extends AbstractTransferListener {
-            public List<TransferEvent> events = new ArrayList<>();
+            List<TransferEvent> events = new ArrayList<>();
 
             @Override
             public void transferInitiated(TransferEvent transferEvent) {

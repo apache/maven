@@ -134,7 +134,7 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
  *
  * TODO: reuse mvn4 Supplier here
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "checkstyle:ParameterNumber"})
 public class RepositorySystemSupplier {
 
     @Provides

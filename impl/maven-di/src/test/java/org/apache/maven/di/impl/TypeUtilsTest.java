@@ -61,6 +61,7 @@ public class TypeUtilsTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:AvoidNestedBlocks")
     public void testSimplifyType() {
         {
             Type type = Integer.class;

@@ -273,18 +273,18 @@ public class InjectorImplTest {
     }
 
     static class SingletonContainer {
-        private static final AtomicInteger bean1 = new AtomicInteger();
-        private static final AtomicInteger bean2 = new AtomicInteger();
+        private static final AtomicInteger BEAN_1 = new AtomicInteger();
+        private static final AtomicInteger BEAN_2 = new AtomicInteger();
 
         @Named
         @Singleton
         static class Bean1 {
-            int num = bean1.incrementAndGet();
+            int num = BEAN_1.incrementAndGet();
         }
 
         @Named
         static class Bean2 {
-            int num = bean2.incrementAndGet();
+            int num = BEAN_2.incrementAndGet();
         }
     }
 
@@ -370,7 +370,7 @@ public class InjectorImplTest {
             private final MyService service;
 
             @Inject
-            public MyMojo(@Nullable MyService service) {
+            MyMojo(@Nullable MyService service) {
                 this.service = service;
             }
         }

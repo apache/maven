@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITmng6720FailFastTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6720FailFastTest() {
+    MavenITmng6720FailFastTest() {
         super("[3.6.2,)");
     }
 

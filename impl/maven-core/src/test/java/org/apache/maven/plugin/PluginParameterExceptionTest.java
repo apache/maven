@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class PluginParameterExceptionTest {
 
-    private final String LS = System.lineSeparator();
+    private static final String LS = System.lineSeparator();
 
     @Test
     void testMissingRequiredStringArrayTypeParameter() {

@@ -66,11 +66,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
 class PomConstructionTest {
-    private static String BASE_DIR = "src/test";
+    private static final String BASE_DIR = "src/test";
 
-    private static String BASE_POM_DIR = BASE_DIR + "/resources-project-builder";
+    private static final String BASE_POM_DIR = BASE_DIR + "/resources-project-builder";
 
-    private static String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
+    private static final String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
 
     @Inject
     private DefaultProjectBuilder projectBuilder;
@@ -1253,6 +1253,7 @@ class PomConstructionTest {
         testCompleteModel(pom);
     }
 
+    @SuppressWarnings("checkstyle:MethodLength")
     private void testCompleteModel(PomTestWrapper pom) throws Exception {
         assertEquals("4.0.0", pom.getValue("modelVersion"));
 

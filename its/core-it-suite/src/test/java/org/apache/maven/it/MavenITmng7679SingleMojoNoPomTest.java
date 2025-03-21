@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng7679SingleMojoNoPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7679SingleMojoNoPomTest() {
+    MavenITmng7679SingleMojoNoPomTest() {
         // affected Maven versions: 3.8.7, 3.9.0, 4.0.0-alpha-4
         super("(,3.8.7)(3.8.7,3.9.0),(3.9.0,4.0.0-alpha-4),(4.0.0-alpha-4,)");
     }

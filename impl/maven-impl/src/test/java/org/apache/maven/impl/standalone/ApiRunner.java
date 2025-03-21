@@ -380,14 +380,6 @@ public class ApiRunner {
         // TODO
         // active profiles
 
-        DefaultSession defaultSession = new DefaultSession(
-                rsession,
-                system,
-                List.of(lookup.lookup(RepositoryFactory.class)
-                        .createRemote("central", "https://repo.maven.apache.org/maven2")),
-                null,
-                lookup);
-
         Profile profile = session.getService(SettingsBuilder.class)
                 .convert(org.apache.maven.api.settings.Profile.newBuilder()
                         .repositories(settings.getRepositories())

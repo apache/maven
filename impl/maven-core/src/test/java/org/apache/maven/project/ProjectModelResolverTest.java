@@ -51,7 +51,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     /**
      * Creates a new {@code ProjectModelResolverTest} instance.
      */
-    public ProjectModelResolverTest() {
+    ProjectModelResolverTest() {
         super();
     }
 

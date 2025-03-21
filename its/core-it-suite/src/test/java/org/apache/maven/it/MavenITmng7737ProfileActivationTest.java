@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng7737ProfileActivationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7737ProfileActivationTest() {
+    MavenITmng7737ProfileActivationTest() {
         // affected Maven versions: 3.9.0
         super("(,3.9.0),(3.9.0,)");
     }

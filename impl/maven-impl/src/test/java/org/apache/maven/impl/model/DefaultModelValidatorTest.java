@@ -583,9 +583,9 @@ class DefaultModelValidatorTest {
 
         // MNG-3832: Aether (part of M3+) supports wildcard expressions for exclusions
 
-        SimpleProblemCollector result_30 = validate("bad-dependency-exclusion-id.xml");
+        SimpleProblemCollector result30 = validate("bad-dependency-exclusion-id.xml");
 
-        assertViolations(result_30, 0, 0, 0);
+        assertViolations(result30, 0, 0, 0);
     }
 
     @Test

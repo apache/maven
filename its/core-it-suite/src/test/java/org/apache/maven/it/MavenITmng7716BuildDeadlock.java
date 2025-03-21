@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Timeout;
  */
 class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7716BuildDeadlock() {
+    MavenITmng7716BuildDeadlock() {
         super("[3.8.8,3.9.0),[3.9.1,4.0.0-alpha-1),[4.0.0-alpha-5,)");
     }
 
