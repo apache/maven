@@ -27,8 +27,8 @@ import org.apache.maven.api.services.DependencyCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
-import static org.apache.maven.impl.Utils.map;
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.map;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 @Named
 @Singleton

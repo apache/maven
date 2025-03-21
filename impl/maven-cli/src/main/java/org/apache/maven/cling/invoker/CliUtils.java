@@ -41,8 +41,8 @@ import static java.util.Objects.requireNonNull;
 /**
  * Various utilities, mostly to bridge "old" and "new" stuff, like Properties vs Maps, File vs Paths, etc.
  */
-public final class Utils {
-    private Utils() {}
+public final class CliUtils {
+    private CliUtils() {}
 
     @Nonnull
     public static String stripLeadingAndTrailingQuotes(String str) {

@@ -32,7 +32,7 @@ import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.cling.invoker.CommonsCliOptions;
 
-import static org.apache.maven.cling.invoker.Utils.createInterpolator;
+import static org.apache.maven.cling.invoker.CliUtils.createInterpolator;
 
 public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOptions {
     public static CommonsCliMavenOptions parse(String source, String[] args) throws ParseException {

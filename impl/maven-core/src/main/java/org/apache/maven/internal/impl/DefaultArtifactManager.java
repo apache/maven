@@ -37,7 +37,7 @@ import org.apache.maven.impl.DefaultArtifact;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
 
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.internal.impl.CoreUtils.nonNull;
 
 @Named
 @Typed

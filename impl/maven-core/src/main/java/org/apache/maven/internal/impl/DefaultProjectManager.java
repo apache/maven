@@ -49,8 +49,8 @@ import org.apache.maven.impl.PropertiesAsMap;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
 
-import static org.apache.maven.impl.Utils.map;
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.internal.impl.CoreUtils.map;
+import static org.apache.maven.internal.impl.CoreUtils.nonNull;
 
 @Named
 @Typed

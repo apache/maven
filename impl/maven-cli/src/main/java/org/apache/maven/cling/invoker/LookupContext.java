@@ -57,8 +57,8 @@ public class LookupContext implements AutoCloseable {
     public LookupContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
         this.invokerRequest = requireNonNull(invokerRequest);
         this.cwd = CWD.create(invokerRequest.cwd());
-        this.installationDirectory = Utils.getCanonicalPath(invokerRequest.installationDirectory());
-        this.userDirectory = Utils.getCanonicalPath(invokerRequest.userHomeDirectory());
+        this.installationDirectory = CliUtils.getCanonicalPath(invokerRequest.installationDirectory());
+        this.userDirectory = CliUtils.getCanonicalPath(invokerRequest.userHomeDirectory());
         this.containerCapsuleManaged = containerCapsuleManaged;
         this.logger = invokerRequest.parserRequest().logger();
 

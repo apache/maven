@@ -39,7 +39,7 @@ import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.impl.Utils.map;
+import static org.apache.maven.impl.ImplUtils.map;
 
 @Named
 @Singleton

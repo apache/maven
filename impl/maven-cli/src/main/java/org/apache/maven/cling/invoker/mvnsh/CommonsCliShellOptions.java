@@ -31,7 +31,7 @@ import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.cling.invoker.CommonsCliOptions;
 
-import static org.apache.maven.cling.invoker.Utils.createInterpolator;
+import static org.apache.maven.cling.invoker.CliUtils.createInterpolator;
 
 /**
  * Implementation of {@link ShellOptions} (base + shell).

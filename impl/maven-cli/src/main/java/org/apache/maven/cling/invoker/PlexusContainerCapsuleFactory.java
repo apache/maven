@@ -61,7 +61,7 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.slf4j.ILoggerFactory;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.cling.invoker.Utils.toPlexusLoggingLevel;
+import static org.apache.maven.cling.invoker.CliUtils.toPlexusLoggingLevel;
 
 /**
  * Container capsule backed by Plexus Container.

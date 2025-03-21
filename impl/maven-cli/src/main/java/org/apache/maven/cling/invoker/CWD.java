@@ -35,7 +35,7 @@ public final class CWD implements Supplier<Path> {
      * Creates instance out of {@link Path}.
      */
     public static CWD create(Path path) {
-        return new CWD(Utils.getCanonicalPath(path));
+        return new CWD(CliUtils.getCanonicalPath(path));
     }
 
     private Path directory;

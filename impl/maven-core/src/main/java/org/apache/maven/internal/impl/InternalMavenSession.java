@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.InternalSession;
 
-import static org.apache.maven.impl.Utils.cast;
+import static org.apache.maven.internal.impl.CoreUtils.cast;
 
 public interface InternalMavenSession extends InternalSession {
 

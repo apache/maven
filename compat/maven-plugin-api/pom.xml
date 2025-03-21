@@ -57,6 +57,10 @@ under the License.
       <artifactId>maven-artifact</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-support</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.woodstox</groupId>
       <artifactId>woodstox-core</artifactId>
     </dependency>
@@ -92,62 +96,6 @@ under the License.
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <configuration>
-          <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
-        </configuration>
-        <executions>
-          <execution>
-            <id>velocity-lifecycle</id>
-            <goals>
-              <goal>velocity</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <templates>
-                <template>reader-stax.vm</template>
-                <template>writer-stax.vm</template>
-              </templates>
-              <params>
-                <param>packageModelV4=org.apache.maven.api.plugin.descriptor.lifecycle</param>
-                <param>packageToolV4=org.apache.maven.plugin.lifecycle.io</param>
-              </params>
-              <models>
-                <model>../../api/maven-api-plugin/src/main/mdo/lifecycle.mdo</model>
-              </models>
-              <version>2.0.0</version>
-            </configuration>
-          </execution>
-          <execution>
-            <id>velocity-plugin</id>
-            <goals>
-              <goal>velocity</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <templates>
-                <template>reader-stax.vm</template>
-                <template>writer-stax.vm</template>
-              </templates>
-              <params>
-                <param>packageModelV3=org.apache.maven.plugin.descriptor</param>
-                <param>packageModelV4=org.apache.maven.api.plugin.descriptor</param>
-                <param>packageToolV4=org.apache.maven.plugin.descriptor.io</param>
-              </params>
-              <models>
-                <model>../../api/maven-api-plugin/src/main/mdo/plugin.mdo</model>
-              </models>
-              <version>2.0.0</version>
-            </configuration>
-          </execution>
-          <execution>
-            <id>modello-site-docs</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-maven-plugin</artifactId>

@@ -41,7 +41,7 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.impl.resolver.type.DefaultType;
 
 import static java.util.function.Function.identity;
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.internal.impl.CoreUtils.nonNull;
 
 @Named
 @Singleton
