@@ -25,8 +25,8 @@ import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.internal.impl.DefaultModelVersionParser;
-import org.apache.maven.internal.impl.DefaultVersionParser;
+import org.apache.maven.impl.DefaultModelVersionParser;
+import org.apache.maven.impl.DefaultVersionParser;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 
 /**
@@ -96,6 +96,7 @@ public class ArtifactStub implements Artifact {
         this.version = version;
     }
 
+    @Override
     public Version getBaseVersion() {
         return getParser().parseVersion(baseVersion != null ? baseVersion : version);
     }

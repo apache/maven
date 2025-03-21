@@ -54,6 +54,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
  */
@@ -109,6 +110,7 @@ public class SessionStub implements Session {
     }
 
     @Nonnull
+    @Override
     public Map<String, String> getEffectiveProperties(@Nullable Project project) {
         HashMap<String, String> result = new HashMap<>(getSystemProperties());
         if (project != null) {
@@ -442,5 +444,15 @@ public class SessionStub implements Session {
     @Override
     public PathScope requirePathScope(String id) {
         return null;
+    }
+
+    @Override
+    public Optional<Version> resolveHighestVersion(ArtifactCoordinates artifact, List<RemoteRepository> repositories) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Collection<ToolchainModel> getToolchains() {
+        return List.of();
     }
 }

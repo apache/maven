@@ -36,6 +36,7 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.PluginContainer;
+import org.apache.maven.api.model.Profile;
 
 /**
  * @author Olivier Lamy
@@ -49,8 +50,11 @@ public class ProjectStub implements Project {
     private Path pomPath;
     private boolean topProject;
     private Path rootDirectory;
-    private Map<String, String> properties = new HashMap<>();
     private ProducedArtifact mainArtifact;
+    private List<Profile> declaredProfiles = List.of();
+    private List<Profile> effectiveProfiles = List.of();
+    private List<Profile> declaredActiveProfiles = List.of();
+    private List<Profile> effectiveActiveProfiles = List.of();
 
     public void setModel(Model model) {
         this.model = model;
@@ -253,5 +257,45 @@ public class ProjectStub implements Project {
         props.put(key, value);
         model = model.withProperties(props);
         return this;
+    }
+
+    @Override
+    @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because list is unmodifiable.
+    public List<Profile> getDeclaredProfiles() {
+        return declaredProfiles;
+    }
+
+    public void setDeclaredProfiles(List<Profile> values) {
+        declaredProfiles = List.copyOf(values);
+    }
+
+    @Override
+    @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because list is unmodifiable.
+    public List<Profile> getEffectiveProfiles() {
+        return effectiveProfiles;
+    }
+
+    public void setEffectiveProfiles(List<Profile> values) {
+        effectiveProfiles = List.copyOf(values);
+    }
+
+    @Override
+    @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because list is unmodifiable.
+    public List<Profile> getDeclaredActiveProfiles() {
+        return declaredActiveProfiles;
+    }
+
+    public void setDeclaredActiveProfiles(List<Profile> values) {
+        declaredActiveProfiles = List.copyOf(values);
+    }
+
+    @Override
+    @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because list is unmodifiable.
+    public List<Profile> getEffectiveActiveProfiles() {
+        return effectiveActiveProfiles;
+    }
+
+    public void setEffectiveActiveProfiles(List<Profile> values) {
+        effectiveActiveProfiles = List.copyOf(values);
     }
 }
