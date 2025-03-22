@@ -196,6 +196,11 @@ export MAVEN_PROJECTBASEDIR
 MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"
 export MAVEN_CMD_LINE_ARGS
 
+# MNG-8248
+if "$JAVACMD" --enable-native-access=ALL-UNNAMED -version >/dev/null 2>&1; then
+  MAVEN_OPTS="--enable-native-access=ALL-UNNAMED $MAVEN_OPTS"
+fi
+
 exec "$JAVACMD" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
