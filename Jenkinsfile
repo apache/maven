@@ -17,14 +17,14 @@
  * under the License.
  */
 
-properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'5':'1'))])
+properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='maven-3.9.x'?'5':'1'))])
 
 def buildOs = 'linux'
 def buildJdk = '8'
-def buildMvn = '3.6.3'
+def buildMvn = '3.9.9'
 def runITsOses = ['linux']
 def runITsJdks = ['8', '11', '17']
-def runITsMvn = '3.6.3'
+def runITsMvn = '3.9.9'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
