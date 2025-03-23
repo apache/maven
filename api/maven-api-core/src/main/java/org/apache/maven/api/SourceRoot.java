@@ -26,13 +26,23 @@ import java.util.Optional;
 /**
  * A root directory of source files.
  * The sources may be Java main classes, test classes, resources or anything else identified by the scope.
+ *
+ * <h2>Default values</h2>
+ * The default implementation of all methods in this interface match the default values
+ * documented in {@code maven.mdo} (the <abbr>POM</abbr> model).
  */
 public interface SourceRoot {
     /**
      * {@return the root directory where the sources are stored}.
      * The path is relative to the <abbr>POM</abbr> file.
+     *
+     * <h4>Default implementation</h4>
+     * The default value is <code>src/{@linkplain #scope() scope}/{@linkplain #language() language}</code>
+     * as a relative path. Implementation classes may override this default with an absolute path instead.
      */
-    Path directory();
+    default Path directory() {
+        return Path.of("src", scope().id(), language().id());
+    }
 
     /**
      * {@return the list of pattern matchers for the files to include}.
@@ -62,8 +72,11 @@ public interface SourceRoot {
 
     /**
      * {@return the language of the source files}.
+     * The default value is {@link Language#JAVA_FAMILY}.
      */
-    Language language();
+    default Language language() {
+        return Language.JAVA_FAMILY;
+    }
 
     /**
      * {@return the name of the Java module (or other language-specific module) which is built by the sources}.
