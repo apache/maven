@@ -471,7 +471,7 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private MavenProject getProject(Artifact artifact) {
-        return getAllProjects()
+        return getProjects()
                 .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
                 .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
                 .getOrDefault(artifact.getBaseVersion(), null);
