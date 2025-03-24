@@ -99,7 +99,7 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
                 .groupId(requireNonNull(coordinates, "coordinates").getGroupId())
                 .artifactId(coordinates.getArtifactId())
                 .classifier(coordinates.getClassifier())
-                .version(coordinates.getVersionConstraint().asString())
+                .version(coordinates.getVersionConstraint().toString())
                 .extension(coordinates.getExtension())
                 .build();
     }

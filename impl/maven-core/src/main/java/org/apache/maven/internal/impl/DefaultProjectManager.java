@@ -102,13 +102,13 @@ public class DefaultProjectManager implements ProjectManager {
         nonNull(path, "path");
         if (artifact.getGroupId().isEmpty()
                 || artifact.getArtifactId().isEmpty()
-                || artifact.getBaseVersion().asString().isEmpty()) {
+                || artifact.getBaseVersion().toString().isEmpty()) {
             artifact = session.createProducedArtifact(
                     artifact.getGroupId().isEmpty() ? project.getGroupId() : artifact.getGroupId(),
                     artifact.getArtifactId().isEmpty() ? project.getArtifactId() : artifact.getArtifactId(),
-                    artifact.getBaseVersion().asString().isEmpty()
-                            ? session.parseVersion(project.getVersion()).asString()
-                            : artifact.getBaseVersion().asString(),
+                    artifact.getBaseVersion().toString().isEmpty()
+                            ? session.parseVersion(project.getVersion()).toString()
+                            : artifact.getBaseVersion().toString(),
                     artifact.getClassifier(),
                     artifact.getExtension(),
                     null);
@@ -116,7 +116,7 @@ public class DefaultProjectManager implements ProjectManager {
         if (!Objects.equals(project.getGroupId(), artifact.getGroupId())
                 || !Objects.equals(project.getArtifactId(), artifact.getArtifactId())
                 || !Objects.equals(
-                        project.getVersion(), artifact.getBaseVersion().asString())) {
+                        project.getVersion(), artifact.getBaseVersion().toString())) {
             throw new IllegalArgumentException(
                     "The produced artifact must have the same groupId/artifactId/version than the project it is attached to. Expecting "
                             + project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion()
