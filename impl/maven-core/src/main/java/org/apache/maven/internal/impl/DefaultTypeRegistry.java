@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -41,7 +42,6 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.impl.resolver.type.DefaultType;
 
 import static java.util.function.Function.identity;
-import static org.apache.maven.internal.impl.CoreUtils.nonNull;
 
 @Named
 @Singleton
@@ -57,12 +57,12 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     @Inject
     public DefaultTypeRegistry(
             List<TypeProvider> providers, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
-        this.types = nonNull(providers, "providers").stream()
+        this.types = Objects.requireNonNull(providers, "providers" + " cannot be null").stream()
                 .flatMap(p -> p.provides().stream())
                 .collect(Collectors.toMap(Type::id, identity()));
-        this.languageRegistry = nonNull(languageRegistry, "languageRegistry");
+        this.languageRegistry = Objects.requireNonNull(languageRegistry, "languageRegistry" + " cannot be null");
         this.usedTypes = new ConcurrentHashMap<>();
-        this.manager = nonNull(manager, "artifactHandlerManager");
+        this.manager = Objects.requireNonNull(manager, "artifactHandlerManager" + " cannot be null");
     }
 
     @Override
@@ -82,7 +82,7 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     @Override
     @Nonnull
     public Type require(String id) {
-        nonNull(id, "id");
+        Objects.requireNonNull(id, "id" + " cannot be null");
         return usedTypes.computeIfAbsent(id, i -> {
             Type type = types.get(id);
             if (type == null) {

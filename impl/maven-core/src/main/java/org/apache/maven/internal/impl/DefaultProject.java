@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,8 +47,6 @@ import org.apache.maven.impl.MappedList;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
-
-import static org.apache.maven.internal.impl.CoreUtils.nonNull;
 
 public class DefaultProject implements Project {
 
@@ -122,13 +121,15 @@ public class DefaultProject implements Project {
     @Nonnull
     @Override
     public Path getPomPath() {
-        return nonNull(project.getFile(), "pomPath").toPath();
+        File t = project.getFile();
+        return Objects.requireNonNull(t, "pomPath" + " cannot be null").toPath();
     }
 
     @Nonnull
     @Override
     public Path getBasedir() {
-        return nonNull(project.getBasedir(), "basedir").toPath();
+        File t = project.getBasedir();
+        return Objects.requireNonNull(t, "basedir" + " cannot be null").toPath();
     }
 
     @Nonnull

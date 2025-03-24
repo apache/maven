@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
@@ -54,7 +55,6 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
 import static org.apache.maven.internal.impl.CoreUtils.map;
-import static org.apache.maven.internal.impl.CoreUtils.nonNull;
 
 public class DefaultSession extends AbstractSession implements InternalMavenSession {
 
@@ -72,7 +72,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
             @Nonnull Lookup lookup,
             @Nonnull RuntimeInformation runtimeInformation) {
         super(
-                nonNull(session).getRepositorySession(),
+                Objects.requireNonNull(session).getRepositorySession(),
                 repositorySystem,
                 remoteRepositories,
                 remoteRepositories == null
@@ -182,7 +182,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     @Nonnull
     @Override
     public Map<String, Object> getPluginContext(Project project) {
-        nonNull(project, "project");
+        Objects.requireNonNull(project, "project" + " cannot be null");
         try {
             MojoExecution mojoExecution = lookup.lookup(MojoExecution.class);
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -195,7 +195,8 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
 
     @Override
     protected Session newSession(RepositorySystemSession repoSession, List<RemoteRepository> repositories) {
-        final MavenSession ms = nonNull(getMavenSession());
+        MavenSession t = getMavenSession();
+        final MavenSession ms = Objects.requireNonNull(t);
         final MavenSession mss;
         if (repoSession != ms.getRepositorySession()) {
             mss = new MavenSession(repoSession, ms.getRequest(), ms.getResult());
@@ -207,7 +208,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
 
     protected Session newSession(MavenSession mavenSession, List<RemoteRepository> repositories) {
         return new DefaultSession(
-                nonNull(mavenSession),
+                Objects.requireNonNull(mavenSession),
                 getRepositorySystem(),
                 repositories,
                 mavenRepositorySystem,
