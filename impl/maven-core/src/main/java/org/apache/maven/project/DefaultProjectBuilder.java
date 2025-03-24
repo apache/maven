@@ -91,6 +91,7 @@ import org.apache.maven.impl.resolver.ArtifactDescriptorUtils;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource2;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.PluginManagerException;
@@ -356,8 +357,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
                     ModelBuilderRequest.RequestType type = pomFile != null
-                            // && this.request.isProcessPlugins()
-                            // && this.request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_STRICT
+                                    //&& this.request.isProcessPlugins()
+                                    //&& this.request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_STRICT
                             ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
                             : ModelBuilderRequest.RequestType.CONSUMER_PARENT;
                     MavenProject theProject = project;
