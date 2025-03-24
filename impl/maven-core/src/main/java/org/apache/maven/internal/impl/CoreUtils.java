@@ -25,19 +25,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class CoreUtils {
-    public static <T> T nonNull(T t) {
-        if (t == null) {
-            throw new IllegalArgumentException();
-        }
-        return t;
-    }
-
-    public static <T> T nonNull(T t, String name) {
-        if (t == null) {
-            throw new IllegalArgumentException(name + " cannot be null");
-        }
-        return t;
-    }
 
     public static <T> T cast(Class<T> clazz, Object o, String name) {
         if (!clazz.isInstance(o)) {

@@ -47,8 +47,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
-import static org.apache.maven.internal.impl.CoreUtils.nonNull;
-
 public class DefaultProject implements Project {
 
     private final InternalMavenSession session;
@@ -122,13 +120,15 @@ public class DefaultProject implements Project {
     @Nonnull
     @Override
     public Path getPomPath() {
-        return nonNull(project.getFile(), "pomPath").toPath();
+        return Objects.requireNonNull(project.getFile(), "pomPath cannot be null")
+                .toPath();
     }
 
     @Nonnull
     @Override
     public Path getBasedir() {
-        return nonNull(project.getBasedir(), "basedir").toPath();
+        return Objects.requireNonNull(project.getBasedir(), "basedir cannot be null")
+                .toPath();
     }
 
     @Nonnull
