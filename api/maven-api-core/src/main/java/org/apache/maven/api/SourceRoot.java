@@ -28,8 +28,9 @@ import java.util.Optional;
  * The sources may be Java main classes, test classes, resources or anything else identified by the scope.
  *
  * <h2>Default values</h2>
- * The default implementation of all methods in this interface match the default values
- * documented in {@code maven.mdo} (the <abbr>POM</abbr> model).
+ * The properties in this interface are defined in the {@code <Source>} element of the
+ * {@linkplain org.apache.maven.api.model.Model Maven project descriptor}.
+ * For each property, the default value is either empty or documented in the project descriptor.
  */
 public interface SourceRoot {
     /**
@@ -64,7 +65,10 @@ public interface SourceRoot {
 
     /**
      * {@return in which context the source files will be used}.
-     * The default value is {@link ProjectScope#MAIN}.
+     * Not to be confused with dependency scope.
+     * The default value is {@code "main"}.
+     *
+     * @see ProjectScope#MAIN
      */
     default ProjectScope scope() {
         return ProjectScope.MAIN;
@@ -72,7 +76,9 @@ public interface SourceRoot {
 
     /**
      * {@return the language of the source files}.
-     * The default value is {@link Language#JAVA_FAMILY}.
+     * The default value is {@code "java"}.
+     *
+     * @see Language#JAVA_FAMILY
      */
     default Language language() {
         return Language.JAVA_FAMILY;

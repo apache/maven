@@ -874,9 +874,9 @@
           <version>4.1.0+</version>
           <description>
             All the sources to compile and resources files to copy for a project or it's unit tests.
-            The sources can be Java source files, generated source files, scripts or resources for examples.
+            The sources can be Java source files, generated source files, scripts, or resources for examples.
             Each source is specified by a {@code directory} element, which is relative to the POM.
-            The kind of sources (codes to compile or resources to copy) and their usage (for the main code
+            The kind of sources (source files to compile or resources to copy) and their usage (for the main code
             or for the tests) is specified by the {@code scope} element together with each source directory.
           </description>
           <association>
@@ -2004,9 +2004,9 @@
       <description>
         <![CDATA[
         Description of the sources associated with a project main code or unit tests.
-        The sources can be Java source files, generated source files, scripts or resources for examples.
+        The sources can be Java source files, generated source files, scripts, or resources for examples.
         A source is specified by a {@code directory} element, which is relative to the POM.
-        The directory content can optionally by reduced to a subset with the {@code includes} and
+        The directory content can optionally be reduced to a subset with the {@code includes} and
         {@code excludes} elements. The kind of sources (codes, resources, <i>etc.</i>) and their
         usage (main code, tests, <i>etc.</i>) is specified by the {@code scope} element.
 
@@ -2084,7 +2084,7 @@
             resource file will be copied as {@code foo.biz/foo/bar.properties}.</p>
 
             <p>This element can be combined with the {@code targetVersion} element for specifying sources,
-            scripts or resources that are specific to both a particular module and a target version.</p>
+            scripts, or resources that are specific to both a particular module and a target version.</p>
             ]]>
           </description>
           <type>String</type>
@@ -2108,7 +2108,7 @@
             resource file will be copied as {@code META-INF/versions/17/foo/bar.properties}.</p>
 
             <p>This element can be combined with the {@code module} element for specifying sources,
-            scripts or resources that are specific to both a particular module and a target version.</p>
+            scripts, or resources that are specific to both a particular module and a target version.</p>
             ]]>
           </description>
           <type>String</type>
