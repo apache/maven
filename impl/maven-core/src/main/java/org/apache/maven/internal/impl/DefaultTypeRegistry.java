@@ -57,12 +57,12 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     @Inject
     public DefaultTypeRegistry(
             List<TypeProvider> providers, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
-        this.types = requireNonNull(providers, "providers" + " cannot be null").stream()
+        this.types = requireNonNull(providers, "providers cannot be null").stream()
                 .flatMap(p -> p.provides().stream())
                 .collect(Collectors.toMap(Type::id, identity()));
-        this.languageRegistry = requireNonNull(languageRegistry, "languageRegistry" + " cannot be null");
+        this.languageRegistry = requireNonNull(languageRegistry, "languageRegistry cannot be null");
         this.usedTypes = new ConcurrentHashMap<>();
-        this.manager = requireNonNull(manager, "artifactHandlerManager" + " cannot be null");
+        this.manager = requireNonNull(manager, "artifactHandlerManager cannot be null");
     }
 
     @Override
