@@ -62,6 +62,6 @@ class LicenseTest {
 
         String s = license.toString();
 
-        assertEquals("License {name=Unlicense, url=http://lic.localdomain}", s)
+        assertEquals("License {name=Unlicense, url=http://lic.localdomain}", s);
     }
 }
