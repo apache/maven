@@ -174,6 +174,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
         assertLocalArtifactPresent(l);
     }
 
+    @Test
     public void testReadRepoFromModel() throws Exception {
         Artifact m = createArtifact(TestMavenWorkspaceReader.ARTIFACT_ID, TestMavenWorkspaceReader.VERSION);
         ArtifactMetadataSource source = getContainer().lookup(ArtifactMetadataSource.class, "maven");

@@ -238,6 +238,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithChildProjectParentVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-project-parent-version-expression/child/pom.xml");
@@ -256,6 +257,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithChildRevisionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-revision-expression/child/pom.xml");
@@ -480,6 +482,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildPomVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-pom-version-expression/pom.xml");
@@ -495,9 +498,8 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
     /**
      * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildPomParentVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-pom-parent-version-expression/pom.xml");
@@ -508,14 +510,14 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         } catch (final ProjectBuildingException e) {
             assertNotNull(e.getMessage());
             assertThat(e.getMessage(), containsString("Version must be a constant"));
+            assertThat(e.getMessage(), containsString("Version must be a constant"));
         }
     }
 
     /**
      * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildProjectParentVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-project-parent-version-expression/pom.xml");
@@ -531,9 +533,8 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
     /**
      * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildRevisionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-revision-expression/pom.xml");

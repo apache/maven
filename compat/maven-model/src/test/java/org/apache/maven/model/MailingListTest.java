@@ -54,6 +54,7 @@ class MailingListTest {
         assertNotNull(new MailingList().toString());
     }
 
+    @Test
     public void testToStringNotNonsense() {
         MailingList list = new MailingList();
         list.setName("modello-dev");
