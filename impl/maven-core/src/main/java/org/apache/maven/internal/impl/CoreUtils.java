@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.impl;
+package org.apache.maven.internal.impl;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Utils {
+class CoreUtils {
     public static <T> T nonNull(T t) {
         if (t == null) {
             throw new IllegalArgumentException();

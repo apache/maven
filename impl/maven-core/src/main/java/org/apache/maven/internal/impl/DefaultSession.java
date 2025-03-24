@@ -53,8 +53,8 @@ import org.apache.maven.rtinfo.RuntimeInformation;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
-import static org.apache.maven.impl.Utils.map;
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.internal.impl.CoreUtils.map;
+import static org.apache.maven.internal.impl.CoreUtils.nonNull;
 
 public class DefaultSession extends AbstractSession implements InternalMavenSession {
 
