@@ -22,13 +22,15 @@ import java.util.AbstractList;
 import java.util.List;
 import java.util.function.Function;
 
+import static java.util.Objects.requireNonNull;
+
 public class MappedList<U, V> extends AbstractList<U> {
     private final List<V> list;
     private final Function<V, U> mapper;
 
     public MappedList(List<V> list, Function<V, U> mapper) {
-        this.list = list;
-        this.mapper = mapper;
+        this.list = requireNonNull(list, "list");
+        this.mapper = requireNonNull(mapper, "mapper");
     }
 
     @Override

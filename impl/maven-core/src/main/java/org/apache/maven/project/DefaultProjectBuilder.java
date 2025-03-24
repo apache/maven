@@ -145,7 +145,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuildingResult build(File pomFile, ProjectBuildingRequest request) throws ProjectBuildingException {
         try (BuildSession bs = new BuildSession(request)) {
             Path path = pomFile.toPath();
-            return bs.build(path, Sources.buildSource(path));
+            return bs.build(false, path, Sources.buildSource(path));
         }
     }
 
@@ -170,7 +170,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuildingResult build(ModelSource modelSource, ProjectBuildingRequest request)
             throws ProjectBuildingException {
         try (BuildSession bs = new BuildSession(request)) {
-            return bs.build(null, modelSource);
+            return bs.build(false, null, modelSource);
         }
     }
 
@@ -184,7 +184,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuildingResult build(Artifact artifact, boolean allowStubModel, ProjectBuildingRequest request)
             throws ProjectBuildingException {
         try (BuildSession bs = new BuildSession(request)) {
-            return bs.build(artifact, allowStubModel);
+            return bs.build(false, artifact, allowStubModel);
         }
     }
 
@@ -342,7 +342,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         @Override
         public void close() {}
 
-        ProjectBuildingResult build(Path pomFile, ModelSource modelSource) throws ProjectBuildingException {
+        ProjectBuildingResult build(boolean parent, Path pomFile, ModelSource modelSource)
+                throws ProjectBuildingException {
             ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
             try {
@@ -355,12 +356,22 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     project = new MavenProject();
                     project.setFile(pomFile != null ? pomFile.toFile() : null);
 
+                    boolean reactorMember = pomFile != null
+                            && session.getProjects() != null // this is for UTs
+                            && session.getProjects().stream()
+                                    .anyMatch(
+                                            p -> p.getPomPath().toAbsolutePath().equals(pomFile.toAbsolutePath()));
+
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
-                    ModelBuilderRequest.RequestType type = pomFile != null
-                                    && this.request.isProcessPlugins()
-                                    && this.request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_STRICT
+                    ModelBuilderRequest.RequestType type = reactorMember
+                                    || (pomFile != null
+                                            && this.request.isProcessPlugins()
+                                            && this.request.getValidationLevel()
+                                                    == ModelBuildingRequest.VALIDATION_LEVEL_STRICT)
                             ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
-                            : ModelBuilderRequest.RequestType.CONSUMER_PARENT;
+                            : (parent
+                                    ? ModelBuilderRequest.RequestType.CONSUMER_PARENT
+                                    : ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY);
                     MavenProject theProject = project;
                     ModelBuilderRequest request = builder.source(modelSource)
                             .requestType(type)
@@ -413,7 +424,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
         }
 
-        ProjectBuildingResult build(Artifact artifact, boolean allowStubModel) throws ProjectBuildingException {
+        ProjectBuildingResult build(boolean parent, Artifact artifact, boolean allowStubModel)
+                throws ProjectBuildingException {
             org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(artifact);
             pomArtifact = ArtifactDescriptorUtils.toPomArtifact(pomArtifact);
 
@@ -437,7 +449,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 localProject = resItem.getRepository() instanceof org.apache.maven.api.WorkspaceRepository;
             } catch (ArtifactResolverException e) {
                 if (e.getResult().getResults().values().iterator().next().isMissing() && allowStubModel) {
-                    return build(null, createStubModelSource(artifact));
+                    return build(parent, null, createStubModelSource(artifact));
                 }
                 throw new ProjectBuildingException(
                         artifact.getId(), "Error resolving project artifact: " + e.getMessage(), e);
@@ -452,9 +464,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
 
             if (localProject) {
-                return build(pomFile, Sources.buildSource(pomFile));
+                return build(parent, pomFile, Sources.buildSource(pomFile));
             } else {
                 return build(
+                        parent,
                         null,
                         Sources.resolvedSource(
                                 pomFile,
@@ -815,7 +828,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());
                         try {
-                            parent = build(parentPomFile, Sources.buildSource(parentPomFile))
+                            parent = build(true, parentPomFile, Sources.buildSource(parentPomFile))
                                     .getProject();
                         } catch (ProjectBuildingException e) {
                             // MNG-4488 where let invalid parents slide on by
@@ -830,7 +843,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     } else {
                         Artifact parentArtifact = project.getParentArtifact();
                         try {
-                            parent = build(parentArtifact, false).getProject();
+                            parent = build(true, parentArtifact, false).getProject();
                         } catch (ProjectBuildingException e) {
                             // MNG-4488 where let invalid parents slide on by
                             if (logger.isDebugEnabled()) {
