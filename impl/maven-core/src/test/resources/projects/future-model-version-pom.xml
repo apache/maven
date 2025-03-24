@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project>
+<project xmlns="http://maven.apache.org/POM/4.9.0">
     <modelVersion>4.9.1</modelVersion>
     <groupId>tests.project</groupId>
     <artifactId>future-model-version</artifactId>
