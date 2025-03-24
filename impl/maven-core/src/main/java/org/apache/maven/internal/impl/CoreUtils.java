@@ -26,17 +26,11 @@ import java.util.stream.Collectors;
 
 class CoreUtils {
     public static <T> T nonNull(T t) {
-        if (t == null) {
-            throw new IllegalArgumentException();
-        }
-        return t;
+        return Objects.requireNonNull( t );
     }
 
     public static <T> T nonNull(T t, String name) {
-        if (t == null) {
-            throw new IllegalArgumentException(name + " cannot be null");
-        }
-        return t;
+        return Objects.requireNonNull( t, name + " cannot be null" );
     }
 
     public static <T> T cast(Class<T> clazz, Object o, String name) {
