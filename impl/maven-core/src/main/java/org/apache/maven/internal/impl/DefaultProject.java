@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -121,15 +120,15 @@ public class DefaultProject implements Project {
     @Nonnull
     @Override
     public Path getPomPath() {
-        File t = project.getFile();
-        return Objects.requireNonNull(t, "pomPath" + " cannot be null").toPath();
+        return Objects.requireNonNull(project.getFile(), "pomPath cannot be null")
+                .toPath();
     }
 
     @Nonnull
     @Override
     public Path getBasedir() {
-        File t = project.getBasedir();
-        return Objects.requireNonNull(t, "basedir" + " cannot be null").toPath();
+        return Objects.requireNonNull(project.getBasedir(), "basedir cannot be null")
+                .toPath();
     }
 
     @Nonnull

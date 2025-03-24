@@ -49,6 +49,7 @@ import org.apache.maven.impl.PropertiesAsMap;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.maven.internal.impl.CoreUtils.map;
 
 @Named
@@ -68,7 +69,7 @@ public class DefaultProjectManager implements ProjectManager {
     @Nonnull
     @Override
     public Optional<Path> getPath(@Nonnull Project project) {
-        Objects.requireNonNull(project, "project" + " cannot be null");
+        requireNonNull(project, "project" + " cannot be null");
         Optional<ProducedArtifact> mainArtifact = project.getMainArtifact();
         return mainArtifact.flatMap(artifactManager::getPath);
     }
@@ -76,7 +77,7 @@ public class DefaultProjectManager implements ProjectManager {
     @Nonnull
     @Override
     public Collection<ProducedArtifact> getAttachedArtifacts(@Nonnull Project project) {
-        Objects.requireNonNull(project, "project" + " cannot be null");
+        requireNonNull(project, "project" + " cannot be null");
         Collection<ProducedArtifact> attached =
                 map(getMavenProject(project).getAttachedArtifacts(), a -> getSession(project)
                         .getArtifact(ProducedArtifact.class, RepositoryUtils.toArtifact(a)));
@@ -86,7 +87,7 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     @Nonnull
     public Collection<ProducedArtifact> getAllArtifacts(@Nonnull Project project) {
-        Objects.requireNonNull(project, "project" + " cannot be null");
+        requireNonNull(project, "project cannot be null");
         ArrayList<ProducedArtifact> result = new ArrayList<>(2);
         result.addAll(project.getArtifacts());
         result.addAll(getAttachedArtifacts(project));
@@ -96,9 +97,9 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     @SuppressWarnings("deprecation")
     public void attachArtifact(@Nonnull Project project, @Nonnull ProducedArtifact artifact, @Nonnull Path path) {
-        Objects.requireNonNull(project, "project" + " cannot be null");
-        Objects.requireNonNull(artifact, "artifact" + " cannot be null");
-        Objects.requireNonNull(path, "path" + " cannot be null");
+        requireNonNull(project, "project cannot be null");
+        requireNonNull(artifact, "artifact cannot be null");
+        requireNonNull(path, "path cannot be null");
         if (artifact.getGroupId().isEmpty()
                 || artifact.getArtifactId().isEmpty()
                 || artifact.getBaseVersion().toString().isEmpty()) {
@@ -131,21 +132,21 @@ public class DefaultProjectManager implements ProjectManager {
     @Nonnull
     @Override
     public Collection<SourceRoot> getSourceRoots(@Nonnull Project project) {
-        MavenProject prj = getMavenProject(Objects.requireNonNull(project, "project" + " cannot be null"));
+        MavenProject prj = getMavenProject(requireNonNull(project, "project" + " cannot be null"));
         return prj.getSourceRoots();
     }
 
     @Nonnull
     @Override
     public Stream<SourceRoot> getEnabledSourceRoots(@Nonnull Project project, ProjectScope scope, Language language) {
-        MavenProject prj = getMavenProject(Objects.requireNonNull(project, "project" + " cannot be null"));
+        MavenProject prj = getMavenProject(requireNonNull(project, "project" + " cannot be null"));
         return prj.getEnabledSourceRoots(scope, language);
     }
 
     @Override
     public void addSourceRoot(@Nonnull Project project, @Nonnull SourceRoot source) {
-        MavenProject prj = getMavenProject(Objects.requireNonNull(project, "project" + " cannot be null"));
-        prj.addSourceRoot(Objects.requireNonNull(source, "source" + " cannot be null"));
+        MavenProject prj = getMavenProject(requireNonNull(project, "project" + " cannot be null"));
+        prj.addSourceRoot(requireNonNull(source, "source" + " cannot be null"));
     }
 
     @Override
@@ -154,11 +155,11 @@ public class DefaultProjectManager implements ProjectManager {
             @Nonnull ProjectScope scope,
             @Nonnull Language language,
             @Nonnull Path directory) {
-        MavenProject prj = getMavenProject(Objects.requireNonNull(project, "project" + " cannot be null"));
+        MavenProject prj = getMavenProject(requireNonNull(project, "project" + " cannot be null"));
         prj.addSourceRoot(
-                Objects.requireNonNull(scope, "scope" + " cannot be null"),
-                Objects.requireNonNull(language, "language" + " cannot be null"),
-                Objects.requireNonNull(directory, "directory" + " cannot be null"));
+                requireNonNull(scope, "scope" + " cannot be null"),
+                requireNonNull(language, "language" + " cannot be null"),
+                requireNonNull(directory, "directory" + " cannot be null"));
     }
 
     @Override
