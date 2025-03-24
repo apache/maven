@@ -26,11 +26,11 @@ import java.util.stream.Collectors;
 
 class CoreUtils {
     public static <T> T nonNull(T t) {
-        return Objects.requireNonNull( t );
+        return Objects.requireNonNull(t);
     }
 
     public static <T> T nonNull(T t, String name) {
-        return Objects.requireNonNull( t, name + " cannot be null" );
+        return Objects.requireNonNull(t, name + " cannot be null");
     }
 
     public static <T> T cast(Class<T> clazz, Object o, String name) {
