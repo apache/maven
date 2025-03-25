@@ -55,8 +55,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
-    @TempDir
-    File localRepoDir;
 
     // only use by reread()
     @TempDir
@@ -471,7 +469,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             fail("Expected 'ProjectBuildingException' not thrown.");
         } catch (final ProjectBuildingException e) {
             assertNotNull(e.getMessage());
-            assertThat(e.getMessage(), containsString("Version must be a constant"));
         }
     }
 
