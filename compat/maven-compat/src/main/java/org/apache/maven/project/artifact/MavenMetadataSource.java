@@ -199,7 +199,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
             MavenSession session = legacySupport.getSession();
-            if (session != null) {
+            if (session != null && session.getProjects() != null) {
                 pomRepositories = session.getProjects().stream()
                         .filter(p -> artifact.equals(p.getArtifact()))
                         .map(MavenProject::getRemoteArtifactRepositories)
