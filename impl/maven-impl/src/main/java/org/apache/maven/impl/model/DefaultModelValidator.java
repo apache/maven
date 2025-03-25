@@ -1416,8 +1416,7 @@ public class DefaultModelValidator implements ModelValidator {
                                 prefix + prefix2 + "[" + repository.getId() + "].url",
                                 null,
                                 "contains a deprecated 'project.baseUri' expression,  use 'project.basedir.uri' instead.",
-                                repository
-                        );
+                                repository);
                     } else if (!("basedir".equals(expr)
                             || "project.basedir".equals(expr)
                             || expr.startsWith("project.basedir.")
