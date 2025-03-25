@@ -111,4 +111,16 @@ public class DefaultType implements Type, ArtifactType {
     public Map<String, String> getProperties() {
         return properties;
     }
+
+    @Override
+    public String toString() {
+        return "DefaultType[" + "id='"
+                + id + '\'' + ", language="
+                + language + ", extension='"
+                + extension + '\'' + ", classifier='"
+                + classifier + '\'' + ", includesDependencies="
+                + includesDependencies + ", pathTypes="
+                + pathTypes + ", properties="
+                + properties + ']';
+    }
 }
