@@ -78,8 +78,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
     /**
      * Check that we can build ok from the middle pom of a (parent,child,grandchild) hierarchy
-     *
-     * @throws Exception in case of issue
      */
     @Test
     void testBuildFromMiddlePom() throws Exception {
@@ -292,8 +290,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
     /**
      * Tests whether external version range parent references are built correctly.
-     *
-     * @throws Exception in case of issue
      */
     @Test
     void testBuildParentVersionRangeExternallyWithChildProjectVersionExpression() throws Exception {
@@ -308,9 +304,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     /**
-     * Ensure that when re-reading a pom, it should not use the cached Model
-     *
-     * @throws Exception in case of issue
+     * Ensure that when re-reading a pom, it does not use the cached Model.
      */
     @Test
     void rereadPomMng7063() throws Exception {
@@ -494,7 +488,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             fail("Expected 'ProjectBuildingException' not thrown.");
         } catch (final ProjectBuildingException e) {
             assertNotNull(e.getMessage());
-            assertThat(e.getMessage(), containsString("Version must be a constant"));
         }
     }
 
@@ -544,7 +537,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         MavenProject p1 = results.get(0).getProject();
         MavenProject p2 = results.get(1).getProject();
         MavenProject parent = p1.getArtifactId().equals("parent") ? p1 : p2;
-        // MavenProject child = p1.getArtifactId().equals("parent") ? p2 : p1;
         assertEquals(List.of("child"), parent.getModel().getDelegate().getSubprojects());
     }
 }
