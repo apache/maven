@@ -30,8 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -144,8 +145,9 @@ class XmlNodeImplTest {
         XmlNode leftDom = toXmlNode(lhs);
         XmlNode rightDom = toXmlNode(rhs);
 
-        XmlNode mergeResult = leftDom.merge(rightDom);
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom);
 
+        assertEquals(toXmlNode(result).toString(), mergeResult.toString());
         assertEquals(toXmlNode(result), mergeResult);
     }
 
@@ -178,11 +180,11 @@ class XmlNodeImplTest {
         XmlNode dom = toXmlNode(lhs);
         XmlNode res = toXmlNode(result);
 
-        XmlNode mergeResult1 = dom.merge(dom, false);
+        XmlNode mergeResult1 = XmlService.merge(dom, dom, false);
         assertEquals(res, mergeResult1);
-        XmlNode mergeResult2 = dom.merge(dom, (Boolean) null);
+        XmlNode mergeResult2 = XmlService.merge(dom, dom, (Boolean) null);
         assertEquals(res, mergeResult2);
-        XmlNode mergeResult3 = dom.merge(dom, true);
+        XmlNode mergeResult3 = XmlService.merge(dom, dom, true);
         assertEquals(dom, mergeResult3);
     }
 
@@ -201,35 +203,35 @@ class XmlNodeImplTest {
                 + "<property combine.id='TOOVERWRITE'><name>TOOVERWRITE</name><value>RHS</value></property>"
                 + "</props>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
         assertEquals(3, getChildren(mergeResult, "property").size());
 
         XmlNode p0 = getNthChild(mergeResult, "property", 0);
-        assertEquals("LHS-ONLY", p0.getChild("name").getValue());
-        assertEquals("left", p0.getChild("name").getInputLocation());
-        assertEquals("LHS", p0.getChild("value").getValue());
-        assertEquals("left", p0.getChild("value").getInputLocation());
+        assertEquals("LHS-ONLY", p0.child("name").value());
+        assertEquals("left", p0.child("name").inputLocation());
+        assertEquals("LHS", p0.child("value").value());
+        assertEquals("left", p0.child("value").inputLocation());
 
         XmlNode p1 = getNthChild(mergeResult, "property", 1);
         assertEquals(
                 "TOOVERWRITE",
-                getNthChild(mergeResult, "property", 1).getChild("name").getValue());
-        assertEquals("left", p1.getChild("name").getInputLocation());
+                getNthChild(mergeResult, "property", 1).child("name").value());
+        assertEquals("left", p1.child("name").inputLocation());
         assertEquals(
-                "LHS", getNthChild(mergeResult, "property", 1).getChild("value").getValue());
-        assertEquals("left", p1.getChild("value").getInputLocation());
+                "LHS", getNthChild(mergeResult, "property", 1).child("value").value());
+        assertEquals("left", p1.child("value").inputLocation());
 
         XmlNode p2 = getNthChild(mergeResult, "property", 2);
         assertEquals(
                 "RHS-ONLY",
-                getNthChild(mergeResult, "property", 2).getChild("name").getValue());
-        assertEquals("right", p2.getChild("name").getInputLocation());
+                getNthChild(mergeResult, "property", 2).child("name").value());
+        assertEquals("right", p2.child("name").inputLocation());
         assertEquals(
-                "RHS", getNthChild(mergeResult, "property", 2).getChild("value").getValue());
-        assertEquals("right", p2.getChild("value").getInputLocation());
+                "RHS", getNthChild(mergeResult, "property", 2).child("value").value());
+        assertEquals("right", p2.child("value").inputLocation());
     }
 
     /**
@@ -247,35 +249,35 @@ class XmlNodeImplTest {
                 + "<property key=\"RHS-ONLY\"><name>RHS-ONLY</name><value>RHS</value></property>"
                 + "<property combine.keys='name'><name>TOOVERWRITE</name><value>RHS</value></property>" + "</props>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
         assertEquals(3, getChildren(mergeResult, "property").size());
 
         XmlNode p0 = getNthChild(mergeResult, "property", 0);
-        assertEquals("LHS-ONLY", p0.getChild("name").getValue());
-        assertEquals("left", p0.getChild("name").getInputLocation());
-        assertEquals("LHS", p0.getChild("value").getValue());
-        assertEquals("left", p0.getChild("value").getInputLocation());
+        assertEquals("LHS-ONLY", p0.child("name").value());
+        assertEquals("left", p0.child("name").inputLocation());
+        assertEquals("LHS", p0.child("value").value());
+        assertEquals("left", p0.child("value").inputLocation());
 
         XmlNode p1 = getNthChild(mergeResult, "property", 1);
         assertEquals(
                 "TOOVERWRITE",
-                getNthChild(mergeResult, "property", 1).getChild("name").getValue());
-        assertEquals("left", p1.getChild("name").getInputLocation());
+                getNthChild(mergeResult, "property", 1).child("name").value());
+        assertEquals("left", p1.child("name").inputLocation());
         assertEquals(
-                "LHS", getNthChild(mergeResult, "property", 1).getChild("value").getValue());
-        assertEquals("left", p1.getChild("value").getInputLocation());
+                "LHS", getNthChild(mergeResult, "property", 1).child("value").value());
+        assertEquals("left", p1.child("value").inputLocation());
 
         XmlNode p2 = getNthChild(mergeResult, "property", 2);
         assertEquals(
                 "RHS-ONLY",
-                getNthChild(mergeResult, "property", 2).getChild("name").getValue());
-        assertEquals("right", p2.getChild("name").getInputLocation());
+                getNthChild(mergeResult, "property", 2).child("name").value());
+        assertEquals("right", p2.child("name").inputLocation());
         assertEquals(
-                "RHS", getNthChild(mergeResult, "property", 2).getChild("value").getValue());
-        assertEquals("right", p2.getChild("value").getInputLocation());
+                "RHS", getNthChild(mergeResult, "property", 2).child("value").value());
+        assertEquals("right", p2.child("value").inputLocation());
     }
 
     @Test
@@ -284,11 +286,11 @@ class XmlNodeImplTest {
 
         String rhs = "<parameter>recessive</parameter>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
-        assertEquals(" ", mergeResult.getValue());
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
+        assertEquals(" ", mergeResult.value());
     }
 
     @Test
@@ -297,11 +299,11 @@ class XmlNodeImplTest {
 
         String rhs = "<parameter>recessive</parameter>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
-        assertEquals("", mergeResult.getValue());
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
+        assertEquals("", mergeResult.value());
     }
 
     @Test
@@ -310,11 +312,11 @@ class XmlNodeImplTest {
 
         String rhs = "<parameter>recessive</parameter>";
 
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
-        assertNull(mergeResult.getValue());
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
+        assertNull(mergeResult.value());
     }
 
     /**
@@ -336,21 +338,21 @@ class XmlNodeImplTest {
                     <topsub1>t2s2Value</topsub1>
                 </top>
                 """;
-        XmlNodeImpl leftDom = XmlNodeStaxBuilder.build(new StringReader(lhs), new FixedInputLocationBuilder("left"));
-        XmlNodeImpl rightDom = XmlNodeStaxBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
-        XmlNode result = XmlNode.merge(leftDom, rightDom);
+        XmlNode result = XmlService.merge(leftDom, rightDom);
         assertEquals(4, getChildren(result, "topsub1").size());
-        assertEquals("t2s1Value", getChildren(result, "topsub1").get(0).getValue());
-        assertEquals("t2s2Value", getChildren(result, "topsub1").get(1).getValue());
-        assertEquals("t1s1Value", getChildren(result, "topsub1").get(2).getValue());
-        assertEquals("t1s2Value", getChildren(result, "topsub1").get(3).getValue());
+        assertEquals("t2s1Value", getChildren(result, "topsub1").get(0).value());
+        assertEquals("t2s2Value", getChildren(result, "topsub1").get(1).value());
+        assertEquals("t1s1Value", getChildren(result, "topsub1").get(2).value());
+        assertEquals("t1s2Value", getChildren(result, "topsub1").get(3).value());
 
-        assertEquals("left", result.getInputLocation());
-        assertEquals("right", getChildren(result, "topsub1").get(0).getInputLocation());
-        assertEquals("right", getChildren(result, "topsub1").get(1).getInputLocation());
-        assertEquals("left", getChildren(result, "topsub1").get(2).getInputLocation());
-        assertEquals("left", getChildren(result, "topsub1").get(3).getInputLocation());
+        assertEquals("left", result.inputLocation());
+        assertEquals("right", getChildren(result, "topsub1").get(0).inputLocation());
+        assertEquals("right", getChildren(result, "topsub1").get(1).inputLocation());
+        assertEquals("left", getChildren(result, "topsub1").get(2).inputLocation());
+        assertEquals("left", getChildren(result, "topsub1").get(3).inputLocation());
     }
 
     /**
@@ -469,11 +471,11 @@ class XmlNodeImplTest {
      */
     @Test
     void testEquals() {
-        XmlNodeImpl dom = new XmlNodeImpl("top");
+        XmlNode dom = XmlNode.newInstance("top");
 
         assertEquals(dom, dom);
         assertNotEquals(dom, null);
-        assertNotEquals(dom, new XmlNodeImpl(""));
+        assertNotEquals(dom, XmlNode.newInstance(""));
     }
 
     /**
@@ -489,7 +491,7 @@ class XmlNodeImplTest {
         attributes.put(null, "nullKey");
         List<XmlNode> childList = new ArrayList<>();
         childList.add(null);
-        Xpp3Dom dom2 = new Xpp3Dom(new XmlNodeImpl(dom.getName(), null, attributes, childList, null));
+        Xpp3Dom dom2 = new Xpp3Dom(XmlNode.newInstance(dom.name(), null, attributes, childList, null));
 
         assertNotEquals(dom, dom2);
         assertNotEquals(dom2, dom);
@@ -506,14 +508,14 @@ class XmlNodeImplTest {
         String childConfigStr = "<configuration><items><item>three</item></items></configuration>";
         XmlNode childConfig = toXmlNode(childConfigStr, new FixedInputLocationBuilder("child"));
 
-        XmlNode result = XmlNode.merge(childConfig, parentConfig);
-        XmlNode items = result.getChild("items");
+        XmlNode result = XmlService.merge(childConfig, parentConfig);
+        XmlNode items = result.child("items");
 
-        assertEquals(1, items.getChildren().size());
+        assertEquals(1, items.children().size());
 
-        XmlNode item = items.getChildren().get(0);
-        assertEquals("three", item.getValue());
-        assertEquals("child", item.getInputLocation());
+        XmlNode item = items.children().get(0);
+        assertEquals("three", item.value());
+        assertEquals("child", item.inputLocation());
     }
 
     /**
@@ -528,17 +530,19 @@ class XmlNodeImplTest {
                 "<configuration><items combine.children=\"append\"><item>three</item></items></configuration>";
         XmlNode childConfig = toXmlNode(childConfigStr, new FixedInputLocationBuilder("child"));
 
-        XmlNode result = XmlNode.merge(childConfig, parentConfig);
-        XmlNode items = result.getChild("items");
+        XmlNode result = XmlService.merge(childConfig, parentConfig);
+        assertNotNull(result);
+        XmlNode items = result.child("items");
+        assertNotNull(result);
 
-        XmlNode[] item = items.getChildren().toArray(new XmlNode[0]);
+        XmlNode[] item = items.children().toArray(new XmlNode[0]);
         assertEquals(3, item.length);
-        assertEquals("one", item[0].getValue());
-        assertEquals("parent", item[0].getInputLocation());
-        assertEquals("two", item[1].getValue());
-        assertEquals("parent", item[1].getInputLocation());
-        assertEquals("three", item[2].getValue());
-        assertEquals("child", item[2].getInputLocation());
+        assertEquals("one", item[0].value());
+        assertEquals("parent", item[0].inputLocation());
+        assertEquals("two", item[1].value());
+        assertEquals("parent", item[1].inputLocation());
+        assertEquals("three", item[2].value());
+        assertEquals("child", item[2].inputLocation());
     }
 
     /**
@@ -549,17 +553,17 @@ class XmlNodeImplTest {
     @Test
     void testShouldNotChangeUponMergeWithItselfWhenFirstOrLastSubItemIsEmpty() throws Exception {
         String configStr = "<configuration><items><item/><item>test</item><item/></items></configuration>";
-        Xpp3Dom dominantConfig = Xpp3DomBuilder.build(new StringReader(configStr));
-        Xpp3Dom recessiveConfig = Xpp3DomBuilder.build(new StringReader(configStr));
+        XmlNode dominantConfig = toXmlNode(configStr);
+        XmlNode recessiveConfig = toXmlNode(configStr);
 
-        Xpp3Dom result = Xpp3Dom.mergeXpp3Dom(dominantConfig, recessiveConfig);
-        Xpp3Dom items = result.getChild("items");
+        XmlNode result = XmlService.merge(dominantConfig, recessiveConfig);
+        XmlNode items = result.child("items");
 
-        assertEquals(3, items.getChildCount());
+        assertEquals(3, items.children().size());
 
-        assertNull(items.getChild(0).getValue());
-        assertEquals("test", items.getChild(1).getValue());
-        assertNull(items.getChild(2).getValue());
+        assertNull(items.children().get(0).value());
+        assertEquals("test", items.children().get(1).value());
+        assertNull(items.children().get(2).value());
     }
 
     /**
@@ -571,8 +575,8 @@ class XmlNodeImplTest {
     void testShouldCopyRecessiveChildrenNotPresentInTarget() throws Exception {
         String dominantStr = "<configuration><foo>x</foo></configuration>";
         String recessiveStr = "<configuration><bar>y</bar></configuration>";
-        Xpp3Dom dominantConfig = Xpp3DomBuilder.build(new StringReader(dominantStr));
-        Xpp3Dom recessiveConfig = Xpp3DomBuilder.build(new StringReader(recessiveStr));
+        Xpp3Dom dominantConfig = build(new StringReader(dominantStr));
+        Xpp3Dom recessiveConfig = build(new StringReader(recessiveStr));
 
         Xpp3Dom result = Xpp3Dom.mergeXpp3Dom(dominantConfig, recessiveConfig);
 
@@ -591,7 +595,7 @@ class XmlNodeImplTest {
         String dupes = "<configuration><foo>x</foo><foo>y</foo></configuration>";
         XmlNode dom = toXmlNode(new StringReader(dupes));
         assertNotNull(dom);
-        assertEquals("y", dom.getChild("foo").getValue());
+        assertEquals("y", dom.child("foo").value());
     }
 
     /**
@@ -603,8 +607,8 @@ class XmlNodeImplTest {
     void testShouldRemoveEntireElementWithAttributesAndChildren() throws Exception {
         String dominantStr = "<config><service combine.self=\"remove\"/></config>";
         String recessiveStr = "<config><service><parameter>parameter</parameter></service></config>";
-        Xpp3Dom dominantConfig = Xpp3DomBuilder.build(new StringReader(dominantStr));
-        Xpp3Dom recessiveConfig = Xpp3DomBuilder.build(new StringReader(recessiveStr));
+        Xpp3Dom dominantConfig = build(new StringReader(dominantStr));
+        Xpp3Dom recessiveConfig = build(new StringReader(recessiveStr));
 
         Xpp3Dom result = Xpp3Dom.mergeXpp3Dom(dominantConfig, recessiveConfig);
 
@@ -621,8 +625,8 @@ class XmlNodeImplTest {
     void testShouldRemoveDoNotRemoveTagWhenSwappedInputDOMs() throws Exception {
         String dominantStr = "<config><service combine.self=\"remove\"/></config>";
         String recessiveStr = "<config><service><parameter>parameter</parameter></service></config>";
-        Xpp3Dom dominantConfig = Xpp3DomBuilder.build(new StringReader(dominantStr));
-        Xpp3Dom recessiveConfig = Xpp3DomBuilder.build(new StringReader(recessiveStr));
+        Xpp3Dom dominantConfig = build(new StringReader(dominantStr));
+        Xpp3Dom recessiveConfig = build(new StringReader(recessiveStr));
 
         // same DOMs as testShouldRemoveEntireElementWithAttributesAndChildren(), swapping dominant <--> recessive
         Xpp3Dom result = Xpp3Dom.mergeXpp3Dom(recessiveConfig, dominantConfig);
@@ -656,17 +660,17 @@ class XmlNodeImplTest {
 
         XmlNode d = toXmlNode(dominant);
         XmlNode r = toXmlNode(recessive);
-        XmlNode m = d.merge(r);
+        XmlNode m = XmlService.merge(d, r, null);
         assertEquals(expected, m.toString().replaceAll("\r\n", "\n"));
     }
 
     private static List<XmlNode> getChildren(XmlNode node, String name) {
-        return node.getChildren().stream().filter(n -> n.getName().equals(name)).toList();
+        return node.children().stream().filter(n -> n.name().equals(name)).toList();
     }
 
     private static XmlNode getNthChild(XmlNode node, String name, int nth) {
-        return node.getChildren().stream()
-                .filter(n -> n.getName().equals(name))
+        return node.children().stream()
+                .filter(n -> n.name().equals(name))
                 .skip(nth)
                 .findFirst()
                 .orElse(null);
@@ -676,7 +680,7 @@ class XmlNodeImplTest {
         return toXmlNode(xml, null);
     }
 
-    private static XmlNode toXmlNode(String xml, XmlNodeStaxBuilder.InputLocationBuilderStax locationBuilder)
+    private static XmlNode toXmlNode(String xml, XmlService.InputLocationBuilder locationBuilder)
             throws XMLStreamException, IOException {
         return toXmlNode(new StringReader(xml), locationBuilder);
     }
@@ -685,12 +689,12 @@ class XmlNodeImplTest {
         return toXmlNode(reader, null);
     }
 
-    private static XmlNode toXmlNode(Reader reader, XmlNodeStaxBuilder.InputLocationBuilderStax locationBuilder)
+    private static XmlNode toXmlNode(Reader reader, XmlService.InputLocationBuilder locationBuilder)
             throws XMLStreamException, IOException {
-        return XmlNodeStaxBuilder.build(reader, locationBuilder);
+        return XmlService.read(reader, locationBuilder);
     }
 
-    private static class FixedInputLocationBuilder implements XmlNodeStaxBuilder.InputLocationBuilderStax {
+    private static class FixedInputLocationBuilder implements XmlService.InputLocationBuilder {
         private final Object location;
 
         FixedInputLocationBuilder(Object location) {
@@ -699,6 +703,12 @@ class XmlNodeImplTest {
 
         public Object toInputLocation(XMLStreamReader parser) {
             return location;
+        }
+    }
+
+    public static Xpp3Dom build(Reader reader) throws XmlPullParserException, IOException {
+        try (Reader closeMe = reader) {
+            return new Xpp3Dom(XmlNodeBuilder.build(reader, true, null));
         }
     }
 }
