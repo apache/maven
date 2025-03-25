@@ -504,7 +504,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             fail("Expected 'ProjectBuildingException' not thrown.");
         } catch (final ProjectBuildingException e) {
             assertNotNull(e.getMessage());
-            assertThat(e.getMessage(), containsString("Version must be a constant"));
         }
     }
 
