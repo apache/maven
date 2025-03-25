@@ -287,7 +287,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
             try {
                 pomRepositories.add(MavenRepositorySystem.buildArtifactRepository(modelRepository));
             } catch (InvalidRepositoryException e) {
-                // can not use this then
+                // cannot use this then
             }
         }
         mavenRepositorySystem.injectMirror(repositorySession, pomRepositories);
