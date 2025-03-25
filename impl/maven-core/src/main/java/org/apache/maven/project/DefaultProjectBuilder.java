@@ -361,9 +361,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             && session.getProjects().stream()
                                     .anyMatch(
                                             p -> p.getPomPath().toAbsolutePath().equals(pomFile.toAbsolutePath()));
+                    boolean isStandalone = pomFile == null
+                            && modelSource != null
+                            && modelSource.getLocation().startsWith("jar:")
+                            && modelSource.getLocation().endsWith("/org/apache/maven/project/standalone.xml");
 
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
                     ModelBuilderRequest.RequestType type = reactorMember
+                                    || isStandalone
                                     || (pomFile != null
                                             && this.request.isProcessPlugins()
                                             && this.request.getValidationLevel()
