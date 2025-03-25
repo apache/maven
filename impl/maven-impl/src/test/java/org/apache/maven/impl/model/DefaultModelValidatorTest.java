@@ -811,7 +811,7 @@ class DefaultModelValidatorTest {
 
     @Test
     void repositoryWithBasedirExpression() throws Exception {
-        SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
+        SimpleProblemCollector result = validateFile("raw-model/repository-with-basedir-expression.xml");
         assertViolations(result, 0, 0, 0);
     }
 
