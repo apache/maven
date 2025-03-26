@@ -296,7 +296,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
             throws CycleDetectedException, DuplicateProjectException, NoLocalRepositoryManagerException {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setSystemProperties(properties)
-                .setGoals(Collections.<String>emptyList())
+                .setGoals(Collections.emptyList())
                 .setBaseDirectory(new File(""))
                 .setLocalRepository(repo);
 
@@ -306,7 +306,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
                 .newInstance(repositorySession, new LocalRepository(repo.getUrl())));
         MavenSession session =
                 new MavenSession(container, repositorySession, request, new DefaultMavenExecutionResult());
-        session.setProjects(Collections.<MavenProject>emptyList());
+        session.setProjects(Collections.emptyList());
         return session;
     }
 

@@ -185,7 +185,7 @@ class DefaultModelInterpolatorTest {
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateModel(
-                model, (Path) null, createModelBuildingRequest(context).build(), collector);
+                model, null, createModelBuildingRequest(context).build(), collector);
         assertCollectorState(0, 1, 0, collector);
     }
 
@@ -502,7 +502,7 @@ class DefaultModelInterpolatorTest {
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel(
-                model, (Path) null, createModelBuildingRequest(context).build(), collector);
+                model, null, createModelBuildingRequest(context).build(), collector);
         assertCollectorState(0, 0, 0, collector);
 
         List<Resource> outResources = out.getBuild().getResources();
