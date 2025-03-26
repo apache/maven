@@ -88,8 +88,6 @@ class DefaultInterpolatorTest {
 
     @Test
     void testLoopEmpty2() {
-        Map<String, String> map = new HashMap<>();
-        map.put("a", "${a}");
         assertEquals("${a}", substVars("${a}", null, null, null, false));
     }
 
