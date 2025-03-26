@@ -196,9 +196,7 @@ class DefaultToolchainsBuilderTest {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(new StringSource(""));
         ToolchainsParseException parseException = new ToolchainsParseException("MESSAGE", 4, 2);
-        doThrow(parseException)
-                .when(toolchainsReader)
-                .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
+        doThrow(parseException).when(toolchainsReader).read(any(InputStream.class), ArgumentMatchers.anyMap());
 
         try {
             toolchainBuilder.build(request);

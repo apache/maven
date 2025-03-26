@@ -1922,6 +1922,6 @@ class PomConstructionTest {
         for (String s : elements) {
             buffer.append(s).append(File.separator);
         }
-        return buffer.toString().substring(0, buffer.toString().length() - 1);
+        return buffer.toString().substring(0, buffer.length() - 1);
     }
 }
