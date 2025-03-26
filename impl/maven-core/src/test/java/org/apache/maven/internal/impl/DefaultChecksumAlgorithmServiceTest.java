@@ -64,7 +64,7 @@ public class DefaultChecksumAlgorithmServiceTest {
         ChecksumAlgorithmService.ChecksumCalculator calculator =
                 service.select("SHA-1").getCalculator();
         calculator.update(ByteBuffer.allocate(0));
-        assertEquals(calculator.checksum(), "da39a3ee5e6b4b0d3255bfef95601890afd80709");
+        assertEquals( "da39a3ee5e6b4b0d3255bfef95601890afd80709", calculator.checksum() );
     }
 
     @Test
