@@ -32,7 +32,7 @@ class ToolchainsBuildingExceptionTest {
 
     @Test
     void testNoProblems() {
-        ToolchainsBuildingException e = new ToolchainsBuildingException(Collections.<Problem>emptyList());
+        ToolchainsBuildingException e = new ToolchainsBuildingException(Collections.emptyList());
         assertEquals("0 problems were encountered while building the effective toolchains" + LS, e.getMessage());
     }
 

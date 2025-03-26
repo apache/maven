@@ -24,7 +24,6 @@ import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -116,10 +115,10 @@ public abstract class AbstractConflictResolverTest {
     }
 
     protected ResolutionNode createResolutionNode(Artifact artifact) {
-        return new ResolutionNode(artifact, Collections.<ArtifactRepository>emptyList());
+        return new ResolutionNode(artifact, Collections.emptyList());
     }
 
     protected ResolutionNode createResolutionNode(Artifact artifact, ResolutionNode parent) {
-        return new ResolutionNode(artifact, Collections.<ArtifactRepository>emptyList(), parent);
+        return new ResolutionNode(artifact, Collections.emptyList(), parent);
     }
 }

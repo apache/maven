@@ -893,7 +893,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         resolver.resolveRawModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
             } catch (UnresolvableModelException e) {
                 problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE) //
-                        .setMessage(e.getMessage().toString())
+                        .setMessage(e.getMessage())
                         .setLocation(parent.getLocation(""))
                         .setException(e));
                 throw problems.newModelBuildingException();
@@ -1194,7 +1194,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         importModel = workspaceResolver.resolveEffectiveModel(groupId, artifactId, version);
                     } catch (UnresolvableModelException e) {
                         problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE)
-                                .setMessage(e.getMessage().toString())
+                                .setMessage(e.getMessage())
                                 .setException(e));
                         continue;
                     }

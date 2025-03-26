@@ -1436,7 +1436,7 @@ public class MavenProject implements Cloneable {
      * @param artifacts The set of artifacts, may be {@code null}.
      */
     public void setResolvedArtifacts(Set<Artifact> artifacts) {
-        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.<Artifact>emptySet();
+        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.emptySet();
         this.artifacts = null;
         this.artifactMap = null;
     }
