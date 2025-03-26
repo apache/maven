@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+
+  <groupId>org.apache.maven.it.mng8653</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.soebes.maven.plugins</groupId>
+        <artifactId>echo-maven-plugin</artifactId>
+        <version>0.5.0</version>
+        <executions>
+          <execution>
+            <id>before-ready</id>
+            <goals>
+              <goal>echo</goal>
+            </goals>
+            <phase>before:ready</phase>
+            <configuration>
+              <echos>
+                <echo>Hallo 'before:ready' phase from '${project.artifactId}'.</echo>
+              </echos>
+            </configuration>
+          </execution>
+          <execution>
+            <id>before-each</id>
+            <goals>
+              <goal>echo</goal>
+            </goals>
+            <phase>before:each</phase>
+            <configuration>
+              <echos>
+                <echo>Hallo 'before:each' phase from '${project.artifactId}'.</echo>
+              </echos>
+            </configuration>
+          </execution>
+          <execution>
+            <id>after-each</id>
+            <goals>
+              <goal>echo</goal>
+            </goals>
+            <phase>after:each</phase>
+            <configuration>
+              <echos>
+                <echo>Hallo 'after:each' phase from '${project.artifactId}'.</echo>
+              </echos>
+            </configuration>
+          </execution>
+          <execution>
+            <id>before-all</id>
+            <goals>
+              <goal>echo</goal>
+            </goals>
+            <phase>before:all</phase>
+            <configuration>
+              <echos>
+                <echo>Hallo 'before:all' phase from '${project.artifactId}'.</echo>
+              </echos>
+            </configuration>
+          </execution>
+          <execution>
+            <id>all</id>
+            <goals>
+              <goal>echo</goal>
+            </goals>
+            <phase>all</phase>
+            <configuration>
+              <echos>
+                <echo>Hallo 'all' phase from '${project.artifactId}'.</echo>
+              </echos>
+            </configuration>
+          </execution>
+          <execution>
+            <id>after-all</id>
+            <goals>
+              <goal>echo</goal>
+            </goals>
+            <phase>after:all</phase>
+            <configuration>
+              <echos>
+                <echo>Hallo 'after:all' phase from '${project.artifactId}'.</echo>
+              </echos>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
@@ -55,6 +56,7 @@ import static org.apache.maven.api.Lifecycle.Phase.ALL;
 import static org.apache.maven.api.Lifecycle.Phase.BUILD;
 import static org.apache.maven.api.Lifecycle.Phase.COMPILE;
 import static org.apache.maven.api.Lifecycle.Phase.DEPLOY;
+import static org.apache.maven.api.Lifecycle.Phase.EACH;
 import static org.apache.maven.api.Lifecycle.Phase.INITIALIZE;
 import static org.apache.maven.api.Lifecycle.Phase.INSTALL;
 import static org.apache.maven.api.Lifecycle.Phase.INTEGRATION_TEST;
@@ -71,6 +73,7 @@ import static org.apache.maven.api.Lifecycle.Phase.VALIDATE;
 import static org.apache.maven.api.Lifecycle.Phase.VERIFY;
 import static org.apache.maven.internal.impl.Lifecycles.after;
 import static org.apache.maven.internal.impl.Lifecycles.alias;
+import static org.apache.maven.internal.impl.Lifecycles.children;
 import static org.apache.maven.internal.impl.Lifecycles.dependencies;
 import static org.apache.maven.internal.impl.Lifecycles.phase;
 import static org.apache.maven.internal.impl.Lifecycles.plugin;
@@ -90,6 +93,11 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     public static final InputLocation DEFAULT_LIFECYCLE_INPUT_LOCATION =
             new InputLocation(new InputSource(DEFAULT_LIFECYCLE_MODELID, null));
+
+    public static final String SCOPE_COMPILE = DependencyScope.COMPILE.id();
+    public static final String SCOPE_RUNTIME = DependencyScope.RUNTIME.id();
+    public static final String SCOPE_TEST_ONLY = DependencyScope.TEST_ONLY.id();
+    public static final String SCOPE_TEST = DependencyScope.TEST.id();
 
     private final List<LifecycleProvider> providers;
 
@@ -384,35 +392,38 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
             // START SNIPPET: default
             return List.of(phase(
                     ALL,
-                    phase(VALIDATE, phase(INITIALIZE)),
+                    children(ALL),
                     phase(
-                            BUILD,
-                            after(VALIDATE),
-                            phase(SOURCES),
-                            phase(RESOURCES),
-                            phase(COMPILE, after(SOURCES), dependencies(COMPILE, READY)),
-                            phase(READY, after(COMPILE), after(RESOURCES)),
-                            phase(PACKAGE, after(READY), dependencies("runtime", PACKAGE))),
-                    phase(
-                            VERIFY,
-                            after(VALIDATE),
+                            EACH,
+                            phase(VALIDATE, phase(INITIALIZE)),
                             phase(
-                                    UNIT_TEST,
-                                    phase(TEST_SOURCES),
-                                    phase(TEST_RESOURCES),
+                                    BUILD,
+                                    after(VALIDATE),
+                                    phase(SOURCES),
+                                    phase(RESOURCES),
+                                    phase(COMPILE, after(SOURCES), dependencies(SCOPE_COMPILE, READY)),
+                                    phase(READY, after(COMPILE), after(RESOURCES)),
+                                    phase(PACKAGE, after(READY), dependencies(SCOPE_RUNTIME, PACKAGE))),
+                            phase(
+                                    VERIFY,
+                                    after(VALIDATE),
                                     phase(
-                                            TEST_COMPILE,
-                                            after(TEST_SOURCES),
-                                            after(READY),
-                                            dependencies("test-only", READY)),
-                                    phase(
-                                            TEST,
-                                            after(TEST_COMPILE),
-                                            after(TEST_RESOURCES),
-                                            dependencies("test", READY))),
-                            phase(INTEGRATION_TEST)),
-                    phase(INSTALL, after(PACKAGE)),
-                    phase(DEPLOY, after(PACKAGE))));
+                                            UNIT_TEST,
+                                            phase(TEST_SOURCES),
+                                            phase(TEST_RESOURCES),
+                                            phase(
+                                                    TEST_COMPILE,
+                                                    after(TEST_SOURCES),
+                                                    after(READY),
+                                                    dependencies(SCOPE_TEST_ONLY, READY)),
+                                            phase(
+                                                    TEST,
+                                                    after(TEST_COMPILE),
+                                                    after(TEST_RESOURCES),
+                                                    dependencies(SCOPE_TEST, READY))),
+                                    phase(INTEGRATION_TEST)),
+                            phase(INSTALL, after(PACKAGE)),
+                            phase(DEPLOY, after(PACKAGE)))));
             // END SNIPPET: default
         }
 

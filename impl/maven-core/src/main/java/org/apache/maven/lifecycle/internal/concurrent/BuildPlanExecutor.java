@@ -103,17 +103,46 @@ import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.SETUP;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.TEARDOWN;
 
 /**
- * Builds the full lifecycle in weave-mode (phase by phase as opposed to project-by-project).
- * <p>
- * This builder uses a number of threads equal to the minimum of the degree of concurrency (which is the thread count
- * set with <code>-T</code> on the command-line) and the number of projects to build. As such, building a single project
- * will always result in a sequential build, regardless of the thread count.
- * </p>
- * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
+ * Executes the Maven build plan in a concurrent manner, handling the lifecycle phases and plugin executions.
+ * This executor implements a weave-mode build strategy, where builds are executed phase-by-phase rather than
+ * project-by-project.
+ *
+ * <h2>Key Features:</h2>
+ * <ul>
+ *   <li>Concurrent execution of compatible build steps across projects</li>
+ *   <li>Thread-safety validation for plugins</li>
+ *   <li>Support for forked executions and lifecycle phases</li>
+ *   <li>Dynamic build plan adjustment during execution</li>
+ * </ul>
+ *
+ * <h2>Execution Strategy:</h2>
+ * <p>The executor follows these main steps:</p>
+ * <ol>
+ *   <li>Initial plan creation based on project dependencies and task segments</li>
+ *   <li>Concurrent execution of build steps while maintaining dependency order</li>
+ *   <li>Dynamic replanning when necessary (e.g., for forked executions)</li>
+ *   <li>Project setup, execution, and teardown phases management</li>
+ * </ol>
+ *
+ * <h2>Thread Management:</h2>
+ * <p>The number of threads used is determined by:</p>
+ * <pre>
+ * min(degreeOfConcurrency, numberOfProjects)
+ * </pre>
+ * where degreeOfConcurrency is set via the -T command-line option.
+ *
+ * <h2>Build Step States:</h2>
+ * <ul>
+ *   <li>CREATED: Initial state of a build step</li>
+ *   <li>PLANNING: Step is being planned</li>
+ *   <li>SCHEDULED: Step is queued for execution</li>
+ *   <li>EXECUTED: Step has completed successfully</li>
+ *   <li>FAILED: Step execution failed</li>
+ * </ul>
+ *
+ * <p><strong>NOTE:</strong> This class is not part of any public API and can be changed or deleted without prior notice.</p>
  *
  * @since 3.0
- *         Builds one or more lifecycles for a full module
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 @Named
 public class BuildPlanExecutor {
@@ -322,6 +351,10 @@ public class BuildPlanExecutor {
             global.start();
             lock.readLock().lock();
             try {
+                // Get all build steps that are:
+                // 1. Not yet started (CREATED status)
+                // 2. Have all their prerequisites completed (predecessors EXECUTED)
+                // 3. Successfully transition from CREATED to SCHEDULED state
                 plan.sortedNodes().stream()
                         .filter(step -> step.status.get() == CREATED)
                         .filter(step -> step.predecessors.stream().allMatch(s -> s.status.get() == EXECUTED))
@@ -356,6 +389,17 @@ public class BuildPlanExecutor {
             }
         }
 
+        /**
+         * Executes all pending after:* phases for a failed project.
+         * This ensures proper cleanup is performed even when a build fails.
+         * Only executes after:xxx phases if their corresponding before:xxx phase
+         * has been either executed or failed.
+         *
+         * For example, if a project fails during 'compile', this will execute
+         * any configured 'after:compile' phases to ensure proper cleanup.
+         *
+         * @param failedStep The build step that failed, containing the project that needs cleanup
+         */
         private void executeAfterPhases(BuildStep failedStep) {
             if (failedStep == null || failedStep.project == null) {
                 return;
@@ -393,6 +437,17 @@ public class BuildPlanExecutor {
             }
         }
 
+        /**
+         * Executes a single build step, which can be one of:
+         * - PLAN: Project build planning
+         * - SETUP: Project initialization
+         * - TEARDOWN: Project cleanup
+         * - Default: Actual mojo/plugin executions
+         *
+         * @param step The build step to execute
+         * @throws IOException If there's an IO error during execution
+         * @throws LifecycleExecutionException If there's a lifecycle execution error
+         */
         private void executeStep(BuildStep step) throws IOException, LifecycleExecutionException {
             Clock clock = getClock(step.project);
             switch (step.name) {
@@ -796,16 +851,27 @@ public class BuildPlanExecutor {
             plan.allSteps().filter(step -> step.phase != null).forEach(step -> {
                 Lifecycle.Phase phase = step.phase;
                 MavenProject project = step.project;
-                phase.links().stream()
-                        .filter(l -> l.pointer().type() != Lifecycle.Pointer.Type.PROJECT)
-                        .forEach(link -> {
-                            String n1 = phase.name();
-                            String n2 = link.pointer().phase();
-                            // for each project, if the phase in the build, link after it
-                            getLinkedProjects(projects, project, link).forEach(p -> plan.step(p, AFTER + n2)
-                                    .ifPresent(a -> plan.requiredStep(project, BEFORE + n1)
-                                            .executeAfter(a)));
+                phase.links().stream().forEach(link -> {
+                    BuildStep before = plan.requiredStep(project, BEFORE + phase.name());
+                    BuildStep after = plan.requiredStep(project, AFTER + phase.name());
+                    Lifecycle.Pointer pointer = link.pointer();
+                    String n2 = pointer.phase();
+                    if (pointer instanceof Lifecycle.DependenciesPointer) {
+                        // For dependencies: ensure current project's phase starts after dependency's phase completes
+                        // Example: project's compile starts after dependency's package completes
+                        // TODO: String scope = ((Lifecycle.DependenciesPointer) pointer).scope();
+                        projects.get(project)
+                                .forEach(p -> plan.step(p, AFTER + n2).ifPresent(before::executeAfter));
+                    } else if (pointer instanceof Lifecycle.ChildrenPointer) {
+                        // For children: ensure bidirectional phase coordination
+                        project.getCollectedProjects().forEach(p -> {
+                            // 1. Child's phase start waits for parent's phase start
+                            plan.step(p, BEFORE + n2).ifPresent(before::executeBefore);
+                            // 2. Parent's phase completion waits for child's phase completion
+                            plan.step(p, AFTER + n2).ifPresent(after::executeAfter);
                         });
+                    }
+                });
             });
 
             // Keep projects in reactors by GAV
@@ -831,19 +897,6 @@ public class BuildPlanExecutor {
             lifecycle.aliases().forEach(alias -> plan.aliases().put(alias.v3Phase(), alias.v4Phase()));
 
             return plan;
-        }
-
-        private List<MavenProject> getLinkedProjects(
-                Map<MavenProject, List<MavenProject>> projects, MavenProject project, Lifecycle.Link link) {
-            if (link.pointer().type() == Lifecycle.Pointer.Type.DEPENDENCIES) {
-                // TODO: String scope = ((Lifecycle.DependenciesPointer) link.pointer()).scope();
-                return projects.get(project);
-            } else if (link.pointer().type() == Lifecycle.Pointer.Type.CHILDREN) {
-                return project.getCollectedProjects();
-            } else {
-                throw new IllegalArgumentException(
-                        "Unsupported pointer type: " + link.pointer().type());
-            }
         }
     }
 
