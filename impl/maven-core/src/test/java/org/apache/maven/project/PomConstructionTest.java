@@ -352,27 +352,20 @@ class PomConstructionTest {
     // them into a resolver, create the expression to extract the data to validate the Model, and the URI
     // to validate the properties. We also need a way to navigate from the Tex specification documents to
     // the test in question and vice versa. A little Eclipse plugin would do the trick.
+    @Test
     public void testThatExecutionsWithoutIdsAreMergedAndTheChildWins() throws Exception {
         PomTestWrapper tester = buildPom("micromailer");
         assertModelEquals(tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]");
     }
 
-    /*MNG-
-    public void testDependencyScope()
-        throws Exception
-    {
-        PomTestWrapper pom = buildPom( "dependency-scope/sub" );
-
-    }*/
-
-    /*MNG- 4010*/
+    /*MNG-4010*/
     @Test
     void testDuplicateExclusionsDependency() throws Exception {
         PomTestWrapper pom = buildPom("duplicate-exclusions-dependency/sub");
         assertEquals(1, ((List<?>) pom.getValue("dependencies[1]/exclusions")).size());
     }
 
-    /*MNG- 4008*/
+    /*MNG-4008*/
     @Test
     void testMultipleFilters() throws Exception {
         PomTestWrapper pom = buildPom("multiple-filters");
@@ -1608,6 +1601,7 @@ class PomConstructionTest {
     }
 
     // This will fail on a validation error if incorrect
+    @Test
     public void testDependencyManagementWithInterpolation() throws Exception {
         buildPom("dependency-management-with-interpolation/sub");
     }
