@@ -186,11 +186,11 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         final MavenProject childProject = getProject(f1);
 
         assertNotNull(childProject.getParentArtifact());
-        assertEquals(childProject.getParentArtifact().getVersion(), "1");
+        assertEquals("1", childProject.getParentArtifact().getVersion());
         assertNotNull(childProject.getParent());
-        assertEquals(childProject.getParent().getVersion(), "1");
+        assertEquals("1", childProject.getParent().getVersion());
         assertNotNull(childProject.getModel().getParent());
-        assertEquals(childProject.getModel().getParent().getVersion(), "[1,10]");
+        assertEquals("[1,10]", childProject.getModel().getParent().getVersion());
     }
 
     /**
@@ -264,11 +264,11 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         final MavenProject childProject = this.getProjectFromRemoteRepository(f1);
 
         assertNotNull(childProject.getParentArtifact());
-        assertEquals(childProject.getParentArtifact().getVersion(), "1");
+        assertEquals("1", childProject.getParentArtifact().getVersion());
         assertNotNull(childProject.getParent());
-        assertEquals(childProject.getParent().getVersion(), "1");
+        assertEquals("1", childProject.getParent().getVersion());
         assertNotNull(childProject.getModel().getParent());
-        assertEquals(childProject.getModel().getParent().getVersion(), "[1,1]");
+        assertEquals("[1,1]", childProject.getModel().getParent().getVersion());
     }
 
     /**
