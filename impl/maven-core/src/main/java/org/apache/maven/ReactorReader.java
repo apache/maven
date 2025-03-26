@@ -98,7 +98,7 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     public File findArtifact(Artifact artifact) {
-        MavenProject project = getProject(artifact, true);
+        MavenProject project = getProject(artifact);
 
         if (project != null) {
             File file = findArtifact(project, artifact, true);
@@ -140,7 +140,7 @@ class ReactorReader implements MavenWorkspaceReader {
 
     @Override
     public Model findModel(Artifact artifact) {
-        MavenProject project = getProject(artifact, false);
+        MavenProject project = getProject(artifact);
         return project == null ? null : project.getModel().getDelegate();
     }
 
@@ -470,8 +470,8 @@ class ReactorReader implements MavenWorkspaceReader {
         return projectLocalRepository;
     }
 
-    private MavenProject getProject(Artifact artifact, boolean includeAllProjects) {
-        return (includeAllProjects ? getAllProjects() : getProjects())
+    private MavenProject getProject(Artifact artifact) {
+        return getProjects()
                 .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
                 .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
                 .getOrDefault(artifact.getBaseVersion(), null);
