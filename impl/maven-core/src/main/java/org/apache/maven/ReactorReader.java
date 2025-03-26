@@ -111,6 +111,11 @@ class ReactorReader implements MavenWorkspaceReader {
         // No project, but most certainly a dependency which has been built previously
         File packagedArtifactFile = findInProjectLocalRepository(artifact);
         if (packagedArtifactFile != null && packagedArtifactFile.exists()) {
+            // Check if artifact is up-to-date
+            project = getProject(artifact, getAllProjects());
+            if (project != null) {
+                isPackagedArtifactUpToDate(project, packagedArtifactFile);
+            }
             return packagedArtifactFile;
         }
 
@@ -471,8 +476,11 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private MavenProject getProject(Artifact artifact) {
-        return getProjects()
-                .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
+        return getProject(artifact, getProjects());
+    }
+
+    private MavenProject getProject(Artifact artifact, Map<String, Map<String, Map<String, MavenProject>>> projects) {
+        return projects.getOrDefault(artifact.getGroupId(), Collections.emptyMap())
                 .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
                 .getOrDefault(artifact.getBaseVersion(), null);
     }
