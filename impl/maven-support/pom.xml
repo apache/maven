@@ -31,7 +31,17 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-plugin</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-xml</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -41,6 +51,53 @@
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <executions>
+          <execution>
+            <id>velocity-lifecycle</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>2.0.0</version>
+              <basedir>${project.basedir}/../../api/maven-api-plugin</basedir>
+              <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
+              <models>
+                <model>src/main/mdo/lifecycle.mdo</model>
+              </models>
+              <templates>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV4=org.apache.maven.api.plugin.descriptor.lifecycle</param>
+                <param>packageToolV4=org.apache.maven.plugin.lifecycle.io</param>
+              </params>
+            </configuration>
+          </execution>
+          <execution>
+            <id>velocity-plugin</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>2.0.0</version>
+              <basedir>${project.basedir}/../../api/maven-api-plugin</basedir>
+              <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
+              <models>
+                <model>src/main/mdo/plugin.mdo</model>
+              </models>
+              <templates>
+                <template>reader-stax.vm</template>
+                <template>writer-stax.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV3=org.apache.maven.plugin.descriptor</param>
+                <param>packageModelV4=org.apache.maven.api.plugin.descriptor</param>
+                <param>packageToolV4=org.apache.maven.plugin.descriptor.io</param>
+              </params>
+            </configuration>
+          </execution>
           <execution>
             <id>velocity-settings</id>
             <goals>
@@ -147,6 +204,7 @@
                 <param>packageModelV4=org.apache.maven.api.model</param>
                 <param>packageToolV4=org.apache.maven.model.v4</param>
                 <param>isMavenModel=true</param>
+                <param>enforceNamespace=true</param>
                 <param>minimalVersion=4.0.0</param>
               </params>
             </configuration>

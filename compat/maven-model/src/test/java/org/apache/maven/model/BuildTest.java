@@ -53,6 +53,7 @@ class BuildTest {
         assertNotNull(new Build().toString());
     }
 
+    @Test
     public void testToStringNotNonsense() {
         Build build = new Build();
 

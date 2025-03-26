@@ -50,6 +50,7 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
         Path linkedMavenHome = tempDir.resolve("linked-maven-home");
 
         Path oldMavenHome = Paths.get(System.getProperty("maven.home"));
+        Files.deleteIfExists(linkedMavenHome);
         Files.createSymbolicLink(linkedMavenHome, oldMavenHome);
         System.setProperty("maven.home", linkedMavenHome.toString());
 

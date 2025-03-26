@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.annotations.Nonnull;
 
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 public class DefaultLocalRepository implements LocalRepository {
 

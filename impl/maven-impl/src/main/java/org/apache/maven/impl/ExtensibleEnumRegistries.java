@@ -42,7 +42,7 @@ import org.apache.maven.api.spi.LanguageProvider;
 import org.apache.maven.api.spi.PathScopeProvider;
 import org.apache.maven.api.spi.ProjectScopeProvider;
 
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 public class ExtensibleEnumRegistries {
 

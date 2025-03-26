@@ -39,7 +39,7 @@ class WrapperNode extends AbstractNode {
 
     @Override
     DependencyNode getDependencyNode() {
-        return Utils.cast(AbstractNode.class, delegate, "delegate").getDependencyNode();
+        return ImplUtils.cast(AbstractNode.class, delegate, "delegate").getDependencyNode();
     }
 
     @Override

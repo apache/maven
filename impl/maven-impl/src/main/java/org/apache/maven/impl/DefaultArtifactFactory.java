@@ -27,7 +27,7 @@ import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 @Named
 @Singleton

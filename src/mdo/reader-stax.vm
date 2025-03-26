@@ -62,6 +62,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
 #if ( $locationTracking )
@@ -71,8 +72,8 @@ import ${packageModelV4}.InputLocation;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -205,7 +206,7 @@ public class ${className} {
 #if ( $locationTracking )
         return read(parser, strict, inputSrc);
 #else
-    return read(parser, strict);
+        return read(parser, strict);
 #end
     } //-- ${root.name} read(Reader, boolean)
 
@@ -274,11 +275,11 @@ public class ${className} {
                     throw new XMLStreamException("Duplicated tag: '${rootTag}'", parser.getLocation(), null);
                 }
 #if ( $locationTracking )
-                $rootLcapName = parse${rootUcapName}(parser, strict, inputSrc);
+                $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI(), inputSrc);
 #elseif ( $needXmlContext )
-                $rootLcapName = parse${rootUcapName}(parser, strict, context);
+                $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI(), context);
 #else
-                $rootLcapName = parse${rootUcapName}(parser, strict);
+                $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI());
 #end
                 parsed = true;
             }
@@ -287,7 +288,7 @@ public class ${className} {
         if (parsed) {
             return $rootLcapName;
         }
-        throw new XMLStreamException("Expected root element '${rootTag}' but found no element at all: invalid XML document", parser.getLocation(), null);
+            throw new XMLStreamException("Expected root element '${rootTag}' but found no element at all: invalid XML document", parser.getLocation(), null);
     } //-- ${root.name} read(XMLStreamReader, boolean)
 
 #foreach ( $class in $model.allClasses )
@@ -297,11 +298,11 @@ public class ${className} {
   #set ( $ancestors = $Helper.ancestors( $class ) )
   #set ( $allFields = $Helper.xmlFields( $class ) )
   #if ( $locationTracking )
-    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, InputSource inputSrc) throws XMLStreamException {
+    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, String namespace, InputSource inputSrc) throws XMLStreamException {
   #elseif ( $needXmlContext )
-    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, Deque<Object> context) throws XMLStreamException {
+    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, String namespace, Deque<Object> context) throws XMLStreamException {
   #else
-    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict) throws XMLStreamException {
+    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, String namespace) throws XMLStreamException {
   #end
         String tagName = parser.getLocalName();
         ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder(true);
@@ -309,6 +310,10 @@ public class ${className} {
         if (addLocationInformation) {
             ${classLcapName}.location("", new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
         }
+  #end
+  #if ( $class == $root )
+        ${classLcapName}.namespaceUri(namespace);
+        ${classLcapName}.modelEncoding(parser.getEncoding());
   #end
         for (int i = parser.getAttributeCount() - 1; i >= 0; i--) {
             String name = parser.getAttributeLocalName(i);
@@ -358,6 +363,7 @@ public class ${className} {
         context.addLast( ${classLcapName} );
   #end
         while ((strict ? parser.nextTag() : nextTag(parser)) == XMLStreamReader.START_ELEMENT) {
+            checkNamespace(parser, strict, namespace);
             String childName = checkDuplicate(parser.getLocalName(), parser, parsed);
   #if ( $locationTracking )
             int line = addLocationInformation ? parser.getLocation().getLineNumber() : -1;
@@ -431,20 +437,20 @@ public class ${className} {
                     break;
       #elseif ( $field.to && $field.multiplicity == "1" )
         #if ( $locationTracking )
-                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, inputSrc));
+                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, namespace, inputSrc));
         #elseif ( $needXmlContext )
-                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, context));
+                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, namespace, context));
         #else
-                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict));
+                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, namespace));
         #end
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) )
         #if ( $locationTracking )
-                    ${field.name}.add(parse${field.toClass.name}(parser, strict, inputSrc));
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, inputSrc));
         #elseif ( $needXmlContext )
-                    ${field.name}.add(parse${field.toClass.name}(parser, strict, context));
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, context));
         #else
-                    ${field.name}.add(parse${field.toClass.name}(parser, strict));
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace));
         #end
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" )
@@ -452,11 +458,11 @@ public class ${className} {
                     while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
                         if ("${Helper.singular($fieldTagName)}".equals(parser.getLocalName())) {
         #if ( $locationTracking )
-                            ${field.name}.add(parse${field.toClass.name}(parser, strict, inputSrc));
+                            ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, inputSrc));
         #elseif ( $needXmlContext )
-                            ${field.name}.add(parse${field.toClass.name}(parser, strict, context));
+                            ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, context));
         #else
-                            ${field.name}.add(parse${field.toClass.name}(parser, strict));
+                            ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace));
         #end
                         } else {
                             checkUnknownElement(parser, strict);
@@ -496,15 +502,27 @@ public class ${className} {
         ${classLcapName}.${field.name}($Helper.xmlFieldMetadata( $field ).format);
     #end
   #end
-  #if ( $class == $root )
-        ${classLcapName}.namespaceUri(parser.getNamespaceURI());
-        ${classLcapName}.modelEncoding(parser.getEncoding());
-  #end
         return ${classLcapName}.build();
     }
 
  #end
 #end
+
+    private void checkNamespace(XMLStreamReader parser, boolean strict, String namespace) throws XMLStreamException {
+        if (strict) {
+            String ns = parser.getNamespaceURI();
+            if (!Objects.equals(namespace, ns)) {
+                throw new XMLStreamException(
+                    String.format("Unexpected namespace for element '%s': found '%s' but expected '%s'",
+                        parser.getLocalName(),
+                        ns != null ? ns : "no namespace",
+                        namespace),
+                    parser.getLocation(),
+                    null
+                );
+            }
+        }
+    }
 
     private String checkDuplicate(String tagName, XMLStreamReader parser, Set<String> parsed) throws XMLStreamException {
 #set( $aliases = { } )
@@ -680,14 +698,14 @@ public class ${className} {
 
 #if ( $locationTracking )
     private XmlNode buildXmlNode(XMLStreamReader parser, InputSource inputSrc) throws XMLStreamException {
-        return XmlNodeStaxBuilder.build(parser,
+        return XmlService.read(parser,
                 addLocationInformation
                         ? p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc)
                         : null);
     }
 #else
     private XmlNode buildXmlNode(XMLStreamReader parser) throws XMLStreamException {
-        return XmlNodeStaxBuilder.build(parser);
+        return XmlService.read(parser);
     }
 #end
 

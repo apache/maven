@@ -146,7 +146,7 @@ public class DefaultModelResolver implements ModelResolver {
                             groupId,
                             artifactId,
                             version))
-                    .asString();
+                    .toString();
             String resultVersion = version.equals(newVersion) ? null : newVersion;
             Path path = getPath(session, repositories, groupId, artifactId, newVersion, classifier);
             return new ModelResolverResult(

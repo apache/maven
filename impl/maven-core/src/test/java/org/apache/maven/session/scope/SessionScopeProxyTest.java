@@ -63,9 +63,9 @@ public class SessionScopeProxyTest {
         MySingletonBean bean = container.lookup(MySingletonBean.class);
         assertNotNull(bean);
         assertNotNull(bean.anotherBean);
-        assertSame(bean.anotherBean.getClass(), AnotherBean.class);
+        assertSame(AnotherBean.class, bean.anotherBean.getClass());
         assertNotNull(bean.myBean);
-        assertNotSame(bean.myBean.getClass(), MySessionScopedBean.class);
+        assertNotSame(MySessionScopedBean.class, bean.myBean.getClass());
 
         assertThrows(OutOfScopeException.class, () -> bean.myBean.getSession());
 
@@ -73,7 +73,7 @@ public class SessionScopeProxyTest {
         sessionScope.seed(Session.class, this.session);
         assertNotNull(bean.myBean.getSession());
         assertNotNull(bean.myBean.getAnotherBean());
-        assertSame(bean.myBean.getAnotherBean().getClass(), AnotherBean.class);
+        assertSame(AnotherBean.class, bean.myBean.getAnotherBean().getClass());
         assertThrows(TestException.class, () -> bean.myBean.throwException());
     }
 

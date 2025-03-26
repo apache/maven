@@ -25,8 +25,8 @@ import java.io.StringReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.configuration.internal.DefaultBeanConfigurator;
-import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,9 +52,7 @@ class DefaultBeanConfiguratorPathTest {
 
     private Xpp3Dom toConfig(String xml) {
         try {
-            return new Xpp3Dom(XmlNodeStaxBuilder.build(
-                    new StringReader("<configuration>" + xml + "</configuration>"),
-                    (XmlNodeStaxBuilder.InputLocationBuilderStax) null));
+            return new Xpp3Dom(XmlService.read(new StringReader("<configuration>" + xml + "</configuration>")));
         } catch (XMLStreamException e) {
             throw new IllegalArgumentException(e);
         }

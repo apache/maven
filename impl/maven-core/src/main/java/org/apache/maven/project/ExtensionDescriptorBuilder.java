@@ -32,7 +32,7 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
+import org.apache.maven.api.xml.XmlService;
 
 /**
  * Creates an extension descriptor from some XML stream.
@@ -89,18 +89,18 @@ public class ExtensionDescriptorBuilder {
         XmlNode dom;
         try {
             XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(is);
-            dom = XmlNodeStaxBuilder.build(reader);
+            dom = XmlService.read(reader);
         } catch (XMLStreamException e) {
             throw new IOException(e.getMessage(), e);
         }
 
-        if (!"extension".equals(dom.getName())) {
-            throw new IOException("Unexpected root element \"" + dom.getName() + "\", expected \"extension\"");
+        if (!"extension".equals(dom.name())) {
+            throw new IOException("Unexpected root element \"" + dom.name() + "\", expected \"extension\"");
         }
 
-        extensionDescriptor.setExportedPackages(parseStrings(dom.getChild("exportedPackages")));
+        extensionDescriptor.setExportedPackages(parseStrings(dom.child("exportedPackages")));
 
-        extensionDescriptor.setExportedArtifacts(parseStrings(dom.getChild("exportedArtifacts")));
+        extensionDescriptor.setExportedArtifacts(parseStrings(dom.child("exportedArtifacts")));
 
         return extensionDescriptor;
     }
@@ -111,8 +111,8 @@ public class ExtensionDescriptorBuilder {
         if (dom != null) {
             strings = new ArrayList<>();
 
-            for (XmlNode child : dom.getChildren()) {
-                String string = child.getValue();
+            for (XmlNode child : dom.children()) {
+                String string = child.value();
                 if (string != null) {
                     string = string.trim();
                     if (!string.isEmpty()) {

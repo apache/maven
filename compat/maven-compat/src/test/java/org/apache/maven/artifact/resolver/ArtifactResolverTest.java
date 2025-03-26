@@ -174,10 +174,11 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
         assertLocalArtifactPresent(l);
     }
 
+    @Test
     public void testReadRepoFromModel() throws Exception {
-        Artifact m = createArtifact(TestMavenWorkspaceReader.ARTIFACT_ID, TestMavenWorkspaceReader.VERSION);
+        Artifact artifact = createArtifact(TestMavenWorkspaceReader.ARTIFACT_ID, TestMavenWorkspaceReader.VERSION);
         ArtifactMetadataSource source = getContainer().lookup(ArtifactMetadataSource.class, "maven");
-        ResolutionGroup group = source.retrieve(m, localRepository(), new ArrayList<>());
+        ResolutionGroup group = source.retrieve(artifact, localRepository(), new ArrayList<>());
         List<ArtifactRepository> repositories = group.getResolutionRepositories();
         assertEquals(1, repositories.size(), "There should be one repository!");
         ArtifactRepository repository = repositories.get(0);
