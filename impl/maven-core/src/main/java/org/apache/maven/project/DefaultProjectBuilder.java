@@ -809,6 +809,24 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             "Failed to create snapshot distribution repository for " + project.getId(), e);
                 }
             }
+
+            // remote repositories
+            List<ArtifactRepository> remoteRepositories = request.getRemoteRepositories();
+            try {
+                remoteRepositories = projectBuildingHelper.createArtifactRepositories(
+                        project.getModel().getRepositories(), remoteRepositories, request);
+            } catch (Exception e) {
+                result.getProblemCollector()
+                        .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
+                                "",
+                                Severity.ERROR,
+                                Version.BASE,
+                                project.getModel().getDelegate(),
+                                -1,
+                                -1,
+                                e));
+            }
+            project.setRemoteArtifactRepositories(remoteRepositories);
         }
 
         private void initParent(MavenProject project, ModelBuilderResult result) {
@@ -828,7 +846,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     // remote repositories with those found in the pom.xml, along with the existing externally
                     // defined repositories.
                     //
-                    request.setRemoteRepositories(project.getRemoteArtifactRepositories());
+                    request.getRemoteRepositories().addAll(project.getRemoteArtifactRepositories());
                     Path parentPomFile = parentModel.getPomFile();
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());
@@ -1019,7 +1037,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             projectBuildingHelper.selectProjectRealm(project);
         }
 
-        // build the regular repos after extensions are loaded to allow for custom layouts
+        // (re)build the regular repos after extensions are loaded to allow for custom layouts
         try {
             remoteRepositories = projectBuildingHelper.createArtifactRepositories(
                     model3.getRepositories(), remoteRepositories, projectBuildingRequest);
