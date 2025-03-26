@@ -73,7 +73,7 @@ public class SessionScopeProxyTest {
         sessionScope.seed(Session.class, this.session);
         assertNotNull(bean.myBean.getSession());
         assertNotNull(bean.myBean.getAnotherBean());
-        assertSame( AnotherBean.class, bean.myBean.getAnotherBean().getClass() );
+        assertSame(AnotherBean.class, bean.myBean.getAnotherBean().getClass());
         assertThrows(TestException.class, () -> bean.myBean.throwException());
     }
 

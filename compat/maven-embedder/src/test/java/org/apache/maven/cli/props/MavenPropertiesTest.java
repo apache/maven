@@ -230,7 +230,7 @@ public class MavenPropertiesTest {
         properties.load(new StringReader(TEST_PROPERTIES));
 
         String test = properties.getProperty("test");
-        assertEquals( "test", test );
+        assertEquals("test", test);
 
         String defaultValue = properties.getProperty("notfound", "default");
         assertEquals("default", defaultValue);

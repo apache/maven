@@ -471,7 +471,7 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals( "${env.DOES_NOT_EXIST}", out.getProperties().get("outputDirectory") );
+        assertEquals("${env.DOES_NOT_EXIST}", out.getProperties().get("outputDirectory"));
     }
 
     @Test
