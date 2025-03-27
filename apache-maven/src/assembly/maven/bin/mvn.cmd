@@ -176,7 +176,13 @@ cd /d "%EXEC_DIR%"
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
 @setlocal EnableExtensions EnableDelayedExpansion
-for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_OPTS=!JVM_CONFIG_MAVEN_OPTS! %%a
+set JVM_CONFIG_MAVEN_OPTS=
+for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do (
+    set "line=%%a"
+    set "line=!line:$MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR%!"
+    set "line=!line:${MAVEN_PROJECTBASEDIR}=%MAVEN_PROJECTBASEDIR%!"
+    set JVM_CONFIG_MAVEN_OPTS=!JVM_CONFIG_MAVEN_OPTS! !line!
+)
 @endlocal & set MAVEN_OPTS=%MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS%
 
 :endReadJvmConfig
