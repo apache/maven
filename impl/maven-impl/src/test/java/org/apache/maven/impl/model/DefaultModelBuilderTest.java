@@ -18,10 +18,17 @@
  */
 package org.apache.maven.impl.model;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
@@ -58,6 +65,53 @@ class DefaultModelBuilderTest {
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);
         assertEquals("21", result.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    @Test
+    public void testMergeRepositories() throws Exception {
+        // this is here only to trigger mainSession creation; unrelated
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .userProperties(Map.of("firstParentRepo", "https://some.repo"))
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession session = builder.newSession();
+        session.build(request); // ignored result value; just to trigger mainSession creation
+
+        Field mainSessionField = DefaultModelBuilder.ModelBuilderSessionImpl.class.getDeclaredField("mainSession");
+        mainSessionField.setAccessible(true);
+        DefaultModelBuilder.ModelBuilderSessionState state =
+                (DefaultModelBuilder.ModelBuilderSessionState) mainSessionField.get(session);
+        Field repositoriesField = DefaultModelBuilder.ModelBuilderSessionState.class.getDeclaredField("repositories");
+        repositoriesField.setAccessible(true);
+
+        List<RemoteRepository> repositories;
+        // before merge
+        repositories = (List<RemoteRepository>) repositoriesField.get(state);
+        assertEquals(1, repositories.size()); // central
+
+        Model model = Model.newBuilder()
+                .repositories(Arrays.asList(
+                        Repository.newBuilder()
+                                .id("first")
+                                .url("${firstParentRepo}")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("second")
+                                .url("${secondParentRepo}")
+                                .build()))
+                .build();
+        state.mergeRepositories(model, false);
+
+        // after merge
+        repositories = (List<RemoteRepository>) repositoriesField.get(state);
+        assertEquals(3, repositories.size());
+        assertEquals(repositories.get(0).getId(), "first");
+        assertEquals(repositories.get(0).getUrl(), "https://some.repo"); // interpolated
+        assertEquals(repositories.get(1).getId(), "second");
+        assertEquals(repositories.get(1).getUrl(), "${secondParentRepo}"); // un-interpolated (no source)
+        assertEquals(repositories.get(2).getId(), "central"); // default
     }
 
     private Path getPom(String name) {
