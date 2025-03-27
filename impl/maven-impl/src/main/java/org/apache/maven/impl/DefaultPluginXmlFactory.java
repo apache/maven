@@ -16,10 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.impl;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.apache.maven.impl;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,6 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.services.xml.PluginXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
@@ -39,9 +38,9 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
 
+import static org.apache.maven.impl.ImplUtils.nonNull;
 import static org.apache.maven.impl.StaxLocation.getLocation;
 import static org.apache.maven.impl.StaxLocation.getMessage;
-import static org.apache.maven.impl.Utils.nonNull;
 
 @Named
 @Singleton

@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Utils {
+class ImplUtils {
     public static <T> T nonNull(T t) {
         if (t == null) {
             throw new IllegalArgumentException();

@@ -230,14 +230,14 @@ public class MavenPropertiesTest {
         properties.load(new StringReader(TEST_PROPERTIES));
 
         String test = properties.getProperty("test");
-        assertEquals(test, "test");
+        assertEquals("test", test);
 
         String defaultValue = properties.getProperty("notfound", "default");
-        assertEquals(defaultValue, "default");
+        assertEquals("default", defaultValue);
 
         properties.setProperty("another", "another");
         Object o1 = properties.getProperty("another");
-        assertEquals(o1, "another");
+        assertEquals("another", o1);
 
         properties.store(System.err, null);
         System.err.println("====");

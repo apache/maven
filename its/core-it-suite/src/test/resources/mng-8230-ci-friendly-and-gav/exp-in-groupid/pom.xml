@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project root="true">
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
   <modelVersion>4.1.0</modelVersion>
 
   <groupId>${foo}</groupId>

@@ -35,6 +35,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * All methods in this class attempt to fully parse the XML.
  * The caller is responsible for closing {@code InputStream} and {@code Reader} arguments.
  */
+@Deprecated
 public class XmlNodeBuilder {
     private static final boolean DEFAULT_TRIM = true;
 

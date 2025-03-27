@@ -20,5 +20,46 @@
       <url>http://localhost:@port@/archiva/repository/internal/</url>
     </mirror>
   </mirrors>
+  <!--
+  This IT got Central only from env, then set it mirrorOf* and expected to get snapshot;
+  This is wrong: As IT had no new repo in context, only default ones (from env, Central) and none of them
+  serve snapshots; despite mirrorOf*. Fixing it by adding a fluke snapshot enabled repo below
+  -->
+  <profiles>
+    <profile>
+      <id>maven-core-it-repo</id>
+      <repositories>
+        <repository>
+          <id>maven-core-it</id>
+          <url>http://unimportant</url>
+          <releases>
+            <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>maven-core-it</id>
+          <url>http://localhost:@port@/repo</url>
+          <releases>
+            <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>maven-core-it-repo</activeProfile>
+  </activeProfiles>
 </settings>
 

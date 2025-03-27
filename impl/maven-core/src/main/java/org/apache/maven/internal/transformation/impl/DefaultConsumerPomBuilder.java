@@ -176,8 +176,8 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     }
 
     private static String getDependencyKey(org.apache.maven.api.Dependency dependency) {
-        return dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getType() + ":"
-                + dependency.getClassifier();
+        return dependency.getGroupId() + ":" + dependency.getArtifactId() + ":"
+                + dependency.getType().id() + ":" + dependency.getClassifier();
     }
 
     private static String getDependencyKey(Dependency dependency) {

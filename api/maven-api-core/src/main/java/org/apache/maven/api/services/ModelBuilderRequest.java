@@ -59,7 +59,7 @@ public interface ModelBuilderRequest extends Request<Session> {
         BUILD_EFFECTIVE,
         /**
          * The request is used specifically to parse the POM used as a basis for creating the consumer POM.
-         * This POM will not ungergo any profile activation.
+         * This POM will not undergo any profile activation.
          */
         BUILD_CONSUMER,
         /**
