@@ -18,7 +18,6 @@
  */
 package org.apache.maven.jline;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -35,35 +34,20 @@ public class DefaultPrompter implements Prompter {
 
     @Override
     public String prompt(String message, List<String> possibleValues, String defaultReply) throws PrompterException {
-        try {
-            return doPrompt(message, possibleValues, defaultReply, false);
-        } catch (IOException e) {
-            throw new PrompterException("Failed to prompt", e);
-        }
+        return doPrompt(message, possibleValues, defaultReply, false);
     }
 
     @Override
     public String promptForPassword(String message) throws PrompterException {
-        try {
-            return doPrompt(message, null, null, true);
-        } catch (IOException e) {
-            throw new PrompterException("Failed to prompt for password", e);
-        }
+        return doPrompt(message, null, null, true);
     }
 
     @Override
     public void showMessage(String message) throws PrompterException {
-        try {
-            doDisplay(message);
-        } catch (IOException e) {
-            throw new PrompterException("Failed to present message", e);
-        }
+        doDisplay(message);
     }
 
-    /**
-     * Used by {@code LegacyPlexusInteractivity}
-     */
-    public String doPrompt(String message, boolean password) throws IOException {
+    private String doPrompt(String message, boolean password) {
         try {
             if (message != null) {
                 if (!message.endsWith("\n")) {
@@ -81,30 +65,26 @@ public class DefaultPrompter implements Prompter {
             }
             return MessageUtils.reader.readLine(message, password ? '*' : null);
         } catch (Exception e) {
-            throw new IOException("Unable to prompt user", e);
+            throw new PrompterException("Unable to prompt user", e);
         }
     }
 
-    /**
-     * Used by {@code LegacyPlexusInteractivity}
-     */
-    public void doDisplay(String message) throws IOException {
+    private void doDisplay(String message) {
         try {
             MessageUtils.terminal.writer().print(message);
             MessageUtils.terminal.flush();
         } catch (Exception e) {
-            throw new IOException("Unable to display message", e);
+            throw new PrompterException("Unable to display message", e);
         }
     }
 
-    private String doPrompt(String message, List<?> possibleValues, String defaultReply, boolean password)
-            throws IOException {
+    private String doPrompt(String message, List<?> possibleValues, String defaultReply, boolean password) {
         String formattedMessage = formatMessage(message, possibleValues, defaultReply);
         String line;
         do {
             line = doPrompt(formattedMessage, password);
             if (line == null && defaultReply == null) {
-                throw new IOException("EOF");
+                throw new PrompterException("EOF");
             }
             if (line == null || line.isEmpty()) {
                 line = defaultReply;
@@ -117,6 +97,9 @@ public class DefaultPrompter implements Prompter {
     }
 
     private String formatMessage(String message, List<?> possibleValues, String defaultReply) {
+        if (message == null) {
+            return null;
+        }
         StringBuilder formatted = new StringBuilder(message.length() * 2);
         formatted.append(message);
         if (possibleValues != null && !possibleValues.isEmpty()) {

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.jline.DefaultPrompter;
 import org.codehaus.plexus.components.interactivity.InputHandler;
 import org.codehaus.plexus.components.interactivity.OutputHandler;
 import org.codehaus.plexus.components.interactivity.Prompter;
@@ -36,28 +35,36 @@ import org.eclipse.sisu.Priority;
 
 /**
  * This class is injected into any legacy component that would want to use legacy "Plexus Interactivity API".
- * It simply delegates to Maven4 API {@link DefaultPrompter}.
+ * It simply delegates to Maven4 API {@link org.apache.maven.api.services.Prompter}.
  */
 @Experimental
 @Named
 @Singleton
 @Priority(10)
 public class LegacyPlexusInteractivity implements Prompter, InputHandler, OutputHandler {
-    private final DefaultPrompter defaultPrompter;
+    private final org.apache.maven.api.services.Prompter prompter;
 
     @Inject
-    public LegacyPlexusInteractivity(DefaultPrompter defaultPrompter) {
-        this.defaultPrompter = defaultPrompter;
+    public LegacyPlexusInteractivity(org.apache.maven.api.services.Prompter prompter) {
+        this.prompter = prompter;
     }
 
     @Override
     public String readLine() throws IOException {
-        return defaultPrompter.doPrompt(null, false);
+        try {
+            return prompter.prompt(null);
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new IOException("Unable to prompt", e);
+        }
     }
 
     @Override
     public String readPassword() throws IOException {
-        return defaultPrompter.doPrompt(null, true);
+        try {
+            return prompter.promptForPassword(null);
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new IOException("Unable to prompt", e);
+        }
     }
 
     @Override
@@ -71,18 +78,26 @@ public class LegacyPlexusInteractivity implements Prompter, InputHandler, Output
 
     @Override
     public void write(String line) throws IOException {
-        defaultPrompter.doDisplay(line);
+        try {
+            prompter.showMessage(line);
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new IOException("Unable to prompt", e);
+        }
     }
 
     @Override
     public void writeLine(String line) throws IOException {
-        defaultPrompter.doDisplay(line + System.lineSeparator());
+        try {
+            prompter.showMessage(line + System.lineSeparator());
+        } catch (org.apache.maven.api.services.PrompterException e) {
+            throw new IOException("Unable to prompt", e);
+        }
     }
 
     @Override
     public String prompt(String message) throws PrompterException {
         try {
-            return defaultPrompter.prompt(message, null, null);
+            return prompter.prompt(message, null, null);
         } catch (org.apache.maven.api.services.PrompterException e) {
             throw new PrompterException("Unable to prompt", e);
         }
@@ -91,7 +106,7 @@ public class LegacyPlexusInteractivity implements Prompter, InputHandler, Output
     @Override
     public String prompt(String message, String defaultReply) throws PrompterException {
         try {
-            return defaultPrompter.prompt(message, null, defaultReply);
+            return prompter.prompt(message, null, defaultReply);
         } catch (org.apache.maven.api.services.PrompterException e) {
             throw new PrompterException("Unable to prompt", e);
         }
@@ -100,7 +115,7 @@ public class LegacyPlexusInteractivity implements Prompter, InputHandler, Output
     @Override
     public String prompt(String message, List possibleValues) throws PrompterException {
         try {
-            return defaultPrompter.prompt(message, possibleValues, null);
+            return prompter.prompt(message, possibleValues, null);
         } catch (org.apache.maven.api.services.PrompterException e) {
             throw new PrompterException("Unable to prompt", e);
         }
@@ -109,7 +124,7 @@ public class LegacyPlexusInteractivity implements Prompter, InputHandler, Output
     @Override
     public String prompt(String message, List possibleValues, String defaultReply) throws PrompterException {
         try {
-            return defaultPrompter.prompt(message, possibleValues, defaultReply);
+            return prompter.prompt(message, possibleValues, defaultReply);
         } catch (org.apache.maven.api.services.PrompterException e) {
             throw new PrompterException("Unable to prompt", e);
         }
@@ -118,7 +133,7 @@ public class LegacyPlexusInteractivity implements Prompter, InputHandler, Output
     @Override
     public String promptForPassword(String message) throws PrompterException {
         try {
-            return defaultPrompter.promptForPassword(message);
+            return prompter.promptForPassword(message);
         } catch (org.apache.maven.api.services.PrompterException e) {
             throw new PrompterException("Unable to promptForPassword", e);
         }
@@ -127,7 +142,7 @@ public class LegacyPlexusInteractivity implements Prompter, InputHandler, Output
     @Override
     public void showMessage(String message) throws PrompterException {
         try {
-            defaultPrompter.showMessage(message);
+            prompter.showMessage(message);
         } catch (org.apache.maven.api.services.PrompterException e) {
             throw new PrompterException("Unable to showMessage", e);
         }
