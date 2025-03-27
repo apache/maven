@@ -107,11 +107,11 @@ class DefaultModelBuilderTest {
         // after merge
         repositories = (List<RemoteRepository>) repositoriesField.get(state);
         assertEquals(3, repositories.size());
-        assertEquals(repositories.get(0).getId(), "first");
-        assertEquals(repositories.get(0).getUrl(), "https://some.repo"); // interpolated
-        assertEquals(repositories.get(1).getId(), "second");
-        assertEquals(repositories.get(1).getUrl(), "${secondParentRepo}"); // un-interpolated (no source)
-        assertEquals(repositories.get(2).getId(), "central"); // default
+        assertEquals("first", repositories.get(0).getId());
+        assertEquals("https://some.repo", repositories.get(0).getUrl()); // interpolated
+        assertEquals("second", repositories.get(1).getId());
+        assertEquals("${secondParentRepo}", repositories.get(1).getUrl()); // un-interpolated (no source)
+        assertEquals("central", repositories.get(2).getId()); // default
     }
 
     private Path getPom(String name) {
