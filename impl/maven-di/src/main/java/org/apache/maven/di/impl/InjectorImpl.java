@@ -61,6 +61,7 @@ public class InjectorImpl implements Injector {
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
     private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
     private final Set<String> loadedUrls = new HashSet<>();
+    private final ThreadLocal<Set<Key<?>>> resolutionStack = new ThreadLocal<>();
 
     public InjectorImpl() {
         bindScope(Singleton.class, new SingletonScope());
@@ -194,6 +195,19 @@ public class InjectorImpl implements Injector {
     }
 
     public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
+        Key<Q> key = dep.key();
+        Supplier<Q> originalSupplier = doGetCompiledBinding(dep);
+        return () -> {
+            checkCyclicDependency(key);
+            try {
+                return originalSupplier.get();
+            } finally {
+                removeFromResolutionStack(key);
+            }
+        };
+    }
+
+    public <Q> Supplier<Q> doGetCompiledBinding(Dependency<Q> dep) {
         Key<Q> key = dep.key();
         Set<Binding<Q>> res = getBindings(key);
         if (res != null && !res.isEmpty()) {
@@ -384,6 +398,30 @@ public class InjectorImpl implements Injector {
         @Override
         public int size() {
             return delegate.size();
+        }
+    }
+
+    private void checkCyclicDependency(Key<?> key) {
+        Set<Key<?>> stack = resolutionStack.get();
+        if (stack == null) {
+            stack = new LinkedHashSet<>();
+            resolutionStack.set(stack);
+        }
+        if (!stack.add(key)) {
+            throw new DIException("Cyclic dependency detected: "
+                    + stack.stream().map(Key::getDisplayString).collect(Collectors.joining(" -> "))
+                    + " -> "
+                    + key.getDisplayString());
+        }
+    }
+
+    private void removeFromResolutionStack(Key<?> key) {
+        Set<Key<?>> stack = resolutionStack.get();
+        if (stack != null) {
+            stack.remove(key);
+            if (stack.isEmpty()) {
+                resolutionStack.remove();
+            }
         }
     }
 
