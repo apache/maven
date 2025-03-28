@@ -343,9 +343,50 @@ public class BuildPlanExecutor {
                                 } catch (Exception e) {
                                     step.status.compareAndSet(SCHEDULED, FAILED);
                                     global.stop();
+
+                                    // Find and execute all pending after:* phases for this project
+                                    executeAfterPhases(step);
+
                                     handleBuildError(reactorContext, session, step.project, e, global);
                                 }
                             });
+                        });
+            } finally {
+                lock.readLock().unlock();
+            }
+        }
+
+        private void executeAfterPhases(BuildStep failedStep) {
+            if (failedStep == null || failedStep.project == null) {
+                return;
+            }
+
+            lock.readLock().lock();
+            try {
+                // Find all after:* phases that should be executed
+                plan.steps(failedStep.project)
+                        .filter(step -> step.name != null && step.name.startsWith(AFTER))
+                        .filter(step -> step.status.get() == CREATED)
+                        .filter(step -> {
+                            // Only execute after:xxx if before:xxx has been executed or failed
+                            String phaseName = step.name.substring(AFTER.length());
+                            return plan.step(failedStep.project, BEFORE + phaseName)
+                                    .map(s -> {
+                                        int status = s.status.get();
+                                        return status == EXECUTED || status == FAILED;
+                                    })
+                                    .orElse(false);
+                        })
+                        .filter(step -> step.status.compareAndSet(CREATED, SCHEDULED))
+                        .forEach(afterStep -> {
+                            try {
+                                executeStep(afterStep);
+                                afterStep.status.compareAndSet(SCHEDULED, EXECUTED);
+                            } catch (Exception e) {
+                                // Log but don't fail - we're already in error handling
+                                logger.error("Error executing cleanup phase " + afterStep.name, e);
+                                afterStep.status.compareAndSet(SCHEDULED, FAILED);
+                            }
                         });
             } finally {
                 lock.readLock().unlock();
