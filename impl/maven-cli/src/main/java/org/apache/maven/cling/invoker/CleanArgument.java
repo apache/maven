@@ -67,7 +67,6 @@ public class CleanArgument {
                 cleaned.add(currentArg.toString());
 
                 currentArg = null;
-                addedToBuffer = false;
                 continue;
             }
 

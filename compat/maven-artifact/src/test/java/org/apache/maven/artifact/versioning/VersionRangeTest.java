@@ -715,9 +715,7 @@ class VersionRangeTest {
 
     public boolean enforceVersion(String requiredVersionRange, ArtifactVersion actualVersion)
             throws InvalidVersionSpecificationException {
-        VersionRange vr = null;
-
-        vr = VersionRange.createFromVersionSpec(requiredVersionRange);
+        VersionRange vr = VersionRange.createFromVersionSpec(requiredVersionRange);
 
         return vr.containsVersion(actualVersion);
     }
