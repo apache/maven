@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<plugin xmlns="http://maven.apache.org/PLUGIN/2.0.0" >
+  <name>test-plugin</name>
+  <description></description>
+  <groupId>test</groupId>
+  <artifactId>test-plugin</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <goalPrefix>test</goalPrefix>
+  <isolatedRealm>false</isolatedRealm>
+  <inheritedByDefault>true</inheritedByDefault>
+  <mojos>
+    <mojo>
+      <goal>goal</goal>
+      <projectRequired>true</projectRequired>
+      <aggregator>false</aggregator>
+      <onlineRequired>false</onlineRequired>
+      <inheritedByDefault>true</inheritedByDefault>
+      <implementation>org.apache.maven.plugin.testing.ParametersMojo</implementation>
+      <language>java</language>
+      <parameters>
+        <parameter>
+          <name>basedir</name>
+          <type>java.nio.file.Path</type>
+        </parameter>
+        <parameter>
+          <name>workdir</name>
+          <type>java.nio.file.Path</type>
+        </parameter>
+        <parameter>
+          <name>param</name>
+          <type>java.lang.String</type>
+        </parameter>
+        <parameter>
+          <name>param2</name>
+          <type>java.lang.String</type>
+        </parameter>
+        <!--
+        <parameter>
+          <name>plain</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description></description>
+        </parameter>
+        <parameter>
+          <name>withDefault</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description></description>
+          <defaultValue>default</defaultValue>
+        </parameter>
+        <parameter>
+          <name>withProperty</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description></description>
+          <expression>${property}</expression>
+        </parameter>
+        <parameter>
+          <name>withPropertyAndDefault</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description></description>
+          <defaultValue>default</defaultValue>
+          <expression>${property}</expression>
+        </parameter>
+        -->
+      </parameters>
+    </mojo>
+  </mojos>
+</plugin>

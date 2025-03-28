@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<faqs id="FAQ" title="Frequently Asked Questions">
+  <part id="General">
+    <faq id="What is a Mojo Testing Harness">
+      <question>What is a Mojo Testing Harness?</question>
+      <answer>
+        <p>
+          A unit test attempts to verify a mojo as an isolated unit, by mocking out the rest of the Maven environment.
+          A mojo unit test does not attempt to run your plugin in the context of a real Maven build.
+          Unit tests are designed to be fast.
+        </p>
+        <p>
+          This testing library is <b>NOT</b> designed for integration or functional testing:
+          <a href="/plugins/maven-invoker-plugin/"><code>maven-invoker-plugin</code></a> is the way to go if you need it,
+          which gives you a complete Maven environment at the cost of more resources and time consuptions.
+        </p>
+      </answer>
+    </faq>
+    <faq id="What kinds of unit tests are supported">
+      <question>What kind of unit tests are supported?</question>
+      <answer>
+        <p>
+          <dl>
+            <dt>TestCase from JUnit</dt>
+            <dd>You could use the <a href="http://junit.org/">JUnit framework</a> to test your plugin in
+              the same way you'd write any other JUnit test cases, i.e. by writing a test class which extends
+              <i>TestCase</i>.</dd>
+            <dt>TestCase from Plexus</dt>
+            <dd>Mojos are written to take specific advantage of the <a href="http://plexus.codehaus.org/plexus-containers/">Plexus
+              container</a>. If you need Plexus container services, you could write your class which extends <i>PlexusTestCase</i>,
+              instead of <i>TestCase</i>.</dd>
+            <dt>TestCase from Testing Harness</dt>
+            <dd>If you need to inject Maven objects into your mojo, you could use the <i>maven-plugin-testing-harness</i>.
+              The <i>maven-plugin-testing-harness</i> is explicitly intended to test the
+              <i>org.apache.maven.reporting.AbstractMavenReport#execute()</i> implementation.</dd>
+          </dl>
+        </p>
+      </answer>
+    </faq>
+    <faq id="Maven 2.x compatibility">
+      <question>Is Mojo Testing Harness 2.x compatible with Maven 2.x?</question>
+      <answer>
+        <p>
+          Mojo Testing Harness 2.0+ requires Maven 3.0. This does not necessary mean that your mojos will be 
+          incompatible with Maven 2.x, it only means that mojo unit tests use Maven 3.x libraries to mock Maven
+          environment. Still, if you want to be absolutely sure your mojo is compatible with Maven 2.x, then you probably want
+          to use Mojo Testing Harness 1.x.
+        </p>
+      </answer>
+    </faq>
+  </part>
+</faqs>
