@@ -162,7 +162,7 @@ under the License.
     <plexusInterpolationVersion>1.27</plexusInterpolationVersion>
     <plexusTestingVersion>1.4.0</plexusTestingVersion>
     <plexusXmlVersion>4.0.4</plexusXmlVersion>
-    <resolverVersion>2.0.7</resolverVersion>
+    <resolverVersion>2.0.8-SNAPSHOT</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M3</sisuVersion>
     <slf4jVersion>2.0.17</slf4jVersion>
