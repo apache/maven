@@ -968,10 +968,16 @@ public class MavenProject implements Cloneable {
     }
 
     public List<RemoteRepository> getRemoteProjectRepositories() {
+        if (remoteProjectRepositories == null) {
+            remoteProjectRepositories = new ArrayList<>();
+        }
         return remoteProjectRepositories;
     }
 
     public List<RemoteRepository> getRemotePluginRepositories() {
+        if (remotePluginRepositories == null) {
+            remotePluginRepositories = new ArrayList<>();
+        }
         return remotePluginRepositories;
     }
 
@@ -1436,7 +1442,7 @@ public class MavenProject implements Cloneable {
      * @param artifacts The set of artifacts, may be {@code null}.
      */
     public void setResolvedArtifacts(Set<Artifact> artifacts) {
-        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.<Artifact>emptySet();
+        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.emptySet();
         this.artifacts = null;
         this.artifactMap = null;
     }

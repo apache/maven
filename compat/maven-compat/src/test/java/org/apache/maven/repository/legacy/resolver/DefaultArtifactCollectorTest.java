@@ -833,7 +833,7 @@ class DefaultArtifactCollectorTest {
                 throws ArtifactMetadataRetrievalException {
             String key = getKey(artifact);
 
-            ArtifactSpec a = (ArtifactSpec) artifacts.get(key);
+            ArtifactSpec a = artifacts.get(key);
             try {
                 return new ResolutionGroup(
                         artifact,

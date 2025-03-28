@@ -341,12 +341,11 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
             throws CycleDetectedException, DuplicateProjectException {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setSystemProperties(properties)
-                .setGoals(Collections.<String>emptyList())
+                .setGoals(Collections.emptyList())
                 .setBaseDirectory(new File(""))
                 .setLocalRepository(repo);
 
-        return new MavenSession(
-                container, request, new DefaultMavenExecutionResult(), Collections.<MavenProject>emptyList());
+        return new MavenSession(container, request, new DefaultMavenExecutionResult(), Collections.emptyList());
     }
 
     @Test

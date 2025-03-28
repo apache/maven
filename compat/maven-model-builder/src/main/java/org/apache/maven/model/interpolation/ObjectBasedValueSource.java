@@ -68,7 +68,7 @@ public class ObjectBasedValueSource extends AbstractValueSource {
      * accessor types to resolve the value for each successive expression part.
      * Finally, return the result of the last expression part's resolution.</p>
      *
-     * <p><b>NOTE:</b> The object-graph nagivation actually takes place via the
+     * <p><b>NOTE:</b> The object-graph navigation actually takes place via the
      * {@link ReflectionValueExtractor} class.</p>
      */
     public Object getValue(String expression) {

@@ -237,7 +237,7 @@ public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEn
 
     protected List<InterpolationPostProcessor> createPostProcessors(
             final Model model, final File projectDir, final ProjectBuilderConfiguration config) {
-        return Collections.singletonList((InterpolationPostProcessor) new PathTranslatingPostProcessor(
+        return Collections.singletonList(new PathTranslatingPostProcessor(
                 PROJECT_PREFIXES, TRANSLATED_PATH_EXPRESSIONS, projectDir, pathTranslator));
     }
 

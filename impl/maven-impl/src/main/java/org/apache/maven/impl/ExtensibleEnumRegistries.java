@@ -91,8 +91,7 @@ public class ExtensibleEnumRegistries {
         protected final Map<String, T> values;
 
         public DefaultExtensibleEnumRegistry(List<P> providers, T... builtinValues) {
-            values = Stream.<T>concat(
-                            Stream.of(builtinValues), providers.stream().flatMap(p -> p.provides().stream()))
+            values = Stream.concat(Stream.of(builtinValues), providers.stream().flatMap(p -> p.provides().stream()))
                     .collect(Collectors.toUnmodifiableMap(t -> t.id().toLowerCase(Locale.ROOT), t -> t));
         }
 
