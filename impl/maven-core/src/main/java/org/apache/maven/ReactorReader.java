@@ -338,14 +338,18 @@ class ReactorReader implements MavenWorkspaceReader {
                     if (!Objects.equals(phase, phases.peekLast())) {
                         phases.addLast(phase);
                         if ("clean".equals(phase)) {
-                            cleanProjectLocalRepository(project);
+                            synchronized (project) {
+                                cleanProjectLocalRepository(project);
+                            }
                         }
                     }
                 }
                 break;
             case ProjectSucceeded:
             case ForkedProjectSucceeded:
-                installIntoProjectLocalRepository(project);
+                synchronized (project) {
+                    installIntoProjectLocalRepository(project);
+                }
                 break;
             default:
                 break;
