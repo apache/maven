@@ -54,6 +54,7 @@ import org.apache.maven.api.di.testing.MavenDIExtension;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.ConfigurationContainer;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Source;
 import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.plugin.Mojo;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
@@ -76,6 +77,7 @@ import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
@@ -84,7 +86,6 @@ import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
 import org.apache.maven.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.DefaultLog;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.model.v4.MavenMerger;
@@ -110,32 +111,107 @@ import org.slf4j.LoggerFactory;
 import static java.util.Objects.requireNonNull;
 
 /**
- * JUnit extension to help testing Mojos. The extension should be automatically registered
- * by adding the {@link MojoTest} annotation on the test class.
+ * JUnit Jupiter extension that provides support for testing Maven plugins (Mojos).
+ * This extension handles the lifecycle of Mojo instances in tests, including instantiation,
+ * configuration, and dependency injection.
+ *
+ * <p>The extension is automatically registered when using the {@link MojoTest} annotation
+ * on a test class. It provides the following features:</p>
+ * <ul>
+ *   <li>Automatic Mojo instantiation based on {@link InjectMojo} annotations</li>
+ *   <li>Parameter injection using {@link MojoParameter} annotations</li>
+ *   <li>POM configuration handling</li>
+ *   <li>Project stub creation and configuration</li>
+ *   <li>Maven session and build context setup</li>
+ *   <li>Component dependency injection</li>
+ * </ul>
+ *
+ * <p>Example usage in a test class:</p>
+ * <pre>
+ * {@code
+ * @MojoTest
+ * class MyMojoTest {
+ *     @Test
+ *     @InjectMojo(goal = "my-goal")
+ *     @MojoParameter(name = "outputDirectory", value = "${project.build.directory}/generated")
+ *     void testMojoExecution(MyMojo mojo) throws Exception {
+ *         mojo.execute();
+ *         // verify execution results
+ *     }
+ * }
+ * }
+ * </pre>
+ *
+ * <p>The extension supports two main injection scenarios:</p>
+ * <ol>
+ *   <li>Method parameter injection: Mojo instances can be injected as test method parameters</li>
+ *   <li>Field injection: Components can be injected into test class fields using {@code @Inject}</li>
+ * </ol>
+ *
+ * <p>For custom POM configurations, you can specify a POM file using the {@link InjectMojo#pom()}
+ * attribute. The extension will merge this configuration with default test project settings.</p>
+ *
+ * <p>Base directory handling:</p>
+ * <ul>
+ *   <li>Plugin basedir: The directory containing the plugin project</li>
+ *   <li>Test basedir: The directory containing test resources, configurable via {@link Basedir}</li>
+ * </ul>
  *
  * @see MojoTest
  * @see InjectMojo
  * @see MojoParameter
  * @see Basedir
+ * @since 4.0.0
  */
 public class MojoExtension extends MavenDIExtension implements ParameterResolver, BeforeEachCallback {
 
+    /** The base directory of the plugin being tested */
     protected static String pluginBasedir;
+
+    /** The base directory for test resources */
     protected static String basedir;
 
+    /**
+     * Gets the identifier for the current test method.
+     * The format is "TestClassName-testMethodName".
+     *
+     * @return the test identifier
+     */
     public static String getTestId() {
         return context.getRequiredTestClass().getSimpleName() + "-"
                 + context.getRequiredTestMethod().getName();
     }
 
+    /**
+     * Gets the base directory for test resources.
+     * If not explicitly set via {@link Basedir}, returns the plugin base directory.
+     *
+     * @return the base directory path
+     * @throws NullPointerException if neither basedir nor plugin basedir is set
+     */
     public static String getBasedir() {
         return requireNonNull(basedir != null ? basedir : MavenDIExtension.basedir);
     }
 
+    /**
+     * Gets the base directory of the plugin being tested.
+     *
+     * @return the plugin base directory path
+     * @throws NullPointerException if plugin basedir is not set
+     */
     public static String getPluginBasedir() {
         return requireNonNull(pluginBasedir);
     }
 
+    /**
+     * Determines if this extension can resolve the given parameter.
+     * Returns true if the parameter is annotated with {@link InjectMojo} or
+     * if its declaring method is annotated with {@link InjectMojo}.
+     *
+     * @param parameterContext the context for the parameter being resolved
+     * @param extensionContext the current extension context
+     * @return true if this extension can resolve the parameter
+     */
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
@@ -147,7 +223,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
         try {
-            Class<?> holder = parameterContext.getTarget().get().getClass();
+            Class<?> holder = parameterContext.getTarget().orElseThrow().getClass();
             PluginDescriptor descriptor = extensionContext
                     .getStore(ExtensionContext.Namespace.GLOBAL)
                     .get(PluginDescriptor.class, PluginDescriptor.class);
@@ -191,12 +267,12 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                             Objects.equals(p.getGroupId(), coord[0]) && Objects.equals(p.getArtifactId(), coord[1]))
                     .map(ConfigurationContainer::getConfiguration)
                     .findFirst()
-                    .orElseGet(() -> new XmlNodeImpl("config"));
+                    .orElseGet(() -> XmlNode.newInstance("config"));
             List<XmlNode> children = mojoParameters.stream()
-                    .map(mp -> new XmlNodeImpl(mp.name(), mp.value()))
+                    .map(mp -> XmlNode.newInstance(mp.name(), mp.value()))
                     .collect(Collectors.toList());
-            XmlNode config = new XmlNodeImpl("configuration", null, null, children, null);
-            pluginConfiguration = XmlNode.merge(config, pluginConfiguration);
+            XmlNode config = XmlNode.newInstance("configuration", null, null, children, null);
+            pluginConfiguration = XmlService.merge(config, pluginConfiguration);
 
             // load default config
             // pluginkey = groupId : artifactId : version : goal
@@ -239,7 +315,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         if (pluginBasedir == null) {
             pluginBasedir = MavenDIExtension.getBasedir();
         }
-        basedir = AnnotationSupport.findAnnotation(context.getElement().get(), Basedir.class)
+        basedir = AnnotationSupport.findAnnotation(context.getElement().orElseThrow(), Basedir.class)
                 .map(Basedir::value)
                 .orElse(pluginBasedir);
         if (basedir != null) {
@@ -298,9 +374,21 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                 .build(Build.newBuilder()
                         .directory(basedirPath.resolve("target").toString())
                         .outputDirectory(basedirPath.resolve("target/classes").toString())
-                        .sourceDirectory(basedirPath.resolve("src/main/java").toString())
-                        .testSourceDirectory(
-                                basedirPath.resolve("src/test/java").toString())
+                        .sources(List.of(
+                                Source.newBuilder()
+                                        .scope("main")
+                                        .lang("java")
+                                        .directory(basedirPath
+                                                .resolve("src/main/java")
+                                                .toString())
+                                        .build(),
+                                Source.newBuilder()
+                                        .scope("test")
+                                        .lang("java")
+                                        .directory(basedirPath
+                                                .resolve("src/test/java")
+                                                .toString())
+                                        .build()))
                         .testOutputDirectory(
                                 basedirPath.resolve("target/test-classes").toString())
                         .build())
@@ -533,38 +621,34 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
     private XmlNode finalizeConfig(XmlNode config, MojoDescriptor mojoDescriptor) {
         List<XmlNode> children = new ArrayList<>();
-        if (mojoDescriptor != null && mojoDescriptor.getParameters() != null) {
+        if (mojoDescriptor != null) {
             XmlNode defaultConfiguration;
             defaultConfiguration = MojoDescriptorCreator.convert(mojoDescriptor);
             for (Parameter parameter : mojoDescriptor.getParameters()) {
-                XmlNode parameterConfiguration = config.getChild(parameter.getName());
+                XmlNode parameterConfiguration = config.child(parameter.getName());
                 if (parameterConfiguration == null) {
-                    parameterConfiguration = config.getChild(parameter.getAlias());
+                    parameterConfiguration = config.child(parameter.getAlias());
                 }
-                XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
+                XmlNode parameterDefaults = defaultConfiguration.child(parameter.getName());
                 parameterConfiguration = XmlNode.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 if (parameterConfiguration != null) {
-                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.getAttributes());
+                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.attributes());
                     // if (isEmpty(parameterConfiguration.getAttribute("implementation"))
                     //         && !isEmpty(parameter.getImplementation())) {
                     //     attributes.put("implementation", parameter.getImplementation());
                     // }
-                    parameterConfiguration = new XmlNodeImpl(
+                    parameterConfiguration = XmlNode.newInstance(
                             parameter.getName(),
-                            parameterConfiguration.getValue(),
+                            parameterConfiguration.value(),
                             attributes,
-                            parameterConfiguration.getChildren(),
-                            parameterConfiguration.getInputLocation());
+                            parameterConfiguration.children(),
+                            parameterConfiguration.inputLocation());
 
                     children.add(parameterConfiguration);
                 }
             }
         }
-        return new XmlNodeImpl("configuration", null, null, children, null);
-    }
-
-    private boolean isEmpty(String str) {
-        return str == null || str.isEmpty();
+        return XmlNode.newInstance("configuration", null, null, children, null);
     }
 
     private static Optional<Xpp3Dom> child(Xpp3Dom element, String name) {

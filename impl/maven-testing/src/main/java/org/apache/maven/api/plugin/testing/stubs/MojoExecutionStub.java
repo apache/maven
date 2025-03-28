@@ -27,7 +27,20 @@ import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.xml.XmlNode;
 
 /**
- * Stub for {@link MojoExecution}.
+ * A stub implementation of {@link MojoExecution} for testing Maven plugins.
+ * This class provides a simplified representation of a Mojo execution context,
+ * allowing tests to simulate plugin executions without a full Maven environment.
+ *
+ * <p>Example usage:</p>
+ * <pre>
+ * MojoExecutionStub execution = new MojoExecutionStub("myExecution", "myGoal");
+ * execution.setPlugin(new PluginStub());
+ * execution.setDescriptor(mojoDescriptor);
+ * </pre>
+ *
+ * @see MojoExecution
+ * @see PluginStub
+ * @since 4.0.0
  */
 public class MojoExecutionStub implements MojoExecution {
     private String executionId;

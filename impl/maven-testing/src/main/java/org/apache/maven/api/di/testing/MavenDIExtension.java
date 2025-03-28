@@ -28,35 +28,64 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
- * This is a slightly modified version of the original plexus class
- * available at https://raw.githubusercontent.com/codehaus-plexus/plexus-containers/master/plexus-container-default/
- *              src/main/java/org/codehaus/plexus/PlexusTestCase.java
- * in order to migrate the tests to JUnit 4.
+ * JUnit Jupiter extension that provides dependency injection support for Maven tests.
+ * This extension manages the lifecycle of a DI container for each test method execution,
+ * automatically performing injection into test instances and cleanup.
  *
- * @author Jason van Zyl
- * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @author <a href="mailto:michal@codehaus.org">Michal Maczka</a>
- * @author Guillaume Nodet
+ * <p>This is a modernized version of the original Plexus test support, adapted for
+ * Maven's new DI framework and JUnit Jupiter.</p>
+ *
+ * <p>Usage example:</p>
+ * <pre>
+ * {@code
+ * @ExtendWith(MavenDIExtension.class)
+ * class MyTest {
+ *     @Inject
+ *     private MyComponent component;
+ *
+ *     @Test
+ *     void testSomething() {
+ *         // component is automatically injected
+ *     }
+ * }
+ * }
+ * </pre>
  */
 public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
     protected static ExtensionContext context;
     protected Injector injector;
     protected static String basedir;
 
+    /**
+     * Initializes the test environment before each test method execution.
+     * Sets up the base directory and DI container, then performs injection into the test instance.
+     *
+     * @param context The extension context provided by JUnit
+     * @throws Exception if initialization fails
+     */
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         basedir = getBasedir();
-
         setContext(context);
-
         getInjector().bindInstance((Class<Object>) context.getRequiredTestClass(), context.getRequiredTestInstance());
         getInjector().injectInstance(context.getRequiredTestInstance());
     }
 
+    /**
+     * Stores the extension context for use during test execution.
+     *
+     * @param context The extension context to store
+     */
     protected void setContext(ExtensionContext context) {
         this.context = context;
     }
 
+    /**
+     * Creates and configures the DI container for test execution.
+     * Performs component discovery and sets up basic bindings.
+     *
+     * @throws IllegalArgumentException if container setup fails
+     */
     @SuppressWarnings("unchecked")
     protected void setupContainer() {
         try {
@@ -70,6 +99,12 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
         }
     }
 
+    /**
+     * Cleans up resources after each test method execution.
+     * Currently a placeholder for future cleanup implementation.
+     *
+     * @param context The extension context provided by JUnit
+     */
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
         if (injector != null) {
@@ -79,43 +114,85 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
         }
     }
 
+    /**
+     * Returns the DI injector, creating it if necessary.
+     *
+     * @return The configured injector instance
+     */
     public Injector getInjector() {
         if (injector == null) {
             setupContainer();
         }
-
         return injector;
     }
 
-    // ----------------------------------------------------------------------
-    // Container access
-    // ----------------------------------------------------------------------
-
+    /**
+     * Looks up a component of the specified type from the container.
+     *
+     * @param <T> The component type
+     * @param componentClass The class of the component to look up
+     * @return The component instance
+     * @throws DIException if lookup fails
+     */
     protected <T> T lookup(Class<T> componentClass) throws DIException {
         return getInjector().getInstance(componentClass);
     }
 
+    /**
+     * Looks up a component of the specified type and role hint from the container.
+     *
+     * @param <T> The component type
+     * @param componentClass The class of the component to look up
+     * @param roleHint The role hint for the component
+     * @return The component instance
+     * @throws DIException if lookup fails
+     */
     protected <T> T lookup(Class<T> componentClass, String roleHint) throws DIException {
         return getInjector().getInstance(Key.ofType(componentClass, roleHint));
     }
 
+    /**
+     * Looks up a component of the specified type and qualifier from the container.
+     *
+     * @param <T> The component type
+     * @param componentClass The class of the component to look up
+     * @param qualifier The qualifier for the component
+     * @return The component instance
+     * @throws DIException if lookup fails
+     */
     protected <T> T lookup(Class<T> componentClass, Object qualifier) throws DIException {
         return getInjector().getInstance(Key.ofType(componentClass, qualifier));
     }
 
+    /**
+     * Releases a component back to the container.
+     * Currently a placeholder for future implementation.
+     *
+     * @param component The component to release
+     * @throws DIException if release fails
+     */
     protected void release(Object component) throws DIException {
         // TODO: implement
         // getInjector().release(component);
     }
 
-    // ----------------------------------------------------------------------
-    // Helper methods for sub classes
-    // ----------------------------------------------------------------------
-
+    /**
+     * Creates a File object for a path relative to the base directory.
+     *
+     * @param path The relative path
+     * @return A File object representing the path
+     */
     public static File getTestFile(String path) {
         return new File(getBasedir(), path);
     }
 
+    /**
+     * Creates a File object for a path relative to a specified base directory.
+     *
+     * @param basedir The base directory path
+     * @param path The relative path
+     * @return A File object representing the path
+     */
     public static File getTestFile(String basedir, String path) {
         File basedirFile = new File(basedir);
 
@@ -126,14 +203,33 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
         return new File(basedirFile, path);
     }
 
+    /**
+     * Returns the absolute path for a path relative to the base directory.
+     *
+     * @param path The relative path
+     * @return The absolute path
+     */
     public static String getTestPath(String path) {
         return getTestFile(path).getAbsolutePath();
     }
 
+    /**
+     * Returns the absolute path for a path relative to a specified base directory.
+     *
+     * @param basedir The base directory path
+     * @param path The relative path
+     * @return The absolute path
+     */
     public static String getTestPath(String basedir, String path) {
         return getTestFile(basedir, path).getAbsolutePath();
     }
 
+    /**
+     * Returns the base directory for test execution.
+     * Uses the "basedir" system property if set, otherwise uses the current directory.
+     *
+     * @return The base directory path
+     */
     public static String getBasedir() {
         if (basedir != null) {
             return basedir;

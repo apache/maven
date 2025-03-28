@@ -39,9 +39,10 @@ import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.Profile;
 
 /**
- * @author Olivier Lamy
- * @since 1.0-beta-1
+ * A stub implementation of {@link Project} for testing Maven plugins.
+ * Provides a simplified project structure with basic model information.
  *
+ * @since 4.0.0
  */
 public class ProjectStub implements Project {
 

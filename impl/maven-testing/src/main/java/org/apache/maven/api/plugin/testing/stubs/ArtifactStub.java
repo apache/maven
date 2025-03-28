@@ -30,7 +30,10 @@ import org.apache.maven.impl.DefaultVersionParser;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 
 /**
+ * A stub implementation of {@link Artifact} for testing purposes.
+ * Provides basic artifact information without actual artifact resolution.
  *
+ * @since 4.0.0
  */
 public class ArtifactStub implements Artifact {
     private String groupId;

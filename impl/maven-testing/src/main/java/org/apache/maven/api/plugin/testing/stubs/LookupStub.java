@@ -25,10 +25,14 @@ import java.util.Optional;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 
+/**
+ * A stub implementation of {@link Lookup} for testing purposes.
+ * Provides a simple service lookup mechanism for tests.
+ *
+ * @since 4.0.0
+ */
 public class LookupStub implements Lookup {
-    /**
-     * A stub where all methods return an empty value when possible, or throw an exception otherwise.
-     */
+
     public static final Lookup EMPTY = new LookupStub();
 
     /**

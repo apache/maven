@@ -18,19 +18,74 @@
  */
 package org.apache.maven.api.plugin.testing;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Mojo parameter
+ * Specifies a parameter value for a Mojo in a Maven plugin test.
+ * This annotation can be used to configure individual Mojo parameters
+ * without requiring a full POM file.
+ *
+ * <p>The annotation is repeatable, allowing multiple parameters to be set
+ * on a single test method or parameter. For multiple parameters, you can
+ * either use multiple {@code @MojoParameter} annotations or a single
+ * {@link MojoParameters} annotation.</p>
+ *
+ * <p>Example usage with a single parameter:</p>
+ * <pre>
+ * {@code
+ * @Test
+ * @InjectMojo(goal = "compile")
+ * @MojoParameter(name = "source", value = "1.8")
+ * void testCompilation(CompileMojo mojo) {
+ *     mojo.execute();
+ * }
+ * }
+ * </pre>
+ *
+ * <p>Example usage with multiple parameters:</p>
+ * <pre>
+ * {@code
+ * @Test
+ * @InjectMojo(goal = "compile")
+ * @MojoParameter(name = "source", value = "1.8")
+ * @MojoParameter(name = "target", value = "1.8")
+ * @MojoParameter(name = "debug", value = "true")
+ * void testCompilation(CompileMojo mojo) {
+ *     mojo.execute();
+ * }
+ * }
+ * </pre>
+ *
+ * @see MojoParameters
+ * @see InjectMojo
+ * @see MojoTest
+ * @since 4.0.0
  */
+@Target({ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Repeatable(MojoParameters.class)
 @Inherited
+@Repeatable(MojoParameters.class)
 public @interface MojoParameter {
+
+    /**
+     * The name of the Mojo parameter to set.
+     * This should match the name of a parameter in the Mojo class,
+     * as specified by its {@code @Parameter} annotation or field name.
+     *
+     * @return the parameter name
+     */
     String name();
 
+    /**
+     * The value to set for the parameter.
+     * The value can include Maven property expressions (e.g., "${project.version}").
+     *
+     * @return the parameter value
+     */
     String value();
 }

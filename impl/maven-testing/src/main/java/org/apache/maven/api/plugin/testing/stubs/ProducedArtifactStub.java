@@ -21,7 +21,10 @@ package org.apache.maven.api.plugin.testing.stubs;
 import org.apache.maven.api.ProducedArtifact;
 
 /**
+ * A stub implementation of {@link ProducedArtifact} for testing purposes.
+ * Represents artifacts produced during the build process.
  *
+ * @since 4.0.0
  */
 public class ProducedArtifactStub extends ArtifactStub implements ProducedArtifact {
     public ProducedArtifactStub() {}

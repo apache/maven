@@ -39,6 +39,7 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactDeployer;
@@ -64,6 +65,7 @@ import org.apache.maven.impl.InternalSession;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.mockito.ArgumentMatchers;
+import org.mockito.quality.Strictness;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -75,7 +77,55 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 /**
+ * A mock implementation of {@link InternalSession} for testing Maven plugins.
+ * This class provides a comprehensive mock session that simulates the behavior
+ * of a real Maven session, including repository management, artifact handling,
+ * and project building capabilities.
  *
+ * <p>The mock session includes pre-configured behaviors for:</p>
+ * <ul>
+ *   <li>Repository management (local and remote repositories)</li>
+ *   <li>Artifact installation and deployment</li>
+ *   <li>Project building and management</li>
+ *   <li>Version parsing and handling</li>
+ *   <li>Model XML processing</li>
+ *   <li>Session data storage</li>
+ * </ul>
+ *
+ * <p>Example usage in a test:</p>
+ * <pre>
+ * {@code
+ * @Test
+ * void testMojo() {
+ *     // Create a mock session with a specific local repository
+ *     InternalSession session = SessionMock.getMockSession("/path/to/local/repo");
+ *
+ *     // Use the session for testing
+ *     MyMojo mojo = new MyMojo();
+ *     mojo.setSession(session);
+ *     mojo.execute();
+ * }
+ * }
+ * </pre>
+ *
+ * <p>The mock session maintains internal state for:</p>
+ * <ul>
+ *   <li>Attached artifacts (via {@link ProjectManager})</li>
+ *   <li>Artifact paths (via {@link ArtifactManager})</li>
+ *   <li>System and user properties</li>
+ *   <li>Session-scoped data (via {@link TestSessionData})</li>
+ * </ul>
+ *
+ * <p>Most service implementations are mocked using Mockito, with pre-configured
+ * behaviors that simulate typical Maven operations. Some services, like
+ * {@link ModelXmlFactory} and {@link VersionParser}, use real implementations
+ * to ensure correct handling of Maven models and versions.</p>
+ *
+ * @see InternalSession
+ * @see LocalRepository
+ * @see ProjectManager
+ * @see ArtifactManager
+ * @since 4.0.0
  */
 public class SessionMock {
 
@@ -109,7 +159,7 @@ public class SessionMock {
             String id = iom.getArgument(0, String.class);
             String url = iom.getArgument(1, String.class);
             RemoteRepository remoteRepository =
-                    mock(RemoteRepository.class, withSettings().lenient());
+                    mock(RemoteRepository.class, withSettings().strictness(Strictness.LENIENT));
             when(remoteRepository.getId()).thenReturn(id);
             when(remoteRepository.getUrl()).thenReturn(url);
             when(remoteRepository.getProtocol()).thenReturn(URI.create(url).getScheme());
@@ -143,7 +193,7 @@ public class SessionMock {
                 .thenAnswer(iom -> {
                     LocalRepository localRepo = iom.getArgument(1, LocalRepository.class);
                     Artifact artifact = iom.getArgument(2, Artifact.class);
-                    return localRepo.getPath().resolve(getPathForArtifact(artifact, true));
+                    return localRepo.getPath().resolve(getPathForArtifact(artifact));
                 });
         when(session.getService(LocalRepositoryManager.class)).thenReturn(localRepositoryManager);
 
@@ -366,7 +416,8 @@ public class SessionMock {
         when(projectBuilder.build(any(ProjectBuilderRequest.class))).then(iom -> {
             ProjectBuilderRequest request = iom.getArgument(0, ProjectBuilderRequest.class);
             ProjectBuilderResult result = mock(ProjectBuilderResult.class);
-            Model model = new MavenStaxReader().read(request.getSource().get().openStream());
+            Model model =
+                    new MavenStaxReader().read(request.getSource().orElseThrow().openStream());
             ProjectStub projectStub = new ProjectStub();
             projectStub.setModel(model);
             ProducedArtifactStub artifactStub = new ProducedArtifactStub(
@@ -404,17 +455,17 @@ public class SessionMock {
         return session;
     }
 
-    static String getPathForArtifact(Artifact artifact, boolean local) {
+    static String getPathForArtifact(Artifact artifact) {
         StringBuilder path = new StringBuilder(128);
         path.append(artifact.getGroupId().replace('.', '/')).append('/');
         path.append(artifact.getArtifactId()).append('/');
         path.append(artifact.getVersion()).append('/');
         path.append(artifact.getArtifactId()).append('-');
         path.append(artifact.getVersion());
-        if (artifact.getClassifier().length() > 0) {
+        if (!artifact.getClassifier().isEmpty()) {
             path.append('-').append(artifact.getClassifier());
         }
-        if (artifact.getExtension().length() > 0) {
+        if (!artifact.getExtension().isEmpty()) {
             path.append('.').append(artifact.getExtension());
         }
         return path.toString();
@@ -424,24 +475,24 @@ public class SessionMock {
         private final Map<Key<?>, Object> map = new ConcurrentHashMap<>();
 
         @Override
-        public <T> void set(Key<T> key, T value) {
+        public <T> void set(@Nonnull Key<T> key, T value) {
             map.put(key, value);
         }
 
         @Override
-        public <T> boolean replace(Key<T> key, T oldValue, T newValue) {
+        public <T> boolean replace(@Nonnull Key<T> key, T oldValue, T newValue) {
             return map.replace(key, oldValue, newValue);
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <T> T get(Key<T> key) {
+        public <T> T get(@Nonnull Key<T> key) {
             return (T) map.get(key);
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <T> T computeIfAbsent(Key<T> key, Supplier<T> supplier) {
+        public <T> T computeIfAbsent(@Nonnull Key<T> key, @Nonnull Supplier<T> supplier) {
             return (T) map.computeIfAbsent(key, k -> supplier.get());
         }
     }
