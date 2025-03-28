@@ -45,31 +45,6 @@ class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase
         return "src/test/projects/project-dependencies-resolver";
     }
 
-    /*
-    @Test
-    public void testExclusionsInDependencies()
-        throws Exception
-    {
-        MavenSession session = createMavenSession( null );
-        MavenProject project = session.getCurrentProject();
-
-        Exclusion exclusion = new Exclusion();
-        exclusion.setGroupId( "org.apache.maven.its" );
-        exclusion.setArtifactId( "a" );
-
-        new ProjectBuilder( project ).addDependency( "org.apache.maven.its", "b", "0.1", Artifact.SCOPE_RUNTIME,
-                                                     exclusion );
-
-        Set<Artifact> artifactDependencies =
-            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session );
-        assertEquals( 0, artifactDependencies.size() );
-
-        artifactDependencies = resolver.resolve( project, Collections.singleton( Artifact.SCOPE_RUNTIME ), session );
-        assertEquals( 1, artifactDependencies.size() );
-        assertEquals( "b", artifactDependencies.iterator().next().getArtifactId() );
-    }
-    */
-
     @Test
     void testSystemScopeDependencies() throws Exception {
         MavenSession session = createMavenSession(null);

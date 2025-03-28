@@ -273,25 +273,6 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         assertActivation(true, profile, newContext(null, newOsProperties("windows", "6.5.0-1014-aws", "aarch64")));
     }
 
-    /*
-    @Test
-    void testOsFamily() {
-        Profile profile = newProfile(ActivationOS.newBuilder().family("windows"));
-
-        assertActivation(false, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
-        assertActivation(true, profile, newContext(null, newOsProperties("windows", "6.5.0-1014-aws", "aarch64")));
-    }
-
-    @Test
-    void testOsNegatedFamily() {
-        Profile profile = newProfile(ActivationOS.newBuilder().family("!windows"));
-
-        assertActivation(true, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
-        assertActivation(false, profile, newContext(null, newOsProperties("windows", "6.5.0-1014-aws", "aarch64")));
-    }
-
-     */
-
     @Test
     void testOsAllConditions() {
         Profile profile =

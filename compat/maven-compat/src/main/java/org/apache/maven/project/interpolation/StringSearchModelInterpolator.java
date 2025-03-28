@@ -273,11 +273,6 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
                 return false;
             }
 
-            //            if ( fieldType.isPrimitive() )
-            //            {
-            //                return false;
-            //            }
-
             return !"parent".equals(field.getName());
         }
 

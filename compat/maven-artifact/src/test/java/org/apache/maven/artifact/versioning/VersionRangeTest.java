@@ -721,12 +721,6 @@ class VersionRangeTest {
     }
 
     @Test
-    void testOrder0() {
-        // assertTrue( new DefaultArtifactVersion( "1.0-alpha10" ).compareTo( new DefaultArtifactVersion( "1.0-alpha1" )
-        // ) > 0 );
-    }
-
-    @Test
     void testCache() throws InvalidVersionSpecificationException {
         VersionRange range = VersionRange.createFromVersionSpec("[1.0,1.2]");
         assertSame(range, VersionRange.createFromVersionSpec("[1.0,1.2]")); // same instance from spec cache
