@@ -103,6 +103,10 @@ public class BuildStep {
         }
     }
 
+    public void executeBefore(BuildStep stepToExecuteAfter) {
+        stepToExecuteAfter.executeAfter(this);
+    }
+
     public Stream<MojoExecution> executions() {
         return mojos.values().stream().flatMap(m -> m.values().stream());
     }
