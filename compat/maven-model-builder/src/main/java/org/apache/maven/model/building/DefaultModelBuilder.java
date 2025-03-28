@@ -247,7 +247,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     @SuppressWarnings("checkstyle:methodlength")
     @Override
     public ModelBuildingResult build(ModelBuildingRequest request) throws ModelBuildingException {
-        return build(request, new LinkedHashSet<String>());
+        return build(request, new LinkedHashSet<>());
     }
 
     @SuppressWarnings("checkstyle:methodlength")
@@ -358,14 +358,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                 currentData.setVersion(null);
                 currentData = parentData;
             } else if (!parentIds.add(parentData.getId())) {
-                String message = "The parents form a cycle: ";
+                StringBuilder message = new StringBuilder("The parents form a cycle: ");
                 for (String modelId : parentIds) {
-                    message += modelId + " -> ";
+                    message.append(modelId);
+                    message.append(" -> ");
                 }
-                message += parentData.getId();
+                message.append(parentData.getId());
 
                 problems.add(new ModelProblemCollectorRequest(ModelProblem.Severity.FATAL, ModelProblem.Version.BASE)
-                        .setMessage(message));
+                        .setMessage(message.toString()));
 
                 throw problems.newModelBuildingException();
             } else {
@@ -431,7 +432,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private List<Profile> getInterpolatedProfiles(
             Model rawModel, DefaultProfileActivationContext context, DefaultModelProblemCollector problems) {
-        List<Profile> interpolatedActivations = getProfiles(rawModel, true);
+        List<Profile> interpolatedActivations = getProfiles(rawModel);
 
         if (interpolatedActivations.isEmpty()) {
             return Collections.emptyList();
@@ -496,7 +497,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     @Override
     public ModelBuildingResult build(ModelBuildingRequest request, ModelBuildingResult result)
             throws ModelBuildingException {
-        return build(request, result, new LinkedHashSet<String>());
+        return build(request, result, new LinkedHashSet());
     }
 
     private ModelBuildingResult build(
@@ -754,12 +755,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    private List<Profile> getProfiles(Model model, boolean clone) {
+    private List<Profile> getProfiles(Model model) {
         ArrayList<Profile> profiles = new ArrayList<>();
         for (Profile profile : model.getProfiles()) {
-            if (clone) {
-                profile = profile.clone();
-            }
+            profile = profile.clone();
             profiles.add(profile);
         }
         return profiles;
@@ -767,7 +766,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private Model interpolateModel(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         // save profile activations before interpolation, since they are evaluated with limited scope
-        List<Profile> originalProfiles = getProfiles(model, true);
+        List<Profile> originalProfiles = getProfiles(model);
 
         Model interpolatedModel =
                 modelInterpolator.interpolateModel(model, model.getProjectDirectory(), request, problems);
@@ -1166,12 +1165,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             String imported = groupId + ':' + artifactId + ':' + version;
 
             if (importIds.contains(imported)) {
-                String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+                StringBuilder message = new StringBuilder("The dependencies of type=pom and with scope=import form a cycle: ");
                 for (String modelId : importIds) {
-                    message += modelId + " -> ";
+                    message.append(modelId);
+                    message.append(" -> ");
                 }
-                message += imported;
-                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE).setMessage(message));
+                message.append(imported);
+                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE).setMessage(message.toString()));
 
                 continue;
             }
@@ -1288,8 +1288,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model model,
             ModelBuildingRequest request,
             ModelProblemCollector problems,
-            ModelBuildingEventCatapult catapult)
-            throws ModelBuildingException {
+            ModelBuildingEventCatapult catapult) {
         ModelBuildingListener listener = request.getModelBuildingListener();
 
         if (listener != null) {
