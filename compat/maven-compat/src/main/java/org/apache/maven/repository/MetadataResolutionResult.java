@@ -30,11 +30,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.CyclicDependencyException;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 
-/**
- *
- *
- *
- */
 @Deprecated
 public class MetadataResolutionResult {
     private Artifact originatingArtifact;
@@ -61,11 +56,7 @@ public class MetadataResolutionResult {
 
     private Set<Artifact> artifacts;
 
-    private MetadataGraph dirtyTree;
-
     private MetadataGraph resolvedTree;
-
-    private MetadataGraph resolvedGraph;
 
     public Artifact getOriginatingArtifact() {
         return originatingArtifact;

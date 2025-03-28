@@ -26,7 +26,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -464,7 +463,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         return dependencyResult.getDependencyNodeResults().stream()
                 .filter(n -> n.getArtifact().getPath() != null)
                 .map(n -> RepositoryUtils.toArtifact(n.getDependency()))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 
     private Map<String, ClassLoader> calcImports(
@@ -1023,29 +1022,5 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         DependencyResult root =
                 pluginDependenciesResolver.resolvePlugin(extensionPlugin, null, null, repositories, session);
         return toMavenArtifacts(root);
-    }
-
-    static class NamedImpl implements Named {
-        private final String value;
-
-        NamedImpl(String value) {
-            this.value = value;
-        }
-
-        public String value() {
-            return this.value;
-        }
-
-        public int hashCode() {
-            return 127 * "value".hashCode() ^ this.value.hashCode();
-        }
-
-        public boolean equals(Object o) {
-            return o instanceof Named named && this.value.equals(named.value());
-        }
-
-        public Class<? extends Annotation> annotationType() {
-            return Named.class;
-        }
     }
 }
