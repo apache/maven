@@ -66,6 +66,7 @@ import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.model.Mixin;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
@@ -851,12 +852,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        Model readParent(Model childModel, DefaultProfileActivationContext profileActivationContext) {
+        Model readParent(Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext) {
             Model parentModel;
 
-            Parent parent = childModel.getParent();
             if (parent != null) {
-                parentModel = resolveParent(childModel, profileActivationContext);
+                parentModel = resolveParent(childModel, parent, profileActivationContext);
 
                 if (!"pom".equals(parentModel.getPackaging())) {
                     add(
@@ -881,23 +881,26 @@ public class DefaultModelBuilder implements ModelBuilder {
             return parentModel;
         }
 
-        private Model resolveParent(Model childModel, DefaultProfileActivationContext profileActivationContext)
+        private Model resolveParent(
+                Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
             Model parentModel = null;
             if (isBuildRequest()) {
-                parentModel = readParentLocally(childModel, profileActivationContext);
+                parentModel = readParentLocally(childModel, parent, profileActivationContext);
             }
             if (parentModel == null) {
-                parentModel = resolveAndReadParentExternally(childModel, profileActivationContext);
+                parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext);
             }
             return parentModel;
         }
 
-        private Model readParentLocally(Model childModel, DefaultProfileActivationContext profileActivationContext)
+        private Model readParentLocally(
+                Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
             ModelSource candidateSource;
 
-            Parent parent = childModel.getParent();
+            boolean isParentOrSimpleMixin =
+                    !(parent instanceof Mixin mixin) || (mixin.getClassifier() == null && mixin.getExtension() == null);
             String parentPath = parent.getRelativePath();
             if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
                 if (parentPath != null && !parentPath.isEmpty()) {
@@ -906,14 +909,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                         wrongParentRelativePath(childModel);
                         return null;
                     }
-                } else {
+                } else if (isParentOrSimpleMixin) {
                     candidateSource =
                             resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
                     if (candidateSource == null && parentPath == null) {
                         candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, "..");
                     }
+                } else {
+                    candidateSource = null;
                 }
-            } else {
+            } else if (isParentOrSimpleMixin) {
                 candidateSource = resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
                 if (candidateSource == null) {
                     if (parentPath == null) {
@@ -923,6 +928,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                         candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
                     }
                 }
+            } else {
+                candidateSource = null;
             }
 
             if (candidateSource == null) {
@@ -938,11 +945,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             String version = getVersion(candidateModel);
 
             // Ensure that relative path and GA match, if both are provided
-            if (groupId == null
-                    || !groupId.equals(parent.getGroupId())
-                    || artifactId == null
-                    || !artifactId.equals(parent.getArtifactId())) {
-                mismatchRelativePathAndGA(childModel, groupId, artifactId);
+            if (parent.getGroupId() != null && (groupId == null || !groupId.equals(parent.getGroupId()))
+                    || parent.getArtifactId() != null
+                            && (artifactId == null || !artifactId.equals(parent.getArtifactId()))) {
+                mismatchRelativePathAndGA(childModel, parent, groupId, artifactId);
                 return null;
             }
 
@@ -981,8 +987,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return candidateModel;
         }
 
-        private void mismatchRelativePathAndGA(Model childModel, String groupId, String artifactId) {
-            Parent parent = childModel.getParent();
+        private void mismatchRelativePathAndGA(Model childModel, Parent parent, String groupId, String artifactId) {
             StringBuilder buffer = new StringBuilder(256);
             buffer.append("'parent.relativePath'");
             if (childModel != getRootModel()) {
@@ -1013,16 +1018,17 @@ public class DefaultModelBuilder implements ModelBuilder {
             add(Severity.FATAL, Version.BASE, buffer.toString(), parent.getLocation(""));
         }
 
-        Model resolveAndReadParentExternally(Model childModel, DefaultProfileActivationContext profileActivationContext)
+        Model resolveAndReadParentExternally(
+                Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
             ModelBuilderRequest request = this.request;
             setSource(childModel);
 
-            Parent parent = childModel.getParent();
-
             String groupId = parent.getGroupId();
             String artifactId = parent.getArtifactId();
             String version = parent.getVersion();
+            String classifier = parent instanceof Mixin mixin ? mixin.getClassifier() : null;
+            String extension = parent instanceof Mixin mixin ? mixin.getExtension() : null;
 
             // add repositories specified by the current model so that we can resolve the parent
             if (!childModel.getRepositories().isEmpty()) {
@@ -1040,12 +1046,23 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             ModelSource modelSource;
             try {
-                modelSource = resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
+                modelSource = classifier == null && extension == null
+                        ? resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion())
+                        : null;
                 if (modelSource == null) {
-                    AtomicReference<Parent> modified = new AtomicReference<>();
-                    modelSource = modelResolver.resolveModel(request.getSession(), repositories, parent, modified);
-                    if (modified.get() != null) {
-                        parent = modified.get();
+                    ModelResolver.ModelResolverRequest req = new ModelResolver.ModelResolverRequest(
+                            request.getSession(),
+                            null,
+                            repositories,
+                            parent.getGroupId(),
+                            parent.getArtifactId(),
+                            parent.getVersion(),
+                            classifier,
+                            extension != null ? extension : "pom");
+                    ModelResolver.ModelResolverResult result = modelResolver.resolveModel(req);
+                    modelSource = result.source();
+                    if (result.version() != null) {
+                        parent = parent.withVersion(result.version());
                     }
                 }
             } catch (ModelResolverException e) {
@@ -1161,7 +1178,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationContext.setUserProperties(profileProps);
             }
 
-            Model parentModel = readParent(activatedFileModel, profileActivationContext);
+            Model parentModel =
+                    readParent(activatedFileModel, activatedFileModel.getParent(), profileActivationContext);
 
             // Now that we have read the parent, we can set the relative
             // path correctly if it was not set in the input model
@@ -1182,6 +1200,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
+
+            // Mixins
+            for (Mixin mixin : model.getMixins()) {
+                Model parent = resolveParent(model, mixin, profileActivationContext);
+                model = inheritanceAssembler.assembleModelInheritance(model, parent, request, this);
+            }
 
             // model normalization
             model = modelNormalizer.mergeDuplicates(model, request, this);
@@ -1367,7 +1391,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                         .version(parentVersion)
                                         .build());
                             } else {
-                                mismatchRelativePathAndGA(model, parentGroupId, parentArtifactId);
+                                mismatchRelativePathAndGA(model, parent, parentGroupId, parentArtifactId);
                             }
                         } else {
                             if (!MODEL_VERSION_4_0_0.equals(model.getModelVersion()) && path != null) {
@@ -1555,7 +1579,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         private Model doReadAsParentModel(DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
             Model raw = readRawModel();
-            Model parentData = readParent(raw, profileActivationContext);
+            Model parentData = readParent(raw, raw.getParent(), profileActivationContext);
             Model parent = new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
                         @Override
                         protected void mergeModel_Modules(

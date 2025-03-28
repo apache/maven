@@ -357,6 +357,11 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
 
+        for (Parent mixin : m.getMixins()) {
+            // TODO: validate mixin
+            mixin.getId();
+        }
+
         if (validationLevel == ModelValidator.VALIDATION_LEVEL_MINIMAL) {
             // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
             HashSet<String> minProfileIds = new HashSet<>();
