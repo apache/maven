@@ -65,23 +65,25 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param source a source element from the model
      */
     public DefaultSourceRoot(final Session session, final Path baseDir, final Source source) {
-        String value = nonBlank(source.getDirectory());
-        if (value == null) {
-            throw new IllegalArgumentException("Source declaration without directory value.");
-        }
-        directory = baseDir.resolve(value);
-        FileSystem fs = directory.getFileSystem();
+        FileSystem fs = baseDir.getFileSystem();
         includes = matchers(fs, source.getIncludes());
         excludes = matchers(fs, source.getExcludes());
         stringFiltering = source.isStringFiltering();
         enabled = source.isEnabled();
         moduleName = nonBlank(source.getModule());
 
-        value = nonBlank(source.getScope());
+        String value = nonBlank(source.getScope());
         scope = (value != null) ? session.requireProjectScope(value) : ProjectScope.MAIN;
 
         value = nonBlank(source.getLang());
         language = (value != null) ? session.requireLanguage(value) : Language.JAVA_FAMILY;
+
+        value = nonBlank(source.getDirectory());
+        if (value != null) {
+            directory = baseDir.resolve(value);
+        } else {
+            directory = baseDir.resolve("src").resolve(scope.id()).resolve(language.id());
+        }
 
         value = nonBlank(source.getTargetVersion());
         targetVersion = (value != null) ? session.parseVersion(value) : null;

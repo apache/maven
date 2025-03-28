@@ -49,7 +49,7 @@ plugins/artifacts from test repos so use of these settings should be the excepti
             <enabled>true</enabled>
           </releases>
           <snapshots>
-            <enabled>true</enabled>
+            <enabled>false</enabled>
           </snapshots>
         </repository>
       </repositories>
@@ -62,7 +62,7 @@ plugins/artifacts from test repos so use of these settings should be the excepti
             <enabled>true</enabled>
           </releases>
           <snapshots>
-            <enabled>true</enabled>
+            <enabled>false</enabled>
           </snapshots>
         </pluginRepository>
       </pluginRepositories>

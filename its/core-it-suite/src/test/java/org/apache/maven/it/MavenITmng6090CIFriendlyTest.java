@@ -56,7 +56,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
         verifier.addCliArgument("-Drevision=1.2");
         verifier.addCliArgument("-Dmaven.consumer.pom=false");
         verifier.setLogFileName("install-log.txt");
-        verifier.addCliArguments("clean", "install");
+        verifier.addCliArguments("clean", "package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -82,7 +82,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
         verifier.addCliArgument("-Drevision=1.2");
         verifier.addCliArgument("-Dmaven.consumer.pom=true");
         verifier.setLogFileName("install-log.txt");
-        verifier.addCliArguments("clean", "install");
+        verifier.addCliArguments("clean", "package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

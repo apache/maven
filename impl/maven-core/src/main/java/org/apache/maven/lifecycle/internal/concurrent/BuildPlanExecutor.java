@@ -400,12 +400,14 @@ public class BuildPlanExecutor {
                     // Planning steps should be executed out of normal execution
                     throw new IllegalStateException();
                 case SETUP:
+                    attachToThread(step);
                     consumerPomArtifactTransformer.injectTransformedArtifacts(
                             session.getRepositorySession(), step.project);
                     projectExecutionListener.beforeProjectExecution(new ProjectExecutionEvent(session, step.project));
                     eventCatapult.fire(ExecutionEvent.Type.ProjectStarted, session, null);
                     break;
                 case TEARDOWN:
+                    attachToThread(step);
                     projectExecutionListener.afterProjectExecutionSuccess(
                             new ProjectExecutionEvent(session, step.project, Collections.emptyList()));
                     reactorContext
@@ -416,8 +418,7 @@ public class BuildPlanExecutor {
                 default:
                     List<MojoExecution> executions = step.executions().collect(Collectors.toList());
                     if (!executions.isEmpty()) {
-                        attachToThread(step.project);
-                        session.setCurrentProject(step.project);
+                        attachToThread(step);
                         clock.start();
                         executions.forEach(mojoExecution -> {
                             mojoExecutionConfigurator(mojoExecution).configure(step.project, mojoExecution, true);
@@ -429,6 +430,11 @@ public class BuildPlanExecutor {
                     break;
             }
             step.status.compareAndSet(SCHEDULED, EXECUTED);
+        }
+
+        private void attachToThread(BuildStep step) {
+            BuildPlanExecutor.attachToThread(step.project);
+            session.setCurrentProject(step.project);
         }
 
         private Clock getClock(Object key) {
