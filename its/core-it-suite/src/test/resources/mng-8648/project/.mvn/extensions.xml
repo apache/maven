@@ -1,0 +1,7 @@
+<extensions>
+    <extension>
+        <groupId>org.apache.maven.its.mng8648</groupId>
+        <artifactId>mng-8648-project-listener-extension</artifactId>
+        <version>1.0</version>
+    </extension>
+</extensions>
