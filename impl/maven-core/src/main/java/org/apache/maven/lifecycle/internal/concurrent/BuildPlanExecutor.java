@@ -254,6 +254,7 @@ public class BuildPlanExecutor {
                 pplan.status.set(PLANNING); // the plan step always need planning
                 BuildStep setup = new BuildStep(SETUP, project, null);
                 BuildStep teardown = new BuildStep(TEARDOWN, project, null);
+                teardown.executeAfter(setup);
                 setup.executeAfter(pplan);
                 plan.steps(project).forEach(step -> {
                     if (step.predecessors.isEmpty()) {
