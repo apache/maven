@@ -48,11 +48,6 @@ class DefaultSettingsBuilderFactoryTest {
 
     @BeforeEach
     void setup() {
-        //        Map<String, String> map = System.getProperties().entrySet().stream()
-        //                .collect(Collectors.toMap(
-        //                        e -> e.getKey().toString(), e -> e.getValue().toString()));
-        //        lenient().when(session.getSystemProperties()).thenReturn(map);
-        //        lenient().when(session.getUserProperties()).thenReturn(Collections.emptyMap());
         Mockito.lenient()
                 .when(session.getService(SettingsXmlFactory.class))
                 .thenReturn(new DefaultSettingsXmlFactory());

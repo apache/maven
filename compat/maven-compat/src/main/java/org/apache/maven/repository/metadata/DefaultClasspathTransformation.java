@@ -101,27 +101,6 @@ public class DefaultClasspathTransformation implements ClasspathTransformation {
             }
 
             cpc.add(md);
-            //
-            //            TreeSet<MetadataGraphEdge> deps = new TreeSet<MetadataGraphEdge>(
-            //                        new Comparator<MetadataGraphEdge>()
-            //                        {
-            //                            public int compare( MetadataGraphEdge e1
-            //                                              , MetadataGraphEdge e2
-            //                                              )
-            //                            {
-            //                                if( e1.getDepth() == e2.getDepth() )
-            //                                {
-            //                                    if( e2.getPomOrder() == e1.getPomOrder() )
-            //                                        return
-            // e1.getTarget().toString().compareTo(e2.getTarget().toString() );
-            //
-            //                                    return e2.getPomOrder() - e1.getPomOrder();
-            //                                }
-            //
-            //                                return e2.getDepth() - e1.getDepth();
-            //                            }
-            //                        }
-            //                    );
 
             List<MetadataGraphEdge> exits = graph.getExcidentEdges(node);
 

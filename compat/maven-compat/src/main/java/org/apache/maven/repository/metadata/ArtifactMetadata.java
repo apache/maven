@@ -169,27 +169,7 @@ public class ArtifactMetadata {
                 error);
     }
 
-    public ArtifactMetadata(Artifact af) {
-        /*
-        if ( af != null )
-        {
-            init( af );
-        }
-        */
-    }
-    // ------------------------------------------------------------------
-    //    public void init( ArtifactMetadata af )
-    //    {
-    //        setGroupId( af.getGroupId() );
-    //        setArtifactId( af.getArtifactId() );
-    //        setVersion( af.getVersion() );
-    //        setType( af.getType() );
-    //        setScope( af.getScope() );
-    //        setClassifier( af.getClassifier() );
-    //        //setUri( af.getDownloadUrl() );
-    //
-    //        this.resolved = af.isResolved();
-    //    }
+    public ArtifactMetadata(Artifact af) {}
 
     @Override
     public String toString() {

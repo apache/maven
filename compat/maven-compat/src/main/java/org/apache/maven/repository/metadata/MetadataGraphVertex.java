@@ -168,11 +168,5 @@ public class MetadataGraphVertex implements Comparable<MetadataGraphVertex> {
         }
 
         return hashString.toString().hashCode();
-
-        // BASE64Encoder b64 = new BASE64Encoder();
-        // return b64.encode( hashString.toString().getBytes() ).hashCode();
     }
-
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
 }

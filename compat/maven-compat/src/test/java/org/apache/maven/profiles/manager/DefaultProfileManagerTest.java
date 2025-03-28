@@ -30,7 +30,6 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -199,36 +198,5 @@ class DefaultProfileManagerTest {
 
         assertNotNull(active);
         assertEquals(0, active.size());
-    }
-
-    @Test
-    @Disabled
-    void testOsActivationProfile() throws Exception {
-        /*
-        Profile osActivated = new Profile();
-        osActivated.setId( "os-profile" );
-
-        Activation osActivation = new Activation();
-
-        ActivationOS activationOS = new ActivationOS();
-
-        activationOS.setName( "!dddd" );
-
-        osActivation.setOs( activationOS );
-
-        osActivated.setActivation( osActivation );
-
-        Properties props = System.getProperties();
-        ProfileActivationContext ctx = new ProfileActivationContext( props, false );
-
-        ProfileManager profileManager = new DefaultProfileManager( getContainer(), props );
-
-        profileManager.addProfile( osActivated );
-
-        List active = profileManager.getActiveProfiles( null );
-
-        assertNotNull( active );
-        assertEquals( 1, active.size() );
-        */
     }
 }

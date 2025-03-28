@@ -243,38 +243,6 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         return name.substring(name.lastIndexOf(".") + 1);
     }
 
-    // /**
-    // * For formatted messages, first substitute arguments and then log.
-    // *
-    // * @param level
-    // * @param format
-    // * @param arg1
-    // * @param arg2
-    // */
-    // private void formatAndLog(int level, String format, Object arg1, Object arg2) {
-    // if (!isLevelEnabled(level)) {
-    // return;
-    // }
-    // FormattingTuple tp = MessageFormatter.format(format, arg1, arg2);
-    // log(level, tp.getMessage(), tp.getThrowable());
-    // }
-
-    // /**
-    // * For formatted messages, first substitute arguments and then log.
-    // *
-    // * @param level
-    // * @param format
-    // * @param arguments
-    // * a list of 3 ore more arguments
-    // */
-    // private void formatAndLog(int level, String format, Object... arguments) {
-    // if (!isLevelEnabled(level)) {
-    // return;
-    // }
-    // FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-    // log(level, tp.getMessage(), tp.getThrowable());
-    // }
-
     /**
      * Is the given log level currently enabled?
      *

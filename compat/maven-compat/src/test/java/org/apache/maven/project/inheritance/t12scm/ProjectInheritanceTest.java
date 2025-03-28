@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Verifies SCM inheritance uses modules statement from parent.
- *
  */
 @Deprecated
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
@@ -55,18 +54,6 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project0 = getProject(pom0);
         MavenProject project1 = getProject(pom1);
 
-        System.out.println("\n\n");
-        System.out.println("Parent SCM URL is: " + project0.getScm().getUrl());
-        System.out.println("Child SCM URL is: " + project1.getScm().getUrl());
-        System.out.println();
-        System.out.println("Parent SCM connection is: " + project0.getScm().getConnection());
-        System.out.println("Child SCM connection is: " + project1.getScm().getConnection());
-        System.out.println();
-        System.out.println(
-                "Parent SCM developer connection is: " + project0.getScm().getDeveloperConnection());
-        System.out.println(
-                "Child SCM developer connection is: " + project1.getScm().getDeveloperConnection());
-
         assertEquals(project1.getScm().getUrl(), project0.getScm().getUrl() + "/modules/p1");
         assertEquals(project1.getScm().getConnection(), project0.getScm().getConnection() + "/modules/p1");
         assertEquals(
@@ -82,42 +69,8 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         // load the child project, which inherits from p0...
         MavenProject project1 = getProject(pom1);
 
-        System.out.println("\n\n");
-        System.out.println("Child SCM URL is: " + project1.getScm().getUrl());
-        System.out.println("Child SCM connection is: " + project1.getScm().getConnection());
-        System.out.println(
-                "Child SCM developer connection is: " + project1.getScm().getDeveloperConnection());
-
         assertEquals("http://host/viewer?path=/p0/modules/p1", project1.getScm().getUrl());
         assertEquals("scm:svn:http://host/p0/modules/p1", project1.getScm().getConnection());
         assertEquals("scm:svn:https://host/p0/modules/p1", project1.getScm().getDeveloperConnection());
     }
-
-    //    public void testScmInfoCalculatedCorrectlyOnChildReadFromLocalRepository()
-    //        throws Exception
-    //    {
-    //        File localRepo = getLocalRepositoryPath();
-    //
-    //        ArtifactFactory factory = (ArtifactFactory) lookup( ArtifactFactory.class );
-    //        Artifact artifact = factory.createProjectArtifact( "maven", "p1", "1.0" );
-    //
-    //        ArtifactRepositoryFactory repoFactory = (ArtifactRepositoryFactory) lookup(
-    // ArtifactRepositoryFactory.class );
-    //        ArtifactRepository localArtifactRepo = repoFactory.createLocalRepository( localRepo );
-    //
-    //        MavenProject project1 = getProjectBuilder().buildFromRepository( artifact, Collections.EMPTY_LIST,
-    // localArtifactRepo );
-    //
-    //        System.out.println( "\n\n" );
-    //        System.out.println( "Child SCM URL is: " + project1.getScm().getUrl() );
-    //        System.out.println( "Child SCM connection is: " + project1.getScm().getConnection() );
-    //        System.out.println( "Child SCM developer connection is: "
-    //                            + project1.getScm().getDeveloperConnection() );
-    //
-    //        assertEquals( project1.getScm().getUrl(), "http://host/viewer?path=/p0/modules/p1" );
-    //        assertEquals( project1.getScm().getConnection(), "scm:svn:http://host/p0/modules/p1" );
-    //        assertEquals( project1.getScm().getDeveloperConnection(),
-    //                      "scm:svn:https://host/p0/modules/p1" );
-    //    }
-
 }
