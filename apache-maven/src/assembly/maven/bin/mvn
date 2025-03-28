@@ -169,11 +169,10 @@ find_file_argument_basedir() {
 concat_lines() {
   if [ -f "$1" ]; then
     # First transform line endings to spaces
-    content=`tr -s '\r\n' '  ' < "$1"`
-    # Then do variable substitution on the single line
-    content=${content//\$\{MAVEN_PROJECTBASEDIR\}/$MAVEN_PROJECTBASEDIR}
-    content=${content//\$MAVEN_PROJECTBASEDIR/$MAVEN_PROJECTBASEDIR}
-    echo "$content"
+    content=$(tr -s '\r\n' ' ' < "$1")
+    # Handle both ${var} and $var formats, only substitute MAVEN_PROJECTBASEDIR
+    echo "$content" | sed -e "s|\${MAVEN_PROJECTBASEDIR}|$MAVEN_PROJECTBASEDIR|g" \
+                         -e "s|\$MAVEN_PROJECTBASEDIR|$MAVEN_PROJECTBASEDIR|g"
   fi
 }
 
