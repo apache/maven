@@ -168,13 +168,12 @@ find_file_argument_basedir() {
 # concatenates all lines of a file and replaces variables
 concat_lines() {
   if [ -f "$1" ]; then
-    # First replace variables in the content
-    while IFS= read -r line || [ -n "$line" ]; do
-      # Replace both ${MAVEN_PROJECTBASEDIR} and $MAVEN_PROJECTBASEDIR with actual value
-      line=${line//\$\{MAVEN_PROJECTBASEDIR\}/$MAVEN_PROJECTBASEDIR}
-      line=${line//\$MAVEN_PROJECTBASEDIR/$MAVEN_PROJECTBASEDIR}
-      echo "$line"
-    done < "$1" | tr -s '\r\n' '  '
+    # First transform line endings to spaces
+    content=`tr -s '\r\n' '  ' < "$1"`
+    # Then do variable substitution on the single line
+    content=${content//\$\{MAVEN_PROJECTBASEDIR\}/$MAVEN_PROJECTBASEDIR}
+    content=${content//\$MAVEN_PROJECTBASEDIR/$MAVEN_PROJECTBASEDIR}
+    echo "$content"
   fi
 }
 
