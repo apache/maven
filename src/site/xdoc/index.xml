@@ -39,6 +39,8 @@ under the License.
     number of other development tools for reporting or the build
     process.</p>
 
+      <p>Learn more about <a href="configuring.html">configuring Maven</a> and <a href="maven-configuration.html">Maven's configuration</a>.</p>
+
       <p>
         <object data="images/maven-deps.svg" width="968" height="605"></object>
       </p>
