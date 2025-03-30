@@ -23,7 +23,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 
 /**
  * Listens to the resolution process and handles events.
- *
  */
 @Deprecated
 public interface ResolutionListener {
@@ -77,12 +76,7 @@ public interface ResolutionListener {
     @Deprecated
     void manageArtifact(Artifact artifact, Artifact replacement);
 
-    // TODO Use the following two instead of manageArtifact
     // TODO Remove ResolutionListenerDM interface
-
-    // void manageArtifactVersion( Artifact artifact, Artifact replacement );
-
-    // void manageArtifactScope( Artifact artifact, Artifact replacement );
 
     void omitForCycle(Artifact artifact);
 

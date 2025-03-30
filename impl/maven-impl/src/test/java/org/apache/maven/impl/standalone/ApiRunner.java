@@ -330,15 +330,6 @@ public class ApiRunner {
         // TODO: remove that when this go more public
         properties.put("user.home", "target");
 
-        // SettingsDecrypter settingsDecrypter =
-        // (SettingsDecrypter)Objects.requireNonNull(this.createSettingsDecrypter(preBoot));
-        //        new DefaultProfileSelector(List.of(
-        //                new JdkVersionProfileActivator(),
-        //                new PropertyProfileActivator(),
-        //                new OperatingSystemProfileActivator(),
-        //                new FileProfileActivator(new ProfileActivationFilePathInterpolator(
-        //                        new DefaultPathTranslator(), new DefaultRootLocator()))));
-
         Path userHome = Paths.get(properties.get("user.home"));
         Path mavenUserHome = userHome.resolve(".m2");
         Path mavenSystemHome = properties.containsKey("maven.home")

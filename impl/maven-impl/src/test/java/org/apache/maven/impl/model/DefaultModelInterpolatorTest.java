@@ -244,21 +244,6 @@ class DefaultModelInterpolatorTest {
                         Dependency.newBuilder().version("${something}").build()))
                 .build();
 
-        /*
-        // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
-        // timing of executing the interpolation
-
-        try
-        {
-        new RegexBasedModelInterpolator().interpolate( model, context );
-        fail( "Should have failed to interpolate with invalid reference" );
-        }
-        catch ( ModelInterpolationException expected )
-        {
-        assertTrue( true );
-        }
-        */
-
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel(
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);

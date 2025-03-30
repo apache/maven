@@ -86,14 +86,6 @@ public class BuildPlanLogger {
                                             .map(n -> phase(project, n, plan.duplicateIds()))
                                             .collect(Collectors.joining(", ")));
                         }
-                        /*
-                        if (!node.successors.isEmpty()) {
-                            writer.accept("\tSuccessors:    "
-                                    + node.successors.stream()
-                                            .map(n -> phase(currentProject, n, duplicateIds))
-                                            .collect(Collectors.joining(", ")));
-                        }
-                        */
                         step.mojos.values().stream()
                                 .flatMap(m -> m.values().stream())
                                 .forEach(mojo -> mojo(writer, mojo));
