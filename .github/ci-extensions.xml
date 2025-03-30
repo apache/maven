@@ -21,6 +21,6 @@ under the License.
   <extension>
     <groupId>eu.maveniverse.maven.mimir</groupId>
     <artifactId>extension</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
   </extension>
 </extensions>
