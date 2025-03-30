@@ -134,7 +134,7 @@ public class VersionTest extends AbstractVersionTest {
     }
 
     @Test
-    void testTransitionFromDigitToLetterAndViceVersaIsEqualivantToDelimiter() {
+    void testTransitionFromDigitToLetterAndViceVersaIsEquivalentToDelimiter() {
         assertOrder(AbstractVersionTest.X_EQ_Y, "1alpha10", "1.alpha.10");
         assertOrder(AbstractVersionTest.X_EQ_Y, "1alpha10", "1-alpha-10");
 
