@@ -215,15 +215,14 @@ class DefaultInterpolatorTest {
             Map<String, String> configProps,
             UnaryOperator<String> callback,
             boolean defaultsToEmptyString) {
-        return new DefaultInterpolator()
-                .substVars(val, currentKey, null, configProps, callback, null, defaultsToEmptyString);
+        return DefaultInterpolator.substVars(val, currentKey, null, configProps, callback, null, defaultsToEmptyString);
     }
 
     private String substVars(String val, String currentKey) {
-        return new DefaultInterpolator().substVars(val, currentKey, null, null, null, null, true);
+        return DefaultInterpolator.substVars(val, currentKey, null, null, null, null, true);
     }
 
     private String substVars(String val, String currentKey, Map<String, String> configProps) {
-        return new DefaultInterpolator().substVars(val, currentKey, null, configProps);
+        return DefaultInterpolator.substVars(val, currentKey, null, configProps);
     }
 }

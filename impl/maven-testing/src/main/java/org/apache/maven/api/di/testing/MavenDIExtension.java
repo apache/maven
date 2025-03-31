@@ -77,7 +77,7 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      * @param context The extension context to store
      */
     protected void setContext(ExtensionContext context) {
-        this.context = context;
+        MavenDIExtension.context = context;
     }
 
     /**
@@ -90,10 +90,10 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
     protected void setupContainer() {
         try {
             injector = Injector.create();
-            injector.bindInstance(ExtensionContext.class, this.context);
-            injector.discover(this.context.getRequiredTestClass().getClassLoader());
+            injector.bindInstance(ExtensionContext.class, context);
+            injector.discover(context.getRequiredTestClass().getClassLoader());
             injector.bindInstance(Injector.class, injector);
-            injector.bindInstance((Class) this.context.getRequiredTestClass(), this.context.getRequiredTestInstance());
+            injector.bindInstance((Class) context.getRequiredTestClass(), context.getRequiredTestInstance());
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to create DI injector.", e);
         }
