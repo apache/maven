@@ -43,7 +43,8 @@ class MavenITmng3558PropertyEscapingTest extends AbstractMavenIntegrationTestCas
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.addCliArgument("validate");
+        verifier.addCliArgument("resources");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:config");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
