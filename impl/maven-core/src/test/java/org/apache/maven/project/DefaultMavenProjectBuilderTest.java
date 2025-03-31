@@ -149,11 +149,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertFalse(project.isExecutionRoot());
     }
 
-    @Override
-    protected ArtifactRepository getLocalRepository() throws Exception {
-        return repositorySystem.createLocalRepository(getLocalRepositoryPath());
-    }
-
     @Test
     void testPartialResultUponBadDependencyDeclaration() throws Exception {
         File pomFile = getTestFile("src/test/resources/projects/bad-dependency.xml");

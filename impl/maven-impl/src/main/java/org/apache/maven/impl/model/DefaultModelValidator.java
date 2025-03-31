@@ -128,12 +128,6 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         @Override
-        protected Activation.Builder transformActivation_ActiveByDefault(
-                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
-            return builder;
-        }
-
-        @Override
         protected Activation.Builder transformActivation_File(
                 Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
             stk.push(nextFrame("file", Activation::getFile));
