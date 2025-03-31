@@ -43,8 +43,7 @@ class MavenITmng3558PropertyEscapingTest extends AbstractMavenIntegrationTestCas
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.addCliArgument("resources");
-        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:config");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -56,8 +55,8 @@ class MavenITmng3558PropertyEscapingTest extends AbstractMavenIntegrationTestCas
 
         // Verify plugin configuration
         Properties configProps = verifier.loadProperties("target/config-values.properties");
-        assertEquals("${test.value}", configProps.getProperty("param"));
-        assertEquals("prefix-${test.value}-suffix", configProps.getProperty("paramWithContext"));
-        assertEquals("interpolated-value", configProps.getProperty("normalParam"));
+        assertEquals("${test.value}", configProps.getProperty("mapParam.param"));
+        assertEquals("prefix-${test.value}-suffix", configProps.getProperty("mapParam.paramWithContext"));
+        assertEquals("interpolated-value", configProps.getProperty("mapParam.normalParam"));
     }
 }
