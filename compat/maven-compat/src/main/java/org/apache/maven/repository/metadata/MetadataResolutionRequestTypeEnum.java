@@ -31,7 +31,7 @@ public enum MetadataResolutionRequestTypeEnum {
     versionedGraph(6),
     scopedGraph(7);
 
-    private int id;
+    private final int id;
 
     // Constructor
     MetadataResolutionRequestTypeEnum(int id) {

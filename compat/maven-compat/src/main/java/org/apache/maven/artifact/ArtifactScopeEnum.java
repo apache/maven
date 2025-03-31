@@ -35,7 +35,7 @@ public enum ArtifactScopeEnum {
 
     public static final ArtifactScopeEnum DEFAULT_SCOPE = compile;
 
-    private int id;
+    private final int id;
 
     // Constructor
     ArtifactScopeEnum(int id) {
