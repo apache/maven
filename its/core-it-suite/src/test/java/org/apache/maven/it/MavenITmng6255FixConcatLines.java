@@ -22,6 +22,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,8 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Check that the <code>.mvn/jvm.config</code> file contents are concatenated properly, no matter
  * what line endings are used.
  */
-public class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6255FixConcatLines() {
+class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
+    MavenITmng6255FixConcatLines() {
         super("[3.5.3,)");
     }
 
@@ -43,7 +44,9 @@ public class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCa
      *
      * @throws Exception in case of failure
      */
-    public void disabledJvmConfigFileCR() throws Exception {
+    @Test
+    @Disabled
+    void testJvmConfigFileCR() throws Exception {
         runWithLineEndings("\r");
     }
 
@@ -53,7 +56,7 @@ public class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCa
      * @throws Exception in case of failure
      */
     @Test
-    public void testJvmConfigFileLF() throws Exception {
+    void testJvmConfigFileLF() throws Exception {
         runWithLineEndings("\n");
     }
 
@@ -63,7 +66,7 @@ public class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCa
      * @throws Exception in case of failure
      */
     @Test
-    public void testJvmConfigFileCRLF() throws Exception {
+    void testJvmConfigFileCRLF() throws Exception {
         runWithLineEndings("\r\n");
     }
 
