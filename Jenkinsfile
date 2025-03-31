@@ -67,6 +67,7 @@ def mavenBuild(jdk, extraArgs) {
       withEnv(["JAVA_HOME=${tool "$jdk"}",
                "PATH+MAVEN=${ tool "$jdk" }/bin:${tool "maven_3_latest"}/bin",
                "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
+        sh "cp .github/ci-extensions.xml .mvn/extensions.xml"
         sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=3.9.9"
         sh "./mvnw clean install -B -U -e -DskipTests -PversionlessMavenDist -V -DdistributionTargetDir=${env.WORKSPACE}/.apache-maven-master"
         // we use two steps so that we can cache artifacts downloaded from Maven Central repository
