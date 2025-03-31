@@ -101,6 +101,7 @@ public class TestSuiteOrdering implements ClassOrderer {
          * the tests are to finishing. Newer tests are also more likely to fail, so this is
          * a fail fast technique as well.
          */
+        suite.addTestSuite(MavenITmng3558PropertyEscapingTest.class);
         suite.addTestSuite(MavenITmng8598JvmConfigSubstitutionTest.class);
         suite.addTestSuite(MavenITmng8653AfterAndEachPhasesWithConcurrentBuilderTest.class);
         suite.addTestSuite(MavenITmng5668AfterPhaseExecutionTest.class);
