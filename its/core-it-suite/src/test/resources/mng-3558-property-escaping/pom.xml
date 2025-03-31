@@ -32,8 +32,8 @@ under the License.
     <test.value>interpolated-value</test.value>
 
     <!-- Escaped properties -->
-    <escaped.property>\${test.value}</escaped.property>
-    <escaped.with.context>prefix-\${test.value}-suffix</escaped.with.context>
+    <escaped.property>$\{test.value\}</escaped.property>
+    <escaped.with.context>prefix-$\{test.value\}-suffix</escaped.with.context>
 
     <!-- Regular interpolation for comparison -->
     <normal.property>${test.value}</normal.property>
@@ -68,8 +68,8 @@ under the License.
         <configuration>
           <propertiesFile>target/config-values.properties</propertiesFile>
           <params>
-            <param>\${test.value}</param>
-            <paramWithContext>prefix-\${test.value}-suffix</paramWithContext>
+            <param>$\{test.value\}</param>
+            <paramWithContext>prefix-$\{test.value\}-suffix</paramWithContext>
             <normalParam>${test.value}</normalParam>
           </params>
         </configuration>
