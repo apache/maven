@@ -98,6 +98,8 @@ public abstract class MavenInvokerTestSupport {
         Files.createDirectories(appJava.getParent());
         Files.writeString(appJava, APP_JAVA_STRING);
 
+        MimirInfuser.infuse(userHome);
+
         HashMap<String, String> logs = new HashMap<>();
         Parser parser = createParser();
         try (ClassWorld classWorld = createClassWorld();
