@@ -67,21 +67,17 @@ public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
     public PluginDescriptor get(Key key, PluginDescriptorSupplier supplier)
             throws PluginDescriptorParsingException, PluginResolutionException, InvalidPluginDescriptorException {
 
-        try {
-            PluginDescriptor desc = descriptors.get(key);
-            if (desc == null) {
-                synchronized (key) {
-                    desc = descriptors.get(key);
-                    if (desc == null) {
-                        desc = supplier.load();
-                        descriptors.putIfAbsent(key, clone(desc));
-                    }
+        PluginDescriptor desc = descriptors.get(key);
+        if (desc == null) {
+            synchronized (key) {
+                desc = descriptors.get(key);
+                if (desc == null) {
+                    desc = supplier.load();
+                    descriptors.putIfAbsent(key, clone(desc));
                 }
             }
-            return clone(desc);
-        } catch (PluginDescriptorParsingException | PluginResolutionException | InvalidPluginDescriptorException e) {
-            throw e;
         }
+        return clone(desc);
     }
 
     public void put(Key cacheKey, PluginDescriptor pluginDescriptor) {
