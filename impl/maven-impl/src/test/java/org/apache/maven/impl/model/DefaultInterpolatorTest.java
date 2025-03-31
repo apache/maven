@@ -223,6 +223,6 @@ class DefaultInterpolatorTest {
     }
 
     private String substVars(String val, String currentKey, Map<String, String> configProps) {
-        return DefaultInterpolator.substVars(val, currentKey, null, configProps);
+        return new DefaultInterpolator().substVars(val, currentKey, null, configProps);
     }
 }
