@@ -43,7 +43,6 @@ import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -346,7 +345,9 @@ public class MavenProject implements Cloneable {
      * @since 4.0.0
      */
     public void addSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull Path directory) {
-        directory = getBaseDirectory().resolve(Objects.requireNonNull(directory, "directory cannot be null")).normalize();
+        directory = getBaseDirectory()
+                .resolve(Objects.requireNonNull(directory, "directory cannot be null"))
+                .normalize();
         addSourceRoot(new DefaultSourceRoot(scope, language, directory));
     }
 
@@ -363,7 +364,8 @@ public class MavenProject implements Cloneable {
      * @since 4.0.0
      */
     public void addSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull String directory) {
-        directory = Objects.requireNonNull(directory, "directory cannot be null").trim();
+        directory =
+                Objects.requireNonNull(directory, "directory cannot be null").trim();
         if (!directory.isBlank()) {
             Path path = getBaseDirectory().resolve(directory).normalize();
             addSourceRoot(scope, language, path);
@@ -378,8 +380,11 @@ public class MavenProject implements Cloneable {
      * @param directory the directory of the source root
      */
     public void removeSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull Path directory) {
-        Path path = getBaseDirectory().resolve(Objects.requireNonNull(directory, "directory cannot be null")    ).normalize();
-        sources.removeIf(source -> source.scope() == scope && source.language() == language
+        Path path = getBaseDirectory()
+                .resolve(Objects.requireNonNull(directory, "directory cannot be null"))
+                .normalize();
+        sources.removeIf(source -> source.scope() == scope
+                && source.language() == language
                 && source.directory().equals(path));
     }
 
@@ -391,7 +396,8 @@ public class MavenProject implements Cloneable {
      * @param directory the directory of the source root
      */
     public void removeSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull String directory) {
-        directory = Objects.requireNonNull(directory, "directory cannot be null").trim();
+        directory =
+                Objects.requireNonNull(directory, "directory cannot be null").trim();
         if (!directory.isBlank()) {
             removeSourceRoot(scope, language, Path.of(directory));
         }
