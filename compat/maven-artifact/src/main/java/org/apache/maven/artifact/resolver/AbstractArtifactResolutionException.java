@@ -277,7 +277,7 @@ public class AbstractArtifactResolutionException extends Exception {
             sb.append(version);
 
             // insert classifier only if it was used in the artifact
-            if (classifier != null && !classifier.equals("")) {
+            if (classifier != null && !classifier.isEmpty()) {
                 sb.append(" -Dclassifier=");
                 sb.append(classifier);
             }
@@ -300,7 +300,7 @@ public class AbstractArtifactResolutionException extends Exception {
             sb.append(version);
 
             // insert classifier only if it was used in the artifact
-            if (classifier != null && !classifier.equals("")) {
+            if (classifier != null && !classifier.isEmpty()) {
                 sb.append(" -Dclassifier=");
                 sb.append(classifier);
             }
