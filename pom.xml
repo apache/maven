@@ -144,7 +144,7 @@ under the License.
     <!-- various versions -->
     <assertjVersion>3.27.3</assertjVersion>
     <asmVersion>9.8</asmVersion>
-    <byteBuddyVersion>1.17.4</byteBuddyVersion>
+    <byteBuddyVersion>1.17.5</byteBuddyVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
