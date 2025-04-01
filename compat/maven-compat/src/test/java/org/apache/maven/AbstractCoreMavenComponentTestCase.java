@@ -94,7 +94,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
                 .setPom(pom)
                 .setProjectPresent(true)
                 .setShowErrors(true)
-                .setPluginGroups(Arrays.asList("org.apache.maven.plugins"))
+                .setPluginGroups(List.of("org.apache.maven.plugins"))
                 .setLocalRepository(getLocalRepository())
                 .setRemoteRepositories(getRemoteRepositories())
                 .setPluginArtifactRepositories(getPluginArtifactRepositories())

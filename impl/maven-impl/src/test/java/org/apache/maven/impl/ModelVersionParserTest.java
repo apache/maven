@@ -24,23 +24,21 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-/**
- */
 public class ModelVersionParserTest {
 
     private final DefaultModelVersionParser versionParser = new DefaultModelVersionParser(new GenericVersionScheme());
 
-    private VersionParserException parseInvalid(String constraint) {
+    private void parseInvalid(String constraint) {
         try {
             versionParser.parseVersionConstraint(constraint);
             fail("expected exception for constraint " + constraint);
-            return null;
         } catch (VersionParserException e) {
-            return e;
+            assertNotNull(e.getMessage());
         }
     }
 
