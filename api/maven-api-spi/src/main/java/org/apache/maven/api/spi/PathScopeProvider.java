@@ -24,6 +24,27 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.di.Named;
 
 /**
+ * Service provider interface for registering custom {@link PathScope} implementations.
+ * <p>
+ * This interface allows plugins and extensions to define and register additional path scopes
+ * beyond the standard ones provided by Maven. Path scopes define how dependencies are used
+ * in different contexts, such as compilation, testing, or runtime.
+ * <p>
+ * Implementations of this interface will be discovered through the Java ServiceLoader mechanism
+ * and their provided path scopes will be available throughout the Maven build process.
+ * <p>
+ * Example usage:
+ * <pre>
+ * public class CustomPathScopeProvider implements PathScopeProvider {
+ *     public Collection&lt;PathScope&gt; provides() {
+ *         return Collections.singleton(pathScope("integration-test",
+ *                 ProjectScope.TEST, DependencyScope.TEST));
+ *     }
+ * }
+ * </pre>
+ *
+ * @see org.apache.maven.api.PathScope
+ * @see org.apache.maven.api.spi.ExtensibleEnumProvider
  * @since 4.0.0
  */
 @Experimental

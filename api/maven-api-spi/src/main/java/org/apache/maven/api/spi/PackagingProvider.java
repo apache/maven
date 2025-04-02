@@ -23,6 +23,30 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.di.Named;
 
+/**
+ * Service provider interface for registering custom {@link Packaging} implementations.
+ * <p>
+ * This interface allows plugins and extensions to define and register additional packaging types
+ * beyond the standard ones provided by Maven (like jar, war, ear, etc.). Implementations of this
+ * interface will be discovered through the Java ServiceLoader mechanism and their provided
+ * packaging types will be available throughout the Maven build process.
+ * <p>
+ * Example usage:
+ * <pre>
+ * public class CustomPackagingProvider implements PackagingProvider {
+ *     public Collection&lt;Packaging&gt; provides() {
+ *         return Arrays.asList(
+ *             packaging("docker-image"),
+ *             packaging("flatpak")
+ *         );
+ *     }
+ * }
+ * </pre>
+ *
+ * @see org.apache.maven.api.Packaging
+ * @see org.apache.maven.api.spi.ExtensibleEnumProvider
+ * @since 4.0.0
+ */
 @Experimental
 @Consumer
 @Named

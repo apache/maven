@@ -25,7 +25,29 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.model.Model;
 
 /**
- * Marker interface for model transformers.
+ * Interface for model transformers that can modify Maven project models at different stages of processing.
+ * <p>
+ * Model transformers allow plugins and extensions to modify the POM model during the build process.
+ * Transformations can be applied at three different stages:
+ * <ol>
+ *   <li>File model - The raw model as read directly from the file</li>
+ *   <li>Raw model - The model after inheritance has been applied</li>
+ *   <li>Effective model - The fully processed model with all interpolation and inheritance applied</li>
+ * </ol>
+ * <p>
+ * Implementations of this interface will be discovered through the Java ServiceLoader mechanism
+ * and will be called in sequence during model building.
+ * <p>
+ * Example usage:
+ * <pre>
+ * public class CustomModelTransformer implements ModelTransformer {
+ *     public Model transformEffectiveModel(Model model) throws ModelTransformerException {
+ *         // Add a custom property to all models
+ *         model.getProperties().put("custom.timestamp", System.currentTimeMillis());
+ *         return model;
+ *     }
+ * }
+ * </pre>
  *
  * @since 4.0.0
  */
