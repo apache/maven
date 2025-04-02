@@ -71,7 +71,7 @@ public interface Lifecycle extends ExtensibleEnum {
 
     /**
      * Collection of main phases for this lifecycle used with the Maven 3 builders.
-     * Those builders does not operate on a graph, but on the list and expect a slightly
+     * Those builders do not operate on a graph, but on the list and expect a slightly
      * different ordering (mainly unit test being executed before packaging).
      */
     default Collection<Phase> v3phases() {

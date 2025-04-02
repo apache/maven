@@ -21,7 +21,7 @@ package org.apache.maven.toolchain.io;
 import java.io.IOException;
 
 /**
- * Signals a failure to parse the toolchains due to invalid syntax (e.g. non well formed XML or unknown elements).
+ * Signals a failure to parse the toolchains due to invalid syntax (e.g. non well-formed XML or unknown elements).
  *
  * @since 3.3.0
  */

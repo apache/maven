@@ -21,7 +21,7 @@ package org.apache.maven.model.io;
 import java.io.IOException;
 
 /**
- * Signals a failure to parse the POM due to invalid syntax (e.g. non well formed XML or unknown elements).
+ * Signals a failure to parse the POM due to invalid syntax (e.g. non well-formed XML or unknown elements).
  *
  * @deprecated use {@code org.apache.maven.api.services.xml.ModelXmlFactory} instead
  */

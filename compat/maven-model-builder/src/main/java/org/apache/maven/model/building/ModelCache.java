@@ -22,7 +22,7 @@ package org.apache.maven.model.building;
  * Caches auxiliary data used during model building like already processed raw/effective models. The data in the cache
  * is meant for exclusive consumption by the model builder and is opaque to the cache implementation. The cache key is
  * formed by a combination of group id, artifact id, version and tag. The first three components generally refer to the
- * identify of a model. The tag allows for further classification of the associated data on the sole discretion of the
+ * identity of a model. The tag allows for further classification of the associated data on the sole discretion of the
  * model builder.
  *
  * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
