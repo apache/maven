@@ -49,8 +49,8 @@ import org.apache.maven.api.spi.ModelParserException;
  *
  * A side effect of using @Typed is that it translates to explicit bindings in the container.
  * So instead of binding the component under a 'wildcard' key it is now bound with an explicit
- * key. Since this is a default component this will be a plain binding of ModelProcessor to
- * this implementation type, ie. no hint/name.
+ * key. Since this is a default component; this will be a plain binding of ModelProcessor to
+ * this implementation type; that is, no hint/name.
  *
  * This leads to a second side effect in that any @Inject request for just ModelProcessor in
  * the same injector is immediately matched to this explicit binding, which means extensions

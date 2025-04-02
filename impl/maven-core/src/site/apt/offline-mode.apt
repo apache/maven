@@ -35,7 +35,7 @@ Offline Mode Design
   earmarked as remote should be accessed, regardless of whether it is actually
   a physically local resource.
 
-  NOTE: One side-effect of this design change is that all offline-mode code can
+  NOTE: One side effect of this design change is that all offline-mode code can
   be isolated to maven-core, maven-plugin-descriptor, and [possibly]
   maven-artifact. Usage of maven-wagon will be determined by an offline-aware
   manager.
