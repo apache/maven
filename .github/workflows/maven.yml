@@ -45,7 +45,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.m2
+          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
+          cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
         uses: actions/cache@v4
@@ -112,7 +114,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.m2
+          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
+          cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
         uses: actions/cache@v4
@@ -193,7 +197,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.m2
+          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
+          cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
         uses: actions/cache@v4

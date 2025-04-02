@@ -311,6 +311,7 @@ public abstract class MavenExecutorTestSupport {
     protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
         Executor invoker = createAndMemoizeExecutor();
         for (ExecutorRequest request : requests) {
+            MimirInfuser.infuse(request.userHomeDirectory());
             int exitCode = invoker.execute(request);
             if (exitCode != 0) {
                 throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));

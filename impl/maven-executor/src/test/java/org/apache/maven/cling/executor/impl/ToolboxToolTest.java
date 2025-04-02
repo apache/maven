@@ -26,8 +26,10 @@ import java.util.Map;
 
 import org.apache.maven.cling.executor.ExecutorHelper;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
+import org.apache.maven.cling.executor.MimirInfuser;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.apache.maven.cling.executor.internal.ToolboxTool;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
@@ -42,6 +44,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ToolboxToolTest {
     @TempDir
     private static Path userHome;
+
+    @BeforeAll
+    static void beforeAll() throws Exception {
+        MimirInfuser.infuse(userHome);
+    }
 
     @Timeout(15)
     @ParameterizedTest
