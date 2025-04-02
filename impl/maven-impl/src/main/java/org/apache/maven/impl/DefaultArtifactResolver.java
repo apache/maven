@@ -99,6 +99,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                 ArtifactRequest req = new ArtifactRequest();
                 req.setRepositories(repositories);
                 req.setArtifact(session.toArtifact(coords));
+                req.setRequestContext(trace.context());
                 req.setTrace(trace.trace());
                 requests.add(new ResolverRequest(session, trace.mvnTrace(), req));
             }
