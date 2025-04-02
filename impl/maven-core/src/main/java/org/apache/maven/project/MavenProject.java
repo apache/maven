@@ -42,6 +42,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.SourceRoot;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -343,8 +344,10 @@ public class MavenProject implements Cloneable {
      *
      * @since 4.0.0
      */
-    public void addSourceRoot(ProjectScope scope, Language language, Path directory) {
-        directory = getBaseDirectory().resolve(directory).normalize();
+    public void addSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull Path directory) {
+        directory = getBaseDirectory()
+                .resolve(Objects.requireNonNull(directory, "directory cannot be null"))
+                .normalize();
         addSourceRoot(new DefaultSourceRoot(scope, language, directory));
     }
 
@@ -360,13 +363,43 @@ public class MavenProject implements Cloneable {
      *
      * @since 4.0.0
      */
-    public void addSourceRoot(ProjectScope scope, Language language, String directory) {
-        if (directory != null) {
-            directory = directory.trim();
-            if (!directory.isBlank()) {
-                Path path = getBaseDirectory().resolve(directory).normalize();
-                addSourceRoot(scope, language, path);
-            }
+    public void addSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull String directory) {
+        directory =
+                Objects.requireNonNull(directory, "directory cannot be null").trim();
+        if (!directory.isBlank()) {
+            Path path = getBaseDirectory().resolve(directory).normalize();
+            addSourceRoot(scope, language, path);
+        }
+    }
+
+    /**
+     * Removes a source root from the project.
+     *
+     * @param scope the scope of the source root
+     * @param language the language of the source root
+     * @param directory the directory of the source root
+     */
+    public void removeSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull Path directory) {
+        Path path = getBaseDirectory()
+                .resolve(Objects.requireNonNull(directory, "directory cannot be null"))
+                .normalize();
+        sources.removeIf(source -> source.scope() == scope
+                && source.language() == language
+                && source.directory().equals(path));
+    }
+
+    /**
+     * Removes a source root from the project.
+     *
+     * @param scope the scope of the source root
+     * @param language the language of the source root
+     * @param directory the directory of the source root
+     */
+    public void removeSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull String directory) {
+        directory =
+                Objects.requireNonNull(directory, "directory cannot be null").trim();
+        if (!directory.isBlank()) {
+            removeSourceRoot(scope, language, Path.of(directory));
         }
     }
 
@@ -379,6 +412,14 @@ public class MavenProject implements Cloneable {
     }
 
     /**
+     * @deprecated Replaced by {@code removeSourceRoot(ProjectScope.MAIN, Language.JAVA_FAMILY, path)}.
+     */
+    @Deprecated(since = "4.0.0")
+    public void removeCompileSourceRoot(String path) {
+        removeSourceRoot(ProjectScope.MAIN, Language.JAVA_FAMILY, path);
+    }
+
+    /**
      * @deprecated Replaced by {@code addSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, path)}.
      */
     @Deprecated(since = "4.0.0")
@@ -386,6 +427,12 @@ public class MavenProject implements Cloneable {
         addSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, path);
     }
 
+    /**
+     * @deprecated Replaced by {@code removeSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, path)}.
+     */
+    public void removeTestCompileSourceRoot(String path) {
+        removeSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, path);
+    }
     /**
      * {@return all source root directories, including the disabled ones, for all languages and scopes}.
      * The iteration order is the order in which the sources are declared in the POM file.
