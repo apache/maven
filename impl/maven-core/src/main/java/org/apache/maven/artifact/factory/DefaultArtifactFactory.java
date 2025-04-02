@@ -162,7 +162,7 @@ public class DefaultArtifactFactory implements ArtifactFactory {
         } else if (Artifact.SCOPE_TEST.equals(scope) || Artifact.SCOPE_PROVIDED.equals(scope)) {
             return null;
         } else if (Artifact.SCOPE_COMPILE.equals(scope) && Artifact.SCOPE_COMPILE.equals(inheritedScope)) {
-            // added to retain compile artifactScope. Remove if you want compile inherited as runtime
+            // added to retain compile artifactScope. Remove if you want to compile inherited as runtime
             desiredScope = Artifact.SCOPE_COMPILE;
         }
 

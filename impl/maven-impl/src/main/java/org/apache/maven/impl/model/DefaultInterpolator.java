@@ -118,7 +118,7 @@ public class DefaultInterpolator implements Interpolator {
      * then the corresponding property value is substituted for the variable
      * placeholder. Multiple variable placeholders may exist in the
      * specified value as well as nested variable placeholders, which
-     * are substituted from inner most to outer most. Configuration
+     * are substituted from innermost to outermost. Configuration
      * properties override system properties.
      * </p>
      *
