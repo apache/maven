@@ -133,7 +133,7 @@ public class ConditionProfileActivator implements ProfileActivator {
                         if (!causeChain.isEmpty()) {
                             causeChain.append(" Caused by: ");
                         }
-                        causeChain.append(cause.toString());
+                        causeChain.append(cause);
                         cause = cause.getCause();
                     }
                     throw new RuntimeException(

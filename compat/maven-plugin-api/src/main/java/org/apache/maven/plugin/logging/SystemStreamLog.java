@@ -109,7 +109,7 @@ public class SystemStreamLog implements Log {
         error.printStackTrace(pWriter);
 
         System.err.println(
-                "[error] " + content.toString() + System.lineSeparator() + System.lineSeparator() + sWriter.toString());
+                "[error] " + content + System.lineSeparator() + System.lineSeparator() + sWriter);
     }
 
     /**
@@ -121,7 +121,7 @@ public class SystemStreamLog implements Log {
 
         error.printStackTrace(pWriter);
 
-        System.err.println("[error] " + sWriter.toString());
+        System.err.println("[error] " + sWriter);
     }
 
     /**
@@ -163,7 +163,7 @@ public class SystemStreamLog implements Log {
 
         error.printStackTrace(pWriter);
 
-        System.out.println("[" + prefix + "] " + sWriter.toString());
+        System.out.println("[" + prefix + "] " + sWriter);
     }
 
     private void print(String prefix, CharSequence content, Throwable error) {
@@ -172,7 +172,7 @@ public class SystemStreamLog implements Log {
 
         error.printStackTrace(pWriter);
 
-        System.out.println("[" + prefix + "] " + content.toString() + System.lineSeparator() + System.lineSeparator()
-                + sWriter.toString());
+        System.out.println("[" + prefix + "] " + content + System.lineSeparator() + System.lineSeparator()
+                + sWriter);
     }
 }
