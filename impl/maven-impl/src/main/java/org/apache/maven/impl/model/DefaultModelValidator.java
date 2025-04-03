@@ -2189,57 +2189,6 @@ public class DefaultModelValidator implements ModelValidator {
         problems.add(severity, version, buffer.toString(), getLocation(fieldName, tracker));
     }
 
-    private static class SourceHint {
-        @Nullable
-        public static SourceHint xmlNodeInputLocation(XmlNode xmlNode) {
-            if (xmlNode.inputLocation() != null) {
-                return new SourceHint(xmlNode.inputLocation().toString(), null);
-            } else {
-                return null;
-            }
-        }
-
-        public static SourceHint gav(String gav) {
-            return new SourceHint(gav, null); // "GAV"
-        }
-
-        public static SourceHint dependencyManagementKey(Dependency dependency) {
-            return new SourceHint(dependency.getManagementKey(), null); // DMK
-        }
-
-        public static SourceHint pluginKey(Plugin plugin) {
-            return new SourceHint(plugin.getKey(), null); // PK
-        }
-
-        public static SourceHint repoId(Repository repository) {
-            return new SourceHint(repository.getId(), null); // ID
-        }
-
-        public static SourceHint resourceDirectory(Resource resource) {
-            if (resource.getDirectory() == null) {
-                return null;
-            }
-            return new SourceHint(resource.getDirectory(), null); // DIR
-        }
-
-        private final String hint;
-        private final String format;
-
-        private SourceHint(String hint, String format) {
-            this.hint = requireNonNull(hint, "hint");
-            this.format = format;
-        }
-
-        @Override
-        public String toString() {
-            String result = hint;
-            if (format != null) {
-                result = result + " (" + format + ")";
-            }
-            return result;
-        }
-    }
-
     private static InputLocation getLocation(String fieldName, InputLocationTracker tracker) {
         InputLocation location = null;
 
@@ -2284,6 +2233,58 @@ public class DefaultModelValidator implements ModelValidator {
             return Severity.WARNING;
         } else {
             return Severity.ERROR;
+        }
+    }
+
+    private static class SourceHint {
+        @Nullable
+        public static SourceHint xmlNodeInputLocation(XmlNode xmlNode) {
+            if (xmlNode.inputLocation() != null) {
+                return new SourceHint(xmlNode.inputLocation().toString(), null);
+            } else {
+                return null;
+            }
+        }
+
+        public static SourceHint gav(String gav) {
+            return new SourceHint(gav, null); // "GAV"
+        }
+
+        public static SourceHint dependencyManagementKey(Dependency dependency) {
+            return new SourceHint(dependency.getManagementKey(), null); // DMK
+        }
+
+        public static SourceHint pluginKey(Plugin plugin) {
+            return new SourceHint(plugin.getKey(), null); // PK
+        }
+
+        public static SourceHint repoId(Repository repository) {
+            return new SourceHint(repository.getId(), null); // ID
+        }
+
+        @Nullable
+        public static SourceHint resourceDirectory(Resource resource) {
+            if (resource.getDirectory() == null) {
+                return null;
+            }
+            return new SourceHint(resource.getDirectory(), null); // DIR
+        }
+
+        private final String hint;
+        private final String format;
+
+        private SourceHint(String hint, String format) {
+            this.hint = requireNonNull(hint, "hint");
+            this.format = format;
+        }
+
+        @Override
+        public String toString() {
+            String result = hint;
+            if (format != null) {
+                result = result + " (" + format + ")";
+            }
+            return result;
         }
     }
 }
