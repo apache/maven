@@ -142,7 +142,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
                 pomArtifact = pomArtifact.setVersion(versionResult.getVersion());
             } catch (VersionResolutionException e) {
-                result.addException(e);
+                e.getResult().getExceptions().forEach(result::addException);
                 throw new ArtifactDescriptorException(result);
             }
 
@@ -172,7 +172,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         return null;
                     }
                 }
-                result.addException(e);
+                e.getResult().getExceptions().forEach(result::addException);
                 throw new ArtifactDescriptorException(result);
             }
 
