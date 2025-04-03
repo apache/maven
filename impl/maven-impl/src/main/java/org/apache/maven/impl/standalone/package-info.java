@@ -26,7 +26,6 @@
  *   <li>{@link org.apache.maven.impl.standalone.ApiRunner} - Creates and manages Maven sessions for standalone execution</li>
  *   <li>{@link org.apache.maven.impl.standalone.UnsupportedInStandaloneModeException} - Indicates operations not available in standalone mode</li>
  * </ul>
- * </p>
  *
  * @since 4.0.0
  */
