@@ -71,7 +71,6 @@ public class FileSizeFormat {
             public long bytes() {
                 return MEGABYTE.bytes() * KILOBYTE.bytes();
             }
-            ;
 
             @Override
             public String symbol() {
