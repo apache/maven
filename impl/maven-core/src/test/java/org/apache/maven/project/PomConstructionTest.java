@@ -448,20 +448,6 @@ class PomConstructionTest {
         assertEquals("1.3.0-SNAPSHOT", pom.getValue("build/plugins[1]/version"));
     }
 
-    /*
-    public void testMaven()
-        throws Exception
-    {
-        PomTestWrapper pom =  buildPomFromMavenProject( "maven-build/sub/pom.xml", null );
-
-        for( String s: pom.getMavenProject().getTestClasspathElements() )
-        {
-            System.out.println( s );
-        }
-
-    }
-    */
-
     /* MNG-3567*/
     @Test
     void testPluginManagementInherited() throws Exception {
@@ -533,13 +519,6 @@ class PomConstructionTest {
                 "src/main/mdo/security.xml", (pom.getValue("build/plugins[1]/executions[2]/configuration[1]/model")));
     }
 
-    /*
-        public void testPluginConfigDuplicate()
-        throws Exception
-    {
-        PomTestWrapper pom = buildPom( "plugin-config-duplicate/dup" );
-    }
-    */
     @Test
     void testSingleConfigurationInheritance() throws Exception {
         PomTestWrapper pom = buildPom("single-configuration-inheritance");

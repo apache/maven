@@ -143,8 +143,8 @@ under the License.
     <project.build.outputTimestamp>2025-03-05T09:43:59Z</project.build.outputTimestamp>
     <!-- various versions -->
     <assertjVersion>3.27.3</assertjVersion>
-    <asmVersion>9.7.1</asmVersion>
-    <byteBuddyVersion>1.17.4</byteBuddyVersion>
+    <asmVersion>9.8</asmVersion>
+    <byteBuddyVersion>1.17.5</byteBuddyVersion>
     <classWorldsVersion>2.8.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
@@ -394,6 +394,10 @@ under the License.
           <exclusion>
             <groupId>org.eclipse.sisu</groupId>
             <artifactId>org.eclipse.sisu.inject</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-xml-impl</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -780,7 +784,7 @@ under the License.</licenseText>
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.12</version>
+          <version>0.8.13</version>
           <configuration>
             <excludes>
               <exclude>**/org/apache/maven/it/**</exclude>

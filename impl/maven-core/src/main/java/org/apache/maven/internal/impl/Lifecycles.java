@@ -89,7 +89,7 @@ public class Lifecycles {
     }
 
     /** Indicates the phase is after the phases given in arguments */
-    static Lifecycle.Link after(String b) {
+    static Lifecycle.Link after(String phase) {
         return new Lifecycle.Link() {
             @Override
             public Kind kind() {
@@ -101,9 +101,19 @@ public class Lifecycles {
                 return new Lifecycle.PhasePointer() {
                     @Override
                     public String phase() {
-                        return b;
+                        return phase;
+                    }
+
+                    @Override
+                    public String toString() {
+                        return "phase(" + phase + ")";
                     }
                 };
+            }
+
+            @Override
+            public String toString() {
+                return "after(" + pointer() + ")";
             }
         };
     }
@@ -128,7 +138,46 @@ public class Lifecycles {
                     public String scope() {
                         return scope;
                     }
+
+                    @Override
+                    public String toString() {
+                        return "dependencies(" + scope + ", " + phase + ")";
+                    }
                 };
+            }
+
+            @Override
+            public String toString() {
+                return "after(" + pointer() + ")";
+            }
+        };
+    }
+
+    static Lifecycle.Link children(String phase) {
+        return new Lifecycle.Link() {
+            @Override
+            public Kind kind() {
+                return Kind.AFTER;
+            }
+
+            @Override
+            public Lifecycle.Pointer pointer() {
+                return new Lifecycle.ChildrenPointer() {
+                    @Override
+                    public String phase() {
+                        return phase;
+                    }
+
+                    @Override
+                    public String toString() {
+                        return "children(" + phase + ")";
+                    }
+                };
+            }
+
+            @Override
+            public String toString() {
+                return "after(" + pointer() + ")";
             }
         };
     }

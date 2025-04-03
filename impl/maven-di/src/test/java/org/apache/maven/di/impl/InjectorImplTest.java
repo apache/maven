@@ -38,12 +38,14 @@ import org.apache.maven.di.Key;
 import org.junit.jupiter.api.Test;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("unused")
 public class InjectorImplTest {
@@ -373,6 +375,34 @@ public class InjectorImplTest {
             MyMojo(@Nullable MyService service) {
                 this.service = service;
             }
+        }
+    }
+
+    @Test
+    void testCircularPriorityDependency() {
+        Injector injector = Injector.create().bindImplicit(CircularPriorityTest.class);
+
+        DIException exception = assertThrows(DIException.class, () -> {
+            injector.getInstance(CircularPriorityTest.MyService.class);
+        });
+        assertThat(exception).isInstanceOf(DIException.class).hasMessageContaining("HighPriorityServiceImpl");
+        assertThat(exception.getCause())
+                .isInstanceOf(DIException.class)
+                .hasMessageContaining("Cyclic dependency detected")
+                .hasMessageContaining("MyService");
+    }
+
+    static class CircularPriorityTest {
+        interface MyService {}
+
+        @Named
+        static class DefaultServiceImpl implements MyService {}
+
+        @Named
+        @Priority(10)
+        static class HighPriorityServiceImpl implements MyService {
+            @Inject
+            MyService defaultService; // This tries to inject the default implementation
         }
     }
 }

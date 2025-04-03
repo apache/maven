@@ -176,8 +176,35 @@ cd /d "%EXEC_DIR%"
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
 @setlocal EnableExtensions EnableDelayedExpansion
-for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_OPTS=!JVM_CONFIG_MAVEN_OPTS! %%a
-@endlocal & set MAVEN_OPTS=%MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS%
+set JVM_CONFIG_MAVEN_OPTS=
+for /F "usebackq tokens=* delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do (
+    set "line=%%a"
+    
+    rem Skip empty lines and full-line comments
+    echo !line! | findstr /b /r /c:"[ ]*#" >nul
+    if errorlevel 1 (
+        rem Handle end-of-line comments by taking everything before #
+        for /f "tokens=1* delims=#" %%i in ("!line!") do set "line=%%i"
+        
+        rem Trim leading/trailing spaces while preserving spaces in quotes
+        set "trimmed=!line!"
+        for /f "tokens=* delims= " %%i in ("!trimmed!") do set "trimmed=%%i"
+        for /l %%i in (1,1,100) do if "!trimmed:~-1!"==" " set "trimmed=!trimmed:~0,-1!"
+        
+        rem Replace MAVEN_PROJECTBASEDIR placeholders
+        set "trimmed=!trimmed:${MAVEN_PROJECTBASEDIR}=%MAVEN_PROJECTBASEDIR%!"
+        set "trimmed=!trimmed:$MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR%!"
+        
+        if not "!trimmed!"=="" (
+            if "!JVM_CONFIG_MAVEN_OPTS!"=="" (
+                set "JVM_CONFIG_MAVEN_OPTS=!trimmed!"
+            ) else (
+                set "JVM_CONFIG_MAVEN_OPTS=!JVM_CONFIG_MAVEN_OPTS! !trimmed!"
+            )
+        )
+    )
+)
+@endlocal & set "MAVEN_OPTS=%MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS%"
 
 :endReadJvmConfig
 

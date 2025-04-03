@@ -63,16 +63,6 @@ public class ModelValidationResult {
         }
 
         StringBuilder message = new StringBuilder();
-
-        //        if ( messages.size() == 1 )
-        //        {
-        //            message.append( "There was 1 validation error: " );
-        //        }
-        //        else
-        //        {
-        //            message.append( "There was " + messages.size() + " validation errors: " + LS );
-        //        }
-        //
         for (int i = 0; i < messages.size(); i++) {
             message.append(indentation)
                     .append('[')

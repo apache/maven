@@ -30,7 +30,6 @@ import org.apache.maven.api.services.model.ModelVersionParser;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -135,7 +134,7 @@ public class VersionTest extends AbstractVersionTest {
     }
 
     @Test
-    void testTransitionFromDigitToLetterAndViceVersaIsEqualivantToDelimiter() {
+    void testTransitionFromDigitToLetterAndViceVersaIsEquivalentToDelimiter() {
         assertOrder(AbstractVersionTest.X_EQ_Y, "1alpha10", "1.alpha.10");
         assertOrder(AbstractVersionTest.X_EQ_Y, "1alpha10", "1-alpha-10");
 
@@ -381,7 +380,7 @@ public class VersionTest extends AbstractVersionTest {
     @Test
     void testCompareUuidVersionStringStream() {
         // this operation below fails with IAEx if comparison is unstable
-        uuidVersionStringStream().map(this::newVersion).sorted().collect(toList());
+        uuidVersionStringStream().map(this::newVersion).sorted().toList();
     }
 
     private Stream<String> uuidVersionStringStream() {

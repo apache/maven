@@ -102,6 +102,7 @@ public interface Lifecycle extends ExtensibleEnum {
         // Maven defined phases
         // ======================
         String ALL = "all";
+        String EACH = "each";
         String BUILD = "build";
         String INITIALIZE = "initialize";
         String VALIDATE = "validate";
