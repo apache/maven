@@ -176,18 +176,63 @@ public abstract class XmlService {
         Object toInputLocation(XMLStreamReader parser);
     }
 
+    /**
+     * Implementation method for reading an XML node from an input stream.
+     *
+     * @param input the input stream to read from
+     * @param locationBuilder optional builder for creating input location objects
+     * @return the parsed XML node
+     * @throws XMLStreamException if there is an error parsing the XML
+     */
     protected abstract XmlNode doRead(InputStream input, InputLocationBuilder locationBuilder)
             throws XMLStreamException;
 
+    /**
+     * Implementation method for reading an XML node from a reader.
+     *
+     * @param reader the reader to read from
+     * @param locationBuilder optional builder for creating input location objects
+     * @return the parsed XML node
+     * @throws XMLStreamException if there is an error parsing the XML
+     */
     protected abstract XmlNode doRead(Reader reader, InputLocationBuilder locationBuilder) throws XMLStreamException;
 
+    /**
+     * Implementation method for reading an XML node from an XMLStreamReader.
+     *
+     * @param reader the XML stream reader to read from
+     * @param locationBuilder optional builder for creating input location objects
+     * @return the parsed XML node
+     * @throws XMLStreamException if there is an error parsing the XML
+     */
     protected abstract XmlNode doRead(XMLStreamReader reader, InputLocationBuilder locationBuilder)
             throws XMLStreamException;
 
+    /**
+     * Implementation method for writing an XML node to a writer.
+     *
+     * @param node the XML node to write
+     * @param writer the writer to write to
+     * @throws IOException if there is an error writing the XML
+     */
     protected abstract void doWrite(XmlNode node, Writer writer) throws IOException;
 
+    /**
+     * Implementation method for merging two XML nodes.
+     *
+     * @param dominant the dominant (higher priority) XML node
+     * @param recessive the recessive (lower priority) XML node
+     * @param childMergeOverride optional override for the child merge mode
+     * @return the merged XML node, or null if both inputs are null
+     */
     protected abstract XmlNode doMerge(XmlNode dominant, XmlNode recessive, Boolean childMergeOverride);
 
+    /**
+     * Gets the singleton instance of the XmlService.
+     *
+     * @return the XmlService instance
+     * @throws IllegalStateException if no implementation is found
+     */
     private static XmlService getService() {
         return Holder.INSTANCE;
     }

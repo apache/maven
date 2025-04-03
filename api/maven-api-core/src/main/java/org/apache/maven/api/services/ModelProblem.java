@@ -29,15 +29,43 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface ModelProblem extends BuilderProblem {
 
     /**
-     * Version
+     * Enumeration of model versions that can be validated.
+     * These versions correspond to different levels of validation that can be applied
+     * during model building, based on the POM schema version.
+     * <p>
+     * The validation levels are cumulative, with higher versions including all validations
+     * from lower versions plus additional checks specific to that version.
      */
     enum Version {
-        // based on ModeBuildingResult.validationLevel
+        /**
+         * Base validation level that applies to all POM versions.
+         * Includes fundamental structural validations.
+         */
         BASE,
+
+        /**
+         * Validation for Maven 2.0 POM format.
+         */
         V20,
+
+        /**
+         * Validation for Maven 3.0 POM format.
+         */
         V30,
+
+        /**
+         * Validation for Maven 3.1 POM format.
+         */
         V31,
+
+        /**
+         * Validation for Maven 4.0 POM format.
+         */
         V40,
+
+        /**
+         * Validation for Maven 4.1 POM format.
+         */
         V41
     }
 
