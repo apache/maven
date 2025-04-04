@@ -24,6 +24,24 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.di.Named;
 
 /**
+ * Service provider interface for registering custom {@link ProjectScope} implementations.
+ * <p>
+ * This interface allows plugins and extensions to define and register additional project scopes
+ * beyond the standard {@link ProjectScope#MAIN} and {@link ProjectScope#TEST} scopes.
+ * Implementations of this interface will be discovered through the Java ServiceLoader mechanism
+ * and their provided project scopes will be available throughout the Maven build process.
+ * <p>
+ * Example usage:
+ * <pre>
+ * public class CustomProjectScopeProvider implements ProjectScopeProvider {
+ *     public Collection&lt;ProjectScope&gt; provides() {
+ *         return Collections.singleton(projectScope("integration-test"));
+ *     }
+ * }
+ * </pre>
+ *
+ * @see org.apache.maven.api.ProjectScope
+ * @see org.apache.maven.api.spi.ExtensibleEnumProvider
  * @since 4.0.0
  */
 @Experimental

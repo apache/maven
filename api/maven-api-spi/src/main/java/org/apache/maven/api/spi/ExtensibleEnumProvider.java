@@ -26,18 +26,47 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * An SPI interface to extend Maven with a new enum value.
+ * An SPI interface to extend Maven with new enum values for extensible enumerations.
+ * <p>
+ * Maven uses extensible enumerations to allow plugins and extensions to add new values
+ * to various categories like languages, scopes, and packaging types. This interface is the
+ * base for all providers that register such extensions.
+ * <p>
+ * Implementations of this interface are discovered through the Java ServiceLoader mechanism.
+ * Each implementation must be registered in a {@code META-INF/services/} file corresponding
+ * to the specific provider interface being implemented.
+ * <p>
+ * Example implementation for a custom language provider:
+ * <pre>
+ * public class CustomLanguageProvider implements LanguageProvider {
+ *     public Collection&lt;Language&gt; provides() {
+ *         return Arrays.asList(
+ *             language("kotlin"),
+ *             language("scala")
+ *         );
+ *     }
+ * }
+ * </pre>
  *
  * @param <T> The type of extensible enum to extend
+ * @since 4.0.0
  */
 @Experimental
 @Consumer
 public interface ExtensibleEnumProvider<T extends ExtensibleEnum> extends SpiService {
 
     /**
-     * Registers new values for the T extensible enum.
+     * Provides new values for the extensible enum.
+     * <p>
+     * This method is called by Maven during initialization to collect all custom enum values
+     * that should be registered. The returned collection should contain all the enum values
+     * that this provider wants to contribute.
+     * <p>
+     * The values returned by this method should be created using the appropriate factory methods
+     * for the specific enum type, such as {@code language()}, {@code projectScope()}, or
+     * {@code pathScope()}.
      *
-     * @return a collection of T instances to register
+     * @return a non-null collection of enum instances to register
      */
     @Nonnull
     Collection<T> provides();

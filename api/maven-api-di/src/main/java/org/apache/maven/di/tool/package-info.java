@@ -16,32 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
-
-import java.io.Serial;
-
-import org.apache.maven.api.annotations.Experimental;
 
 /**
- * The Exception class throw by the {@link Prompter} service.
+ * Provides tools for processing Maven dependency injection annotations at compile time.
+ * <p>
+ * This package contains annotation processors that generate metadata files used by
+ * the Maven dependency injection system. The main component is the {@link org.apache.maven.di.tool.DiIndexProcessor},
+ * which processes classes annotated with {@link org.apache.maven.api.di.Named} and creates an index file
+ * that allows for efficient discovery of injectable components at runtime.
+ * <p>
+ * The generated index is stored at {@code META-INF/maven/org.apache.maven.api.di.Inject} and contains
+ * the fully qualified names of all classes annotated with {@code @Named}.
  *
  * @since 4.0.0
  */
-@Experimental
-public class PrompterException extends MavenException {
-
-    @Serial
-    private static final long serialVersionUID = -3505070928479515081L;
-
-    public PrompterException(String message) {
-        super(message);
-    }
-
-    /**
-     * @param message the message to give
-     * @param e the {@link Exception}
-     */
-    public PrompterException(String message, Exception e) {
-        super(message, e);
-    }
-}
+package org.apache.maven.di.tool;

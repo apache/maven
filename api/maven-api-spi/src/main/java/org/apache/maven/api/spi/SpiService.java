@@ -23,6 +23,19 @@ import org.apache.maven.api.annotations.Experimental;
 
 /**
  * Marker interface to indicate services that can be provided by plugins and extensions.
+ * <p>
+ * This interface serves as the base for all Service Provider Interface (SPI) components in Maven.
+ * Classes implementing this interface can be discovered and loaded by Maven through the
+ * Java ServiceLoader mechanism, allowing plugins and extensions to contribute functionality
+ * to the Maven build process.
+ * <p>
+ * SPI services are typically registered in {@code META-INF/services/} files corresponding to
+ * the specific service interface being implemented.
+ * <p>
+ * All SPI services should be annotated with {@link Consumer} to indicate they are meant to be
+ * implemented by plugins and extensions rather than used by them.
+ *
+ * @since 4.0.0
  */
 @Experimental
 @Consumer

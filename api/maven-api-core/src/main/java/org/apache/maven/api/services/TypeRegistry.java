@@ -24,6 +24,9 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Access to {@link Type} registry.
+ * <p>
+ * This registry provides access to all registered artifact types, both standard types
+ * provided by Maven and custom types registered through SPI provider implementations.
  *
  * @since 4.0.0
  */

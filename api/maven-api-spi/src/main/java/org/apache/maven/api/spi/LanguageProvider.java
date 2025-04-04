@@ -24,6 +24,24 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.di.Named;
 
 /**
+ * Service provider interface for registering custom {@link Language} implementations.
+ * <p>
+ * This interface allows plugins and extensions to define and register additional programming languages
+ * beyond the standard ones provided by Maven. Implementations of this interface will be discovered
+ * through the Java ServiceLoader mechanism and their provided languages will be available
+ * throughout the Maven build process.
+ * <p>
+ * Example usage:
+ * <pre>
+ * public class CustomLanguageProvider implements LanguageProvider {
+ *     public Collection&lt;Language&gt; provides() {
+ *         return Collections.singleton(language("kotlin"));
+ *     }
+ * }
+ * </pre>
+ *
+ * @see org.apache.maven.api.Language
+ * @see org.apache.maven.api.spi.ExtensibleEnumProvider
  * @since 4.0.0
  */
 @Experimental
