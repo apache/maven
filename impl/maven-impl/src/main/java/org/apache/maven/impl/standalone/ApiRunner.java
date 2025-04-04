@@ -74,22 +74,57 @@ import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 
+/**
+ * Provides functionality for running Maven API in a standalone mode.
+ * <p>
+ * This class serves as the main entry point for executing Maven operations outside
+ * of the standard Maven build environment. It provides methods for creating and
+ * managing Maven sessions in a simplified context, primarily for testing and
+ * specialized execution scenarios.
+ * </p>
+ *
+ * <p>Example usage:</p>
+ * <pre>
+ * Session session = ApiRunner.createSession();
+ * // Use session for Maven operations
+ * </pre>
+ *
+ * <p>
+ * The standalone mode provides a subset of Maven's functionality, with some
+ * features being unavailable or simplified. Operations not supported in
+ * standalone mode will throw {@link UnsupportedInStandaloneModeException}.
+ * </p>
+ *
+ * @since 4.0.0
+ */
 public class ApiRunner {
 
     /**
-     * Create a new session.
+     * Creates a new Maven session with default configuration.
+     *
+     * @return a new {@link Session} instance
      */
     public static Session createSession() {
         return createSession(null);
     }
 
     /**
-     * Create a new session.
+     * Creates a new Maven session with custom injector configuration.
+     *
+     * @param injectorConsumer consumer function to customize the injector
+     * @return a new {@link Session} instance
      */
     public static Session createSession(Consumer<Injector> injectorConsumer) {
         return createSession(injectorConsumer, null);
     }
 
+    /**
+     * Creates a new Maven session with custom injector configuration and local repository path.
+     *
+     * @param injectorConsumer consumer function to customize the injector
+     * @param localRepo path to the local repository
+     * @return a new {@link Session} instance
+     */
     public static Session createSession(Consumer<Injector> injectorConsumer, Path localRepo) {
         Injector injector = Injector.create();
         injector.bindInstance(Injector.class, injector);
@@ -108,10 +143,21 @@ public class ApiRunner {
         return session;
     }
 
+    /**
+     * Interface for providing the local repository path.
+     */
     interface LocalRepoProvider {
+        /**
+         * Gets the path to the local repository.
+         *
+         * @return the local repository path
+         */
         Path getLocalRepo();
     }
 
+    /**
+     * Default implementation of the Maven session for standalone mode.
+     */
     static class DefaultSession extends AbstractSession {
 
         private final Map<String, String> systemProperties;
@@ -393,8 +439,6 @@ public class ApiRunner {
         //        defaultSession.getService(RepositoryFactory.class).createRemote()
         //        return defaultSession;
     }
-
-    static class UnsupportedInStandaloneModeException extends MavenException {}
 
     record DumbPackaging(String id, Type type, Map<String, PluginContainer> plugins) implements Packaging {}
 }
