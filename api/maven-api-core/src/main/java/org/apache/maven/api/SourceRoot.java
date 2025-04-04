@@ -47,8 +47,10 @@ public interface SourceRoot {
     /**
      * {@return the list of pattern matchers for the files to include}.
      * The path separator is {@code /} on all platforms, including Windows.
-     * If the pattern does not start with {@code regex:} or {@code glob:}, the default variation of
-     * the {@code glob} pattern will be used.
+     * The patterns are used to match paths relative to the {@code directory}.
+     * The prefix before the {@code :} character, if present, is the syntax.
+     * If no syntax is specified, the default is a Maven-specific variation
+     * of the {@code "glob"} pattern.
      *
      * <p>
      * The default implementation returns an empty list, which means to apply a language-dependent pattern.
