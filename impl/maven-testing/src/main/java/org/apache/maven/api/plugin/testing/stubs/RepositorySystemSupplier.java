@@ -123,8 +123,10 @@ import org.eclipse.aether.internal.impl.collect.DependencyCollectorDelegate;
 import org.eclipse.aether.internal.impl.collect.bf.BfDependencyCollector;
 import org.eclipse.aether.internal.impl.collect.df.DfDependencyCollector;
 import org.eclipse.aether.internal.impl.filter.DefaultRemoteRepositoryFilterManager;
+import org.eclipse.aether.internal.impl.filter.FilteringPipelineRepositoryConnectorFactory;
 import org.eclipse.aether.internal.impl.filter.GroupIdRemoteRepositoryFilterSource;
 import org.eclipse.aether.internal.impl.filter.PrefixesRemoteRepositoryFilterSource;
+import org.eclipse.aether.internal.impl.offline.OfflinePipelineRepositoryConnectorFactory;
 import org.eclipse.aether.internal.impl.resolution.TrustedChecksumsArtifactResolverPostProcessor;
 import org.eclipse.aether.internal.impl.synccontext.DefaultSyncContextFactory;
 import org.eclipse.aether.internal.impl.synccontext.named.NameMapper;
@@ -145,6 +147,7 @@ import org.eclipse.aether.spi.artifact.generator.ArtifactGeneratorFactory;
 import org.eclipse.aether.spi.artifact.transformer.ArtifactTransformer;
 import org.eclipse.aether.spi.checksums.ProvidedChecksumsSource;
 import org.eclipse.aether.spi.checksums.TrustedChecksumsSource;
+import org.eclipse.aether.spi.connector.PipelineRepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactorySelector;
@@ -725,6 +728,27 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         return result;
     }
 
+    private Map<String, PipelineRepositoryConnectorFactory> pipelineRepositoryConnectorFactories;
+
+    public final Map<String, PipelineRepositoryConnectorFactory> getPipelineRepositoryConnectorFactories() {
+        checkClosed();
+        if (pipelineRepositoryConnectorFactories == null) {
+            pipelineRepositoryConnectorFactories = createPipelineRepositoryConnectorFactories();
+        }
+        return pipelineRepositoryConnectorFactories;
+    }
+
+    protected Map<String, PipelineRepositoryConnectorFactory> createPipelineRepositoryConnectorFactories() {
+        HashMap<String, PipelineRepositoryConnectorFactory> result = new HashMap<>();
+        result.put(
+                OfflinePipelineRepositoryConnectorFactory.NAME,
+                new OfflinePipelineRepositoryConnectorFactory(getOfflineController()));
+        result.put(
+                FilteringPipelineRepositoryConnectorFactory.NAME,
+                new FilteringPipelineRepositoryConnectorFactory(getRemoteRepositoryFilterManager()));
+        return result;
+    }
+
     private RepositoryConnectorProvider repositoryConnectorProvider;
 
     public final RepositoryConnectorProvider getRepositoryConnectorProvider() {
@@ -737,7 +761,7 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
 
     protected RepositoryConnectorProvider createRepositoryConnectorProvider() {
         return new DefaultRepositoryConnectorProvider(
-                getRepositoryConnectorFactories(), getRemoteRepositoryFilterManager());
+                getRepositoryConnectorFactories(), getPipelineRepositoryConnectorFactories());
     }
 
     private Installer installer;

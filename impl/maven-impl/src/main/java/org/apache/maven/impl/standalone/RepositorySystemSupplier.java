@@ -89,8 +89,10 @@ import org.eclipse.aether.internal.impl.collect.DependencyCollectorDelegate;
 import org.eclipse.aether.internal.impl.collect.bf.BfDependencyCollector;
 import org.eclipse.aether.internal.impl.collect.df.DfDependencyCollector;
 import org.eclipse.aether.internal.impl.filter.DefaultRemoteRepositoryFilterManager;
+import org.eclipse.aether.internal.impl.filter.FilteringPipelineRepositoryConnectorFactory;
 import org.eclipse.aether.internal.impl.filter.GroupIdRemoteRepositoryFilterSource;
 import org.eclipse.aether.internal.impl.filter.PrefixesRemoteRepositoryFilterSource;
+import org.eclipse.aether.internal.impl.offline.OfflinePipelineRepositoryConnectorFactory;
 import org.eclipse.aether.internal.impl.synccontext.DefaultSyncContextFactory;
 import org.eclipse.aether.internal.impl.synccontext.named.NameMapper;
 import org.eclipse.aether.internal.impl.synccontext.named.NameMappers;
@@ -109,6 +111,7 @@ import org.eclipse.aether.spi.artifact.decorator.ArtifactDecoratorFactory;
 import org.eclipse.aether.spi.artifact.generator.ArtifactGeneratorFactory;
 import org.eclipse.aether.spi.checksums.ProvidedChecksumsSource;
 import org.eclipse.aether.spi.checksums.TrustedChecksumsSource;
+import org.eclipse.aether.spi.connector.PipelineRepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactorySelector;
@@ -182,8 +185,8 @@ public class RepositorySystemSupplier {
     @Provides
     static RepositoryConnectorProvider newRepositoryConnectorProvider(
             Map<String, RepositoryConnectorFactory> connectorFactories,
-            RemoteRepositoryFilterManager remoteRepositoryFilterManager) {
-        return new DefaultRepositoryConnectorProvider(connectorFactories, remoteRepositoryFilterManager);
+            Map<String, PipelineRepositoryConnectorFactory> pipelineConnectorFactories) {
+        return new DefaultRepositoryConnectorProvider(connectorFactories, pipelineConnectorFactories);
     }
 
     @Named("basic")
@@ -200,6 +203,20 @@ public class RepositorySystemSupplier {
                 checksumPolicyProvider,
                 checksumProcessor,
                 providedChecksumsSources);
+    }
+
+    @Named(OfflinePipelineRepositoryConnectorFactory.NAME)
+    @Provides
+    static OfflinePipelineRepositoryConnectorFactory newOfflinePipelineConnectorFactory(
+            OfflineController offlineController) {
+        return new OfflinePipelineRepositoryConnectorFactory(offlineController);
+    }
+
+    @Named(FilteringPipelineRepositoryConnectorFactory.NAME)
+    @Provides
+    static FilteringPipelineRepositoryConnectorFactory newFilteringPipelineConnectorFactory(
+            RemoteRepositoryFilterManager remoteRepositoryFilterManager) {
+        return new FilteringPipelineRepositoryConnectorFactory(remoteRepositoryFilterManager);
     }
 
     @Provides
