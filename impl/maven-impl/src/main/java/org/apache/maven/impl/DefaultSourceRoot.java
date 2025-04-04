@@ -140,7 +140,9 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param scope scope of source code (main or test)
      * @param language language of the source code
      * @param directory directory of the source code
-     */
+     * @param includes list of patterns for the files to include, or {@code null} if unspecified
+     * @param excludes list of patterns for the files to exclude, or {@code null} if unspecified
+     * */
     public DefaultSourceRoot(
             final ProjectScope scope,
             final Language language,

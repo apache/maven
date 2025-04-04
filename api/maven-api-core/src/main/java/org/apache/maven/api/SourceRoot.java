@@ -46,6 +46,11 @@ public interface SourceRoot {
 
     /**
      * {@return the list of pattern matchers for the files to include}.
+     * The path separator is {@code /} on all platforms, including Windows.
+     * If the pattern does not start with {@code regex:} or {@code glob:}, the default variation of
+     * the {@code glob} pattern will be used.
+     *
+     * <p>
      * The default implementation returns an empty list, which means to apply a language-dependent pattern.
      * For example, for the Java language, the pattern includes all files with the {@code .java} suffix.
      */
