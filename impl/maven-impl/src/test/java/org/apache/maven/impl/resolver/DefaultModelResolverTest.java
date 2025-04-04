@@ -25,11 +25,17 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.services.model.ModelResolver;
 import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.impl.standalone.ApiRunner;
+import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
+import org.eclipse.aether.spi.io.PathProcessor;
+import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
+import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +57,11 @@ class DefaultModelResolverTest {
         Path basedir = Paths.get(System.getProperty("basedir", ""));
         Path localRepoPath = basedir.resolve("target/local-repo");
         Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
-        Session s = ApiRunner.createSession(null, localRepoPath);
+        Session s = ApiRunner.createSession(
+                injector -> {
+                    injector.bindInstance(DefaultModelResolverTest.class, this);
+                },
+                localRepoPath);
         RemoteRepository remoteRepository = s.createRemoteRepository(
                 RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
         session = s.withRemoteRepositories(List.of(remoteRepository));
@@ -201,5 +211,18 @@ class DefaultModelResolverTest {
 
     private ModelResolver newModelResolver() throws Exception {
         return new DefaultModelResolver();
+    }
+
+    @Provides
+    @Named(FileTransporterFactory.NAME)
+    static FileTransporterFactory newFileTransporterFactory() {
+        return new FileTransporterFactory();
+    }
+
+    @Provides
+    @Named(ApacheTransporterFactory.NAME)
+    static ApacheTransporterFactory newApacheTransporterFactory(
+            ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
+        return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
     }
 }

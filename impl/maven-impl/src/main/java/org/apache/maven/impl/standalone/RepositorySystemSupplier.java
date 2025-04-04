@@ -126,8 +126,6 @@ import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
 import org.eclipse.aether.spi.resolution.ArtifactResolverPostProcessor;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.spi.validator.ValidatorFactory;
-import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
 
 /**
  * DI Bridge for Maven Resolver
@@ -505,21 +503,8 @@ public class RepositorySystemSupplier {
     }
 
     @Provides
-    static TransporterProvider newTransportProvider(Map<String, TransporterFactory> transporterFactories) {
-        return new DefaultTransporterProvider(transporterFactories);
-    }
-
-    @Provides
-    @Named(FileTransporterFactory.NAME)
-    static FileTransporterFactory newFileTransporterFactory() {
-        return new FileTransporterFactory();
-    }
-
-    @Provides
-    @Named(ApacheTransporterFactory.NAME)
-    static ApacheTransporterFactory newApacheTransporterFactory(
-            ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
-        return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
+    static TransporterProvider newTransportProvider(@Nullable Map<String, TransporterFactory> transporterFactories) {
+        return new DefaultTransporterProvider(transporterFactories != null ? transporterFactories : Map.of());
     }
 
     @Provides
