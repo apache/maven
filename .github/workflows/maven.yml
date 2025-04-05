@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.mimir
-          cp .github/ci-extensions.xml .mvn/extensions.xml
+          cp .github/ci-extensions.xml ~/.m2/extensions.xml
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
