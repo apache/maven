@@ -34,11 +34,9 @@ import org.apache.maven.model.Exclusion;
  */
 public class ExclusionArtifactFilter implements ArtifactFilter {
 
-    private final List<Exclusion> exclusions;
     private final List<Predicate<Artifact>> predicates;
 
     public ExclusionArtifactFilter(List<Exclusion> exclusions) {
-        this.exclusions = exclusions;
         this.predicates =
                 exclusions.stream().map(ExclusionArtifactFilter::toPredicate).collect(Collectors.toList());
     }

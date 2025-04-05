@@ -84,7 +84,6 @@ public class SimpleLoggerConfiguration {
     OutputChoice outputChoice = null;
 
     private static final boolean CACHE_OUTPUT_STREAM_DEFAULT = false;
-    private boolean cacheOutputStream = CACHE_OUTPUT_STREAM_DEFAULT;
 
     private static final String WARN_LEVELS_STRING_DEFAULT = "WARN";
     String warnLevelString = WARN_LEVELS_STRING_DEFAULT;
@@ -116,7 +115,7 @@ public class SimpleLoggerConfiguration {
 
         logFile = getStringProperty(Constants.MAVEN_LOGGER_LOG_FILE, logFile);
 
-        cacheOutputStream = getBooleanProperty(Constants.MAVEN_LOGGER_CACHE_OUTPUT_STREAM, CACHE_OUTPUT_STREAM_DEFAULT);
+        boolean cacheOutputStream = getBooleanProperty(Constants.MAVEN_LOGGER_CACHE_OUTPUT_STREAM, CACHE_OUTPUT_STREAM_DEFAULT);
         outputChoice = computeOutputChoice(logFile, cacheOutputStream);
 
         if (dateTimeFormatStr != null) {
