@@ -33,7 +33,7 @@ import java.util.Set;
  * The pathnames used for method parameters will be relative to some base directory
  * and use {@code '/'} as separator, regardless of the hosting operating system.
  *
- * <h4>Syntax</h4>
+ * <h2>Syntax</h2>
  * If a pattern contains the {@code ':'} character and the prefix before is longer than 1 character,
  * then that pattern is given verbatim to {@link FileSystem#getPathMatcher(String)}, which interprets
  * the part before {@code ':'} as the syntax (usually {@code "glob"} or {@code "regex"}).
