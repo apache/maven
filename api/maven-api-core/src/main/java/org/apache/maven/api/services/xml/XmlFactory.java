@@ -103,7 +103,7 @@ public interface XmlFactory<T> extends Service {
     }
 
     /**
-     * Simply converts the given content to an xml string.
+     * Converts the given content to an XML string.
      *
      * @param content the object to convert
      * @return the xml string representation

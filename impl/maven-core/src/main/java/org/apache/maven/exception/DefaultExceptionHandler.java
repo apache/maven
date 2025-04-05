@@ -76,7 +76,7 @@ Plugins:
 - plugin dependency metadata missing
 - plugin dependency metadata retrieval problem
 - plugin configuration problem
-- plugin execution failure due to something that is know to possibly go wrong (like compilation failure)
+- plugin execution failure due to something that is known to possibly go wrong (like compilation failure)
 - plugin execution error due to something that is not expected to go wrong (the compiler executable missing)
 - asking to use a plugin for which you do not have a version defined - tools to easily select versions
 - goal not found in a plugin (probably could list the ones that are)

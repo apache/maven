@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.settings.Settings;
 
 /**
- * Builds the effective settings from a user settings file and/or a installation settings file.
+ * Builds the effective settings from a user settings file and/or an installation settings file.
  *
  * @since 4.0.0
  */

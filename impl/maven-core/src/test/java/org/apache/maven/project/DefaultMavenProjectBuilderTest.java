@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.internal.impl.DefaultProject;
 import org.apache.maven.internal.impl.InternalMavenSession;
@@ -147,11 +146,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertNull(project.getParentArtifact());
 
         assertFalse(project.isExecutionRoot());
-    }
-
-    @Override
-    protected ArtifactRepository getLocalRepository() throws Exception {
-        return repositorySystem.createLocalRepository(getLocalRepositoryPath());
     }
 
     @Test

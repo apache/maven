@@ -22,7 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use
+ * Artifact collector - takes a set of original artifacts and resolves the best versions to use
  * along with their metadata. No artifacts are downloaded.
  */
 @Deprecated

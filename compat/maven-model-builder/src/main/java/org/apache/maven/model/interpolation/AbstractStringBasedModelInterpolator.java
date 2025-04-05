@@ -158,7 +158,7 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
 
         valueSources.add(new MapBasedValueSource(config.getUserProperties()));
 
-        // Overwrite existing values in model properties. Otherwise it's not possible
+        // Overwrite existing values in model properties. Otherwise, it's not possible
         // to define them via command line e.g.: mvn -Drevision=6.5.7 ...
         versionProcessor.overwriteModelProperties(modelProperties, config);
         valueSources.add(new MapBasedValueSource(modelProperties));

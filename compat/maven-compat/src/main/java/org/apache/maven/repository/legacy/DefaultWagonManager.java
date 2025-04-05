@@ -602,7 +602,7 @@ public class DefaultWagonManager implements WagonManager {
             // warn if it is set to anything other than ignore
             logger.warn("*** CHECKSUM FAILED - " + message + " - IGNORING");
         }
-        // otherwise it is ignore
+        // otherwise it is ignored
     }
 
     private void verifyChecksum(

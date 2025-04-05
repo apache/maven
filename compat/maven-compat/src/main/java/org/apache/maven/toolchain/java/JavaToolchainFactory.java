@@ -97,7 +97,7 @@ public class JavaToolchainFactory implements ToolchainFactory {
 
     public ToolchainPrivate createDefaultToolchain() {
         // not sure it's necessary to provide a default toolchain here.
-        // only version can be eventually supplied, and
+        // only version can be eventually supplied.
         return null;
     }
 
