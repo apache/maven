@@ -19,7 +19,6 @@
 package org.apache.maven.api;
 
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,10 +46,15 @@ public interface SourceRoot {
 
     /**
      * {@return the list of pattern matchers for the files to include}.
+     * The path separator is {@code /} on all platforms, including Windows.
+     * If the pattern does not start with {@code regex:} or {@code glob:}, the default variation of
+     * the {@code glob} pattern will be used.
+     *
+     * <p>
      * The default implementation returns an empty list, which means to apply a language-dependent pattern.
      * For example, for the Java language, the pattern includes all files with the {@code .java} suffix.
      */
-    default List<PathMatcher> includes() {
+    default List<String> includes() {
         return List.of();
     }
 
@@ -59,7 +63,7 @@ public interface SourceRoot {
      * The exclusions are applied after the inclusions.
      * The default implementation returns an empty list.
      */
-    default List<PathMatcher> excludes() {
+    default List<String> excludes() {
         return List.of();
     }
 
