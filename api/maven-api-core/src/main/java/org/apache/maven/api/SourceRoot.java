@@ -19,6 +19,7 @@
 package org.apache.maven.api;
 
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,10 +46,11 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return the list of pattern matchers for the files to include}.
+     * {@return the list of patterns for the files to include}.
      * The path separator is {@code /} on all platforms, including Windows.
-     * If the pattern does not start with {@code regex:} or {@code glob:}, the default variation of
-     * the {@code glob} pattern will be used.
+     * The prefix before the {@code :} character, if present and longer than 1 character, is the syntax.
+     * If no syntax is specified, or if its length is 1 character (interpreted as a Windows drive),
+     * the default is a Maven-specific variation of the {@code "glob"} pattern.
      *
      * <p>
      * The default implementation returns an empty list, which means to apply a language-dependent pattern.
@@ -59,13 +61,23 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return the list of pattern matchers for the files to exclude}.
+     * {@return the list of patterns for the files to exclude}.
      * The exclusions are applied after the inclusions.
      * The default implementation returns an empty list.
      */
     default List<String> excludes() {
         return List.of();
     }
+
+    /**
+     * {@return a matcher combining the include and exclude patterns}.
+     * The matcher is absent if the includes/excludes lists are empty
+     * and {@code useDefaultExcludes} is {@code false}.
+     *
+     * @param useDefaultExcludes whether to add the default set of patterns to exclude
+     *        (mostly <abbr>SCM</abbr> files)
+     */
+    Optional<PathMatcher> matcher(boolean useDefaultExcludes);
 
     /**
      * {@return in which context the source files will be used}.

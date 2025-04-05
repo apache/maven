@@ -19,6 +19,7 @@
 package org.apache.maven.impl;
 
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,6 +41,8 @@ public final class DefaultSourceRoot implements SourceRoot {
     private final List<String> includes;
 
     private final List<String> excludes;
+
+    private transient PathMatcher matcher, matcherWithDefaults;
 
     private final ProjectScope scope;
 
@@ -142,7 +145,7 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param directory directory of the source code
      * @param includes list of patterns for the files to include, or {@code null} if unspecified
      * @param excludes list of patterns for the files to exclude, or {@code null} if unspecified
-     * */
+     */
     public DefaultSourceRoot(
             final ProjectScope scope,
             final Language language,
@@ -183,7 +186,7 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return the list of pattern matchers for the files to include}.
+     * {@return the list of patterns for the files to include}.
      */
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable
@@ -192,12 +195,34 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return the list of pattern matchers for the files to exclude}.
+     * {@return the list of patterns for the files to exclude}.
      */
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable
     public List<String> excludes() {
         return excludes;
+    }
+
+    /**
+     * {@return a matcher combining the include and exclude patterns}.
+     *
+     * @param useDefaultExcludes whether to add <abbr>SCM</abbr> files to set of exclude patterns
+     */
+    @Override
+    public Optional<PathMatcher> matcher(boolean useDefaultExcludes) {
+        PathMatcher cached = useDefaultExcludes ? matcherWithDefaults : matcher;
+        if (cached != null) {
+            return Optional.of(cached);
+        }
+        Optional<PathMatcher> selector =
+                new PathSelector(directory(), includes(), excludes(), useDefaultExcludes).simplify();
+        cached = selector.orElse(null);
+        if (useDefaultExcludes) {
+            matcherWithDefaults = cached;
+        } else {
+            matcher = cached;
+        }
+        return selector;
     }
 
     /**
