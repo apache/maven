@@ -32,12 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PathSelectorTest {
     /**
-     * The temporary directory where are the files to test.
+     * The temporary directory containing the files to test.
      */
     private Path directory;
 
     /**
-     * The filtered set of paths. creates by {@link #filter()}.
+     * The filtered set of paths. Created by {@link #filter()}.
      */
     private Set<Path> filtered;
 
@@ -84,7 +84,7 @@ public class PathSelectorTest {
     /**
      * Asserts that the filtered set of paths contains the given item.
      * If present, the path is removed from the collection of filtered files.
-     * It allows caller to verify that there is no unexpected elements remaining
+     * It allows caller to verify that there are no unexpected elements remaining
      * after all expected elements have been removed.
      *
      * @param path the path to test

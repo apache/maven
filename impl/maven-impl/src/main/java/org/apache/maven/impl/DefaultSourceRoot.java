@@ -153,8 +153,8 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param scope scope of source code (main or test)
      * @param language language of the source code
      * @param directory directory of the source code
-     * @param includes list of patterns for the files to include, or {@code null} if unspecified
-     * @param excludes list of patterns for the files to exclude, or {@code null} if nothing to exclude
+     * @param includes patterns for the files to include, or {@code null} or empty if unspecified
+     * @param excludes patterns for the files to exclude, or {@code null} or empty if nothing to exclude
      */
     public DefaultSourceRoot(
             final ProjectScope scope,
@@ -196,7 +196,7 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return the list of patterns for the files to include}.
+     * {@return the patterns for the files to include}.
      */
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable
@@ -205,7 +205,7 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return the list of patterns for the files to exclude}.
+     * {@return the patterns for the files to exclude}.
      */
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable

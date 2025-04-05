@@ -30,9 +30,9 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Determines whether a path is selected according include/exclude patterns.
+ * Determines whether a path is selected according to include/exclude patterns.
  * The pathnames used for method parameters will be relative to some base directory
- * and use {@code '/'} as separator, regardless the hosting operating system.
+ * and use {@code '/'} as separator, regardless of the hosting operating system.
  *
  * <h4>Syntax</h4>
  * If a pattern contains the {@code ':'} character and the prefix before is longer than 1 character,
@@ -51,10 +51,12 @@ import java.util.Set;
  * </ul>
  *
  * If above changes are not desired, put an explicit {@code "glob:"} prefix before the patterns.
- * Note that putting such prefix is recommended anyway for better performances.
+ * Note that putting such a prefix is recommended anyway for better performances.
  *
  * @author Benjamin Bentmann
  * @author Martin Desruisseaux
+ *
+ * @see java.nio.file.FileSystem#getPathMatcher(String)
  */
 public class PathSelector implements PathMatcher {
     /**
@@ -224,7 +226,7 @@ public class PathSelector implements PathMatcher {
 
     /**
      * Whether the given pattern does not specify a syntax, in which case Maven syntax should be used.
-     * If the prefix has a length of 1, then it is assumed to be a Window drive letter rather than a syntax.
+     * If the prefix has a length of 1, then it is assumed to be a Windows drive letter rather than a syntax.
      *
      * @param pattern the pattern to test
      * @return whether the patter does not specify a syntax
@@ -387,7 +389,7 @@ public class PathSelector implements PathMatcher {
      */
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
     public Optional<PathMatcher> simplify() {
-        if ((excludes.length | dirIncludes.length | dirExcludes.length) == 0) {
+        if (excludes.length == 0 && dirIncludes.length == 0 && dirExcludes.length == 0) {
             switch (includes.length) {
                 case 0:
                     return Optional.empty();
@@ -413,7 +415,7 @@ public class PathSelector implements PathMatcher {
     }
 
     /**
-     * {@return whether the given file matches according one of the given matchers}.
+     * {@return whether the given file matches according to one of the given matchers}.
      */
     private static boolean isMatched(Path path, PathMatcher[] matchers) {
         for (PathMatcher matcher : matchers) {
@@ -444,7 +446,7 @@ public class PathSelector implements PathMatcher {
      * Appends the elements of the given array in the given buffer.
      * This is a helper method for {@link #toString()} implementations.
      *
-     * @param buffer the buffer where to add the elements
+     * @param buffer the buffer to add the elements to
      * @param label label identifying the array of elements to add
      * @param patterns the elements to append, or {@code null} if none
      */
@@ -463,7 +465,6 @@ public class PathSelector implements PathMatcher {
 
     /**
      * {@return a string representation for logging purposes}.
-     * This string representation is reported logged when {@link Cleaner} is executed.
      */
     @Override
     public String toString() {

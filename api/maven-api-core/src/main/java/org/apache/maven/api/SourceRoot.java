@@ -55,6 +55,8 @@ public interface SourceRoot {
      * <p>
      * The default implementation returns an empty list, which means to apply a language-dependent pattern.
      * For example, for the Java language, the pattern includes all files with the {@code .java} suffix.
+     *
+     * @see java.nio.file.FileSystem#getPathMatcher(String)
      */
     default List<String> includes() {
         return List.of();
