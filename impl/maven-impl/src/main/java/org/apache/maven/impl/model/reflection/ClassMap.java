@@ -124,9 +124,9 @@ class ClassMap {
             Method publicMethod = getPublicMethod(method);
 
             // it is entirely possible that there is no public method for
-            // the methods of this class (i.e. in the facade, a method
+            // the methods of this class; i.e., in the facade, a method
             // that isn't on any of the interfaces or superclass
-            // in which case, ignore it.  Otherwise, map and cache
+            // in which case, ignore it. Otherwise, map and cache.
             if (publicMethod != null) {
                 methodMap.add(publicMethod);
                 methodCache.put(makeMethodKey(publicMethod), publicMethod);

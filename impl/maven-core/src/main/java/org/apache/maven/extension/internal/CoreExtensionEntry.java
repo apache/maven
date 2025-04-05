@@ -86,7 +86,7 @@ public class CoreExtensionEntry {
     }
 
     /**
-     * The key that can must used to identify the configuration using the
+     * The key that can be used to identify the configuration using the
      * {@link javax.inject.Named} annotation.
      */
     public String getKey() {

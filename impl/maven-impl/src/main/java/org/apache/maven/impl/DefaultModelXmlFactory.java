@@ -145,7 +145,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
     /**
      * Simply parse the given xml string.
      *
-     * @param xml the input xml string
+     * @param xml the input XML string
      * @return the parsed object
      * @throws XmlReaderException if an error occurs during the parsing
      * @see #toXmlString(Object)
@@ -155,10 +155,10 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
     }
 
     /**
-     * Simply converts the given content to an xml string.
+     * Simply converts the given content to an XML string.
      *
      * @param content the object to convert
-     * @return the xml string representation
+     * @return the XML string representation
      * @throws XmlWriterException if an error occurs during the transformation
      * @see #fromXmlString(String)
      */

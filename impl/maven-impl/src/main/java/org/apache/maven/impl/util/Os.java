@@ -123,7 +123,7 @@ public class Os {
     private static final String FAMILY_UNKNOWN = "unknown";
 
     /**
-     * OpenJDK is reported to call MacOS X "Darwin"
+     * OpenJDK is reported to call Mac OS X "Darwin"
      *
      * @see <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=44889">bugzilla issue</a>
      * @see <a href="https://issues.apache.org/jira/browse/HADOOP-3318">HADOOP-3318</a>
@@ -177,7 +177,7 @@ public class Os {
                     || actualOsName.contains("98")
                     || actualOsName.contains("me")
                     // wince isn't really 9x, but crippled enough to
-                    // be a muchness. Maven doesnt run on CE, anyway.
+                    // be a muchness. Maven doesn't run on CE, anyway.
                     || actualOsName.contains("ce"));
             isNT = !is9x;
         }

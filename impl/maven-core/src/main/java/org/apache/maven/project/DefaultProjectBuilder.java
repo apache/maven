@@ -842,7 +842,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 MavenProject parent = projectIndex.get(parentModel.getId());
                 if (parent == null) {
                     //
-                    // At this point the DefaultModelBuildingListener has fired and it populates the
+                    // At this point the DefaultModelBuildingListener has fired, and it populates the
                     // remote repositories with those found in the pom.xml, along with the existing externally
                     // defined repositories.
                     //

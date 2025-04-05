@@ -21,7 +21,7 @@ package org.apache.maven.execution;
 import java.util.Optional;
 
 /**
- * Instances of this class are responsible for determining whether it makes sense to "resume" a build (i.e., using
+ * Instances of this class are responsible for determining whether it makes sense to "resume" a build using
  * the {@code --resume} flag.
  */
 public interface BuildResumptionAnalyzer {

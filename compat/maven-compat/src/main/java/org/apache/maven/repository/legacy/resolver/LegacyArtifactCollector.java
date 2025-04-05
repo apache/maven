@@ -32,9 +32,8 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 
 /**
- * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use
+ * Artifact collector - takes a set of original artifacts and resolves the best versions to use
  * along with their metadata. No artifacts are downloaded.
- *
  */
 @Deprecated
 @SuppressWarnings("checkstyle:parameternumber")

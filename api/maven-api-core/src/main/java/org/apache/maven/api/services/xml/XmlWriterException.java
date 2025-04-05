@@ -22,7 +22,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.services.MavenException;
 
 /**
- * An exception thrown during the writing of an xml file.
+ * An exception thrown while writing an XML file.
  *
  * @since 4.0.0
  */

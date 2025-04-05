@@ -93,8 +93,7 @@ public class DefaultClasspathTransformation implements ClasspathTransformation {
         }
 
         // -----------------------------------------------------------------------
-        protected void visit(MetadataGraphVertex node) // , String version, String artifactUri )
-                {
+        protected void visit(MetadataGraphVertex node) {
             ArtifactMetadata md = node.getMd();
             if (visited.contains(node)) {
                 return;

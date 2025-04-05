@@ -84,7 +84,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
 
     // These methods deal with construction intact Plugin object that look like they come from a standard
     // <plugin/> block in a Maven POM. We have to do some wiggling to pull the sources of information
-    // together and this really shows the problem of constructing a sensible default configuration but
+    // together and this really shows the problem of constructing a sensible default configuration, but
     // it's all encapsulated here so it appears normalized to the POM builder.
 
     // We are going to take the project packaging and find all plugin in the default lifecycle and create
