@@ -108,8 +108,7 @@ public class SystemStreamLog implements Log {
 
         error.printStackTrace(pWriter);
 
-        System.err.println(
-                "[error] " + content + System.lineSeparator() + System.lineSeparator() + sWriter);
+        System.err.println("[error] " + content + System.lineSeparator() + System.lineSeparator() + sWriter);
     }
 
     /**
@@ -172,7 +171,6 @@ public class SystemStreamLog implements Log {
 
         error.printStackTrace(pWriter);
 
-        System.out.println("[" + prefix + "] " + content + System.lineSeparator() + System.lineSeparator()
-                + sWriter);
+        System.out.println("[" + prefix + "] " + content + System.lineSeparator() + System.lineSeparator() + sWriter);
     }
 }

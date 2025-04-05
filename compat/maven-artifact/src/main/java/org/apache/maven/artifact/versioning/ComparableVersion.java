@@ -839,8 +839,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
             if (prev != null) {
                 int compare = prev.compareTo(c);
-                System.out.println("   " + prev + ' ' + ((compare == 0) ? "==" : ((compare < 0) ? "<" : ">"))
-                        + ' ' + version);
+                System.out.println(
+                        "   " + prev + ' ' + ((compare == 0) ? "==" : ((compare < 0) ? "<" : ">")) + ' ' + version);
             }
 
             System.out.println(
