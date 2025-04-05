@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -141,6 +140,13 @@ public class PathSelector implements PathMatcher {
      * Maximum number of characters of the prefix before {@code ':'} for handling as a Maven syntax.
      */
     private static final int MAVEN_SYNTAX_THRESHOLD = 1;
+
+    /**
+     * A path matcher which accepts all files.
+     *
+     * @see #simplify()
+     */
+    private static final PathMatcher INCLUDES_ALL = (path) -> true;
 
     /**
      * String representation of the normalized include filters.
@@ -385,19 +391,18 @@ public class PathSelector implements PathMatcher {
 
     /**
      * {@return a potentially simpler matcher equivalent to this matcher}.
-     * It may be empty if there is no filtering to apply (i.e., all files are included).
      */
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
-    public Optional<PathMatcher> simplify() {
+    public PathMatcher simplify() {
         if (excludes.length == 0 && dirIncludes.length == 0 && dirExcludes.length == 0) {
             switch (includes.length) {
                 case 0:
-                    return Optional.empty();
+                    return INCLUDES_ALL;
                 case 1:
-                    return Optional.of(includes[0]);
+                    return includes[0];
             }
         }
-        return Optional.of(this);
+        return this;
     }
 
     /**

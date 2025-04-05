@@ -20,6 +20,7 @@ package org.apache.maven.api;
 
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,13 +74,19 @@ public interface SourceRoot {
 
     /**
      * {@return a matcher combining the include and exclude patterns}.
-     * The matcher is absent if the includes/excludes lists are empty
-     * and {@code useDefaultExcludes} is {@code false}.
+     * If the user did not specified any includes, the given {@code defaultIncludes} are used.
+     * These defaults depend on the plugin.
+     * For example, the default include of the Java compiler plugin is <code>"**&sol;*.java"</code>.
      *
+     * <p>If the user did not specified any excludes, the default can be files generated
+     * by Source Code Management (<abbr>SCM</abbr>) software or by the operating system.
+     * Examples: <code>"**&sol;.gitignore"</code>, <code>"**&sol;.DS_Store"</code>.</p>
+     *
+     * @param defaultIncludes the default includes if unspecified by the user
      * @param useDefaultExcludes whether to add the default set of patterns to exclude,
      *        mostly Source Code Management (<abbr>SCM</abbr>) files
      */
-    Optional<PathMatcher> matcher(boolean useDefaultExcludes);
+    PathMatcher matcher(Collection<String> defaultIncludes, boolean useDefaultExcludes);
 
     /**
      * {@return in which context the source files will be used}.

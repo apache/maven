@@ -58,12 +58,12 @@ public class PathSelectorTest {
         Files.createFile(biz.resolve("excluded.txt"));
 
         filter("");
-        assertContains("root.txt");
-        assertContains("foo/bar/leaf.txt");
+        assertFilteredFilesContains("root.txt");
+        assertFilteredFilesContains("foo/bar/leaf.txt");
         assertTrue(filtered.isEmpty(), filtered.toString());
 
         filter("glob:");
-        assertContains("foo/bar/leaf.txt");
+        assertFilteredFilesContains("foo/bar/leaf.txt");
         assertTrue(filtered.isEmpty(), filtered.toString());
     }
 
@@ -89,7 +89,7 @@ public class PathSelectorTest {
      *
      * @param path the path to test
      */
-    private void assertContains(String path) {
+    private void assertFilteredFilesContains(String path) {
         assertTrue(filtered.remove(directory.resolve(path)), path);
     }
 }

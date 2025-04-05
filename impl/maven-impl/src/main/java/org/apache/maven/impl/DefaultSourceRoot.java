@@ -20,6 +20,7 @@ package org.apache.maven.impl;
 
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -216,22 +217,24 @@ public final class DefaultSourceRoot implements SourceRoot {
     /**
      * {@return a matcher combining the include and exclude patterns}.
      *
+     * @param defaultIncludes the default includes if unspecified by the user
      * @param useDefaultExcludes whether to add the default set of patterns to exclude,
      *        mostly Source Code Management (<abbr>SCM</abbr>) files
      */
     @Override
-    public Optional<PathMatcher> matcher(boolean useDefaultExcludes) {
-        PathMatcher cached = useDefaultExcludes ? matcherWithDefaults : matcher;
-        if (cached != null) {
-            return Optional.of(cached);
-        }
-        Optional<PathMatcher> selector =
-                new PathSelector(directory(), includes(), excludes(), useDefaultExcludes).simplify();
-        cached = selector.orElse(null);
-        if (useDefaultExcludes) {
-            matcherWithDefaults = cached;
-        } else {
-            matcher = cached;
+    public PathMatcher matcher(Collection<String> defaultIncludes, boolean useDefaultExcludes) {
+        PathMatcher selector = useDefaultExcludes ? matcherWithDefaults : matcher;
+        if (selector == null) {
+            Collection<String> actual = includes();
+            if (actual == null || actual.isEmpty()) {
+                actual = defaultIncludes;
+            }
+            selector = new PathSelector(directory(), actual, excludes(), useDefaultExcludes).simplify();
+            if (useDefaultExcludes) {
+                matcherWithDefaults = selector;
+            } else {
+                matcher = selector;
+            }
         }
         return selector;
     }
