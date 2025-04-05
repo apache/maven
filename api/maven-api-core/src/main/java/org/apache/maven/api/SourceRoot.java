@@ -74,8 +74,8 @@ public interface SourceRoot {
      * The matcher is absent if the includes/excludes lists are empty
      * and {@code useDefaultExcludes} is {@code false}.
      *
-     * @param useDefaultExcludes whether to add the default set of patterns to exclude
-     *        (mostly <abbr>SCM</abbr> files)
+     * @param useDefaultExcludes whether to add the default set of patterns to exclude,
+     *        mostly Source Code Management (<abbr>SCM</abbr>) files
      */
     Optional<PathMatcher> matcher(boolean useDefaultExcludes);
 

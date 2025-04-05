@@ -83,6 +83,9 @@ public class PathSelectorTest {
 
     /**
      * Asserts that the filtered set of paths contains the given item.
+     * If present, the path is removed from the collection of filtered files.
+     * It allows caller to verify that there is no unexpected elements remaining
+     * after all expected elements have been removed.
      *
      * @param path the path to test
      */

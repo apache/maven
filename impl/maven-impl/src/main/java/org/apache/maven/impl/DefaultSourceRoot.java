@@ -42,7 +42,17 @@ public final class DefaultSourceRoot implements SourceRoot {
 
     private final List<String> excludes;
 
-    private transient PathMatcher matcher, matcherWithDefaults;
+    /**
+     * Matcher combining the includes and excludes.
+     * Computed when first requested, then cached.
+     */
+    private transient PathMatcher matcher;
+
+    /**
+     * Matcher combining the includes, excludes, and default excludes.
+     * Computed when first requested, then cached.
+     */
+    private transient PathMatcher matcherWithDefaults;
 
     private final ProjectScope scope;
 
@@ -144,7 +154,7 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param language language of the source code
      * @param directory directory of the source code
      * @param includes list of patterns for the files to include, or {@code null} if unspecified
-     * @param excludes list of patterns for the files to exclude, or {@code null} if unspecified
+     * @param excludes list of patterns for the files to exclude, or {@code null} if nothing to exclude
      */
     public DefaultSourceRoot(
             final ProjectScope scope,
@@ -206,7 +216,8 @@ public final class DefaultSourceRoot implements SourceRoot {
     /**
      * {@return a matcher combining the include and exclude patterns}.
      *
-     * @param useDefaultExcludes whether to add <abbr>SCM</abbr> files to set of exclude patterns
+     * @param useDefaultExcludes whether to add the default set of patterns to exclude,
+     *        mostly Source Code Management (<abbr>SCM</abbr>) files
      */
     @Override
     public Optional<PathMatcher> matcher(boolean useDefaultExcludes) {
