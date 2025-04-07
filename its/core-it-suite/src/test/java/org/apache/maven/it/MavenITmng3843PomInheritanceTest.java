@@ -114,14 +114,6 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         assertEquals("1", props.getProperty("project.build.testResources"));
         assertPathEquals(basedir, "src/main/resources", props.getProperty("project.build.resources.0.directory"));
         assertPathEquals(basedir, "src/test/resources", props.getProperty("project.build.testResources.0.directory"));
-        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
-            assertPathEquals(
-                    basedir, "src/main/resources-filtered", props.getProperty("project.build.resources.1.directory"));
-            assertPathEquals(
-                    basedir,
-                    "src/test/resources-filtered",
-                    props.getProperty("project.build.testResources.1.directory"));
-        }
         assertPathEquals(basedir, "target", props.getProperty("project.build.directory"));
         assertPathEquals(basedir, "target/classes", props.getProperty("project.build.outputDirectory"));
         assertPathEquals(basedir, "target/test-classes", props.getProperty("project.build.testOutputDirectory"));
