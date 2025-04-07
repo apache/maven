@@ -43,18 +43,6 @@ public final class DefaultSourceRoot implements SourceRoot {
 
     private final List<String> excludes;
 
-    /**
-     * Matcher combining the includes and excludes.
-     * Computed when first requested, then cached.
-     */
-    private transient PathMatcher matcher;
-
-    /**
-     * Matcher combining the includes, excludes, and default excludes.
-     * Computed when first requested, then cached.
-     */
-    private transient PathMatcher matcherWithDefaults;
-
     private final ProjectScope scope;
 
     private final Language language;
@@ -223,20 +211,11 @@ public final class DefaultSourceRoot implements SourceRoot {
      */
     @Override
     public PathMatcher matcher(Collection<String> defaultIncludes, boolean useDefaultExcludes) {
-        PathMatcher selector = useDefaultExcludes ? matcherWithDefaults : matcher;
-        if (selector == null) {
-            Collection<String> actual = includes();
-            if (actual == null || actual.isEmpty()) {
-                actual = defaultIncludes;
-            }
-            selector = new PathSelector(directory(), actual, excludes(), useDefaultExcludes).simplify();
-            if (useDefaultExcludes) {
-                matcherWithDefaults = selector;
-            } else {
-                matcher = selector;
-            }
+        Collection<String> actual = includes();
+        if (actual == null || actual.isEmpty()) {
+            actual = defaultIncludes;
         }
-        return selector;
+        return new PathSelector(directory(), actual, excludes(), useDefaultExcludes).simplify();
     }
 
     /**
