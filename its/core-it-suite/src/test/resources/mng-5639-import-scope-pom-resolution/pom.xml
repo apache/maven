@@ -29,11 +29,6 @@ under the License.
   <description>Checks that an import POM in the dependencyManagement section can be successfully
         resolved from a repository defining a URL that contains a property.</description>
 
-  <properties>
-    <!-- Value corresponds to the folder name in this directory -->
-    <repository.url.suffix.property>repo-set-by-property</repository.url.suffix.property>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
