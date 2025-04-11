@@ -26,9 +26,9 @@ public class CIDetectorHelperRunner {
     public static void main(String[] args) {
         List<CISupport> detect = CIDetectorHelper.detectCI();
         if (detect.isEmpty()) {
-            System.out.println("NONE");
+            System.out.print("NONE;");
         } else {
-            detect.forEach(d -> System.out.println(d.name() + (d.isDebug() ? "+DEBUG" : "")));
+            detect.forEach(d -> System.out.print(d.name() + (d.isDebug() ? "+DEBUG" : "") + ";"));
         }
     }
 }

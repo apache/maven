@@ -31,33 +31,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CIDetectorHelperTest {
     @Test
     void smoke() throws Exception {
-        assertEquals("NONE\n", runner(Map.of(), List.of("CI", "WORKSPACE", "GITHUB_ACTIONS")));
+        assertEquals("NONE;", runner(Map.of(), List.of("CI", "WORKSPACE", "GITHUB_ACTIONS")));
     }
 
     @Test
     void generic() throws Exception {
         assertEquals(
-                GenericCIDetector.NAME + "\n", runner(Map.of("CI", "true"), List.of("WORKSPACE", "GITHUB_ACTIONS")));
+                GenericCIDetector.NAME + ";", runner(Map.of("CI", "true"), List.of("WORKSPACE", "GITHUB_ACTIONS")));
     }
 
     @Test
     void jenkins() throws Exception {
         assertEquals(
-                JenkinsCIDetector.NAME + "\n",
+                JenkinsCIDetector.NAME + ";",
                 runner(Map.of("CI", "true", "WORKSPACE", "foobar"), List.of("GITHUB_ACTIONS")));
     }
 
     @Test
     void github() throws Exception {
         assertEquals(
-                GithubCIDetector.NAME + "\n",
+                GithubCIDetector.NAME + ";",
                 runner(Map.of("CI", "true", "GITHUB_ACTIONS", "true"), List.of("WORKSPACE")));
     }
 
     @Test
     void githubDebug() throws Exception {
         assertEquals(
-                GithubCIDetector.NAME + "+DEBUG\n",
+                GithubCIDetector.NAME + "+DEBUG;",
                 runner(Map.of("CI", "true", "GITHUB_ACTIONS", "true", "RUNNER_DEBUG", "1"), List.of("WORKSPACE")));
     }
 
