@@ -297,11 +297,16 @@ public class Verifier {
     }
 
     /**
-     * This method removes all env variables that are used for CI detection (by all known detector).
+     * This method renders all env variables that are used for CI detection (by all known detector) to not trigger.
      */
     public void removeCIEnvironmentVariables() {
-        List.of("CI", "GITHUB_ACTIONS", "WORKSPACE", "CIRCLECI", "TEAMCITY_VERSION", "TRAVIS")
-                .forEach(environmentVariables::remove);
+        environmentVariables.putAll(Map.of(
+                "CIRCLECI", "",
+                "CI", "",
+                "GITHUB_ACTIONS", "",
+                "WORKSPACE", "",
+                "TEAMCITY_VERSION", "",
+                "TRAVIS", ""));
     }
 
     public void setEnvironmentVariable(String key, String value) {
