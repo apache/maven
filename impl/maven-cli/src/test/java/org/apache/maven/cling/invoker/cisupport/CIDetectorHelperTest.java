@@ -19,6 +19,8 @@
 package org.apache.maven.cling.invoker.cisupport;
 
 import java.nio.file.FileSystems;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.maven.impl.util.Os;
@@ -29,39 +31,48 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CIDetectorHelperTest {
     @Test
     void smoke() throws Exception {
-        assertEquals("NONE\n", runner(Map.of()));
+        assertEquals("NONE\n", runner(Map.of(), Arrays.asList("CI", "WORKSPACE", "GITHUB_ACTIONS")));
     }
 
     @Test
     void generic() throws Exception {
-        assertEquals(GenericCIDetector.NAME + "\n", runner(Map.of("CI", "true")));
+        assertEquals(
+                GenericCIDetector.NAME + "\n",
+                runner(Map.of("CI", "true"), Arrays.asList("WORKSPACE", "GITHUB_ACTIONS")));
     }
 
     @Test
     void jenkins() throws Exception {
-        assertEquals(JenkinsCIDetector.NAME + "\n", runner(Map.of("CI", "true", "WORKSPACE", "foobar")));
+        assertEquals(
+                JenkinsCIDetector.NAME + "\n",
+                runner(Map.of("CI", "true", "WORKSPACE", "foobar"), Arrays.asList("CI", "GITHUB_ACTIONS")));
     }
 
     @Test
     void github() throws Exception {
-        assertEquals(GithubCIDetector.NAME + "\n", runner(Map.of("CI", "true", "GITHUB_ACTIONS", "true")));
+        assertEquals(
+                GithubCIDetector.NAME + "\n",
+                runner(Map.of("CI", "true", "GITHUB_ACTIONS", "true"), Arrays.asList("CI", "WORKSPACE")));
     }
 
     @Test
     void githubDebug() throws Exception {
         assertEquals(
                 GithubCIDetector.NAME + "+DEBUG\n",
-                runner(Map.of("CI", "true", "GITHUB_ACTIONS", "true", "RUNNER_DEBUG", "1")));
+                runner(
+                        Map.of("CI", "true", "GITHUB_ACTIONS", "true", "RUNNER_DEBUG", "1"),
+                        Arrays.asList("CI", "WORKSPACE")));
     }
 
-    private static String runner(Map<String, String> env) throws Exception {
+    private static String runner(Map<String, String> add, Collection<String> remove) throws Exception {
         String separator = FileSystems.getDefault().getSeparator();
         String classpath = System.getProperty("java.class.path");
         String path =
                 System.getProperty("java.home") + separator + "bin" + separator + (Os.IS_WINDOWS ? "java.exe" : "java");
         ProcessBuilder processBuilder =
                 new ProcessBuilder(path, "-cp", classpath, CIDetectorHelperRunner.class.getName());
-        processBuilder.environment().putAll(env);
+        processBuilder.environment().putAll(add);
+        remove.forEach(k -> processBuilder.environment().remove(k));
         Process process = processBuilder.start();
         process.waitFor();
         return new String(process.getInputStream().readAllBytes());
