@@ -90,7 +90,7 @@ public abstract class CommonsCliOptions implements Options {
 
     @Override
     public Optional<Boolean> verbose() {
-        if (commandLine.hasOption(CLIManager.VERBOSE)) {
+        if (commandLine.hasOption(CLIManager.VERBOSE) || "1".equals(System.getenv("RUNNER_DEBUG"))) {
             return Optional.of(Boolean.TRUE);
         }
         return Optional.empty();
