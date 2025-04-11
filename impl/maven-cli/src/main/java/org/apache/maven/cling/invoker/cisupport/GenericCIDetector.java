@@ -34,7 +34,7 @@ public class GenericCIDetector implements CIDetector {
     @Override
     public Optional<CISupport> detectCI() {
         String ciEnv = System.getenv(CI);
-        if ("true".equals(ciEnv)) {
+        if (ciEnv != null && !"false".equals(ciEnv)) {
             return Optional.of(new CISupport() {
                 @Override
                 public String name() {
@@ -44,7 +44,7 @@ public class GenericCIDetector implements CIDetector {
                 @Override
                 public String message() {
                     return "Environment variable " + CI
-                            + " equals \"true\". Disable detection by removing that variable or by setting it to any other value";
+                            + " is set and its value is not \"false\". Disable this detection by removing that variable or by setting it to \"false\"";
                 }
             });
         }
