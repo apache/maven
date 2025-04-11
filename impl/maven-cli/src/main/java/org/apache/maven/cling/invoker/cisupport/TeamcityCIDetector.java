@@ -33,7 +33,7 @@ public class TeamcityCIDetector implements CIDetector {
     @Override
     public Optional<CISupport> detectCI() {
         String ciEnv = System.getenv(TEAMCITY_VERSION);
-        if (ciEnv != null) {
+        if (ciEnv != null && !ciEnv.trim().isEmpty()) {
             return Optional.of(new CISupport() {
                 @Override
                 public String name() {
