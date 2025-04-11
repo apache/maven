@@ -20,7 +20,7 @@ package org.apache.maven.cling.invoker.cisupport;
 
 import java.util.Optional;
 
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 
 /**
  * Generic CI support. This offers same support as Maven 3 always had. Is also special, as code will reject this
@@ -32,10 +32,10 @@ public class GenericCIDetector implements CIDetector {
     private static final String CI = "CI";
 
     @Override
-    public Optional<CISupport> detectCI() {
+    public Optional<CIInfo> detectCI() {
         String ciEnv = System.getenv(CI);
         if (ciEnv != null && !"false".equals(ciEnv)) {
-            return Optional.of(new CISupport() {
+            return Optional.of(new CIInfo() {
                 @Override
                 public String name() {
                     return NAME;

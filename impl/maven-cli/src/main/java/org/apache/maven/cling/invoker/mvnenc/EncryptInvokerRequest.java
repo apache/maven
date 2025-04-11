@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.CoreExtensions;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.BaseInvokerRequest;
 
@@ -46,7 +46,7 @@ public class EncryptInvokerRequest extends BaseInvokerRequest {
             Path topDirectory,
             Path rootDirectory,
             List<CoreExtensions> coreExtensions,
-            CISupport ciSupport,
+            CIInfo ciInfo,
             EncryptOptions options) {
         super(
                 parserRequest,
@@ -59,7 +59,7 @@ public class EncryptInvokerRequest extends BaseInvokerRequest {
                 topDirectory,
                 rootDirectory,
                 coreExtensions,
-                ciSupport);
+                ciInfo);
         this.options = requireNonNull(options);
     }
 

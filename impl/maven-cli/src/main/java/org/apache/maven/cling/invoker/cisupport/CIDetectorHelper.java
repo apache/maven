@@ -23,23 +23,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 
 /**
- * CI detector helper: it uses service discovery (one is always present: {@link GenericCIDetector}) to detect CI, if
- * present and returns a list of detections. If result has 2 or more results, it will return the generic result before.
+ * CI detector helper: it uses service discovery to discover {@link CIDetector}s. If resulting list has more than
+ * one element, it will remove the {@link GenericCIDetector} result, assuming a more specific one is also present.
  */
 public final class CIDetectorHelper {
     private CIDetectorHelper() {}
 
-    public static List<CISupport> detectCI() {
+    public static List<CIInfo> detectCI() {
         List<CIDetector> detectors = ServiceLoader.load(CIDetector.class).stream()
                 .map(ServiceLoader.Provider::get)
                 .toList();
 
-        ArrayList<CISupport> result = new ArrayList<>();
+        ArrayList<CIInfo> result = new ArrayList<>();
         for (CIDetector detector : detectors) {
-            Optional<CISupport> detected = detector.detectCI();
+            Optional<CIInfo> detected = detector.detectCI();
             detected.ifPresent(result::add);
         }
         if (result.size() > 1) {

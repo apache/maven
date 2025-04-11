@@ -28,7 +28,7 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilderFactory;
 
@@ -186,11 +186,11 @@ public interface InvokerRequest {
     /**
      * Returns detected CI system, if any.
      *
-     * @return an {@link Optional} containing the {@link CISupport} collected from CI system. or empty if CI not
+     * @return an {@link Optional} containing the {@link CIInfo} collected from CI system. or empty if CI not
      * detected.
      */
     @Nonnull
-    Optional<CISupport> ciSupport();
+    Optional<CIInfo> ciInfo();
 
     /**
      * Returns the options associated with this invocation request.
@@ -205,8 +205,6 @@ public interface InvokerRequest {
      * if applicable.
      */
     default boolean effectiveVerbose() {
-        return options()
-                .verbose()
-                .orElse(ciSupport().isPresent() && ciSupport().get().isDebug());
+        return options().verbose().orElse(ciInfo().isPresent() && ciInfo().get().isDebug());
     }
 }

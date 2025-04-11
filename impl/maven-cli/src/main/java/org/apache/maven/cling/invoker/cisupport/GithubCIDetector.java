@@ -20,7 +20,7 @@ package org.apache.maven.cling.invoker.cisupport;
 
 import java.util.Optional;
 
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 
 /**
  * GitHub CI support.
@@ -32,10 +32,10 @@ public class GithubCIDetector implements CIDetector {
     private static final String RUNNER_DEBUG = "RUNNER_DEBUG";
 
     @Override
-    public Optional<CISupport> detectCI() {
+    public Optional<CIInfo> detectCI() {
         String ciEnv = System.getenv(GITHUB_ACTIONS);
         if ("true".equals(ciEnv)) {
-            return Optional.of(new CISupport() {
+            return Optional.of(new CIInfo() {
                 @Override
                 public String name() {
                     return NAME;

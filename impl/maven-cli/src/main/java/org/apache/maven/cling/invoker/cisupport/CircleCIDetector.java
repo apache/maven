@@ -20,7 +20,7 @@ package org.apache.maven.cling.invoker.cisupport;
 
 import java.util.Optional;
 
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 
 /**
  * Circle CI support.
@@ -31,10 +31,10 @@ public class CircleCIDetector implements CIDetector {
     private static final String CIRCLECI = "CIRCLECI";
 
     @Override
-    public Optional<CISupport> detectCI() {
+    public Optional<CIInfo> detectCI() {
         String ciEnv = System.getenv(CIRCLECI);
         if ("true".equals(ciEnv)) {
-            return Optional.of(new CISupport() {
+            return Optional.of(new CIInfo() {
                 @Override
                 public String name() {
                     return NAME;

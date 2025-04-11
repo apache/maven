@@ -49,7 +49,7 @@ public class ShellParser extends BaseParser {
                 context.topDirectory,
                 context.rootDirectory,
                 context.extensions,
-                context.ciSupport,
+                context.ciInfo,
                 (ShellOptions) context.options);
     }
 

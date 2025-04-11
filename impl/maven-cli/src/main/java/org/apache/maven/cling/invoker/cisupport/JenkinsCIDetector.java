@@ -20,7 +20,7 @@ package org.apache.maven.cling.invoker.cisupport;
 
 import java.util.Optional;
 
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 
 /**
  * Jenkins CI support.
@@ -31,10 +31,10 @@ public class JenkinsCIDetector implements CIDetector {
     private static final String WORKSPACE = "WORKSPACE";
 
     @Override
-    public Optional<CISupport> detectCI() {
+    public Optional<CIInfo> detectCI() {
         String workspace = System.getenv(WORKSPACE);
         if (workspace != null && !workspace.trim().isEmpty()) {
-            return Optional.of(new CISupport() {
+            return Optional.of(new CIInfo() {
                 @Override
                 public String name() {
                     return NAME;

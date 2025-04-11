@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * CI support: this class contains gathered information and more from CI that Maven process runs on.
  */
-public interface CISupport {
+public interface CIInfo {
     /**
      * Short distinct name of CI system: "GH", "Jenkins", etc.
      */

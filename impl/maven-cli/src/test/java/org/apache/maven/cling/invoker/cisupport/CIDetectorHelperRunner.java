@@ -20,11 +20,11 @@ package org.apache.maven.cling.invoker.cisupport;
 
 import java.util.List;
 
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 
 public class CIDetectorHelperRunner {
     public static void main(String[] args) {
-        List<CISupport> detect = CIDetectorHelper.detectCI();
+        List<CIInfo> detect = CIDetectorHelper.detectCI();
         if (detect.isEmpty()) {
             System.out.print("NONE;");
         } else {

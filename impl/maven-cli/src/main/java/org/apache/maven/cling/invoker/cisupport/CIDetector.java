@@ -20,7 +20,7 @@ package org.apache.maven.cling.invoker.cisupport;
 
 import java.util.Optional;
 
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 
 /**
  * Service interface to detect CI system process runs on, if any.
@@ -29,5 +29,5 @@ public interface CIDetector {
     /**
      * Returns non-empty optional with CI information, if CI is detected, empty otherwise.
      */
-    Optional<CISupport> detectCI();
+    Optional<CIInfo> detectCI();
 }

@@ -43,7 +43,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.extensions.InputLocation;
 import org.apache.maven.api.cli.extensions.InputSource;
@@ -89,7 +89,7 @@ public abstract class BaseParser implements Parser {
         public List<CoreExtensions> extensions;
 
         @Nullable
-        public CISupport ciSupport;
+        public CIInfo ciInfo;
 
         public Options options;
 
@@ -196,7 +196,7 @@ public abstract class BaseParser implements Parser {
         }
 
         // CI detection
-        context.ciSupport = detectCI(context);
+        context.ciInfo = detectCI(context);
 
         // only if not failed so far; otherwise we may have no options to validate
         if (!context.parsingFailed) {
@@ -510,16 +510,16 @@ public abstract class BaseParser implements Parser {
     }
 
     @Nullable
-    protected CISupport detectCI(LocalContext context) {
-        List<CISupport> detected = CIDetectorHelper.detectCI();
+    protected CIInfo detectCI(LocalContext context) {
+        List<CIInfo> detected = CIDetectorHelper.detectCI();
         if (detected.isEmpty()) {
             return null;
         } else if (detected.size() > 1) {
             // warn
             context.parserRequest
                     .logger()
-                    .warn("Multiple CI systems detected:"
-                            + detected.stream().map(CISupport::name).collect(Collectors.joining(", ")));
+                    .warn("Multiple CI systems detected: "
+                            + detected.stream().map(CIInfo::name).collect(Collectors.joining(", ")));
         }
         return detected.get(0);
     }

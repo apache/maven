@@ -362,7 +362,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected TransferListener determineTransferListener(MavenContext context, boolean noTransferProgress) {
         boolean quiet = context.invokerRequest.options().quiet().orElse(false);
         boolean logFile = context.invokerRequest.options().logFile().isPresent();
-        boolean quietCI = context.invokerRequest.ciSupport().isPresent()
+        boolean quietCI = context.invokerRequest.ciInfo().isPresent()
                 && !context.invokerRequest.options().forceInteractive().orElse(false);
 
         TransferListener delegate;

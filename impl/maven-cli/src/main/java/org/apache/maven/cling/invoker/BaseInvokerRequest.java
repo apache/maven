@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.CoreExtensions;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.ParserRequest;
-import org.apache.maven.api.cli.cisupport.CISupport;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 
 import static java.util.Objects.requireNonNull;
 
@@ -43,7 +43,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     private final Path topDirectory;
     private final Path rootDirectory;
     private final List<CoreExtensions> coreExtensions;
-    private final CISupport ciSupport;
+    private final CIInfo ciInfo;
 
     @SuppressWarnings("ParameterNumber")
     public BaseInvokerRequest(
@@ -57,7 +57,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
             @Nonnull Path topDirectory,
             @Nullable Path rootDirectory,
             @Nullable List<CoreExtensions> coreExtensions,
-            @Nullable CISupport ciSupport) {
+            @Nullable CIInfo ciInfo) {
         this.parserRequest = requireNonNull(parserRequest);
         this.parsingFailed = parsingFailed;
         this.cwd = requireNonNull(cwd);
@@ -69,7 +69,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
         this.topDirectory = requireNonNull(topDirectory);
         this.rootDirectory = rootDirectory;
         this.coreExtensions = coreExtensions;
-        this.ciSupport = ciSupport;
+        this.ciInfo = ciInfo;
     }
 
     @Override
@@ -123,7 +123,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     }
 
     @Override
-    public Optional<CISupport> ciSupport() {
-        return Optional.ofNullable(ciSupport);
+    public Optional<CIInfo> ciInfo() {
+        return Optional.ofNullable(ciInfo);
     }
 }
