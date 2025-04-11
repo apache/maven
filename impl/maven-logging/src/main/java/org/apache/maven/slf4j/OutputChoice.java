@@ -33,7 +33,7 @@ class OutputChoice {
         CACHED_SYS_OUT,
         SYS_ERR,
         CACHED_SYS_ERR,
-        FILE;
+        FILE
     }
 
     final OutputChoiceType outputChoiceType;
