@@ -18,9 +18,9 @@
  */
 package org.apache.maven.impl;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,9 +39,9 @@ import org.apache.maven.api.model.Source;
 public final class DefaultSourceRoot implements SourceRoot {
     private final Path directory;
 
-    private final List<PathMatcher> includes;
+    private final List<String> includes;
 
-    private final List<PathMatcher> excludes;
+    private final List<String> excludes;
 
     private final ProjectScope scope;
 
@@ -65,9 +65,8 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param source a source element from the model
      */
     public DefaultSourceRoot(final Session session, final Path baseDir, final Source source) {
-        FileSystem fs = baseDir.getFileSystem();
-        includes = matchers(fs, source.getIncludes());
-        excludes = matchers(fs, source.getExcludes());
+        includes = source.getIncludes();
+        excludes = source.getExcludes();
         stringFiltering = source.isStringFiltering();
         enabled = source.isEnabled();
         moduleName = nonBlank(source.getModule());
@@ -106,9 +105,8 @@ public final class DefaultSourceRoot implements SourceRoot {
             throw new IllegalArgumentException("Source declaration without directory value.");
         }
         directory = baseDir.resolve(value).normalize();
-        FileSystem fs = directory.getFileSystem();
-        includes = matchers(fs, resource.getIncludes());
-        excludes = matchers(fs, resource.getExcludes());
+        includes = resource.getIncludes();
+        excludes = resource.getExcludes();
         stringFiltering = Boolean.parseBoolean(resource.getFiltering());
         enabled = true;
         moduleName = null;
@@ -144,13 +142,15 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param scope scope of source code (main or test)
      * @param language language of the source code
      * @param directory directory of the source code
+     * @param includes patterns for the files to include, or {@code null} or empty if unspecified
+     * @param excludes patterns for the files to exclude, or {@code null} or empty if nothing to exclude
      */
     public DefaultSourceRoot(
             final ProjectScope scope,
             final Language language,
             final Path directory,
-            List<PathMatcher> includes,
-            List<PathMatcher> excludes) {
+            List<String> includes,
+            List<String> excludes) {
         this.scope = Objects.requireNonNull(scope);
         this.language = language;
         this.directory = Objects.requireNonNull(directory);
@@ -177,38 +177,6 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * Creates a path matcher for each pattern.
-     * The path separator is {@code /} on all platforms, including Windows.
-     * The prefix before the {@code :} character is the syntax.
-     * If no syntax is specified, {@code "glob"} is assumed.
-     *
-     * @param fs the file system of the root directory
-     * @param patterns the patterns for which to create path matcher
-     * @return a path matcher for each pattern
-     */
-    private static List<PathMatcher> matchers(FileSystem fs, List<String> patterns) {
-        final var matchers = new PathMatcher[patterns.size()];
-        for (int i = 0; i < matchers.length; i++) {
-            String rawPattern = patterns.get(i);
-            String pattern = rawPattern.contains(":") ? rawPattern : "glob:" + rawPattern;
-            matchers[i] = new PathMatcher() {
-                final PathMatcher delegate = fs.getPathMatcher(pattern);
-
-                @Override
-                public boolean matches(Path path) {
-                    return delegate.matches(path);
-                }
-
-                @Override
-                public String toString() {
-                    return rawPattern;
-                }
-            };
-        }
-        return List.of(matchers);
-    }
-
-    /**
      * {@return the root directory where the sources are stored}.
      */
     @Override
@@ -217,21 +185,37 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return the list of pattern matchers for the files to include}.
+     * {@return the patterns for the files to include}.
      */
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable
-    public List<PathMatcher> includes() {
+    public List<String> includes() {
         return includes;
     }
 
     /**
-     * {@return the list of pattern matchers for the files to exclude}.
+     * {@return the patterns for the files to exclude}.
      */
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable
-    public List<PathMatcher> excludes() {
+    public List<String> excludes() {
         return excludes;
+    }
+
+    /**
+     * {@return a matcher combining the include and exclude patterns}.
+     *
+     * @param defaultIncludes the default includes if unspecified by the user
+     * @param useDefaultExcludes whether to add the default set of patterns to exclude,
+     *        mostly Source Code Management (<abbr>SCM</abbr>) files
+     */
+    @Override
+    public PathMatcher matcher(Collection<String> defaultIncludes, boolean useDefaultExcludes) {
+        Collection<String> actual = includes();
+        if (actual == null || actual.isEmpty()) {
+            actual = defaultIncludes;
+        }
+        return new PathSelector(directory(), actual, excludes(), useDefaultExcludes).simplify();
     }
 
     /**
