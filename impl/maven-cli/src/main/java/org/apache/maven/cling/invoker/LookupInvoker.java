@@ -278,7 +278,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
 
         context.loggerLevel = Slf4jConfiguration.Level.INFO;
-        if (mavenOptions.verbose().orElse(false)) {
+        if (context.invokerRequest.effectiveVerbose()) {
             context.loggerLevel = Slf4jConfiguration.Level.DEBUG;
         } else if (mavenOptions.quiet().orElse(false)) {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
@@ -465,7 +465,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         InvokerRequest invokerRequest = context.invokerRequest;
         if (invokerRequest.options().quiet().orElse(false)) {
             writer.accept(CLIReportingUtils.showVersionMinimal());
-        } else if (invokerRequest.options().verbose().orElse(false)) {
+        } else if (context.invokerRequest.effectiveVerbose()) {
             writer.accept(CLIReportingUtils.showVersion(
                     ProcessHandle.current().info().commandLine().orElse(null), describe(context.terminal)));
 
@@ -493,9 +493,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void preCommands(C context) throws Exception {
-        Options mavenOptions = context.invokerRequest.options();
-        boolean verbose = mavenOptions.verbose().orElse(false);
-        boolean version = mavenOptions.showVersion().orElse(false);
+        boolean verbose = context.invokerRequest.effectiveVerbose();
+        boolean version = context.invokerRequest.options().showVersion().orElse(false);
         if (verbose || version) {
             showVersion(context);
         }

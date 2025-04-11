@@ -362,8 +362,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected TransferListener determineTransferListener(MavenContext context, boolean noTransferProgress) {
         boolean quiet = context.invokerRequest.options().quiet().orElse(false);
         boolean logFile = context.invokerRequest.options().logFile().isPresent();
-        boolean runningOnCI = context.invokerRequest.ciSupport().isPresent();
-        boolean quietCI = runningOnCI
+        boolean quietCI = context.invokerRequest.ciSupport().isPresent()
                 && !context.invokerRequest.options().forceInteractive().orElse(false);
 
         TransferListener delegate;
@@ -373,7 +372,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             SimplexTransferListener simplex = new SimplexTransferListener(new ConsoleMavenTransferListener(
                     context.invokerRequest.messageBuilderFactory(),
                     context.terminal.writer(),
-                    context.invokerRequest.options().verbose().orElse(false)));
+                    context.invokerRequest.effectiveVerbose()));
             context.closeables.add(simplex);
             delegate = simplex;
         } else {
@@ -485,7 +484,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                 context.logger.error("To see the full stack trace of the errors, re-run Maven with the '"
                         + MessageUtils.builder().strong("-e") + "' switch");
             }
-            if (!context.invokerRequest.options().verbose().orElse(false)) {
+            if (!context.invokerRequest.effectiveVerbose()) {
                 context.logger.error("Re-run Maven using the '"
                         + MessageUtils.builder().strong("-X") + "' switch to enable verbose output");
             }

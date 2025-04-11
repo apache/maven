@@ -198,4 +198,12 @@ public interface InvokerRequest {
      */
     @Nonnull
     Options options();
+
+    /**
+     * This method returns "verbose" option value derived from multiple places: CLI options, but also CI detection,
+     * if applicable.
+     */
+    default boolean effectiveVerbose() {
+        return options().verbose().orElse(ciSupport().isPresent() && ciSupport().get().isDebug());
+    }
 }

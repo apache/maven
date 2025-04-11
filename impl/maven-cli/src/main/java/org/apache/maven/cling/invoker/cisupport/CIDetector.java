@@ -20,7 +20,6 @@ package org.apache.maven.cling.invoker.cisupport;
 
 import java.util.Optional;
 
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.cisupport.CISupport;
 
 /**
@@ -30,6 +29,5 @@ public interface CIDetector {
     /**
      * Returns non-empty optional with CI information, if CI is detected, empty otherwise.
      */
-    @Nullable
     Optional<CISupport> detectCI();
 }
