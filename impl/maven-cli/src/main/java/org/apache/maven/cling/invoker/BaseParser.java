@@ -43,11 +43,13 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
+import org.apache.maven.api.cli.cisupport.CISupport;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.extensions.InputLocation;
 import org.apache.maven.api.cli.extensions.InputSource;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
+import org.apache.maven.cling.invoker.cisupport.CIDetectorHelper;
 import org.apache.maven.cling.props.MavenPropertiesLoader;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.properties.internal.EnvironmentUtils;
@@ -85,6 +87,9 @@ public abstract class BaseParser implements Parser {
 
         @Nullable
         public List<CoreExtensions> extensions;
+
+        @Nullable
+        public CISupport ciSupport;
 
         public Options options;
 
@@ -189,6 +194,9 @@ public abstract class BaseParser implements Parser {
             context.parsingFailed = true;
             parserRequest.logger().error("Error reading core extensions descriptor", e);
         }
+
+        // CI detection
+        context.ciSupport = detectCI(context);
 
         // only if not failed so far; otherwise we may have no options to validate
         if (!context.parsingFailed) {
@@ -499,5 +507,20 @@ public abstract class BaseParser implements Parser {
                                         .map(l -> String.valueOf(l.getLineNumber()))
                                         .collect(Collectors.joining(", ")))
                         .collect(Collectors.joining("; ")));
+    }
+
+    @Nullable
+    protected CISupport detectCI(LocalContext context) {
+        List<CISupport> detected = CIDetectorHelper.detectCI();
+        if (detected.isEmpty()) {
+            return null;
+        } else if (detected.size() > 1) {
+            // warn
+            context.parserRequest
+                    .logger()
+                    .warn("Multiple CI systems detected:"
+                            + detected.stream().map(CISupport::name).collect(Collectors.joining(", ")));
+        }
+        return detected.get(0);
     }
 }

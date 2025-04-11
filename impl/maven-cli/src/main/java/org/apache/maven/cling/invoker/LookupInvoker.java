@@ -726,7 +726,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             if (context.invokerRequest.options().nonInteractive().orElse(false)) {
                 return false;
             } else {
-                boolean runningOnCI = isRunningOnCI(context);
+                boolean runningOnCI = context.invokerRequest.ciSupport().isPresent();
                 if (runningOnCI) {
                     context.logger.info(
                             "Making this build non-interactive, because the environment variable CI equals \"true\"."
@@ -933,11 +933,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             throw new IllegalArgumentException("Invalid threads value: '" + threadConfiguration
                     + "'. Supported are int and float values ending with C.");
         }
-    }
-
-    protected boolean isRunningOnCI(C context) {
-        String ciEnv = context.protoSession.getSystemProperties().get("env.CI");
-        return ciEnv != null && !"false".equals(ciEnv);
     }
 
     protected abstract int execute(C context) throws Exception;

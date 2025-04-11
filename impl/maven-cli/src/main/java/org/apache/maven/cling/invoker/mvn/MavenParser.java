@@ -123,6 +123,7 @@ public class MavenParser extends BaseParser {
                 context.topDirectory,
                 context.rootDirectory,
                 context.extensions,
+                context.ciSupport,
                 (MavenOptions) context.options);
     }
 

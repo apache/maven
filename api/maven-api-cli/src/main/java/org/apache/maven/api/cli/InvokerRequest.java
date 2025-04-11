@@ -28,6 +28,7 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cli.cisupport.CISupport;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilderFactory;
 
@@ -181,6 +182,14 @@ public interface InvokerRequest {
      */
     @Nonnull
     Optional<List<CoreExtensions>> coreExtensions();
+
+    /**
+     * Returns detected CI system, if any.
+     *
+     * @return an {@link Optional} containing the {@link CISupport} collected from CI system. or empty if CI not
+     * detected.
+     */
+    Optional<CISupport> ciSupport();
 
     /**
      * Returns the options associated with this invocation request.
