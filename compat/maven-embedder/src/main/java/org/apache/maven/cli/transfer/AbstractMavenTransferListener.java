@@ -206,7 +206,7 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
         message.append(darkOff).append(resource.getResourceName());
 
-        out.println(message.toString());
+        out.println(message);
     }
 
     @Override
@@ -243,6 +243,6 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         }
 
         message.append(')').append(darkOff);
-        out.println(message.toString());
+        out.println(message);
     }
 }

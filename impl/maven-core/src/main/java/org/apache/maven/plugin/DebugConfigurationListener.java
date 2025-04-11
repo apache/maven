@@ -72,7 +72,7 @@ public class DebugConfigurationListener implements ConfigurationListener {
                 if (i > 0) {
                     buf.append(", ");
                 }
-                buf.append(String.valueOf(Array.get(obj, i)));
+                buf.append(Array.get(obj, i));
             }
             buf.append(']');
             str = buf.toString();
