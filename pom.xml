@@ -133,7 +133,7 @@ under the License.
     <hamcrestVersion>3.0</hamcrestVersion>
     <mockitoVersion>4.11.0</mockitoVersion>
     <plexusVersion>2.2.0</plexusVersion>
-    <plexusInterpolationVersion>1.27</plexusInterpolationVersion>
+    <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
     <!-- Blocked by 3.4.0+ changes, see MNG-7710, downgrade from parent 4.0.1 -->
     <version.plexus-utils>3.6.0</version.plexus-utils>
     <guiceVersion>5.1.0</guiceVersion>
