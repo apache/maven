@@ -1,1 +1,3 @@
 org.apache.maven.cling.invoker.cisupport.GenericCIDetector
+org.apache.maven.cling.invoker.cisupport.GithubCIDetector
+org.apache.maven.cling.invoker.cisupport.JenkinsCIDetector
