@@ -26,11 +26,14 @@ import org.apache.maven.api.cli.cisupport.CISupport;
  * GitHub CI support.
  */
 public class GithubCIDetector implements CIDetector {
-    public static final String NAME = "github";
+    public static final String NAME = "GitHub";
+
+    private static final String GITHUB_ACTIONS = "GITHUB_ACTIONS";
+    private static final String RUNNER_DEBUG = "RUNNER_DEBUG";
 
     @Override
     public Optional<CISupport> detectCI() {
-        String ciEnv = System.getenv("GITHUB_ACTIONS");
+        String ciEnv = System.getenv(GITHUB_ACTIONS);
         if ("true".equals(ciEnv)) {
             return Optional.of(new CISupport() {
                 @Override
@@ -40,7 +43,7 @@ public class GithubCIDetector implements CIDetector {
 
                 @Override
                 public boolean isDebug() {
-                    return "1".equals(System.getenv("RUNNER_DEBUG"));
+                    return "1".equals(System.getenv(RUNNER_DEBUG));
                 }
             });
         }

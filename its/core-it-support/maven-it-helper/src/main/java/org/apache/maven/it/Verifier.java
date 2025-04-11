@@ -296,6 +296,13 @@ public class Verifier {
         return systemProperties;
     }
 
+    /**
+     * This method removes all env variables that are used for CI detection (by all known detector).
+     */
+    public void removeCIEnvironmentVariables() {
+        List.of("CI", "GITHUB_ACTIONS", "WORKSPACE").forEach(environmentVariables::remove);
+    }
+
     public void setEnvironmentVariable(String key, String value) {
         if (value != null) {
             environmentVariables.put(key, value);

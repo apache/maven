@@ -27,12 +27,14 @@ import org.apache.maven.api.cli.cisupport.CISupport;
  * detector result IF there are also any other returned via discovered services.
  */
 public class GenericCIDetector implements CIDetector {
-    public static final String NAME = "generic";
+    public static final String NAME = "Generic";
+
+    private static final String CI = "CI";
 
     @Override
     public Optional<CISupport> detectCI() {
-        String ciEnv = System.getenv("CI");
-        if (ciEnv != null && !"false".equals(ciEnv)) {
+        String ciEnv = System.getenv(CI);
+        if ("true".equals(ciEnv)) {
             return Optional.of(new CISupport() {
                 @Override
                 public String name() {
@@ -41,7 +43,8 @@ public class GenericCIDetector implements CIDetector {
 
                 @Override
                 public String message() {
-                    return "Environment variable CI equals \"true\". Disable detection by removing that variable or by setting it to any other value";
+                    return "Environment variable " + CI
+                            + " equals \"true\". Disable detection by removing that variable or by setting it to any other value";
                 }
             });
         }

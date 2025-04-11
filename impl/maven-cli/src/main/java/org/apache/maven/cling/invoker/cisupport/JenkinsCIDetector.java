@@ -26,11 +26,13 @@ import org.apache.maven.api.cli.cisupport.CISupport;
  * Jenkins CI support.
  */
 public class JenkinsCIDetector implements CIDetector {
-    public static final String NAME = "jenkins";
+    public static final String NAME = "Jenkins";
+
+    private static final String WORKSPACE = "WORKSPACE";
 
     @Override
     public Optional<CISupport> detectCI() {
-        String workspace = System.getenv("WORKSPACE");
+        String workspace = System.getenv(WORKSPACE);
         if (workspace != null && !workspace.trim().isEmpty()) {
             return Optional.of(new CISupport() {
                 @Override
