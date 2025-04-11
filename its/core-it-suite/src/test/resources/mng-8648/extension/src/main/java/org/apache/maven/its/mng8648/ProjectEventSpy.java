@@ -38,12 +38,17 @@ public class ProjectEventSpy implements EventSpy {
             MavenProject project = executionEvent.getProject();
             switch (executionEvent.getType()) {
                 case ProjectStarted:
-                    System.out.println(project.getId() + " started");
-                    projects.put(project.getId(), project);
+                    System.out.println(project.getId() + " " + executionEvent.getType());
+                    MavenProject existing = projects.put(project.getId(), project);
+                    if (existing != null) {
+                        throw new IllegalStateException("Project " + project.getId() + " was already started");
+                    }
                     break;
                 case ProjectSucceeded:
+                case ProjectFailed:
+                case ProjectSkipped:
+                    System.out.println(project.getId() + " " + executionEvent.getType());
                     MavenProject mavenProject = projects.get(project.getId());
-                    System.out.println(project.getId() + " finished");
                     if (mavenProject == null) {
                         throw new IllegalStateException("Project " + project.getId() + " was never started");
                     }
