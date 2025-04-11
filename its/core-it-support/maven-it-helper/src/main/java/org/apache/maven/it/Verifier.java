@@ -302,7 +302,7 @@ public class Verifier {
     public void removeCIEnvironmentVariables() {
         environmentVariables.putAll(Map.of(
                 "CIRCLECI", "",
-                "CI", "",
+                "CI", "false",
                 "GITHUB_ACTIONS", "",
                 "WORKSPACE", "",
                 "TEAMCITY_VERSION", "",
