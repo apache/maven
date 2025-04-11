@@ -50,6 +50,7 @@ public class EncryptParser extends BaseParser {
                 context.topDirectory,
                 context.rootDirectory,
                 context.extensions,
+                context.ciInfo,
                 (EncryptOptions) context.options);
     }
 

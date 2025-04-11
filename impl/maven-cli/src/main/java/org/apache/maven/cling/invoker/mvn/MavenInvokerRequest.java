@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.CoreExtensions;
 import org.apache.maven.api.cli.ParserRequest;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.BaseInvokerRequest;
 
@@ -48,6 +49,7 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
             Path topDirectory,
             Path rootDirectory,
             List<CoreExtensions> coreExtensions,
+            CIInfo ciInfo,
             MavenOptions options) {
         super(
                 parserRequest,
@@ -59,7 +61,8 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
                 systemProperties,
                 topDirectory,
                 rootDirectory,
-                coreExtensions);
+                coreExtensions,
+                ciInfo);
         this.options = requireNonNull(options);
     }
 

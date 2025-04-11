@@ -1,0 +1,6 @@
+org.apache.maven.cling.invoker.cisupport.CircleCIDetector
+org.apache.maven.cling.invoker.cisupport.GenericCIDetector
+org.apache.maven.cling.invoker.cisupport.GithubCIDetector
+org.apache.maven.cling.invoker.cisupport.JenkinsCIDetector
+org.apache.maven.cling.invoker.cisupport.TeamcityCIDetector
+org.apache.maven.cling.invoker.cisupport.TravisCIDetector
