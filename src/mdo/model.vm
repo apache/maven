@@ -114,6 +114,9 @@ import $imp;
  * ${line.trim()}
     #end
  */
+#foreach( $ann in ${class.annotations} )
+${ann}
+#end
 @Experimental
 @Generated @ThreadSafe @Immutable
 public class ${class.name}
