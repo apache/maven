@@ -60,7 +60,7 @@ public class MavenITmng6240PluginExtensionAetherProvider extends AbstractMavenIn
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(projectDir.getAbsolutePath());
-        verifier.setEnvironmentVariable("CI", "false");
+        verifier.removeCIEnvironmentVariables();
         verifier.addCliArgument("deploy");
         verifier.execute();
         verifier.verifyErrorFreeLog();
