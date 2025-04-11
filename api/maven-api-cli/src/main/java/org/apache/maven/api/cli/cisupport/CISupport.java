@@ -31,13 +31,17 @@ public interface CISupport {
     String name();
 
     /**
-     * Returns a message that will be logged by Maven (why it was detected and possibly more).
+     * May return a message that will be logged by Maven explaining why it was detected (and possibly more).
      */
     @Nonnull
-    String message();
+    default String message() {
+        return "";
+    }
 
     /**
-     * Returns {@code true} if Maven runs on CI and the job is running in "debug" (or any equivalent) mode.
+     * Some CI systems may allow running jobs in "debug" (or some equivalent) mode.
      */
-    boolean isDebug();
+    default boolean isDebug() {
+        return false;
+    }
 }
