@@ -19,8 +19,8 @@
 package org.apache.maven.cling.invoker.cisupport;
 
 import java.nio.file.FileSystems;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.impl.util.Os;
@@ -31,37 +31,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CIDetectorHelperTest {
     @Test
     void smoke() throws Exception {
-        assertEquals("NONE\n", runner(Map.of(), Arrays.asList("CI", "WORKSPACE", "GITHUB_ACTIONS")));
+        assertEquals("NONE\n", runner(Map.of(), List.of("CI", "WORKSPACE", "GITHUB_ACTIONS")));
     }
 
     @Test
     void generic() throws Exception {
         assertEquals(
-                GenericCIDetector.NAME + "\n",
-                runner(Map.of("CI", "true"), Arrays.asList("WORKSPACE", "GITHUB_ACTIONS")));
+                GenericCIDetector.NAME + "\n", runner(Map.of("CI", "true"), List.of("WORKSPACE", "GITHUB_ACTIONS")));
     }
 
     @Test
     void jenkins() throws Exception {
         assertEquals(
                 JenkinsCIDetector.NAME + "\n",
-                runner(Map.of("CI", "true", "WORKSPACE", "foobar"), Arrays.asList("CI", "GITHUB_ACTIONS")));
+                runner(Map.of("CI", "true", "WORKSPACE", "foobar"), List.of("GITHUB_ACTIONS")));
     }
 
     @Test
     void github() throws Exception {
         assertEquals(
                 GithubCIDetector.NAME + "\n",
-                runner(Map.of("CI", "true", "GITHUB_ACTIONS", "true"), Arrays.asList("CI", "WORKSPACE")));
+                runner(Map.of("CI", "true", "GITHUB_ACTIONS", "true"), List.of("WORKSPACE")));
     }
 
     @Test
     void githubDebug() throws Exception {
         assertEquals(
                 GithubCIDetector.NAME + "+DEBUG\n",
-                runner(
-                        Map.of("CI", "true", "GITHUB_ACTIONS", "true", "RUNNER_DEBUG", "1"),
-                        Arrays.asList("CI", "WORKSPACE")));
+                runner(Map.of("CI", "true", "GITHUB_ACTIONS", "true", "RUNNER_DEBUG", "1"), List.of("WORKSPACE")));
     }
 
     private static String runner(Map<String, String> add, Collection<String> remove) throws Exception {
