@@ -40,6 +40,11 @@ public class GenericCIDetector implements CIDetector {
                 }
 
                 @Override
+                public String message() {
+                    return "Environment variable CI equals \"true\". Disable detection by removing that variable or by setting it to any other value";
+                }
+
+                @Override
                 public boolean isDebug() {
                     return false;
                 }

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.cli.cisupport;
 
+import org.apache.maven.api.annotations.Nonnull;
+
 /**
  * CI support: this class contains gathered information and more from CI that Maven process runs on.
  */
@@ -25,7 +27,14 @@ public interface CISupport {
     /**
      * Short distinct name of CI system: "GH", "Jenkins", etc.
      */
+    @Nonnull
     String name();
+
+    /**
+     * Returns a message that will be logged by Maven (why it was detected and possibly more).
+     */
+    @Nonnull
+    String message();
 
     /**
      * Returns {@code true} if Maven runs on CI and the job is running in "debug" (or any equivalent) mode.

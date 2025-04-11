@@ -46,6 +46,7 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.cli.cisupport.CISupport;
 import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
@@ -725,11 +726,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             if (context.invokerRequest.options().nonInteractive().orElse(false)) {
                 return false;
             } else {
-                boolean runningOnCI = context.invokerRequest.ciSupport().isPresent();
-                if (runningOnCI) {
+                if (context.invokerRequest.ciSupport().isPresent()) {
+                    CISupport ci = context.invokerRequest.ciSupport().get();
                     context.logger.info(
-                            "Making this build non-interactive, because the environment variable CI equals \"true\"."
-                                    + " Disable this detection by removing that variable or adding --force-interactive.");
+                            "Making this build non-interactive, because CI detected. Disable this detection by adding --force-interactive.");
+                    context.logger.info("Detected CI system: '" + ci.name() + "': " + ci.message());
                     return false;
                 }
             }

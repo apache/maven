@@ -189,6 +189,7 @@ public interface InvokerRequest {
      * @return an {@link Optional} containing the {@link CISupport} collected from CI system. or empty if CI not
      * detected.
      */
+    @Nonnull
     Optional<CISupport> ciSupport();
 
     /**
