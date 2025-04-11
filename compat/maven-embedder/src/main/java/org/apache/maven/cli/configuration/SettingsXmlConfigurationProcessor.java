@@ -76,12 +76,10 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsXmlConfigurationProcessor.class);
 
     private final SettingsBuilder settingsBuilder;
-    private final SettingsDecrypter settingsDecrypter;
 
     @Inject
     public SettingsXmlConfigurationProcessor(SettingsBuilder settingsBuilder, SettingsDecrypter settingsDecrypter) {
         this.settingsBuilder = settingsBuilder;
-        this.settingsDecrypter = settingsDecrypter;
     }
 
     @Override
