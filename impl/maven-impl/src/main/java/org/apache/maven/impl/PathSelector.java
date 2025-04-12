@@ -23,7 +23,9 @@ import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,9 +49,11 @@ import java.util.Set;
  *   <li>Trailing {@code "/"} is completed as {@code "/**"}.</li>
  *   <li>The {@code "**"} wildcard means "0 or more directories" instead of "1 or more directories".
  *       This is implemented by adding variants of the pattern without the {@code "**"} wildcard.</li>
+ *   <li>Bracket characters [ ] and { } are escaped.</li>
+ *   <li>On Unix only, the escape character {@code '\\'} is itself escaped.</li>
  * </ul>
  *
- * If above changes are not desired, put an explicit {@code "glob:"} prefix before the patterns.
+ * If above changes are not desired, put an explicit {@code "glob:"} prefix before the pattern.
  * Note that putting such a prefix is recommended anyway for better performances.
  *
  * @author Benjamin Bentmann
@@ -142,6 +146,19 @@ public class PathSelector implements PathMatcher {
     private static final int MAVEN_SYNTAX_THRESHOLD = 1;
 
     /**
+     * The default syntax to use if none was specified. Note that when this default syntax is applied,
+     * the user-provided pattern get some changes as documented in class Javadoc.
+     */
+    private static final String DEFAULT_SYNTAX = "glob:";
+
+    /**
+     * Characters having a special meaning in the glob syntax.
+     *
+     * @see FileSystem#getPathMatcher(String)
+     */
+    private static final String SPECIAL_CHARACTERS = "*?[]{}\\";
+
+    /**
      * A path matcher which accepts all files.
      *
      * @see #simplify()
@@ -149,14 +166,20 @@ public class PathSelector implements PathMatcher {
     private static final PathMatcher INCLUDES_ALL = (path) -> true;
 
     /**
-     * String representation of the normalized include filters.
-     * This is kept only for {@link #toString()} implementation.
+     * String representations of the normalized include filters.
+     * Each pattern shall be prefixed by its syntax, which is {@value #DEFAULT_SYNTAX} by default.
+     *
+     * @see #toString()
      */
     private final String[] includePatterns;
 
     /**
-     * String representation of the normalized exclude filters.
-     * This is kept only for {@link #toString()} implementation.
+     * String representations of the normalized exclude filters.
+     * Each pattern shall be prefixed by its syntax, which is {@value #DEFAULT_SYNTAX} by default.
+     * This array may be longer or shorter than the user-supplied excludes, depending on whether
+     * default excludes have been added and whether some unnecessary excludes have been omitted.
+     *
+     * @see #toString()
      */
     private final String[] excludePatterns;
 
@@ -200,7 +223,7 @@ public class PathSelector implements PathMatcher {
     public PathSelector(
             Path directory, Collection<String> includes, Collection<String> excludes, boolean useDefaultExcludes) {
         includePatterns = normalizePatterns(includes, false);
-        excludePatterns = normalizePatterns(addDefaultExcludes(excludes, useDefaultExcludes), true);
+        excludePatterns = normalizePatterns(effectiveExcludes(excludes, includePatterns, useDefaultExcludes), true);
         baseDirectory = directory;
         FileSystem system = directory.getFileSystem();
         this.includes = matchers(system, includePatterns);
@@ -210,35 +233,153 @@ public class PathSelector implements PathMatcher {
     }
 
     /**
-     * Returns the given array of excludes, optionally expanded with a default set of excludes.
+     * Returns the given array of excludes, optionally expanded with a default set of excludes,
+     * then with unnecessary excludes omitted. An unnecessary exclude is an exclude which will never
+     * match a file because there is no include which would accept a file that could match the exclude.
+     * For example, if the only include is {@code "*.java"}, then the <code>"**&sol;project.pj"</code>,
+     * <code>"**&sol;.DS_Store"</code> and other excludes will never match a file and can be omitted.
+     * Because the list of {@linkplain #DEFAULT_EXCLUDES default excludes} contains many elements,
+     * removing unnecessary excludes can reduce a lot the number of matches tested on each source file.
      *
-     * @param excludes the user-specified excludes.
+     * <h4>Implementation note</h4>
+     * The removal of unnecessary excludes is done on a best effort basis. The current implementation
+     * compares only the prefixes and suffixes of each pattern, keeping the pattern in case of doubt.
+     * This is not bad, but it does not remove all unnecessary patterns. It would be possible to do
+     * better in the future if benchmarking suggests that it would be worth the effort.
+     *
+     * @param excludes the user-specified excludes, potentially not yet converted to glob syntax
+     * @param includes the include patterns converted to glob syntax
      * @param useDefaultExcludes whether to expand user exclude with the set of default excludes
-     * @return the potentially expanded set of excludes to use
+     * @return the potentially expanded or reduced set of excludes to use
      */
-    private static Collection<String> addDefaultExcludes(Collection<String> excludes, boolean useDefaultExcludes) {
-        if (!useDefaultExcludes) {
-            return excludes;
-        }
-        List<String> defaults = DEFAULT_EXCLUDES;
+    private static Collection<String> effectiveExcludes(
+            Collection<String> excludes, final String[] includes, final boolean useDefaultExcludes) {
         if (excludes == null || excludes.isEmpty()) {
-            return defaults;
+            if (useDefaultExcludes) {
+                excludes = new ArrayList<>(DEFAULT_EXCLUDES);
+            } else {
+                return List.of();
+            }
         } else {
-            var patterns = new ArrayList<String>(excludes);
-            patterns.addAll(DEFAULT_EXCLUDES);
-            return patterns;
+            excludes = new ArrayList<>(excludes);
+            if (useDefaultExcludes) {
+                excludes.addAll(DEFAULT_EXCLUDES);
+            }
         }
+        /*
+         * Get the prefixes and suffixes of all includes, stopping at the first special character.
+         * Redundant prefixes and suffixes are omitted.
+         */
+        var prefixes = new String[includes.length];
+        var suffixes = new String[includes.length];
+        for (int i = 0; i < includes.length; i++) {
+            String include = includes[i];
+            if (!include.startsWith(DEFAULT_SYNTAX)) {
+                return excludes; // Do not filter if at least one pattern is too complicated.
+            }
+            include = include.substring(DEFAULT_SYNTAX.length());
+            prefixes[i] = prefixOrSuffix(include, false);
+            suffixes[i] = prefixOrSuffix(include, true);
+        }
+        prefixes = sortByLength(prefixes, false);
+        suffixes = sortByLength(suffixes, true);
+        /*
+         * Keep only the exclude which start with one of the prefixes and end with one of the suffixes.
+         * Note that a prefix or suffix may be the empty string, which match everything.
+         */
+        final Iterator<String> it = excludes.iterator();
+        nextExclude:
+        while (it.hasNext()) {
+            final String exclude = it.next();
+            final int s = exclude.indexOf(':');
+            if (s <= MAVEN_SYNTAX_THRESHOLD || exclude.startsWith(DEFAULT_SYNTAX)) {
+                if (cannotMatch(exclude, prefixes, false) || cannotMatch(exclude, suffixes, true)) {
+                    it.remove();
+                }
+            }
+        }
+        return excludes;
     }
 
     /**
-     * Whether the given pattern does not specify a syntax, in which case Maven syntax should be used.
-     * If the prefix has a length of 1, then it is assumed to be a Windows drive letter rather than a syntax.
+     * Returns the maximal amount of ordinary characters at the beginning or end of the given pattern.
+     * The prefix or suffix stops at the first {@linkplain #SPECIAL_CHARACTERS special character}.
      *
-     * @param pattern the pattern to test
-     * @return whether the patter does not specify a syntax
+     * @param include the pattern for which to get a prefix or suffix without special character
+     * @param suffix {@code false} if a prefix is desired, or {@code true} if a suffix is desired
      */
-    private static boolean useMavenSyntax(String pattern) {
-        return pattern.indexOf(':') <= MAVEN_SYNTAX_THRESHOLD;
+    private static String prefixOrSuffix(final String include, boolean suffix) {
+        int s = suffix ? -1 : include.length();
+        for (int i = SPECIAL_CHARACTERS.length(); --i >= 0; ) {
+            char c = SPECIAL_CHARACTERS.charAt(i);
+            if (suffix) {
+                s = Math.max(s, include.lastIndexOf(c));
+            } else {
+                int p = include.indexOf(c);
+                if (p >= 0 && p < s) {
+                    s = p;
+                }
+            }
+        }
+        return suffix ? include.substring(s + 1) : include.substring(0, s);
+    }
+
+    /**
+     * Returns {@code true} if the given exclude cannot match any include patterns.
+     * In case of doubt, returns {@code false}.
+     *
+     * @param exclude the exclude pattern to test
+     * @param fragments the prefixes or suffixes (fragments without special characters) of the includes
+     * @param suffix {@code false} if the specified fragments are prefixes, {@code true} if they are suffixes
+     * @return {@code true} if it is certain that the exclude pattern cannot match, or {@code false} in case of doubt
+     */
+    private static boolean cannotMatch(String exclude, final String[] fragments, final boolean suffix) {
+        exclude = prefixOrSuffix(exclude, suffix);
+        for (String fragment : fragments) {
+            int fg = fragment.length();
+            int ex = exclude.length();
+            int length = Math.min(fg, ex);
+            if (suffix) {
+                fg -= length;
+                ex -= length;
+            } else {
+                fg = 0;
+                ex = 0;
+            }
+            if (exclude.regionMatches(ex, fragment, fg, length)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Sorts the given patterns by their length. The main intent is to have the empty string first,
+     * while will cause the loops testing for prefixes and suffixes to stop almost immediately.
+     * Short prefixes or suffixes are also more likely to be matched.
+     *
+     * @param fragments the fragments to sort in-place
+     * @param suffix {@code false} if the specified fragments are prefixes, {@code true} if they are suffixes
+     * @return the given array, or a smaller array if some fragments were discarded because redundant
+     */
+    private static String[] sortByLength(final String[] fragments, final boolean suffix) {
+        Arrays.sort(fragments, (s1, s2) -> s1.length() - s2.length());
+        int count = 0;
+        /*
+         * Simplify the array of prefixes or suffixes by removing all redundant elements.
+         * An element is redundant if there is a shorter prefix or suffix with the same characters.
+         */
+        nextBase:
+        for (String fragment : fragments) {
+            for (int i = count; --i >= 0; ) {
+                String base = fragments[i];
+                if (suffix ? fragment.endsWith(base) : fragment.startsWith(base)) {
+                    continue nextBase; // Skip this fragment
+                }
+            }
+            fragments[count++] = fragment;
+        }
+        return (fragments.length == count) ? fragments : Arrays.copyOf(fragments, count);
     }
 
     /**
@@ -257,8 +398,7 @@ public class PathSelector implements PathMatcher {
         final var normalized = new LinkedHashSet<String>(patterns.size());
         for (String pattern : patterns) {
             if (pattern != null && !pattern.isEmpty()) {
-                final boolean useMavenSyntax = useMavenSyntax(pattern);
-                if (useMavenSyntax) {
+                if (pattern.indexOf(':') <= MAVEN_SYNTAX_THRESHOLD) {
                     pattern = pattern.replace(File.separatorChar, '/');
                     if (pattern.endsWith("/")) {
                         pattern += "**";
@@ -271,15 +411,20 @@ public class PathSelector implements PathMatcher {
                         pattern = pattern.substring(3);
                     }
                     pattern = pattern.replace("/**/**/", "/**/");
-                }
-                normalized.add(pattern);
-                /*
-                 * If the pattern starts or ends with "**", Java GLOB expects a directory level at
-                 * that location while Maven seems to consider that "**" can mean "no directory".
-                 * Add another pattern for reproducing this effect.
-                 */
-                if (useMavenSyntax) {
+                    pattern = pattern.replace("\\", "\\\\")
+                            .replace("[", "\\[")
+                            .replace("]", "\\]")
+                            .replace("{", "\\{")
+                            .replace("}", "\\}");
+                    normalized.add(DEFAULT_SYNTAX + pattern);
+                    /*
+                     * If the pattern starts or ends with "**", Java GLOB expects a directory level at
+                     * that location while Maven seems to consider that "**" can mean "no directory".
+                     * Add another pattern for reproducing this effect.
+                     */
                     addPatternsWithOneDirRemoved(normalized, pattern, 0);
+                } else {
+                    normalized.add(pattern);
                 }
             }
         }
@@ -292,7 +437,7 @@ public class PathSelector implements PathMatcher {
      * Tests suggest that we need an explicit GLOB pattern with no {@code "**"} for matching an absence of directory.
      *
      * @param patterns where to add the derived patterns
-     * @param pattern  the pattern for which to add derived forms
+     * @param pattern  the pattern for which to add derived forms, without the "glob:" syntax prefix
      * @param end      should be 0 (reserved for recursive invocations of this method)
      */
     private static void addPatternsWithOneDirRemoved(final Set<String> patterns, final String pattern, int end) {
@@ -314,7 +459,7 @@ public class PathSelector implements PathMatcher {
                 }
             }
             String reduced = pattern.substring(0, start) + pattern.substring(end);
-            patterns.add(reduced);
+            patterns.add(DEFAULT_SYNTAX + reduced);
             addPatternsWithOneDirRemoved(patterns, reduced, start);
         }
     }
@@ -353,13 +498,13 @@ public class PathSelector implements PathMatcher {
         // TODO: use `LinkedHashSet.newLinkedHashSet(int)` instead with JDK19.
         final var directories = new LinkedHashSet<String>(patterns.length);
         for (String pattern : patterns) {
-            int s = pattern.indexOf(':');
-            if (s <= MAVEN_SYNTAX_THRESHOLD || pattern.startsWith("glob:")) {
+            if (pattern.startsWith(DEFAULT_SYNTAX)) {
                 if (excludes) {
                     if (pattern.endsWith("/**")) {
                         directories.add(pattern.substring(0, pattern.length() - 3));
                     }
                 } else {
+                    int s = pattern.indexOf(':');
                     if (pattern.regionMatches(++s, "**/", 0, 3)) {
                         s = pattern.indexOf('/', s + 3);
                         if (s < 0) {
@@ -375,16 +520,12 @@ public class PathSelector implements PathMatcher {
 
     /**
      * Creates the path matchers for the given patterns.
-     * If no syntax is specified, the default is {@code glob}.
+     * The syntax (usually {@value #DEFAULT_SYNTAX}) must be specified for each pattern.
      */
     private static PathMatcher[] matchers(final FileSystem fs, final String[] patterns) {
         final var matchers = new PathMatcher[patterns.length];
         for (int i = 0; i < patterns.length; i++) {
-            String pattern = patterns[i];
-            if (useMavenSyntax(pattern)) {
-                pattern = "glob:" + pattern;
-            }
-            matchers[i] = fs.getPathMatcher(pattern);
+            matchers[i] = fs.getPathMatcher(patterns[i]);
         }
         return matchers;
     }
@@ -394,7 +535,7 @@ public class PathSelector implements PathMatcher {
      */
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
     public PathMatcher simplify() {
-        if (excludes.length == 0 && dirIncludes.length == 0 && dirExcludes.length == 0) {
+        if (excludes.length == 0) {
             switch (includes.length) {
                 case 0:
                     return INCLUDES_ALL;

@@ -28,6 +28,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PathSelectorTest {
@@ -91,5 +92,24 @@ public class PathSelectorTest {
      */
     private void assertFilteredFilesContains(String path) {
         assertTrue(filtered.remove(directory.resolve(path)), path);
+    }
+
+    /**
+     * Tests the omission of unnecessary excludes.
+     *
+     * Note: at the time of writing this test (April 2025), the list of excludes go down from 40 to 17 elements.
+     * This is not bad, but we could do better with, for example, a special treatment of the excludes that are
+     * for excluding an entire directory.
+     */
+    @Test
+    public void testExcludeOmission() {
+        directory = Path.of("dummy");
+        var includes = List.of("**/*.java");
+        var excludes = List.of("biz/**");
+        var matcher = new PathSelector(directory, includes, excludes, true);
+        String s = matcher.toString();
+        assertTrue(s.contains("glob:**/*.java"));
+        assertFalse(s.contains("project.pj")); // Unnecessary exclusion should have been omitted.
+        assertFalse(s.contains(".DS_Store"));
     }
 }
