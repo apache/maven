@@ -145,7 +145,7 @@ under the License.
     <assertjVersion>3.27.3</assertjVersion>
     <asmVersion>9.8</asmVersion>
     <byteBuddyVersion>1.17.5</byteBuddyVersion>
-    <classWorldsVersion>2.8.0</classWorldsVersion>
+    <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
     <guavaVersion>33.4.6-jre</guavaVersion>
@@ -158,9 +158,9 @@ under the License.
     <jxpathVersion>1.3</jxpathVersion>
     <logbackClassicVersion>1.5.18</logbackClassicVersion>
     <mockitoVersion>5.17.0</mockitoVersion>
-    <plexusInteractivityVersion>1.3</plexusInteractivityVersion>
+    <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
-    <plexusTestingVersion>1.4.0</plexusTestingVersion>
+    <plexusTestingVersion>1.5.0</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
     <resolverVersion>2.0.8-SNAPSHOT</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
@@ -802,7 +802,7 @@ under the License.</licenseText>
       <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
