@@ -18,7 +18,7 @@
  */
 package org.apache.maven.repository.internal;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -161,7 +161,7 @@ class DefaultModelResolver implements ModelResolver {
             throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
         }
 
-        File pomFile = pomArtifact.getFile();
+        Path pomFile = pomArtifact.getPath();
 
         return new FileModelSource(pomFile);
     }
