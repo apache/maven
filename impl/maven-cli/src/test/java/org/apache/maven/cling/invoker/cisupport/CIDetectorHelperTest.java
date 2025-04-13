@@ -19,7 +19,6 @@
 package org.apache.maven.cling.invoker.cisupport;
 
 import java.nio.file.FileSystems;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -89,13 +88,10 @@ public class CIDetectorHelperTest {
         ProcessBuilder processBuilder =
                 new ProcessBuilder(path, "-cp", classpath, CIDetectorHelperRunner.class.getName());
         processBuilder.environment().putAll(add);
-        Collection<String> toRemove;
-        if (add.isEmpty()) {
-            toRemove = ALL;
-        } else {
-            toRemove = ALL.stream().filter(s -> !add.containsKey(s)).collect(Collectors.toSet());
-        }
-        toRemove.forEach(k -> processBuilder.environment().remove(k));
+        ALL.stream()
+                .filter(s -> !add.containsKey(s))
+                .collect(Collectors.toSet())
+                .forEach(k -> processBuilder.environment().remove(k));
         Process process = processBuilder.start();
         process.waitFor();
         return new String(process.getInputStream().readAllBytes());
