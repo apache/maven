@@ -2224,12 +2224,18 @@
             <version>4.0.0+</version>
             <code>
             <![CDATA[
-    @Deprecated
+    /**
+     * @deprecated this was unused and has no replacement, this method returns {@code null} now.
+     */
+    @Deprecated(since = "4.0.0")
     public String getMergeId() {
         return null;
     }
 
-    @Deprecated
+    /**
+     * @deprecated this was unused and has no replacement, this method is a no-op now.
+     */
+    @Deprecated(since = "4.0.0")
     public void setMergeId(String mergeId) {
     }
             ]]>
