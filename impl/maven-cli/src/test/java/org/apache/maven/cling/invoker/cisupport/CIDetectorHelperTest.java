@@ -90,7 +90,6 @@ public class CIDetectorHelperTest {
         processBuilder.environment().putAll(add);
         ALL.stream()
                 .filter(s -> !add.containsKey(s))
-                .collect(Collectors.toSet())
                 .forEach(k -> processBuilder.environment().remove(k));
         Process process = processBuilder.start();
         process.waitFor();
