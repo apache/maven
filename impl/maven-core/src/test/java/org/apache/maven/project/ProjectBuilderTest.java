@@ -101,7 +101,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertThat(
                 e.getResults(),
                 contains(projectBuildingResultWithProblemMessage(
-                        "'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing")));
+                        "'dependencies.dependency.version' for org.apache.maven.its:a:jar (GAT) is missing")));
         assertThat(e.getResults(), contains(projectBuildingResultWithLocation(5, 9)));
     }
 

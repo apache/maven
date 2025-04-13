@@ -198,7 +198,7 @@ class DefaultModelValidatorTest {
 
         assertTrue(result.getErrors()
                 .get(0)
-                .contains("'dependencies.dependency.artifactId' for groupId:null:jar is missing"));
+                .contains("'dependencies.dependency.artifactId' for groupId:null:jar (GAT) is missing"));
     }
 
     @Test
@@ -209,7 +209,7 @@ class DefaultModelValidatorTest {
 
         assertTrue(result.getErrors()
                 .get(0)
-                .contains("'dependencies.dependency.groupId' for null:artifactId:jar is missing"));
+                .contains("'dependencies.dependency.groupId' for null:artifactId:jar (GAT) is missing"));
     }
 
     @Test
@@ -220,7 +220,7 @@ class DefaultModelValidatorTest {
 
         assertTrue(result.getErrors()
                 .get(0)
-                .contains("'dependencies.dependency.version' for groupId:artifactId:jar is missing"));
+                .contains("'dependencies.dependency.version' for groupId:artifactId:jar (GAT) is missing"));
     }
 
     @Test
@@ -229,9 +229,11 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
-                .get(0)
-                .contains("'dependencyManagement.dependencies.dependency.artifactId' for groupId:null:jar is missing"));
+        assertTrue(
+                result.getErrors()
+                        .get(0)
+                        .contains(
+                                "'dependencyManagement.dependencies.dependency.artifactId' for groupId:null:jar (GAT) is missing"));
     }
 
     @Test
@@ -240,9 +242,11 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
-                .get(0)
-                .contains("'dependencyManagement.dependencies.dependency.groupId' for null:artifactId:jar is missing"));
+        assertTrue(
+                result.getErrors()
+                        .get(0)
+                        .contains(
+                                "'dependencyManagement.dependencies.dependency.groupId' for null:artifactId:jar (GAT) is missing"));
     }
 
     @Test
@@ -361,10 +365,11 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 2, 0);
 
         assertContains(
-                result.getErrors().get(0), "'dependencies.dependency.version' for test:b:jar must be a valid version");
+                result.getErrors().get(0),
+                "'dependencies.dependency.version' for test:b:jar (GAT) must be a valid version");
         assertContains(
                 result.getErrors().get(1),
-                "'dependencies.dependency.version' for test:c:jar must not contain any of these characters");
+                "'dependencies.dependency.version' for test:c:jar (GAT) must not contain any of these characters");
     }
 
     @Test
@@ -441,13 +446,13 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for test:a:jar (GAT) declares usage of deprecated 'system' scope");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path");
+                "'dependencies.dependency.systemPath' for test:a:jar (GAT) should use a variable instead of a hard-coded path");
         assertContains(
                 result.getWarnings().get(2),
-                "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for test:b:jar (GAT) declares usage of deprecated 'system' scope");
     }
 
     @Test
@@ -596,10 +601,10 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.exclusions.exclusion.groupId' for gid:aid:jar is missing");
+                "'dependencies.dependency.exclusions.exclusion.groupId' for gid:aid:jar (GAT) is missing");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.exclusions.exclusion.artifactId' for gid:aid:jar is missing");
+                "'dependencies.dependency.exclusions.exclusion.artifactId' for gid:aid:jar (GAT) is missing");
     }
 
     @Test
@@ -610,7 +615,7 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencyManagement.dependencies.dependency.type' for test:a:jar must be 'pom'");
+                "'dependencyManagement.dependencies.dependency.type' for test:a:jar (GAT) must be 'pom'");
     }
 
     @Test
@@ -621,7 +626,7 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getErrors().get(0),
-                "'dependencyManagement.dependencies.dependency.classifier' for test:a:pom:cls must be empty");
+                "'dependencyManagement.dependencies.dependency.classifier' for test:a:pom:cls (GAT) must be empty");
     }
 
     @Test
@@ -632,16 +637,16 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for test:a:jar (GAT) declares usage of deprecated 'system' scope");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.systemPath' for test:a:jar should not point at files within the project directory");
+                "'dependencies.dependency.systemPath' for test:a:jar (GAT) should not point at files within the project directory");
         assertContains(
                 result.getWarnings().get(2),
-                "'dependencies.dependency.scope' for test:b:jar declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for test:b:jar (GAT) declares usage of deprecated 'system' scope");
         assertContains(
                 result.getWarnings().get(3),
-                "'dependencies.dependency.systemPath' for test:b:jar should not point at files within the project directory");
+                "'dependencies.dependency.systemPath' for test:b:jar (GAT) should not point at files within the project directory");
     }
 
     @Test
@@ -707,10 +712,10 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.version' for test:a:jar is either LATEST or RELEASE (both of them are being deprecated)");
+                "'dependencies.dependency.version' for test:a:jar (GAT) is either LATEST or RELEASE (both of them are being deprecated)");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.version' for test:b:jar is either LATEST or RELEASE (both of them are being deprecated)");
+                "'dependencies.dependency.version' for test:b:jar (GAT) is either LATEST or RELEASE (both of them are being deprecated)");
     }
 
     @Test
