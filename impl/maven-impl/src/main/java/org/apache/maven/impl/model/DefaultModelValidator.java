@@ -2241,11 +2241,11 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         public static SourceHint gav(String gav) {
-            return new SourceHint(gav, null); // "GAV"
+            return new SourceHint(gav, "G:A:V"); // GAV
         }
 
         public static SourceHint dependencyManagementKey(Dependency dependency) {
-            return new SourceHint(dependency.getManagementKey(), null); // DMK
+            return new SourceHint(dependency.getManagementKey(), "G:A:T"); // DMK
         }
 
         public static SourceHint pluginKey(Plugin plugin) {
