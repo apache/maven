@@ -66,11 +66,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
 class PomConstructionTest {
-    private static String BASE_DIR = "src/test";
+    private static final String BASE_DIR = "src/test";
 
-    private static String BASE_POM_DIR = BASE_DIR + "/resources-project-builder";
+    private static final String BASE_POM_DIR = BASE_DIR + "/resources-project-builder";
 
-    private static String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
+    private static final String BASE_MIXIN_DIR = BASE_DIR + "/resources-mixins";
 
     @Inject
     private DefaultProjectBuilder projectBuilder;
@@ -352,27 +352,20 @@ class PomConstructionTest {
     // them into a resolver, create the expression to extract the data to validate the Model, and the URI
     // to validate the properties. We also need a way to navigate from the Tex specification documents to
     // the test in question and vice versa. A little Eclipse plugin would do the trick.
+    @Test
     public void testThatExecutionsWithoutIdsAreMergedAndTheChildWins() throws Exception {
         PomTestWrapper tester = buildPom("micromailer");
         assertModelEquals(tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]");
     }
 
-    /*MNG-
-    public void testDependencyScope()
-        throws Exception
-    {
-        PomTestWrapper pom = buildPom( "dependency-scope/sub" );
-
-    }*/
-
-    /*MNG- 4010*/
+    /*MNG-4010*/
     @Test
     void testDuplicateExclusionsDependency() throws Exception {
         PomTestWrapper pom = buildPom("duplicate-exclusions-dependency/sub");
         assertEquals(1, ((List<?>) pom.getValue("dependencies[1]/exclusions")).size());
     }
 
-    /*MNG- 4008*/
+    /*MNG-4008*/
     @Test
     void testMultipleFilters() throws Exception {
         PomTestWrapper pom = buildPom("multiple-filters");
@@ -455,20 +448,6 @@ class PomConstructionTest {
         assertEquals("1.3.0-SNAPSHOT", pom.getValue("build/plugins[1]/version"));
     }
 
-    /*
-    public void testMaven()
-        throws Exception
-    {
-        PomTestWrapper pom =  buildPomFromMavenProject( "maven-build/sub/pom.xml", null );
-
-        for( String s: pom.getMavenProject().getTestClasspathElements() )
-        {
-            System.out.println( s );
-        }
-
-    }
-    */
-
     /* MNG-3567*/
     @Test
     void testPluginManagementInherited() throws Exception {
@@ -540,13 +519,6 @@ class PomConstructionTest {
                 "src/main/mdo/security.xml", (pom.getValue("build/plugins[1]/executions[2]/configuration[1]/model")));
     }
 
-    /*
-        public void testPluginConfigDuplicate()
-        throws Exception
-    {
-        PomTestWrapper pom = buildPom( "plugin-config-duplicate/dup" );
-    }
-    */
     @Test
     void testSingleConfigurationInheritance() throws Exception {
         PomTestWrapper pom = buildPom("single-configuration-inheritance");
@@ -1253,6 +1225,7 @@ class PomConstructionTest {
         testCompleteModel(pom);
     }
 
+    @SuppressWarnings("checkstyle:MethodLength")
     private void testCompleteModel(PomTestWrapper pom) throws Exception {
         assertEquals("4.0.0", pom.getValue("modelVersion"));
 
@@ -1607,6 +1580,7 @@ class PomConstructionTest {
     }
 
     // This will fail on a validation error if incorrect
+    @Test
     public void testDependencyManagementWithInterpolation() throws Exception {
         buildPom("dependency-management-with-interpolation/sub");
     }
@@ -1927,6 +1901,6 @@ class PomConstructionTest {
         for (String s : elements) {
             buffer.append(s).append(File.separator);
         }
-        return buffer.toString().substring(0, buffer.toString().length() - 1);
+        return buffer.toString().substring(0, buffer.length() - 1);
     }
 }

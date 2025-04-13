@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -71,8 +72,11 @@ import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  */
@@ -124,12 +128,6 @@ public class DefaultModelValidator implements ModelValidator {
             } finally {
                 stk.pop();
             }
-        }
-
-        @Override
-        protected Activation.Builder transformActivation_ActiveByDefault(
-                Supplier<? extends Activation.Builder> creator, Activation.Builder builder, Activation target) {
-            return builder;
         }
 
         @Override
@@ -786,49 +784,46 @@ public class DefaultModelValidator implements ModelValidator {
     private void validateXmlNodeRecursively(
             ModelProblemCollector problems, String fieldPathPrefix, InputLocationTracker tracker, XmlNode xmlNode) {
         validateXmlNode(problems, fieldPathPrefix, tracker, xmlNode);
-        for (XmlNode child : xmlNode.getChildren()) {
-            validateXmlNodeRecursively(problems, fieldPathPrefix + "." + xmlNode.getName(), tracker, child);
+        for (XmlNode child : xmlNode.children()) {
+            validateXmlNodeRecursively(problems, fieldPathPrefix + "." + xmlNode.name(), tracker, child);
         }
     }
 
     private void validateXmlNode(
             ModelProblemCollector problems, String fieldPathPrefix, InputLocationTracker tracker, XmlNode xmlNode) {
-        String childrenCombinationModeAttribute = xmlNode.getAttributes()
-                .getOrDefault(XmlNode.CHILDREN_COMBINATION_MODE_ATTRIBUTE, XmlNode.DEFAULT_CHILDREN_COMBINATION_MODE);
-        if (!(XmlNode.CHILDREN_COMBINATION_APPEND.equals(childrenCombinationModeAttribute)
-                || XmlNode.CHILDREN_COMBINATION_MERGE.equals(childrenCombinationModeAttribute))) {
+        String childrenCombinationModeAttribute = xmlNode.attributes()
+                .getOrDefault(
+                        XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE, XmlService.DEFAULT_CHILDREN_COMBINATION_MODE);
+        if (!(XmlService.CHILDREN_COMBINATION_APPEND.equals(childrenCombinationModeAttribute)
+                || XmlService.CHILDREN_COMBINATION_MERGE.equals(childrenCombinationModeAttribute))) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V40,
-                    fieldPathPrefix + "." + xmlNode.getName(),
-                    xmlNode.getInputLocation() != null
-                            ? xmlNode.getInputLocation().toString()
-                            : null,
+                    fieldPathPrefix + "." + xmlNode.name(),
+                    SourceHint.xmlNodeInputLocation(xmlNode),
                     "Unsupported value '" + childrenCombinationModeAttribute + "' for "
-                            + XmlNode.CHILDREN_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
-                            + XmlNode.CHILDREN_COMBINATION_APPEND + ", and " + XmlNode.CHILDREN_COMBINATION_MERGE
-                            + " (default is: " + XmlNode.DEFAULT_SELF_COMBINATION_MODE + ")",
+                            + XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
+                            + XmlService.CHILDREN_COMBINATION_APPEND + ", and " + XmlService.CHILDREN_COMBINATION_MERGE
+                            + " (default is: " + XmlService.DEFAULT_SELF_COMBINATION_MODE + ")",
                     tracker);
         }
-        String selfCombinationModeAttribute = xmlNode.getAttributes()
-                .getOrDefault(XmlNode.SELF_COMBINATION_MODE_ATTRIBUTE, XmlNode.DEFAULT_SELF_COMBINATION_MODE);
-        if (!(XmlNode.SELF_COMBINATION_OVERRIDE.equals(selfCombinationModeAttribute)
-                || XmlNode.SELF_COMBINATION_MERGE.equals(selfCombinationModeAttribute)
-                || XmlNode.SELF_COMBINATION_REMOVE.equals(selfCombinationModeAttribute))) {
+        String selfCombinationModeAttribute = xmlNode.attributes()
+                .getOrDefault(XmlService.SELF_COMBINATION_MODE_ATTRIBUTE, XmlService.DEFAULT_SELF_COMBINATION_MODE);
+        if (!(XmlService.SELF_COMBINATION_OVERRIDE.equals(selfCombinationModeAttribute)
+                || XmlService.SELF_COMBINATION_MERGE.equals(selfCombinationModeAttribute)
+                || XmlService.SELF_COMBINATION_REMOVE.equals(selfCombinationModeAttribute))) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V40,
-                    fieldPathPrefix + "." + xmlNode.getName(),
-                    xmlNode.getInputLocation() != null
-                            ? xmlNode.getInputLocation().toString()
-                            : null,
+                    fieldPathPrefix + "." + xmlNode.name(),
+                    SourceHint.xmlNodeInputLocation(xmlNode),
                     "Unsupported value '" + selfCombinationModeAttribute + "' for "
-                            + XmlNode.SELF_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
-                            + XmlNode.SELF_COMBINATION_OVERRIDE + ", " + XmlNode.SELF_COMBINATION_MERGE + ", and "
-                            + XmlNode.SELF_COMBINATION_REMOVE
-                            + " (default is: " + XmlNode.DEFAULT_SELF_COMBINATION_MODE + ")",
+                            + XmlService.SELF_COMBINATION_MODE_ATTRIBUTE + " attribute. " + "Valid values are: "
+                            + XmlService.SELF_COMBINATION_OVERRIDE + ", " + XmlService.SELF_COMBINATION_MERGE + ", and "
+                            + XmlService.SELF_COMBINATION_REMOVE
+                            + " (default is: " + XmlService.DEFAULT_SELF_COMBINATION_MODE + ")",
                     tracker);
         }
     }
@@ -931,7 +926,12 @@ public class DefaultModelValidator implements ModelValidator {
                             "build.plugins.plugin.groupId", problems, Severity.ERROR, Version.V20, p.getGroupId(), p);
 
                     validate20PluginVersion(
-                            "build.plugins.plugin.version", problems, p.getVersion(), p.getKey(), p, validationLevel);
+                            "build.plugins.plugin.version",
+                            problems,
+                            p.getVersion(),
+                            SourceHint.pluginKey(p),
+                            p,
+                            validationLevel);
 
                     validateBoolean(
                             "build.plugins.plugin.inherited",
@@ -940,7 +940,7 @@ public class DefaultModelValidator implements ModelValidator {
                             errOn30,
                             Version.V20,
                             p.getInherited(),
-                            p.getKey(),
+                            SourceHint.pluginKey(p),
                             p);
 
                     validateBoolean(
@@ -950,7 +950,7 @@ public class DefaultModelValidator implements ModelValidator {
                             errOn30,
                             Version.V20,
                             p.getExtensions(),
-                            p.getKey(),
+                            SourceHint.pluginKey(p),
                             p);
 
                     validate20EffectivePluginDependencies(problems, p, validationLevel);
@@ -1038,7 +1038,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V20,
                             prefix + prefix2 + "type",
-                            key,
+                            SourceHint.dependencyManagementKey(dependency),
                             "must be 'pom' to import the managed dependencies.",
                             dependency);
                 } else if (!is41OrBeyond
@@ -1049,7 +1049,7 @@ public class DefaultModelValidator implements ModelValidator {
                             errOn30,
                             Version.V20,
                             prefix + prefix2 + "classifier",
-                            key,
+                            SourceHint.dependencyManagementKey(dependency),
                             "must be empty, imported POM cannot have a classifier.",
                             dependency);
                 }
@@ -1061,7 +1061,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V31,
                             prefix + prefix2 + "scope",
-                            key,
+                            SourceHint.dependencyManagementKey(dependency),
                             "declares usage of deprecated 'system' scope ",
                             dependency);
                 }
@@ -1074,7 +1074,7 @@ public class DefaultModelValidator implements ModelValidator {
                                 Severity.WARNING,
                                 Version.V20,
                                 prefix + prefix2 + "systemPath",
-                                key,
+                                SourceHint.dependencyManagementKey(dependency),
                                 "should use a variable instead of a hard-coded path " + sysPath,
                                 dependency);
                     } else if (sysPath.contains("${basedir}") || sysPath.contains("${project.basedir}")) {
@@ -1083,7 +1083,7 @@ public class DefaultModelValidator implements ModelValidator {
                                 Severity.WARNING,
                                 Version.V20,
                                 prefix + prefix2 + "systemPath",
-                                key,
+                                SourceHint.dependencyManagementKey(dependency),
                                 "should not point at files within the project directory, " + sysPath
                                         + " will be unresolvable by dependent projects",
                                 dependency);
@@ -1097,7 +1097,7 @@ public class DefaultModelValidator implements ModelValidator {
                         Severity.WARNING,
                         Version.BASE,
                         prefix + prefix2 + "version",
-                        key,
+                        SourceHint.dependencyManagementKey(dependency),
                         "is either LATEST or RELEASE (both of them are being deprecated)",
                         dependency);
             }
@@ -1147,7 +1147,7 @@ public class DefaultModelValidator implements ModelValidator {
                         Severity.FATAL,
                         Version.V31,
                         prefix + "[" + key + "]",
-                        key,
+                        SourceHint.gav(key),
                         "is referencing itself.",
                         dependency);
             }
@@ -1169,11 +1169,25 @@ public class DefaultModelValidator implements ModelValidator {
 
             if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
                 validateBoolean(
-                        prefix, "optional", problems, errOn30, Version.V20, d.getOptional(), d.getManagementKey(), d);
+                        prefix,
+                        "optional",
+                        problems,
+                        errOn30,
+                        Version.V20,
+                        d.getOptional(),
+                        SourceHint.dependencyManagementKey(d),
+                        d);
 
                 if (!management) {
                     validateVersion(
-                            prefix, "version", problems, errOn30, Version.V20, d.getVersion(), d.getManagementKey(), d);
+                            prefix,
+                            "version",
+                            problems,
+                            errOn30,
+                            Version.V20,
+                            d.getVersion(),
+                            SourceHint.dependencyManagementKey(d),
+                            d);
 
                     /*
                      * TODO Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
@@ -1186,7 +1200,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V20,
                             d.getScope(),
-                            d.getManagementKey(),
+                            SourceHint.dependencyManagementKey(d),
                             d,
                             "provided",
                             "compile",
@@ -1203,7 +1217,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V20,
                             d.getScope(),
-                            d.getManagementKey(),
+                            SourceHint.dependencyManagementKey(d),
                             d,
                             "provided",
                             "compile",
@@ -1226,7 +1240,13 @@ public class DefaultModelValidator implements ModelValidator {
             // groupId, artifactId, version and classifier coordinates. This is in consequence
             // a self reference or in other words a circular reference which can not being resolved.
             addViolation(
-                    problems, Severity.FATAL, Version.V31, prefix + "[" + key + "]", key, "is referencing itself.", d);
+                    problems,
+                    Severity.FATAL,
+                    Version.V31,
+                    prefix + "[" + key + "]",
+                    SourceHint.gav(key),
+                    "is referencing itself.",
+                    d);
         }
     }
 
@@ -1243,7 +1263,14 @@ public class DefaultModelValidator implements ModelValidator {
                 validateEffectiveDependency(problems, d, false, prefix, validationLevel);
 
                 validateVersion(
-                        prefix, "version", problems, errOn30, Version.BASE, d.getVersion(), d.getManagementKey(), d);
+                        prefix,
+                        "version",
+                        problems,
+                        errOn30,
+                        Version.BASE,
+                        d.getVersion(),
+                        SourceHint.dependencyManagementKey(d),
+                        d);
 
                 validateEnum(
                         prefix,
@@ -1252,7 +1279,7 @@ public class DefaultModelValidator implements ModelValidator {
                         errOn30,
                         Version.BASE,
                         d.getScope(),
-                        d.getManagementKey(),
+                        SourceHint.dependencyManagementKey(d),
                         d,
                         "compile",
                         "runtime",
@@ -1270,15 +1297,29 @@ public class DefaultModelValidator implements ModelValidator {
                 Severity.ERROR,
                 Version.BASE,
                 d.getArtifactId(),
-                d.getManagementKey(),
+                SourceHint.dependencyManagementKey(d),
                 d);
 
         validateCoordinatesId(
-                prefix, "groupId", problems, Severity.ERROR, Version.BASE, d.getGroupId(), d.getManagementKey(), d);
+                prefix,
+                "groupId",
+                problems,
+                Severity.ERROR,
+                Version.BASE,
+                d.getGroupId(),
+                SourceHint.dependencyManagementKey(d),
+                d);
 
         if (!management) {
             validateStringNotEmpty(
-                    prefix, "type", problems, Severity.ERROR, Version.BASE, d.getType(), d.getManagementKey(), d);
+                    prefix,
+                    "type",
+                    problems,
+                    Severity.ERROR,
+                    Version.BASE,
+                    d.getType(),
+                    SourceHint.dependencyManagementKey(d),
+                    d);
 
             validateDependencyVersion(problems, d, prefix);
         }
@@ -1292,7 +1333,7 @@ public class DefaultModelValidator implements ModelValidator {
                         Severity.ERROR,
                         Version.BASE,
                         prefix + "systemPath",
-                        d.getManagementKey(),
+                        SourceHint.dependencyManagementKey(d),
                         "is missing.",
                         d);
             } else {
@@ -1303,7 +1344,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.ERROR,
                             Version.BASE,
                             prefix + "systemPath",
-                            d.getManagementKey(),
+                            SourceHint.dependencyManagementKey(d),
                             "must specify an absolute path but is " + systemPath,
                             d);
                 } else if (!sysFile.isFile()) {
@@ -1313,7 +1354,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.BASE,
                             prefix + "systemPath",
-                            d.getManagementKey(),
+                            SourceHint.dependencyManagementKey(d),
                             msg,
                             d);
                 }
@@ -1324,7 +1365,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Severity.ERROR,
                     Version.BASE,
                     prefix + "systemPath",
-                    d.getManagementKey(),
+                    SourceHint.dependencyManagementKey(d),
                     "must be omitted. This field may only be specified for a dependency with system scope.",
                     d);
         }
@@ -1339,7 +1380,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V20,
                             exclusion.getGroupId(),
-                            d.getManagementKey(),
+                            SourceHint.dependencyManagementKey(d),
                             exclusion);
 
                     validateCoordinatesId(
@@ -1349,7 +1390,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V20,
                             exclusion.getArtifactId(),
-                            d.getManagementKey(),
+                            SourceHint.dependencyManagementKey(d),
                             exclusion);
                 } else {
                     validateCoordinatesIdWithWildcards(
@@ -1359,7 +1400,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V30,
                             exclusion.getGroupId(),
-                            d.getManagementKey(),
+                            SourceHint.dependencyManagementKey(d),
                             exclusion);
 
                     validateCoordinatesIdWithWildcards(
@@ -1369,7 +1410,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V30,
                             exclusion.getArtifactId(),
-                            d.getManagementKey(),
+                            SourceHint.dependencyManagementKey(d),
                             exclusion);
                 }
             }
@@ -1381,7 +1422,14 @@ public class DefaultModelValidator implements ModelValidator {
      */
     protected void validateDependencyVersion(ModelProblemCollector problems, Dependency d, String prefix) {
         validateStringNotEmpty(
-                prefix, "version", problems, Severity.ERROR, Version.BASE, d.getVersion(), d.getManagementKey(), d);
+                prefix,
+                "version",
+                problems,
+                Severity.ERROR,
+                Version.BASE,
+                d.getVersion(),
+                SourceHint.dependencyManagementKey(d),
+                d);
     }
 
     private void validateRawRepositories(
@@ -1484,7 +1532,7 @@ public class DefaultModelValidator implements ModelValidator {
                         Severity.WARNING,
                         Version.V20,
                         prefix + "layout",
-                        repository.getId(),
+                        SourceHint.repoId(repository),
                         "uses the unsupported value 'legacy', artifact resolution might fail.",
                         repository);
             }
@@ -1513,7 +1561,7 @@ public class DefaultModelValidator implements ModelValidator {
                     errOn30,
                     Version.V20,
                     resource.getFiltering(),
-                    resource.getDirectory(),
+                    SourceHint.resourceDirectory(resource),
                     resource);
         }
     }
@@ -1535,7 +1583,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String id,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (id != null && validCoordinatesIds.contains(id)) {
             return true;
@@ -1581,7 +1629,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String id,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (validProfileIds.contains(id)) {
             return true;
@@ -1623,7 +1671,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String id,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (!validateStringNotEmpty(prefix, fieldName, problems, severity, version, id, sourceHint, tracker)) {
             return false;
@@ -1741,7 +1789,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String string,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (!validateNotNull(prefix, prefix2, fieldName, problems, severity, version, string, sourceHint, tracker)) {
             return false;
@@ -1772,7 +1820,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String string,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (!validateNotNull(prefix, fieldName, problems, severity, version, string, sourceHint, tracker)) {
             return false;
@@ -1802,7 +1850,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             Object object,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (object != null) {
             return true;
@@ -1829,7 +1877,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             Object object,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (object != null) {
             return true;
@@ -1848,7 +1896,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String string,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (string == null || string.isEmpty()) {
             return true;
@@ -1878,7 +1926,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String string,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker,
             String... validValues) {
         if (string == null || string.isEmpty()) {
@@ -1996,7 +2044,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String string,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker,
             String banned) {
         if (string != null) {
@@ -2026,7 +2074,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String string,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (string == null || string.isEmpty()) {
             return true;
@@ -2054,7 +2102,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String string,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
         if (string == null || string.isEmpty()) {
             return true;
@@ -2079,7 +2127,7 @@ public class DefaultModelValidator implements ModelValidator {
             String fieldName,
             ModelProblemCollector problems,
             String string,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             InputLocationTracker tracker,
             int validationLevel) {
         if (string == null) {
@@ -2120,7 +2168,7 @@ public class DefaultModelValidator implements ModelValidator {
             Severity severity,
             Version version,
             String fieldName,
-            String sourceHint,
+            @Nullable SourceHint sourceHint,
             String message,
             InputLocationTracker tracker) {
         StringBuilder buffer = new StringBuilder(256);
@@ -2179,6 +2227,58 @@ public class DefaultModelValidator implements ModelValidator {
             return Severity.WARNING;
         } else {
             return Severity.ERROR;
+        }
+    }
+
+    private static class SourceHint {
+        @Nullable
+        public static SourceHint xmlNodeInputLocation(XmlNode xmlNode) {
+            if (xmlNode.inputLocation() != null) {
+                return new SourceHint(xmlNode.inputLocation().toString(), null);
+            } else {
+                return null;
+            }
+        }
+
+        public static SourceHint gav(String gav) {
+            return new SourceHint(gav, null); // "GAV"
+        }
+
+        public static SourceHint dependencyManagementKey(Dependency dependency) {
+            return new SourceHint(dependency.getManagementKey(), null); // DMK
+        }
+
+        public static SourceHint pluginKey(Plugin plugin) {
+            return new SourceHint(plugin.getKey(), null); // PK
+        }
+
+        public static SourceHint repoId(Repository repository) {
+            return new SourceHint(repository.getId(), null); // ID
+        }
+
+        @Nullable
+        public static SourceHint resourceDirectory(Resource resource) {
+            if (resource.getDirectory() == null) {
+                return null;
+            }
+            return new SourceHint(resource.getDirectory(), null); // DIR
+        }
+
+        private final String hint;
+        private final String format;
+
+        private SourceHint(String hint, String format) {
+            this.hint = requireNonNull(hint, "hint");
+            this.format = format;
+        }
+
+        @Override
+        public String toString() {
+            String result = hint;
+            if (format != null) {
+                result = result + " (" + format + ")";
+            }
+            return result;
         }
     }
 }

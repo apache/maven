@@ -85,7 +85,7 @@ public class MultiThreadedBuilder implements Builder {
                 session.getRequest().getDegreeOfConcurrency(),
                 session.getProjects().size());
         boolean parallel = nThreads > 1;
-        // Propagate the parallel flag to the root session and all of the cloned sessions in each project segment
+        // Propagate the parallel flag to the root session and all the cloned sessions in each project segment
         session.setParallel(parallel);
         for (ProjectSegment segment : projectBuilds) {
             segment.getSession().setParallel(parallel);

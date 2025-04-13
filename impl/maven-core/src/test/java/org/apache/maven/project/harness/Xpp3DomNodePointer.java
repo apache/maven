@@ -35,12 +35,12 @@ class Xpp3DomNodePointer extends NodePointer {
 
     private XmlNode node;
 
-    public Xpp3DomNodePointer(XmlNode node) {
+    Xpp3DomNodePointer(XmlNode node) {
         super(null);
         this.node = node;
     }
 
-    public Xpp3DomNodePointer(NodePointer parent, XmlNode node) {
+    Xpp3DomNodePointer(NodePointer parent, XmlNode node) {
         super(parent);
         this.node = node;
     }
@@ -52,7 +52,7 @@ class Xpp3DomNodePointer extends NodePointer {
         if (node1 == node2) {
             return 0;
         }
-        for (XmlNode child : node.getChildren()) {
+        for (XmlNode child : node.children()) {
             if (child == node1) {
                 return -1;
             }
@@ -69,11 +69,11 @@ class Xpp3DomNodePointer extends NodePointer {
     }
 
     private static Object getValue(XmlNode node) {
-        if (node.getValue() != null) {
-            return node.getValue();
+        if (node.value() != null) {
+            return node.value();
         } else {
             List<Object> children = new ArrayList<>();
-            for (XmlNode child : node.getChildren()) {
+            for (XmlNode child : node.children()) {
                 children.add(getValue(child));
             }
             return children;
@@ -97,7 +97,7 @@ class Xpp3DomNodePointer extends NodePointer {
 
     @Override
     public QName getName() {
-        return new QName(null, node.getName());
+        return new QName(null, node.name());
     }
 
     @Override
@@ -107,7 +107,7 @@ class Xpp3DomNodePointer extends NodePointer {
 
     @Override
     public boolean isLeaf() {
-        return node.getChildren().isEmpty();
+        return node.children().isEmpty();
     }
 
     @Override

@@ -42,12 +42,30 @@ import java.util.TreeSet;
 
 import org.apache.maven.api.di.Named;
 
+/**
+ * Annotation processor that generates an index file for classes annotated with {@link Named}.
+ * This processor scans for classes with the {@code @Named} annotation and creates a file
+ * at {@code META-INF/maven/org.apache.maven.api.di.Inject} containing the fully qualified
+ * names of these classes.
+ *
+ * @since 4.0.0
+ */
 @SupportedAnnotationTypes("org.apache.maven.api.di.Named")
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 public class DiIndexProcessor extends AbstractProcessor {
 
+    /**
+     * Set of fully qualified class names that have been processed and contain the {@link Named} annotation.
+     */
     private final Set<String> processedClasses = new HashSet<>();
 
+    /**
+     * Processes classes with the {@link Named} annotation and generates an index file.
+     *
+     * @param annotations the annotation types requested to be processed
+     * @param roundEnv environment for information about the current and prior round
+     * @return whether or not the set of annotations are claimed by this processor
+     */
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         logMessage(
@@ -71,6 +89,12 @@ public class DiIndexProcessor extends AbstractProcessor {
         return true;
     }
 
+    /**
+     * Gets the fully qualified class name for a type element, including handling inner classes.
+     *
+     * @param typeElement the type element to get the class name for
+     * @return the fully qualified class name
+     */
     private String getFullClassName(TypeElement typeElement) {
         StringBuilder className = new StringBuilder(typeElement.getSimpleName());
         Element enclosingElement = typeElement.getEnclosingElement();
@@ -87,6 +111,13 @@ public class DiIndexProcessor extends AbstractProcessor {
         return className.toString();
     }
 
+    /**
+     * Updates the index file if its content has changed.
+     * The file is created at {@code META-INF/maven/org.apache.maven.api.di.Inject} and contains
+     * the fully qualified names of classes with the {@link Named} annotation.
+     *
+     * @throws IOException if there is an error reading or writing the file
+     */
     private void updateFileIfChanged() throws IOException {
         String path = "META-INF/maven/org.apache.maven.api.di.Inject";
         Set<String> existingClasses = new TreeSet<>(); // Using TreeSet for natural ordering
@@ -136,10 +167,22 @@ public class DiIndexProcessor extends AbstractProcessor {
         }
     }
 
+    /**
+     * Logs a message to the annotation processing environment.
+     *
+     * @param kind the kind of diagnostic message
+     * @param message the message to log
+     */
     private void logMessage(Diagnostic.Kind kind, String message) {
         processingEnv.getMessager().printMessage(kind, message);
     }
 
+    /**
+     * Logs an error message with exception details to the annotation processing environment.
+     *
+     * @param message the error message
+     * @param e the exception that occurred
+     */
     private void logError(String message, Exception e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

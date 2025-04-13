@@ -343,10 +343,8 @@ public class DefaultWagonManager implements WagonManager {
                 ChecksumObserver sha1ChecksumObserver = null;
                 try {
                     // TODO configure on repository
-                    int i = 0;
-
-                    md5ChecksumObserver = addChecksumObserver(wagon, CHECKSUM_ALGORITHMS[i++]);
-                    sha1ChecksumObserver = addChecksumObserver(wagon, CHECKSUM_ALGORITHMS[i++]);
+                    md5ChecksumObserver = addChecksumObserver(wagon, "MD5");
+                    sha1ChecksumObserver = addChecksumObserver(wagon, "SHA-1");
 
                     // reset the retry flag.
                     retry = false;
@@ -604,7 +602,7 @@ public class DefaultWagonManager implements WagonManager {
             // warn if it is set to anything other than ignore
             logger.warn("*** CHECKSUM FAILED - " + message + " - IGNORING");
         }
-        // otherwise it is ignore
+        // otherwise it is ignored
     }
 
     private void verifyChecksum(

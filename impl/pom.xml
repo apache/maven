@@ -22,7 +22,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-rc-3-SNAPSHOT</version>
+    <version>4.0.0-rc-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-impl-modules</artifactId>
@@ -31,6 +31,7 @@ under the License.
   <name>Maven 4 Implementation Modules</name>
 
   <modules>
+    <module>maven-support</module>
     <module>maven-impl</module>
     <module>maven-di</module>
     <module>maven-xml</module>
@@ -38,6 +39,7 @@ under the License.
     <module>maven-logging</module>
     <module>maven-core</module>
     <module>maven-cli</module>
+    <module>maven-testing</module>
     <module>maven-executor</module>
   </modules>
 </project>

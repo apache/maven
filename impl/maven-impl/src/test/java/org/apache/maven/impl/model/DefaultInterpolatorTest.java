@@ -88,8 +88,6 @@ class DefaultInterpolatorTest {
 
     @Test
     void testLoopEmpty2() {
-        Map<String, String> map = new HashMap<>();
-        map.put("a", "${a}");
         assertEquals("${a}", substVars("${a}", null, null, null, false));
     }
 
@@ -217,12 +215,11 @@ class DefaultInterpolatorTest {
             Map<String, String> configProps,
             UnaryOperator<String> callback,
             boolean defaultsToEmptyString) {
-        return new DefaultInterpolator()
-                .substVars(val, currentKey, null, configProps, callback, null, defaultsToEmptyString);
+        return DefaultInterpolator.substVars(val, currentKey, null, configProps, callback, null, defaultsToEmptyString);
     }
 
     private String substVars(String val, String currentKey) {
-        return new DefaultInterpolator().substVars(val, currentKey, null, null, null, null, true);
+        return DefaultInterpolator.substVars(val, currentKey, null, null, null, null, true);
     }
 
     private String substVars(String val, String currentKey, Map<String, String> configProps) {

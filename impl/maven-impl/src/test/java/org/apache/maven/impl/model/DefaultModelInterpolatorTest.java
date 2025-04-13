@@ -185,7 +185,7 @@ class DefaultModelInterpolatorTest {
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateModel(
-                model, (Path) null, createModelBuildingRequest(context).build(), collector);
+                model, null, createModelBuildingRequest(context).build(), collector);
         assertCollectorState(0, 1, 0, collector);
     }
 
@@ -243,21 +243,6 @@ class DefaultModelInterpolatorTest {
                 .dependencies(Collections.singletonList(
                         Dependency.newBuilder().version("${something}").build()))
                 .build();
-
-        /*
-        // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
-        // timing of executing the interpolation
-
-        try
-        {
-        new RegexBasedModelInterpolator().interpolate( model, context );
-        fail( "Should have failed to interpolate with invalid reference" );
-        }
-        catch ( ModelInterpolationException expected )
-        {
-        assertTrue( true );
-        }
-        */
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel(
@@ -471,7 +456,7 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals(out.getProperties().get("outputDirectory"), "${env.DOES_NOT_EXIST}");
+        assertEquals("${env.DOES_NOT_EXIST}", out.getProperties().get("outputDirectory"));
     }
 
     @Test
@@ -502,7 +487,7 @@ class DefaultModelInterpolatorTest {
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel(
-                model, (Path) null, createModelBuildingRequest(context).build(), collector);
+                model, null, createModelBuildingRequest(context).build(), collector);
         assertCollectorState(0, 0, 0, collector);
 
         List<Resource> outResources = out.getBuild().getResources();

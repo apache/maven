@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 class OldestConflictResolverTest extends AbstractConflictResolverTest {
     // constructors -----------------------------------------------------------
 
-    public OldestConflictResolverTest() throws Exception {
+    OldestConflictResolverTest() throws Exception {
         super("oldest");
     }
 

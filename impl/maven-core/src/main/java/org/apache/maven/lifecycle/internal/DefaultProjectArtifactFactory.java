@@ -131,7 +131,7 @@ public class DefaultProjectArtifactFactory implements ProjectArtifactFactory {
             // system scope come through unchanged...
             effectiveScope = Artifact.SCOPE_SYSTEM;
         } else if (Artifact.SCOPE_COMPILE.equals(originalScope) && Artifact.SCOPE_COMPILE.equals(inheritedScope)) {
-            // added to retain compile scope. Remove if you want compile inherited as runtime
+            // added to retain compile scope. Remove if you want to compile inherited as runtime
             effectiveScope = Artifact.SCOPE_COMPILE;
         } else if (Artifact.SCOPE_TEST.equals(inheritedScope)) {
             effectiveScope = Artifact.SCOPE_TEST;

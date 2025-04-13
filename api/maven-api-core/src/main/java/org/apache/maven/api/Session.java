@@ -34,6 +34,7 @@ import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactory;
 import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
  * The session to install / deploy / resolve artifacts and dependencies.
@@ -59,6 +60,14 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     Settings getSettings();
+
+    /**
+     * Retrieves toolchain models that have been explicitly configured.
+     *
+     * @return the toolchain models
+     */
+    @Nonnull
+    Collection<ToolchainModel> getToolchains();
 
     /**
      * Retrieves the local repository associated with this session.
@@ -824,7 +833,11 @@ public interface Session extends ProtoSession {
     /**
      * Obtain the {@link DependencyScope} from the specified {@code id}.
      * <p>
-     * Shortcut for {@code DependencyScope.forId(...)}.
+     * Shortcut for {@code DependencyScope.forId(...)} with a verification that the given identifier exists.
+     *
+     * @param id the identifier of the scope (case-sensitive)
+     * @return the scope for the given identifier (never null)
+     * @throws IllegalArgumentException if the given identifier is not a known scope
      *
      * @see org.apache.maven.api.DependencyScope#forId(String)
      */

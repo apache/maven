@@ -18,14 +18,13 @@
  */
 package org.apache.maven.settings.validation;
 
-import org.apache.maven.impl.DefaultSettingsValidator;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 
 /**
  * Validate a model settings
  *
- * @deprecated since 4.0.0, use {@link DefaultSettingsValidator} instead
+ * @deprecated since 4.0.0, use {@code org.apache.maven.impl.DefaultSettingsValidator} instead
  */
 @Deprecated(since = "4.0.0")
 public interface SettingsValidator {

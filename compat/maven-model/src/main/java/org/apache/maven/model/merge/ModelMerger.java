@@ -1062,8 +1062,7 @@ public class ModelMerger {
                     target.setLocation("reports", sourceLocation);
                 } else {
                     for (int i = 0; i < src.size(); i++) {
-                        targetLocation.setLocation(
-                                Integer.valueOf(tgt.size() + i), sourceLocation.getLocation(Integer.valueOf(i)));
+                        targetLocation.setLocation(tgt.size() + i, sourceLocation.getLocation(i));
                     }
                 }
             }

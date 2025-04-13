@@ -22,7 +22,8 @@ import org.apache.maven.api.Version;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DefaultModelVersionParserTest {
 
@@ -30,6 +31,6 @@ class DefaultModelVersionParserTest {
     void parseVersion() {
         Version v = new DefaultModelVersionParser(new GenericVersionScheme()).parseVersion("");
         assertNotNull(v);
-        assertEquals("", v.asString());
+        assertEquals("", v.toString());
     }
 }

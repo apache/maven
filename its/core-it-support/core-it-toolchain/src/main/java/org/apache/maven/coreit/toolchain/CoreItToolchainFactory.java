@@ -18,7 +18,8 @@
  */
 package org.apache.maven.coreit.toolchain;
 
-import org.apache.maven.toolchain.MisconfiguredToolchainException;
+import javax.inject.Named;
+
 import org.apache.maven.toolchain.ToolchainFactory;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.model.ToolchainModel;
@@ -26,13 +27,14 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 /**
  * @author Benjamin Bentmann
  */
+@Named("coreit")
 public class CoreItToolchainFactory implements ToolchainFactory {
 
     public ToolchainPrivate createDefaultToolchain() {
         return null;
     }
 
-    public ToolchainPrivate createToolchain(ToolchainModel model) throws MisconfiguredToolchainException {
+    public ToolchainPrivate createToolchain(ToolchainModel model) {
         if (model == null) {
             return null;
         }

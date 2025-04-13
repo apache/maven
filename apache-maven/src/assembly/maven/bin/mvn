@@ -165,10 +165,28 @@ find_file_argument_basedir() {
 )
 }
 
-# concatenates all lines of a file
+# concatenates all lines of a file and replaces variables
 concat_lines() {
   if [ -f "$1" ]; then
-    echo "`tr -s '\r\n' '  ' < "$1"`"
+    # First convert all CR to LF using tr
+    tr '\r' '\n' < "$1" | \
+    sed -e '/^$/d' -e 's/#.*$//' | \
+    # Split into words and process each argument
+    xargs -n 1 | \
+    while read -r arg; do
+      # Replace variables first
+      arg=$(echo "$arg" | sed \
+        -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
+        -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
+
+      # Add quotes only if argument contains spaces and isn't already quoted
+      if echo "$arg" | grep -q " " && ! echo "$arg" | grep -q "^\".*\"$"; then
+        echo "\"$arg\""
+      else
+        echo "$arg"
+      fi
+    done | \
+    tr '\n' ' '
   fi
 }
 
@@ -220,16 +238,25 @@ handle_args() {
 handle_args "$@"
 MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
-exec "$JAVACMD" \
+cmd="\"$JAVACMD\" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
   --enable-native-access=ALL-UNNAMED \
-  -classpath "$LAUNCHER_JAR" \
-  "-Dclassworlds.conf=$CLASSWORLDS_CONF" \
-  "-Dmaven.home=$MAVEN_HOME" \
-  "-Dmaven.mainClass=$MAVEN_MAIN_CLASS" \
-  "-Dlibrary.jline.path=${MAVEN_HOME}/lib/jline-native" \
-  "-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR" \
+  -classpath \"$LAUNCHER_JAR\" \
+  \"-Dclassworlds.conf=$CLASSWORLDS_CONF\" \
+  \"-Dmaven.home=$MAVEN_HOME\" \
+  \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\" \
+  \"-Dlibrary.jline.path=${MAVEN_HOME}/lib/jline-native\" \
+  \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\" \
   $LAUNCHER_CLASS \
-  $MAVEN_ARGS \
-  "$@"
+  $MAVEN_ARGS"
+# Add remaining arguments with proper quoting
+for arg in "$@"; do
+    cmd="$cmd \"$arg\""
+done
+
+# Debug: print the command that will be executed
+#echo "About to execute:"
+#echo "$cmd"
+
+eval exec "$cmd"

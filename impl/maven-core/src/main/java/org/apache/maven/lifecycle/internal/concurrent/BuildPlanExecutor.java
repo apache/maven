@@ -46,6 +46,7 @@ import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
@@ -58,7 +59,6 @@ import org.apache.maven.impl.util.PhasingExecutor;
 import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -103,17 +103,46 @@ import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.SETUP;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.TEARDOWN;
 
 /**
- * Builds the full lifecycle in weave-mode (phase by phase as opposed to project-by-project).
- * <p>
- * This builder uses a number of threads equal to the minimum of the degree of concurrency (which is the thread count
- * set with <code>-T</code> on the command-line) and the number of projects to build. As such, building a single project
- * will always result in a sequential build, regardless of the thread count.
- * </p>
- * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
+ * Executes the Maven build plan in a concurrent manner, handling the lifecycle phases and plugin executions.
+ * This executor implements a weave-mode build strategy, where builds are executed phase-by-phase rather than
+ * project-by-project.
+ *
+ * <h2>Key Features:</h2>
+ * <ul>
+ *   <li>Concurrent execution of compatible build steps across projects</li>
+ *   <li>Thread-safety validation for plugins</li>
+ *   <li>Support for forked executions and lifecycle phases</li>
+ *   <li>Dynamic build plan adjustment during execution</li>
+ * </ul>
+ *
+ * <h2>Execution Strategy:</h2>
+ * <p>The executor follows these main steps:</p>
+ * <ol>
+ *   <li>Initial plan creation based on project dependencies and task segments</li>
+ *   <li>Concurrent execution of build steps while maintaining dependency order</li>
+ *   <li>Dynamic replanning when necessary (e.g., for forked executions)</li>
+ *   <li>Project setup, execution, and teardown phases management</li>
+ * </ol>
+ *
+ * <h2>Thread Management:</h2>
+ * <p>The number of threads used is determined by:</p>
+ * <pre>
+ * min(degreeOfConcurrency, numberOfProjects)
+ * </pre>
+ * where degreeOfConcurrency is set via the -T command-line option.
+ *
+ * <h2>Build Step States:</h2>
+ * <ul>
+ *   <li>CREATED: Initial state of a build step</li>
+ *   <li>PLANNING: Step is being planned</li>
+ *   <li>SCHEDULED: Step is queued for execution</li>
+ *   <li>EXECUTED: Step has completed successfully</li>
+ *   <li>FAILED: Step execution failed</li>
+ * </ul>
+ *
+ * <p><strong>NOTE:</strong> This class is not part of any public API and can be changed or deleted without prior notice.</p>
  *
  * @since 3.0
- *         Builds one or more lifecycles for a full module
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 @Named
 public class BuildPlanExecutor {
@@ -225,6 +254,7 @@ public class BuildPlanExecutor {
                 pplan.status.set(PLANNING); // the plan step always need planning
                 BuildStep setup = new BuildStep(SETUP, project, null);
                 BuildStep teardown = new BuildStep(TEARDOWN, project, null);
+                teardown.executeAfter(setup);
                 setup.executeAfter(pplan);
                 plan.steps(project).forEach(step -> {
                     if (step.predecessors.isEmpty()) {
@@ -322,6 +352,10 @@ public class BuildPlanExecutor {
             global.start();
             lock.readLock().lock();
             try {
+                // Get all build steps that are:
+                // 1. Not yet started (CREATED status)
+                // 2. Have all their prerequisites completed (predecessors EXECUTED)
+                // 3. Successfully transition from CREATED to SCHEDULED state
                 plan.sortedNodes().stream()
                         .filter(step -> step.status.get() == CREATED)
                         .filter(step -> step.predecessors.stream().allMatch(s -> s.status.get() == EXECUTED))
@@ -343,6 +377,10 @@ public class BuildPlanExecutor {
                                 } catch (Exception e) {
                                     step.status.compareAndSet(SCHEDULED, FAILED);
                                     global.stop();
+
+                                    // Find and execute all pending after:* phases for this project
+                                    executeAfterPhases(step);
+
                                     handleBuildError(reactorContext, session, step.project, e, global);
                                 }
                             });
@@ -352,6 +390,65 @@ public class BuildPlanExecutor {
             }
         }
 
+        /**
+         * Executes all pending after:* phases for a failed project.
+         * This ensures proper cleanup is performed even when a build fails.
+         * Only executes after:xxx phases if their corresponding before:xxx phase
+         * has been either executed or failed.
+         *
+         * For example, if a project fails during 'compile', this will execute
+         * any configured 'after:compile' phases to ensure proper cleanup.
+         *
+         * @param failedStep The build step that failed, containing the project that needs cleanup
+         */
+        private void executeAfterPhases(BuildStep failedStep) {
+            if (failedStep == null || failedStep.project == null) {
+                return;
+            }
+
+            lock.readLock().lock();
+            try {
+                // Find all after:* phases that should be executed
+                plan.steps(failedStep.project)
+                        .filter(step -> step.name != null && step.name.startsWith(AFTER))
+                        .filter(step -> step.status.get() == CREATED)
+                        .filter(step -> {
+                            // Only execute after:xxx if before:xxx has been executed or failed
+                            String phaseName = step.name.substring(AFTER.length());
+                            return plan.step(failedStep.project, BEFORE + phaseName)
+                                    .map(s -> {
+                                        int status = s.status.get();
+                                        return status == EXECUTED || status == FAILED;
+                                    })
+                                    .orElse(false);
+                        })
+                        .filter(step -> step.status.compareAndSet(CREATED, SCHEDULED))
+                        .forEach(afterStep -> {
+                            try {
+                                executeStep(afterStep);
+                                afterStep.status.compareAndSet(SCHEDULED, EXECUTED);
+                            } catch (Exception e) {
+                                // Log but don't fail - we're already in error handling
+                                logger.error("Error executing cleanup phase " + afterStep.name, e);
+                                afterStep.status.compareAndSet(SCHEDULED, FAILED);
+                            }
+                        });
+            } finally {
+                lock.readLock().unlock();
+            }
+        }
+
+        /**
+         * Executes a single build step, which can be one of:
+         * - PLAN: Project build planning
+         * - SETUP: Project initialization
+         * - TEARDOWN: Project cleanup
+         * - Default: Actual mojo/plugin executions
+         *
+         * @param step The build step to execute
+         * @throws IOException If there's an IO error during execution
+         * @throws LifecycleExecutionException If there's a lifecycle execution error
+         */
         private void executeStep(BuildStep step) throws IOException, LifecycleExecutionException {
             Clock clock = getClock(step.project);
             switch (step.name) {
@@ -359,12 +456,14 @@ public class BuildPlanExecutor {
                     // Planning steps should be executed out of normal execution
                     throw new IllegalStateException();
                 case SETUP:
+                    attachToThread(step);
                     consumerPomArtifactTransformer.injectTransformedArtifacts(
                             session.getRepositorySession(), step.project);
                     projectExecutionListener.beforeProjectExecution(new ProjectExecutionEvent(session, step.project));
                     eventCatapult.fire(ExecutionEvent.Type.ProjectStarted, session, null);
                     break;
                 case TEARDOWN:
+                    attachToThread(step);
                     projectExecutionListener.afterProjectExecutionSuccess(
                             new ProjectExecutionEvent(session, step.project, Collections.emptyList()));
                     reactorContext
@@ -375,8 +474,7 @@ public class BuildPlanExecutor {
                 default:
                     List<MojoExecution> executions = step.executions().collect(Collectors.toList());
                     if (!executions.isEmpty()) {
-                        attachToThread(step.project);
-                        session.setCurrentProject(step.project);
+                        attachToThread(step);
                         clock.start();
                         executions.forEach(mojoExecution -> {
                             mojoExecutionConfigurator(mojoExecution).configure(step.project, mojoExecution, true);
@@ -388,6 +486,11 @@ public class BuildPlanExecutor {
                     break;
             }
             step.status.compareAndSet(SCHEDULED, EXECUTED);
+        }
+
+        private void attachToThread(BuildStep step) {
+            BuildPlanExecutor.attachToThread(step.project);
+            session.setCurrentProject(step.project);
         }
 
         private Clock getClock(Object key) {
@@ -749,16 +852,27 @@ public class BuildPlanExecutor {
             plan.allSteps().filter(step -> step.phase != null).forEach(step -> {
                 Lifecycle.Phase phase = step.phase;
                 MavenProject project = step.project;
-                phase.links().stream()
-                        .filter(l -> l.pointer().type() != Lifecycle.Pointer.Type.PROJECT)
-                        .forEach(link -> {
-                            String n1 = phase.name();
-                            String n2 = link.pointer().phase();
-                            // for each project, if the phase in the build, link after it
-                            getLinkedProjects(projects, project, link).forEach(p -> plan.step(p, AFTER + n2)
-                                    .ifPresent(a -> plan.requiredStep(project, BEFORE + n1)
-                                            .executeAfter(a)));
+                phase.links().stream().forEach(link -> {
+                    BuildStep before = plan.requiredStep(project, BEFORE + phase.name());
+                    BuildStep after = plan.requiredStep(project, AFTER + phase.name());
+                    Lifecycle.Pointer pointer = link.pointer();
+                    String n2 = pointer.phase();
+                    if (pointer instanceof Lifecycle.DependenciesPointer) {
+                        // For dependencies: ensure current project's phase starts after dependency's phase completes
+                        // Example: project's compile starts after dependency's package completes
+                        // TODO: String scope = ((Lifecycle.DependenciesPointer) pointer).scope();
+                        projects.get(project)
+                                .forEach(p -> plan.step(p, AFTER + n2).ifPresent(before::executeAfter));
+                    } else if (pointer instanceof Lifecycle.ChildrenPointer) {
+                        // For children: ensure bidirectional phase coordination
+                        project.getCollectedProjects().forEach(p -> {
+                            // 1. Child's phase start waits for parent's phase start
+                            plan.step(p, BEFORE + n2).ifPresent(before::executeBefore);
+                            // 2. Parent's phase completion waits for child's phase completion
+                            plan.step(p, AFTER + n2).ifPresent(after::executeAfter);
                         });
+                    }
+                });
             });
 
             // Keep projects in reactors by GAV
@@ -784,19 +898,6 @@ public class BuildPlanExecutor {
             lifecycle.aliases().forEach(alias -> plan.aliases().put(alias.v3Phase(), alias.v4Phase()));
 
             return plan;
-        }
-
-        private List<MavenProject> getLinkedProjects(
-                Map<MavenProject, List<MavenProject>> projects, MavenProject project, Lifecycle.Link link) {
-            if (link.pointer().type() == Lifecycle.Pointer.Type.DEPENDENCIES) {
-                // TODO: String scope = ((Lifecycle.DependenciesPointer) link.pointer()).scope();
-                return projects.get(project);
-            } else if (link.pointer().type() == Lifecycle.Pointer.Type.CHILDREN) {
-                return project.getCollectedProjects();
-            } else {
-                throw new IllegalArgumentException(
-                        "Unsupported pointer type: " + link.pointer().type());
-            }
         }
     }
 
@@ -830,7 +931,7 @@ public class BuildPlanExecutor {
                 ? mojoExecution.getConfiguration().getDom()
                 : null;
         if (executionConfiguration == null) {
-            executionConfiguration = new XmlNodeImpl("configuration");
+            executionConfiguration = XmlNode.newInstance("configuration");
         }
 
         XmlNode defaultConfiguration = getMojoConfiguration(mojoDescriptor);
@@ -838,42 +939,42 @@ public class BuildPlanExecutor {
         List<XmlNode> children = new ArrayList<>();
         if (mojoDescriptor.getParameters() != null) {
             for (Parameter parameter : mojoDescriptor.getParameters()) {
-                XmlNode parameterConfiguration = executionConfiguration.getChild(parameter.getName());
+                XmlNode parameterConfiguration = executionConfiguration.child(parameter.getName());
 
                 if (parameterConfiguration == null) {
-                    parameterConfiguration = executionConfiguration.getChild(parameter.getAlias());
+                    parameterConfiguration = executionConfiguration.child(parameter.getAlias());
                 }
 
-                XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
+                XmlNode parameterDefaults = defaultConfiguration.child(parameter.getName());
 
                 if (parameterConfiguration != null) {
-                    parameterConfiguration = parameterConfiguration.merge(parameterDefaults, Boolean.TRUE);
+                    parameterConfiguration = XmlService.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 } else {
                     parameterConfiguration = parameterDefaults;
                 }
 
                 if (parameterConfiguration != null) {
-                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.getAttributes());
+                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.attributes());
 
-                    String attributeForImplementation = parameterConfiguration.getAttribute("implementation");
+                    String attributeForImplementation = parameterConfiguration.attribute("implementation");
                     String parameterForImplementation = parameter.getImplementation();
                     if ((attributeForImplementation == null || attributeForImplementation.isEmpty())
                             && ((parameterForImplementation != null) && !parameterForImplementation.isEmpty())) {
                         attributes.put("implementation", parameter.getImplementation());
                     }
 
-                    parameterConfiguration = new XmlNodeImpl(
+                    parameterConfiguration = XmlNode.newInstance(
                             parameter.getName(),
-                            parameterConfiguration.getValue(),
+                            parameterConfiguration.value(),
                             attributes,
-                            parameterConfiguration.getChildren(),
-                            parameterConfiguration.getInputLocation());
+                            parameterConfiguration.children(),
+                            parameterConfiguration.inputLocation());
 
                     children.add(parameterConfiguration);
                 }
             }
         }
-        XmlNode finalConfiguration = new XmlNodeImpl("configuration", null, null, children, null);
+        XmlNode finalConfiguration = XmlNode.newInstance("configuration", children);
 
         mojoExecution.setConfiguration(finalConfiguration);
     }

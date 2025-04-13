@@ -46,7 +46,7 @@ import org.codehaus.plexus.interpolation.ValueSource;
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator {
@@ -158,7 +158,7 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
 
         valueSources.add(new MapBasedValueSource(config.getUserProperties()));
 
-        // Overwrite existing values in model properties. Otherwise it's not possible
+        // Overwrite existing values in model properties. Otherwise, it's not possible
         // to define them via command line e.g.: mvn -Drevision=6.5.7 ...
         versionProcessor.overwriteModelProperties(modelProperties, config);
         valueSources.add(new MapBasedValueSource(modelProperties));

@@ -35,7 +35,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Determines profile activation based on the existence or value of some execution property.
  *
  * @see ActivationProperty
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("property")
 @Singleton

@@ -118,7 +118,7 @@ public class DefaultInterpolator implements Interpolator {
      * then the corresponding property value is substituted for the variable
      * placeholder. Multiple variable placeholders may exist in the
      * specified value as well as nested variable placeholders, which
-     * are substituted from inner most to outer most. Configuration
+     * are substituted from innermost to outermost. Configuration
      * properties override system properties.
      * </p>
      *
@@ -144,7 +144,7 @@ public class DefaultInterpolator implements Interpolator {
      * then the corresponding property value is substituted for the variable
      * placeholder. Multiple variable placeholders may exist in the
      * specified value as well as nested variable placeholders, which
-     * are substituted from inner most to outer most. Configuration
+     * are substituted from innermost to outermost. Configuration
      * properties override system properties.
      * </p>
      *
@@ -176,7 +176,7 @@ public class DefaultInterpolator implements Interpolator {
      * then the corresponding property value is substituted for the variable
      * placeholder. Multiple variable placeholders may exist in the
      * specified value as well as nested variable placeholders, which
-     * are substituted from inner most to outer most. Configuration
+     * are substituted from innermost to outermost. Configuration
      * properties override system properties.
      * </p>
      *
@@ -294,7 +294,6 @@ public class DefaultInterpolator implements Interpolator {
 
         // Process chained operators from left to right
         int startIdx = 0;
-        String currentVar = variable;
         String substValue = null;
 
         while (startIdx < variable.length()) {
@@ -305,7 +304,7 @@ public class DefaultInterpolator implements Interpolator {
             if (idx < 0) {
                 // No more operators, process the final variable
                 if (substValue == null) {
-                    currentVar = variable.substring(startIdx);
+                    String currentVar = variable.substring(startIdx);
                     substValue = resolveVariable(
                             currentVar, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
                 }

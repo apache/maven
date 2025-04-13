@@ -39,6 +39,7 @@ package org.apache.maven.it.utils;
 /**
  * @author Olivier Lamy
  */
+@SuppressWarnings("checkstyle:VisibilityModifier")
 public class DeployedResource {
     public String httpMethod;
 

@@ -37,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,10 +48,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Order(200)
 public class MavenInvokerTest extends MavenInvokerTestSupport {
     @Override
-    protected Invoker createInvoker() {
-        return new MavenInvoker(ProtoLookup.builder()
-                .addMapping(ClassWorld.class, new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader()))
-                .build());
+    protected Invoker createInvoker(ClassWorld classWorld) {
+        return new MavenInvoker(
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
     }
 
     @Override
@@ -66,8 +66,59 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         invoke(cwd, userHome, List.of("verify"), List.of());
     }
 
+    /**
+     * Same source (user or project extensions.xml) must not contain same GA with different V.
+     */
     @Test
-    void conflictingExtensions(
+    void conflictingExtensionsFromSameSource(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        String projectExtensionsXml =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <extensions>
+                    <extension>
+                        <groupId>io.takari.maven</groupId>
+                        <artifactId>takari-smart-builder</artifactId>
+                        <version>1.0.2</version>
+                    </extension>
+                    <extension>
+                        <groupId>io.takari.maven</groupId>
+                        <artifactId>takari-smart-builder</artifactId>
+                        <version>1.0.1</version>
+                    </extension>
+                </extensions>
+                """;
+        Path dotMvn = cwd.resolve(".mvn");
+        Files.createDirectories(dotMvn);
+        Path projectExtensions = dotMvn.resolve("extensions.xml");
+        Files.writeString(projectExtensions, projectExtensionsXml);
+
+        String userExtensionsXml =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <extensions>
+                    <extension>
+                        <groupId>io.takari.maven</groupId>
+                        <artifactId>takari-smart-builder</artifactId>
+                        <version>1.0.2</version>
+                    </extension>
+                </extensions>
+                """;
+        Path userConf = userHome.resolve(".m2");
+        Files.createDirectories(userConf);
+        Path userExtensions = userConf.resolve("extensions.xml");
+        Files.writeString(userExtensions, userExtensionsXml);
+
+        assertThrows(InvokerException.class, () -> invoke(cwd, userHome, List.of("validate"), List.of()));
+    }
+
+    /**
+     * In case of conflict spanning different sources, precedence is applied: project > user > installation.
+     */
+    @Test
+    void conflictingExtensionsFromDifferentSource(
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
@@ -76,9 +127,9 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
-                        <groupId>eu.maveniverse.maven.mimir</groupId>
-                        <artifactId>extension3</artifactId>
-                        <version>0.3.4</version>
+                        <groupId>io.takari.maven</groupId>
+                        <artifactId>takari-smart-builder</artifactId>
+                        <version>1.0.2</version>
                     </extension>
                 </extensions>
                 """;
@@ -92,7 +143,19 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path userExtensions = userConf.resolve("extensions.xml");
         Files.writeString(userExtensions, extensionsXml);
 
-        assertThrows(InvokerException.class, () -> invoke(cwd, userHome, List.of("validate"), List.of()));
+        // this should not throw
+        assertDoesNotThrow(() -> invoke(cwd, userHome, List.of("validate"), List.of()));
+        // but warn
+
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - Found 1 extension conflict(s):
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - * Conflicting extension
+        // eu.maveniverse.maven.mimir:extension3: /tmp/junit-191051426131307150/.mvn/extensions.xml:3 vs
+        // /tmp/junit-16591192886395443631/.m2/extensions.xml:3
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory -
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - Order of core extensions
+        // precedence is project > user > installation. Selected extensions are:
+        // [main] WARNING org.apache.maven.cling.invoker.PlexusContainerCapsuleFactory - *
+        // eu.maveniverse.maven.mimir:extension3:0.3.4 configured in /tmp/junit-191051426131307150/.mvn/extensions.xml:3
     }
 
     @Test
@@ -155,10 +218,10 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Map<String, String> logs = invoke(
                 cwd,
                 userHome,
-                List.of("eu.maveniverse.maven.plugins:toolbox:0.6.1:help"),
+                List.of("eu.maveniverse.maven.plugins:toolbox:0.6.2:help"),
                 List.of("--force-interactive"));
 
-        String log = logs.get("eu.maveniverse.maven.plugins:toolbox:0.6.1:help");
+        String log = logs.get("eu.maveniverse.maven.plugins:toolbox:0.6.2:help");
         assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
         assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
     }

@@ -33,7 +33,7 @@ class MavenModelMergerTest {
 
     // modelVersion is neither inherited nor injected
     @Test
-    void testMergeModel_ModelVersion() {
+    void testMergeModelModelVersion() {
         Model parent = Model.newBuilder().modelVersion("4.0.0").build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
@@ -48,7 +48,7 @@ class MavenModelMergerTest {
 
     // ArtifactId is neither inherited nor injected
     @Test
-    void testMergeModel_ArtifactId() {
+    void testMergeModelArtifactId() {
         Model parent = Model.newBuilder().artifactId("PARENT").build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
@@ -63,7 +63,7 @@ class MavenModelMergerTest {
 
     // Prerequisites are neither inherited nor injected
     @Test
-    void testMergeModel_Prerequisites() {
+    void testMergeModelPrerequisites() {
         Model parent =
                 Model.newBuilder().prerequisites(Prerequisites.newInstance()).build();
         Model model = Model.newInstance();
@@ -81,7 +81,7 @@ class MavenModelMergerTest {
 
     // Profiles are neither inherited nor injected
     @Test
-    void testMergeModel_Profiles() {
+    void testMergeModelProfiles() {
         Model parent = Model.newBuilder()
                 .profiles(Collections.singletonList(Profile.newInstance()))
                 .build();

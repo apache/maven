@@ -28,7 +28,7 @@ import org.apache.maven.building.FileSource;
  * Represents a model pulled from a repository
  *
  * @since 4.0.0
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public class ArtifactModelSource extends FileSource implements ModelSource {

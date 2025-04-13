@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyCoordinates;
@@ -38,13 +40,12 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.impl.MappedCollection;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
-
-import static org.apache.maven.impl.Utils.nonNull;
 
 public class DefaultProject implements Project {
 
@@ -119,13 +120,15 @@ public class DefaultProject implements Project {
     @Nonnull
     @Override
     public Path getPomPath() {
-        return nonNull(project.getFile(), "pomPath").toPath();
+        return Objects.requireNonNull(project.getFile(), "pomPath cannot be null")
+                .toPath();
     }
 
     @Nonnull
     @Override
     public Path getBasedir() {
-        return nonNull(project.getBasedir(), "basedir").toPath();
+        return Objects.requireNonNull(project.getBasedir(), "basedir cannot be null")
+                .toPath();
     }
 
     @Nonnull
@@ -163,6 +166,37 @@ public class DefaultProject implements Project {
     public Optional<Project> getParent() {
         MavenProject parent = project.getParent();
         return Optional.ofNullable(session.getProject(parent));
+    }
+
+    @Override
+    @Nonnull
+    public List<Profile> getDeclaredProfiles() {
+        return getModel().getProfiles();
+    }
+
+    @Override
+    @Nonnull
+    public List<Profile> getEffectiveProfiles() {
+        return Stream.iterate(this.project, Objects::nonNull, MavenProject::getParent)
+                .flatMap(project -> project.getModel().getDelegate().getProfiles().stream())
+                .toList();
+    }
+
+    @Override
+    @Nonnull
+    public List<Profile> getDeclaredActiveProfiles() {
+        return project.getActiveProfiles().stream()
+                .map(org.apache.maven.model.Profile::getDelegate)
+                .toList();
+    }
+
+    @Override
+    @Nonnull
+    public List<Profile> getEffectiveActiveProfiles() {
+        return Stream.iterate(this.project, Objects::nonNull, MavenProject::getParent)
+                .flatMap(project -> project.getActiveProfiles().stream())
+                .map(org.apache.maven.model.Profile::getDelegate)
+                .toList();
     }
 
     @Nonnull
@@ -209,7 +243,10 @@ public class DefaultProject implements Project {
             @Nonnull
             @Override
             public DependencyScope getScope() {
-                String scope = dependency.getScope() != null ? dependency.getScope() : "";
+                String scope = dependency.getScope();
+                if (scope == null) {
+                    scope = "";
+                }
                 return session.requireDependencyScope(scope);
             }
 

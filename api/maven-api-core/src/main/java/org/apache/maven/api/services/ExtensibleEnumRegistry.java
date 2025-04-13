@@ -24,6 +24,16 @@ import org.apache.maven.api.ExtensibleEnum;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * Registry for extensible enum values that allows looking up enum instances by their identifiers.
+ * <p>
+ * This service provides access to all registered instances of a specific extensible enum type.
+ * It's used internally by Maven and can also be used by plugins and extensions to access
+ * custom enum values that have been registered through SPI providers.
+ *
+ * @param <T> the specific type of extensible enum managed by this registry
+ * @since 4.0.0
+ */
 public interface ExtensibleEnumRegistry<T extends ExtensibleEnum> extends Service {
     @Nonnull
     Optional<T> lookup(@Nonnull String id);

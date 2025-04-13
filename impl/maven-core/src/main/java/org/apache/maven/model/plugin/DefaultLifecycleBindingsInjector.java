@@ -90,7 +90,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                 target.setBuild(new Build());
             }
 
-            Map<Object, Object> context = Collections.<Object, Object>singletonMap(
+            Map<Object, Object> context = Collections.singletonMap(
                     PLUGIN_MANAGEMENT, target.getBuild().getPluginManagement());
 
             mergePluginContainer_Plugins(target.getBuild(), source.getBuild(), false, context);

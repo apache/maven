@@ -192,7 +192,7 @@ class DefaultGraphBuilderTest {
                 scenario("Selected missing project as required and as optional")
                         .activeRequiredProjects("non-existing-module")
                         .activeOptionalProjects("non-existing-module")
-                        .expectResult(MavenExecutionException.class, "not find the selected project"),
+                        .expectResult(MavenExecutionException.class, "do not exist"),
                 scenario("Resuming from project")
                         .resumeFrom(MODULE_B)
                         .expectResult(MODULE_B, MODULE_C_2, INDEPENDENT_MODULE),
@@ -264,7 +264,7 @@ class DefaultGraphBuilderTest {
     static class SelectedProjectsResult implements ExpectedResult {
         final List<String> projectNames;
 
-        public SelectedProjectsResult(List<String> projectSelectors) {
+        SelectedProjectsResult(List<String> projectSelectors) {
             this.projectNames = projectSelectors;
         }
     }
@@ -273,7 +273,7 @@ class DefaultGraphBuilderTest {
         final Class<? extends Throwable> expected;
         final String partOfMessage;
 
-        public ExceptionThrown(final Class<? extends Throwable> expected, final String partOfMessage) {
+        ExceptionThrown(final Class<? extends Throwable> expected, final String partOfMessage) {
             this.expected = expected;
             this.partOfMessage = partOfMessage;
         }
@@ -281,6 +281,7 @@ class DefaultGraphBuilderTest {
 
     @ParameterizedTest
     @MethodSource("parameters")
+    @SuppressWarnings("checkstyle:ParameterNumber")
     void testGetReactorProjects(
             String parameterDescription,
             List<String> parameterActiveRequiredProjects,

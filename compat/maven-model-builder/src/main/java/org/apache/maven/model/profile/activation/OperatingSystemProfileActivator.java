@@ -34,7 +34,7 @@ import org.apache.maven.utils.Os;
  * Determines profile activation based on the operating system of the current runtime platform.
  *
  * @see ActivationOS
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("os")
 @Singleton

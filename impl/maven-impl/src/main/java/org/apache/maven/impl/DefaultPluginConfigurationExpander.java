@@ -34,6 +34,7 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.PluginConfigurationExpander;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 
 /**
  * Handles expansion of general build plugin configuration into individual executions.
@@ -66,10 +67,10 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
         return map(oldPlugins, plugin -> {
             XmlNode pluginConfiguration = plugin.getConfiguration();
             if (pluginConfiguration != null) {
-                return plugin.withExecutions(map(
-                        plugin.getExecutions(),
-                        execution -> execution.withConfiguration(
-                                XmlNode.merge(execution.getConfiguration(), pluginConfiguration))));
+                return plugin.withExecutions(map(plugin.getExecutions(), execution -> {
+                    return execution.withConfiguration(
+                            XmlService.merge(execution.getConfiguration(), pluginConfiguration));
+                }));
             } else {
                 return plugin;
             }
@@ -80,10 +81,9 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
         return map(oldPlugins, plugin -> {
             XmlNode pluginConfiguration = plugin.getConfiguration();
             if (pluginConfiguration != null) {
-                return plugin.withReportSets(map(
-                        plugin.getReportSets(),
-                        report -> report.withConfiguration(
-                                XmlNode.merge(report.getConfiguration(), pluginConfiguration))));
+                return plugin.withReportSets(map(plugin.getReportSets(), report -> {
+                    return report.withConfiguration(XmlService.merge(report.getConfiguration(), pluginConfiguration));
+                }));
             } else {
                 return plugin;
             }

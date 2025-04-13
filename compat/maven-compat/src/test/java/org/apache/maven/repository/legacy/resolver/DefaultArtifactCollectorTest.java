@@ -293,6 +293,7 @@ class DefaultArtifactCollectorTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     void testResolveRangeWithManagedVersion() throws ArtifactResolutionException, InvalidVersionSpecificationException {
         ArtifactSpec a = createArtifactSpec("a", "1.0");
         ArtifactSpec b = a.addDependency("b", "[1.0,3.0]");
@@ -675,6 +676,7 @@ class DefaultArtifactCollectorTest {
 
     @Test
     @Disabled("that one does not work")
+    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     void testOverConstrainedVersionException()
             throws ArtifactResolutionException, InvalidVersionSpecificationException {
         ArtifactSpec a = createArtifactSpec("a", "1.0");
@@ -831,7 +833,7 @@ class DefaultArtifactCollectorTest {
                 throws ArtifactMetadataRetrievalException {
             String key = getKey(artifact);
 
-            ArtifactSpec a = (ArtifactSpec) artifacts.get(key);
+            ArtifactSpec a = artifacts.get(key);
             try {
                 return new ResolutionGroup(
                         artifact,

@@ -62,17 +62,6 @@ public class PomTestWrapper {
         context.setValue(expression, value);
     }
 
-    /*
-    public int containerCountForUri( String uri )
-        throws IOException
-    {
-        Validate.notEmpty( uri, "uri can neither be null nor empty " );
-        ModelDataSource source = new DefaultModelDataSource();
-        source.init( domainModel.getModelProperties(), null );
-        return source.queryFor( uri ).size();
-    }
-    */
-
     public Iterator<?> getIteratorForXPathExpression(String expression) {
         return context.iterate(expression);
     }

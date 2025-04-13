@@ -144,7 +144,7 @@ public class DefaultArtifactVersion implements ArtifactVersion {
                 }
             }
             if (idx < tok.length) {
-                qualifier = tok[idx++];
+                qualifier = tok[idx];
                 fallback = isDigits(qualifier);
             }
 

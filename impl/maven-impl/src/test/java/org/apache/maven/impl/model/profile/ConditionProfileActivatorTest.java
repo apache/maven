@@ -273,25 +273,6 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         assertActivation(true, profile, newContext(null, newOsProperties("windows", "6.5.0-1014-aws", "aarch64")));
     }
 
-    /*
-    @Test
-    void testOsFamily() {
-        Profile profile = newProfile(ActivationOS.newBuilder().family("windows"));
-
-        assertActivation(false, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
-        assertActivation(true, profile, newContext(null, newOsProperties("windows", "6.5.0-1014-aws", "aarch64")));
-    }
-
-    @Test
-    void testOsNegatedFamily() {
-        Profile profile = newProfile(ActivationOS.newBuilder().family("!windows"));
-
-        assertActivation(true, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
-        assertActivation(false, profile, newContext(null, newOsProperties("windows", "6.5.0-1014-aws", "aarch64")));
-    }
-
-     */
-
     @Test
     void testOsAllConditions() {
         Profile profile =
@@ -318,7 +299,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNameOnly_UserProperty() throws Exception {
+    void testPropWithNameOnlyUserProperty() throws Exception {
         Profile profile = newProfile("${prop}");
 
         assertActivation(true, profile, newContext(newPropProperties("prop", "value"), null));
@@ -327,7 +308,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNameOnly_SystemProperty() throws Exception {
+    void testPropWithNameOnlySystemProperty() throws Exception {
         Profile profile = newProfile("${prop}");
 
         assertActivation(true, profile, newContext(null, newPropProperties("prop", "value")));
@@ -336,7 +317,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedNameOnly_UserProperty() throws Exception {
+    void testPropWithNegatedNameOnlyUserProperty() throws Exception {
         Profile profile = newProfile("not(${prop})");
 
         assertActivation(false, profile, newContext(newPropProperties("prop", "value"), null));
@@ -345,7 +326,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedNameOnly_SystemProperty() throws Exception {
+    void testPropWithNegatedNameOnlySystemProperty() throws Exception {
         Profile profile = newProfile("not(${prop})");
 
         assertActivation(false, profile, newContext(null, newPropProperties("prop", "value")));
@@ -354,7 +335,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithValue_UserProperty() throws Exception {
+    void testPropWithValueUserProperty() throws Exception {
         Profile profile = newProfile("${prop} == 'value'");
 
         assertActivation(true, profile, newContext(newPropProperties("prop", "value"), null));
@@ -363,7 +344,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithValue_SystemProperty() throws Exception {
+    void testPropWithValueSystemProperty() throws Exception {
         Profile profile = newProfile("${prop} == 'value'");
 
         assertActivation(true, profile, newContext(null, newPropProperties("prop", "value")));
@@ -372,7 +353,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedValue_UserProperty() throws Exception {
+    void testPropWithNegatedValueUserProperty() throws Exception {
         Profile profile = newProfile("${prop} != 'value'");
 
         assertActivation(false, profile, newContext(newPropProperties("prop", "value"), null));
@@ -381,7 +362,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedValue_SystemProperty() throws Exception {
+    void testPropWithNegatedValueSystemProperty() throws Exception {
         Profile profile = newProfile("${prop} != 'value'");
 
         assertActivation(false, profile, newContext(null, newPropProperties("prop", "value")));
@@ -390,7 +371,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithValue_UserPropertyDominantOverSystemProperty() throws Exception {
+    void testPropWithValueUserPropertyDominantOverSystemProperty() throws Exception {
         Profile profile = newProfile("${prop} == 'value'");
 
         Map<String, String> props1 = newPropProperties("prop", "value");

@@ -30,7 +30,7 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
  * Handles deserialization of toolchains from some kind of textual format like XML.
  *
  * @since 3.3.0
- * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.xml.ToolchainsXmlFactory} instead
+ * @deprecated since 4.0.0, use {@code org.apache.maven.api.services.xml.ToolchainsXmlFactory} instead
  */
 @Deprecated(since = "4.0.0")
 public interface ToolchainsReader {

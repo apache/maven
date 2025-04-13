@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test ComparableVersion.
- *
  */
 @SuppressWarnings("unchecked")
 class ComparableVersionTest {
@@ -109,8 +108,11 @@ class ComparableVersionTest {
 
     private void checkVersionsArrayEqual(String[] array) {
         // compare against each other (including itself)
-        for (int i = 0; i < array.length; ++i)
-            for (int j = i; j < array.length; ++j) checkVersionsEqual(array[i], array[j]);
+        for (int i = 0; i < array.length; ++i) {
+            for (int j = i; j < array.length; ++j) {
+                checkVersionsEqual(array[i], array[j]);
+            }
+        }
     }
 
     private void checkVersionsOrder(String v1, String v2) {
@@ -223,6 +225,23 @@ class ComparableVersionTest {
     }
 
     @Test
+    void testDigitGreaterThanNonAscii() {
+        ComparableVersion c1 = new ComparableVersion("1");
+        ComparableVersion c2 = new ComparableVersion("é");
+        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\uD835\uDFE4");
+        assertTrue(c2.compareTo(c1) < 0, "expected " + "\uD835\uDFE4" + " < " + "1");
+    }
+
+    @Test
+    void testDigitGreaterThanNonBmpCharacters() {
+        ComparableVersion c1 = new ComparableVersion("1");
+        // MATHEMATICAL SANS-SERIF DIGIT TWO
+        ComparableVersion c2 = new ComparableVersion("\uD835\uDFE4");
+        assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\uD835\uDFE4");
+        assertTrue(c2.compareTo(c1) < 0, "expected " + "\uD835\uDFE4" + " < " + "1");
+    }
+
+    @Test
     void testGetCanonical() {
         // MNG-7700
         newComparable("0.x");
@@ -237,14 +256,54 @@ class ComparableVersionTest {
     }
 
     @Test
+    void testLexicographicASCIISortOrder() { // Required by Semver 1.0
+        ComparableVersion lower = new ComparableVersion("1.0.0-alpha1");
+        ComparableVersion upper = new ComparableVersion("1.0.0-ALPHA1");
+        // Lower case is equal to upper case. This is *NOT* what Semver 1.0
+        // specifies. Here we are explicitly deviating from Semver 1.0.
+        assertTrue(upper.compareTo(lower) == 0, "expected 1.0.0-ALPHA1 == 1.0.0-alpha1");
+        assertTrue(lower.compareTo(upper) == 0, "expected 1.0.0-alpha1 == 1.0.0-ALPHA1");
+    }
+
+    @Test
+    void testCompareLowerCaseToUpperCaseASCII() {
+        ComparableVersion lower = new ComparableVersion("1.a");
+        ComparableVersion upper = new ComparableVersion("1.A");
+        // Lower case is equal to upper case
+        assertTrue(upper.compareTo(lower) == 0, "expected 1.A == 1.a");
+        assertTrue(lower.compareTo(upper) == 0, "expected 1.a == 1.A");
+    }
+
+    @Test
+    void testCompareLowerCaseToUpperCaseNonASCII() {
+        ComparableVersion lower = new ComparableVersion("1.é");
+        ComparableVersion upper = new ComparableVersion("1.É");
+        // Lower case is equal to upper case
+        assertTrue(upper.compareTo(lower) == 0, "expected 1.É < 1.é");
+        assertTrue(lower.compareTo(upper) == 0, "expected 1.é > 1.É");
+    }
+
+    @Test
     void testCompareDigitToLetter() {
-        ComparableVersion c1 = new ComparableVersion("7");
-        ComparableVersion c2 = new ComparableVersion("J");
-        ComparableVersion c3 = new ComparableVersion("c");
-        assertTrue(c1.compareTo(c2) > 0, "expected 7 > J");
-        assertTrue(c2.compareTo(c1) < 0, "expected J < 1");
-        assertTrue(c1.compareTo(c3) > 0, "expected 7 > c");
-        assertTrue(c3.compareTo(c1) < 0, "expected c < 7");
+        ComparableVersion seven = new ComparableVersion("7");
+        ComparableVersion capitalJ = new ComparableVersion("J");
+        ComparableVersion lowerCaseC = new ComparableVersion("c");
+        // Digits are greater than letters
+        assertTrue(seven.compareTo(capitalJ) > 0, "expected 7 > J");
+        assertTrue(capitalJ.compareTo(seven) < 0, "expected J < 1");
+        assertTrue(seven.compareTo(lowerCaseC) > 0, "expected 7 > c");
+        assertTrue(lowerCaseC.compareTo(seven) < 0, "expected c < 7");
+    }
+
+    @Test
+    void testNonAsciiDigits() { // These should not be treated as digits.
+        ComparableVersion asciiOne = new ComparableVersion("1");
+        ComparableVersion arabicEight = new ComparableVersion("\u0668");
+        ComparableVersion asciiNine = new ComparableVersion("9");
+        assertTrue(asciiOne.compareTo(arabicEight) > 0, "expected " + "1" + " > " + "\u0668");
+        assertTrue(arabicEight.compareTo(asciiOne) < 0, "expected " + "\u0668" + " < " + "1");
+        assertTrue(asciiNine.compareTo(arabicEight) > 0, "expected " + "9" + " > " + "\u0668");
+        assertTrue(arabicEight.compareTo(asciiNine) < 0, "expected " + "\u0668" + " < " + "9");
     }
 
     @Test
@@ -255,9 +314,9 @@ class ComparableVersionTest {
         assertTrue(aardvark.compareTo(zebra) < 0);
 
         // Greek zebra
-        ComparableVersion ζέβρα = new ComparableVersion("ζέβρα");
-        assertTrue(ζέβρα.compareTo(zebra) > 0);
-        assertTrue(zebra.compareTo(ζέβρα) < 0);
+        ComparableVersion greek = new ComparableVersion("ζέβρα");
+        assertTrue(greek.compareTo(zebra) > 0);
+        assertTrue(zebra.compareTo(greek) < 0);
     }
 
     /**

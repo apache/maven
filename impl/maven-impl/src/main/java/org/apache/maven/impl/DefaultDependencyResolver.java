@@ -60,9 +60,9 @@ import org.eclipse.aether.scope.ResolutionScope;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
-import static org.apache.maven.impl.Utils.cast;
-import static org.apache.maven.impl.Utils.map;
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.cast;
+import static org.apache.maven.impl.ImplUtils.map;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 @Named
 @Singleton

@@ -79,16 +79,23 @@ public final class SettingsUtilsV4 {
     public static Profile convertToSettingsProfile(org.apache.maven.api.model.Profile modelProfile) {
         Profile.Builder profile = Profile.newBuilder();
 
+        profile.location("", toLocation(modelProfile.getLocation("")));
+
         profile.id(modelProfile.getId());
+        profile.location("id", toLocation(modelProfile.getLocation("id")));
 
         org.apache.maven.api.model.Activation modelActivation = modelProfile.getActivation();
 
         if (modelActivation != null) {
             Activation.Builder activation = Activation.newBuilder();
 
+            activation.location("", toLocation(modelActivation.getLocation("")));
+
             activation.activeByDefault(modelActivation.isActiveByDefault());
+            activation.location("activeByDefault", toLocation(modelActivation.getLocation("activeByDefault")));
 
             activation.jdk(modelActivation.getJdk());
+            activation.location("jdk", toLocation(modelActivation.getLocation("jdk")));
 
             org.apache.maven.api.model.ActivationProperty modelProp = modelActivation.getProperty();
 
@@ -96,6 +103,9 @@ public final class SettingsUtilsV4 {
                 ActivationProperty prop = ActivationProperty.newBuilder()
                         .name(modelProp.getName())
                         .value(modelProp.getValue())
+                        .location("", toLocation(modelProp.getLocation("")))
+                        .location("name", toLocation(modelProp.getLocation("name")))
+                        .location("value", toLocation(modelProp.getLocation("value")))
                         .build();
                 activation.property(prop);
             }
@@ -108,6 +118,11 @@ public final class SettingsUtilsV4 {
                         .family(modelOs.getFamily())
                         .name(modelOs.getName())
                         .version(modelOs.getVersion())
+                        .location("", toLocation(modelOs.getLocation("")))
+                        .location("arch", toLocation(modelOs.getLocation("arch")))
+                        .location("family", toLocation(modelOs.getLocation("family")))
+                        .location("name", toLocation(modelOs.getLocation("name")))
+                        .location("version", toLocation(modelOs.getLocation("version")))
                         .build();
 
                 activation.os(os);
@@ -120,14 +135,19 @@ public final class SettingsUtilsV4 {
                         org.apache.maven.api.settings.ActivationFile.newBuilder()
                                 .exists(modelFile.getExists())
                                 .missing(modelFile.getMissing())
+                                .location("", toLocation(modelFile.getLocation("")))
+                                .location("exists", toLocation(modelFile.getLocation("exists")))
+                                .location("missing", toLocation(modelFile.getLocation("missing")))
                                 .build();
 
                 activation.file(file);
             }
 
             activation.packaging(modelActivation.getPackaging());
+            activation.location("packaging", toLocation(modelActivation.getLocation("packaging")));
 
             activation.condition(modelActivation.getCondition());
+            activation.location("condition", toLocation(modelActivation.getLocation("condition")));
 
             profile.activation(activation.build());
         }
@@ -135,6 +155,7 @@ public final class SettingsUtilsV4 {
         profile.properties(modelProfile.getProperties().entrySet().stream()
                 .collect(Collectors.toMap(
                         e -> e.getKey().toString(), e -> e.getValue().toString())));
+        profile.location("properties", toLocation(modelProfile.getLocation("properties")));
 
         List<org.apache.maven.api.model.Repository> repos = modelProfile.getRepositories();
         if (repos != null) {
@@ -143,6 +164,7 @@ public final class SettingsUtilsV4 {
                 repositories.add(convertToSettingsRepository(repo));
             }
             profile.repositories(repositories);
+            profile.location("repositories", toLocation(modelProfile.getLocation("repositories")));
         }
 
         List<org.apache.maven.api.model.Repository> pluginRepos = modelProfile.getPluginRepositories();
@@ -152,6 +174,7 @@ public final class SettingsUtilsV4 {
                 repositories.add(convertToSettingsRepository(pluginRepo));
             }
             profile.pluginRepositories(repositories);
+            profile.location("pluginRepositories", toLocation(modelProfile.getLocation("pluginRepositories")));
         }
 
         return profile.build();
@@ -164,7 +187,10 @@ public final class SettingsUtilsV4 {
     public static org.apache.maven.api.model.Profile convertFromSettingsProfile(Profile settingsProfile) {
         org.apache.maven.api.model.Profile.Builder profile = org.apache.maven.api.model.Profile.newBuilder();
 
+        profile.location("", toLocation(settingsProfile.getLocation("")));
+
         profile.id(settingsProfile.getId());
+        profile.location("id", toLocation(settingsProfile.getLocation("id")));
 
         Activation settingsActivation = settingsProfile.getActivation();
 
@@ -183,6 +209,7 @@ public final class SettingsUtilsV4 {
                 activation.property(org.apache.maven.api.model.ActivationProperty.newBuilder()
                         .name(settingsProp.getName())
                         .value(settingsProp.getValue())
+                        .location("", toLocation(settingsProp.getLocation("")))
                         .location("name", toLocation(settingsProp.getLocation("name")))
                         .location("value", toLocation(settingsProp.getLocation("value")))
                         .build());
@@ -195,6 +222,7 @@ public final class SettingsUtilsV4 {
                         .family(settingsOs.getFamily())
                         .name(settingsOs.getName())
                         .version(settingsOs.getVersion())
+                        .location("", toLocation(settingsOs.getLocation("")))
                         .location("arch", toLocation(settingsOs.getLocation("arch")))
                         .location("family", toLocation(settingsOs.getLocation("family")))
                         .location("name", toLocation(settingsOs.getLocation("name")))
@@ -207,14 +235,17 @@ public final class SettingsUtilsV4 {
                 activation.file(ActivationFile.newBuilder()
                         .exists(settingsFile.getExists())
                         .missing(settingsFile.getMissing())
+                        .location("", toLocation(settingsFile.getLocation("")))
                         .location("exists", toLocation(settingsFile.getLocation("exists")))
                         .location("missing", toLocation(settingsFile.getLocation("missing")))
                         .build());
             }
 
             activation.packaging(settingsActivation.getPackaging());
+            activation.location("packaging", toLocation(settingsActivation.getLocation("packaging")));
 
             activation.condition(settingsActivation.getCondition());
+            activation.location("condition", toLocation(settingsActivation.getLocation("condition")));
 
             profile.activation(activation.build());
         }
@@ -297,6 +328,11 @@ public final class SettingsUtilsV4 {
                 .url(modelRepo.getUrl())
                 .snapshots(modelRepo.getSnapshots() != null ? convertRepositoryPolicy(modelRepo.getSnapshots()) : null)
                 .releases(modelRepo.getReleases() != null ? convertRepositoryPolicy(modelRepo.getReleases()) : null)
+                .location("", toLocation(modelRepo.getLocation("")))
+                .location("id", toLocation(modelRepo.getLocation("id")))
+                .location("layout", toLocation(modelRepo.getLocation("layout")))
+                .location("name", toLocation(modelRepo.getLocation("name")))
+                .location("url", toLocation(modelRepo.getLocation("url")))
                 .build();
 
         return repo;
@@ -311,8 +347,28 @@ public final class SettingsUtilsV4 {
                 .enabled(modelPolicy.isEnabled())
                 .updatePolicy(modelPolicy.getUpdatePolicy())
                 .checksumPolicy(modelPolicy.getChecksumPolicy())
+                .location("", toLocation(modelPolicy.getLocation("")))
+                .location("enabled", toLocation(modelPolicy.getLocation("enabled")))
+                .location("updatePolicy", toLocation(modelPolicy.getLocation("updatePolicy")))
+                .location("checksumPolicy", toLocation(modelPolicy.getLocation("checksumPolicy")))
                 .build();
         return policy;
+    }
+
+    private static org.apache.maven.api.settings.InputLocation toLocation(
+            org.apache.maven.api.model.InputLocation location) {
+        if (location != null) {
+            org.apache.maven.api.model.InputSource source = location.getSource();
+            Map<Object, org.apache.maven.api.settings.InputLocation> locs = location.getLocations().entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> toLocation(e.getValue())));
+            return new org.apache.maven.api.settings.InputLocation(
+                    location.getLineNumber(),
+                    location.getColumnNumber(),
+                    source != null ? new org.apache.maven.api.settings.InputSource(source.getLocation()) : null,
+                    locs);
+        } else {
+            return null;
+        }
     }
 
     private static org.apache.maven.api.model.InputLocation toLocation(

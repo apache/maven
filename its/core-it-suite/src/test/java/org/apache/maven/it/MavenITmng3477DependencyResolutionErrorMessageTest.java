@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3477DependencyResolutionErrorMessageTest() {
+    MavenITmng3477DependencyResolutionErrorMessageTest() {
         super("[4.0.0-beta-4,)");
     }
 
@@ -96,7 +96,7 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
                 new String[] {
                     ".*The following artifacts could not be resolved: org.apache.maven.its.plugins:maven-it-plugin-not-exists:pom:1.2.3 \\(absent\\): "
                             + "Could not transfer artifact org.apache.maven.its.plugins:maven-it-plugin-not-exists:pom:1.2.3 from/to "
-                            + "maven-core-it \\(http://localhost:.*/repo\\): Connection to http://localhost:.*2/repo/ refused.*"
+                            + "central \\(http://localhost:.*/repo\\): Connection to http://localhost:.*2/repo/ refused.*"
                 },
                 "pom-plugin.xml");
     }

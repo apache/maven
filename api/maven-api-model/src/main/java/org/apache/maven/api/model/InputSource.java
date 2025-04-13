@@ -26,7 +26,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Class InputSource.
+ * Represents the source of a model input, such as a POM file.
+ * <p>
+ * This class tracks the origin of model elements, including their location in source files
+ * and relationships between imported models. It's used for error reporting and debugging
+ * to help identify where specific model elements came from.
+ *
+ * @since 4.0.0
  */
 public class InputSource implements Serializable {
 

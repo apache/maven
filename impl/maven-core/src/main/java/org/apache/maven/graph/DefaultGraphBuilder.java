@@ -175,14 +175,12 @@ public class DefaultGraphBuilder implements GraphBuilder {
         List<MavenProject> result = projects;
 
         ProjectActivation projectActivation = request.getProjectActivation();
+
         Set<String> requiredSelectors = projectActivation.getRequiredActiveProjectSelectors();
         Set<String> optionalSelectors = projectActivation.getOptionalActiveProjectSelectors();
         if (!requiredSelectors.isEmpty() || !optionalSelectors.isEmpty()) {
-            Set<MavenProject> selectedProjects = new HashSet<>(requiredSelectors.size() + optionalSelectors.size());
-            selectedProjects.addAll(
-                    projectSelector.getRequiredProjectsBySelectors(request, allSortedProjects, requiredSelectors));
-            selectedProjects.addAll(
-                    projectSelector.getOptionalProjectsBySelectors(request, allSortedProjects, optionalSelectors));
+            Set<MavenProject> selectedProjects =
+                    projectSelector.getActiveProjects(request, allSortedProjects, projectActivation.getActivations());
 
             // it can be empty when an optional project is missing from the reactor, fallback to returning all projects
             if (!selectedProjects.isEmpty()) {
@@ -231,6 +229,11 @@ public class DefaultGraphBuilder implements GraphBuilder {
         List<MavenProject> result = projects;
 
         ProjectActivation projectActivation = request.getProjectActivation();
+
+        projectActivation.getActivations().stream()
+                .filter(pa -> pa.activationSettings().active())
+                .forEach(pas -> {});
+
         Set<String> requiredSelectors = projectActivation.getRequiredInactiveProjectSelectors();
         Set<String> optionalSelectors = projectActivation.getOptionalInactiveProjectSelectors();
         if (!requiredSelectors.isEmpty() || !optionalSelectors.isEmpty()) {

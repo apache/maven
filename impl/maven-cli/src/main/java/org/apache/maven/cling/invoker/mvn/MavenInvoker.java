@@ -25,9 +25,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
@@ -44,10 +46,11 @@ import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
 import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.api.services.model.ModelProcessor;
+import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.cling.event.ExecutionEventLogger;
+import org.apache.maven.cling.invoker.CliUtils;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.invoker.Utils;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
@@ -58,7 +61,6 @@ import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
@@ -67,6 +69,7 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logging.LoggingExecutionListener;
 import org.apache.maven.logging.MavenTransferListener;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.toolchain.model.ToolchainModel;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
 
@@ -139,7 +142,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected void toolchains(MavenContext context, MavenExecutionRequest request) throws Exception {
         Path userToolchainsFile = null;
         if (context.invokerRequest.options().altUserToolchains().isPresent()) {
-            userToolchainsFile = context.cwdResolver.apply(
+            userToolchainsFile = context.cwd.resolve(
                     context.invokerRequest.options().altUserToolchains().get());
 
             if (!Files.isRegularFile(userToolchainsFile)) {
@@ -150,13 +153,13 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             String userToolchainsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_USER_TOOLCHAINS);
             if (userToolchainsFileStr != null) {
-                userToolchainsFile = context.cwdResolver.apply(userToolchainsFileStr);
+                userToolchainsFile = context.cwd.resolve(userToolchainsFileStr);
             }
         }
 
         Path installationToolchainsFile = null;
         if (context.invokerRequest.options().altInstallationToolchains().isPresent()) {
-            installationToolchainsFile = context.cwdResolver.apply(
+            installationToolchainsFile = context.cwd.resolve(
                     context.invokerRequest.options().altInstallationToolchains().get());
 
             if (!Files.isRegularFile(installationToolchainsFile)) {
@@ -167,7 +170,9 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             String installationToolchainsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
             if (installationToolchainsFileStr != null) {
-                installationToolchainsFile = context.cwdResolver.apply(installationToolchainsFileStr);
+                installationToolchainsFile = context.installationDirectory
+                        .resolve(installationToolchainsFileStr)
+                        .normalize();
             }
         }
 
@@ -197,12 +202,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
         context.eventSpyDispatcher.onEvent(toolchainsResult);
 
-        context.lookup
-                .lookup(MavenExecutionRequestPopulator.class)
-                .populateFromToolchains(
-                        request,
-                        new org.apache.maven.toolchain.model.PersistedToolchains(
-                                toolchainsResult.getEffectiveToolchains()));
+        context.effectiveToolchains = toolchainsResult.getEffectiveToolchains();
 
         if (toolchainsResult.getProblems().hasWarningProblems()) {
             int totalProblems = toolchainsResult.getProblems().totalProblemsReported();
@@ -233,6 +233,12 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             request.setRootDirectory(context.invokerRequest.topDirectory());
         }
 
+        request.setToolchains(
+                Optional.ofNullable(context.effectiveToolchains).map(PersistedToolchains::getToolchains).stream()
+                        .flatMap(List::stream)
+                        .map(ToolchainModel::new)
+                        .collect(Collectors.groupingBy(ToolchainModel::getType)));
+
         MavenOptions options = (MavenOptions) context.invokerRequest.options();
         request.setNoSnapshotUpdates(options.suppressSnapshotUpdates().orElse(false));
         request.setGoals(options.goals().orElse(List.of()));
@@ -251,7 +257,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
             // project present, but we could not determine rootDirectory: extra work needed
             if (context.invokerRequest.rootDirectory().isEmpty()) {
-                Path rootDirectory = Utils.findMandatoryRoot(context.invokerRequest.topDirectory());
+                Path rootDirectory = CliUtils.findMandatoryRoot(context.invokerRequest.topDirectory());
                 request.setMultiModuleProjectDirectory(rootDirectory.toFile());
                 request.setRootDirectory(rootDirectory);
             }
@@ -307,10 +313,10 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected Path determinePom(MavenContext context, Lookup lookup) {
-        Path current = context.invokerRequest.cwd();
+        Path current = context.cwd.get();
         MavenOptions options = (MavenOptions) context.invokerRequest.options();
         if (options.alternatePomFile().isPresent()) {
-            current = context.cwdResolver.apply(options.alternatePomFile().get());
+            current = context.cwd.resolve(options.alternatePomFile().get());
         }
         ModelProcessor modelProcessor =
                 lookup.lookupOptional(ModelProcessor.class).orElse(null);

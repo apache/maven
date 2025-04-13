@@ -76,7 +76,7 @@ public abstract class MavenExecutorTestSupport {
                 List.of(mvn3ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument("eu.maveniverse.maven.plugins:toolbox:0.5.2:gav-dump")
+                        .argument("eu.maveniverse.maven.plugins:toolbox:0.6.2:gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
@@ -95,7 +95,7 @@ public abstract class MavenExecutorTestSupport {
                 List.of(mvn4ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument("eu.maveniverse.maven.plugins:toolbox:0.5.2:gav-dump")
+                        .argument("eu.maveniverse.maven.plugins:toolbox:0.6.2:gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
@@ -311,6 +311,7 @@ public abstract class MavenExecutorTestSupport {
     protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
         Executor invoker = createAndMemoizeExecutor();
         for (ExecutorRequest request : requests) {
+            MimirInfuser.infuse(request.userHomeDirectory());
             int exitCode = invoker.execute(request);
             if (exitCode != 0) {
                 throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));

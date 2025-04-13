@@ -28,13 +28,30 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public abstract class MavenBuilderException extends MavenException {
 
+    /**
+     * The collection of problems associated with this exception.
+     */
     private final ProblemCollector<BuilderProblem> problems;
 
+    /**
+     * Constructs a new exception with the specified message and cause.
+     * This constructor creates an empty problem collector.
+     *
+     * @param message the detail message
+     * @param cause the cause of this exception
+     */
     public MavenBuilderException(String message, Throwable cause) {
         super(message, cause);
         problems = ProblemCollector.empty();
     }
 
+    /**
+     * Constructs a new exception with the specified message and problems.
+     * The message will be enhanced with details from the problems.
+     *
+     * @param message the detail message
+     * @param problems the collection of problems associated with this exception
+     */
     public MavenBuilderException(String message, ProblemCollector<BuilderProblem> problems) {
         super(buildMessage(message, problems), null);
         this.problems = problems;
@@ -44,6 +61,10 @@ public abstract class MavenBuilderException extends MavenException {
      * Formats message out of problems: problems are sorted (in natural order of {@link BuilderProblem.Severity})
      * and then a list is built. These exceptions are usually thrown in "fatal" cases (and usually prevent Maven
      * from starting), and these exceptions may end up very early on output.
+     *
+     * @param message the base message to enhance
+     * @param problems the collection of problems to include in the message
+     * @return a formatted message including details of all problems
      */
     protected static String buildMessage(String message, ProblemCollector<BuilderProblem> problems) {
         StringBuilder msg = new StringBuilder(message);
@@ -54,6 +75,11 @@ public abstract class MavenBuilderException extends MavenException {
         return msg.toString();
     }
 
+    /**
+     * Returns the problem collector associated with this exception.
+     *
+     * @return the problem collector containing all problems related to this exception
+     */
     public ProblemCollector<BuilderProblem> getProblemCollector() {
         return problems;
     }

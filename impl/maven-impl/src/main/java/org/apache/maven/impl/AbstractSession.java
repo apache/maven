@@ -103,8 +103,8 @@ import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.transfer.TransferResource;
 
-import static org.apache.maven.impl.Utils.map;
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.map;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 public abstract class AbstractSession implements InternalSession {
 
@@ -556,7 +556,7 @@ public abstract class AbstractSession implements InternalSession {
                         this,
                         artifact.getGroupId(),
                         artifact.getArtifactId(),
-                        artifact.getVersion().asString(),
+                        artifact.getVersion().toString(),
                         artifact.getClassifier(),
                         artifact.getExtension(),
                         null);
@@ -967,7 +967,11 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public DependencyScope requireDependencyScope(String id) {
-        return DependencyScope.forId(nonNull(id, "id"));
+        DependencyScope scope = DependencyScope.forId(nonNull(id, "id"));
+        if (scope == null) {
+            throw new IllegalArgumentException("Invalid dependency scope: " + id);
+        }
+        return scope;
     }
 
     @Override

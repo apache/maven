@@ -20,6 +20,7 @@ package org.apache.maven.cling.invoker.mvnsh;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.services.Lookup;
@@ -36,12 +37,12 @@ import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.MaskingCallback;
-import org.jline.reader.Parser;
 import org.jline.reader.Reference;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.DefaultHighlighter;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.reader.impl.history.DefaultHistory;
+import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.InfoCmp;
@@ -67,9 +68,8 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
     @Override
     protected int execute(LookupContext context) throws Exception {
         // set up JLine built-in commands
-        ConfigurationPath configPath =
-                new ConfigurationPath(context.invokerRequest.cwd(), context.invokerRequest.cwd());
-        Builtins builtins = new Builtins(context.invokerRequest::cwd, configPath, null);
+        ConfigurationPath configPath = new ConfigurationPath(context.cwd.get(), context.cwd.get());
+        Builtins builtins = new Builtins(context.cwd, configPath, null);
         builtins.rename(Builtins.Command.TTOP, "top");
         builtins.alias("zle", "widget");
         builtins.alias("bindkey", "keymap");
@@ -84,7 +84,8 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
             holder.addCommandRegistry(entry.getValue().createShellCommandRegistry(context));
         }
 
-        Parser parser = new DefaultParser();
+        DefaultParser parser = new DefaultParser();
+        parser.setRegexCommand("[:]{0,1}[a-zA-Z!]{1,}\\S*"); // change default regex to support shell commands
 
         String banner =
                 """
@@ -104,10 +105,15 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
 
         try (holder) {
             SimpleSystemRegistryImpl systemRegistry =
-                    new SimpleSystemRegistryImpl(parser, context.terminal, context.invokerRequest::cwd, configPath);
+                    new SimpleSystemRegistryImpl(parser, context.terminal, context.cwd, configPath) {
+                        @Override
+                        public boolean isCommandOrScript(String command) {
+                            return command.startsWith("!") || super.isCommandOrScript(command);
+                        }
+                    };
             systemRegistry.setCommandRegistries(holder.getCommandRegistries());
 
-            Path history = context.userResolver.apply(".mvnsh_history");
+            Path history = context.userDirectory.resolve(".mvnsh_history");
             LineReader reader = LineReaderBuilder.builder()
                     .terminal(context.terminal)
                     .history(new DefaultHistory())
@@ -127,16 +133,29 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
             KeyMap<Binding> keyMap = reader.getKeyMaps().get("main");
             keyMap.bind(new Reference("tailtip-toggle"), KeyMap.alt("s"));
 
-            String prompt = "mvnsh> ";
-            String rightPrompt = null;
-
             // start the shell and process input until the user quits with Ctrl-D
-            String line;
+            AtomicReference<Exception> failure = new AtomicReference<>();
             while (true) {
                 try {
+                    failure.set(null);
                     systemRegistry.cleanUp();
-                    line = reader.readLine(prompt, rightPrompt, (MaskingCallback) null, null);
-                    systemRegistry.execute(line);
+                    Thread commandThread = new Thread(() -> {
+                        try {
+                            systemRegistry.execute(reader.readLine(
+                                    context.cwd.get().getFileName().toString() + " mvnsh> ",
+                                    null,
+                                    (MaskingCallback) null,
+                                    null));
+                        } catch (Exception e) {
+                            failure.set(e);
+                        }
+                    });
+                    context.terminal.handle(Terminal.Signal.INT, signal -> commandThread.interrupt());
+                    commandThread.start();
+                    commandThread.join();
+                    if (failure.get() != null) {
+                        throw failure.get();
+                    }
                 } catch (UserInterruptException e) {
                     // Ignore
                     // return CANCELED;
@@ -153,7 +172,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
                     context.writer.accept(context.invokerRequest
                             .messageBuilderFactory()
                             .builder()
-                            .error("Error:" + e.getMessage())
+                            .error("Error: " + e.getMessage())
                             .build());
                     if (context.invokerRequest.options().showErrors().orElse(false)) {
                         e.printStackTrace(context.terminal.writer());

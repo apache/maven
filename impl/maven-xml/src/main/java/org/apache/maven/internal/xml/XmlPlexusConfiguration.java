@@ -28,9 +28,9 @@ public class XmlPlexusConfiguration extends DefaultPlexusConfiguration {
     }
 
     public XmlPlexusConfiguration(XmlNode node) {
-        super(node.getName(), node.getValue());
-        node.getAttributes().forEach(this::setAttribute);
-        node.getChildren().forEach(c -> this.addChild(new XmlPlexusConfiguration(c)));
+        super(node.name(), node.value());
+        node.attributes().forEach(this::setAttribute);
+        node.children().forEach(c -> this.addChild(new XmlPlexusConfiguration(c)));
     }
 
     @Override

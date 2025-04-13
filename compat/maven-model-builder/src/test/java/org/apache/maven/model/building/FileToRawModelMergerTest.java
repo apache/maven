@@ -58,7 +58,7 @@ class FileToRawModelMergerTest {
                     }
                 })
                 .map(Method::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         List<String> overriddenMethods = Stream.of(FileToRawModelMerger.class.getDeclaredMethods())
                 .map(Method::getName)

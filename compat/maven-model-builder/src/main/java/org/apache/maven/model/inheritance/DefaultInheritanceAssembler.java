@@ -43,7 +43,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * Handles inheritance of model values.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @SuppressWarnings({"checkstyle:methodname"})
 @Named

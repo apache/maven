@@ -67,7 +67,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
 
     private static final String PLUGIN_EXCLUDES_KEY = DefaultPluginValidationManager.class.getName() + ".excludes";
 
-    public static final ValidationReportLevel DEFAULT_VALIDATION_LEVEL = ValidationReportLevel.INLINE;
+    private static final ValidationReportLevel DEFAULT_VALIDATION_LEVEL = ValidationReportLevel.INLINE;
 
     private static final Collection<ValidationReportLevel> INLINE_VALIDATION_LEVEL = Collections.unmodifiableCollection(
             Arrays.asList(ValidationReportLevel.INLINE, ValidationReportLevel.BRIEF));

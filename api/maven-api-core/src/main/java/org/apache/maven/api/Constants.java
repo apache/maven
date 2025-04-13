@@ -30,8 +30,56 @@ public final class Constants {
      *
      * @since 3.0.0
      */
-    @Config(readOnly = true)
+    @Config(readOnly = true, source = Config.Source.SYSTEM_PROPERTIES)
     public static final String MAVEN_HOME = "maven.home";
+
+    /**
+     * Maven version.
+     *
+     * @since 3.0.0
+     */
+    @Config(readOnly = true, source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_VERSION = "maven.version";
+
+    /**
+     * Maven major version: contains the major segment of this Maven version.
+     *
+     * @since 4.0.0
+     */
+    @Config(readOnly = true, source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_VERSION_MAJOR = "maven.version.major";
+
+    /**
+     * Maven minor version: contains the minor segment of this Maven version.
+     *
+     * @since 4.0.0
+     */
+    @Config(readOnly = true, source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_VERSION_MINOR = "maven.version.minor";
+
+    /**
+     * Maven patch version: contains the patch segment of this Maven version.
+     *
+     * @since 4.0.0
+     */
+    @Config(readOnly = true, source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_VERSION_PATCH = "maven.version.patch";
+
+    /**
+     * Maven snapshot: contains "true" if this Maven is a snapshot version.
+     *
+     * @since 4.0.0
+     */
+    @Config(readOnly = true, source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_VERSION_SNAPSHOT = "maven.version.snapshot";
+
+    /**
+     * Maven build version: a human-readable string containing this Maven version, buildnumber, and time of its build.
+     *
+     * @since 3.0.0
+     */
+    @Config(readOnly = true, source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_BUILD_VERSION = "maven.build.version";
 
     /**
      * Maven installation configuration directory.

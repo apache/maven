@@ -216,7 +216,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
         repository.setReleases(policy);
         repository.setSnapshots(policy);
 
-        return Arrays.asList(mavenRepositorySystem.buildArtifactRepository(repository));
+        return Arrays.asList(MavenRepositorySystem.buildArtifactRepository(repository));
     }
 
     protected List<ArtifactRepository> getPluginArtifactRepositories() throws InvalidRepositoryException {

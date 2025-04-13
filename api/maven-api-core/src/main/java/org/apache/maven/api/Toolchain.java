@@ -21,6 +21,7 @@ package org.apache.maven.api;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
  * Represents a toolchain in the Maven build system.
@@ -69,6 +70,13 @@ public interface Toolchain {
      * @return the toolchain type
      */
     String getType();
+
+    /**
+     * Gets the underlying toolchain model.
+     *
+     * @return the toolchain model
+     */
+    ToolchainModel getModel();
 
     /**
      * Gets the platform tool executable.

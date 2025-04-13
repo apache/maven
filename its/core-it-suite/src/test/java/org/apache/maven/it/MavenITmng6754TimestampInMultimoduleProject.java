@@ -44,6 +44,7 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
     }
 
     @Test
+    @SuppressWarnings("checkstyle:MethodLength")
     public void testArtifactsHaveSameTimestamp() throws Exception {
         final File testDir = extractResources(RESOURCE_PATH);
         final Verifier verifier = newVerifier(testDir.getAbsolutePath());
@@ -358,15 +359,12 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
     }
 
     private void assertEquals(String moduleName, String location, String field, String expected, String actual) {
-        String phase = null;
-        switch (location) {
-            case "local":
-                phase = "Installed";
-                break;
-            case "remote":
-                phase = "Deployed";
-                break;
-        }
+        String phase =
+                switch (location) {
+                    case "local" -> "Installed";
+                    case "remote" -> "Deployed";
+                    default -> throw new IllegalArgumentException("Unknown location: " + location);
+                };
         Assertions.assertEquals(
                 expected,
                 actual,
@@ -376,15 +374,12 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
     }
 
     private void assertPathExists(Path repoDir, String moduleName, String location, String version, String fileName) {
-        String phase = null;
-        switch (location) {
-            case "local":
-                phase = "Installed";
-                break;
-            case "remote":
-                phase = "Deployed";
-                break;
-        }
+        String phase =
+                switch (location) {
+                    case "local" -> "Installed";
+                    case "remote" -> "Deployed";
+                    default -> throw new IllegalArgumentException("Unknown location: " + location);
+                };
         Path file = getRepoFile(repoDir, moduleName, version, fileName);
         assertTrue(
                 Files.exists(file),

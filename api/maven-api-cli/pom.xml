@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-rc-3-SNAPSHOT</version>
+    <version>4.0.0-rc-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-cli</artifactId>
@@ -38,6 +38,10 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-xml</artifactId>
     </dependency>
   </dependencies>
 
@@ -55,6 +59,8 @@
             <template>model.vm</template>
           </templates>
           <params>
+            <param>locationTracking=true</param>
+            <param>generateLocationClasses=true</param>
             <param>packageModelV4=org.apache.maven.api.cli.extensions</param>
             <param>packageToolV4=org.apache.maven.cli.internal.extension.io</param>
           </params>

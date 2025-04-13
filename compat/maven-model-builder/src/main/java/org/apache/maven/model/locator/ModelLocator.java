@@ -23,14 +23,14 @@ import java.io.File;
 /**
  * Locates a POM file within a project base directory.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public interface ModelLocator {
 
     /**
      * Locates the POM file within the specified project directory. In case the given project directory does not exist
-     * or does not contain a POM file, the return value indicates the expected path to the POM file. Sub directories of
+     * or does not contain a POM file, the return value indicates the expected path to the POM file. Subdirectories of
      * the project directory will not be considered when locating the POM file. The return value will be an absolute
      * path if the project directory is given as an absolute path.
      *

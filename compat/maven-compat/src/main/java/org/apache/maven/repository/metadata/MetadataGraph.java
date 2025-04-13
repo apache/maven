@@ -128,9 +128,7 @@ public class MetadataGraph {
         }
 
         MetadataGraphVertex vertex = new MetadataGraphVertex(node.md, versionedVertices, scopedVertices);
-        if (!vertices.contains(vertex)) {
-            vertices.add(vertex);
-        }
+        vertices.add(vertex);
 
         if (parentVertex != null) // then create the edge
         {

@@ -40,16 +40,45 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
+import static org.apache.maven.impl.ImplUtils.nonNull;
 import static org.apache.maven.impl.StaxLocation.getLocation;
 import static org.apache.maven.impl.StaxLocation.getMessage;
-import static org.apache.maven.impl.Utils.nonNull;
 
 @Named
 @Singleton
 public class DefaultModelXmlFactory implements ModelXmlFactory {
     @Override
+    @Nonnull
     public Model read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
         nonNull(request, "request");
+        Model model = doRead(request);
+        if (isModelVersionGreaterThan400(model)
+                && !model.getNamespaceUri().startsWith("http://maven.apache.org/POM/")) {
+            throw new XmlReaderException(
+                    "Invalid namespace '" + model.getNamespaceUri() + "' for model version " + model.getModelVersion(),
+                    null,
+                    null);
+        }
+        return model;
+    }
+
+    private boolean isModelVersionGreaterThan400(Model model) {
+        String version = model.getModelVersion();
+        if (version == null) {
+            return false;
+        }
+        try {
+            String[] parts = version.split("\\.");
+            int major = Integer.parseInt(parts[0]);
+            int minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+            return major > 4 || (major == 4 && minor > 0);
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            return false;
+        }
+    }
+
+    @Nonnull
+    private Model doRead(XmlReaderRequest request) throws XmlReaderException {
         Path path = request.getPath();
         URL url = request.getURL();
         Reader reader = request.getReader();
@@ -116,7 +145,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
     /**
      * Simply parse the given xml string.
      *
-     * @param xml the input xml string
+     * @param xml the input XML string
      * @return the parsed object
      * @throws XmlReaderException if an error occurs during the parsing
      * @see #toXmlString(Object)
@@ -126,10 +155,10 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
     }
 
     /**
-     * Simply converts the given content to an xml string.
+     * Simply converts the given content to an XML string.
      *
      * @param content the object to convert
-     * @return the xml string representation
+     * @return the XML string representation
      * @throws XmlWriterException if an error occurs during the transformation
      * @see #fromXmlString(String)
      */

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -48,8 +49,8 @@ import org.apache.maven.api.spi.ModelParserException;
  *
  * A side effect of using @Typed is that it translates to explicit bindings in the container.
  * So instead of binding the component under a 'wildcard' key it is now bound with an explicit
- * key. Since this is a default component this will be a plain binding of ModelProcessor to
- * this implementation type, ie. no hint/name.
+ * key. Since this is a default component; this will be a plain binding of ModelProcessor to
+ * this implementation type; that is, no hint/name.
  *
  * This leads to a second side effect in that any @Inject request for just ModelProcessor in
  * the same injector is immediately matched to this explicit binding, which means extensions
@@ -71,7 +72,7 @@ public class DefaultModelProcessor implements ModelProcessor {
     private final List<ModelParser> modelParsers;
 
     @Inject
-    public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, List<ModelParser> modelParsers) {
+    public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, @Nullable List<ModelParser> modelParsers) {
         this.modelXmlFactory = modelXmlFactory;
         this.modelParsers = modelParsers;
     }

@@ -29,7 +29,7 @@ import org.codehaus.plexus.interpolation.ValueSource;
 /**
  * Wraps another value source and intercepts interpolated expressions, checking for problems.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 class ProblemDetectingValueSource implements ValueSource {

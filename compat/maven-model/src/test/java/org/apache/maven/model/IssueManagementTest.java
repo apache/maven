@@ -53,6 +53,7 @@ class IssueManagementTest {
         assertNotNull(new IssueManagement().toString());
     }
 
+    @Test
     public void testToStringNotNonsense() {
         IssueManagement im = new IssueManagement();
         im.setSystem("Velociraptor");

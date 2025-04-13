@@ -26,7 +26,7 @@ import org.apache.maven.api.cli.ExecutorRequest;
 /**
  * Helper class for routing Maven execution based on preferences and/or issued execution requests.
  */
-public interface ExecutorHelper extends ExecutorTool {
+public interface ExecutorHelper {
     /**
      * The modes of execution.
      */

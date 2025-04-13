@@ -35,7 +35,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 /**
  * Handles expansion of general build plugin configuration into individual executions.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named
 @Singleton

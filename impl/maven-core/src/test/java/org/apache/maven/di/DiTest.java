@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class DiTest {
@@ -257,6 +258,99 @@ public class DiTest {
 
         @org.apache.maven.api.di.Named
         static class TestModelParser implements ModelParser {
+            @Override
+            public Optional<Source> locate(Path dir) {
+                return Optional.empty();
+            }
+
+            @Override
+            public Model parse(Source source, Map<String, ?> options) throws ModelParserException {
+                return null;
+            }
+        }
+    }
+
+    @Nested
+    class DiTest4 {
+
+        PlexusContainer container;
+
+        @BeforeEach
+        void setup() throws Exception {
+            container = new DefaultPlexusContainer(
+                    new DefaultContainerConfiguration(),
+                    new AbstractModule() {
+                        @Override
+                        protected void configure() {
+                            bind(ModelParser.class).to(DiTest4.TestModelParserSisu.class);
+                        }
+                    },
+                    new SisuDiBridgeModule(false) {
+                        @Override
+                        protected void configure() {
+                            super.configure();
+                            injector.bindImplicit(TestModelParserDi.class);
+                        }
+                    });
+        }
+
+        @Test
+        void testPlexus() throws Exception {
+            List<ModelParser> parsers = container.lookupList(ModelParser.class);
+            assertNotNull(parsers);
+            assertEquals(1, parsers.size());
+            Map<String, ModelParser> parsersMap = container.lookupMap(ModelParser.class);
+            assertNotNull(parsersMap);
+            assertEquals(1, parsersMap.size());
+        }
+
+        @Test
+        void testGuice() throws Exception {
+            List<Binding<ModelParser>> parsers =
+                    container.lookup(Injector.class).findBindingsByType(TypeLiteral.get(ModelParser.class));
+            assertNotNull(parsers);
+            assertEquals(1, parsers.size());
+        }
+
+        @Test
+        void testDI() throws Exception {
+            DiInjected diInjected = new DiInjected();
+            container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
+            assertNotNull(diInjected.parser);
+            assertInstanceOf(TestModelParserSisu.class, diInjected.parser);
+            assertNotNull(diInjected.parsers);
+            assertEquals(2, diInjected.parsers.size());
+            assertNotNull(diInjected.parsersMap);
+            assertEquals(2, diInjected.parsersMap.size());
+        }
+
+        static class DiInjected {
+            @org.apache.maven.api.di.Inject
+            ModelParser parser;
+
+            @org.apache.maven.api.di.Inject
+            List<ModelParser> parsers;
+
+            @org.apache.maven.api.di.Inject
+            Map<String, ModelParser> parsersMap;
+        }
+
+        @javax.inject.Named("sisu")
+        @org.eclipse.sisu.Priority(100)
+        static class TestModelParserSisu implements ModelParser {
+            @Override
+            public Optional<Source> locate(Path dir) {
+                return Optional.empty();
+            }
+
+            @Override
+            public Model parse(Source source, Map<String, ?> options) throws ModelParserException {
+                return null;
+            }
+        }
+
+        // @org.apache.maven.api.di.Named("di")
+        static class TestModelParserDi implements ModelParser {
             @Override
             public Optional<Source> locate(Path dir) {
                 return Optional.empty();

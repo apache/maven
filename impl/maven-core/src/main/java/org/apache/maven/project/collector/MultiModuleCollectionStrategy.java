@@ -136,12 +136,12 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
      * - Because of inter-module dependency collection, all projects in the multi-module project are collected.
      * - The plugin is not yet installed in a repository.
      *
-     * Therefore the build fails because the plugin is not found and plugins cannot be built in the same session.
+     * Therefore, the build fails because the plugin is not found and plugins cannot be built in the same session.
      *
      * The integration test for <a href="https://issues.apache.org/jira/browse/MNG-5572">MNG-5572</a> is an
      *   example of this scenario.
      *
-     * @return true if the module which fails to collect the inter-module plugin is not part of the build.
+     * @return true if the module which fails to collect the inter-module plugin is not part of the build
      */
     private boolean isModuleOutsideRequestScopeDependingOnPluginModule(
             MavenExecutionRequest request, ProjectBuildingException exception) {

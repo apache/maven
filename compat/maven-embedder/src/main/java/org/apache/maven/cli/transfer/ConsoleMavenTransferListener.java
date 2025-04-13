@@ -77,7 +77,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
             while (entries.hasNext()) {
                 TransferResourceAndSize entry = entries.next();
                 long total = entry.resource.getContentLength();
-                Long complete = entry.transferredBytes;
+                long complete = entry.transferredBytes;
                 buffer.append(getStatus(entry.resource.getResourceName(), complete, total));
                 if (entries.hasNext()) {
                     buffer.append(" | ");

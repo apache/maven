@@ -28,6 +28,8 @@ import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.ModelBuilder;
@@ -40,6 +42,10 @@ import org.apache.maven.impl.RequestTraceHelper;
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
+import org.eclipse.aether.spi.io.PathProcessor;
+import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
+import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,7 +56,9 @@ class RequestTraceTest {
 
     @Test
     void testTraces() {
-        Session session = ApiRunner.createSession();
+        Session session = ApiRunner.createSession(injector -> {
+            injector.bindInstance(RequestTraceTest.class, this);
+        });
 
         ModelBuilder builder = session.getService(ModelBuilder.class);
         ModelBuilderResult result = builder.newSession()
@@ -102,5 +110,18 @@ class RequestTraceTest {
 
         assertNotNull(node);
         assertEquals(6, node.getChildren().size());
+    }
+
+    @Provides
+    @Named(FileTransporterFactory.NAME)
+    static FileTransporterFactory newFileTransporterFactory() {
+        return new FileTransporterFactory();
+    }
+
+    @Provides
+    @Named(ApacheTransporterFactory.NAME)
+    static ApacheTransporterFactory newApacheTransporterFactory(
+            ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
+        return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
     }
 }

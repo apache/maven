@@ -111,6 +111,11 @@ class ReactorReader implements MavenWorkspaceReader {
         // No project, but most certainly a dependency which has been built previously
         File packagedArtifactFile = findInProjectLocalRepository(artifact);
         if (packagedArtifactFile != null && packagedArtifactFile.exists()) {
+            // Check if artifact is up-to-date
+            project = getProject(artifact, getAllProjects());
+            if (project != null) {
+                isPackagedArtifactUpToDate(project, packagedArtifactFile);
+            }
             return packagedArtifactFile;
         }
 
@@ -333,14 +338,18 @@ class ReactorReader implements MavenWorkspaceReader {
                     if (!Objects.equals(phase, phases.peekLast())) {
                         phases.addLast(phase);
                         if ("clean".equals(phase)) {
-                            cleanProjectLocalRepository(project);
+                            synchronized (project) {
+                                cleanProjectLocalRepository(project);
+                            }
                         }
                     }
                 }
                 break;
             case ProjectSucceeded:
             case ForkedProjectSucceeded:
-                installIntoProjectLocalRepository(project);
+                synchronized (project) {
+                    installIntoProjectLocalRepository(project);
+                }
                 break;
             default:
                 break;
@@ -471,8 +480,11 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private MavenProject getProject(Artifact artifact) {
-        return getAllProjects()
-                .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
+        return getProject(artifact, getProjects());
+    }
+
+    private MavenProject getProject(Artifact artifact, Map<String, Map<String, Map<String, MavenProject>>> projects) {
+        return projects.getOrDefault(artifact.getGroupId(), Collections.emptyMap())
                 .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
                 .getOrDefault(artifact.getBaseVersion(), null);
     }

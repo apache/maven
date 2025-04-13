@@ -92,17 +92,33 @@ public interface Node {
     Node filter(@Nonnull Predicate<Node> filter);
 
     /**
-     * Returns a string representation of this dependency node.
+     * Returns a detailed string representation of this dependency node.
+     * <p>
+     * When verbose mode is disabled, returns the basic string representation in the format:
+     * {@code groupId:artifactId:version[:scope]}
+     * <p>
+     * When verbose mode is enabled, additional details are included with the following format:
+     * <ul>
+     *   <li>For included dependencies: {@code groupId:artifactId:version[:scope] (details)}</li>
+     *   <li>For omitted dependencies: {@code (groupId:artifactId:version[:scope] - details)}</li>
+     * </ul>
+     * Where details may include:
+     * <ul>
+     *   <li>Version management information (if the version was managed from a different version)</li>
+     *   <li>Scope management information (if the scope was managed from a different scope)</li>
+     *   <li>Scope updates (if the scope was changed during resolution)</li>
+     *   <li>Conflict resolution information (if the dependency was omitted due to conflicts or duplicates)</li>
+     * </ul>
      *
-     * @return the string representation
+     * @return a string representation of this dependency node with optional detailed information
      */
     @Nonnull
     String asString();
 
     /**
-     * Obtain a Stream containing this node and all its descendant.
+     * Obtain a Stream containing this node and all its descendants.
      *
-     * @return a stream containing this node and its descendant
+     * @return a stream containing this node and its descendants
      */
     @Nonnull
     default Stream<Node> stream() {

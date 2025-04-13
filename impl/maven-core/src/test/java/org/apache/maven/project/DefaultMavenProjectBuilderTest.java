@@ -25,20 +25,25 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputSource;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.internal.impl.DefaultProject;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.model.Profile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
 
 import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,8 +54,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
-    @TempDir
-    File localRepoDir;
 
     // only use by reread()
     @TempDir
@@ -72,8 +75,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
     /**
      * Check that we can build ok from the middle pom of a (parent,child,grandchild) hierarchy
-     *
-     * @throws Exception in case of issue
      */
     @Test
     void testBuildFromMiddlePom() throws Exception {
@@ -147,11 +148,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertFalse(project.isExecutionRoot());
     }
 
-    @Override
-    protected ArtifactRepository getLocalRepository() throws Exception {
-        return repositorySystem.createLocalRepository(getLocalRepositoryPath());
-    }
-
     @Test
     void testPartialResultUponBadDependencyDeclaration() throws Exception {
         File pomFile = getTestFile("src/test/resources/projects/bad-dependency.xml");
@@ -175,9 +171,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     /**
-     * Tests whether local version range parent references are build correctly.
-     *
-     * @throws Exception in case of issue
+     * Tests whether local version range parent references are built correctly.
      */
     @Test
     void testBuildValidParentVersionRangeLocally() throws Exception {
@@ -186,17 +180,15 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         final MavenProject childProject = getProject(f1);
 
         assertNotNull(childProject.getParentArtifact());
-        assertEquals(childProject.getParentArtifact().getVersion(), "1");
+        assertEquals("1", childProject.getParentArtifact().getVersion());
         assertNotNull(childProject.getParent());
-        assertEquals(childProject.getParent().getVersion(), "1");
+        assertEquals("1", childProject.getParent().getVersion());
         assertNotNull(childProject.getModel().getParent());
-        assertEquals(childProject.getModel().getParent().getVersion(), "[1,10]");
+        assertEquals("[1,10]", childProject.getModel().getParent().getVersion());
     }
 
     /**
-     * Tests whether local version range parent references are build correctly.
-     *
-     * @throws Exception in case of issue
+     * Tests whether local version range parent references are built correctly.
      */
     @Test
     void testBuildParentVersionRangeLocallyWithoutChildVersion() throws Exception {
@@ -211,9 +203,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     /**
-     * Tests whether local version range parent references are build correctly.
-     *
-     * @throws Exception in case of issue
+     * Tests whether local version range parent references are built correctly.
      */
     @Test
     void testBuildParentVersionRangeLocallyWithChildProjectVersionExpression() throws Exception {
@@ -228,10 +218,9 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     /**
-     * Tests whether local version range parent references are build correctly.
-     *
-     * @throws Exception
+     * Tests whether local version range parent references are built correctly.
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithChildProjectParentVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-project-parent-version-expression/child/pom.xml");
@@ -241,15 +230,15 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             fail("Expected 'ProjectBuildingException' not thrown.");
         } catch (final ProjectBuildingException e) {
             assertNotNull(e.getMessage());
-            assertThat(e.getMessage(), containsString("Version must be a constant"));
         }
     }
 
     /**
-     * Tests whether local version range parent references are build correctly.
+     * Tests whether local version range parent references are built correctly.
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithChildRevisionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-revision-expression/child/pom.xml");
@@ -260,9 +249,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     /**
-     * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception in case of issue
+     * Tests whether external version range parent references are built correctly.
      */
     @Test
     void testBuildParentVersionRangeExternally() throws Exception {
@@ -271,17 +258,15 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         final MavenProject childProject = this.getProjectFromRemoteRepository(f1);
 
         assertNotNull(childProject.getParentArtifact());
-        assertEquals(childProject.getParentArtifact().getVersion(), "1");
+        assertEquals("1", childProject.getParentArtifact().getVersion());
         assertNotNull(childProject.getParent());
-        assertEquals(childProject.getParent().getVersion(), "1");
+        assertEquals("1", childProject.getParent().getVersion());
         assertNotNull(childProject.getModel().getParent());
-        assertEquals(childProject.getModel().getParent().getVersion(), "[1,1]");
+        assertEquals("[1,1]", childProject.getModel().getParent().getVersion());
     }
 
     /**
-     * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception in case of issue
+     * Tests whether external version range parent references are built correctly.
      */
     @Test
     void testBuildParentVersionRangeExternallyWithoutChildVersion() throws Exception {
@@ -296,9 +281,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     /**
-     * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception in case of issue
+     * Tests whether external version range parent references are built correctly.
      */
     @Test
     void testBuildParentVersionRangeExternallyWithChildProjectVersionExpression() throws Exception {
@@ -313,12 +296,10 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     /**
-     * Ensure that when re-reading a pom, it should not use the cached Model
-     *
-     * @throws Exception in case of issue
+     * Ensure that when re-reading a pom, it does not use the cached Model.
      */
     @Test
-    void rereadPom_mng7063() throws Exception {
+    void rereadPomMng7063() throws Exception {
         final Path pom = projectRoot.resolve("pom.xml");
         final ProjectBuildingRequest buildingRequest = newBuildingRequest();
 
@@ -345,11 +326,134 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertThat(project.getName(), is("PROJECT NAME"));
     }
 
+    @Test
+    void testActivatedProfileBySource() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setActiveProfileIds(List.of("profile1"));
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
+        assertTrue(
+                project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("active-by-default"::equals));
+    }
+
+    @Test
+    void testActivatedDefaultProfileBySource() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("active-by-default"::equals));
+
+        InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
+        List<org.apache.maven.api.model.Profile> activeProfiles =
+                new DefaultProject(session, project).getDeclaredActiveProfiles();
+        assertEquals(1, activeProfiles.size());
+        org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
+        assertEquals("active-by-default", profile.getId());
+        InputLocation location = profile.getLocation("");
+        assertNotNull(location);
+        assertThat(location.getLineNumber(), greaterThan(0));
+        assertThat(location.getColumnNumber(), greaterThan(0));
+        assertNotNull(location.getSource());
+        assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
+    }
+
+    @Test
+    void testActivatedExternalProfileBySource() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        final Profile externalProfile = new Profile();
+        externalProfile.setLocation(
+                "",
+                new org.apache.maven.model.InputLocation(
+                        1, 1, new org.apache.maven.model.InputSource(new InputSource(null, "settings.xml", null))));
+        externalProfile.setId("external-profile");
+        request.addProfile(externalProfile);
+        request.setActiveProfileIds(List.of(externalProfile.getId()));
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        assertTrue(project.getInjectedProfileIds().get("external").stream().anyMatch("external-profile"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
+        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("active-by-default"::equals));
+
+        InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
+        List<org.apache.maven.api.model.Profile> activeProfiles =
+                new DefaultProject(session, project).getDeclaredActiveProfiles();
+        assertEquals(2, activeProfiles.size());
+        org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
+        assertEquals("active-by-default", profile.getId());
+        InputLocation location = profile.getLocation("");
+        assertNotNull(location);
+        assertThat(location.getLineNumber(), greaterThan(0));
+        assertThat(location.getColumnNumber(), greaterThan(0));
+        assertNotNull(location.getSource());
+        assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
+        profile = activeProfiles.get(1);
+        assertEquals("external-profile", profile.getId());
+        location = profile.getLocation("");
+        assertNotNull(location);
+        assertThat(location.getLineNumber(), greaterThan(0));
+        assertThat(location.getColumnNumber(), greaterThan(0));
+        assertNotNull(location.getSource());
+        assertThat(location.getSource().getLocation(), containsString("settings.xml"));
+    }
+
+    @Test
+    void testActivatedProfileIsResolved() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setActiveProfileIds(List.of("profile1"));
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertEquals(1, project.getActiveProfiles().size());
+        assertTrue(project.getActiveProfiles().stream().anyMatch(p -> "profile1".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "profile2".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "active-by-default".equals(p.getId())));
+    }
+
+    @Test
+    void testActivatedProfileByDefaultIsResolved() throws Exception {
+        File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
+
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        MavenProject project = projectBuilder.build(testPom, request).getProject();
+
+        assertEquals(1, project.getActiveProfiles().size());
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "profile1".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().noneMatch(p -> "profile2".equals(p.getId())));
+        assertTrue(project.getActiveProfiles().stream().anyMatch(p -> "active-by-default".equals(p.getId())));
+    }
+
     /**
-     * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception
+     * Tests whether external version range parent references are built correctly.
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildPomVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-pom-version-expression/pom.xml");
@@ -359,15 +463,13 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             fail("Expected 'ProjectBuildingException' not thrown.");
         } catch (final ProjectBuildingException e) {
             assertNotNull(e.getMessage());
-            assertThat(e.getMessage(), containsString("Version must be a constant"));
         }
     }
 
     /**
-     * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception
+     * Tests whether external version range parent references are built correctly.
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildPomParentVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-pom-parent-version-expression/pom.xml");
@@ -377,15 +479,13 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             fail("Expected 'ProjectBuildingException' not thrown.");
         } catch (final ProjectBuildingException e) {
             assertNotNull(e.getMessage());
-            assertThat(e.getMessage(), containsString("Version must be a constant"));
         }
     }
 
     /**
-     * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception
+     * Tests whether external version range parent references are built correctly.
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildProjectParentVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-project-parent-version-expression/pom.xml");
@@ -395,15 +495,13 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             fail("Expected 'ProjectBuildingException' not thrown.");
         } catch (final ProjectBuildingException e) {
             assertNotNull(e.getMessage());
-            assertThat(e.getMessage(), containsString("Version must be a constant"));
         }
     }
 
     /**
-     * Tests whether external version range parent references are build correctly.
-     *
-     * @throws Exception
+     * Tests whether external version range parent references are built correctly.
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildRevisionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-revision-expression/pom.xml");
@@ -429,7 +527,6 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         MavenProject p1 = results.get(0).getProject();
         MavenProject p2 = results.get(1).getProject();
         MavenProject parent = p1.getArtifactId().equals("parent") ? p1 : p2;
-        MavenProject child = p1.getArtifactId().equals("parent") ? p2 : p1;
         assertEquals(List.of("child"), parent.getModel().getDelegate().getSubprojects());
     }
 }

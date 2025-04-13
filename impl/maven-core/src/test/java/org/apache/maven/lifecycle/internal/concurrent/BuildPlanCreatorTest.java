@@ -30,6 +30,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BuildPlanCreatorTest {
@@ -37,6 +38,7 @@ class BuildPlanCreatorTest {
     @Test
     void testMulti() {
         MavenProject project = new MavenProject();
+        project.setCollectedProjects(List.of());
         Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
 
         BuildPlan plan = calculateLifecycleMappings(projects, "package");
@@ -47,8 +49,10 @@ class BuildPlanCreatorTest {
     @Test
     void testCondense() {
         MavenProject p1 = new MavenProject();
+        p1.setCollectedProjects(List.of());
         p1.setArtifactId("p1");
         MavenProject p2 = new MavenProject();
+        p2.setCollectedProjects(List.of());
         p2.setArtifactId("p2");
         Map<MavenProject, List<MavenProject>> projects = new HashMap<>();
         projects.put(p1, Collections.emptyList());
@@ -82,11 +86,42 @@ class BuildPlanCreatorTest {
     void testAlias() {
         MavenProject p1 = new MavenProject();
         p1.setArtifactId("p1");
+        p1.setCollectedProjects(List.of());
         Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(p1, Collections.emptyList());
 
         BuildPlan plan = calculateLifecycleMappings(projects, "generate-resources");
+        assertNotNull(plan);
     }
 
+    @Test
+    void testAllPhase() {
+        MavenProject c1 = new MavenProject();
+        c1.setArtifactId("c1");
+        c1.setCollectedProjects(List.of());
+        MavenProject c2 = new MavenProject();
+        c2.setArtifactId("c2");
+        c2.setCollectedProjects(List.of());
+        MavenProject p = new MavenProject();
+        p.setArtifactId("p");
+        p.setCollectedProjects(List.of(c1, c2));
+        Map<MavenProject, List<MavenProject>> projects = Map.of(p, List.of(), c1, List.of(), c2, List.of());
+
+        BuildPlan plan = calculateLifecycleMappings(projects, "all");
+        assertNotNull(plan);
+        assertIsSuccessor(plan.requiredStep(p, "before:all"), plan.requiredStep(p, "before:each"));
+        assertIsSuccessor(plan.requiredStep(p, "before:all"), plan.requiredStep(c1, "before:all"));
+        assertIsSuccessor(plan.requiredStep(p, "before:all"), plan.requiredStep(c2, "before:all"));
+        assertIsSuccessor(plan.requiredStep(c1, "after:all"), plan.requiredStep(p, "after:all"));
+        assertIsSuccessor(plan.requiredStep(c2, "after:all"), plan.requiredStep(p, "after:all"));
+    }
+
+    private void assertIsSuccessor(BuildStep predecessor, BuildStep successor) {
+        assertTrue(
+                successor.isSuccessorOf(predecessor),
+                String.format("Expected '%s' to be a successor of '%s'", successor.toString(), predecessor.toString()));
+    }
+
+    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     private BuildPlan calculateLifecycleMappings(Map<MavenProject, List<MavenProject>> projects, String phase) {
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
         BuildPlanExecutor builder = new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles);

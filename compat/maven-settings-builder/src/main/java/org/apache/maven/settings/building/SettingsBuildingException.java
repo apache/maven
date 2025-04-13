@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Signals one ore more errors during settings building. The settings builder tries to collect as many problems as
+ * Signals one or more errors during settings building. The settings builder tries to collect as many problems as
  * possible before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to
  * query the details of the failure.
  *

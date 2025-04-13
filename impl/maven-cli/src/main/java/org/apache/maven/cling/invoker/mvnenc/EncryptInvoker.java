@@ -78,8 +78,8 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
             context.addInHeader("This tool is part of Apache Maven 4 distribution.");
             context.addInHeader("");
 
-            Thread executeThread = Thread.currentThread();
-            context.terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
+            context.terminal.handle(
+                    Terminal.Signal.INT, signal -> Thread.currentThread().interrupt());
 
             context.reader =
                     LineReaderBuilder.builder().terminal(context.terminal).build();

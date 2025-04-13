@@ -22,10 +22,8 @@ under the License.
 
   <parent>
     <groupId>org.apache.maven</groupId>
-    <artifactId>maven</artifactId>
-    <version>4.0.0-rc-3-SNAPSHOT</version>
-
-    <relativePath>../../</relativePath>
+    <artifactId>maven-impl-modules</artifactId>
+    <version>4.0.0-rc-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-core</artifactId>
@@ -34,48 +32,10 @@ under the License.
   <description>Maven Core classes.</description>
 
   <dependencies>
-    <!--  Maven -->
+    <!--  Maven4 API -->
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-di</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-    </dependency>
-    <!-- Remove the following two deps to see how to remove Settings from the core -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-settings</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-settings-builder</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-toolchain-model</artifactId>
-    </dependency>
-    <!-- Used for Javadoc in a deprecated class only -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-toolchain-builder</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-repository-metadata</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model-builder</artifactId>
+      <artifactId>maven-api-annotations</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -83,7 +43,41 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-di</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-metadata</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-plugin</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-settings</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-spi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-toolchain</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-xml</artifactId>
+    </dependency>
+
+    <!-- Maven4 impl -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-di</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -97,6 +91,43 @@ under the License.
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-logging</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-xml</artifactId>
+    </dependency>
+
+    <!-- compat -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model-builder</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-repository-metadata</artifactId>
+    </dependency>
+    <!-- Remove the following dep to see how to remove Settings from the core -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-settings</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-toolchain-model</artifactId>
+    </dependency>
+
+    <!-- Resolver -->
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-api</artifactId>
@@ -113,15 +144,17 @@ under the License.
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-impl</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-classworlds</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
+    <!-- Sisu/Eclipse DI -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-classworlds</artifactId>
+    </dependency>
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
@@ -141,6 +174,17 @@ under the License.
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <!-- Plexus Utils + XML -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
     </dependency>
 
     <!-- Test -->
@@ -183,6 +227,23 @@ under the License.
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
       <version>${mockitoVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Used in TestApi -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-toolchain-builder</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -285,8 +346,6 @@ under the License.
               <exclude>org.apache.maven.project.DefaultProjectDependenciesResolver#DefaultProjectDependenciesResolver()</exclude>
               <exclude>org.apache.maven.rtinfo.internal.DefaultRuntimeInformation#DefaultRuntimeInformation()</exclude>
               <exclude>org.apache.maven.settings.DefaultMavenSettingsBuilder#DefaultMavenSettingsBuilder()</exclude>
-              <exclude>org.apache.maven.toolchain.DefaultToolchainManager#DefaultToolchainManager():CONSTRUCTOR_REMOVED</exclude>
-              <exclude>org.apache.maven.toolchain.DefaultToolchainManagerPrivate#DefaultToolchainManagerPrivate()</exclude>
               <!-- END default constructor on Plexus/JSR 330 components -->
               <!-- system property with that name no longer evaluated -->
               <exclude>org.apache.maven.project.DefaultProjectBuilder#DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY</exclude>
@@ -321,7 +380,18 @@ under the License.
               <exclude>org.apache.maven.repository.RepositorySystem</exclude>
               <exclude>org.apache.maven.settings.DefaultMavenSettingsBuilder</exclude>
               <exclude>org.apache.maven.settings.MavenSettingsBuilder</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchain</exclude>
               <exclude>org.apache.maven.toolchain.DefaultToolchainsBuilder</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchainManager</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchainManagerPrivate</exclude>
+              <exclude>org.apache.maven.toolchain.MisconfiguredToolchainException</exclude>
+              <exclude>org.apache.maven.toolchain.RequirementMatcher</exclude>
+              <exclude>org.apache.maven.toolchain.RequirementMatcherFactory</exclude>
+              <exclude>org.apache.maven.toolchain.Toolchain</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainFactory</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainManager</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainManagerPrivate</exclude>
+              <exclude>org.apache.maven.toolchain.ToolchainPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainsBuilder</exclude>
             </excludes>
           </parameter>

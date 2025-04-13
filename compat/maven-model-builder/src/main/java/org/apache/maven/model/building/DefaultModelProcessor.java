@@ -41,12 +41,12 @@ import org.eclipse.sisu.Typed;
  * made this component available under all its interfaces then it could end up being injected
  * into itself leading to a stack overflow.
  *
- * A side-effect of using @Typed is that it translates to explicit bindings in the container.
+ * A side effect of using @Typed is that it translates to explicit bindings in the container.
  * So instead of binding the component under a 'wildcard' key it is now bound with an explicit
- * key. Since this is a default component this will be a plain binding of ModelProcessor to
- * this implementation type, ie. no hint/name.
+ * key. Since this is a default component, this will be a plain binding of ModelProcessor to
+ * this implementation type; that is no hint/name.
  *
- * This leads to a second side-effect in that any @Inject request for just ModelProcessor in
+ * This leads to a second side effect in that any @Inject request for just ModelProcessor in
  * the same injector is immediately matched to this explicit binding, which means extensions
  * cannot override this binding. This is because the lookup is always short-circuited in this
  * specific situation (plain @Inject request, and plain explicit binding for the same type.)
@@ -58,7 +58,7 @@ import org.eclipse.sisu.Typed;
  * of the same interface. Since we want to allow overriding this doesn't matter in this case.
  * (if it did we could add @Priority of 0 to match the priority given to default components.)
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Named("core-default")
 @Singleton

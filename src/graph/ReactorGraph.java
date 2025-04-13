@@ -42,7 +42,7 @@ public class ReactorGraph {
         CLUSTER_PATTERNS.put("JLine", Pattern.compile("^org\\.jline:.*"));
         CLUSTER_PATTERNS.put("Maven API", Pattern.compile("^org\\.apache\\.maven:maven-api-(?!impl).*"));
         CLUSTER_PATTERNS.put("Maven Resolver", Pattern.compile("^org\\.apache\\.maven\\.resolver:.*"));
-        CLUSTER_PATTERNS.put("Maven Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(impl|di|core|cli|xml|jline|logging|executor):.*"));
+        CLUSTER_PATTERNS.put("Maven Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(support|impl|di|core|cli|xml|jline|logging|executor|testing):.*"));
         CLUSTER_PATTERNS.put("Maven Compatibility", Pattern.compile("^org\\.apache\\.maven:maven-(artifact|builder-support|compat|embedder|model|model-builder|plugin-api|repository-metadata|resolver-provider|settings|settings-builder|toolchain-builder|toolchain-model):.*"));
         CLUSTER_PATTERNS.put("Sisu", Pattern.compile("(^org\\.eclipse\\.sisu:.*)|(.*:guice:.*)|(.*:javax.inject:.*)|(.*:javax.annotation-api:.*)"));
         CLUSTER_PATTERNS.put("Plexus", Pattern.compile("^org\\.codehaus\\.plexus:.*"));
@@ -50,6 +50,7 @@ public class ReactorGraph {
         CLUSTER_PATTERNS.put("Wagon", Pattern.compile("^org\\.apache\\.maven\\.wagon:.*"));
         CLUSTER_PATTERNS.put("SLF4j", Pattern.compile("^org\\.slf4j:.*"));
         CLUSTER_PATTERNS.put("Commons", Pattern.compile("^commons-cli:.*"));
+        CLUSTER_PATTERNS.put("Testing", Pattern.compile("^.*:(mockito-core|junit-jupiter-api):.*"));
     }
     private static final Pattern HIDDEN_NODES = Pattern.compile(".*:(maven-docgen|roaster-api|roaster-jdt|velocity-engine-core|commons-lang3|asm|logback-classic|slf4j-simple):.*");
 
@@ -195,8 +196,8 @@ public class ReactorGraph {
                         String prefix = null;
                         switch (clusterName) {
                             case "MavenAPI": prefix = "../api/"; break;
-                            case "MavenImplementation":
-                            case "MavenCompatibility": prefix = "../"; break;
+                            case "MavenImplementation": prefix = "../maven-impl-modules/"; break;
+                            case "MavenCompatibility": prefix = "../maven-compat-modules/"; break;
                             case "MavenResolver": prefix = "https://maven.apache.org/resolver/"; break;
                         }
                         if (prefix != null) {

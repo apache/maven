@@ -36,8 +36,8 @@ import java.util.Set;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Execution;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Phase;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
@@ -286,7 +286,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 ? mojoExecution.getConfiguration().getDom()
                 : null;
         if (executionConfiguration == null) {
-            executionConfiguration = new XmlNodeImpl("configuration");
+            executionConfiguration = XmlNode.newInstance("configuration");
         }
 
         XmlNode defaultConfiguration = getMojoConfiguration(mojoDescriptor);
@@ -294,42 +294,42 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         List<XmlNode> children = new ArrayList<>();
         if (mojoDescriptor.getParameters() != null) {
             for (Parameter parameter : mojoDescriptor.getParameters()) {
-                XmlNode parameterConfiguration = executionConfiguration.getChild(parameter.getName());
+                XmlNode parameterConfiguration = executionConfiguration.child(parameter.getName());
 
                 if (parameterConfiguration == null) {
-                    parameterConfiguration = executionConfiguration.getChild(parameter.getAlias());
+                    parameterConfiguration = executionConfiguration.child(parameter.getAlias());
                 }
 
-                XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
+                XmlNode parameterDefaults = defaultConfiguration.child(parameter.getName());
 
                 if (parameterConfiguration != null) {
-                    parameterConfiguration = parameterConfiguration.merge(parameterDefaults, Boolean.TRUE);
+                    parameterConfiguration = XmlService.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 } else {
                     parameterConfiguration = parameterDefaults;
                 }
 
                 if (parameterConfiguration != null) {
-                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.getAttributes());
+                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.attributes());
 
-                    String attributeForImplementation = parameterConfiguration.getAttribute("implementation");
+                    String attributeForImplementation = parameterConfiguration.attribute("implementation");
                     String parameterForImplementation = parameter.getImplementation();
                     if ((attributeForImplementation == null || attributeForImplementation.isEmpty())
                             && ((parameterForImplementation != null) && !parameterForImplementation.isEmpty())) {
                         attributes.put("implementation", parameter.getImplementation());
                     }
 
-                    parameterConfiguration = new XmlNodeImpl(
+                    parameterConfiguration = XmlNode.newInstance(
                             parameter.getName(),
-                            parameterConfiguration.getValue(),
+                            parameterConfiguration.value(),
                             attributes,
-                            parameterConfiguration.getChildren(),
-                            parameterConfiguration.getInputLocation());
+                            parameterConfiguration.children(),
+                            parameterConfiguration.inputLocation());
 
                     children.add(parameterConfiguration);
                 }
             }
         }
-        XmlNode finalConfiguration = new XmlNodeImpl("configuration", null, null, children, null);
+        XmlNode finalConfiguration = XmlNode.newInstance("configuration", children);
 
         mojoExecution.setConfiguration(finalConfiguration);
     }
@@ -516,7 +516,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                         if (config != null) {
                             XmlNode forkedConfiguration = config.getDom();
 
-                            forkedConfiguration = phaseConfiguration.merge(forkedConfiguration);
+                            forkedConfiguration = XmlService.merge(phaseConfiguration, forkedConfiguration);
 
                             forkedExecution.setConfiguration(forkedConfiguration);
                         }

@@ -46,7 +46,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     /**
      * Creates a new {@code DefaultModelResolverTest} instance.
      */
-    public DefaultModelResolverTest() {
+    DefaultModelResolverTest() {
         super();
     }
 

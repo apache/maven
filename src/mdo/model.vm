@@ -173,11 +173,7 @@ public class ${class.name}
       #end
     #end
     #if ( $locationTracking && ! $class.superClass )
-      #if ( ! $class.getFields($version).isEmpty() )
         this.locations = builder.computeLocations();
-      #else
-        this.locations = Map.of();
-      #end
         this.importedFrom = builder.importedFrom;
     #end
     }
@@ -243,55 +239,24 @@ public class ${class.name}
      * Gets the location of the specified field in the input source.
      */
     public InputLocation getLocation(Object key) {
-      #if ( $class.getFields($version).isEmpty() )
-        #if ( $class.superClass )
-        return super.getLocation(key);
-        #else
-        return null;
-        #end
-      #elseif ( $class.superClass )
-        return locations.containsKey(key) ? locations.get(key) : super.getLocation(key);
-      #else
         return locations.get(key);
-      #end
     }
 
     /**
      * Gets the keys of the locations of the input source.
      */
     public Set<Object> getLocationKeys() {
-      #if ( $class.getFields($version).isEmpty() )
-        #if ( $class.superClass )
-        return super.getLocationKeys();
-        #else
-        return Set.of();
-        #end
-      #elseif ( $class.superClass )
-        return getLocationKeyStream().collect(Collectors.toUnmodifiableSet());
-      #else
         return locations.keySet();
-      #end
     }
 
     protected Stream<Object> getLocationKeyStream() {
-      #if ( $class.getFields($version).isEmpty() )
-        #if ( $class.superClass )
-        return super.getLocationKeyStream();
-        #else
-        return Stream.empty();
-        #end
-      #elseif ( $class.superClass )
-        return Stream.concat(locations.keySet().stream(), super.getLocationKeyStream());
-      #else
         return locations.keySet().stream();
-      #end
     }
 
     /**
      * Gets the input location that caused this model to be read.
      */
-    public InputLocation getImportedFrom()
-    {
+    public InputLocation getImportedFrom() {
         return importedFrom;
     }
 
@@ -534,7 +499,6 @@ public class ${class.name}
 
     #if ( $locationTracking && ! $class.superClass )
         Map<Object, InputLocation> computeLocations() {
-      #if ( ! $class.getFields($version).isEmpty() )
             Map<Object, InputLocation> newlocs = locations != null ? locations : Map.of();
             Map<Object, InputLocation> oldlocs = base != null ? base.locations : Map.of();
             if (newlocs.isEmpty()) {
@@ -546,9 +510,6 @@ public class ${class.name}
             return Stream.concat(newlocs.entrySet().stream(), oldlocs.entrySet().stream())
                     // Keep value from newlocs in case of duplicates
                     .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1));
-      #else
-            return Map.of();
-      #end
         }
     #end
     }

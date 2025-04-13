@@ -21,7 +21,7 @@ package org.apache.maven.model.building;
 /**
  * Provides a skeleton implementation for model building listeners. The methods of this class are empty.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public class AbstractModelBuildingListener implements ModelBuildingListener {

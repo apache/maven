@@ -73,7 +73,7 @@ import org.apache.maven.model.validation.ModelValidator;
  * plugins should always acquire model builder instances via dependency injection. Developers might want to subclass
  * this factory to provide custom implementations for some of the components used by the model builder.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public class DefaultModelBuilderFactory {

@@ -62,6 +62,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
 #if ( $locationTracking )
@@ -71,8 +72,8 @@ import ${packageModelV4}.InputLocation;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.apache.maven.internal.xml.XmlNodeStaxBuilder;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.api.xml.XmlService;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -80,276 +81,32 @@ import javax.xml.transform.stream.StreamSource;
 
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 import static javax.xml.XMLConstants.XML_NS_URI;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+import static java.util.Map.entry;
 
 @Generated
 public class ${className} {
 
-    private static final Map<String, String> DEFAULT_ENTITIES;
-    static {
-        Map<String, String> entities = new HashMap<>();
-        entities.put("nbsp", "\u00a0");
-        entities.put("iexcl", "\u00a1");
-        entities.put("cent", "\u00a2");
-        entities.put("pound", "\u00a3");
-        entities.put("curren", "\u00a4");
-        entities.put("yen", "\u00a5");
-        entities.put("brvbar", "\u00a6");
-        entities.put("sect", "\u00a7");
-        entities.put("uml", "\u00a8");
-        entities.put("copy", "\u00a9");
-        entities.put("ordf", "\u00aa");
-        entities.put("laquo", "\u00ab");
-        entities.put("not", "\u00ac");
-        entities.put("shy", "\u00ad");
-        entities.put("reg", "\u00ae");
-        entities.put("macr", "\u00af");
-        entities.put("deg", "\u00b0");
-        entities.put("plusmn", "\u00b1");
-        entities.put("sup2", "\u00b2");
-        entities.put("sup3", "\u00b3");
-        entities.put("acute", "\u00b4");
-        entities.put("micro", "\u00b5");
-        entities.put("para", "\u00b6");
-        entities.put("middot", "\u00b7");
-        entities.put("cedil", "\u00b8");
-        entities.put("sup1", "\u00b9");
-        entities.put("ordm", "\u00ba");
-        entities.put("raquo", "\u00bb");
-        entities.put("frac14", "\u00bc");
-        entities.put("frac12", "\u00bd");
-        entities.put("frac34", "\u00be");
-        entities.put("iquest", "\u00bf");
-        entities.put("Agrave", "\u00c0");
-        entities.put("Aacute", "\u00c1");
-        entities.put("Acirc", "\u00c2");
-        entities.put("Atilde", "\u00c3");
-        entities.put("Auml", "\u00c4");
-        entities.put("Aring", "\u00c5");
-        entities.put("AElig", "\u00c6");
-        entities.put("Ccedil", "\u00c7");
-        entities.put("Egrave", "\u00c8");
-        entities.put("Eacute", "\u00c9");
-        entities.put("Ecirc", "\u00ca");
-        entities.put("Euml", "\u00cb");
-        entities.put("Igrave", "\u00cc");
-        entities.put("Iacute", "\u00cd");
-        entities.put("Icirc", "\u00ce");
-        entities.put("Iuml", "\u00cf");
-        entities.put("ETH", "\u00d0");
-        entities.put("Ntilde", "\u00d1");
-        entities.put("Ograve", "\u00d2");
-        entities.put("Oacute", "\u00d3");
-        entities.put("Ocirc", "\u00d4");
-        entities.put("Otilde", "\u00d5");
-        entities.put("Ouml", "\u00d6");
-        entities.put("times", "\u00d7");
-        entities.put("Oslash", "\u00d8");
-        entities.put("Ugrave", "\u00d9");
-        entities.put("Uacute", "\u00da");
-        entities.put("Ucirc", "\u00db");
-        entities.put("Uuml", "\u00dc");
-        entities.put("Yacute", "\u00dd");
-        entities.put("THORN", "\u00de");
-        entities.put("szlig", "\u00df");
-        entities.put("agrave", "\u00e0");
-        entities.put("aacute", "\u00e1");
-        entities.put("acirc", "\u00e2");
-        entities.put("atilde", "\u00e3");
-        entities.put("auml", "\u00e4");
-        entities.put("aring", "\u00e5");
-        entities.put("aelig", "\u00e6");
-        entities.put("ccedil", "\u00e7");
-        entities.put("egrave", "\u00e8");
-        entities.put("eacute", "\u00e9");
-        entities.put("ecirc", "\u00ea");
-        entities.put("euml", "\u00eb");
-        entities.put("igrave", "\u00ec");
-        entities.put("iacute", "\u00ed");
-        entities.put("icirc", "\u00ee");
-        entities.put("iuml", "\u00ef");
-        entities.put("eth", "\u00f0");
-        entities.put("ntilde", "\u00f1");
-        entities.put("ograve", "\u00f2");
-        entities.put("oacute", "\u00f3");
-        entities.put("ocirc", "\u00f4");
-        entities.put("otilde", "\u00f5");
-        entities.put("ouml", "\u00f6");
-        entities.put("divide", "\u00f7");
-        entities.put("oslash", "\u00f8");
-        entities.put("ugrave", "\u00f9");
-        entities.put("uacute", "\u00fa");
-        entities.put("ucirc", "\u00fb");
-        entities.put("uuml", "\u00fc");
-        entities.put("yacute", "\u00fd");
-        entities.put("thorn", "\u00fe");
-        entities.put("yuml", "\u00ff");
+    public static interface ContentTransformer {
+        /**
+         * Interpolate the value read from the xpp3 document
+         * @param inputSrc The input source value
+         * @param fieldName A description of the field being interpolated. The implementation may use this to
+         *                           log stuff.
+         * @return The interpolated value.
+         */
+        String transform(String inputSrc, String fieldName);
+    }
 
-        // ----------------------------------------------------------------------
-        // Special entities
-        // ----------------------------------------------------------------------
-
-        entities.put("OElig", "\u0152");
-        entities.put("oelig", "\u0153");
-        entities.put("Scaron", "\u0160");
-        entities.put("scaron", "\u0161");
-        entities.put("Yuml", "\u0178");
-        entities.put("circ", "\u02c6");
-        entities.put("tilde", "\u02dc");
-        entities.put("ensp", "\u2002");
-        entities.put("emsp", "\u2003");
-        entities.put("thinsp", "\u2009");
-        entities.put("zwnj", "\u200c");
-        entities.put("zwj", "\u200d");
-        entities.put("lrm", "\u200e");
-        entities.put("rlm", "\u200f");
-        entities.put("ndash", "\u2013");
-        entities.put("mdash", "\u2014");
-        entities.put("lsquo", "\u2018");
-        entities.put("rsquo", "\u2019");
-        entities.put("sbquo", "\u201a");
-        entities.put("ldquo", "\u201c");
-        entities.put("rdquo", "\u201d");
-        entities.put("bdquo", "\u201e");
-        entities.put("dagger", "\u2020");
-        entities.put("Dagger", "\u2021");
-        entities.put("permil", "\u2030");
-        entities.put("lsaquo", "\u2039");
-        entities.put("rsaquo", "\u203a");
-        entities.put("euro", "\u20ac");
-
-        // ----------------------------------------------------------------------
-        // Symbol entities
-        // ----------------------------------------------------------------------
-
-        entities.put("fnof", "\u0192");
-        entities.put("Alpha", "\u0391");
-        entities.put("Beta", "\u0392");
-        entities.put("Gamma", "\u0393");
-        entities.put("Delta", "\u0394");
-        entities.put("Epsilon", "\u0395");
-        entities.put("Zeta", "\u0396");
-        entities.put("Eta", "\u0397");
-        entities.put("Theta", "\u0398");
-        entities.put("Iota", "\u0399");
-        entities.put("Kappa", "\u039a");
-        entities.put("Lambda", "\u039b");
-        entities.put("Mu", "\u039c");
-        entities.put("Nu", "\u039d");
-        entities.put("Xi", "\u039e");
-        entities.put("Omicron", "\u039f");
-        entities.put("Pi", "\u03a0");
-        entities.put("Rho", "\u03a1");
-        entities.put("Sigma", "\u03a3");
-        entities.put("Tau", "\u03a4");
-        entities.put("Upsilon", "\u03a5");
-        entities.put("Phi", "\u03a6");
-        entities.put("Chi", "\u03a7");
-        entities.put("Psi", "\u03a8");
-        entities.put("Omega", "\u03a9");
-        entities.put("alpha", "\u03b1");
-        entities.put("beta", "\u03b2");
-        entities.put("gamma", "\u03b3");
-        entities.put("delta", "\u03b4");
-        entities.put("epsilon", "\u03b5");
-        entities.put("zeta", "\u03b6");
-        entities.put("eta", "\u03b7");
-        entities.put("theta", "\u03b8");
-        entities.put("iota", "\u03b9");
-        entities.put("kappa", "\u03ba");
-        entities.put("lambda", "\u03bb");
-        entities.put("mu", "\u03bc");
-        entities.put("nu", "\u03bd");
-        entities.put("xi", "\u03be");
-        entities.put("omicron", "\u03bf");
-        entities.put("pi", "\u03c0");
-        entities.put("rho", "\u03c1");
-        entities.put("sigmaf", "\u03c2");
-        entities.put("sigma", "\u03c3");
-        entities.put("tau", "\u03c4");
-        entities.put("upsilon", "\u03c5");
-        entities.put("phi", "\u03c6");
-        entities.put("chi", "\u03c7");
-        entities.put("psi", "\u03c8");
-        entities.put("omega", "\u03c9");
-        entities.put("thetasym", "\u03d1");
-        entities.put("upsih", "\u03d2");
-        entities.put("piv", "\u03d6");
-        entities.put("bull", "\u2022");
-        entities.put("hellip", "\u2026");
-        entities.put("prime", "\u2032");
-        entities.put("Prime", "\u2033");
-        entities.put("oline", "\u203e");
-        entities.put("frasl", "\u2044");
-        entities.put("weierp", "\u2118");
-        entities.put("image", "\u2111");
-        entities.put("real", "\u211c");
-        entities.put("trade", "\u2122");
-        entities.put("alefsym", "\u2135");
-        entities.put("larr", "\u2190");
-        entities.put("uarr", "\u2191");
-        entities.put("rarr", "\u2192");
-        entities.put("darr", "\u2193");
-        entities.put("harr", "\u2194");
-        entities.put("crarr", "\u21b5");
-        entities.put("lArr", "\u21d0");
-        entities.put("uArr", "\u21d1");
-        entities.put("rArr", "\u21d2");
-        entities.put("dArr", "\u21d3");
-        entities.put("hArr", "\u21d4");
-        entities.put("forall", "\u2200");
-        entities.put("part", "\u2202");
-        entities.put("exist", "\u2203");
-        entities.put("empty", "\u2205");
-        entities.put("nabla", "\u2207");
-        entities.put("isin", "\u2208");
-        entities.put("notin", "\u2209");
-        entities.put("ni", "\u220b");
-        entities.put("prod", "\u220f");
-        entities.put("sum", "\u2211");
-        entities.put("minus", "\u2212");
-        entities.put("lowast", "\u2217");
-        entities.put("radic", "\u221a");
-        entities.put("prop", "\u221d");
-        entities.put("infin", "\u221e");
-        entities.put("ang", "\u2220");
-        entities.put("and", "\u2227");
-        entities.put("or", "\u2228");
-        entities.put("cap", "\u2229");
-        entities.put("cup", "\u222a");
-        entities.put("int", "\u222b");
-        entities.put("there4", "\u2234");
-        entities.put("sim", "\u223c");
-        entities.put("cong", "\u2245");
-        entities.put("asymp", "\u2248");
-        entities.put("ne", "\u2260");
-        entities.put("equiv", "\u2261");
-        entities.put("le", "\u2264");
-        entities.put("ge", "\u2265");
-        entities.put("sub", "\u2282");
-        entities.put("sup", "\u2283");
-        entities.put("nsub", "\u2284");
-        entities.put("sube", "\u2286");
-        entities.put("supe", "\u2287");
-        entities.put("oplus", "\u2295");
-        entities.put("otimes", "\u2297");
-        entities.put("perp", "\u22a5");
-        entities.put("sdot", "\u22c5");
-        entities.put("lceil", "\u2308");
-        entities.put("rceil", "\u2309");
-        entities.put("lfloor", "\u230a");
-        entities.put("rfloor", "\u230b");
-        entities.put("lang", "\u2329");
-        entities.put("rang", "\u232a");
-        entities.put("loz", "\u25ca");
-        entities.put("spades", "\u2660");
-        entities.put("clubs", "\u2663");
-        entities.put("hearts", "\u2665");
-        entities.put("diams", "\u2666");
-        DEFAULT_ENTITIES = Collections.unmodifiableMap(entities);
+    static class DefaultEntitiesHolder {
+        static final Map<String, String> DEFAULT_ENTITIES;
+        static {
+            DEFAULT_ENTITIES = doGetDefaultEntities();
+        }
     }
 
     static class InputFactoryHolder {
-        static XMLInputFactory XML_INPUT_FACTORY;
+        static final XMLInputFactory XML_INPUT_FACTORY;
         static {
             XMLInputFactory factory = XMLInputFactory.newFactory();
             factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
@@ -449,7 +206,7 @@ public class ${className} {
 #if ( $locationTracking )
         return read(parser, strict, inputSrc);
 #else
-    return read(parser, strict);
+        return read(parser, strict);
 #end
     } //-- ${root.name} read(Reader, boolean)
 
@@ -518,11 +275,11 @@ public class ${className} {
                     throw new XMLStreamException("Duplicated tag: '${rootTag}'", parser.getLocation(), null);
                 }
 #if ( $locationTracking )
-                $rootLcapName = parse${rootUcapName}(parser, strict, inputSrc);
+                $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI(), inputSrc);
 #elseif ( $needXmlContext )
-                $rootLcapName = parse${rootUcapName}(parser, strict, context);
+                $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI(), context);
 #else
-                $rootLcapName = parse${rootUcapName}(parser, strict);
+                $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI());
 #end
                 parsed = true;
             }
@@ -531,7 +288,7 @@ public class ${className} {
         if (parsed) {
             return $rootLcapName;
         }
-        throw new XMLStreamException("Expected root element '${rootTag}' but found no element at all: invalid XML document", parser.getLocation(), null);
+            throw new XMLStreamException("Expected root element '${rootTag}' but found no element at all: invalid XML document", parser.getLocation(), null);
     } //-- ${root.name} read(XMLStreamReader, boolean)
 
 #foreach ( $class in $model.allClasses )
@@ -541,11 +298,11 @@ public class ${className} {
   #set ( $ancestors = $Helper.ancestors( $class ) )
   #set ( $allFields = $Helper.xmlFields( $class ) )
   #if ( $locationTracking )
-    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, InputSource inputSrc) throws XMLStreamException {
+    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, String namespace, InputSource inputSrc) throws XMLStreamException {
   #elseif ( $needXmlContext )
-    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, Deque<Object> context) throws XMLStreamException {
+    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, String namespace, Deque<Object> context) throws XMLStreamException {
   #else
-    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict) throws XMLStreamException {
+    private ${classUcapName} parse${classUcapName}(XMLStreamReader parser, boolean strict, String namespace) throws XMLStreamException {
   #end
         String tagName = parser.getLocalName();
         ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder(true);
@@ -554,6 +311,10 @@ public class ${className} {
             ${classLcapName}.location("", new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc));
         }
   #end
+  #if ( $class == $root )
+        ${classLcapName}.namespaceUri(namespace);
+        ${classLcapName}.modelEncoding(parser.getEncoding());
+  #end
         for (int i = parser.getAttributeCount() - 1; i >= 0; i--) {
             String name = parser.getAttributeLocalName(i);
             String ns = parser.getAttributeNamespace(i);
@@ -561,7 +322,7 @@ public class ${className} {
             if (W3C_XML_SCHEMA_INSTANCE_NS_URI.equals(ns) || XML_NS_URI.equals(ns)) {
                 // just ignore attributes with non-default namespace (for example: xsi and xml)
   #if ( $class == $root )
-            } else if ("xmlns".equals(name)) {
+            } else if (XMLNS_ATTRIBUTE.equals(name)) {
                 // ignore xmlns attribute in root class, which is a reserved attribute name
   #end
   #foreach ( $field in $allFields )
@@ -602,6 +363,7 @@ public class ${className} {
         context.addLast( ${classLcapName} );
   #end
         while ((strict ? parser.nextTag() : nextTag(parser)) == XMLStreamReader.START_ELEMENT) {
+            checkNamespace(parser, strict, namespace);
             String childName = checkDuplicate(parser.getLocalName(), parser, parsed);
   #if ( $locationTracking )
             int line = addLocationInformation ? parser.getLocation().getLineNumber() : -1;
@@ -675,20 +437,20 @@ public class ${className} {
                     break;
       #elseif ( $field.to && $field.multiplicity == "1" )
         #if ( $locationTracking )
-                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, inputSrc));
+                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, namespace, inputSrc));
         #elseif ( $needXmlContext )
-                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, context));
+                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, namespace, context));
         #else
-                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict));
+                    ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, namespace));
         #end
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) )
         #if ( $locationTracking )
-                    ${field.name}.add(parse${field.toClass.name}(parser, strict, inputSrc));
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, inputSrc));
         #elseif ( $needXmlContext )
-                    ${field.name}.add(parse${field.toClass.name}(parser, strict, context));
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, context));
         #else
-                    ${field.name}.add(parse${field.toClass.name}(parser, strict));
+                    ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace));
         #end
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" )
@@ -696,11 +458,11 @@ public class ${className} {
                     while (parser.nextTag() == XMLStreamReader.START_ELEMENT) {
                         if ("${Helper.singular($fieldTagName)}".equals(parser.getLocalName())) {
         #if ( $locationTracking )
-                            ${field.name}.add(parse${field.toClass.name}(parser, strict, inputSrc));
+                            ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, inputSrc));
         #elseif ( $needXmlContext )
-                            ${field.name}.add(parse${field.toClass.name}(parser, strict, context));
+                            ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, context));
         #else
-                            ${field.name}.add(parse${field.toClass.name}(parser, strict));
+                            ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace));
         #end
                         } else {
                             checkUnknownElement(parser, strict);
@@ -740,15 +502,27 @@ public class ${className} {
         ${classLcapName}.${field.name}($Helper.xmlFieldMetadata( $field ).format);
     #end
   #end
-  #if ( $class == $root )
-        ${classLcapName}.namespaceUri(parser.getNamespaceURI());
-        ${classLcapName}.modelEncoding(parser.getEncoding());
-  #end
         return ${classLcapName}.build();
     }
 
  #end
 #end
+
+    private void checkNamespace(XMLStreamReader parser, boolean strict, String namespace) throws XMLStreamException {
+        if (strict) {
+            String ns = parser.getNamespaceURI();
+            if (!Objects.equals(namespace, ns)) {
+                throw new XMLStreamException(
+                    String.format("Unexpected namespace for element '%s': found '%s' but expected '%s'",
+                        parser.getLocalName(),
+                        ns != null ? ns : "no namespace",
+                        namespace),
+                    parser.getLocation(),
+                    null
+                );
+            }
+        }
+    }
 
     private String checkDuplicate(String tagName, XMLStreamReader parser, Set<String> parsed) throws XMLStreamException {
 #set( $aliases = { } )
@@ -903,7 +677,7 @@ public class ${className} {
                 if (strict) {
                     throw new XMLStreamException("Entities are not supported in strict mode", parser.getLocation(), null);
                 } else if (addDefaultEntities) {
-                    val = DEFAULT_ENTITIES.get(parser.getLocalName());
+                    val = DefaultEntitiesHolder.DEFAULT_ENTITIES.get(parser.getLocalName());
                 }
                 if (val != null) {
                     result.append(val);
@@ -924,14 +698,14 @@ public class ${className} {
 
 #if ( $locationTracking )
     private XmlNode buildXmlNode(XMLStreamReader parser, InputSource inputSrc) throws XMLStreamException {
-        return XmlNodeStaxBuilder.build(parser,
+        return XmlService.read(parser,
                 addLocationInformation
                         ? p -> new InputLocation(parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber(), inputSrc)
                         : null);
     }
 #else
     private XmlNode buildXmlNode(XMLStreamReader parser) throws XMLStreamException {
-        return XmlNodeStaxBuilder.build(parser);
+        return XmlService.read(parser);
     }
 #end
 
@@ -990,15 +764,72 @@ public class ${className} {
     } //-- int getIntegerValue(String, String, XMLStreamReader, boolean)
 
 #end
-    public static interface ContentTransformer {
-        /**
-         * Interpolate the value read from the xpp3 document
-         * @param inputSrc The input source value
-         * @param fieldName A description of the field being interpolated. The implementation may use this to
-         *                           log stuff.
-         * @return The interpolated value.
-         */
-        String transform(String inputSrc, String fieldName);
+    private static Map<String, String> doGetDefaultEntities() {
+        return Map.ofEntries(
+            entry("nbsp",   "\u00a0"), entry("iexcl",  "\u00a1"), entry("cent",   "\u00a2"), entry("pound",  "\u00a3"),
+            entry("curren", "\u00a4"), entry("yen",    "\u00a5"), entry("brvbar", "\u00a6"), entry("sect",   "\u00a7"),
+            entry("uml",    "\u00a8"), entry("copy",   "\u00a9"), entry("ordf",   "\u00aa"), entry("laquo",  "\u00ab"),
+            entry("not",    "\u00ac"), entry("shy",    "\u00ad"), entry("reg",    "\u00ae"), entry("macr",   "\u00af"),
+            entry("deg",    "\u00b0"), entry("plusmn", "\u00b1"), entry("sup2",   "\u00b2"), entry("sup3",   "\u00b3"),
+            entry("acute",  "\u00b4"), entry("micro",  "\u00b5"), entry("para",   "\u00b6"), entry("middot", "\u00b7"),
+            entry("cedil",  "\u00b8"), entry("sup1",   "\u00b9"), entry("ordm",   "\u00ba"), entry("raquo",  "\u00bb"),
+            entry("frac14", "\u00bc"), entry("frac12", "\u00bd"), entry("frac34", "\u00be"), entry("iquest", "\u00bf"),
+            entry("Agrave", "\u00c0"), entry("Aacute", "\u00c1"), entry("Acirc",  "\u00c2"), entry("Atilde", "\u00c3"),
+            entry("Auml",   "\u00c4"), entry("Aring",  "\u00c5"), entry("AElig",  "\u00c6"), entry("Ccedil", "\u00c7"),
+            entry("Egrave", "\u00c8"), entry("Eacute", "\u00c9"), entry("Ecirc",  "\u00ca"), entry("Euml",   "\u00cb"),
+            entry("Igrave", "\u00cc"), entry("Iacute", "\u00cd"), entry("Icirc",  "\u00ce"), entry("Iuml",   "\u00cf"),
+            entry("ETH",    "\u00d0"), entry("Ntilde", "\u00d1"), entry("Ograve", "\u00d2"), entry("Oacute", "\u00d3"),
+            entry("Ocirc",  "\u00d4"), entry("Otilde", "\u00d5"), entry("Ouml",   "\u00d6"), entry("times",  "\u00d7"),
+            entry("Oslash", "\u00d8"), entry("Ugrave", "\u00d9"), entry("Uacute", "\u00da"), entry("Ucirc",  "\u00db"),
+            entry("Uuml",   "\u00dc"), entry("Yacute", "\u00dd"), entry("THORN",  "\u00de"), entry("szlig",  "\u00df"),
+            entry("agrave", "\u00e0"), entry("aacute", "\u00e1"), entry("acirc",  "\u00e2"), entry("atilde", "\u00e3"),
+            entry("auml",   "\u00e4"), entry("aring",  "\u00e5"), entry("aelig",  "\u00e6"), entry("ccedil", "\u00e7"),
+            entry("egrave", "\u00e8"), entry("eacute", "\u00e9"), entry("ecirc",  "\u00ea"), entry("euml",   "\u00eb"),
+            entry("igrave", "\u00ec"), entry("iacute", "\u00ed"), entry("icirc",  "\u00ee"), entry("iuml",   "\u00ef"),
+            entry("eth",    "\u00f0"), entry("ntilde", "\u00f1"), entry("ograve", "\u00f2"), entry("oacute", "\u00f3"),
+            entry("ocirc",  "\u00f4"), entry("otilde", "\u00f5"), entry("ouml",   "\u00f6"), entry("divide", "\u00f7"),
+            entry("oslash", "\u00f8"), entry("ugrave", "\u00f9"), entry("uacute", "\u00fa"), entry("ucirc",  "\u00fb"),
+            entry("uuml",   "\u00fc"), entry("yacute", "\u00fd"), entry("thorn",  "\u00fe"), entry("yuml",   "\u00ff"),
+            // Special entities
+            entry("OElig",  "\u0152"), entry("oelig",  "\u0153"), entry("Scaron", "\u0160"), entry("scaron", "\u0161"),
+            entry("Yuml",   "\u0178"), entry("circ",   "\u02c6"), entry("tilde",  "\u02dc"), entry("ensp",   "\u2002"),
+            entry("emsp",   "\u2003"), entry("thinsp", "\u2009"), entry("zwnj",   "\u200c"), entry("zwj",    "\u200d"),
+            entry("lrm",    "\u200e"), entry("rlm",    "\u200f"), entry("ndash",  "\u2013"), entry("mdash",  "\u2014"),
+            entry("lsquo",  "\u2018"), entry("rsquo",  "\u2019"), entry("sbquo",  "\u201a"), entry("ldquo",  "\u201c"),
+            entry("rdquo",  "\u201d"), entry("bdquo",  "\u201e"), entry("dagger", "\u2020"), entry("Dagger", "\u2021"),
+            entry("permil", "\u2030"), entry("lsaquo", "\u2039"), entry("rsaquo", "\u203a"), entry("euro",   "\u20ac"),
+            // Symbol entities
+            entry("fnof",   "\u0192"), entry("Alpha",  "\u0391"), entry("Beta",   "\u0392"), entry("Gamma",  "\u0393"),
+            entry("Delta",  "\u0394"), entry("Epsilon","\u0395"), entry("Zeta",   "\u0396"), entry("Eta",    "\u0397"),
+            entry("Theta",  "\u0398"), entry("Iota",   "\u0399"), entry("Kappa",  "\u039a"), entry("Lambda", "\u039b"),
+            entry("Mu",     "\u039c"), entry("Nu",     "\u039d"), entry("Xi",     "\u039e"), entry("Omicron","\u039f"),
+            entry("Pi",     "\u03a0"), entry("Rho",    "\u03a1"), entry("Sigma",  "\u03a3"), entry("Tau",    "\u03a4"),
+            entry("Upsilon","\u03a5"), entry("Phi",    "\u03a6"), entry("Chi",    "\u03a7"), entry("Psi",    "\u03a8"),
+            entry("Omega",  "\u03a9"), entry("alpha",  "\u03b1"), entry("beta",   "\u03b2"), entry("gamma",  "\u03b3"),
+            entry("delta",  "\u03b4"), entry("epsilon","\u03b5"), entry("zeta",   "\u03b6"), entry("eta",    "\u03b7"),
+            entry("theta",  "\u03b8"), entry("iota",   "\u03b9"), entry("kappa",  "\u03ba"), entry("lambda", "\u03bb"),
+            entry("mu",     "\u03bc"), entry("nu",     "\u03bd"), entry("xi",     "\u03be"), entry("omicron","\u03bf"),
+            entry("pi",     "\u03c0"), entry("rho",    "\u03c1"), entry("sigmaf", "\u03c2"), entry("sigma",  "\u03c3"),
+            entry("tau",    "\u03c4"), entry("upsilon","\u03c5"), entry("phi",    "\u03c6"), entry("chi",    "\u03c7"),
+            entry("psi",    "\u03c8"), entry("omega",  "\u03c9"), entry("thetasym","\u03d1"),entry("upsih",  "\u03d2"),
+            entry("piv",    "\u03d6"), entry("bull",   "\u2022"), entry("hellip", "\u2026"), entry("prime",  "\u2032"),
+            entry("Prime",  "\u2033"), entry("oline",  "\u203e"), entry("frasl",  "\u2044"), entry("weierp", "\u2118"),
+            entry("image",  "\u2111"), entry("real",   "\u211c"), entry("trade",  "\u2122"), entry("alefsym","\u2135"),
+            entry("larr",   "\u2190"), entry("uarr",   "\u2191"), entry("rarr",   "\u2192"), entry("darr",   "\u2193"),
+            entry("harr",   "\u2194"), entry("crarr",  "\u21b5"), entry("lArr",   "\u21d0"), entry("uArr",   "\u21d1"),
+            entry("rArr",   "\u21d2"), entry("dArr",   "\u21d3"), entry("hArr",   "\u21d4"), entry("forall", "\u2200"),
+            entry("part",   "\u2202"), entry("exist",  "\u2203"), entry("empty",  "\u2205"), entry("nabla",  "\u2207"),
+            entry("isin",   "\u2208"), entry("notin",  "\u2209"), entry("ni",     "\u220b"), entry("prod",   "\u220f"),
+            entry("sum",    "\u2211"), entry("minus",  "\u2212"), entry("lowast", "\u2217"), entry("radic",  "\u221a"),
+            entry("prop",   "\u221d"), entry("infin",  "\u221e"), entry("ang",    "\u2220"), entry("and",    "\u2227"),
+            entry("or",     "\u2228"), entry("cap",    "\u2229"), entry("cup",    "\u222a"), entry("int",    "\u222b"),
+            entry("there4", "\u2234"), entry("sim",    "\u223c"), entry("cong",   "\u2245"), entry("asymp",  "\u2248"),
+            entry("ne",     "\u2260"), entry("equiv",  "\u2261"), entry("le",     "\u2264"), entry("ge",     "\u2265"),
+            entry("sub",    "\u2282"), entry("sup",    "\u2283"), entry("nsub",   "\u2284"), entry("sube",   "\u2286"),
+            entry("supe",   "\u2287"), entry("oplus",  "\u2295"), entry("otimes", "\u2297"), entry("perp",   "\u22a5"),
+            entry("sdot",   "\u22c5"), entry("lceil",  "\u2308"), entry("rceil",  "\u2309"), entry("lfloor", "\u230a"),
+            entry("rfloor", "\u230b"), entry("lang",   "\u2329"), entry("rang",   "\u232a"), entry("loz",    "\u25ca"),
+            entry("spades", "\u2660"), entry("clubs",  "\u2663"), entry("hearts", "\u2665"), entry("diams",  "\u2666")
+        );
     }
-
 }

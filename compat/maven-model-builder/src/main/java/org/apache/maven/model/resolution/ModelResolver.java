@@ -28,7 +28,7 @@ import org.apache.maven.model.building.ModelSource;
  * {@link org.apache.maven.model.building.ModelBuilder} will add any relevant repositories to the model resolver. In
  * other words, the model resolver is stateful and should not be reused across multiple model building requests.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public interface ModelResolver {
@@ -97,13 +97,13 @@ public interface ModelResolver {
     /**
      * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters,
      * repositories that were added first should also be searched first. When multiple repositories with the same
-     * identifier are added, then the value of the replace argument is determines the behaviour.
+     * identifier are added, then the value of the replace argument determines the behaviour.
      *
-     * If replace is false than any existing repository with the same Id will remain in use. If replace
-     * is true the new repository replaces the original.
+     * If replace is false, then any existing repository with the same ID will remain in use. If replace
+     * is true, the new repository replaces the original.
      *
-     * @param repository The repository to add to the internal search chain, must not be {@code null}.
-     * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).
+     * @param repository the repository to add to the internal search chain, must not be {@code null}
+     * @throws InvalidRepositoryException if the repository could not be added (e.g. due to invalid URL or layout)
      */
     void addRepository(Repository repository, boolean replace) throws InvalidRepositoryException;
 

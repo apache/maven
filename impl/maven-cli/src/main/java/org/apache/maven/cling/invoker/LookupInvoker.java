@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -93,8 +94,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.cling.invoker.Utils.toMavenExecutionRequestLoggingLevel;
-import static org.apache.maven.cling.invoker.Utils.toProperties;
+import static org.apache.maven.cling.invoker.CliUtils.toMavenExecutionRequestLoggingLevel;
+import static org.apache.maven.cling.invoker.CliUtils.toProperties;
 
 /**
  * Lookup invoker implementation, that boots up DI container.
@@ -199,7 +200,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected void validate(C context) throws Exception {
         if (context.invokerRequest.parsingFailed()) {
             // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
-            List<Logger.Entry> entries = context.logger.drain();
+            // in case of mvnsh the context.logger != context.invokerRequest.parserRequest.logger
+            List<Logger.Entry> entries =
+                    context.invokerRequest.parserRequest().logger().drain();
             printErrors(
                     context,
                     context.invokerRequest
@@ -283,11 +286,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
-
-        // Create the build log appender; also sets MavenSimpleLogger sink
-        ProjectBuildLogAppender projectBuildLogAppender =
-                new ProjectBuildLogAppender(determineBuildEventListener(context));
-        context.closeables.add(projectBuildLogAppender);
     }
 
     protected BuildEventListener determineBuildEventListener(C context) {
@@ -302,24 +300,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         return new SimpleBuildEventListener(writer);
     }
 
-    protected void createTerminal(C context) {
+    protected final void createTerminal(C context) {
         if (context.terminal == null) {
+            // Create the build log appender; also sets MavenSimpleLogger sink
+            ProjectBuildLogAppender projectBuildLogAppender =
+                    new ProjectBuildLogAppender(determineBuildEventListener(context));
+            context.closeables.add(projectBuildLogAppender);
+
             MessageUtils.systemInstall(
-                    builder -> {
-                        if (context.invokerRequest.embedded()) {
-                            InputStream in = context.invokerRequest.stdIn().orElse(InputStream.nullInputStream());
-                            OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
-                            builder.streams(in, out);
-                            builder.provider("exec");
-                            context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
-                            context.closeables.add(out::flush);
-                        } else {
-                            builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
-                        }
-                        if (context.coloredOutput != null) {
-                            builder.color(context.coloredOutput);
-                        }
-                    },
+                    builder -> doCreateTerminal(context, builder),
                     terminal -> doConfigureWithTerminal(context, terminal));
 
             context.terminal = MessageUtils.getTerminal();
@@ -330,7 +319,31 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
     }
 
-    protected void doConfigureWithTerminal(C context, Terminal terminal) {
+    /**
+     * Override this method to create Terminal as you want.
+     *
+     * @see #createTerminal(LookupContext)
+     */
+    protected void doCreateTerminal(C context, TerminalBuilder builder) {
+        if (context.invokerRequest.embedded()) {
+            InputStream in = context.invokerRequest.stdIn().orElse(InputStream.nullInputStream());
+            OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
+            builder.streams(in, out);
+            builder.provider(TerminalBuilder.PROP_PROVIDER_EXEC);
+            context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
+            context.closeables.add(out::flush);
+        } else {
+            builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+        }
+        if (context.coloredOutput != null) {
+            builder.color(context.coloredOutput);
+        }
+    }
+
+    /**
+     * Called from {@link #createTerminal(LookupContext)} when Terminal was built.
+     */
+    protected final void doConfigureWithTerminal(C context, Terminal terminal) {
         context.terminal = terminal;
         Options options = context.invokerRequest.options();
         // tricky thing: align what JLine3 detected and Maven thinks:
@@ -341,15 +354,35 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // not be not colored (good), but Maven will print out "Message scheme: color".
         MessageUtils.setColorEnabled(
                 context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
-        if (!options.rawStreams().orElse(false)) {
-            MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
-            MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
-            stdout.setLogLevel(LocationAwareLogger.INFO_INT);
-            stderr.setLogLevel(LocationAwareLogger.INFO_INT);
-            System.setOut(new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream());
-            System.setErr(new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream());
-            // no need to set them back, this is already handled by MessageUtils.systemUninstall() above
+
+        // handle rawStreams: some would like to act on true, some on false
+        if (options.rawStreams().orElse(false)) {
+            doConfigureWithTerminalWithRawStreamsEnabled(context);
+        } else {
+            doConfigureWithTerminalWithRawStreamsDisabled(context);
         }
+    }
+
+    /**
+     * Override this method to add some special handling for "raw streams" <em>enabled</em> option.
+     */
+    protected void doConfigureWithTerminalWithRawStreamsEnabled(C context) {}
+
+    /**
+     * Override this method to add some special handling for "raw streams" <em>disabled</em> option.
+     */
+    protected void doConfigureWithTerminalWithRawStreamsDisabled(C context) {
+        MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
+        MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
+        stdout.setLogLevel(LocationAwareLogger.INFO_INT);
+        stderr.setLogLevel(LocationAwareLogger.INFO_INT);
+        PrintStream psOut = new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream();
+        context.closeables.add(() -> LoggingOutputStream.forceFlush(psOut));
+        PrintStream psErr = new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream();
+        context.closeables.add(() -> LoggingOutputStream.forceFlush(psErr));
+        System.setOut(psOut);
+        System.setErr(psErr);
+        // no need to set them back, this is already handled by MessageUtils.systemUninstall() above
     }
 
     protected Consumer<String> determineWriter(C context) {
@@ -362,7 +395,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected Consumer<String> doDetermineWriter(C context) {
         Options options = context.invokerRequest.options();
         if (options.logFile().isPresent()) {
-            Path logFile = context.cwdResolver.apply(options.logFile().get());
+            Path logFile = context.cwd.resolve(options.logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
@@ -470,12 +503,17 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void container(C context) throws Exception {
         if (context.lookup == null) {
-            context.containerCapsule = createContainerCapsuleFactory().createContainerCapsule(this, context);
+            context.containerCapsule = createContainerCapsuleFactory()
+                    .createContainerCapsule(this, context, createCoreExtensionSelector());
             context.closeables.add(context::closeContainer);
             context.lookup = context.containerCapsule.getLookup();
         } else {
             context.containerCapsule.updateLogging(context);
         }
+    }
+
+    protected CoreExtensionSelector<C> createCoreExtensionSelector() {
+        return new PrecedenceCoreExtensionSelector<>();
     }
 
     protected ContainerCapsuleFactory<C> createContainerCapsuleFactory() {
@@ -502,10 +540,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void init(C context) throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
         Map<String, Object> data = new HashMap<>();
         data.put("plexus", context.lookup.lookup(PlexusContainer.class));
-        data.put("workingDirectory", invokerRequest.cwd().toString());
+        data.put("workingDirectory", context.cwd.get().toString());
         data.put("systemProperties", toProperties(context.protoSession.getSystemProperties()));
         data.put("userProperties", toProperties(context.protoSession.getUserProperties()));
         data.put("versionProperties", CLIReportingUtils.getBuildProperties());
@@ -562,7 +599,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         Path userSettingsFile = null;
         if (mavenOptions.altUserSettings().isPresent()) {
             userSettingsFile =
-                    context.cwdResolver.apply(mavenOptions.altUserSettings().get());
+                    context.cwd.resolve(mavenOptions.altUserSettings().get());
 
             if (!Files.isRegularFile(userSettingsFile)) {
                 throw new FileNotFoundException("The specified user settings file does not exist: " + userSettingsFile);
@@ -571,14 +608,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             String userSettingsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_USER_SETTINGS);
             if (userSettingsFileStr != null) {
-                userSettingsFile = context.userResolver.apply(userSettingsFileStr);
+                userSettingsFile =
+                        context.userDirectory.resolve(userSettingsFileStr).normalize();
             }
         }
 
         Path projectSettingsFile = null;
         if (mavenOptions.altProjectSettings().isPresent()) {
             projectSettingsFile =
-                    context.cwdResolver.apply(mavenOptions.altProjectSettings().get());
+                    context.cwd.resolve(mavenOptions.altProjectSettings().get());
 
             if (!Files.isRegularFile(projectSettingsFile)) {
                 throw new FileNotFoundException(
@@ -588,14 +626,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             String projectSettingsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
             if (projectSettingsFileStr != null) {
-                projectSettingsFile = context.cwdResolver.apply(projectSettingsFileStr);
+                projectSettingsFile = context.cwd.resolve(projectSettingsFileStr);
             }
         }
 
         Path installationSettingsFile = null;
         if (mavenOptions.altInstallationSettings().isPresent()) {
-            installationSettingsFile = context.cwdResolver.apply(
-                    mavenOptions.altInstallationSettings().get());
+            installationSettingsFile =
+                    context.cwd.resolve(mavenOptions.altInstallationSettings().get());
 
             if (!Files.isRegularFile(installationSettingsFile)) {
                 throw new FileNotFoundException(
@@ -605,7 +643,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             String installationSettingsFileStr =
                     context.protoSession.getUserProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
             if (installationSettingsFileStr != null) {
-                installationSettingsFile = context.installationResolver.apply(installationSettingsFileStr);
+                installationSettingsFile = context.installationDirectory
+                        .resolve(installationSettingsFileStr)
+                        .normalize();
             }
         }
 
@@ -711,17 +751,18 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
         if (userDefinedLocalRepo != null) {
-            return context.cwdResolver.apply(userDefinedLocalRepo);
+            return context.cwd.resolve(userDefinedLocalRepo);
         }
         // settings
         userDefinedLocalRepo = context.effectiveSettings.getLocalRepository();
         if (userDefinedLocalRepo != null && !userDefinedLocalRepo.isEmpty()) {
-            return context.userResolver.apply(userDefinedLocalRepo);
+            return context.userDirectory.resolve(userDefinedLocalRepo).normalize();
         }
         // defaults
-        return context.userResolver
-                .apply(context.protoSession.getUserProperties().get(Constants.MAVEN_USER_CONF))
-                .resolve("repository");
+        return context.userDirectory
+                .resolve(context.protoSession.getUserProperties().get(Constants.MAVEN_USER_CONF))
+                .resolve("repository")
+                .normalize();
     }
 
     protected void populateRequest(C context, Lookup lookup, MavenExecutionRequest request) throws Exception {

@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
-import java.util.AbstractList;
+import java.util.AbstractSequentialList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,11 +30,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -42,6 +42,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.SourceRoot;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -146,9 +147,9 @@ public class MavenProject implements Cloneable {
     private List<MavenProject> collectedProjects;
 
     /**
-     * All sources of this project. The map includes main and test codes for all languages.
+     * All sources of this project, in the order they were added.
      */
-    private List<SourceRoot> sources = new CopyOnWriteArrayList<>();
+    private Set<SourceRoot> sources = new LinkedHashSet<>();
 
     @Deprecated
     private ArtifactRepository releaseArtifactRepository;
@@ -317,22 +318,16 @@ public class MavenProject implements Cloneable {
     // ----------------------------------------------------------------------
 
     /**
-     * Adds the given source. If a source already exists for the given scope, language and directory,
-     * then this method either does nothing if all other properties are equal, or thrown
-     * {@linkplain IllegalArgumentException} otherwise.
+     * Adds the given source if not already present.
      *
      * @param source the source to add
-     * @throws IllegalArgumentException if a source exists for the given language, scope and directory
-     *         but with different values for the other properties.
      *
      * @see #getSourceRoots()
      *
      * @since 4.0.0
      */
     public void addSourceRoot(SourceRoot source) {
-        if (!sources.contains(source)) {
-            sources.add(source);
-        }
+        sources.add(source);
     }
 
     /**
@@ -349,8 +344,10 @@ public class MavenProject implements Cloneable {
      *
      * @since 4.0.0
      */
-    public void addSourceRoot(ProjectScope scope, Language language, Path directory) {
-        directory = getBaseDirectory().resolve(directory).normalize();
+    public void addSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull Path directory) {
+        directory = getBaseDirectory()
+                .resolve(Objects.requireNonNull(directory, "directory cannot be null"))
+                .normalize();
         addSourceRoot(new DefaultSourceRoot(scope, language, directory));
     }
 
@@ -366,13 +363,43 @@ public class MavenProject implements Cloneable {
      *
      * @since 4.0.0
      */
-    public void addSourceRoot(ProjectScope scope, Language language, String directory) {
-        if (directory != null) {
-            directory = directory.trim();
-            if (!directory.isBlank()) {
-                Path path = getBaseDirectory().resolve(directory).normalize();
-                addSourceRoot(scope, language, path);
-            }
+    public void addSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull String directory) {
+        directory =
+                Objects.requireNonNull(directory, "directory cannot be null").trim();
+        if (!directory.isBlank()) {
+            Path path = getBaseDirectory().resolve(directory).normalize();
+            addSourceRoot(scope, language, path);
+        }
+    }
+
+    /**
+     * Removes a source root from the project.
+     *
+     * @param scope the scope of the source root
+     * @param language the language of the source root
+     * @param directory the directory of the source root
+     */
+    public void removeSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull Path directory) {
+        Path path = getBaseDirectory()
+                .resolve(Objects.requireNonNull(directory, "directory cannot be null"))
+                .normalize();
+        sources.removeIf(source -> source.scope() == scope
+                && source.language() == language
+                && source.directory().equals(path));
+    }
+
+    /**
+     * Removes a source root from the project.
+     *
+     * @param scope the scope of the source root
+     * @param language the language of the source root
+     * @param directory the directory of the source root
+     */
+    public void removeSourceRoot(@Nonnull ProjectScope scope, @Nonnull Language language, @Nonnull String directory) {
+        directory =
+                Objects.requireNonNull(directory, "directory cannot be null").trim();
+        if (!directory.isBlank()) {
+            removeSourceRoot(scope, language, Path.of(directory));
         }
     }
 
@@ -385,6 +412,14 @@ public class MavenProject implements Cloneable {
     }
 
     /**
+     * @deprecated Replaced by {@code removeSourceRoot(ProjectScope.MAIN, Language.JAVA_FAMILY, path)}.
+     */
+    @Deprecated(since = "4.0.0")
+    public void removeCompileSourceRoot(String path) {
+        removeSourceRoot(ProjectScope.MAIN, Language.JAVA_FAMILY, path);
+    }
+
+    /**
      * @deprecated Replaced by {@code addSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, path)}.
      */
     @Deprecated(since = "4.0.0")
@@ -392,6 +427,12 @@ public class MavenProject implements Cloneable {
         addSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, path);
     }
 
+    /**
+     * @deprecated Replaced by {@code removeSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, path)}.
+     */
+    public void removeTestCompileSourceRoot(String path) {
+        removeSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, path);
+    }
     /**
      * {@return all source root directories, including the disabled ones, for all languages and scopes}.
      * The iteration order is the order in which the sources are declared in the POM file.
@@ -738,26 +779,7 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getResources() {
-        return new AbstractList<>() {
-            @Override
-            public Resource get(int index) {
-                return toResource(getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
-                        .toList()
-                        .get(index));
-            }
-
-            @Override
-            public int size() {
-                return (int) getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
-                        .count();
-            }
-
-            @Override
-            public boolean add(Resource resource) {
-                addResource(resource);
-                return true;
-            }
-        };
+        return getResources(ProjectScope.MAIN);
     }
 
     /**
@@ -765,29 +787,39 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public List<Resource> getTestResources() {
-        return new AbstractList<>() {
+        return getResources(ProjectScope.TEST);
+    }
+
+    private List<Resource> getResources(final ProjectScope scope) {
+        return new AbstractSequentialList<>() {
+            private Stream<SourceRoot> sources() {
+                return getEnabledSourceRoots(scope, Language.RESOURCES);
+            }
+
             @Override
-            public Resource get(int index) {
-                return toResource(getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
-                        .toList()
-                        .get(index));
+            public ListIterator<Resource> listIterator(int index) {
+                return sources().map(MavenProject::toResource).toList().listIterator(index);
             }
 
             @Override
             public int size() {
-                return (int) getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
-                        .count();
+                return Math.toIntExact(sources().count());
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return sources().findAny().isEmpty();
             }
 
             @Override
             public boolean add(Resource resource) {
-                addTestResource(resource);
+                addResource(scope, resource);
                 return true;
             }
         };
     }
 
-    private Resource toResource(SourceRoot sourceRoot) {
+    private static Resource toResource(SourceRoot sourceRoot) {
         return new Resource(org.apache.maven.api.model.Resource.newBuilder()
                 .directory(sourceRoot.directory().toString())
                 .includes(sourceRoot.includes().stream().map(Object::toString).toList())
@@ -796,12 +828,16 @@ public class MavenProject implements Cloneable {
                 .build());
     }
 
+    private void addResource(ProjectScope scope, Resource resource) {
+        addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), scope, resource.getDelegate()));
+    }
+
     /**
      * @deprecated {@link Resource} is replaced by {@link SourceRoot}.
      */
     @Deprecated(since = "4.0.0")
     public void addResource(Resource resource) {
-        addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), ProjectScope.MAIN, resource.getDelegate()));
+        addResource(ProjectScope.MAIN, resource);
     }
 
     /**
@@ -809,7 +845,7 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated(since = "4.0.0")
     public void addTestResource(Resource testResource) {
-        addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), ProjectScope.TEST, testResource.getDelegate()));
+        addResource(ProjectScope.TEST, testResource);
     }
 
     public void setLicenses(List<License> licenses) {
@@ -979,10 +1015,16 @@ public class MavenProject implements Cloneable {
     }
 
     public List<RemoteRepository> getRemoteProjectRepositories() {
+        if (remoteProjectRepositories == null) {
+            remoteProjectRepositories = new ArrayList<>();
+        }
         return remoteProjectRepositories;
     }
 
     public List<RemoteRepository> getRemotePluginRepositories() {
+        if (remotePluginRepositories == null) {
+            remotePluginRepositories = new ArrayList<>();
+        }
         return remotePluginRepositories;
     }
 
@@ -1337,7 +1379,7 @@ public class MavenProject implements Cloneable {
         // This property is not handled like others as we don't use public API.
         // The whole implementation of this `deepCopy` method may need revision,
         // but it would be the topic for a separated commit.
-        sources = new CopyOnWriteArrayList<>(project.sources);
+        sources = new LinkedHashSet<>(project.sources);
 
         if (project.getModel() != null) {
             setModel(project.getModel().clone());
@@ -1447,7 +1489,7 @@ public class MavenProject implements Cloneable {
      * @param artifacts The set of artifacts, may be {@code null}.
      */
     public void setResolvedArtifacts(Set<Artifact> artifacts) {
-        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.<Artifact>emptySet();
+        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.emptySet();
         this.artifacts = null;
         this.artifactMap = null;
     }

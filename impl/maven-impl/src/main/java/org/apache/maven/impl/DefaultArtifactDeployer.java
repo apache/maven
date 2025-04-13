@@ -31,7 +31,7 @@ import org.apache.maven.api.services.ArtifactDeployerRequest;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeploymentException;
 
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 /**
  * Implementation of {@link ArtifactDeployer} service.

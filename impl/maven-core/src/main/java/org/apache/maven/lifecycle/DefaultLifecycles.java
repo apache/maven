@@ -91,7 +91,7 @@ public class DefaultLifecycles {
 
     /**
      * We use this to map all phases to the lifecycle that contains it. This is used so that a user can specify the
-     * phase they want to execute and we can easily determine what lifecycle we need to run.
+     * phase they want to execute, and we can easily determine what lifecycle we need to run.
      *
      * @return A map of lifecycles, indexed on id
      */

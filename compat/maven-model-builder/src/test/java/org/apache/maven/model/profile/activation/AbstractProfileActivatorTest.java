@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
  *
+ * @param <T> the type of {@link ProfileActivator} being tested
  */
 @Deprecated
 public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {

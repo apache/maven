@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.eclipse.aether.RepositoryEvent;
@@ -226,9 +227,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
         Versioning filteredVersions = versioning.clone();
 
         for (String version : versioning.getVersions()) {
-            if (!remoteRepository
-                    .getPolicy(DefaultModelVersionParser.checkSnapshot(version))
-                    .isEnabled()) {
+            if (!remoteRepository.getPolicy(ArtifactUtils.isSnapshot(version)).isEnabled()) {
                 filteredVersions.removeVersion(version);
             }
         }

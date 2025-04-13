@@ -92,6 +92,9 @@ public interface ProblemCollector<P extends BuilderProblem> {
 
     /**
      * Returns count of problems reported for given severities.
+     *
+     * @param severities the severity levels to count problems for
+     * @return the total count of problems for the specified severities
      */
     int problemsReportedFor(BuilderProblem.Severity... severities);
 
@@ -99,6 +102,8 @@ public interface ProblemCollector<P extends BuilderProblem> {
      * Returns {@code true} if reported problem count exceeded allowed count, and issues were lost. When this
      * method returns {@code true}, it means that element count of stream returned by method {@link #problems()}
      * and the counter returned by {@link #totalProblemsReported()} are not equal (latter is bigger than former).
+     *
+     * @return true if the problem collector has overflowed and some problems were not preserved
      */
     boolean problemsOverflow();
 
@@ -106,6 +111,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
      * Reports a problem: always maintains the counters, but whether problem is preserved in memory, depends on
      * implementation and its configuration.
      *
+     * @param problem the problem to report
      * @return {@code true} if passed problem is preserved by this call.
      */
     boolean reportProblem(P problem);
@@ -126,12 +132,18 @@ public interface ProblemCollector<P extends BuilderProblem> {
     /**
      * Returns all reported and preserved problems for given severity. Note: counters and element count in this
      * stream does not have to be equal.
+     *
+     * @param severity the severity level to get problems for
+     * @return a stream of problems with the specified severity
      */
     @Nonnull
     Stream<P> problems(BuilderProblem.Severity severity);
 
     /**
-     * Creates "empty" problem collector.
+     * Creates an "empty" problem collector that doesn't store any problems.
+     *
+     * @param <P> the type of problem
+     * @return an empty problem collector
      */
     @Nonnull
     static <P extends BuilderProblem> ProblemCollector<P> empty() {
@@ -159,7 +171,11 @@ public interface ProblemCollector<P extends BuilderProblem> {
     }
 
     /**
-     * Creates new instance of problem collector.
+     * Creates new instance of problem collector with configuration from the provided session.
+     *
+     * @param <P> the type of problem
+     * @param protoSession the session containing configuration for the problem collector
+     * @return a new problem collector instance
      */
     @Nonnull
     static <P extends BuilderProblem> ProblemCollector<P> create(@Nullable ProtoSession protoSession) {
@@ -173,13 +189,23 @@ public interface ProblemCollector<P extends BuilderProblem> {
     }
 
     /**
-     * Creates new instance of problem collector. Visible for testing only.
+     * Creates new instance of problem collector with the specified maximum problem count limit.
+     * Visible for testing only.
+     *
+     * @param <P> the type of problem
+     * @param maxCountLimit the maximum number of problems to preserve
+     * @return a new problem collector instance
      */
     @Nonnull
     static <P extends BuilderProblem> ProblemCollector<P> create(int maxCountLimit) {
         return new Impl<>(maxCountLimit);
     }
 
+    /**
+     * Default implementation of the ProblemCollector interface.
+     *
+     * @param <P> the type of problem
+     */
     class Impl<P extends BuilderProblem> implements ProblemCollector<P> {
 
         private final int maxCountLimit;

@@ -21,7 +21,6 @@ package org.apache.maven.cling.executor.internal;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.annotations.Nullable;
@@ -29,7 +28,6 @@ import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.ExecutorHelper;
-import org.apache.maven.cling.executor.ExecutorTool;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,7 +38,6 @@ public class HelperImpl implements ExecutorHelper {
     private final Mode defaultMode;
     private final Path installationDirectory;
     private final Path userHomeDirectory;
-    private final ExecutorTool executorTool;
     private final HashMap<Mode, Executor> executors;
 
     private final ConcurrentHashMap<String, String> cache;
@@ -58,7 +55,6 @@ public class HelperImpl implements ExecutorHelper {
         this.userHomeDirectory = userHomeDirectory != null
                 ? ExecutorRequest.getCanonicalPath(userHomeDirectory)
                 : ExecutorRequest.discoverUserHomeDirectory();
-        this.executorTool = new ToolboxTool(this);
         this.executors = new HashMap<>();
 
         this.executors.put(Mode.EMBEDDED, requireNonNull(embedded, "embedded"));
@@ -87,28 +83,6 @@ public class HelperImpl implements ExecutorHelper {
             ExecutorRequest request = executorRequest().build();
             return getExecutor(Mode.AUTO, request).mavenVersion(request);
         });
-    }
-
-    @Override
-    public Map<String, String> dump(ExecutorRequest.Builder request) throws ExecutorException {
-        return executorTool.dump(request);
-    }
-
-    @Override
-    public String localRepository(ExecutorRequest.Builder request) throws ExecutorException {
-        return executorTool.localRepository(request);
-    }
-
-    @Override
-    public String artifactPath(ExecutorRequest.Builder request, String gav, String repositoryId)
-            throws ExecutorException {
-        return executorTool.artifactPath(request, gav, repositoryId);
-    }
-
-    @Override
-    public String metadataPath(ExecutorRequest.Builder request, String gav, String repositoryId)
-            throws ExecutorException {
-        return executorTool.metadataPath(request, gav, repositoryId);
     }
 
     protected Executor getExecutor(Mode mode, ExecutorRequest request) throws ExecutorException {

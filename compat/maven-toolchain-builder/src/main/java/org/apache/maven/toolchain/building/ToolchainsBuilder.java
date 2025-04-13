@@ -22,7 +22,7 @@ package org.apache.maven.toolchain.building;
  * Builds the effective toolchains from a user toolchains file and/or a global toolchains file.
  *
  * @since 3.3.0
- * @deprecated since 4.0.0, use {@link org.apache.maven.api.services.ToolchainsBuilder} instead
+ * @deprecated since 4.0.0, use {@code org.apache.maven.api.services.ToolchainsBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public interface ToolchainsBuilder {

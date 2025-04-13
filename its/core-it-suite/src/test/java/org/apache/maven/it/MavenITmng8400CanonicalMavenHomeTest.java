@@ -50,13 +50,14 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
         Path linkedMavenHome = tempDir.resolve("linked-maven-home");
 
         Path oldMavenHome = Paths.get(System.getProperty("maven.home"));
+        Files.deleteIfExists(linkedMavenHome);
         Files.createSymbolicLink(linkedMavenHome, oldMavenHome);
         System.setProperty("maven.home", linkedMavenHome.toString());
 
         Verifier verifier = newVerifier(basedir.toString(), null);
         verifier.addCliArgument("-DasProperties");
         verifier.addCliArgument("-DtoFile=dump.properties");
-        verifier.addCliArgument("eu.maveniverse.maven.plugins:toolbox:0.5.2:gav-dump");
+        verifier.addCliArgument("eu.maveniverse.maven.plugins:toolbox:0.6.2:gav-dump");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

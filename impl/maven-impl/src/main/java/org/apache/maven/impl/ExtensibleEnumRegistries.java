@@ -42,7 +42,7 @@ import org.apache.maven.api.spi.LanguageProvider;
 import org.apache.maven.api.spi.PathScopeProvider;
 import org.apache.maven.api.spi.ProjectScopeProvider;
 
-import static org.apache.maven.impl.Utils.nonNull;
+import static org.apache.maven.impl.ImplUtils.nonNull;
 
 public class ExtensibleEnumRegistries {
 
@@ -91,8 +91,7 @@ public class ExtensibleEnumRegistries {
         protected final Map<String, T> values;
 
         public DefaultExtensibleEnumRegistry(List<P> providers, T... builtinValues) {
-            values = Stream.<T>concat(
-                            Stream.of(builtinValues), providers.stream().flatMap(p -> p.provides().stream()))
+            values = Stream.concat(Stream.of(builtinValues), providers.stream().flatMap(p -> p.provides().stream()))
                     .collect(Collectors.toUnmodifiableMap(t -> t.id().toLowerCase(Locale.ROOT), t -> t));
         }
 

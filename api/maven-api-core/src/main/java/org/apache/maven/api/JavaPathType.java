@@ -203,7 +203,7 @@ public enum JavaPathType implements PathType {
     /**
      * Returns the identification of this path in the {@code javax.tool} API.
      * The value may be an instance of {@link StandardLocation} or {@link DocumentationTool.Location},
-     * depending which tool will use this location.
+     * depending on which tool will use this location.
      *
      * @return the {@code javax.tool} enumeration value corresponding to this {@code JavaPathType}
      */

@@ -94,15 +94,8 @@ public class DefaultGraphConflictResolver implements GraphConflictResolver {
                     if (entry.equals(v)) { // unless it's an entry point.
                         // currently processing the entry point - it should not have any entry incident edges
                         res.getEntry().getMd().setWhy("This is a graph entry point. No links.");
-                    } else {
-                        // System.out.println("--->"+v.getMd().toDomainString()
-                        // +" has been terminated on this entry set\n-------------------\n"
-                        // +ins
-                        // +"\n-------------------\n"
-                        // );
                     }
                 } else {
-                    // System.out.println("+++>"+v.getMd().toDomainString()+" still has "+edge.toString() );
                     // fill in domain md with actual version data
                     ArtifactMetadata md = v.getMd();
                     ArtifactMetadata newMd = new ArtifactMetadata(
@@ -126,10 +119,6 @@ public class DefaultGraphConflictResolver implements GraphConflictResolver {
                     res.addEdge(sourceV, newV, edge);
                 }
             }
-            // System.err.println("Original graph("+graph.getVertices().size()+"):\n"+graph.toString());
-            // System.err.println("Cleaned("+requestedScope+") graph("+res.getVertices().size()+"):\n"+res.toString());
-            // System.err.println("Linked("+requestedScope+")
-            // subgraph("+linkedRes.getVertices().size()+"):\n"+linkedRes.toString());
             return findLinkedSubgraph(res);
         } catch (MetadataResolutionException e) {
             throw new GraphConflictResolutionException(e);

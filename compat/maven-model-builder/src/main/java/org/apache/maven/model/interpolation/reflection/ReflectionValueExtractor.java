@@ -40,7 +40,7 @@ import org.apache.maven.model.interpolation.reflection.MethodMap.AmbiguousExcept
  * In addition to usual getters using {@code getXxx} or {@code isXxx} suffixes, accessors
  * using {@code asXxx} or {@code toXxx} prefixes are also supported.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public class ReflectionValueExtractor {

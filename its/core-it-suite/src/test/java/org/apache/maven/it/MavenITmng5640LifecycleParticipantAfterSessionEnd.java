@@ -28,8 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * IT that verifies that lifecycle participant
  * methods are invoked even with various build failures/errors.
  */
-public class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5640LifecycleParticipantAfterSessionEnd() {
+@SuppressWarnings("checkstyle:UnusedLocalVariable")
+class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenIntegrationTestCase {
+    MavenITmng5640LifecycleParticipantAfterSessionEnd() {
         super("[3.2.2,)");
     }
 
@@ -43,29 +44,24 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractM
         File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
         File extensionDir = new File(testDir, "extension");
         File projectDir = new File(testDir, "buildfailure-utfail");
+        Verifier verifier;
 
         // install the test plugin
-        {
-            Verifier verifier;
-            verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("install");
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
-        }
+        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
 
         // build the test project
-        {
-            Verifier verifier;
-            verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("package");
-            assertThrows(VerificationException.class, verifier::execute, "The build should fail");
-            verifier.verifyTextInLog("testApp(org.apache.maven.its.mng5640.FailingTest)");
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("package");
+        assertThrows(VerificationException.class, verifier::execute, "The build should fail");
+        verifier.verifyTextInLog("testApp(org.apache.maven.its.mng5640.FailingTest)");
 
-            verifier.verifyFilePresent("target/afterProjectsRead.txt");
-            // See https://issues.apache.org/jira/browse/MNG-5641
-            // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
-            verifier.verifyFilePresent("target/afterSessionEnd.txt");
-        }
+        verifier.verifyFilePresent("target/afterProjectsRead.txt");
+        // See https://issues.apache.org/jira/browse/MNG-5641
+        // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
+        verifier.verifyFilePresent("target/afterSessionEnd.txt");
     }
 
     /**
@@ -78,29 +74,24 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractM
         File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
         File extensionDir = new File(testDir, "extension");
         File projectDir = new File(testDir, "buildfailure-depmissing");
+        Verifier verifier;
 
         // install the test plugin
-        {
-            Verifier verifier;
-            verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("install");
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
-        }
+        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
 
         // build the test project
-        {
-            Verifier verifier;
-            verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("package");
-            VerificationException exception =
-                    assertThrows(VerificationException.class, verifier::execute, "The build should fail");
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("package");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "The build should fail");
 
-            verifier.verifyFilePresent("target/afterProjectsRead.txt");
-            // See https://issues.apache.org/jira/browse/MNG-5641
-            // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
-            verifier.verifyFilePresent("target/afterSessionEnd.txt");
-        }
+        verifier.verifyFilePresent("target/afterProjectsRead.txt");
+        // See https://issues.apache.org/jira/browse/MNG-5641
+        // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
+        verifier.verifyFilePresent("target/afterSessionEnd.txt");
     }
 
     /**
@@ -114,35 +105,30 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractM
         File extensionDir = new File(testDir, "extension");
         File pluginDir = new File(testDir, "badplugin");
         File projectDir = new File(testDir, "builderror-mojoex");
+        Verifier verifier;
 
         // install the test plugin
-        {
-            Verifier verifier;
-            verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("install");
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
-        }
+        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
 
         // install the bad plugin
-        {
-            Verifier verifier;
-            verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("install");
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
+        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
 
-            // build the test project
-            verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("package");
-            VerificationException exception =
-                    assertThrows(VerificationException.class, verifier::execute, "The build should fail");
+        // build the test project
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("package");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "The build should fail");
 
-            verifier.verifyFilePresent("target/afterProjectsRead.txt");
-            // See https://issues.apache.org/jira/browse/MNG-5641
-            // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
-            verifier.verifyFilePresent("target/afterSessionEnd.txt");
-        }
+        verifier.verifyFilePresent("target/afterProjectsRead.txt");
+        // See https://issues.apache.org/jira/browse/MNG-5641
+        // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
+        verifier.verifyFilePresent("target/afterSessionEnd.txt");
     }
 
     /**
@@ -156,37 +142,29 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractM
         File extensionDir = new File(testDir, "extension");
         File pluginDir = new File(testDir, "badplugin");
         File projectDir = new File(testDir, "builderror-runtimeex");
+        Verifier verifier;
 
         // install the test plugin
-        {
-            Verifier verifier;
-            verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("install");
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
-        }
+        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
 
         // install the bad plugin
-        {
-            Verifier verifier;
-            verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("install");
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
-        }
+        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
 
         // build the test project
-        {
-            Verifier verifier;
-            verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
-            verifier.addCliArgument("package");
-            VerificationException exception =
-                    assertThrows(VerificationException.class, verifier::execute, "The build should fail");
+        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier.addCliArgument("package");
+        VerificationException exception =
+                assertThrows(VerificationException.class, verifier::execute, "The build should fail");
 
-            verifier.verifyFilePresent("target/afterProjectsRead.txt");
-            // See https://issues.apache.org/jira/browse/MNG-5641
-            // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
-            verifier.verifyFilePresent("target/afterSessionEnd.txt");
-        }
+        verifier.verifyFilePresent("target/afterProjectsRead.txt");
+        // See https://issues.apache.org/jira/browse/MNG-5641
+        // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
+        verifier.verifyFilePresent("target/afterSessionEnd.txt");
     }
 }

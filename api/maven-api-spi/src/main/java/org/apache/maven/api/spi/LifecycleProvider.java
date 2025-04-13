@@ -23,6 +23,35 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.di.Named;
 
+/**
+ * Service provider interface for registering custom {@link Lifecycle} implementations.
+ * <p>
+ * This interface allows plugins and extensions to define and register additional build lifecycles
+ * beyond the standard ones provided by Maven (like clean, default, site). Lifecycles define a sequence
+ * of phases that can be executed during a build.
+ * <p>
+ * Implementations of this interface will be discovered through the Java ServiceLoader mechanism
+ * and their provided lifecycles will be available throughout the Maven build process.
+ * <p>
+ * Example usage:
+ * <pre>
+ * public class CustomLifecycleProvider implements LifecycleProvider {
+ *     public Collection&lt;Lifecycle&gt; provides() {
+ *         return Collections.singleton(
+ *             lifecycle("deploy-docker", Arrays.asList(
+ *                 "build-image",
+ *                 "tag-image",
+ *                 "push-image"
+ *             ))
+ *         );
+ *     }
+ * }
+ * </pre>
+ *
+ * @see org.apache.maven.api.Lifecycle
+ * @see org.apache.maven.api.spi.ExtensibleEnumProvider
+ * @since 4.0.0
+ */
 @Experimental
 @Consumer
 @Named

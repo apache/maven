@@ -22,10 +22,8 @@ under the License.
 
   <parent>
     <groupId>org.apache.maven</groupId>
-    <artifactId>maven</artifactId>
-    <version>4.0.0-rc-3-SNAPSHOT</version>
-
-    <relativePath>../../</relativePath>
+    <artifactId>maven-compat-modules</artifactId>
+    <version>4.0.0-rc-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-repository-metadata</artifactId>
@@ -44,15 +42,11 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-impl</artifactId>
+      <artifactId>maven-support</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-xml</artifactId>
     </dependency>
 
     <dependency>
@@ -63,11 +57,6 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.woodstox</groupId>
-      <artifactId>woodstox-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

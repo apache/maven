@@ -31,7 +31,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
 /**
  * Collects settings that control the building of effective models.
  *
- * @deprecated use {@link org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
 @Deprecated(since = "4.0.0")
 public interface ModelBuildingRequest {
@@ -104,7 +104,7 @@ public interface ModelBuildingRequest {
     /**
      * Sets the POM file of the project to build. Note that providing the path to a POM file via this method will make
      * the model builder operate in project mode. This mode is meant for effective models that are employed during the
-     * build process of a local project. Hence the effective model will support the notion of a project directory. To
+     * build process of a local project. Hence, the effective model will support the notion of a project directory. To
      * build the model for a POM from the repository, use {@link #setModelSource(ModelSource)} in combination with a
      * {@link FileModelSource} instead.
      *
@@ -154,7 +154,7 @@ public interface ModelBuildingRequest {
      * builder will only produce an interim result which may be used to analyze inter-model dependencies before the
      * final invocation of the model builder is performed.
      *
-     * @return {@code true} if two-phase building is enabled, {@code false} if the model should be build in a single
+     * @return {@code true} if two-phase building is enabled, {@code false} if the model should be built in a single
      *         step.
      */
     boolean isTwoPhaseBuilding();
@@ -164,7 +164,7 @@ public interface ModelBuildingRequest {
      * interim result which may be used to analyze inter-model dependencies before the final invocation of the model
      * builder is performed.
      *
-     * @param twoPhaseBuilding {@code true} to enable two-phase building, {@code false} if the model should be build in
+     * @param twoPhaseBuilding {@code true} to enable two-phase building, {@code false} if the model should be built in
      *            a single step.
      * @return This request, never {@code null}.
      */

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cli.InvokerException;
@@ -34,6 +33,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.logging.BuildEventListener;
@@ -45,9 +45,9 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("VisibilityModifier")
 public class LookupContext implements AutoCloseable {
     public final InvokerRequest invokerRequest;
-    public final Function<String, Path> cwdResolver;
-    public final Function<String, Path> installationResolver;
-    public final Function<String, Path> userResolver;
+    public final CWD cwd;
+    public final Path installationDirectory;
+    public final Path userDirectory;
     public final boolean containerCapsuleManaged;
 
     public LookupContext(InvokerRequest invokerRequest) {
@@ -56,11 +56,9 @@ public class LookupContext implements AutoCloseable {
 
     public LookupContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
         this.invokerRequest = requireNonNull(invokerRequest);
-        this.cwdResolver = s -> invokerRequest.cwd().resolve(s).normalize().toAbsolutePath();
-        this.installationResolver = s ->
-                invokerRequest.installationDirectory().resolve(s).normalize().toAbsolutePath();
-        this.userResolver =
-                s -> invokerRequest.userHomeDirectory().resolve(s).normalize().toAbsolutePath();
+        this.cwd = CWD.create(invokerRequest.cwd());
+        this.installationDirectory = CliUtils.getCanonicalPath(invokerRequest.installationDirectory());
+        this.userDirectory = CliUtils.getCanonicalPath(invokerRequest.userHomeDirectory());
         this.containerCapsuleManaged = containerCapsuleManaged;
         this.logger = invokerRequest.parserRequest().logger();
 
@@ -106,6 +104,7 @@ public class LookupContext implements AutoCloseable {
     public boolean interactive;
     public Path localRepositoryPath;
     public Settings effectiveSettings;
+    public PersistedToolchains effectiveToolchains;
 
     public final List<AutoCloseable> closeables = new ArrayList<>();
 

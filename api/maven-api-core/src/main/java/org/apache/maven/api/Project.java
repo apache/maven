@@ -26,6 +26,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 
 /**
  * Interface representing a Maven project which can be created using the
@@ -237,4 +238,69 @@ public interface Project {
      */
     @Nonnull
     Optional<Project> getParent();
+
+    /**
+     * Returns all profiles defined in this project.
+     * <p>
+     * This method returns only the profiles defined directly in the current project's POM
+     * and does not include profiles from parent projects.
+     *
+     * @return a non-null, possibly empty list of profiles defined in this project
+     * @see Profile
+     * @see #getEffectiveProfiles()
+     */
+    @Nonnull
+    List<Profile> getDeclaredProfiles();
+
+    /**
+     * Returns all profiles defined in this project and all of its parent projects.
+     * <p>
+     * This method traverses the parent hierarchy and includes profiles defined in parent POMs.
+     * The returned list contains profiles from the current project and all of its ancestors in
+     * the project inheritance chain.
+     *
+     * @return a non-null, possibly empty list of all profiles from this project and its parents
+     * @see Profile
+     * @see #getDeclaredProfiles()
+     */
+    @Nonnull
+    List<Profile> getEffectiveProfiles();
+
+    /**
+     * Returns all active profiles for the current project build.
+     * <p>
+     * Active profiles are those that have been explicitly activated through one of the following means:
+     * <ul>
+     *   <li>Command line activation using the -P flag</li>
+     *   <li>Maven settings activation in settings.xml via &lt;activeProfiles&gt;</li>
+     *   <li>Automatic activation via &lt;activation&gt; conditions</li>
+     *   <li>The default active profile (marked with &lt;activeByDefault&gt;true&lt;/activeByDefault&gt;)</li>
+     * </ul>
+     * <p>
+     * The active profiles control various aspects of the build configuration including but not
+     * limited to dependencies, plugins, properties, and build resources.
+     *
+     * @return a non-null, possibly empty list of active profiles for this project
+     * @see Profile
+     * @see #getEffectiveActiveProfiles()
+     */
+    @Nonnull
+    List<Profile> getDeclaredActiveProfiles();
+
+    /**
+     * Returns all active profiles for this project and all of its parent projects.
+     * <p>
+     * This method traverses the parent hierarchy and collects all active profiles from
+     * the current project and its ancestors. Active profiles are those that meet the
+     * activation criteria through explicit activation or automatic conditions.
+     * <p>
+     * The combined set of active profiles from the entire project hierarchy affects
+     * the effective build configuration.
+     *
+     * @return a non-null, possibly empty list of all active profiles from this project and its parents
+     * @see Profile
+     * @see #getDeclaredActiveProfiles()
+     */
+    @Nonnull
+    List<Profile> getEffectiveActiveProfiles();
 }

@@ -98,9 +98,9 @@ public class BuildPlan {
     private Map<String, BuildStep> merge(Map<String, BuildStep> org, Map<String, BuildStep> add) {
         // all new phases should be added after the existing ones
         List<BuildStep> lasts =
-                org.values().stream().filter(b -> b.successors.isEmpty()).collect(Collectors.toList());
+                org.values().stream().filter(b -> b.successors.isEmpty()).toList();
         List<BuildStep> firsts =
-                add.values().stream().filter(b -> b.predecessors.isEmpty()).collect(Collectors.toList());
+                add.values().stream().filter(b -> b.predecessors.isEmpty()).toList();
         firsts.stream()
                 .filter(addNode -> !org.containsKey(addNode.name))
                 .forEach(addNode -> lasts.forEach(orgNode -> addNode.executeAfter(orgNode)));
