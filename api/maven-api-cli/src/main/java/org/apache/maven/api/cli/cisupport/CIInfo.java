@@ -22,6 +22,8 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * CI support: this class contains gathered information and more from CI that Maven process runs on.
+ *
+ * @since 4.0.0
  */
 public interface CIInfo {
     /**

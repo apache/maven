@@ -24,6 +24,8 @@ import org.apache.maven.api.cli.cisupport.CIInfo;
 
 /**
  * Service interface to detect CI system process runs on, if any.
+ *
+ * @since 4.0.0
  */
 public interface CIDetector {
     /**

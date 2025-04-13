@@ -466,7 +466,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         InvokerRequest invokerRequest = context.invokerRequest;
         if (invokerRequest.options().quiet().orElse(false)) {
             writer.accept(CLIReportingUtils.showVersionMinimal());
-        } else if (context.invokerRequest.effectiveVerbose()) {
+        } else if (invokerRequest.effectiveVerbose()) {
             writer.accept(CLIReportingUtils.showVersion(
                     ProcessHandle.current().info().commandLine().orElse(null), describe(context.terminal)));
 
