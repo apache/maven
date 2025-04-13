@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.cli.cisupport.CIInfo;
 
@@ -33,12 +34,12 @@ public final class CIDetectorHelper {
     private CIDetectorHelper() {}
 
     public static List<CIInfo> detectCI() {
-        List<CIInfo> result = new ArrayList<>(ServiceLoader.load(CIDetector.class).stream()
+        ArrayList<CIInfo> result = ServiceLoader.load(CIDetector.class).stream()
                 .map(ServiceLoader.Provider::get)
                 .map(CIDetector::detectCI)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .toList());
+                .collect(Collectors.toCollection(ArrayList::new));
 
         if (result.size() > 1) {
             // remove generic
