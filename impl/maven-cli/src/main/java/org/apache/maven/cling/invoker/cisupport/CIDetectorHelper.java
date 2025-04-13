@@ -33,15 +33,13 @@ public final class CIDetectorHelper {
     private CIDetectorHelper() {}
 
     public static List<CIInfo> detectCI() {
-        List<CIDetector> detectors = ServiceLoader.load(CIDetector.class).stream()
+        List<CIInfo> result = new ArrayList<>(ServiceLoader.load(CIDetector.class).stream()
                 .map(ServiceLoader.Provider::get)
-                .toList();
+                .map(CIDetector::detectCI)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList());
 
-        ArrayList<CIInfo> result = new ArrayList<>();
-        for (CIDetector detector : detectors) {
-            Optional<CIInfo> detected = detector.detectCI();
-            detected.ifPresent(result::add);
-        }
         if (result.size() > 1) {
             // remove generic
             result.removeIf(c -> GenericCIDetector.NAME.equals(c.name()));

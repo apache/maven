@@ -205,6 +205,6 @@ public interface InvokerRequest {
      * if applicable.
      */
     default boolean effectiveVerbose() {
-        return options().verbose().orElse(ciInfo().isPresent() && ciInfo().get().isDebug());
+        return options().verbose().orElse(ciInfo().isPresent() && ciInfo().get().isVerbose());
     }
 }

@@ -41,7 +41,7 @@ public interface CIInfo {
     /**
      * Some CI systems may allow running jobs in "debug" (or some equivalent) mode.
      */
-    default boolean isDebug() {
+    default boolean isVerbose() {
         return false;
     }
 }
