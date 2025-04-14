@@ -198,7 +198,7 @@ class DefaultModelValidatorTest {
 
         assertTrue(result.getErrors()
                 .get(0)
-                .contains("'dependencies.dependency.artifactId' for groupId:null:jar (GAT) is missing"));
+                .contains("'dependencies.dependency.artifactId' for g='groupId', a=, type='jar' is missing"));
     }
 
     @Test
@@ -209,7 +209,7 @@ class DefaultModelValidatorTest {
 
         assertTrue(result.getErrors()
                 .get(0)
-                .contains("'dependencies.dependency.groupId' for null:artifactId:jar (GAT) is missing"));
+                .contains("'dependencies.dependency.groupId' for g=, a='artifactId', type='jar' is missing"));
     }
 
     @Test
@@ -220,7 +220,7 @@ class DefaultModelValidatorTest {
 
         assertTrue(result.getErrors()
                 .get(0)
-                .contains("'dependencies.dependency.version' for groupId:artifactId:jar (GAT) is missing"));
+                .contains("'dependencies.dependency.version' for g='groupId', a='artifactId', type='jar' is missing"));
     }
 
     @Test
@@ -233,7 +233,7 @@ class DefaultModelValidatorTest {
                 result.getErrors()
                         .get(0)
                         .contains(
-                                "'dependencyManagement.dependencies.dependency.artifactId' for groupId:null:jar (GAT) is missing"));
+                                "'dependencyManagement.dependencies.dependency.artifactId' for g='groupId', a=, type='jar' is missing"));
     }
 
     @Test
@@ -246,7 +246,7 @@ class DefaultModelValidatorTest {
                 result.getErrors()
                         .get(0)
                         .contains(
-                                "'dependencyManagement.dependencies.dependency.groupId' for null:artifactId:jar (GAT) is missing"));
+                                "'dependencyManagement.dependencies.dependency.groupId' for g=, a='artifactId', type='jar' is missing"));
     }
 
     @Test
@@ -331,11 +331,11 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 3, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:d"));
+        assertTrue(result.getErrors().get(0).contains("g='test', a='d'"));
 
-        assertTrue(result.getErrors().get(1).contains("test:e"));
+        assertTrue(result.getErrors().get(1).contains("g='test', a='e'"));
 
-        assertTrue(result.getErrors().get(2).contains("test:f"));
+        assertTrue(result.getErrors().get(2).contains("g='test', a='f'"));
     }
 
     @Test
@@ -344,9 +344,9 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 2);
 
-        assertTrue(result.getWarnings().get(0).contains("test:f"));
+        assertTrue(result.getWarnings().get(0).contains("g='test', a='f'"));
 
-        assertTrue(result.getWarnings().get(1).contains("test:g"));
+        assertTrue(result.getWarnings().get(1).contains("g='test', a='g'"));
     }
 
     @Test
@@ -355,7 +355,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 1);
 
-        assertContains(result.getWarnings().get(0), "test:g");
+        assertContains(result.getWarnings().get(0), "g='test', a='g'");
     }
 
     @Test
@@ -366,10 +366,10 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getErrors().get(0),
-                "'dependencies.dependency.version' for test:b:jar (GAT) must be a valid version");
+                "'dependencies.dependency.version' for g='test', a='b', type='jar' must be a valid version");
         assertContains(
                 result.getErrors().get(1),
-                "'dependencies.dependency.version' for test:c:jar (GAT) must not contain any of these characters");
+                "'dependencies.dependency.version' for g='test', a='c', type='jar' must not contain any of these characters");
     }
 
     @Test
@@ -446,13 +446,13 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.scope' for test:a:jar (GAT) declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for g='test', a='a', type='jar' declares usage of deprecated 'system' scope");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.systemPath' for test:a:jar (GAT) should use a variable instead of a hard-coded path");
+                "'dependencies.dependency.systemPath' for g='test', a='a', type='jar' should use a variable instead of a hard-coded path");
         assertContains(
                 result.getWarnings().get(2),
-                "'dependencies.dependency.scope' for test:b:jar (GAT) declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for g='test', a='b', type='jar' declares usage of deprecated 'system' scope");
     }
 
     @Test
@@ -506,7 +506,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains(":a:"));
+        assertTrue(result.getErrors().get(0).contains("g=, a='a',"));
     }
 
     @Test
@@ -515,7 +515,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:"));
+        assertTrue(result.getErrors().get(0).contains("g='test', a=,"));
     }
 
     @Test
@@ -524,7 +524,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:a"));
+        assertTrue(result.getErrors().get(0).contains("g='test', a='a',"));
     }
 
     @Test
@@ -533,7 +533,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:b"));
+        assertTrue(result.getErrors().get(0).contains("g='test', a='b'"));
     }
 
     @Test
@@ -581,10 +581,11 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 2);
 
         assertContains(
-                result.getWarnings().get(0), "'dependencies.dependency.exclusions.exclusion.groupId' for gid:aid:jar");
+                result.getWarnings().get(0),
+                "'dependencies.dependency.exclusions.exclusion.groupId' for g='gid', a='aid', type='jar'");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.exclusions.exclusion.artifactId' for gid:aid:jar");
+                "'dependencies.dependency.exclusions.exclusion.artifactId' for g='gid', a='aid', type='jar'");
 
         // MNG-3832: Aether (part of M3+) supports wildcard expressions for exclusions
 
@@ -601,10 +602,10 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.exclusions.exclusion.groupId' for gid:aid:jar (GAT) is missing");
+                "'dependencies.dependency.exclusions.exclusion.groupId' for g='gid', a='aid', type='jar' is missing");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.exclusions.exclusion.artifactId' for gid:aid:jar (GAT) is missing");
+                "'dependencies.dependency.exclusions.exclusion.artifactId' for g='gid', a='aid', type='jar' is missing");
     }
 
     @Test
@@ -615,7 +616,7 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencyManagement.dependencies.dependency.type' for test:a:jar (GAT) must be 'pom'");
+                "'dependencyManagement.dependencies.dependency.type' for g='test', a='a', type='jar' must be 'pom'");
     }
 
     @Test
@@ -626,7 +627,7 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getErrors().get(0),
-                "'dependencyManagement.dependencies.dependency.classifier' for test:a:pom:cls (GAT) must be empty");
+                "'dependencyManagement.dependencies.dependency.classifier' for g='test', a='a', c='cls', type='pom' must be empty");
     }
 
     @Test
@@ -637,16 +638,16 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.scope' for test:a:jar (GAT) declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for g='test', a='a', type='jar' declares usage of deprecated 'system' scope");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.systemPath' for test:a:jar (GAT) should not point at files within the project directory");
+                "'dependencies.dependency.systemPath' for g='test', a='a', type='jar' should not point at files within the project directory");
         assertContains(
                 result.getWarnings().get(2),
-                "'dependencies.dependency.scope' for test:b:jar (GAT) declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for g='test', a='b', type='jar' declares usage of deprecated 'system' scope");
         assertContains(
                 result.getWarnings().get(3),
-                "'dependencies.dependency.systemPath' for test:b:jar (GAT) should not point at files within the project directory");
+                "'dependencies.dependency.systemPath' for g='test', a='b', type='jar' should not point at files within the project directory");
     }
 
     @Test
@@ -712,10 +713,10 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.version' for test:a:jar (GAT) is either LATEST or RELEASE (both of them are being deprecated)");
+                "'dependencies.dependency.version' for g='test', a='a', type='jar' is either LATEST or RELEASE (both of them are being deprecated)");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.version' for test:b:jar (GAT) is either LATEST or RELEASE (both of them are being deprecated)");
+                "'dependencies.dependency.version' for g='test', a='b', type='jar' is either LATEST or RELEASE (both of them are being deprecated)");
     }
 
     @Test

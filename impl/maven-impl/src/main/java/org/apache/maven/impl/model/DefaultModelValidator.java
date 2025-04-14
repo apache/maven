@@ -2245,7 +2245,25 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         public static SourceHint dependencyManagementKey(Dependency dependency) {
-            return new SourceHint(dependency.getManagementKey(), "GAT"); // DMK
+            String hint;
+            if (dependency.getClassifier() == null
+                    || dependency.getClassifier().trim().isEmpty()) {
+                hint = String.format(
+                        "g=%s, a=%s, type=%s",
+                        nvl(dependency.getGroupId()), nvl(dependency.getArtifactId()), nvl(dependency.getType()));
+            } else {
+                hint = String.format(
+                        "g=%s, a=%s, c=%s, type=%s",
+                        nvl(dependency.getGroupId()),
+                        nvl(dependency.getArtifactId()),
+                        nvl(dependency.getClassifier()),
+                        nvl(dependency.getType()));
+            }
+            return new SourceHint(hint, null); // DMK
+        }
+
+        private static String nvl(String value) {
+            return value == null ? "" : "'" + value + "'";
         }
 
         public static SourceHint pluginKey(Plugin plugin) {
