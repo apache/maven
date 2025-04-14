@@ -341,6 +341,13 @@ public interface XmlNode {
         return new Builder();
     }
 
+    /**
+     * Builder class for creating XmlNode instances.
+     * <p>
+     * This builder provides a fluent API for setting the various properties of an XML node.
+     * All properties are optional except for the node name, which must be set before calling
+     * {@link #build()}.
+     */
     class Builder {
         private String name;
         private String value;
@@ -350,41 +357,98 @@ public interface XmlNode {
         private List<XmlNode> children;
         private Object inputLocation;
 
+        /**
+         * Sets the name of the XML node.
+         * <p>
+         * This is the only required property that must be set before calling {@link #build()}.
+         *
+         * @param name the name of the XML node
+         * @return this builder instance
+         * @throws NullPointerException if name is null
+         */
         public Builder name(String name) {
             this.name = name;
             return this;
         }
 
+        /**
+         * Sets the text content of the XML node.
+         *
+         * @param value the text content of the XML node
+         * @return this builder instance
+         */
         public Builder value(String value) {
             this.value = value;
             return this;
         }
 
+        /**
+         * Sets the namespace URI of the XML node.
+         *
+         * @param namespaceUri the namespace URI of the XML node
+         * @return this builder instance
+         */
         public Builder namespaceUri(String namespaceUri) {
             this.namespaceUri = namespaceUri;
             return this;
         }
 
+        /**
+         * Sets the namespace prefix of the XML node.
+         *
+         * @param prefix the namespace prefix of the XML node
+         * @return this builder instance
+         */
         public Builder prefix(String prefix) {
             this.prefix = prefix;
             return this;
         }
 
+        /**
+         * Sets the attributes of the XML node.
+         * <p>
+         * The provided map will be copied to ensure immutability.
+         *
+         * @param attributes the map of attribute names to values
+         * @return this builder instance
+         */
         public Builder attributes(Map<String, String> attributes) {
             this.attributes = attributes;
             return this;
         }
 
+        /**
+         * Sets the child nodes of the XML node.
+         * <p>
+         * The provided list will be copied to ensure immutability.
+         *
+         * @param children the list of child nodes
+         * @return this builder instance
+         */
         public Builder children(List<XmlNode> children) {
             this.children = children;
             return this;
         }
 
+        /**
+         * Sets the input location information for the XML node.
+         * <p>
+         * This is typically used for error reporting and debugging purposes.
+         *
+         * @param inputLocation the input location object
+         * @return this builder instance
+         */
         public Builder inputLocation(Object inputLocation) {
             this.inputLocation = inputLocation;
             return this;
         }
 
+        /**
+         * Builds a new XmlNode instance with the current builder settings.
+         *
+         * @return a new immutable XmlNode instance
+         * @throws NullPointerException if name has not been set
+         */
         public XmlNode build() {
             return new Impl(prefix, namespaceUri, name, value, attributes, children, inputLocation);
         }

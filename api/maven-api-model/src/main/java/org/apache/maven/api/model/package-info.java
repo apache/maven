@@ -19,6 +19,20 @@
 
 /**
  * Maven Immutable POM (Project Object Model) classes, generated from <code>maven.mdo</code> model.
- * The root class is {@link org.apache.maven.api.model.Model}.
+ * <p>
+ * This package contains the data model classes that represent the structure of Maven POM files.
+ * These classes are immutable to ensure thread safety and prevent unintended modifications.
+ * The root class is {@link org.apache.maven.api.model.Model}, which represents the entire POM.
+ * <p>
+ * Key components include:
+ * <ul>
+ *   <li>{@link org.apache.maven.api.model.Model} - The root element of a POM file</li>
+ *   <li>{@link org.apache.maven.api.model.Dependency} - Represents a project dependency</li>
+ *   <li>{@link org.apache.maven.api.model.Plugin} - Represents a Maven plugin configuration</li>
+ *   <li>{@link org.apache.maven.api.model.Build} - Contains build configuration information</li>
+ *   <li>{@link org.apache.maven.api.model.Profile} - Represents a build profile for conditional execution</li>
+ * </ul>
+ *
+ * @since 4.0.0
  */
 package org.apache.maven.api.model;

@@ -2171,9 +2171,15 @@
     <class>
       <name>Resource</name>
       <description>This element describes all of the classpath resources associated with a project
-        or unit tests.</description>
+        or unit tests.
+
+        @deprecated Replaced by {@code &lt;Source&gt;} with {@code resources} language.
+      </description>
       <version>3.0.0+</version>
       <superClass>FileSet</superClass>
+      <annotations>
+        <annotation>@Deprecated(since = "4.0.0")</annotation>
+      </annotations>
       <fields>
         <field>
           <name>targetPath</name>
@@ -2186,13 +2192,8 @@
             element with this value: {@code org/apache/maven/messages}.
             This is not required if you simply put the resources in that directory
             structure at the source, however.
-
-            @deprecated Replaced by {@code &lt;Source&gt;} with {@code resources} language.
           </description>
           <type>String</type>
-          <annotations>
-            <annotation>@Deprecated(since = "4.0.0")</annotation>
-          </annotations>
         </field>
         <field>
           <name>filtering</name>

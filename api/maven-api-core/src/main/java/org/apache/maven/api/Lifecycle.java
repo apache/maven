@@ -65,14 +65,18 @@ public interface Lifecycle extends ExtensibleEnum {
     String id();
 
     /**
-     * Collection of main phases for this lifecycle
+     * Collection of main phases for this lifecycle.
+     *
+     * @return the collection of top-level phases in this lifecycle
      */
     Collection<Phase> phases();
 
     /**
      * Collection of main phases for this lifecycle used with the Maven 3 builders.
-     * Those builders does not operate on a graph, but on the list and expect a slightly
+     * Those builders do not operate on a graph, but on the list and expect a slightly
      * different ordering (mainly unit test being executed before packaging).
+     *
+     * @return the collection of phases in Maven 3 compatible ordering
      */
     default Collection<Phase> v3phases() {
         return phases();
@@ -80,13 +84,18 @@ public interface Lifecycle extends ExtensibleEnum {
 
     /**
      * Stream of phases containing all child phases recursively.
+     *
+     * @return a stream of all phases in this lifecycle, including nested phases
      */
     default Stream<Phase> allPhases() {
         return phases().stream().flatMap(Phase::allPhases);
     }
 
     /**
-     * Collection of aliases.
+     * Collection of aliases for this lifecycle.
+     * Aliases map Maven 3 phase names to their Maven 4 equivalents.
+     *
+     * @return the collection of phase aliases
      */
     Collection<Alias> aliases();
 
@@ -122,12 +131,27 @@ public interface Lifecycle extends ExtensibleEnum {
         String DEPLOY = "deploy";
         String CLEAN = "clean";
 
+        /**
+         * Returns the name of this phase.
+         *
+         * @return the phase name
+         */
         @Nonnull
         String name();
 
+        /**
+         * Returns the list of plugins bound to this phase.
+         *
+         * @return the list of plugins
+         */
         @Nonnull
         List<Plugin> plugins();
 
+        /**
+         * Returns the collection of links from this phase to other phases.
+         *
+         * @return the collection of links
+         */
         @Nonnull
         Collection<Link> links();
 
@@ -137,6 +161,11 @@ public interface Lifecycle extends ExtensibleEnum {
         @Nonnull
         List<Phase> phases();
 
+        /**
+         * Returns a stream of all phases, including this phase and all nested phases.
+         *
+         * @return a stream of all phases
+         */
         @Nonnull
         Stream<Phase> allPhases();
     }
@@ -146,8 +175,18 @@ public interface Lifecycle extends ExtensibleEnum {
      * to dynamic phases in Maven 4.
      */
     interface Alias {
+        /**
+         * Returns the Maven 3 phase name.
+         *
+         * @return the Maven 3 phase name
+         */
         String v3Phase();
 
+        /**
+         * Returns the Maven 4 phase name.
+         *
+         * @return the Maven 4 phase name
+         */
         String v4Phase();
     }
 
@@ -162,8 +201,18 @@ public interface Lifecycle extends ExtensibleEnum {
             AFTER
         }
 
+        /**
+         * Returns the kind of link (BEFORE or AFTER).
+         *
+         * @return the link kind
+         */
         Kind kind();
 
+        /**
+         * Returns the pointer to the target phase.
+         *
+         * @return the phase pointer
+         */
         Pointer pointer();
     }
 
@@ -174,26 +223,56 @@ public interface Lifecycle extends ExtensibleEnum {
             CHILDREN
         }
 
+        /**
+         * Returns the name of the target phase.
+         *
+         * @return the phase name
+         */
         String phase();
 
+        /**
+         * Returns the type of pointer (PROJECT, DEPENDENCIES, or CHILDREN).
+         *
+         * @return the pointer type
+         */
         Type type();
     }
 
     interface PhasePointer extends Pointer {
+        /**
+         * Returns the type of pointer, which is always PROJECT for a PhasePointer.
+         *
+         * @return the PROJECT pointer type
+         */
         default Type type() {
             return Type.PROJECT;
         }
     }
 
     interface DependenciesPointer extends Pointer {
+        /**
+         * Returns the dependency scope this pointer applies to.
+         *
+         * @return the dependency scope, or "all" if not specified
+         */
         String scope(); // default: all
 
+        /**
+         * Returns the type of pointer, which is always DEPENDENCIES for a DependenciesPointer.
+         *
+         * @return the DEPENDENCIES pointer type
+         */
         default Type type() {
             return Type.DEPENDENCIES;
         }
     }
 
     interface ChildrenPointer extends Pointer {
+        /**
+         * Returns the type of pointer, which is always CHILDREN for a ChildrenPointer.
+         *
+         * @return the CHILDREN pointer type
+         */
         default Type type() {
             return Type.CHILDREN;
         }

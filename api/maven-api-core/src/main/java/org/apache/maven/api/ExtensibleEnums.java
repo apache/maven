@@ -24,28 +24,69 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Utility class for creating extensible enum implementations.
+ * This class provides factory methods for creating instances of extensible enums
+ * such as Language, PathScope, and ProjectScope.
+ *
+ * @since 4.0.0
+ */
 abstract class ExtensibleEnums {
 
+    /**
+     * Creates a new Language instance with the specified ID.
+     *
+     * @param id the identifier for the language
+     * @return a new Language instance
+     */
     static Language language(String id) {
         return new DefaultLanguage(id);
     }
 
+    /**
+     * Creates a new PathScope instance with the specified ID, project scope, and dependency scopes.
+     *
+     * @param id the identifier for the path scope
+     * @param projectScope the project scope associated with this path scope
+     * @param dependencyScopes the dependency scopes associated with this path scope
+     * @return a new PathScope instance
+     */
     static PathScope pathScope(String id, ProjectScope projectScope, DependencyScope... dependencyScopes) {
         return new DefaultPathScope(id, projectScope, dependencyScopes);
     }
 
+    /**
+     * Creates a new ProjectScope instance with the specified ID.
+     *
+     * @param id the identifier for the project scope
+     * @return a new ProjectScope instance
+     */
     static ProjectScope projectScope(String id) {
         return new DefaultProjectScope(id);
     }
 
+    /**
+     * Base implementation of the ExtensibleEnum interface.
+     * Provides common functionality for all extensible enum implementations.
+     */
     private static class DefaultExtensibleEnum implements ExtensibleEnum {
 
         private final String id;
 
+        /**
+         * Creates a new DefaultExtensibleEnum with the specified ID.
+         *
+         * @param id the identifier for this enum value, must not be null
+         */
         DefaultExtensibleEnum(String id) {
             this.id = Objects.requireNonNull(id);
         }
 
+        /**
+         * Returns the identifier for this enum value.
+         *
+         * @return the identifier
+         */
         public String id() {
             return id;
         }
@@ -66,10 +107,20 @@ abstract class ExtensibleEnums {
         }
     }
 
+    /**
+     * Implementation of the PathScope interface.
+     */
     private static class DefaultPathScope extends DefaultExtensibleEnum implements PathScope {
         private final ProjectScope projectScope;
         private final Set<DependencyScope> dependencyScopes;
 
+        /**
+         * Creates a new DefaultPathScope with the specified ID, project scope, and dependency scopes.
+         *
+         * @param id the identifier for this path scope
+         * @param projectScope the project scope associated with this path scope, must not be null
+         * @param dependencyScopes the dependency scopes associated with this path scope, must not be null
+         */
         DefaultPathScope(String id, ProjectScope projectScope, DependencyScope... dependencyScopes) {
             super(id);
             this.projectScope = Objects.requireNonNull(projectScope);
@@ -77,26 +128,52 @@ abstract class ExtensibleEnums {
                     Collections.unmodifiableSet(new HashSet<>(Arrays.asList(Objects.requireNonNull(dependencyScopes))));
         }
 
+        /**
+         * Returns the project scope associated with this path scope.
+         *
+         * @return the project scope
+         */
         @Override
         public ProjectScope projectScope() {
             return projectScope;
         }
 
+        /**
+         * Returns the dependency scopes associated with this path scope.
+         *
+         * @return an unmodifiable set of dependency scopes
+         */
         @Override
         public Set<DependencyScope> dependencyScopes() {
             return dependencyScopes;
         }
     }
 
+    /**
+     * Implementation of the ProjectScope interface.
+     */
     private static class DefaultProjectScope extends DefaultExtensibleEnum implements ProjectScope {
 
+        /**
+         * Creates a new DefaultProjectScope with the specified ID.
+         *
+         * @param id the identifier for this project scope
+         */
         DefaultProjectScope(String id) {
             super(id);
         }
     }
 
+    /**
+     * Implementation of the Language interface.
+     */
     private static class DefaultLanguage extends DefaultExtensibleEnum implements Language {
 
+        /**
+         * Creates a new DefaultLanguage with the specified ID.
+         *
+         * @param id the identifier for this language
+         */
         DefaultLanguage(String id) {
             super(id);
         }

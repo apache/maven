@@ -45,10 +45,10 @@ public interface ArtifactInstaller extends Service {
     /**
      * @param session the repository session
      * @param artifact the {@link ProducedArtifact} to install
-     * @throws ArtifactInstallerException In case of an error which can be the a given artifact cannot be found or the
-     *             installation has failed.
-     * @throws IllegalArgumentException in case of parameter {@code session} is {@code null} or
-     *          {@code artifact} is {@code null}.
+     * @throws ArtifactInstallerException in case of an error which can be a given artifact cannot be found or the
+     *             installation has failed
+     * @throws IllegalArgumentException if a parameter {@code session} is {@code null} or
+     *          {@code artifact} is {@code null}
      */
     default void install(Session session, ProducedArtifact artifact) {
         install(session, Collections.singletonList(artifact));
@@ -57,9 +57,9 @@ public interface ArtifactInstaller extends Service {
     /**
      * @param session the repository session
      * @param artifacts Collection of {@link ProducedArtifact MavenArtifacts}
-     * @throws ArtifactInstallerException In case of an error which can be the a given artifact cannot be found or the
-     *             installation has failed.
-     * @throws IllegalArgumentException in case of parameter {@code request} is {@code null} or parameter
+     * @throws ArtifactInstallerException if the given artifact cannot be found or the
+     *             installation has failed
+     * @throws IllegalArgumentException if {@code request} is {@code null} or parameter
      *             {@code localRepository} is {@code null} or {@code localRepository} is not a directory
      *             or parameter {@code mavenArtifacts} is {@code null} or
      *             {@code mavenArtifacts.isEmpty()} is {@code true}.

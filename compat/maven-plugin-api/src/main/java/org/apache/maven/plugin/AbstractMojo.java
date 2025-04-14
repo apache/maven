@@ -154,7 +154,7 @@ public abstract class AbstractMojo implements Mojo, ContextEnabled {
 
     /**
      * <p>
-     * Returns the logger that has been injected into this mojo. If no logger has been setup yet, a
+     * Returns the logger that has been injected into this mojo. If no logger has been set up yet, a
      * <code>SystemStreamLog</code> logger will be created and returned.
      * </p>
      * <strong>Note:</strong>

@@ -50,9 +50,9 @@ public interface Executor extends AutoCloseable {
     int execute(@Nonnull ExecutorRequest executorRequest) throws ExecutorException;
 
     /**
-     * Returns the Maven version that provided {@link ExecutorRequest} point at (would use). Please note, that this
-     * operation, depending on underlying implementation may be costly. If caller use this method often, it is
-     * caller responsibility to properly cache returned values (key can be {@link ExecutorRequest#installationDirectory()}.
+     * Returns the Maven version that provided {@link ExecutorRequest} point at (would use). This
+     * operation, depending on the underlying implementation, can be costly. If a caller uses this method often, it is
+     * the caller's responsibility to properly cache returned values. (key can be {@link ExecutorRequest#installationDirectory()}.
      *
      * @param executorRequest the request containing all necessary information for the execution
      * @return a string representing the Maven version or {@link #UNKNOWN_VERSION}

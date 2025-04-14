@@ -46,7 +46,10 @@ public final class MimirInfuser {
 
                     Path mimirProperties = userHome.resolve(".mimir").resolve("mimir.properties");
                     Files.createDirectories(mimirProperties.getParent());
-                    Files.copy(Path.of("target/test-classes/ut-mimir.properties"), mimirProperties);
+                    Files.copy(
+                            Path.of("target/test-classes/ut-mimir.properties"),
+                            mimirProperties,
+                            StandardCopyOption.REPLACE_EXISTING);
                 }
             }
         }

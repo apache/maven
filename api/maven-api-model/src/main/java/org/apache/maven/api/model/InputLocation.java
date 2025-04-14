@@ -25,7 +25,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Class InputLocation.
+ * Represents the location of an element within a model source file.
+ * <p>
+ * This class tracks the line and column numbers of elements in source files like POM files.
+ * It's used for error reporting and debugging to help identify where specific model elements
+ * are defined in the source files.
+ *
+ * @since 4.0.0
  */
 public class InputLocation implements Serializable, InputLocationTracker {
     private final int lineNumber;

@@ -64,14 +64,6 @@ public class SettingsXpp3Reader {
         delegate.setAddDefaultEntities(addDefaultEntities);
     }
 
-    /**
-     * @param reader a reader object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Settings
-     */
     public Settings read(Reader reader, boolean strict) throws IOException, XmlPullParserException {
         try {
             return new Settings(delegate.read(reader, strict, null));
@@ -80,13 +72,6 @@ public class SettingsXpp3Reader {
         }
     }
 
-    /**
-     * @param reader a reader object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Model
-     */
     public Settings read(Reader reader) throws IOException, XmlPullParserException {
         try {
             return new Settings(delegate.read(reader));
@@ -95,16 +80,6 @@ public class SettingsXpp3Reader {
         }
     }
 
-    /**
-     * Method read.
-     *
-     * @param in a in object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Settings
-     */
     public Settings read(InputStream in, boolean strict) throws IOException, XmlPullParserException {
         try {
             return new Settings(delegate.read(in, strict, null));
@@ -113,15 +88,6 @@ public class SettingsXpp3Reader {
         }
     }
 
-    /**
-     * Method read.
-     *
-     * @param in a in object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Settings
-     */
     public Settings read(InputStream in) throws IOException, XmlPullParserException {
         try {
             return new Settings(delegate.read(in));
@@ -130,16 +96,6 @@ public class SettingsXpp3Reader {
         }
     }
 
-    /**
-     * Method read.
-     *
-     * @param parser a parser object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
-     * @return Settings
-     */
     public Settings read(XMLStreamReader parser, boolean strict) throws IOException, XmlPullParserException {
         try {
             return new Settings(delegate.read(parser, strict, null));

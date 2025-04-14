@@ -276,9 +276,8 @@ public class DefaultMaven implements Maven {
         // because the participant is free to change the dependencies of a project which can potentially change the
         // topological order of the projects, and therefore can potentially change the build order.
         //
-        // Note that participants may affect the topological order of the projects but it is
+        // Note that participants may affect the topological order of the projects, but it is
         // not expected that a participant will add or remove projects from the session.
-        //
 
         graphResult = buildGraph(session);
 

@@ -84,7 +84,7 @@ public class Ansi implements Appendable {
     }
 
     /**
-     * Display attributes, also know as
+     * Display attributes, also known as
      * <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters">SGR
      * (Select Graphic Rendition) parameters</a>.
      */

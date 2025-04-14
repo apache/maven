@@ -24,6 +24,29 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.di.Named;
 
 /**
+ * Service provider interface for registering custom {@link Type} implementations.
+ * <p>
+ * This interface allows plugins and extensions to define and register additional artifact types
+ * beyond the standard ones provided by Maven (like jar, war, pom, etc.). Types define how artifacts
+ * are handled, including their default extension, classifier, and language.
+ * <p>
+ * Implementations of this interface will be discovered through the Java ServiceLoader mechanism
+ * and their provided types will be available throughout the Maven build process.
+ * <p>
+ * Example usage:
+ * <pre>
+ * public class CustomTypeProvider implements TypeProvider {
+ *     public Collection&lt;Type&gt; provides() {
+ *         return Arrays.asList(
+ *             type("kotlin-library", "jar", "kotlin"),
+ *             type("docker-image", "tar.gz", null)
+ *         );
+ *     }
+ * }
+ * </pre>
+ *
+ * @see org.apache.maven.api.Type
+ * @see org.apache.maven.api.spi.ExtensibleEnumProvider
  * @since 4.0.0
  */
 @Experimental

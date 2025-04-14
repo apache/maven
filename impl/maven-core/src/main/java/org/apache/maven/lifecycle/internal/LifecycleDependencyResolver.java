@@ -263,7 +263,7 @@ public class LifecycleDependencyResolver {
 
             /*
              * MNG-2277, the check below compensates for our bad plugin support where we ended up with aggregator
-             * plugins that require dependency resolution although they usually run in phases of the build where project
+             * plugins that require dependency resolution, although they usually run in phases of the build where project
              * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
              */
             if (aggregating && areAllDependenciesInReactor(session.getProjects(), result.getUnresolvedDependencies())) {

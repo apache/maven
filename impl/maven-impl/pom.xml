@@ -113,6 +113,14 @@ under the License.
       <artifactId>maven-resolver-impl</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-named-locks</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-connector-basic</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-sec-dispatcher</artifactId>
     </dependency>
@@ -145,16 +153,6 @@ under the License.
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-named-locks</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-connector-basic</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

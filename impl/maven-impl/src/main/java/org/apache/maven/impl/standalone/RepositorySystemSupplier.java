@@ -18,11 +18,13 @@
  */
 package org.apache.maven.impl.standalone;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.impl.resolver.validator.MavenValidatorFactory;
 import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
@@ -40,6 +42,7 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.RepositoryConnectorProvider;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.impl.RepositorySystemLifecycle;
+import org.eclipse.aether.impl.RepositorySystemValidator;
 import org.eclipse.aether.impl.UpdateCheckManager;
 import org.eclipse.aether.impl.UpdatePolicyAnalyzer;
 import org.eclipse.aether.impl.VersionRangeResolver;
@@ -62,6 +65,7 @@ import org.eclipse.aether.internal.impl.DefaultRepositoryEventDispatcher;
 import org.eclipse.aether.internal.impl.DefaultRepositoryLayoutProvider;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystemLifecycle;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystemValidator;
 import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
 import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
 import org.eclipse.aether.internal.impl.DefaultUpdateCheckManager;
@@ -85,8 +89,10 @@ import org.eclipse.aether.internal.impl.collect.DependencyCollectorDelegate;
 import org.eclipse.aether.internal.impl.collect.bf.BfDependencyCollector;
 import org.eclipse.aether.internal.impl.collect.df.DfDependencyCollector;
 import org.eclipse.aether.internal.impl.filter.DefaultRemoteRepositoryFilterManager;
+import org.eclipse.aether.internal.impl.filter.FilteringPipelineRepositoryConnectorFactory;
 import org.eclipse.aether.internal.impl.filter.GroupIdRemoteRepositoryFilterSource;
 import org.eclipse.aether.internal.impl.filter.PrefixesRemoteRepositoryFilterSource;
+import org.eclipse.aether.internal.impl.offline.OfflinePipelineRepositoryConnectorFactory;
 import org.eclipse.aether.internal.impl.synccontext.DefaultSyncContextFactory;
 import org.eclipse.aether.internal.impl.synccontext.named.NameMapper;
 import org.eclipse.aether.internal.impl.synccontext.named.NameMappers;
@@ -105,6 +111,7 @@ import org.eclipse.aether.spi.artifact.decorator.ArtifactDecoratorFactory;
 import org.eclipse.aether.spi.artifact.generator.ArtifactGeneratorFactory;
 import org.eclipse.aether.spi.checksums.ProvidedChecksumsSource;
 import org.eclipse.aether.spi.checksums.TrustedChecksumsSource;
+import org.eclipse.aether.spi.connector.PipelineRepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactorySelector;
@@ -121,8 +128,7 @@ import org.eclipse.aether.spi.io.PathProcessor;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
 import org.eclipse.aether.spi.resolution.ArtifactResolverPostProcessor;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
-import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
+import org.eclipse.aether.spi.validator.ValidatorFactory;
 
 /**
  * DI Bridge for Maven Resolver
@@ -179,8 +185,8 @@ public class RepositorySystemSupplier {
     @Provides
     static RepositoryConnectorProvider newRepositoryConnectorProvider(
             Map<String, RepositoryConnectorFactory> connectorFactories,
-            RemoteRepositoryFilterManager remoteRepositoryFilterManager) {
-        return new DefaultRepositoryConnectorProvider(connectorFactories, remoteRepositoryFilterManager);
+            Map<String, PipelineRepositoryConnectorFactory> pipelineConnectorFactories) {
+        return new DefaultRepositoryConnectorProvider(connectorFactories, pipelineConnectorFactories);
     }
 
     @Named("basic")
@@ -197,6 +203,20 @@ public class RepositorySystemSupplier {
                 checksumPolicyProvider,
                 checksumProcessor,
                 providedChecksumsSources);
+    }
+
+    @Named(OfflinePipelineRepositoryConnectorFactory.NAME)
+    @Provides
+    static OfflinePipelineRepositoryConnectorFactory newOfflinePipelineConnectorFactory(
+            OfflineController offlineController) {
+        return new OfflinePipelineRepositoryConnectorFactory(offlineController);
+    }
+
+    @Named(FilteringPipelineRepositoryConnectorFactory.NAME)
+    @Provides
+    static FilteringPipelineRepositoryConnectorFactory newFilteringPipelineConnectorFactory(
+            RemoteRepositoryFilterManager remoteRepositoryFilterManager) {
+        return new FilteringPipelineRepositoryConnectorFactory(remoteRepositoryFilterManager);
     }
 
     @Provides
@@ -248,6 +268,16 @@ public class RepositorySystemSupplier {
     }
 
     @Provides
+    static List<ValidatorFactory> newValidatorFactories() {
+        return List.of(new MavenValidatorFactory());
+    }
+
+    @Provides
+    static RepositorySystemValidator newRepositorySystemValidator(List<ValidatorFactory> validatorFactories) {
+        return new DefaultRepositorySystemValidator(validatorFactories);
+    }
+
+    @Provides
     static RepositorySystem newRepositorySystem(
             VersionResolver versionResolver,
             VersionRangeResolver versionRangeResolver,
@@ -261,7 +291,8 @@ public class RepositorySystemSupplier {
             SyncContextFactory syncContextFactory,
             RemoteRepositoryManager remoteRepositoryManager,
             RepositorySystemLifecycle repositorySystemLifecycle,
-            @Nullable Map<String, ArtifactDecoratorFactory> artifactDecoratorFactories) {
+            @Nullable Map<String, ArtifactDecoratorFactory> artifactDecoratorFactories,
+            RepositorySystemValidator repositorySystemValidator) {
         return new DefaultRepositorySystem(
                 versionResolver,
                 versionRangeResolver,
@@ -275,7 +306,8 @@ public class RepositorySystemSupplier {
                 syncContextFactory,
                 remoteRepositoryManager,
                 repositorySystemLifecycle,
-                artifactDecoratorFactories != null ? artifactDecoratorFactories : Map.of());
+                artifactDecoratorFactories != null ? artifactDecoratorFactories : Map.of(),
+                repositorySystemValidator);
     }
 
     @Provides
@@ -488,21 +520,8 @@ public class RepositorySystemSupplier {
     }
 
     @Provides
-    static TransporterProvider newTransportProvider(Map<String, TransporterFactory> transporterFactories) {
-        return new DefaultTransporterProvider(transporterFactories);
-    }
-
-    @Provides
-    @Named(FileTransporterFactory.NAME)
-    static FileTransporterFactory newFileTransporterFactory() {
-        return new FileTransporterFactory();
-    }
-
-    @Provides
-    @Named(ApacheTransporterFactory.NAME)
-    static ApacheTransporterFactory newApacheTransporterFactory(
-            ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
-        return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
+    static TransporterProvider newTransportProvider(@Nullable Map<String, TransporterFactory> transporterFactories) {
+        return new DefaultTransporterProvider(transporterFactories != null ? transporterFactories : Map.of());
     }
 
     @Provides
