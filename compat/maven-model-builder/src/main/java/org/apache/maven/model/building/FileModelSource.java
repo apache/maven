@@ -20,6 +20,8 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.maven.building.FileSource;
 
@@ -40,6 +42,10 @@ public class FileModelSource extends FileSource implements ModelSource2 {
         super(pomFile);
     }
 
+    public FileModelSource(Path pomFile) {
+        super(pomFile);
+    }
+
     /**
      *
      * @return the file of this source
@@ -55,15 +61,15 @@ public class FileModelSource extends FileSource implements ModelSource2 {
     public ModelSource2 getRelatedSource(String relPath) {
         relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-        File relatedPom = new File(getFile().getParentFile(), relPath);
+        Path relatedPom = getPath().getParent().resolve(relPath);
 
-        if (relatedPom.isDirectory()) {
+        if (Files.isDirectory(relatedPom)) {
             // TODO figure out how to reuse ModelLocator.locatePom(File) here
-            relatedPom = new File(relatedPom, "pom.xml");
+            relatedPom = relatedPom.resolve("pom.xml");
         }
 
-        if (relatedPom.isFile() && relatedPom.canRead()) {
-            return new FileModelSource(new File(relatedPom.toURI().normalize()));
+        if (Files.isRegularFile(relatedPom) && Files.isReadable(relatedPom)) {
+            return new FileModelSource(relatedPom.normalize());
         }
 
         return null;
