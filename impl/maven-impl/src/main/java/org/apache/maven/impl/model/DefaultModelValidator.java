@@ -2249,11 +2249,11 @@ public class DefaultModelValidator implements ModelValidator {
             if (dependency.getClassifier() == null
                     || dependency.getClassifier().trim().isEmpty()) {
                 hint = String.format(
-                        "g=%s, a=%s, type=%s",
+                        "groupId=%s, artifactId=%s, type=%s",
                         nvl(dependency.getGroupId()), nvl(dependency.getArtifactId()), nvl(dependency.getType()));
             } else {
                 hint = String.format(
-                        "g=%s, a=%s, c=%s, type=%s",
+                        "groupId=%s, artifactId=%s, classifier=%s, type=%s",
                         nvl(dependency.getGroupId()),
                         nvl(dependency.getArtifactId()),
                         nvl(dependency.getClassifier()),

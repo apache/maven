@@ -196,9 +196,11 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
-                .get(0)
-                .contains("'dependencies.dependency.artifactId' for g='groupId', a=, type='jar' is missing"));
+        assertTrue(
+                result.getErrors()
+                        .get(0)
+                        .contains(
+                                "'dependencies.dependency.artifactId' for groupId='groupId', artifactId=, type='jar' is missing"));
     }
 
     @Test
@@ -207,9 +209,11 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
-                .get(0)
-                .contains("'dependencies.dependency.groupId' for g=, a='artifactId', type='jar' is missing"));
+        assertTrue(
+                result.getErrors()
+                        .get(0)
+                        .contains(
+                                "'dependencies.dependency.groupId' for groupId=, artifactId='artifactId', type='jar' is missing"));
     }
 
     @Test
@@ -218,9 +222,11 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
-                .get(0)
-                .contains("'dependencies.dependency.version' for g='groupId', a='artifactId', type='jar' is missing"));
+        assertTrue(
+                result.getErrors()
+                        .get(0)
+                        .contains(
+                                "'dependencies.dependency.version' for groupId='groupId', artifactId='artifactId', type='jar' is missing"));
     }
 
     @Test
@@ -233,7 +239,7 @@ class DefaultModelValidatorTest {
                 result.getErrors()
                         .get(0)
                         .contains(
-                                "'dependencyManagement.dependencies.dependency.artifactId' for g='groupId', a=, type='jar' is missing"));
+                                "'dependencyManagement.dependencies.dependency.artifactId' for groupId='groupId', artifactId=, type='jar' is missing"));
     }
 
     @Test
@@ -246,7 +252,7 @@ class DefaultModelValidatorTest {
                 result.getErrors()
                         .get(0)
                         .contains(
-                                "'dependencyManagement.dependencies.dependency.groupId' for g=, a='artifactId', type='jar' is missing"));
+                                "'dependencyManagement.dependencies.dependency.groupId' for groupId=, artifactId='artifactId', type='jar' is missing"));
     }
 
     @Test
@@ -331,11 +337,11 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 3, 0);
 
-        assertTrue(result.getErrors().get(0).contains("g='test', a='d'"));
+        assertTrue(result.getErrors().get(0).contains("groupId='test', artifactId='d'"));
 
-        assertTrue(result.getErrors().get(1).contains("g='test', a='e'"));
+        assertTrue(result.getErrors().get(1).contains("groupId='test', artifactId='e'"));
 
-        assertTrue(result.getErrors().get(2).contains("g='test', a='f'"));
+        assertTrue(result.getErrors().get(2).contains("groupId='test', artifactId='f'"));
     }
 
     @Test
@@ -344,9 +350,9 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 2);
 
-        assertTrue(result.getWarnings().get(0).contains("g='test', a='f'"));
+        assertTrue(result.getWarnings().get(0).contains("groupId='test', artifactId='f'"));
 
-        assertTrue(result.getWarnings().get(1).contains("g='test', a='g'"));
+        assertTrue(result.getWarnings().get(1).contains("groupId='test', artifactId='g'"));
     }
 
     @Test
@@ -355,7 +361,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 1);
 
-        assertContains(result.getWarnings().get(0), "g='test', a='g'");
+        assertContains(result.getWarnings().get(0), "groupId='test', artifactId='g'");
     }
 
     @Test
@@ -366,10 +372,10 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getErrors().get(0),
-                "'dependencies.dependency.version' for g='test', a='b', type='jar' must be a valid version");
+                "'dependencies.dependency.version' for groupId='test', artifactId='b', type='jar' must be a valid version");
         assertContains(
                 result.getErrors().get(1),
-                "'dependencies.dependency.version' for g='test', a='c', type='jar' must not contain any of these characters");
+                "'dependencies.dependency.version' for groupId='test', artifactId='c', type='jar' must not contain any of these characters");
     }
 
     @Test
@@ -446,13 +452,13 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.scope' for g='test', a='a', type='jar' declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for groupId='test', artifactId='a', type='jar' declares usage of deprecated 'system' scope");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.systemPath' for g='test', a='a', type='jar' should use a variable instead of a hard-coded path");
+                "'dependencies.dependency.systemPath' for groupId='test', artifactId='a', type='jar' should use a variable instead of a hard-coded path");
         assertContains(
                 result.getWarnings().get(2),
-                "'dependencies.dependency.scope' for g='test', a='b', type='jar' declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for groupId='test', artifactId='b', type='jar' declares usage of deprecated 'system' scope");
     }
 
     @Test
@@ -506,7 +512,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("g=, a='a',"));
+        assertTrue(result.getErrors().get(0).contains("groupId=, artifactId='a',"));
     }
 
     @Test
@@ -515,7 +521,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("g='test', a=,"));
+        assertTrue(result.getErrors().get(0).contains("groupId='test', artifactId=,"));
     }
 
     @Test
@@ -524,7 +530,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("g='test', a='a',"));
+        assertTrue(result.getErrors().get(0).contains("groupId='test', artifactId='a',"));
     }
 
     @Test
@@ -533,7 +539,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("g='test', a='b'"));
+        assertTrue(result.getErrors().get(0).contains("groupId='test', artifactId='b'"));
     }
 
     @Test
@@ -582,10 +588,10 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.exclusions.exclusion.groupId' for g='gid', a='aid', type='jar'");
+                "'dependencies.dependency.exclusions.exclusion.groupId' for groupId='gid', artifactId='aid', type='jar'");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.exclusions.exclusion.artifactId' for g='gid', a='aid', type='jar'");
+                "'dependencies.dependency.exclusions.exclusion.artifactId' for groupId='gid', artifactId='aid', type='jar'");
 
         // MNG-3832: Aether (part of M3+) supports wildcard expressions for exclusions
 
@@ -602,10 +608,10 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.exclusions.exclusion.groupId' for g='gid', a='aid', type='jar' is missing");
+                "'dependencies.dependency.exclusions.exclusion.groupId' for groupId='gid', artifactId='aid', type='jar' is missing");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.exclusions.exclusion.artifactId' for g='gid', a='aid', type='jar' is missing");
+                "'dependencies.dependency.exclusions.exclusion.artifactId' for groupId='gid', artifactId='aid', type='jar' is missing");
     }
 
     @Test
@@ -616,7 +622,7 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencyManagement.dependencies.dependency.type' for g='test', a='a', type='jar' must be 'pom'");
+                "'dependencyManagement.dependencies.dependency.type' for groupId='test', artifactId='a', type='jar' must be 'pom'");
     }
 
     @Test
@@ -627,7 +633,7 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getErrors().get(0),
-                "'dependencyManagement.dependencies.dependency.classifier' for g='test', a='a', c='cls', type='pom' must be empty");
+                "'dependencyManagement.dependencies.dependency.classifier' for groupId='test', artifactId='a', classifier='cls', type='pom' must be empty");
     }
 
     @Test
@@ -638,16 +644,16 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.scope' for g='test', a='a', type='jar' declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for groupId='test', artifactId='a', type='jar' declares usage of deprecated 'system' scope");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.systemPath' for g='test', a='a', type='jar' should not point at files within the project directory");
+                "'dependencies.dependency.systemPath' for groupId='test', artifactId='a', type='jar' should not point at files within the project directory");
         assertContains(
                 result.getWarnings().get(2),
-                "'dependencies.dependency.scope' for g='test', a='b', type='jar' declares usage of deprecated 'system' scope");
+                "'dependencies.dependency.scope' for groupId='test', artifactId='b', type='jar' declares usage of deprecated 'system' scope");
         assertContains(
                 result.getWarnings().get(3),
-                "'dependencies.dependency.systemPath' for g='test', a='b', type='jar' should not point at files within the project directory");
+                "'dependencies.dependency.systemPath' for groupId='test', artifactId='b', type='jar' should not point at files within the project directory");
     }
 
     @Test
@@ -713,10 +719,10 @@ class DefaultModelValidatorTest {
 
         assertContains(
                 result.getWarnings().get(0),
-                "'dependencies.dependency.version' for g='test', a='a', type='jar' is either LATEST or RELEASE (both of them are being deprecated)");
+                "'dependencies.dependency.version' for groupId='test', artifactId='a', type='jar' is either LATEST or RELEASE (both of them are being deprecated)");
         assertContains(
                 result.getWarnings().get(1),
-                "'dependencies.dependency.version' for g='test', a='b', type='jar' is either LATEST or RELEASE (both of them are being deprecated)");
+                "'dependencies.dependency.version' for groupId='test', artifactId='b', type='jar' is either LATEST or RELEASE (both of them are being deprecated)");
     }
 
     @Test
