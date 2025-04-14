@@ -46,6 +46,7 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
@@ -278,7 +279,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
 
         context.loggerLevel = Slf4jConfiguration.Level.INFO;
-        if (mavenOptions.verbose().orElse(false)) {
+        if (context.invokerRequest.effectiveVerbose()) {
             context.loggerLevel = Slf4jConfiguration.Level.DEBUG;
         } else if (mavenOptions.quiet().orElse(false)) {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
@@ -465,7 +466,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         InvokerRequest invokerRequest = context.invokerRequest;
         if (invokerRequest.options().quiet().orElse(false)) {
             writer.accept(CLIReportingUtils.showVersionMinimal());
-        } else if (invokerRequest.options().verbose().orElse(false)) {
+        } else if (invokerRequest.effectiveVerbose()) {
             writer.accept(CLIReportingUtils.showVersion(
                     ProcessHandle.current().info().commandLine().orElse(null), describe(context.terminal)));
 
@@ -493,9 +494,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void preCommands(C context) throws Exception {
-        Options mavenOptions = context.invokerRequest.options();
-        boolean verbose = mavenOptions.verbose().orElse(false);
-        boolean version = mavenOptions.showVersion().orElse(false);
+        boolean verbose = context.invokerRequest.effectiveVerbose();
+        boolean version = context.invokerRequest.options().showVersion().orElse(false);
         if (verbose || version) {
             showVersion(context);
         }
@@ -726,11 +726,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             if (context.invokerRequest.options().nonInteractive().orElse(false)) {
                 return false;
             } else {
-                boolean runningOnCI = isRunningOnCI(context);
-                if (runningOnCI) {
+                if (context.invokerRequest.ciInfo().isPresent()) {
+                    CIInfo ci = context.invokerRequest.ciInfo().get();
                     context.logger.info(
-                            "Making this build non-interactive, because the environment variable CI equals \"true\"."
-                                    + " Disable this detection by removing that variable or adding --force-interactive.");
+                            "Making this build non-interactive, because CI detected. Disable this detection by adding --force-interactive.");
+                    context.logger.info("Detected CI system: '" + ci.name() + "': " + ci.message());
                     return false;
                 }
             }
@@ -933,11 +933,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             throw new IllegalArgumentException("Invalid threads value: '" + threadConfiguration
                     + "'. Supported are int and float values ending with C.");
         }
-    }
-
-    protected boolean isRunningOnCI(C context) {
-        String ciEnv = context.protoSession.getSystemProperties().get("env.CI");
-        return ciEnv != null && !"false".equals(ciEnv);
     }
 
     protected abstract int execute(C context) throws Exception;
