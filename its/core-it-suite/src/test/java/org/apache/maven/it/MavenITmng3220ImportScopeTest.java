@@ -81,7 +81,8 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
         boolean found = false;
         for (String line : lines) {
             if (line.contains("\'dependencies.dependency.version\' is missing for junit:junit")
-                    || line.contains("\'dependencies.dependency.version\' for groupId='junit', artifactId='junit', type='jar' is missing")) {
+                    || line.contains(
+                            "\'dependencies.dependency.version\' for groupId='junit', artifactId='junit', type='jar' is missing")) {
                 found = true;
                 break;
             }
