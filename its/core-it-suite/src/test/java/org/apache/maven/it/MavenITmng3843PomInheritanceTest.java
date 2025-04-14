@@ -109,23 +109,11 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         assertPathEquals(basedir, "src/main/java", props.getProperty("project.build.sourceDirectory"));
         assertPathEquals(basedir, "src/test/java", props.getProperty("project.build.testSourceDirectory"));
         assertPathEquals(basedir, "src/main/scripts", props.getProperty("project.build.scriptSourceDirectory"));
-        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
-            assertEquals("2", props.getProperty("project.build.resources"));
-            assertEquals("2", props.getProperty("project.build.testResources"));
-        } else {
-            assertEquals("1", props.getProperty("project.build.resources"));
-            assertEquals("1", props.getProperty("project.build.testResources"));
-        }
+        // model is 4.0.0: SuperPOM does not auto-add filtered-resources
+        assertEquals("1", props.getProperty("project.build.resources"));
+        assertEquals("1", props.getProperty("project.build.testResources"));
         assertPathEquals(basedir, "src/main/resources", props.getProperty("project.build.resources.0.directory"));
         assertPathEquals(basedir, "src/test/resources", props.getProperty("project.build.testResources.0.directory"));
-        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
-            assertPathEquals(
-                    basedir, "src/main/resources-filtered", props.getProperty("project.build.resources.1.directory"));
-            assertPathEquals(
-                    basedir,
-                    "src/test/resources-filtered",
-                    props.getProperty("project.build.testResources.1.directory"));
-        }
         assertPathEquals(basedir, "target", props.getProperty("project.build.directory"));
         assertPathEquals(basedir, "target/classes", props.getProperty("project.build.outputDirectory"));
         assertPathEquals(basedir, "target/test-classes", props.getProperty("project.build.testOutputDirectory"));

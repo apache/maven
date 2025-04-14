@@ -822,8 +822,8 @@ public class MavenProject implements Cloneable {
     private static Resource toResource(SourceRoot sourceRoot) {
         return new Resource(org.apache.maven.api.model.Resource.newBuilder()
                 .directory(sourceRoot.directory().toString())
-                .includes(sourceRoot.includes().stream().map(Object::toString).toList())
-                .excludes(sourceRoot.excludes().stream().map(Object::toString).toList())
+                .includes(sourceRoot.includes())
+                .excludes(sourceRoot.excludes())
                 .filtering(Boolean.toString(sourceRoot.stringFiltering()))
                 .build());
     }

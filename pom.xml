@@ -145,24 +145,24 @@ under the License.
     <assertjVersion>3.27.3</assertjVersion>
     <asmVersion>9.8</asmVersion>
     <byteBuddyVersion>1.17.5</byteBuddyVersion>
-    <classWorldsVersion>2.8.0</classWorldsVersion>
+    <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>6.0.0</guiceVersion>
-    <guavaVersion>33.4.6-jre</guavaVersion>
+    <guavaVersion>33.4.7-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <hamcrestVersion>3.0</hamcrestVersion>
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
     <jlineVersion>3.29.0</jlineVersion>
-    <junitVersion>5.12.1</junitVersion>
+    <junitVersion>5.12.2</junitVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <logbackClassicVersion>1.5.18</logbackClassicVersion>
-    <mockitoVersion>5.16.1</mockitoVersion>
-    <plexusInteractivityVersion>1.3</plexusInteractivityVersion>
-    <plexusInterpolationVersion>1.27</plexusInterpolationVersion>
-    <plexusTestingVersion>1.4.0</plexusTestingVersion>
-    <plexusXmlVersion>4.0.4</plexusXmlVersion>
-    <resolverVersion>2.0.7</resolverVersion>
+    <mockitoVersion>5.17.0</mockitoVersion>
+    <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
+    <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
+    <plexusTestingVersion>1.5.0</plexusTestingVersion>
+    <plexusXmlVersion>4.1.0</plexusXmlVersion>
+    <resolverVersion>2.0.8</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M3</sisuVersion>
     <slf4jVersion>2.0.17</slf4jVersion>
@@ -802,7 +802,7 @@ under the License.</licenseText>
       <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.2</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

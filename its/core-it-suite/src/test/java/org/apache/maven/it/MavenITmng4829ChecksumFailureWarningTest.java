@@ -51,7 +51,7 @@ public class MavenITmng4829ChecksumFailureWarningTest extends AbstractMavenInteg
         verifier.deleteArtifacts("org.apache.maven.its.mng4829");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.setEnvironmentVariable("CI", "false");
+        verifier.removeCIEnvironmentVariables();
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("validate");
         verifier.execute();

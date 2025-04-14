@@ -296,6 +296,19 @@ public class Verifier {
         return systemProperties;
     }
 
+    /**
+     * This method renders all env variables that are used for CI detection (by all known detector) to not trigger.
+     */
+    public void removeCIEnvironmentVariables() {
+        environmentVariables.putAll(Map.of(
+                "CIRCLECI", "",
+                "CI", "false",
+                "GITHUB_ACTIONS", "",
+                "WORKSPACE", "",
+                "TEAMCITY_VERSION", "",
+                "TRAVIS", ""));
+    }
+
     public void setEnvironmentVariable(String key, String value) {
         if (value != null) {
             environmentVariables.put(key, value);
