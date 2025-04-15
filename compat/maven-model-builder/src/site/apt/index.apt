@@ -180,8 +180,8 @@ Maven Model Builder
 <<<pom.basedir>>> (<deprecated>)\
 <<<basedir>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file | <<<$\{project.basedir\}>>> |
 *----+------+------+
-| <<<project.baseUri>>>\
-<<<pom.baseUri>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file as URI | <<<$\{project.baseUri\}>>> |
+| <<<project.baseUri>>> (<deprecated>)\
+<<<pom.baseUri>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file as URI. Those properties are deprecated, use <<<$\{project.basedir.uri\}>>> instead. | <<<$\{project.basedir.uri\}>>> |
 *----+------+------+
 | <<<project.rootDirectory>>> | the project's root directory (containing a <<<.mvn>>> directory or with the <<<root="true">>> xml attribute) | <<<$\{project.rootDirectory\}>>> |
 *----+------+------+
