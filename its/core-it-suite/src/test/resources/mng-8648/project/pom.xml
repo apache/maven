@@ -11,5 +11,7 @@
   <modules>
     <module>subproject-a</module>
     <module>subproject-b</module>
+    <module>subproject-c</module>
+    <module>subproject-d</module>
   </modules>
 </project>

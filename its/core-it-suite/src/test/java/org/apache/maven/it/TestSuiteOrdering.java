@@ -107,7 +107,7 @@ public class TestSuiteOrdering implements ClassOrderer {
         suite.addTestSuite(MavenITmng8598JvmConfigSubstitutionTest.class);
         suite.addTestSuite(MavenITmng8653AfterAndEachPhasesWithConcurrentBuilderTest.class);
         suite.addTestSuite(MavenITmng5668AfterPhaseExecutionTest.class);
-        suite.addTestSuite(MavenITmng8648ProjectStartedEventsTest.class);
+        suite.addTestSuite(MavenITmng8648ProjectEventsTest.class);
         suite.addTestSuite(MavenITmng8645ConsumerPomDependencyManagementTest.class);
         suite.addTestSuite(MavenITmng8594AtFileTest.class);
         suite.addTestSuite(MavenITmng8561SourceRootTest.class);
