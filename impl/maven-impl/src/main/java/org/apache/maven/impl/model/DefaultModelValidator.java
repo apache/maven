@@ -2241,11 +2241,29 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         public static SourceHint gav(String gav) {
-            return new SourceHint(gav, null); // "GAV"
+            return new SourceHint(gav, null); // GAV
         }
 
         public static SourceHint dependencyManagementKey(Dependency dependency) {
-            return new SourceHint(dependency.getManagementKey(), null); // DMK
+            String hint;
+            if (dependency.getClassifier() == null
+                    || dependency.getClassifier().trim().isEmpty()) {
+                hint = String.format(
+                        "groupId=%s, artifactId=%s, type=%s",
+                        nvl(dependency.getGroupId()), nvl(dependency.getArtifactId()), nvl(dependency.getType()));
+            } else {
+                hint = String.format(
+                        "groupId=%s, artifactId=%s, classifier=%s, type=%s",
+                        nvl(dependency.getGroupId()),
+                        nvl(dependency.getArtifactId()),
+                        nvl(dependency.getClassifier()),
+                        nvl(dependency.getType()));
+            }
+            return new SourceHint(hint, null); // DMK
+        }
+
+        private static String nvl(String value) {
+            return value == null ? "" : "'" + value + "'";
         }
 
         public static SourceHint pluginKey(Plugin plugin) {
