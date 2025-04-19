@@ -190,7 +190,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     return Optional.ofNullable(res.getDependencyResolutionResult())
                             .map(r -> new DefaultDependencyResolverResult(
                                     // TODO: this should not be null
-                                    null, null, r.getCollectionErrors(), session.getNode(r.getDependencyGraph()), 0));
+                                    null, r.getCollectionErrors(), session.getNode(r.getDependencyGraph()), 0));
                 }
             };
         } catch (ProjectBuildingException e) {
