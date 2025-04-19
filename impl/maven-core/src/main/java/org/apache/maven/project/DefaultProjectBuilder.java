@@ -114,7 +114,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     private final ModelBuilder modelBuilder;
     private final ProjectBuildingHelper projectBuildingHelper;
     private final MavenRepositorySystem repositorySystem;
-    private final org.eclipse.aether.RepositorySystem repoSystem;
     private final ProjectDependenciesResolver dependencyResolver;
     private final RootLocator rootLocator;
     private final LifecycleBindingsInjector lifecycleBindingsInjector;
@@ -132,7 +131,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         this.modelBuilder = modelBuilder;
         this.projectBuildingHelper = projectBuildingHelper;
         this.repositorySystem = repositorySystem;
-        this.repoSystem = repoSystem;
         this.dependencyResolver = dependencyResolver;
         this.rootLocator = rootLocator;
         this.lifecycleBindingsInjector = lifecycleBindingsInjector;
