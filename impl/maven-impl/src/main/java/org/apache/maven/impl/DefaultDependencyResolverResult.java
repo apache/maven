@@ -108,8 +108,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      */
     public DefaultDependencyResolverResult(
             DependencyResolverRequest request, List<Exception> exceptions, Node root, int count) {
-        // TODO pass a new cache instead of null?
-        this(request, null, exceptions, root, count);
+        this(request, new PathModularizationCache(), exceptions, root, count);
     }
 
     DefaultDependencyResolverResult(
@@ -119,7 +118,11 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
             Node root,
             int count) {
         this.request = request;
-        this.cache = cache;
+        if (cache == null) {
+            this.cache = new PathModularizationCache();
+        } else {
+            this.cache = cache;
+        }
         this.exceptions = exceptions;
         this.root = root;
         nodes = new ArrayList<>(count);
