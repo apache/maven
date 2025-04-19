@@ -107,14 +107,11 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      * @param count estimated number of dependencies
      */
     public DefaultDependencyResolverResult(
-        DependencyResolverRequest request,
-        List<Exception> exceptions,
-        Node root,
-        int count) {
+            DependencyResolverRequest request, List<Exception> exceptions, Node root, int count) {
         this(request, null, exceptions, root, count);
     }
 
-     DefaultDependencyResolverResult(
+    DefaultDependencyResolverResult(
             DependencyResolverRequest request,
             PathModularizationCache cache,
             List<Exception> exceptions,
