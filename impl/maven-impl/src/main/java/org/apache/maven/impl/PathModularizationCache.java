@@ -38,7 +38,7 @@ import org.apache.maven.api.PathType;
  * same dependency is used for different scope. For example a path used for compilation
  * is typically also used for tests.
  */
-public class PathModularizationCache {
+class PathModularizationCache {
     /**
      * Module information for each JAR file or output directories.
      * Cached when first requested to avoid decoding the module descriptors multiple times.
