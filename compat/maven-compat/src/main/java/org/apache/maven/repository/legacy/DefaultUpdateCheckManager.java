@@ -243,8 +243,8 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
             } catch (IOException e) {
                 getLogger()
                         .debug(
-                                "Failed to record lastUpdated information for resolution.\nFile: "
-                                        + touchfile.toString() + "; key: " + key,
+                                "Failed to record lastUpdated information for resolution.\nFile: " + touchfile
+                                        + "; key: " + key,
                                 e);
             } finally {
                 if (lock != null) {
