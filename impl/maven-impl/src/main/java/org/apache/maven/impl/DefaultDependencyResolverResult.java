@@ -108,6 +108,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      */
     public DefaultDependencyResolverResult(
             DependencyResolverRequest request, List<Exception> exceptions, Node root, int count) {
+        // TODO pass a new cache instead of null?
         this(request, null, exceptions, root, count);
     }
 
