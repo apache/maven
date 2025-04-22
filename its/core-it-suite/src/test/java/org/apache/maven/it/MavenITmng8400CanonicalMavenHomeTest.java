@@ -57,7 +57,7 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
         Verifier verifier = newVerifier(basedir.toString(), null);
         verifier.addCliArgument("-DasProperties");
         verifier.addCliArgument("-DtoFile=dump.properties");
-        verifier.addCliArgument("eu.maveniverse.maven.plugins:toolbox:0.6.2:gav-dump");
+        verifier.addCliArgument("eu.maveniverse.maven.plugins:toolbox:0.7.4:gav-dump");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

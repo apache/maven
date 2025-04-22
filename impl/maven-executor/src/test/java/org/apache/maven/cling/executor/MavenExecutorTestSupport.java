@@ -76,7 +76,7 @@ public abstract class MavenExecutorTestSupport {
                 List.of(mvn3ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument("eu.maveniverse.maven.plugins:toolbox:0.6.2:gav-dump")
+                        .argument("eu.maveniverse.maven.plugins:toolbox:0.7.4:gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
@@ -95,7 +95,7 @@ public abstract class MavenExecutorTestSupport {
                 List.of(mvn4ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument("eu.maveniverse.maven.plugins:toolbox:0.6.2:gav-dump")
+                        .argument("eu.maveniverse.maven.plugins:toolbox:0.7.4:gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
