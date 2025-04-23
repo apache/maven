@@ -330,38 +330,6 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
         setContext(context);
 
-        /*
-           binder.install(ProviderMethodsModule.forObject(context.getRequiredTestInstance()));
-           binder.requestInjection(context.getRequiredTestInstance());
-           binder.bind(Log.class).toInstance(new DefaultLog(LoggerFactory.getLogger("anonymous")));
-           binder.bind(ExtensionContext.class).toInstance(context);
-           // Load maven 4 api Services interfaces and try to bind them to the (possible) mock instances
-           // returned by the (possibly) mock InternalSession
-           try {
-               for (ClassPath.ClassInfo clazz :
-                       ClassPath.from(getClassLoader()).getAllClasses()) {
-                   if ("org.apache.maven.api.services".equals(clazz.getPackageName())) {
-                       Class<?> load = clazz.load();
-                       if (Service.class.isAssignableFrom(load)) {
-                           Class<Service> svc = (Class) load;
-                           binder.bind(svc).toProvider(() -> {
-                               try {
-                                   return getContainer()
-                                           .lookup(InternalSession.class)
-                                           .getService(svc);
-                               } catch (ComponentLookupException e) {
-                                   throw new RuntimeException("Unable to lookup service " + svc.getName());
-                               }
-                           });
-                       }
-                   }
-               }
-           } catch (Exception e) {
-               throw new RuntimeException("Unable to bind session services", e);
-           }
-
-        */
-
         Path basedirPath = Paths.get(getBasedir());
 
         InjectMojo mojo = AnnotationSupport.findAnnotation(context.getElement().get(), InjectMojo.class)
@@ -429,13 +397,9 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                         classLoader.getResourceAsStream(getPluginDescriptorLocation()),
                         "Unable to find plugin descriptor: " + getPluginDescriptorLocation());
                 Reader reader = new BufferedReader(new XmlStreamReader(is))) {
-            // new InterpolationFilterReader(reader, map, "${", "}");
             pluginDescriptor = new PluginDescriptorStaxReader().read(reader);
         }
         context.getStore(ExtensionContext.Namespace.GLOBAL).put(PluginDescriptor.class, pluginDescriptor);
-        // for (ComponentDescriptor<?> desc : pluginDescriptor.getComponents()) {
-        //    getContainer().addComponentDescriptor(desc);
-        // }
 
         @SuppressWarnings({"unused", "MagicNumber"})
         class Foo {
@@ -570,16 +534,6 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         getInjector().bindInstance(Foo.class, new Foo());
 
         getInjector().injectInstance(context.getRequiredTestInstance());
-
-        //        SessionScope sessionScope = getInjector().getInstance(SessionScope.class);
-        //        sessionScope.enter();
-        //        sessionScope.seed(Session.class, s);
-        //        sessionScope.seed(InternalSession.class, s);
-
-        //        MojoExecutionScope mojoExecutionScope = getInjector().getInstance(MojoExecutionScope.class);
-        //        mojoExecutionScope.enter();
-        //        mojoExecutionScope.seed(Project.class, p);
-        //        mojoExecutionScope.seed(MojoExecution.class, me);
     }
 
     private Reader openPomUrl(Class<?> holder, String pom, Path[] modelPath) throws IOException {
@@ -633,10 +587,6 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                 parameterConfiguration = XmlNode.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 if (parameterConfiguration != null) {
                     Map<String, String> attributes = new HashMap<>(parameterConfiguration.attributes());
-                    // if (isEmpty(parameterConfiguration.getAttribute("implementation"))
-                    //         && !isEmpty(parameter.getImplementation())) {
-                    //     attributes.put("implementation", parameter.getImplementation());
-                    // }
                     parameterConfiguration = XmlNode.newInstance(
                             parameter.getName(),
                             parameterConfiguration.value(),
@@ -780,35 +730,4 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             return evaluator.alignToBaseDirectory(path);
         }
     }
-
-    /*
-    private Scope getScopeInstanceOrNull(final Injector injector, final Binding<?> binding) {
-        return binding.acceptScopingVisitor(new DefaultBindingScopingVisitor<Scope>() {
-
-            @Override
-            public Scope visitScopeAnnotation(Class<? extends Annotation> scopeAnnotation) {
-                throw new RuntimeException(String.format(
-                        "I don't know how to handle the scopeAnnotation: %s", scopeAnnotation.getCanonicalName()));
-            }
-
-            @Override
-            public Scope visitNoScoping() {
-                if (binding instanceof LinkedKeyBinding) {
-                    Binding<?> childBinding = injector.getBinding(((LinkedKeyBinding) binding).getLinkedKey());
-                    return getScopeInstanceOrNull(injector, childBinding);
-                }
-                return null;
-            }
-
-            @Override
-            public Scope visitEagerSingleton() {
-                return Scopes.SINGLETON;
-            }
-
-            public Scope visitScope(Scope scope) {
-                return scope;
-            }
-        });
-    }*/
-
 }
