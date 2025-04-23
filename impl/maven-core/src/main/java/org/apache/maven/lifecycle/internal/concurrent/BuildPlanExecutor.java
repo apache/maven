@@ -251,7 +251,7 @@ public class BuildPlanExecutor {
             // Create plan, setup and teardown
             for (MavenProject project : plan.getAllProjects().keySet()) {
                 BuildStep pplan = new BuildStep(PLAN, project, null);
-                pplan.status.set(PLANNING); // the plan step always need planning
+                pplan.status.set(PLANNING); // the plan step always needs planning
                 BuildStep setup = new BuildStep(SETUP, project, null);
                 BuildStep teardown = new BuildStep(TEARDOWN, project, null);
                 teardown.executeAfter(setup);
@@ -694,7 +694,7 @@ public class BuildPlanExecutor {
             } else if (MavenExecutionRequest.REACTOR_FAIL_FAST.equals(session.getReactorFailureBehavior())) {
                 buildContext.getReactorBuildStatus().halt();
             } else {
-                logger.error("invalid reactor failure behavior " + session.getReactorFailureBehavior());
+                logger.error("invalid reactor failure behavior {}", session.getReactorFailureBehavior());
                 buildContext.getReactorBuildStatus().halt();
             }
         }
@@ -848,11 +848,11 @@ public class BuildPlanExecutor {
                 plan.addProject(project, steps);
             }
 
-            // Create inter project dependencies
+            // Create inter-project dependencies
             plan.allSteps().filter(step -> step.phase != null).forEach(step -> {
                 Lifecycle.Phase phase = step.phase;
                 MavenProject project = step.project;
-                phase.links().stream().forEach(link -> {
+                phase.links().forEach(link -> {
                     BuildStep before = plan.requiredStep(project, BEFORE + phase.name());
                     BuildStep after = plan.requiredStep(project, AFTER + phase.name());
                     Lifecycle.Pointer pointer = link.pointer();

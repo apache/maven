@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -251,13 +250,11 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                             @Override
                             public List<Plugin> plugins() {
                                 Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
-                                LifecyclePhase phase = lfPhases != null ? lfPhases.get(name) : null;
-                                if (phase != null) {
-                                    Map<String, Plugin> plugins = new LinkedHashMap<>();
-                                    DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(plugins, name, phase);
-                                    return plugins.values().stream().toList();
-                                }
-                                return List.of();
+                                return lfPhases != null
+                                        ? List.of(DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(lfPhases)
+                                                .values()
+                                                .toArray(Plugin[]::new))
+                                        : List.of();
                             }
 
                             @Override

@@ -23,7 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -73,41 +73,35 @@ public class DefaultPackagingRegistry
 
     @Override
     public Optional<Packaging> lookup(String id) {
-        id = id.toLowerCase(Locale.ROOT);
+        String lid = id.toLowerCase(Locale.ROOT);
         // TODO: we should be able to inject a Map<String, LifecycleMapping> directly,
         // however, SISU visibility filtering can only happen when an explicit
         // lookup is performed. The whole problem here is caused by "project extensions"
         // which are bound to a project's classloader, without any clear definition
         // of a "project scope"
-        LifecycleMapping lifecycleMapping =
-                lookup.lookupOptional(LifecycleMapping.class, id).orElse(null);
-        if (lifecycleMapping == null) {
-            return Optional.empty();
-        }
-        Type type = typeRegistry.lookup(id).orElse(null);
-        if (type == null) {
-            return Optional.empty();
-        }
-        return Optional.of(new DefaultPackaging(id, type, getPlugins(lifecycleMapping)));
+        return lookup.lookupOptional(LifecycleMapping.class, lid).flatMap(lifecycleMapping -> typeRegistry
+                .lookup(lid)
+                .map(type -> new DefaultPackaging(lid, type, getPlugins(lifecycleMapping))));
     }
 
     private Map<String, PluginContainer> getPlugins(LifecycleMapping lifecycleMapping) {
-        Map<String, PluginContainer> lfs = new HashMap<>();
-        lifecycleMapping.getLifecycles().forEach((id, lifecycle) -> {
-            Map<String, Plugin> plugins = new HashMap<>();
-            lifecycle
-                    .getLifecyclePhases()
-                    .forEach((phase, lifecyclePhase) -> parseLifecyclePhaseDefinitions(plugins, phase, lifecyclePhase));
-            lfs.put(id, PluginContainer.newBuilder().plugins(plugins.values()).build());
-        });
-        return lfs;
+        return lifecycleMapping.getLifecycles().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> PluginContainer.newBuilder()
+                        .plugins(parseLifecyclePhaseDefinitions(e.getValue().getLifecyclePhases())
+                                .values())
+                        .build()));
     }
 
-    static void parseLifecyclePhaseDefinitions(Map<String, Plugin> plugins, String phase, LifecyclePhase goals) {
+    static Map<String, Plugin> parseLifecyclePhaseDefinitions(Map<String, LifecyclePhase> phases) {
         InputLocation location = DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION;
+        Map<String, Plugin> plugins = new LinkedHashMap<>();
 
-        List<LifecycleMojo> mojos = goals.getMojos();
-        if (mojos != null) {
+        phases.forEach((phase, goals) -> {
+            List<LifecycleMojo> mojos = goals.getMojos();
+            if (mojos == null) {
+                return;
+            }
+
             for (int i = 0; i < mojos.size(); i++) {
                 LifecycleMojo mojo = mojos.get(i);
 
@@ -181,7 +175,9 @@ public class DefaultPackagingRegistry
 
                 plugins.put(key, plugin);
             }
-        }
+        });
+
+        return plugins;
     }
 
     private static String getExecutionId(Plugin plugin, String goal) {
