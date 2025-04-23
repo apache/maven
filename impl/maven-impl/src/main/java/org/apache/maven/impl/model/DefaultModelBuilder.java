@@ -597,8 +597,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                         // extract the key inside ${}
                         String key = matcher.group(1);
                         // get replacement from the map, or use the original ${xy} if not found
-                        String replacement = properties.getOrDefault(key, "\\" + matcher.group(0));
-                        matcher.appendReplacement(result, replacement);
+                        String replacement = properties.getOrDefault(key, matcher.group(0));
+                        matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
                     } while (matcher.find());
                     matcher.appendTail(result); // Append the remaining part of the string
                     return result.toString();
