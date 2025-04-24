@@ -513,8 +513,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
     @Test
     public void testParentVersionResolvedFromNestedProperties() throws Exception {
-        File f1 = getTestFile(
-                "src/test/resources/projects/pom-parent-version-from-nested-properties/pom.xml");
+        File f1 = getTestFile("src/test/resources/projects/pom-parent-version-from-nested-properties/pom.xml");
         MavenProject mp = this.getProjectFromRemoteRepository(f1);
         assertEquals("0.1.0", mp.getVersion());
     }
