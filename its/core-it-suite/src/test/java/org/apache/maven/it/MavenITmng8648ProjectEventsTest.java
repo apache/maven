@@ -40,7 +40,7 @@ public class MavenITmng8648ProjectEventsTest extends AbstractMavenIntegrationTes
         File projectDir = extractResources("/mng-8648/project");
 
         verifier = newVerifier(projectDir.getAbsolutePath());
-        verifier.addCliArguments("compile", "-b", "concurrent");
+        verifier.addCliArguments("compile", "-b", "concurrent", "-T5");
         try {
             verifier.execute();
         } catch (VerificationException expected) {
@@ -56,10 +56,12 @@ public class MavenITmng8648ProjectEventsTest extends AbstractMavenIntegrationTes
         verifier.verifyTextInLog("org.apache.maven.its.mng8648:subproject-b:jar:1-SNAPSHOT ProjectSucceeded");
         verifier.verifyTextInLog("org.apache.maven.its.mng8648:subproject-c:jar:1-SNAPSHOT ProjectStarted");
         verifier.verifyTextInLog("org.apache.maven.its.mng8648:subproject-c:jar:1-SNAPSHOT ProjectFailed");
-        // With the traditional builder, project D is not reported at all (it is never even started) and in the reactor
-        // summary it is listed as "skipped"
-        // With the concurrent builder, it is currently reported as successful, which seems wrong, since it depends on
-        // a failed project
+        // With the traditional builder, project D is not reported at all (it is never even started),
+        // and in the reactor summary it is listed as "skipped".
+        // With the concurrent builder, it should be started and later reported as "skipped"
+        verifier.verifyTextInLog("org.apache.maven.its.mng8648:subproject-d:jar:1-SNAPSHOT ProjectStarted");
+        verifier.verifyTextInLog("org.apache.maven.its.mng8648:subproject-d:jar:1-SNAPSHOT ProjectSkipped");
+        // Make sure there's no problem with the event spy
         verifier.verifyTextNotInLog("Failed to notify spy org.apache.maven.its.mng8648.ProjectEventSpy");
     }
 }

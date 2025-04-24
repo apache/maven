@@ -70,6 +70,7 @@ import org.apache.maven.lifecycle.internal.GoalTask;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
+import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.Task;
 import org.apache.maven.lifecycle.internal.TaskSegment;
@@ -100,6 +101,7 @@ import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.PLAN;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.PLANNING;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.SCHEDULED;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.SETUP;
+import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.SKIPPED;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.TEARDOWN;
 
 /**
@@ -257,9 +259,9 @@ public class BuildPlanExecutor {
                 teardown.executeAfter(setup);
                 setup.executeAfter(pplan);
                 plan.steps(project).forEach(step -> {
-                    if (step.predecessors.isEmpty()) {
+                    if (step.predecessors.stream().noneMatch(s -> s.project == project)) {
                         step.executeAfter(setup);
-                    } else if (step.successors.isEmpty()) {
+                    } else if (step.successors.stream().noneMatch(s -> s.project == project)) {
                         teardown.executeAfter(step);
                     }
                 });
@@ -344,95 +346,135 @@ public class BuildPlanExecutor {
             this.executor.close();
         }
 
-        private void executePlan() {
-            if (reactorContext.getReactorBuildStatus().isHalted()) {
-                return;
-            }
-            Clock global = clocks.computeIfAbsent(GLOBAL, p -> new Clock());
-            global.start();
-            lock.readLock().lock();
-            try {
-                // Get all build steps that are:
-                // 1. Not yet started (CREATED status)
-                // 2. Have all their prerequisites completed (predecessors EXECUTED)
-                // 3. Successfully transition from CREATED to SCHEDULED state
-                plan.sortedNodes().stream()
-                        .filter(step -> step.status.get() == CREATED)
-                        .filter(step -> step.predecessors.stream().allMatch(s -> s.status.get() == EXECUTED))
-                        .filter(step -> step.status.compareAndSet(CREATED, SCHEDULED))
-                        .forEach(step -> {
-                            boolean nextIsPlanning = step.successors.stream().anyMatch(st -> PLAN.equals(st.name));
-                            executor.execute(() -> {
-                                try {
-                                    executeStep(step);
-                                    if (nextIsPlanning) {
-                                        lock.writeLock().lock();
-                                        try {
-                                            plan();
-                                        } finally {
-                                            lock.writeLock().unlock();
-                                        }
-                                    }
-                                    executePlan();
-                                } catch (Exception e) {
-                                    step.status.compareAndSet(SCHEDULED, FAILED);
-                                    global.stop();
+        /**
+         * Processes a single build step, deciding whether to schedule it for execution or skip it.
+         *
+         * @param step The build step to process
+         */
+        private void processStep(BuildStep step) {
+            // 1. Apply reactor failure behavior to decide whether to schedule or skip
+            ReactorBuildStatus status = reactorContext.getReactorBuildStatus();
+            boolean isAfterStep = step.name.startsWith(AFTER);
+            boolean shouldExecute;
 
-                                    // Find and execute all pending after:* phases for this project
-                                    executeAfterPhases(step);
+            // Check if all predecessors are executed successfully
+            boolean allPredecessorsExecuted = step.predecessors.stream().allMatch(s -> s.status.get() == EXECUTED);
 
-                                    handleBuildError(reactorContext, session, step.project, e, global);
-                                }
-                            });
+            // Special case for after:* steps - they should run if their corresponding before:* step ran
+            if (isAfterStep) {
+                String phaseName = step.name.substring(AFTER.length());
+                // Always process after:* steps for cleanup if their before:* step ran
+                shouldExecute = plan.step(step.project, BEFORE + phaseName)
+                        .map(s -> {
+                            int stepStatus = s.status.get();
+                            return stepStatus == EXECUTED;
+                        })
+                        .orElse(false);
+
+                // Check if any predecessor failed - if so, we'll run the step but mark it as SKIPPED
+                boolean anyPredecessorFailed = step.predecessors.stream().anyMatch(s -> s.status.get() == FAILED);
+
+                // If any predecessor failed, we'll use a special status transition: CREATED -> SKIPPED
+                // This ensures the step runs for cleanup but is marked as skipped in the end
+                if (shouldExecute && anyPredecessorFailed) {
+                    // We'll run the step but mark it as SKIPPED instead of SCHEDULED
+                    if (step.status.compareAndSet(CREATED, SKIPPED)) {
+                        logger.debug(
+                                "Running after:* step {} for cleanup but marking it as SKIPPED because a predecessor failed",
+                                step);
+                        executor.execute(() -> {
+                            try {
+                                executeStep(step);
+                                executePlan();
+                            } catch (Exception e) {
+                                step.status.compareAndSet(SKIPPED, FAILED);
+                                // Store the exception in the step for handling in the TEARDOWN phase
+                                step.exception = e;
+                                logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
+                                // Let the scheduler handle after:* phases and TEARDOWN in the next cycle
+                                executePlan();
+                            }
                         });
-            } finally {
-                lock.readLock().unlock();
+                        return; // Skip the rest of the method since we've handled this step
+                    }
+                }
+            } else if (TEARDOWN.equals(step.name)) {
+                // TEARDOWN should always run to ensure proper cleanup and error handling
+                // We'll handle success/failure reporting inside the TEARDOWN phase
+                shouldExecute = true;
+            } else {
+                // For regular steps:
+                // Don't run for halted builds, blacklisted projects, or if predecessors failed
+                shouldExecute = !status.isHalted() && !status.isBlackListed(step.project) && allPredecessorsExecuted;
+            }
+
+            // 2. Either schedule the step or mark it as skipped based on the decision
+            if (shouldExecute && step.status.compareAndSet(CREATED, SCHEDULED)) {
+                boolean nextIsPlanning = step.successors.stream().anyMatch(st -> PLAN.equals(st.name));
+                executor.execute(() -> {
+                    try {
+                        executeStep(step);
+                        if (nextIsPlanning) {
+                            lock.writeLock().lock();
+                            try {
+                                plan();
+                            } finally {
+                                lock.writeLock().unlock();
+                            }
+                        }
+                        executePlan();
+                    } catch (Exception e) {
+                        step.status.compareAndSet(SCHEDULED, FAILED);
+
+                        // Store the exception in the step for handling in the TEARDOWN phase
+                        step.exception = e;
+                        logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
+
+                        // Let the scheduler handle after:* phases and TEARDOWN in the next cycle
+                        executePlan();
+                    }
+                });
+            } else if (step.status.compareAndSet(CREATED, SKIPPED)) {
+                // Skip the step and provide a specific reason
+                if (!shouldExecute) {
+                    if (status.isHalted()) {
+                        logger.debug("Skipping step {} because the build is halted", step);
+                    } else if (status.isBlackListed(step.project)) {
+                        logger.debug("Skipping step {} because the project is blacklisted", step);
+                    } else if (TEARDOWN.equals(step.name)) {
+                        // This should never happen given we always process TEARDOWN steps
+                        logger.warn("Unexpected skipping of TEARDOWN step {}", step);
+                    } else {
+                        logger.debug("Skipping step {} because a dependency has failed", step);
+                    }
+                } else {
+                    // Skip because predecessors failed or were skipped
+                    logger.debug(
+                            "Skipping step {} because one or more predecessors did not execute successfully", step);
+                }
+                // Recursively call executePlan to process steps that depend on this one
+                executePlan();
             }
         }
 
-        /**
-         * Executes all pending after:* phases for a failed project.
-         * This ensures proper cleanup is performed even when a build fails.
-         * Only executes after:xxx phases if their corresponding before:xxx phase
-         * has been either executed or failed.
-         *
-         * For example, if a project fails during 'compile', this will execute
-         * any configured 'after:compile' phases to ensure proper cleanup.
-         *
-         * @param failedStep The build step that failed, containing the project that needs cleanup
-         */
-        private void executeAfterPhases(BuildStep failedStep) {
-            if (failedStep == null || failedStep.project == null) {
-                return;
-            }
-
+        private void executePlan() {
+            // Even if the build is halted, we still want to execute TEARDOWN and after:* steps
+            // for proper cleanup, so we don't return early here
+            Clock global = getClock(GLOBAL);
+            global.start();
             lock.readLock().lock();
             try {
-                // Find all after:* phases that should be executed
-                plan.steps(failedStep.project)
-                        .filter(step -> step.name != null && step.name.startsWith(AFTER))
-                        .filter(step -> step.status.get() == CREATED)
-                        .filter(step -> {
-                            // Only execute after:xxx if before:xxx has been executed or failed
-                            String phaseName = step.name.substring(AFTER.length());
-                            return plan.step(failedStep.project, BEFORE + phaseName)
-                                    .map(s -> {
-                                        int status = s.status.get();
-                                        return status == EXECUTED || status == FAILED;
-                                    })
-                                    .orElse(false);
-                        })
-                        .filter(step -> step.status.compareAndSet(CREATED, SCHEDULED))
-                        .forEach(afterStep -> {
-                            try {
-                                executeStep(afterStep);
-                                afterStep.status.compareAndSet(SCHEDULED, EXECUTED);
-                            } catch (Exception e) {
-                                // Log but don't fail - we're already in error handling
-                                logger.error("Error executing cleanup phase " + afterStep.name, e);
-                                afterStep.status.compareAndSet(SCHEDULED, FAILED);
-                            }
-                        });
+                // Process build steps in a logical order:
+                // 1. Find steps that are not yet started (CREATED status)
+                // 2. Check if all their predecessors have completed (in a terminal state)
+                // 3. Process each step (schedule or skip based on reactor failure behavior)
+                plan.sortedNodes().stream()
+                        // 1. Filter steps that are in CREATED state
+                        .filter(BuildStep::isCreated)
+                        // 2. Check if all predecessors are in a terminal state
+                        .filter(step -> step.predecessors.stream().allMatch(BuildStep::isDone))
+                        // 3. Process each step
+                        .forEach(this::processStep);
             } finally {
                 lock.readLock().unlock();
             }
@@ -464,24 +506,58 @@ public class BuildPlanExecutor {
                     break;
                 case TEARDOWN:
                     attachToThread(step);
-                    projectExecutionListener.afterProjectExecutionSuccess(
-                            new ProjectExecutionEvent(session, step.project, Collections.emptyList()));
-                    reactorContext
-                            .getResult()
-                            .addBuildSummary(new BuildSuccess(step.project, clock.wallTime(), clock.execTime()));
-                    eventCatapult.fire(ExecutionEvent.Type.ProjectSucceeded, session, null);
+
+                    // Check if there are any stored exceptions for this project
+                    List<Throwable> failures = null;
+                    boolean allStepsExecuted = true;
+                    for (BuildStep projectStep : plan.steps(step.project).toList()) {
+                        Exception exception = projectStep.exception;
+                        if (exception != null) {
+                            if (failures == null) {
+                                failures = new ArrayList<>();
+                            }
+                            failures.add(exception);
+                        }
+                        allStepsExecuted &= step == projectStep || projectStep.status.get() == EXECUTED;
+                    }
+
+                    if (failures != null) {
+                        // Handle the stored exception
+                        Throwable failure;
+                        if (failures.size() == 1) {
+                            failure = failures.get(
+                                    0); // Single exception, no need to wrap it in a LifecycleExecutionException
+                        } else {
+                            failure = new LifecycleExecutionException("Error building project");
+                            failures.forEach(failure::addSuppressed);
+                        }
+                        handleBuildError(reactorContext, session, step.project, failure);
+                    } else if (allStepsExecuted) {
+                        // If there were no failures, report success
+                        projectExecutionListener.afterProjectExecutionSuccess(
+                                new ProjectExecutionEvent(session, step.project, Collections.emptyList()));
+                        reactorContext
+                                .getResult()
+                                .addBuildSummary(new BuildSuccess(step.project, clock.wallTime(), clock.execTime()));
+                        eventCatapult.fire(ExecutionEvent.Type.ProjectSucceeded, session, null);
+                    } else {
+                        eventCatapult.fire(ExecutionEvent.Type.ProjectSkipped, session, null);
+                    }
                     break;
                 default:
-                    List<MojoExecution> executions = step.executions().collect(Collectors.toList());
+                    List<MojoExecution> executions = step.executions().toList();
                     if (!executions.isEmpty()) {
                         attachToThread(step);
                         clock.start();
-                        executions.forEach(mojoExecution -> {
-                            mojoExecutionConfigurator(mojoExecution).configure(step.project, mojoExecution, true);
-                            finalizeMojoConfiguration(mojoExecution);
-                        });
-                        mojoExecutor.execute(session, executions);
-                        clock.stop();
+                        try {
+                            executions.forEach(mojoExecution -> {
+                                mojoExecutionConfigurator(mojoExecution).configure(step.project, mojoExecution, true);
+                                finalizeMojoConfiguration(mojoExecution);
+                            });
+                            mojoExecutor.execute(session, executions);
+                        } finally {
+                            clock.stop();
+                        }
                     }
                     break;
             }
@@ -501,7 +577,7 @@ public class BuildPlanExecutor {
             lock.writeLock().lock();
             try {
                 Set<BuildStep> planSteps = plan.allSteps()
-                        .filter(st -> PLAN.equals(st.name))
+                        .filter(step -> PLAN.equals(step.name))
                         .filter(step -> step.predecessors.stream().allMatch(s -> s.status.get() == EXECUTED))
                         .filter(step -> step.status.compareAndSet(PLANNING, SCHEDULED))
                         .collect(Collectors.toSet());
@@ -664,13 +740,30 @@ public class BuildPlanExecutor {
                     .orElse(phase);
         }
 
+        /**
+         * Handles build errors by recording the error, notifying listeners, and updating the ReactorBuildStatus
+         * based on the reactor failure behavior.
+         * <p>
+         * This method works in conjunction with the filtering in executePlan():
+         * - For FAIL_FAST: Sets ReactorBuildStatus to halted, which causes executePlan to only process after:* steps
+         * - For FAIL_AT_END: Blacklists the project and its dependents, which causes executePlan to skip them
+         * - For FAIL_NEVER: Does nothing special, allowing all projects to continue building
+         * <p>
+         * Note: TEARDOWN steps are not executed for failed or blacklisted projects, as they're designed for
+         * successful project completions.
+         *
+         * @param buildContext The reactor context
+         * @param session The Maven session
+         * @param mavenProject The project that failed
+         * @param t The exception that caused the failure
+         */
         protected void handleBuildError(
                 final ReactorContext buildContext,
                 final MavenSession session,
                 final MavenProject mavenProject,
-                Throwable t,
-                final Clock clock) {
+                Throwable t) {
             // record the error and mark the project as failed
+            Clock clock = getClock(mavenProject);
             buildContext.getResult().addException(t);
             buildContext
                     .getResult()
@@ -812,7 +905,7 @@ public class BuildPlanExecutor {
                             return Stream.of(a, b, c);
                         })
                         .collect(Collectors.toMap(n -> n.name, n -> n));
-                // for each phase, make sure children phases are execute between pre and post steps
+                // for each phase, make sure children phases are executed between before and after steps
                 lifecycle.allPhases().forEach(phase -> phase.phases().forEach(child -> {
                     steps.get(BEFORE + child.name()).executeAfter(steps.get(BEFORE + phase.name()));
                     steps.get(AFTER + phase.name()).executeAfter(steps.get(AFTER + child.name()));
