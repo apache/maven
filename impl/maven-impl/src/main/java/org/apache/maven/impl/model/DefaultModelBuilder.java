@@ -43,7 +43,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -246,8 +245,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     protected class ModelBuilderSessionState implements ModelProblemCollector {
-        private static final Pattern REGEX = Pattern.compile("\\$\\{([^}]+)}");
-
         final Session session;
         final ModelBuilderRequest request;
         final DefaultModelBuilderResult result;
