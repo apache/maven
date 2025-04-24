@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0">
+  <modelVersion>4.1.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng8572</groupId>
+  <artifactId>dummy-artifact</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>custom-type</packaging>
+
+  <name>MNG-8572 Dummy Artifact</name>
+  <description>Dummy artifact with custom type</description>
+</project>
