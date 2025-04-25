@@ -318,6 +318,12 @@ public class MavenProject implements Cloneable {
         addPath(getCompileSourceRoots(), path);
     }
 
+    /**
+     * Removes the specified path from the list of compile source roots.
+     *
+     * @param path the source root to remove
+     * @since 3.9.10
+     */
     public void removeCompileSourceRoot(String path) {
         removePath(getCompileSourceRoots(), path);
     }
@@ -326,6 +332,12 @@ public class MavenProject implements Cloneable {
         addPath(getTestCompileSourceRoots(), path);
     }
 
+    /**
+     * Removes the specified path from the list of test compile source roots.
+     *
+     * @param path the test source root to remove
+     * @since 3.9.10
+     */
     public void removeTestCompileSourceRoot(String path) {
         removePath(getTestCompileSourceRoots(), path);
     }
