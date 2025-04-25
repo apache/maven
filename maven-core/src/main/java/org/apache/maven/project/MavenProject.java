@@ -279,41 +279,41 @@ public class MavenProject implements Cloneable {
     // Test and compile sourceroots.
     // ----------------------------------------------------------------------
 
-    private void addPath(List<String> paths, String path) {
-        if (path != null) {
-            path = path.trim();
-            if (!path.isEmpty()) {
-                File file = new File(path);
-                if (file.isAbsolute()) {
-                    path = file.getAbsolutePath();
-                } else if (".".equals(path)) {
-                    path = getBasedir().getAbsolutePath();
-                } else {
-                    path = new File(getBasedir(), path).getAbsolutePath();
-                }
+    /**
+     * Sanitizes a path by trimming it and converting it to an absolute path.
+     *
+     * @param path the path to sanitize
+     * @return the sanitized path, or null if the input path is null, empty, or consists only of whitespace
+     */
+    private String sanitizePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        path = path.trim();
+        if (path.isEmpty()) {
+            return null;
+        }
+        File file = new File(path);
+        if (file.isAbsolute()) {
+            return file.getAbsolutePath();
+        } else if (".".equals(path)) {
+            return getBasedir().getAbsolutePath();
+        } else {
+            return new File(getBasedir(), path).getAbsolutePath();
+        }
+    }
 
-                if (!paths.contains(path)) {
-                    paths.add(path);
-                }
-            }
+    private void addPath(List<String> paths, String path) {
+        String sanitizedPath = sanitizePath(path);
+        if (sanitizedPath != null && !paths.contains(sanitizedPath)) {
+            paths.add(sanitizedPath);
         }
     }
 
     private void removePath(List<String> paths, String path) {
-        if (path != null) {
-            path = path.trim();
-            if (!path.isEmpty()) {
-                File file = new File(path);
-                if (file.isAbsolute()) {
-                    path = file.getAbsolutePath();
-                } else if (".".equals(path)) {
-                    path = getBasedir().getAbsolutePath();
-                } else {
-                    path = new File(getBasedir(), path).getAbsolutePath();
-                }
-
-                paths.remove(path);
-            }
+        String sanitizedPath = sanitizePath(path);
+        if (sanitizedPath != null) {
+            paths.remove(sanitizedPath);
         }
     }
 
