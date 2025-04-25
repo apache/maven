@@ -26,7 +26,8 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A wrapper class around a maven resolver artifact.
+ * Default implementation of the Artifact interface.
+ * Wraps an Aether artifact and provides access to its properties.
  */
 public class DefaultArtifact implements Artifact {
     /**
