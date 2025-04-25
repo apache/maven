@@ -172,7 +172,9 @@ public interface Lifecycle extends ExtensibleEnum {
          * @return a stream of all phases
          */
         @Nonnull
-        Stream<Phase> allPhases();
+        default Stream<Phase> allPhases() {
+            return Stream.concat(Stream.of(this), phases().stream().flatMap(Lifecycle.Phase::allPhases));
+        }
     }
 
     /**

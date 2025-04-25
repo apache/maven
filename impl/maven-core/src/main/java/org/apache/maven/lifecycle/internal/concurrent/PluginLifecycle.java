@@ -21,7 +21,6 @@ package org.apache.maven.lifecycle.internal.concurrent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.annotations.Nonnull;
@@ -83,12 +82,6 @@ class PluginLifecycle implements Lifecycle {
                     @Nonnull
                     public List<Phase> phases() {
                         return List.of();
-                    }
-
-                    @Override
-                    @Nonnull
-                    public Stream<Phase> allPhases() {
-                        return Stream.concat(Stream.of(this), phases().stream().flatMap(Phase::allPhases));
                     }
                 })
                 .toList();
