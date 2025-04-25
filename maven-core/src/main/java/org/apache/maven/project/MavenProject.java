@@ -314,6 +314,11 @@ public class MavenProject implements Cloneable {
         }
     }
 
+    /**
+     * Adds the specified path to the list of compile source roots for this project.
+     *
+     * @param path the source root to add
+     */
     public void addCompileSourceRoot(String path) {
         addPath(getCompileSourceRoots(), path);
     }
@@ -328,6 +333,11 @@ public class MavenProject implements Cloneable {
         removePath(getCompileSourceRoots(), path);
     }
 
+    /**
+     * Adds the specified path to the list of test compile source roots for this project.
+     *
+     * @param path the test source root to add
+     */
     public void addTestCompileSourceRoot(String path) {
         addPath(getTestCompileSourceRoots(), path);
     }
@@ -342,12 +352,28 @@ public class MavenProject implements Cloneable {
         removePath(getTestCompileSourceRoots(), path);
     }
 
+    /**
+     * Gets the list of compile source roots for this project.
+     * <p>
+     * <strong>Note:</strong> The collection returned by this method should not be modified directly.
+     * Use {@link #addCompileSourceRoot(String)} and {@link #removeCompileSourceRoot(String)} methods instead.
+     *
+     * @return a list of compile source roots
+     */
     public List<String> getCompileSourceRoots() {
-        return compileSourceRoots;
+        return new LoggingList<>(compileSourceRoots, "compileSourceRoots");
     }
 
+    /**
+     * Gets the list of test compile source roots for this project.
+     * <p>
+     * <strong>Note:</strong> The collection returned by this method should not be modified directly.
+     * Use {@link #addTestCompileSourceRoot(String)} and {@link #removeTestCompileSourceRoot(String)} methods instead.
+     *
+     * @return a list of test compile source roots
+     */
     public List<String> getTestCompileSourceRoots() {
-        return testCompileSourceRoots;
+        return new LoggingList<>(testCompileSourceRoots, "testCompileSourceRoots");
     }
 
     public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
@@ -1156,6 +1182,91 @@ public class MavenProject implements Cloneable {
         StringBuilder buffer = new StringBuilder(128);
         buffer.append(groupId).append(':').append(artifactId).append(':').append(version);
         return buffer.toString();
+    }
+
+    /**
+     * A List implementation that logs warnings when modified directly instead of using the proper add/remove methods.
+     *
+     * @param <E> the type of elements in the list
+     * @since 3.9.10
+     */
+    private static class LoggingList<E> extends ArrayList<E> {
+        private static final long serialVersionUID = 1L;
+        private final String collectionName;
+
+        LoggingList(List<E> delegate, String collectionName) {
+            super(delegate);
+            this.collectionName = collectionName;
+        }
+
+        private void logWarning(String method) {
+            LOGGER.warn("Direct modification of " + collectionName + " through " + method + "() is deprecated. "
+                    + "Please use the add/remove methods instead.");
+            // Log a stack trace to help identify the caller
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Stack trace", new Exception("Stack trace"));
+            }
+        }
+
+        @Override
+        public boolean add(E e) {
+            logWarning("add");
+            return super.add(e);
+        }
+
+        @Override
+        public void add(int index, E element) {
+            logWarning("add");
+            super.add(index, element);
+        }
+
+        @Override
+        public boolean addAll(java.util.Collection<? extends E> c) {
+            logWarning("addAll");
+            return super.addAll(c);
+        }
+
+        @Override
+        public boolean addAll(int index, java.util.Collection<? extends E> c) {
+            logWarning("addAll");
+            return super.addAll(index, c);
+        }
+
+        @Override
+        public void clear() {
+            logWarning("clear");
+            super.clear();
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            logWarning("remove");
+            return super.remove(o);
+        }
+
+        @Override
+        public E remove(int index) {
+            logWarning("remove");
+            return super.remove(index);
+        }
+
+        @Override
+        public boolean removeAll(java.util.Collection<?> c) {
+            logWarning("removeAll");
+            return super.removeAll(c);
+        }
+
+        @Override
+        public boolean retainAll(java.util.Collection<?> c) {
+            logWarning("retainAll");
+            return super.retainAll(c);
+        }
+
+        @Override
+        public E set(int index, E element) {
+            logWarning("set");
+            return super.set(index, element);
+        }
     }
 
     /**
