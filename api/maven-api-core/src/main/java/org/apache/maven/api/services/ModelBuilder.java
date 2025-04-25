@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.util.List;
 
 import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Model;
 
 public interface ModelBuilder extends Service {
@@ -31,12 +32,15 @@ public interface ModelBuilder extends Service {
 
     List<String> VALID_MODEL_VERSIONS = List.of(MODEL_VERSION_4_0_0, MODEL_VERSION_4_1_0);
 
+    @Nonnull
     ModelBuilderSession newSession();
 
     interface ModelBuilderSession {
 
-        ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException;
+        @Nonnull
+        ModelBuilderResult build(@Nonnull ModelBuilderRequest request) throws ModelBuilderException;
     }
 
-    Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException;
+    @Nonnull
+    Model buildRawModel(@Nonnull ModelBuilderRequest request) throws ModelBuilderException;
 }

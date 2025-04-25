@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Plugin;
@@ -123,21 +124,25 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     }
 
     @Override
+    @Nonnull
     public Iterator<Lifecycle> iterator() {
         return stream().toList().iterator();
     }
 
     @Override
+    @Nonnull
     public Stream<Lifecycle> stream() {
         return providers.stream().map(ExtensibleEnumProvider::provides).flatMap(Collection::stream);
     }
 
     @Override
-    public Optional<Lifecycle> lookup(String id) {
+    @Nonnull
+    public Optional<Lifecycle> lookup(@Nonnull String id) {
         return stream().filter(lf -> Objects.equals(id, lf.id())).findAny();
     }
 
-    public List<String> computePhases(Lifecycle lifecycle) {
+    @Nonnull
+    public List<String> computePhases(@Nonnull Lifecycle lifecycle) {
         Graph graph = new Graph();
         addPhases(graph, null, null, lifecycle.v3phases());
         List<String> allPhases = graph.visitAll();
@@ -202,6 +207,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Lifecycle> provides() {
             try {
                 Map<String, org.apache.maven.lifecycle.Lifecycle> all =
@@ -360,11 +366,13 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         private static final String MAVEN_CLEAN_PLUGIN_VERSION = "3.4.0";
 
         @Override
+        @Nonnull
         public String id() {
             return Lifecycle.CLEAN;
         }
 
         @Override
+        @Nonnull
         public Collection<Phase> phases() {
             // START SNIPPET: clean
             return List.of(phase(
@@ -376,6 +384,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Alias> aliases() {
             return List.of(alias("pre-clean", BEFORE + Phase.CLEAN), alias("post-clean", AFTER + Phase.CLEAN));
         }
@@ -383,11 +392,13 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     static class DefaultLifecycle implements Lifecycle {
         @Override
+        @Nonnull
         public String id() {
             return Lifecycle.DEFAULT;
         }
 
         @Override
+        @Nonnull
         public Collection<Phase> phases() {
             // START SNIPPET: default
             return List.of(phase(
@@ -428,6 +439,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Phase> v3phases() {
             return List.of(phase(
                     ALL,
@@ -450,6 +462,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Alias> aliases() {
             return List.of(
                     alias("generate-sources", SOURCES),
@@ -477,11 +490,13 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         private static final String PHASE_SITE_DEPLOY = "site-deploy";
 
         @Override
+        @Nonnull
         public String id() {
             return Lifecycle.SITE;
         }
 
         @Override
+        @Nonnull
         public Collection<Phase> phases() {
             // START SNIPPET: site
             return List.of(
@@ -494,6 +509,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Alias> aliases() {
             return List.of(alias("pre-site", BEFORE + PHASE_SITE), alias("post-site", AFTER + PHASE_SITE));
         }

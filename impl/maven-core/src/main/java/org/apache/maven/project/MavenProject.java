@@ -1962,6 +1962,7 @@ public class MavenProject implements Cloneable {
      * @return the rootDirectory for this project
      * @throws IllegalStateException if the rootDirectory cannot be found
      */
+    @Nonnull
     public Path getRootDirectory() {
         if (rootDirectory == null) {
             throw new IllegalStateException(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);

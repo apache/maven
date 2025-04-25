@@ -24,9 +24,10 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Nonnull;
 
 public class DefaultRemoteRepository implements RemoteRepository {
+    @Nonnull
     private final org.eclipse.aether.repository.RemoteRepository repository;
 
-    public DefaultRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository) {
+    public DefaultRemoteRepository(@Nonnull org.eclipse.aether.repository.RemoteRepository repository) {
         this.repository = repository;
     }
 

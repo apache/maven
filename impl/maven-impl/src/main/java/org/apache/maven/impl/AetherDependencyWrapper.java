@@ -40,11 +40,13 @@ abstract class AetherDependencyWrapper {
     /**
      * The session to install / deploy / resolve artifacts and dependencies.
      */
+    @Nonnull
     final InternalSession session;
 
     /**
      * The wrapped Eclipse Aether dependency.
      */
+    @Nonnull
     final Dependency dependency;
 
     /**

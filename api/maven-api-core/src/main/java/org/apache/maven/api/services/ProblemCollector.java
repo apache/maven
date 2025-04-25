@@ -73,7 +73,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
      * Returns {@code true} if there is at least one problem collected with severity equal or more severe than
      * passed in severity.
      */
-    default boolean hasProblemsFor(BuilderProblem.Severity severity) {
+    default boolean hasProblemsFor(@Nonnull BuilderProblem.Severity severity) {
         requireNonNull(severity, "severity");
         for (BuilderProblem.Severity s : BuilderProblem.Severity.values()) {
             if (s.ordinal() <= severity.ordinal() && problemsReportedFor(s) > 0) {
@@ -96,7 +96,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
      * @param severities the severity levels to count problems for
      * @return the total count of problems for the specified severities
      */
-    int problemsReportedFor(BuilderProblem.Severity... severities);
+    int problemsReportedFor(@Nonnull BuilderProblem.Severity... severities);
 
     /**
      * Returns {@code true} if reported problem count exceeded allowed count, and issues were lost. When this
@@ -114,7 +114,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
      * @param problem the problem to report
      * @return {@code true} if passed problem is preserved by this call.
      */
-    boolean reportProblem(P problem);
+    boolean reportProblem(@Nonnull P problem);
 
     /**
      * Returns all reported and preserved problems ordered by severity in decreasing order. Note: counters and

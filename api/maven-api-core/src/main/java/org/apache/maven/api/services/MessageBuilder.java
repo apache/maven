@@ -154,8 +154,10 @@ public interface MessageBuilder extends Appendable {
         return style(style).a(message).resetStyle();
     }
 
-    MessageBuilder style(String style);
+    @Nonnull
+    MessageBuilder style(@Nonnull String style);
 
+    @Nonnull
     MessageBuilder resetStyle();
 
     //
@@ -262,6 +264,7 @@ public interface MessageBuilder extends Appendable {
      * @param length the new length
      * @return the current builder
      */
+    @Nonnull
     MessageBuilder setLength(int length);
 
     /**

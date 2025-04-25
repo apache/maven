@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 
 /**
@@ -37,5 +38,6 @@ import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 @Consumer
 public interface LifecycleProvider {
 
+    @Nonnull
     List<Lifecycle> getLifecycles();
 }

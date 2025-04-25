@@ -19,6 +19,7 @@
 package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Represents a Java toolchain in the Maven build system.
@@ -41,5 +42,6 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public interface JavaToolchain extends Toolchain {
 
+    @Nonnull
     String getJavaHome();
 }

@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
@@ -40,20 +41,24 @@ class PluginLifecycle implements Lifecycle {
     }
 
     @Override
+    @Nonnull
     public String id() {
         return lifecycleOverlay.getId();
     }
 
     @Override
+    @Nonnull
     public Collection<Phase> phases() {
         return lifecycleOverlay.getPhases().stream()
                 .map(phase -> new Phase() {
                     @Override
+                    @Nonnull
                     public String name() {
                         return phase.getId();
                     }
 
                     @Override
+                    @Nonnull
                     public List<Plugin> plugins() {
                         return Collections.singletonList(Plugin.newBuilder()
                                 .groupId(pluginDescriptor.getGroupId())
@@ -70,16 +75,19 @@ class PluginLifecycle implements Lifecycle {
                     }
 
                     @Override
+                    @Nonnull
                     public Collection<Link> links() {
                         return Collections.emptyList();
                     }
 
                     @Override
+                    @Nonnull
                     public List<Phase> phases() {
                         return Collections.emptyList();
                     }
 
                     @Override
+                    @Nonnull
                     public Stream<Phase> allPhases() {
                         return Stream.concat(Stream.of(this), phases().stream().flatMap(Phase::allPhases));
                     }
@@ -88,6 +96,7 @@ class PluginLifecycle implements Lifecycle {
     }
 
     @Override
+    @Nonnull
     public Collection<Alias> aliases() {
         return Collections.emptyList();
     }

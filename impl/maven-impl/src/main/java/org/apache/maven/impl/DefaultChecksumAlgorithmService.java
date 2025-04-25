@@ -50,8 +50,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
 
     @Inject
     public DefaultChecksumAlgorithmService(ChecksumAlgorithmFactorySelector checksumAlgorithmFactorySelector) {
-        this.checksumAlgorithmFactorySelector =
-                nonNull(checksumAlgorithmFactorySelector, "checksumAlgorithmFactorySelector");
+        this.checksumAlgorithmFactorySelector = Objects.requireNonNull(
+                checksumAlgorithmFactorySelector, "checksumAlgorithmFactorySelector cannot be null");
     }
 
     @Override

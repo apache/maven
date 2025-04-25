@@ -26,6 +26,8 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Resolves the artifact, i.e. download the file when required and attach it to the artifact
@@ -42,7 +44,8 @@ public interface ArtifactResolver extends Service {
      * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
      *             parameter {@code mavenArtifact} is {@code null} or invalid
      */
-    ArtifactResolverResult resolve(ArtifactResolverRequest request);
+    @Nonnull
+    ArtifactResolverResult resolve(@Nonnull ArtifactResolverRequest request);
 
     /**
      * Resolves several artifacts from their coordinates.
@@ -54,7 +57,9 @@ public interface ArtifactResolver extends Service {
      * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
      *             parameter {@code coordinates} is {@code null} or invalid
      */
-    default ArtifactResolverResult resolve(Session session, Collection<? extends ArtifactCoordinates> coordinates) {
+    @Nonnull
+    default ArtifactResolverResult resolve(
+            @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinates> coordinates) {
         return resolve(ArtifactResolverRequest.build(session, coordinates));
     }
 
@@ -69,10 +74,11 @@ public interface ArtifactResolver extends Service {
      * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
      *             parameter {@code coordinates} is {@code null} or invalid
      */
+    @Nonnull
     default ArtifactResolverResult resolve(
-            Session session,
-            Collection<? extends ArtifactCoordinates> coordinates,
-            List<RemoteRepository> repositories) {
+            @Nonnull Session session,
+            @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
+            @Nullable List<RemoteRepository> repositories) {
         return resolve(ArtifactResolverRequest.build(session, coordinates, repositories));
     }
 }

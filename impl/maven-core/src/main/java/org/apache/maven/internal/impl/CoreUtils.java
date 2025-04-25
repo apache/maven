@@ -24,9 +24,13 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+
 class CoreUtils {
 
-    public static <T> T cast(Class<T> clazz, Object o, String name) {
+    @Nonnull
+    public static <T> T cast(@Nonnull Class<T> clazz, @Nullable Object o, @Nonnull String name) {
         if (!clazz.isInstance(o)) {
             if (o == null) {
                 throw new IllegalArgumentException(name + " is null");
@@ -36,7 +40,8 @@ class CoreUtils {
         return clazz.cast(o);
     }
 
-    public static <U, V> List<V> map(Collection<U> list, Function<U, V> mapper) {
+    @Nonnull
+    public static <U, V> List<V> map(@Nonnull Collection<U> list, @Nonnull Function<U, V> mapper) {
         return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
     }
 }
