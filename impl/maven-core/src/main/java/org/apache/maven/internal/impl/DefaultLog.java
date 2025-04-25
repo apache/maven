@@ -152,14 +152,14 @@ public class DefaultLog implements Log {
     @Override
     public void error(Supplier<String> content) {
         if (isErrorEnabled()) {
-            logger.error(content.get());
+            logger.error(toString(content.get()));
         }
     }
 
     @Override
     public void error(Supplier<String> content, Throwable error) {
         if (isErrorEnabled()) {
-            logger.error(content.get(), error);
+            logger.error(toString(content.get()), error);
         }
     }
 
