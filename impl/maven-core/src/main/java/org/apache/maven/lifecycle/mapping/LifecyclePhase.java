@@ -56,7 +56,7 @@ public class LifecyclePhase {
 
         if (goals != null && !goals.isEmpty()) {
             String[] mojoGoals = goals.split(",");
-            mojos = Arrays.stream(mojoGoals).map(fromGoalIntoLifecycleMojo).collect(Collectors.toList());
+            mojos = Arrays.stream(mojoGoals).map(fromGoalIntoLifecycleMojo).toList();
         }
     }
 

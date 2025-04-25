@@ -21,7 +21,6 @@ package org.apache.maven.lifecycle.internal.concurrent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
@@ -50,7 +49,7 @@ class PluginLifecycle implements Lifecycle {
     @Nonnull
     public Collection<Phase> phases() {
         return lifecycleOverlay.getPhases().stream()
-                .map(phase -> new Phase() {
+                .map(phase -> (Phase) new Phase() {
                     @Override
                     @Nonnull
                     public String name() {
@@ -70,20 +69,20 @@ class PluginLifecycle implements Lifecycle {
                                                 .goals(exec.getGoals())
                                                 .configuration(exec.getConfiguration())
                                                 .build())
-                                        .collect(Collectors.toList()))
+                                        .toList())
                                 .build());
                     }
 
                     @Override
                     @Nonnull
                     public Collection<Link> links() {
-                        return Collections.emptyList();
+                        return List.of();
                     }
 
                     @Override
                     @Nonnull
                     public List<Phase> phases() {
-                        return Collections.emptyList();
+                        return List.of();
                     }
 
                     @Override
@@ -92,12 +91,12 @@ class PluginLifecycle implements Lifecycle {
                         return Stream.concat(Stream.of(this), phases().stream().flatMap(Phase::allPhases));
                     }
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     @Nonnull
     public Collection<Alias> aliases() {
-        return Collections.emptyList();
+        return List.of();
     }
 }

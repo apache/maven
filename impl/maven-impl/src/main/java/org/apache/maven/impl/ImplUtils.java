@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
@@ -67,6 +66,6 @@ class ImplUtils {
      */
     @Nonnull
     public static <U, V> List<V> map(@Nonnull Collection<U> list, @Nonnull Function<U, V> mapper) {
-        return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
+        return list.stream().map(mapper).filter(Objects::nonNull).toList();
     }
 }

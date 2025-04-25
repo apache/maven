@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.DependencyScope;
@@ -147,9 +146,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         addPhases(graph, null, null, lifecycle.v3phases());
         List<String> allPhases = graph.visitAll();
         Collections.reverse(allPhases);
-        List<String> computed =
-                allPhases.stream().filter(s -> !s.startsWith("$")).collect(Collectors.toList());
-        return computed;
+        return allPhases.stream().filter(s -> !s.startsWith("$")).toList();
     }
 
     private static void addPhase(
@@ -217,7 +214,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                                 && !Lifecycle.DEFAULT.equals(id)
                                 && !Lifecycle.SITE.equals(id))
                         .map(id -> wrap(all.get(id)))
-                        .collect(Collectors.toList());
+                        .toList();
             } catch (ComponentLookupException e) {
                 throw new LookupException(e);
             }

@@ -220,7 +220,7 @@ public class InjectorImpl implements Injector {
         if (key.getRawType() == List.class) {
             Set<Binding<Object>> res2 = getBindings(key.getTypeParameter(0));
             if (res2 != null) {
-                List<Supplier<Object>> list = res2.stream().map(this::compile).collect(Collectors.toList());
+                List<Supplier<Object>> list = res2.stream().map(this::compile).toList();
                 //noinspection unchecked
                 return () -> (Q) list(list, Supplier::get);
             }

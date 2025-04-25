@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -56,7 +55,7 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
     public Collection<String> getChecksumAlgorithmNames() {
         return checksumAlgorithmFactorySelector.getChecksumAlgorithmFactories().stream()
                 .map(ChecksumAlgorithmFactory::getName)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -74,8 +73,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
         Objects.requireNonNull(algorithmNames, "algorithmNames cannot be null");
         try {
             return checksumAlgorithmFactorySelector.selectList(new ArrayList<>(algorithmNames)).stream()
-                    .map(DefaultChecksumAlgorithm::new)
-                    .collect(Collectors.toList());
+                    .map(a -> (ChecksumAlgorithm) new DefaultChecksumAlgorithm(a))
+                    .toList();
         } catch (IllegalArgumentException e) {
             throw new ChecksumAlgorithmServiceException("unsupported algorithm", e);
         }

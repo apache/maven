@@ -188,7 +188,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         .map(Node::getDependency)
                         .filter(Objects::nonNull)
                         .map(Artifact::toCoordinates)
-                        .collect(Collectors.toList());
+                        .toList();
                 Predicate<PathType> filter = request.getPathTypeFilter();
                 if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {
                     DefaultDependencyResolverResult flattenResult = new DefaultDependencyResolverResult(
