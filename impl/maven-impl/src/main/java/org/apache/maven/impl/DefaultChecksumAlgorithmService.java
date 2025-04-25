@@ -41,8 +41,6 @@ import org.apache.maven.api.services.ChecksumAlgorithmServiceException;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactorySelector;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
-
 @Named
 @Singleton
 public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService {
@@ -63,7 +61,7 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
 
     @Override
     public ChecksumAlgorithm select(String algorithmName) {
-        nonNull(algorithmName, "algorithmName");
+        Objects.requireNonNull(algorithmName, "algorithmName cannot be null");
         try {
             return new DefaultChecksumAlgorithm(checksumAlgorithmFactorySelector.select(algorithmName));
         } catch (IllegalArgumentException e) {
@@ -73,7 +71,7 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
 
     @Override
     public Collection<ChecksumAlgorithm> select(Collection<String> algorithmNames) {
-        nonNull(algorithmNames, "algorithmNames");
+        Objects.requireNonNull(algorithmNames, "algorithmNames cannot be null");
         try {
             return checksumAlgorithmFactorySelector.selectList(new ArrayList<>(algorithmNames)).stream()
                     .map(DefaultChecksumAlgorithm::new)
@@ -85,8 +83,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
 
     @Override
     public Map<ChecksumAlgorithm, String> calculate(byte[] data, Collection<ChecksumAlgorithm> algorithms) {
-        nonNull(data, "data");
-        nonNull(algorithms, "algorithms");
+        Objects.requireNonNull(data, "data cannot be null");
+        Objects.requireNonNull(algorithms, "algorithms cannot be null");
         try {
             return calculate(new ByteArrayInputStream(data), algorithms);
         } catch (IOException e) {
@@ -96,8 +94,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
 
     @Override
     public Map<ChecksumAlgorithm, String> calculate(ByteBuffer data, Collection<ChecksumAlgorithm> algorithms) {
-        nonNull(data, "data");
-        nonNull(algorithms, "algorithms");
+        Objects.requireNonNull(data, "data cannot be null");
+        Objects.requireNonNull(algorithms, "algorithms cannot be null");
         LinkedHashMap<ChecksumAlgorithm, ChecksumCalculator> algMap = new LinkedHashMap<>();
         algorithms.forEach(f -> algMap.put(f, f.getCalculator()));
         data.mark();
@@ -113,8 +111,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
     @Override
     public Map<ChecksumAlgorithm, String> calculate(Path file, Collection<ChecksumAlgorithm> algorithms)
             throws IOException {
-        nonNull(file, "file");
-        nonNull(algorithms, "algorithms");
+        Objects.requireNonNull(file, "file cannot be null");
+        Objects.requireNonNull(algorithms, "algorithms cannot be null");
         try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(file))) {
             return calculate(inputStream, algorithms);
         }
@@ -123,8 +121,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
     @Override
     public Map<ChecksumAlgorithm, String> calculate(InputStream stream, Collection<ChecksumAlgorithm> algorithms)
             throws IOException {
-        nonNull(stream, "stream");
-        nonNull(algorithms, "algorithms");
+        Objects.requireNonNull(stream, "stream cannot be null");
+        Objects.requireNonNull(algorithms, "algorithms cannot be null");
         LinkedHashMap<ChecksumAlgorithm, ChecksumCalculator> algMap = new LinkedHashMap<>();
         algorithms.forEach(f -> algMap.put(f, f.getCalculator()));
         final byte[] buffer = new byte[1024 * 32];

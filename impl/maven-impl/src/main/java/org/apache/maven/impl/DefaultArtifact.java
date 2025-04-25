@@ -25,8 +25,6 @@ import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
-
 /**
  * A wrapper class around a maven resolver artifact.
  */
@@ -50,8 +48,8 @@ public class DefaultArtifact implements Artifact {
     protected final String key;
 
     public DefaultArtifact(@Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
-        this.session = nonNull(session, "session");
-        this.artifact = nonNull(artifact, "artifact");
+        this.session = Objects.requireNonNull(session, "session cannot be null");
+        this.artifact = Objects.requireNonNull(artifact, "artifact cannot be null");
         this.key = getGroupId()
                 + ':'
                 + getArtifactId()

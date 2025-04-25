@@ -28,7 +28,7 @@ public class DefaultRemoteRepository implements RemoteRepository {
     private final org.eclipse.aether.repository.RemoteRepository repository;
 
     public DefaultRemoteRepository(@Nonnull org.eclipse.aether.repository.RemoteRepository repository) {
-        this.repository = repository;
+        this.repository = Objects.requireNonNull(repository, "repository cannot be null");
     }
 
     public org.eclipse.aether.repository.RemoteRepository getRepository() {

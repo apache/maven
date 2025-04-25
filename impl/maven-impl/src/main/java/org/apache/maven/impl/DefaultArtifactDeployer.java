@@ -32,8 +32,6 @@ import org.apache.maven.api.services.ArtifactDeployerRequest;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeploymentException;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
-
 /**
  * Implementation of {@link ArtifactDeployer} service.
  */
@@ -43,7 +41,7 @@ public class DefaultArtifactDeployer implements ArtifactDeployer {
 
     @Override
     public void deploy(@Nonnull ArtifactDeployerRequest request) {
-        nonNull(request, "request");
+        Objects.requireNonNull(request, "request cannot be null");
         InternalSession session = InternalSession.from(request.getSession());
         Collection<ProducedArtifact> artifacts =
                 Objects.requireNonNull(request.getArtifacts(), "request.artifacts cannot be null");

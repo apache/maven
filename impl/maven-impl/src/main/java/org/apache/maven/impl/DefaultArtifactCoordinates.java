@@ -24,8 +24,6 @@ import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
-
 /**
  * A wrapper class around a maven resolver artifact.
  */
@@ -35,8 +33,8 @@ public class DefaultArtifactCoordinates implements ArtifactCoordinates {
 
     public DefaultArtifactCoordinates(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact coordinates) {
-        this.session = nonNull(session, "session");
-        this.coordinates = nonNull(coordinates, "coordinates");
+        this.session = Objects.requireNonNull(session, "session cannot be null");
+        this.coordinates = Objects.requireNonNull(coordinates, "coordinates cannot be null");
     }
 
     public org.eclipse.aether.artifact.Artifact getCoordinates() {

@@ -29,13 +29,24 @@ import org.apache.maven.api.annotations.Nullable;
 
 class CoreUtils {
 
+    /**
+     * Casts an object to the specified type, with validation and error handling.
+     *
+     * @param <T> the target type
+     * @param clazz the class representing the target type
+     * @param o the object to cast
+     * @param name the name of the parameter for error messages
+     * @return the cast object
+     * @throws NullPointerException if the object is null
+     * @throws ClassCastException if the object is not an instance of the target type
+     */
     @Nonnull
     public static <T> T cast(@Nonnull Class<T> clazz, @Nullable Object o, @Nonnull String name) {
         if (!clazz.isInstance(o)) {
             if (o == null) {
-                throw new IllegalArgumentException(name + " is null");
+                throw new NullPointerException(name + " is null");
             }
-            throw new IllegalArgumentException(name + " is not an instance of " + clazz.getName());
+            throw new ClassCastException(name + " is not an instance of " + clazz.getName());
         }
         return clazz.cast(o);
     }

@@ -104,7 +104,6 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.transfer.TransferResource;
 
 import static org.apache.maven.impl.ImplUtils.map;
-import static org.apache.maven.impl.ImplUtils.nonNull;
 
 public abstract class AbstractSession implements InternalSession {
 
@@ -134,7 +133,7 @@ public abstract class AbstractSession implements InternalSession {
             List<RemoteRepository> repositories,
             List<org.eclipse.aether.repository.RemoteRepository> resolverRepositories,
             Lookup lookup) {
-        this.session = nonNull(session, "session");
+        this.session = Objects.requireNonNull(session, "session cannot be null");
         this.repositorySystem = repositorySystem;
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
@@ -337,7 +336,7 @@ public abstract class AbstractSession implements InternalSession {
     @Nonnull
     @Override
     public Session withLocalRepository(@Nonnull LocalRepository localRepository) {
-        nonNull(localRepository, "localRepository");
+        Objects.requireNonNull(localRepository, "localRepository cannot be null");
         if (session.getLocalRepository() != null
                 && Objects.equals(session.getLocalRepository().getBasePath(), localRepository.getPath())) {
             return this;
@@ -461,12 +460,12 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public void registerListener(@Nonnull Listener listener) {
-        listeners.add(nonNull(listener));
+        listeners.add(Objects.requireNonNull(listener));
     }
 
     @Override
     public void unregisterListener(@Nonnull Listener listener) {
-        listeners.remove(nonNull(listener));
+        listeners.remove(Objects.requireNonNull(listener));
     }
 
     @Nonnull
@@ -967,7 +966,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public DependencyScope requireDependencyScope(String id) {
-        DependencyScope scope = DependencyScope.forId(nonNull(id, "id"));
+        DependencyScope scope = DependencyScope.forId(Objects.requireNonNull(id, "id cannot be null"));
         if (scope == null) {
             throw new IllegalArgumentException("Invalid dependency scope: " + id);
         }
