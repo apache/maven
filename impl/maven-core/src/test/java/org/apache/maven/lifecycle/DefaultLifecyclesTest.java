@@ -22,7 +22,6 @@ import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -79,8 +78,7 @@ class DefaultLifecyclesTest {
     @Test
     void testCustomLifecycle() throws ComponentLookupException {
         List<Lifecycle> myLifecycles = new ArrayList<>();
-        Lifecycle myLifecycle =
-                new Lifecycle("etl", Arrays.asList("extract", "transform", "load"), Collections.emptyMap());
+        Lifecycle myLifecycle = new Lifecycle("etl", Arrays.asList("extract", "transform", "load"), Map.of());
         myLifecycles.add(myLifecycle);
         myLifecycles.addAll(defaultLifeCycles.getLifeCycles());
 

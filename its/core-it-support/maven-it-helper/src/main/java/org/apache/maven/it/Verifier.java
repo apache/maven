@@ -586,7 +586,7 @@ public class Verifier {
 
             return l;
         } else {
-            return Collections.singletonList(line);
+            return List.of(line);
         }
     }
 

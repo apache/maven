@@ -21,7 +21,6 @@ package org.apache.maven.graph;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -117,7 +116,7 @@ class ProjectSelectorTest {
         selectors.add(":optional");
 
         final MavenProject mavenProject = createMavenProject("maven-core");
-        final List<MavenProject> listOfProjects = Collections.singletonList(mavenProject);
+        final List<MavenProject> listOfProjects = List.of(mavenProject);
 
         final Set<MavenProject> optionalProjectsBySelectors =
                 sut.getOptionalProjectsBySelectors(mavenExecutionRequest, listOfProjects, selectors);
@@ -133,7 +132,7 @@ class ProjectSelectorTest {
         selectors.add(":required");
 
         final MavenProject mavenProject = createMavenProject("maven-core");
-        final List<MavenProject> listOfProjects = Collections.singletonList(mavenProject);
+        final List<MavenProject> listOfProjects = List.of(mavenProject);
 
         final MavenExecutionException exception = assertThrows(
                 MavenExecutionException.class,
@@ -148,7 +147,7 @@ class ProjectSelectorTest {
         selectors.add(":maven-core");
 
         final MavenProject mavenProject = createMavenProject("maven-core");
-        final List<MavenProject> listOfProjects = Collections.singletonList(mavenProject);
+        final List<MavenProject> listOfProjects = List.of(mavenProject);
 
         final Set<MavenProject> requiredProjectsBySelectors =
                 sut.getRequiredProjectsBySelectors(mavenExecutionRequest, listOfProjects, selectors);
@@ -166,8 +165,8 @@ class ProjectSelectorTest {
 
         final MavenProject mavenProject = createMavenProject("maven-core");
         final MavenProject child = createMavenProject("maven-core-child");
-        mavenProject.setCollectedProjects(Collections.singletonList(child));
-        final List<MavenProject> listOfProjects = Collections.singletonList(mavenProject);
+        mavenProject.setCollectedProjects(List.of(child));
+        final List<MavenProject> listOfProjects = List.of(mavenProject);
 
         final Set<MavenProject> requiredProjectsBySelectors =
                 sut.getRequiredProjectsBySelectors(mavenExecutionRequest, listOfProjects, selectors);
@@ -185,8 +184,8 @@ class ProjectSelectorTest {
 
         final MavenProject mavenProject = createMavenProject("maven-core");
         final MavenProject child = createMavenProject("maven-core-child");
-        mavenProject.setCollectedProjects(Collections.singletonList(child));
-        final List<MavenProject> listOfProjects = Collections.singletonList(mavenProject);
+        mavenProject.setCollectedProjects(List.of(child));
+        final List<MavenProject> listOfProjects = List.of(mavenProject);
 
         final Set<MavenProject> optionalProjectsBySelectors =
                 sut.getOptionalProjectsBySelectors(mavenExecutionRequest, listOfProjects, selectors);

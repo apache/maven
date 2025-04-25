@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -439,7 +438,7 @@ public class DefaultMaven implements Maven {
 
     protected <T> Collection<T> getProjectScopedExtensionComponents(Collection<MavenProject> projects, Class<T> role) {
         if (projects == null) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         Collection<T> foundComponents = new LinkedHashSet<>();

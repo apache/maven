@@ -103,7 +103,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     private List<String> parsePluginExcludes(RepositorySystemSession session) {
         String excludes = ConfigUtils.getString(session, null, Constants.MAVEN_PLUGIN_VALIDATION_EXCLUDES);
         if (excludes == null || excludes.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
         return Arrays.stream(excludes.split(","))
                 .map(String::trim)

@@ -22,7 +22,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
@@ -46,7 +45,7 @@ public class BuildListCalculator {
             List<MavenProject> projects;
 
             if (taskSegment.isAggregating()) {
-                projects = Collections.singletonList(rootProject);
+                projects = List.of(rootProject);
             } else {
                 projects = session.getProjects();
             }

@@ -934,7 +934,7 @@ public class MavenProject implements Cloneable {
 
     public List<Plugin> getBuildPlugins() {
         if (getModel().getBuild() == null) {
-            return Collections.emptyList();
+            return List.of();
         }
         return Collections.unmodifiableList(getModel().getBuild().getPlugins());
     }
@@ -1204,7 +1204,7 @@ public class MavenProject implements Cloneable {
     public List<Extension> getBuildExtensions() {
         Build build = getBuild();
         if ((build == null) || (build.getExtensions() == null)) {
-            return Collections.emptyList();
+            return List.of();
         } else {
             return Collections.unmodifiableList(build.getExtensions());
         }
@@ -1637,7 +1637,7 @@ public class MavenProject implements Cloneable {
         Set<Artifact> artifacts = getArtifacts();
 
         if ((artifacts == null) || artifacts.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<Dependency> list = new ArrayList<>(artifacts.size());
@@ -1678,7 +1678,7 @@ public class MavenProject implements Cloneable {
         Set<Artifact> artifacts = getArtifacts();
 
         if ((artifacts == null) || artifacts.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<Dependency> list = new ArrayList<>(artifacts.size());
@@ -1703,7 +1703,7 @@ public class MavenProject implements Cloneable {
         Set<Artifact> artifacts = getArtifacts();
 
         if ((artifacts == null) || artifacts.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<Dependency> list = new ArrayList<>(artifacts.size());
@@ -1783,7 +1783,7 @@ public class MavenProject implements Cloneable {
         Set<Artifact> artifacts = getArtifacts();
 
         if ((artifacts == null) || artifacts.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<Dependency> list = new ArrayList<>(artifacts.size());
@@ -1860,7 +1860,7 @@ public class MavenProject implements Cloneable {
     @Deprecated
     public List<ReportPlugin> getReportPlugins() {
         if (getModel().getReporting() == null) {
-            return Collections.emptyList();
+            return List.of();
         }
         return Collections.unmodifiableList(getModel().getReporting().getPlugins());
     }

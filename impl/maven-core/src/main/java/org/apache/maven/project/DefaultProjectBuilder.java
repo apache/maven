@@ -740,7 +740,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             project.setExtensionArtifacts(extensionArtifacts);
 
             // managedVersionMap
-            Map<String, Artifact> map = Collections.emptyMap();
+            Map<String, Artifact> map = Map.of();
             final DependencyManagement dependencyManagement =
                     project.getModel().getDelegate().getDependencyManagement();
             if (dependencyManagement != null
@@ -924,7 +924,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 RepositoryUtils.toArtifacts(
                         artifacts,
                         resolutionResult.getDependencyGraph().getChildren(),
-                        Collections.singletonList(project.getArtifact().getId()),
+                        List.of(project.getArtifact().getId()),
                         null);
 
                 // Maven 2.x quirk: an artifact always points at the local repo, regardless whether resolved or not

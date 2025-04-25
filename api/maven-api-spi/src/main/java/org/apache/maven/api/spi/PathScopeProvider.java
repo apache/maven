@@ -37,7 +37,7 @@ import org.apache.maven.api.di.Named;
  * <pre>
  * public class CustomPathScopeProvider implements PathScopeProvider {
  *     public Collection&lt;PathScope&gt; provides() {
- *         return Collections.singleton(pathScope("integration-test",
+ *         return Set.of(pathScope("integration-test",
  *                 ProjectScope.TEST, DependencyScope.TEST));
  *     }
  * }

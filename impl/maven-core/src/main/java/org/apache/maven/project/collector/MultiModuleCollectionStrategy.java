@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -63,7 +62,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
     @Override
     public List<MavenProject> collectProjects(MavenExecutionRequest request) throws ProjectBuildingException {
         File moduleProjectPomFile = getRootProject(request);
-        List<File> files = Collections.singletonList(moduleProjectPomFile.getAbsoluteFile());
+        List<File> files = List.of(moduleProjectPomFile.getAbsoluteFile());
         try {
             List<MavenProject> projects = projectsSelector.selectProjects(files, request);
             boolean isRequestedProjectCollected = isRequestedProjectCollected(request, projects);
@@ -78,7 +77,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
                         System.lineSeparator(),
                         moduleProjectPomFile.getAbsolutePath(),
                         request.getPom().getAbsolutePath());
-                return Collections.emptyList();
+                return List.of();
             }
         } catch (ProjectBuildingException e) {
             boolean fallThrough = isModuleOutsideRequestScopeDependingOnPluginModule(request, e);
@@ -90,7 +89,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
                                 + "plugin extension which still needed to be built. This is not possible within the same "
                                 + "reactor build. Another project collection strategy will be executed as result.",
                         System.lineSeparator());
-                return Collections.emptyList();
+                return List.of();
             }
 
             throw e;
@@ -153,7 +152,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
                 .map(requestPomProject -> {
                     List<MavenProject> modules = requestPomProject.getCollectedProjects() != null
                             ? requestPomProject.getCollectedProjects()
-                            : Collections.emptyList();
+                            : List.of();
                     List<MavenProject> projectsInRequestScope = new ArrayList<>(modules);
                     projectsInRequestScope.add(requestPomProject);
 

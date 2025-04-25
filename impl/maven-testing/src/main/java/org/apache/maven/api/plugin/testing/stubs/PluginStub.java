@@ -18,7 +18,6 @@
  */
 package org.apache.maven.api.plugin.testing.stubs;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -51,11 +50,11 @@ public class PluginStub implements Plugin {
 
     org.apache.maven.api.model.Plugin model;
     PluginDescriptor descriptor;
-    List<Lifecycle> lifecycles = Collections.emptyList();
+    List<Lifecycle> lifecycles = List.of();
     ClassLoader classLoader;
     Artifact artifact;
-    List<Dependency> dependencies = Collections.emptyList();
-    Map<String, Dependency> dependenciesMap = Collections.emptyMap();
+    List<Dependency> dependencies = List.of();
+    Map<String, Dependency> dependenciesMap = Map.of();
 
     @Override
     public org.apache.maven.api.model.Plugin getModel() {

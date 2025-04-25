@@ -18,7 +18,7 @@
  */
 package org.apache.maven.plugin;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -51,8 +51,7 @@ class PluginParameterExceptionTest {
 
         parameter.setRequired(true);
 
-        PluginParameterException exception =
-                new PluginParameterException(mojoDescriptor, Collections.singletonList(parameter));
+        PluginParameterException exception = new PluginParameterException(mojoDescriptor, List.of(parameter));
 
         assertEquals(
                 "One or more required plugin parameters are invalid/missing for 'goalPrefix:goal'" + LS
@@ -83,8 +82,7 @@ class PluginParameterExceptionTest {
 
         parameter.setRequired(true);
 
-        PluginParameterException exception =
-                new PluginParameterException(mojoDescriptor, Collections.singletonList(parameter));
+        PluginParameterException exception = new PluginParameterException(mojoDescriptor, List.of(parameter));
 
         assertEquals(
                 "One or more required plugin parameters are invalid/missing for 'goalPrefix:goal'" + LS
@@ -115,8 +113,7 @@ class PluginParameterExceptionTest {
 
         parameter.setRequired(true);
 
-        PluginParameterException exception =
-                new PluginParameterException(mojoDescriptor, Collections.singletonList(parameter));
+        PluginParameterException exception = new PluginParameterException(mojoDescriptor, List.of(parameter));
 
         assertEquals(
                 "One or more required plugin parameters are invalid/missing for 'goalPrefix:goal'" + LS
@@ -147,8 +144,7 @@ class PluginParameterExceptionTest {
 
         parameter.setRequired(true);
 
-        PluginParameterException exception =
-                new PluginParameterException(mojoDescriptor, Collections.singletonList(parameter));
+        PluginParameterException exception = new PluginParameterException(mojoDescriptor, List.of(parameter));
 
         assertEquals(
                 "One or more required plugin parameters are invalid/missing for 'goalPrefix:goal'" + LS

@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -242,9 +241,8 @@ public class BuildPlanExecutor {
 
             BuildPlan plan = new BuildPlan(allProjects);
             for (TaskSegment taskSegment : taskSegments) {
-                Map<MavenProject, List<MavenProject>> projects = taskSegment.isAggregating()
-                        ? Collections.singletonMap(rootProject, allProjects.get(rootProject))
-                        : allProjects;
+                Map<MavenProject, List<MavenProject>> projects =
+                        taskSegment.isAggregating() ? Map.of(rootProject, allProjects.get(rootProject)) : allProjects;
 
                 BuildPlan segment = calculateMojoExecutions(projects, taskSegment.getTasks());
                 plan.then(segment);
@@ -535,7 +533,7 @@ public class BuildPlanExecutor {
                     } else if (allStepsExecuted) {
                         // If there were no failures, report success
                         projectExecutionListener.afterProjectExecutionSuccess(
-                                new ProjectExecutionEvent(session, step.project, Collections.emptyList()));
+                                new ProjectExecutionEvent(session, step.project, List.of()));
                         reactorContext
                                 .getResult()
                                 .addBuildSummary(new BuildSuccess(step.project, clock.wallTime(), clock.execTime()));
@@ -713,8 +711,8 @@ public class BuildPlanExecutor {
 
                 String resolvedPhase = getResolvedPhase(lifecycle, phase);
 
-                Map<MavenProject, List<MavenProject>> map = Collections.singletonMap(
-                        step.project, plan.getAllProjects().get(step.project));
+                Map<MavenProject, List<MavenProject>> map =
+                        Map.of(step.project, plan.getAllProjects().get(step.project));
                 BuildPlan forkedPlan = calculateLifecycleMappings(map, lifecycle, resolvedPhase);
                 forkedPlan.then(buildPlan);
                 return forkedPlan;

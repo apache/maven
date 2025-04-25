@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -381,7 +380,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         session.setProjectDependencyGraph(new ProjectDependencyGraph() {
             @Override
             public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
-                return Collections.emptyList();
+                return List.of();
             }
 
             @Override
@@ -391,12 +390,12 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
 
             @Override
             public List<MavenProject> getSortedProjects() {
-                return Collections.singletonList(session.getCurrentProject());
+                return List.of(session.getCurrentProject());
             }
 
             @Override
             public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
-                return Collections.emptyList();
+                return List.of();
             }
         });
 

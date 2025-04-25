@@ -20,12 +20,12 @@ package org.apache.maven.internal.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class Graph {
     private enum DfsState {
@@ -69,7 +69,7 @@ class Graph {
     }
 
     List<String> findCycle(Vertex vertex) {
-        return visitCycle(Collections.singleton(vertex), new HashMap<>(), new LinkedList<>());
+        return visitCycle(Set.of(vertex), new HashMap<>(), new LinkedList<>());
     }
 
     private static List<String> visitAll(

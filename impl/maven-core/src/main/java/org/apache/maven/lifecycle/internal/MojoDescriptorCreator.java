@@ -24,8 +24,8 @@ import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.execution.MavenSession;
@@ -96,9 +96,7 @@ public class MojoDescriptorCreator {
                 .map(p -> XmlNode.newInstance(
                         p.getName(),
                         p.getExpression(),
-                        p.getDefaultValue() != null
-                                ? Collections.singletonMap("default-value", p.getDefaultValue())
-                                : null,
+                        p.getDefaultValue() != null ? Map.of("default-value", p.getDefaultValue()) : null,
                         null,
                         null))
                 .toList();
@@ -118,7 +116,7 @@ public class MojoDescriptorCreator {
                     XmlNode e = XmlNode.newInstance(
                             ce.getName(),
                             value,
-                            defaultValue != null ? Collections.singletonMap("default-value", defaultValue) : null,
+                            defaultValue != null ? Map.of("default-value", defaultValue) : null,
                             null,
                             null);
                     children.add(e);

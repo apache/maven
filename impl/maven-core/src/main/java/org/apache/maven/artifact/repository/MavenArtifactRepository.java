@@ -57,7 +57,7 @@ public class MavenArtifactRepository implements ArtifactRepository {
 
     private Proxy proxy;
 
-    private List<ArtifactRepository> mirroredRepositories = Collections.emptyList();
+    private List<ArtifactRepository> mirroredRepositories = List.of();
 
     private boolean blocked;
 
@@ -190,7 +190,7 @@ public class MavenArtifactRepository implements ArtifactRepository {
     }
 
     public List<String> findVersions(Artifact artifact) {
-        return Collections.emptyList();
+        return List.of();
     }
 
     public String getId() {
@@ -386,7 +386,7 @@ public class MavenArtifactRepository implements ArtifactRepository {
         if (mirroredRepositories != null) {
             this.mirroredRepositories = Collections.unmodifiableList(mirroredRepositories);
         } else {
-            this.mirroredRepositories = Collections.emptyList();
+            this.mirroredRepositories = List.of();
         }
     }
 

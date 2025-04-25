@@ -19,7 +19,6 @@
 package org.apache.maven.lifecycle.internal.concurrent;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.api.Lifecycle;
@@ -58,7 +57,7 @@ class PluginLifecycle implements Lifecycle {
                     @Override
                     @Nonnull
                     public List<Plugin> plugins() {
-                        return Collections.singletonList(Plugin.newBuilder()
+                        return List.of(Plugin.newBuilder()
                                 .groupId(pluginDescriptor.getGroupId())
                                 .artifactId(pluginDescriptor.getArtifactId())
                                 .version(pluginDescriptor.getVersion())

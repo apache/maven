@@ -101,7 +101,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     private final List<LifecycleProvider> providers;
 
     public DefaultLifecycleRegistry() {
-        this(Collections.emptyList());
+        this(List.of());
     }
 
     @Inject

@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Map;
 
 import org.apache.maven.api.metadata.Metadata;
@@ -134,7 +133,7 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
 
     @Override
     public Map<String, String> getProperties() {
-        return Collections.emptyMap();
+        return Map.of();
     }
 
     @Override

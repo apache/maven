@@ -614,7 +614,7 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates) {
         return getService(ArtifactResolver.class)
-                .resolve(this, Collections.singletonList(coordinates))
+                .resolve(this, List.of(coordinates))
                 .getResults()
                 .values()
                 .iterator()
@@ -631,7 +631,7 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates, List<RemoteRepository> repositories) {
         return getService(ArtifactResolver.class)
-                .resolve(this, Collections.singletonList(coordinates), repositories)
+                .resolve(this, List.of(coordinates), repositories)
                 .getResults()
                 .values()
                 .iterator()

@@ -35,7 +35,7 @@ import org.apache.maven.api.di.Named;
  * <pre>
  * public class CustomProjectScopeProvider implements ProjectScopeProvider {
  *     public Collection&lt;ProjectScope&gt; provides() {
- *         return Collections.singleton(projectScope("integration-test"));
+ *         return Set.of(projectScope("integration-test"));
  *     }
  * }
  * </pre>

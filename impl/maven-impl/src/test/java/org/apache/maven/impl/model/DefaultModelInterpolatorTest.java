@@ -25,7 +25,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -224,7 +223,7 @@ class DefaultModelInterpolatorTest {
     public void shouldInterpolateDependencyVersionToSetSameAsProjectVersion() throws Exception {
         Model model = Model.newBuilder()
                 .version("3.8.1")
-                .dependencies(Collections.singletonList(
+                .dependencies(List.of(
                         Dependency.newBuilder().version("${project.version}").build()))
                 .build();
 
@@ -240,8 +239,8 @@ class DefaultModelInterpolatorTest {
     public void testShouldNotInterpolateDependencyVersionWithInvalidReference() throws Exception {
         Model model = Model.newBuilder()
                 .version("3.8.1")
-                .dependencies(Collections.singletonList(
-                        Dependency.newBuilder().version("${something}").build()))
+                .dependencies(
+                        List.of(Dependency.newBuilder().version("${something}").build()))
                 .build();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
@@ -257,7 +256,7 @@ class DefaultModelInterpolatorTest {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .dependencies(Collections.singletonList(Dependency.newBuilder()
+                .dependencies(List.of(Dependency.newBuilder()
                         .version("${project.artifactId}-${project.version}")
                         .build()))
                 .build();
@@ -275,7 +274,7 @@ class DefaultModelInterpolatorTest {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .repositories(Collections.singletonList(Repository.newBuilder()
+                .repositories(List.of(Repository.newBuilder()
                         .url("file://localhost/${anotherdir}/temp-repo")
                         .build()))
                 .build();
@@ -301,7 +300,7 @@ class DefaultModelInterpolatorTest {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .repositories(Collections.singletonList(
+                .repositories(List.of(
                         Repository.newBuilder().url("${basedir}/temp-repo").build()))
                 .build();
 
@@ -323,7 +322,7 @@ class DefaultModelInterpolatorTest {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .repositories(Collections.singletonList(
+                .repositories(List.of(
                         Repository.newBuilder().url("${basedir}/temp-repo").build()))
                 .build();
 
@@ -344,7 +343,7 @@ class DefaultModelInterpolatorTest {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .repositories(Collections.singletonList(Repository.newBuilder()
+                .repositories(List.of(Repository.newBuilder()
                         .url("${project.baseUri}/temp-repo")
                         .build()))
                 .build();
@@ -366,7 +365,7 @@ class DefaultModelInterpolatorTest {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .repositories(Collections.singletonList(Repository.newBuilder()
+                .repositories(List.of(Repository.newBuilder()
                         .url("file:${project.rootDirectory}/temp-repo")
                         .build()))
                 .build();
@@ -386,7 +385,7 @@ class DefaultModelInterpolatorTest {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .repositories(Collections.singletonList(Repository.newBuilder()
+                .repositories(List.of(Repository.newBuilder()
                         .url("${project.rootDirectory.uri}/temp-repo")
                         .build()))
                 .build();
@@ -409,7 +408,7 @@ class DefaultModelInterpolatorTest {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .repositories(Collections.singletonList(Repository.newBuilder()
+                .repositories(List.of(Repository.newBuilder()
                         .url("file:///${project.rootDirectory}/temp-repo")
                         .build()))
                 .build();
@@ -500,7 +499,7 @@ class DefaultModelInterpolatorTest {
     public void shouldInterpolateUnprefixedBasedirExpression() throws Exception {
         Path basedir = Paths.get("/test/path");
         Model model = Model.newBuilder()
-                .dependencies(Collections.singletonList(Dependency.newBuilder()
+                .dependencies(List.of(Dependency.newBuilder()
                         .systemPath("${basedir}/artifact.jar")
                         .build()))
                 .build();

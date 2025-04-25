@@ -97,7 +97,7 @@ public class LifecycleDependencyResolver {
                     .filter(projectAndSubmodules::contains)
                     .toList(); // sorted and filtered to what we need
         } else {
-            return Collections.singletonList(project);
+            return List.of(project);
         }
     }
 
@@ -287,7 +287,7 @@ public class LifecycleDependencyResolver {
             RepositoryUtils.toArtifacts(
                     artifacts,
                     result.getDependencyGraph().getChildren(),
-                    Collections.singletonList(project.getArtifact().getId()),
+                    List.of(project.getArtifact().getId()),
                     collectionFilter);
         }
         return new SetWithResolutionResult(result, artifacts);

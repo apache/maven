@@ -30,7 +30,7 @@ import org.apache.maven.project.MavenProject;
 public class DefaultMavenExecutionResult implements MavenExecutionResult {
     private MavenProject project;
 
-    private List<MavenProject> topologicallySortedProjects = Collections.emptyList();
+    private List<MavenProject> topologicallySortedProjects = List.of();
 
     private DependencyResolutionResult dependencyResolutionResult;
 
@@ -58,7 +58,7 @@ public class DefaultMavenExecutionResult implements MavenExecutionResult {
 
     public List<MavenProject> getTopologicallySortedProjects() {
         return null == topologicallySortedProjects
-                ? Collections.emptyList()
+                ? List.of()
                 : Collections.unmodifiableList(topologicallySortedProjects);
     }
 

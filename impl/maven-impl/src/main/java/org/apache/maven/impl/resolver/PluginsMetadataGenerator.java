@@ -23,9 +23,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.jar.JarFile;
@@ -89,7 +89,7 @@ class PluginsMetadataGenerator implements MetadataGenerator {
 
     @Override
     public Collection<? extends Metadata> prepare(Collection<? extends Artifact> artifacts) {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

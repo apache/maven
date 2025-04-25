@@ -20,7 +20,6 @@ package org.apache.maven.lifecycle.mapping;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +67,7 @@ public class LifecyclePhase {
 
     @Override
     public String toString() {
-        return Optional.ofNullable(getMojos()).orElse(Collections.emptyList()).stream()
+        return Optional.ofNullable(getMojos()).orElse(List.of()).stream()
                 .map(LifecycleMojo::getGoal)
                 .collect(Collectors.joining(","));
     }
@@ -80,7 +79,7 @@ public class LifecyclePhase {
         }
 
         if (lifecyclePhases.isEmpty()) {
-            return Collections.emptyMap();
+            return Map.of();
         }
 
         Map<String, String> phases = new LinkedHashMap<>();

@@ -209,7 +209,7 @@ public class ${class.name}
         }
       #elseif ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
         if (${field.name} == null) {
-            ${field.name} = Collections.emptyList();
+            ${field.name} = List.of();
         }
         if (!Objects.equals(${field.name}, ${pfx}${cap}())) {
             update(getDelegate().with${cap}(

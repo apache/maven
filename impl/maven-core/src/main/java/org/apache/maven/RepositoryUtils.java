@@ -21,7 +21,6 @@ package org.apache.maven;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +121,7 @@ public class RepositoryUtils {
             nodeTrail.addAll(trail);
             nodeTrail.add(artifact.getId());
 
-            if (filter == null || filter.accept(node, Collections.emptyList())) {
+            if (filter == null || filter.accept(node, List.of())) {
                 artifact.setDependencyTrail(nodeTrail);
                 artifacts.add(artifact);
             }
@@ -144,7 +143,7 @@ public class RepositoryUtils {
         Map<String, String> props = null;
         if (org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(artifact.getScope())) {
             String localPath = (artifact.getFile() != null) ? artifact.getFile().getPath() : "";
-            props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, localPath);
+            props = Map.of(MavenArtifactProperties.LOCAL_PATH, localPath);
         }
 
         Artifact result = new DefaultArtifact(
@@ -168,14 +167,14 @@ public class RepositoryUtils {
 
         Artifact result = toArtifact(artifact);
 
-        List<Exclusion> excl = Optional.ofNullable(exclusions).orElse(Collections.emptyList()).stream()
+        List<Exclusion> excl = Optional.ofNullable(exclusions).orElse(List.of()).stream()
                 .map(RepositoryUtils::toExclusion)
                 .toList();
         return new Dependency(result, artifact.getScope(), artifact.isOptional(), excl);
     }
 
     public static List<RemoteRepository> toRepos(List<ArtifactRepository> repos) {
-        return Optional.ofNullable(repos).orElse(Collections.emptyList()).stream()
+        return Optional.ofNullable(repos).orElse(List.of()).stream()
                 .map(RepositoryUtils::toRepo)
                 .toList();
     }
@@ -279,7 +278,7 @@ public class RepositoryUtils {
 
         Map<String, String> props = null;
         if (system) {
-            props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
+            props = Map.of(MavenArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
         }
 
         Artifact artifact = new DefaultArtifact(

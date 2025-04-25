@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -113,7 +112,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         this.lifecyclePluginResolver = lifecyclePluginResolver;
         this.standardDelegate = null;
         this.delegates = null;
-        this.mojoExecutionConfigurators = Collections.singletonMap("default", new DefaultMojoExecutionConfigurator());
+        this.mojoExecutionConfigurators = Map.of("default", new DefaultMojoExecutionConfigurator());
     }
 
     @Override
@@ -551,7 +550,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         }
 
         if (alreadyPlannedExecutions.contains(forkedMojoDescriptor)) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         MojoExecution forkedExecution = new MojoExecution(forkedMojoDescriptor, forkedGoal);
@@ -562,7 +561,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
         calculateForkedExecutions(forkedExecution, session, project, alreadyPlannedExecutions);
 
-        return Collections.singletonList(forkedExecution);
+        return List.of(forkedExecution);
     }
 
     private MojoExecutionConfigurator mojoExecutionConfigurator(MojoExecution mojoExecution) {

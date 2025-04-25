@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,8 +89,8 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                 target.setBuild(new Build());
             }
 
-            Map<Object, Object> context = Collections.singletonMap(
-                    PLUGIN_MANAGEMENT, target.getBuild().getPluginManagement());
+            Map<Object, Object> context =
+                    Map.of(PLUGIN_MANAGEMENT, target.getBuild().getPluginManagement());
 
             mergePluginContainer_Plugins(target.getBuild(), source.getBuild(), false, context);
         }
@@ -132,7 +131,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                             Plugin addedPlugin = added.get(key);
                             if (addedPlugin != null) {
                                 Plugin plugin = managedPlugin.clone();
-                                mergePlugin(plugin, addedPlugin, sourceDominant, Collections.emptyMap());
+                                mergePlugin(plugin, addedPlugin, sourceDominant, Map.of());
                                 merged.put(key, plugin);
                             }
                         }

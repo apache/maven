@@ -18,6 +18,7 @@
  */
 package org.apache.maven.execution;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -82,7 +82,7 @@ class DefaultBuildResumptionAnalyzerTest {
         MavenProject projectA = createSucceededMavenProject("A");
         MavenProject projectB = createFailedMavenProject("B");
         MavenProject projectC = createSkippedMavenProject("C");
-        projectC.setDependencies(singletonList(toDependency(projectB)));
+        projectC.setDependencies(List.of(toDependency(projectB)));
         executionResult.setTopologicallySortedProjects(asList(projectA, projectB, projectC));
 
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);

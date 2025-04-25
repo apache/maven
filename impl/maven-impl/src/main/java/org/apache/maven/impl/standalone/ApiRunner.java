@@ -164,7 +164,7 @@ public class ApiRunner {
         private final Instant startTime = MonotonicClock.now();
 
         DefaultSession(RepositorySystemSession session, RepositorySystem repositorySystem, Lookup lookup) {
-            this(session, repositorySystem, Collections.emptyList(), null, lookup);
+            this(session, repositorySystem, List.of(), null, lookup);
         }
 
         protected DefaultSession(

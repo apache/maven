@@ -19,7 +19,6 @@
 package org.apache.maven.impl.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -133,8 +132,9 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                 targetBuild = Build.newInstance();
             }
 
+            PluginManagement pluginManagement = targetBuild.getPluginManagement();
             Map<Object, Object> context =
-                    Collections.singletonMap(PLUGIN_MANAGEMENT, targetBuild.getPluginManagement());
+                    pluginManagement != null ? Map.of(PLUGIN_MANAGEMENT, pluginManagement) : Map.of();
 
             Build.Builder builder = Build.newBuilder(targetBuild);
             mergePluginContainer_Plugins(builder, targetBuild, source.getBuild(), false, context);
@@ -181,8 +181,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                             Object key = getPluginKey().apply(managedPlugin);
                             Plugin addedPlugin = added.get(key);
                             if (addedPlugin != null) {
-                                Plugin plugin =
-                                        mergePlugin(managedPlugin, addedPlugin, sourceDominant, Collections.emptyMap());
+                                Plugin plugin = mergePlugin(managedPlugin, addedPlugin, sourceDominant, Map.of());
                                 merged.put(key, plugin);
                             }
                         }

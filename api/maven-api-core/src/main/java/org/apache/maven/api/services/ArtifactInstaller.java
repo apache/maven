@@ -19,7 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Service;
@@ -51,7 +51,7 @@ public interface ArtifactInstaller extends Service {
      *          {@code artifact} is {@code null}
      */
     default void install(Session session, ProducedArtifact artifact) {
-        install(session, Collections.singletonList(artifact));
+        install(session, List.of(artifact));
     }
 
     /**
