@@ -11,9 +11,7 @@
 
   <properties>
     <versionCore>0.1.0</versionCore>
-    <releaseProp>-RELEASE</releaseProp>
-    <release>${releaseProp:--DEVELOPER}</release>
-    <revision>${versionCore}${release:--NOT_DEV}</revision>
+    <revision>${versionCore}${release:+:--DEVELOPER}</revision>
   </properties>
 
 </project>

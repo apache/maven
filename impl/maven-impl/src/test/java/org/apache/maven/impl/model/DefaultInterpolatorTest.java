@@ -170,6 +170,52 @@ class DefaultInterpolatorTest {
     }
 
     @Test
+    void testTernary() {
+        Map<String, String> props;
+
+        props = new LinkedHashMap<>();
+        props.put("foo", "-FOO");
+        props.put("bar", "-BAR");
+        props.put("version", "1.0${release:+${foo}:-${bar}}");
+        performSubstitution(props);
+        assertEquals("1.0-BAR", props.get("version"));
+
+        props = new LinkedHashMap<>();
+        props.put("release", "true");
+        props.put("foo", "-FOO");
+        props.put("bar", "-BAR");
+        props.put("version", "1.0${release:+${foo}:-${bar}}");
+        performSubstitution(props);
+        assertEquals("1.0-FOO", props.get("version"));
+
+        props = new LinkedHashMap<>();
+        props.put("foo", "");
+        props.put("bar", "-BAR");
+        props.put("version", "1.0${release:+${foo}:-${bar}}");
+        performSubstitution(props);
+        assertEquals("1.0-BAR", props.get("version"));
+
+        props = new LinkedHashMap<>();
+        props.put("release", "true");
+        props.put("foo", "");
+        props.put("bar", "-BAR");
+        props.put("version", "1.0${release:+${foo}:-${bar}}");
+        performSubstitution(props);
+        assertEquals("1.0", props.get("version"));
+
+        props = new LinkedHashMap<>();
+        props.put("version", "1.0${release:+:--BAR}");
+        performSubstitution(props);
+        assertEquals("1.0-BAR", props.get("version"));
+
+        props = new LinkedHashMap<>();
+        props.put("release", "true");
+        props.put("version", "1.0${release:+:--BAR}");
+        performSubstitution(props);
+        assertEquals("1.0", props.get("version"));
+    }
+
+    @Test
     void testXdg() {
         Map<String, String> props;
 
