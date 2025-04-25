@@ -320,7 +320,7 @@ public class MavenProject implements Cloneable {
      * @param path the source root to add
      */
     public void addCompileSourceRoot(String path) {
-        addPath(getCompileSourceRoots(), path);
+        addPath(compileSourceRoots, path);
     }
 
     /**
@@ -330,7 +330,7 @@ public class MavenProject implements Cloneable {
      * @since 3.9.10
      */
     public void removeCompileSourceRoot(String path) {
-        removePath(getCompileSourceRoots(), path);
+        removePath(compileSourceRoots, path);
     }
 
     /**
@@ -339,7 +339,7 @@ public class MavenProject implements Cloneable {
      * @param path the test source root to add
      */
     public void addTestCompileSourceRoot(String path) {
-        addPath(getTestCompileSourceRoots(), path);
+        addPath(testCompileSourceRoots, path);
     }
 
     /**
@@ -349,7 +349,7 @@ public class MavenProject implements Cloneable {
      * @since 3.9.10
      */
     public void removeTestCompileSourceRoot(String path) {
-        removePath(getTestCompileSourceRoots(), path);
+        removePath(testCompileSourceRoots, path);
     }
 
     /**
