@@ -279,7 +279,7 @@ public class MavenProject implements Cloneable {
     private void addPath(List<String> paths, String path) {
         if (path != null) {
             path = path.trim();
-            if (path.length() > 0) {
+            if (!path.isEmpty()) {
                 File file = new File(path);
                 if (file.isAbsolute()) {
                     path = file.getAbsolutePath();
@@ -296,12 +296,38 @@ public class MavenProject implements Cloneable {
         }
     }
 
+    private void removePath(List<String> paths, String path) {
+        if (path != null) {
+            path = path.trim();
+            if (!path.isEmpty()) {
+                File file = new File(path);
+                if (file.isAbsolute()) {
+                    path = file.getAbsolutePath();
+                } else if (".".equals(path)) {
+                    path = getBasedir().getAbsolutePath();
+                } else {
+                    path = new File(getBasedir(), path).getAbsolutePath();
+                }
+
+                paths.remove(path);
+            }
+        }
+    }
+
     public void addCompileSourceRoot(String path) {
         addPath(getCompileSourceRoots(), path);
     }
 
+    public void removeCompileSourceRoot(String path) {
+        removePath(getCompileSourceRoots(), path);
+    }
+
     public void addTestCompileSourceRoot(String path) {
         addPath(getTestCompileSourceRoots(), path);
+    }
+
+    public void removeTestCompileSourceRoot(String path) {
+        removePath(getTestCompileSourceRoots(), path);
     }
 
     public List<String> getCompileSourceRoots() {
