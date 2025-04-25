@@ -21,6 +21,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1211,7 +1212,8 @@ public class MavenProject implements Cloneable {
                 return;
             }
 
-            LOGGER.warn("Direct modification of " + collectionName + " through " + method + "() is deprecated and will not work in Maven 4.0.0. "
+            LOGGER.warn("Direct modification of " + collectionName + " through " + method
+                    + "() is deprecated and will not work in Maven 4.0.0. "
                     + "Please use the add/remove methods instead. If you're using a plugin that causes this warning, "
                     + "please upgrade to the latest version and report an issue if the warning persists. "
                     + "To disable these warnings, set -D" + DISABLE_WARNINGS_PROPERTY + "=true");
