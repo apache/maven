@@ -22,11 +22,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -1192,7 +1195,7 @@ public class MavenProject implements Cloneable {
      * @param <E> the type of elements in the list
      * @since 3.9.10
      */
-    private static class LoggingList<E> implements List<E> {
+    private static class LoggingList<E> extends AbstractList<E> {
         private static final String DISABLE_WARNINGS_PROPERTY = "maven.project.sourceRoots.warningsDisabled";
         private final List<E> delegate;
         private final String collectionName;
@@ -1219,18 +1222,43 @@ public class MavenProject implements Cloneable {
         }
 
         @Override
+        public E get(int index) {
+            return delegate.get(index);
+        }
+
+        @Override
         public int size() {
             return delegate.size();
         }
 
         @Override
-        public boolean isEmpty() {
-            return delegate.isEmpty();
+        public E set(int index, E element) {
+            logWarning("set");
+            return delegate.set(index, element);
         }
 
         @Override
-        public boolean contains(Object o) {
-            return delegate.contains(o);
+        public void add(int index, E element) {
+            logWarning("add");
+            delegate.add(index, element);
+        }
+
+        @Override
+        public E remove(int index) {
+            logWarning("remove");
+            return delegate.remove(index);
+        }
+
+        @Override
+        public void clear() {
+            logWarning("clear");
+            delegate.clear();
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends E> c) {
+            logWarning("addAll");
+            return delegate.addAll(index, c);
         }
 
         @Override
@@ -1257,103 +1285,63 @@ public class MavenProject implements Cloneable {
         }
 
         @Override
-        public Object[] toArray() {
-            return delegate.toArray();
-        }
-
-        @Override
-        public <T> T[] toArray(T[] a) {
-            return delegate.toArray(a);
-        }
-
-        @Override
-        public boolean add(E e) {
-            logWarning("add");
-            return delegate.add(e);
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            logWarning("remove");
-            return delegate.remove(o);
-        }
-
-        @Override
-        public boolean containsAll(Collection<?> c) {
-            return delegate.containsAll(c);
-        }
-
-        @Override
-        public boolean addAll(Collection<? extends E> c) {
-            logWarning("addAll");
-            return delegate.addAll(c);
-        }
-
-        @Override
-        public boolean addAll(int index, Collection<? extends E> c) {
-            logWarning("addAll");
-            return delegate.addAll(index, c);
-        }
-
-        @Override
-        public boolean removeAll(Collection<?> c) {
-            logWarning("removeAll");
-            return delegate.removeAll(c);
-        }
-
-        @Override
-        public boolean retainAll(Collection<?> c) {
-            logWarning("retainAll");
-            return delegate.retainAll(c);
-        }
-
-        @Override
-        public void clear() {
-            logWarning("clear");
-            delegate.clear();
-        }
-
-        @Override
-        public E get(int index) {
-            return delegate.get(index);
-        }
-
-        @Override
-        public E set(int index, E element) {
-            logWarning("set");
-            return delegate.set(index, element);
-        }
-
-        @Override
-        public void add(int index, E element) {
-            logWarning("add");
-            delegate.add(index, element);
-        }
-
-        @Override
-        public E remove(int index) {
-            logWarning("remove");
-            return delegate.remove(index);
-        }
-
-        @Override
-        public int indexOf(Object o) {
-            return delegate.indexOf(o);
-        }
-
-        @Override
-        public int lastIndexOf(Object o) {
-            return delegate.lastIndexOf(o);
-        }
-
-        @Override
         public ListIterator<E> listIterator() {
-            return new LoggingListIterator(delegate.listIterator());
+            return listIterator(0);
         }
 
         @Override
         public ListIterator<E> listIterator(int index) {
-            return new LoggingListIterator(delegate.listIterator(index));
+            return new ListIterator<E>() {
+                private final ListIterator<E> it = delegate.listIterator(index);
+
+                @Override
+                public boolean hasNext() {
+                    return it.hasNext();
+                }
+
+                @Override
+                public E next() {
+                    return it.next();
+                }
+
+                @Override
+                public boolean hasPrevious() {
+                    return it.hasPrevious();
+                }
+
+                @Override
+                public E previous() {
+                    return it.previous();
+                }
+
+                @Override
+                public int nextIndex() {
+                    return it.nextIndex();
+                }
+
+                @Override
+                public int previousIndex() {
+                    return it.previousIndex();
+                }
+
+                @Override
+                public void remove() {
+                    logWarning("listIterator.remove");
+                    it.remove();
+                }
+
+                @Override
+                public void set(E e) {
+                    logWarning("listIterator.set");
+                    it.set(e);
+                }
+
+                @Override
+                public void add(E e) {
+                    logWarning("listIterator.add");
+                    it.add(e);
+                }
+            };
         }
 
         @Override
@@ -1374,62 +1362,6 @@ public class MavenProject implements Cloneable {
         @Override
         public String toString() {
             return delegate.toString();
-        }
-
-        private class LoggingListIterator implements ListIterator<E> {
-            private final ListIterator<E> it;
-
-            LoggingListIterator(ListIterator<E> it) {
-                this.it = it;
-            }
-
-            @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
-
-            @Override
-            public E next() {
-                return it.next();
-            }
-
-            @Override
-            public boolean hasPrevious() {
-                return it.hasPrevious();
-            }
-
-            @Override
-            public E previous() {
-                return it.previous();
-            }
-
-            @Override
-            public int nextIndex() {
-                return it.nextIndex();
-            }
-
-            @Override
-            public int previousIndex() {
-                return it.previousIndex();
-            }
-
-            @Override
-            public void remove() {
-                logWarning("listIterator.remove");
-                it.remove();
-            }
-
-            @Override
-            public void set(E e) {
-                logWarning("listIterator.set");
-                it.set(e);
-            }
-
-            @Override
-            public void add(E e) {
-                logWarning("listIterator.add");
-                it.add(e);
-            }
         }
     }
 
