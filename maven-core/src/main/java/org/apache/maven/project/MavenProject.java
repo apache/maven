@@ -1192,6 +1192,7 @@ public class MavenProject implements Cloneable {
      */
     private static class LoggingList<E> extends ArrayList<E> {
         private static final long serialVersionUID = 1L;
+        private static final String DISABLE_WARNINGS_PROPERTY = "maven.project.sourceRoots.warningsDisabled";
         private final String collectionName;
 
         LoggingList(List<E> delegate, String collectionName) {
@@ -1200,8 +1201,15 @@ public class MavenProject implements Cloneable {
         }
 
         private void logWarning(String method) {
-            LOGGER.warn("Direct modification of " + collectionName + " through " + method + "() is deprecated. "
-                    + "Please use the add/remove methods instead.");
+            // Check if warnings are disabled
+            if (Boolean.getBoolean(DISABLE_WARNINGS_PROPERTY)) {
+                return;
+            }
+
+            LOGGER.warn("Direct modification of " + collectionName + " through " + method + "() is deprecated and will not work in Maven 4.0.0. "
+                    + "Please use the add/remove methods instead. If you're using a plugin that causes this warning, "
+                    + "please upgrade to the latest version and report an issue if the warning persists. "
+                    + "To disable these warnings, set -D" + DISABLE_WARNINGS_PROPERTY + "=true");
             // Log a stack trace to help identify the caller
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Stack trace", new Exception("Stack trace"));
