@@ -1529,7 +1529,7 @@
             Gives the status of this artifact in the remote repository.
             This must not be set in your local project, as it is updated by
             tools placing it in the repository. Valid values are: {@code none} (default),
-            {@code converted} (repository manager converted this from an Maven 1 POM),
+            {@code converted} (repository manager converted this from a Maven 1 POM),
             {@code partner}
             (directly synced from a partner Maven 2 repository), {@code deployed} (was deployed from a Maven 2
             instance), {@code verified} (has been hand verified as correct and final).
@@ -3382,7 +3382,7 @@
           <defaultValue>2.0</defaultValue>
           <description><![CDATA[
             For a plugin project (packaging is {@code maven-plugin}), the minimum version of
-            Maven required to use the resulting plugin.<br>
+            Maven required to use the resulting plugin.
             ]]>
           </description>
           <required>false</required>
