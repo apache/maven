@@ -1087,8 +1087,10 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            The version of the dependency, e.g. <code>3.2.1</code>. In Maven 2, this can also be
-            specified as a range of versions.
+            The version requirement of the dependency, e.g. <code>3.2.1</code> for soft version requirement: the effective version will be resolved based on the usage context.
+            In Maven 2, version requirement can also be specified as a range of versions, e.g. <code>[3.2.0,)</code>: notice this is discouraged, as it may break <i>predictability</i> of resolved version.
+            See <a href="https://s.apache.org/dependendy-version">dependency version requirement documentation</a>
+            and <a href="https://s.apache.org/transitive-dependencies-resolution">transitive dependencies resolution</a> for more details.
             ]]>
           </description>
           <type>String</type>
