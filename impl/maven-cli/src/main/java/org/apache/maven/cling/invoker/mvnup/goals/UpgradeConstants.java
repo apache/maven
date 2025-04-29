@@ -38,6 +38,9 @@ public final class UpgradeConstants {
         /** Maven 4.1.0 model version */
         public static final String MODEL_VERSION_4_1_0 = "4.1.0";
 
+        /** Maven 4.2.0 model version */
+        public static final String MODEL_VERSION_4_2_0 = "4.2.0";
+
         private ModelVersions() {
             // Utility class
         }
@@ -183,6 +186,9 @@ public final class UpgradeConstants {
         /** Maven 4.1.0 namespace URI */
         public static final String MAVEN_4_1_0_NAMESPACE = "http://maven.apache.org/POM/4.1.0";
 
+        /** Maven 4.2.0 namespace URI */
+        public static final String MAVEN_4_2_0_NAMESPACE = "http://maven.apache.org/POM/4.2.0";
+
         private Namespaces() {
             // Utility class
         }
@@ -199,6 +205,10 @@ public final class UpgradeConstants {
         /** Schema location for 4.1.0 models */
         public static final String MAVEN_4_1_0_SCHEMA_LOCATION =
                 Namespaces.MAVEN_4_1_0_NAMESPACE + " https://maven.apache.org/xsd/maven-4.1.0.xsd";
+
+        /** Schema location for 4.2.0 models */
+        public static final String MAVEN_4_2_0_SCHEMA_LOCATION =
+                Namespaces.MAVEN_4_2_0_NAMESPACE + " https://maven.apache.org/xsd/maven-4.2.0.xsd";
 
         private SchemaLocations() {
             // Utility class
