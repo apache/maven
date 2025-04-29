@@ -54,8 +54,7 @@
     <p>This is a reference for the Maven project descriptor used in Maven.</p>
     <p>An XSD is available at:</p>
     <ul>
-      <li><a href="https://maven.apache.org/xsd/maven-v3_0_0.xsd">https://maven.apache.org/xsd/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
-      <li><a href="https://maven.apache.org/xsd/maven-4.0.0.xsd">https://maven.apache.org/xsd/maven-4.0.0.xsd</a> for Maven 2.0.</li>
+      <li><a href="https://maven.apache.org/xsd/maven-4.0.0.xsd">https://maven.apache.org/xsd/maven-4.0.0.xsd</a> for Maven 3.0.</li>
       <li><a href="https://maven.apache.org/xsd/maven-4.1.0.xsd">https://maven.apache.org/xsd/maven-4.1.0.xsd</a> for Maven 4.0.</li>
     </ul>
     ]]>
@@ -771,7 +770,7 @@
         <field>
           <name>defaultGoal</name>
           <version>3.0.0+</version>
-          <description>The default goal (or phase in Maven 2) to execute when none is specified for
+          <description>The default goal to execute when none is specified for
             the project. Note that in case of a build with subprojects, only the default goal of the top-level
             project is relevant, i.e. the default goals of subprojects are ignored. Since Maven 3,
             multiple goals/phases can be separated by whitespace.</description>
@@ -1210,7 +1209,7 @@
           <name>version</name>
           <version>3.0.0+</version>
           <description>
-            The version of the dependency, e.g. {@code 3.2.1}. Since Maven 2, this can also be
+            The version of the dependency, e.g. {@code 3.2.1}. This can also be
             specified as a range of versions.
           </description>
           <type>String</type>
@@ -1530,7 +1529,7 @@
             Gives the status of this artifact in the remote repository.
             This must not be set in your local project, as it is updated by
             tools placing it in the repository. Valid values are: {@code none} (default),
-            {@code converted} (repository manager converted this from an Maven 1 POM),
+            {@code converted} (repository manager converted this from a Maven 1 POM),
             {@code partner}
             (directly synced from a partner Maven 2 repository), {@code deployed} (was deployed from a Maven 2
             instance), {@code verified} (has been hand verified as correct and final).
@@ -2380,7 +2379,7 @@
             What to do when verification of an artifact checksum fails. Valid values are
             {@code ignore},
             {@code fail} (default for Maven 4 and above) or
-            {@code warn} (default for Maven 2 and 3).
+            {@code warn} (default for Maven 3).
           </description>
           <type>String</type>
         </field>
@@ -3383,11 +3382,7 @@
           <defaultValue>2.0</defaultValue>
           <description><![CDATA[
             For a plugin project (packaging is {@code maven-plugin}), the minimum version of
-            Maven required to use the resulting plugin.<br>
-            In Maven 2, this was also specifying the minimum version of Maven required to build a
-            project, but this usage is <b>deprecated</b> in Maven 3 and not checked any more: use
-            the <a href="https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html">Maven Enforcer Plugin's
-            {@code requireMavenVersion} rule</a> instead.
+            Maven required to use the resulting plugin.
             ]]>
           </description>
           <required>false</required>
