@@ -1196,7 +1196,7 @@ public class MavenProject implements Cloneable {
      * @param <E> the type of elements in the list
      * @since 3.9.10
      */
-    private static class LoggingList<E> extends AbstractList<E> {
+    private class LoggingList<E> extends AbstractList<E> {
         private static final String DISABLE_WARNINGS_PROPERTY = "maven.project.sourceRoots.warningsDisabled";
         private final List<E> delegate;
         private final String collectionName;
@@ -1208,7 +1208,11 @@ public class MavenProject implements Cloneable {
 
         private void logWarning(String method) {
             // Check if warnings are disabled
-            if (Boolean.getBoolean(DISABLE_WARNINGS_PROPERTY)) {
+            String property = getProperties().getProperty(DISABLE_WARNINGS_PROPERTY);
+            if (property == null) {
+                property = System.getProperty(DISABLE_WARNINGS_PROPERTY);
+            }
+            if (Boolean.parseBoolean(property)) {
                 return;
             }
 
@@ -1216,7 +1220,8 @@ public class MavenProject implements Cloneable {
                     + "() is deprecated and will not work in Maven 4.0.0. "
                     + "Please use the add/remove methods instead. If you're using a plugin that causes this warning, "
                     + "please upgrade to the latest version and report an issue if the warning persists. "
-                    + "To disable these warnings, set -D" + DISABLE_WARNINGS_PROPERTY + "=true");
+                    + "To disable these warnings, set -D" + DISABLE_WARNINGS_PROPERTY + "=true on the command line, "
+                    + "in the .mvn/maven.config file, or in project POM properties.");
             // Log a stack trace to help identify the caller
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Stack trace", new Exception("Stack trace"));
