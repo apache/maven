@@ -21,12 +21,16 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -276,40 +280,104 @@ public class MavenProject implements Cloneable {
     // Test and compile sourceroots.
     // ----------------------------------------------------------------------
 
-    private void addPath(List<String> paths, String path) {
-        if (path != null) {
-            path = path.trim();
-            if (path.length() > 0) {
-                File file = new File(path);
-                if (file.isAbsolute()) {
-                    path = file.getAbsolutePath();
-                } else if (".".equals(path)) {
-                    path = getBasedir().getAbsolutePath();
-                } else {
-                    path = new File(getBasedir(), path).getAbsolutePath();
-                }
-
-                if (!paths.contains(path)) {
-                    paths.add(path);
-                }
-            }
+    /**
+     * Sanitizes a path by trimming it and converting it to an absolute path.
+     *
+     * @param path the path to sanitize
+     * @return the sanitized path, or null if the input path is null, empty, or consists only of whitespace
+     */
+    private String sanitizePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        path = path.trim();
+        if (path.isEmpty()) {
+            return null;
+        }
+        File file = new File(path);
+        if (file.isAbsolute()) {
+            return file.getAbsolutePath();
+        } else if (".".equals(path)) {
+            return getBasedir().getAbsolutePath();
+        } else {
+            return new File(getBasedir(), path).getAbsolutePath();
         }
     }
 
+    private void addPath(List<String> paths, String path) {
+        String sanitizedPath = sanitizePath(path);
+        if (sanitizedPath != null && !paths.contains(sanitizedPath)) {
+            paths.add(sanitizedPath);
+        }
+    }
+
+    private void removePath(List<String> paths, String path) {
+        String sanitizedPath = sanitizePath(path);
+        if (sanitizedPath != null) {
+            paths.remove(sanitizedPath);
+        }
+    }
+
+    /**
+     * Adds the specified path to the list of compile source roots for this project.
+     *
+     * @param path the source root to add
+     */
     public void addCompileSourceRoot(String path) {
-        addPath(getCompileSourceRoots(), path);
+        addPath(compileSourceRoots, path);
     }
 
+    /**
+     * Removes the specified path from the list of compile source roots.
+     *
+     * @param path the source root to remove
+     * @since 3.9.10
+     */
+    public void removeCompileSourceRoot(String path) {
+        removePath(compileSourceRoots, path);
+    }
+
+    /**
+     * Adds the specified path to the list of test compile source roots for this project.
+     *
+     * @param path the test source root to add
+     */
     public void addTestCompileSourceRoot(String path) {
-        addPath(getTestCompileSourceRoots(), path);
+        addPath(testCompileSourceRoots, path);
     }
 
+    /**
+     * Removes the specified path from the list of test compile source roots.
+     *
+     * @param path the test source root to remove
+     * @since 3.9.10
+     */
+    public void removeTestCompileSourceRoot(String path) {
+        removePath(testCompileSourceRoots, path);
+    }
+
+    /**
+     * Gets the list of compile source roots for this project.
+     * <p>
+     * <strong>Note:</strong> The collection returned by this method should not be modified directly.
+     * Use {@link #addCompileSourceRoot(String)} and {@link #removeCompileSourceRoot(String)} methods instead.
+     *
+     * @return a list of compile source roots
+     */
     public List<String> getCompileSourceRoots() {
-        return compileSourceRoots;
+        return new LoggingList<>(compileSourceRoots, "compileSourceRoots");
     }
 
+    /**
+     * Gets the list of test compile source roots for this project.
+     * <p>
+     * <strong>Note:</strong> The collection returned by this method should not be modified directly.
+     * Use {@link #addTestCompileSourceRoot(String)} and {@link #removeTestCompileSourceRoot(String)} methods instead.
+     *
+     * @return a list of test compile source roots
+     */
     public List<String> getTestCompileSourceRoots() {
-        return testCompileSourceRoots;
+        return new LoggingList<>(testCompileSourceRoots, "testCompileSourceRoots");
     }
 
     public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
@@ -1118,6 +1186,190 @@ public class MavenProject implements Cloneable {
         StringBuilder buffer = new StringBuilder(128);
         buffer.append(groupId).append(':').append(artifactId).append(':').append(version);
         return buffer.toString();
+    }
+
+    /**
+     * A List implementation that logs warnings when modified directly instead of using the proper add/remove methods.
+     * This is a wrapper that delegates all operations to the underlying list, so modifications to this list
+     * will affect the original list.
+     *
+     * @param <E> the type of elements in the list
+     * @since 3.9.10
+     */
+    private class LoggingList<E> extends AbstractList<E> {
+        private static final String DISABLE_WARNINGS_PROPERTY = "maven.project.sourceRoots.warningsDisabled";
+        private final List<E> delegate;
+        private final String collectionName;
+
+        LoggingList(List<E> delegate, String collectionName) {
+            this.delegate = delegate;
+            this.collectionName = collectionName;
+        }
+
+        private void logWarning(String method) {
+            // Check if warnings are disabled
+            String property = getProperties().getProperty(DISABLE_WARNINGS_PROPERTY);
+            if (property == null) {
+                property = System.getProperty(DISABLE_WARNINGS_PROPERTY);
+            }
+            if (Boolean.parseBoolean(property)) {
+                return;
+            }
+
+            LOGGER.warn("Direct modification of " + collectionName + " through " + method
+                    + "() is deprecated and will not work in Maven 4.0.0. "
+                    + "Please use the add/remove methods instead. If you're using a plugin that causes this warning, "
+                    + "please upgrade to the latest version and report an issue if the warning persists. "
+                    + "To disable these warnings, set -D" + DISABLE_WARNINGS_PROPERTY + "=true on the command line, "
+                    + "in the .mvn/maven.config file, or in project POM properties.");
+            // Log a stack trace to help identify the caller
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Stack trace", new Exception("Stack trace"));
+            }
+        }
+
+        @Override
+        public E get(int index) {
+            return delegate.get(index);
+        }
+
+        @Override
+        public int size() {
+            return delegate.size();
+        }
+
+        @Override
+        public E set(int index, E element) {
+            logWarning("set");
+            return delegate.set(index, element);
+        }
+
+        @Override
+        public void add(int index, E element) {
+            logWarning("add");
+            delegate.add(index, element);
+        }
+
+        @Override
+        public E remove(int index) {
+            logWarning("remove");
+            return delegate.remove(index);
+        }
+
+        @Override
+        public void clear() {
+            logWarning("clear");
+            delegate.clear();
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends E> c) {
+            logWarning("addAll");
+            return delegate.addAll(index, c);
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return new Iterator<E>() {
+                private final Iterator<E> it = delegate.iterator();
+
+                @Override
+                public boolean hasNext() {
+                    return it.hasNext();
+                }
+
+                @Override
+                public E next() {
+                    return it.next();
+                }
+
+                @Override
+                public void remove() {
+                    logWarning("iterator.remove");
+                    it.remove();
+                }
+            };
+        }
+
+        @Override
+        public ListIterator<E> listIterator() {
+            return listIterator(0);
+        }
+
+        @Override
+        public ListIterator<E> listIterator(int index) {
+            return new ListIterator<E>() {
+                private final ListIterator<E> it = delegate.listIterator(index);
+
+                @Override
+                public boolean hasNext() {
+                    return it.hasNext();
+                }
+
+                @Override
+                public E next() {
+                    return it.next();
+                }
+
+                @Override
+                public boolean hasPrevious() {
+                    return it.hasPrevious();
+                }
+
+                @Override
+                public E previous() {
+                    return it.previous();
+                }
+
+                @Override
+                public int nextIndex() {
+                    return it.nextIndex();
+                }
+
+                @Override
+                public int previousIndex() {
+                    return it.previousIndex();
+                }
+
+                @Override
+                public void remove() {
+                    logWarning("listIterator.remove");
+                    it.remove();
+                }
+
+                @Override
+                public void set(E e) {
+                    logWarning("listIterator.set");
+                    it.set(e);
+                }
+
+                @Override
+                public void add(E e) {
+                    logWarning("listIterator.add");
+                    it.add(e);
+                }
+            };
+        }
+
+        @Override
+        public List<E> subList(int fromIndex, int toIndex) {
+            return new LoggingList<>(delegate.subList(fromIndex, toIndex), collectionName);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return delegate.equals(o);
+        }
+
+        @Override
+        public int hashCode() {
+            return delegate.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return delegate.toString();
+        }
     }
 
     /**
