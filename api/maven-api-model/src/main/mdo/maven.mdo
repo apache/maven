@@ -2208,7 +2208,7 @@
         </field>
         <field xml.transient="true">
           <name>mergeId</name>
-          <version>4.0.0+</version>
+          <version>4.0.0</version>
           <description>
             FOR INTERNAL USE ONLY. This is a unique identifier assigned to each
             resource to allow Maven to merge changes to this resource that take
@@ -2220,6 +2220,27 @@
         </field>
       </fields>
       <codeSegments>
+        <codeSegment>
+            <version>4.0.0+</version>
+            <code>
+            <![CDATA[
+    /**
+     * @deprecated this was unused and has no replacement, this method returns {@code null} now.
+     */
+    @Deprecated(since = "4.0.0")
+    public String getMergeId() {
+        return null;
+    }
+
+    /**
+     * @deprecated this was unused and has no replacement, this method is a no-op now.
+     */
+    @Deprecated(since = "4.0.0")
+    public void setMergeId(String mergeId) {
+    }
+            ]]>
+            </code>
+        </codeSegment>
         <codeSegment>
           <version>4.0.0+</version>
           <code>
