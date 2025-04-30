@@ -43,8 +43,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -247,8 +245,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     protected class ModelBuilderSessionState implements ModelProblemCollector {
-        private static final Pattern REGEX = Pattern.compile("\\$\\{([^}]+)}");
-
         final Session session;
         final ModelBuilderRequest request;
         final DefaultModelBuilderResult result;
@@ -585,26 +581,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         String replaceCiFriendlyVersion(Map<String, String> properties, String version) {
-            // TODO: we're using a simple regex here, but we should probably use
-            //       a proper interpolation service to do the replacements
-            //       once one is available in maven-api-impl
-            //       https://issues.apache.org/jira/browse/MNG-8262
-            if (version != null) {
-                Matcher matcher = REGEX.matcher(version);
-                if (matcher.find()) {
-                    StringBuilder result = new StringBuilder();
-                    do {
-                        // extract the key inside ${}
-                        String key = matcher.group(1);
-                        // get replacement from the map, or use the original ${xy} if not found
-                        String replacement = properties.getOrDefault(key, "\\" + matcher.group(0));
-                        matcher.appendReplacement(result, replacement);
-                    } while (matcher.find());
-                    matcher.appendTail(result); // Append the remaining part of the string
-                    return result.toString();
-                }
-            }
-            return version;
+            return version != null ? interpolator.interpolate(version, properties::get) : null;
         }
 
         private void buildBuildPom() throws ModelBuilderException {

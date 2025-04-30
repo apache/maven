@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.internal.impl.DefaultProject;
 import org.apache.maven.internal.impl.InternalMavenSession;
@@ -509,6 +510,21 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         MavenProject mp = this.getProjectFromRemoteRepository(f1);
 
         assertEquals("1.0-SNAPSHOT", mp.getVersion());
+    }
+
+    @Test
+    public void testParentVersionResolvedFromNestedProperties() throws Exception {
+        File f1 = getTestFile("src/test/resources/projects/pom-parent-version-from-nested-properties/pom.xml");
+        ProjectBuildingRequest request = newBuildingRequest();
+        MavenSession session =
+                InternalMavenSession.from(request.getRepositorySession()).getMavenSession();
+
+        MavenProject mp = projectBuilder.build(f1, request).getProject();
+        assertEquals("0.1.0-DEVELOPER", mp.getVersion());
+
+        session.getUserProperties().put("release", "true");
+        mp = projectBuilder.build(f1, request).getProject();
+        assertEquals("0.1.0", mp.getVersion());
     }
 
     @Test

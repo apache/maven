@@ -334,10 +334,14 @@ public class DefaultInterpolator implements Interpolator {
             if (":+".equals(op)) {
                 if (substValue != null && !substValue.isEmpty()) {
                     substValue = processedOpValue;
+                    // Skip any remaining operators since we've made a decision
+                    break;
                 }
             } else if (":-".equals(op)) {
                 if (substValue == null || substValue.isEmpty()) {
                     substValue = processedOpValue;
+                    // Skip any remaining operators since we've made a decision
+                    break;
                 }
             } else {
                 throw new InterpolatorException("Bad substitution operator in: ${" + org + "}");
