@@ -30,6 +30,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -39,24 +41,41 @@ public class BuildStep {
     public static final int SCHEDULED = 2;
     public static final int EXECUTED = 3;
     public static final int FAILED = 4;
+    public static final int SKIPPED = 5;
 
     public static final String PLAN = "$plan$";
     public static final String SETUP = "$setup$";
     public static final String TEARDOWN = "$teardown$";
 
+    @Nonnull
     final MavenProject project;
+
+    @Nonnull
     final String name;
+
+    @Nullable
     final Lifecycle.Phase phase;
+
     final Map<Integer, Map<String, MojoExecution>> mojos = new TreeMap<>();
     final Collection<BuildStep> predecessors = new HashSet<>();
     final Collection<BuildStep> successors = new HashSet<>();
     final AtomicInteger status = new AtomicInteger();
     final AtomicBoolean skip = new AtomicBoolean();
+    volatile Exception exception;
 
     public BuildStep(String name, MavenProject project, Lifecycle.Phase phase) {
-        this.name = name;
-        this.project = project;
+        this.name = Objects.requireNonNull(name, "name cannot be null");
+        this.project = Objects.requireNonNull(project, "project cannot be null");
         this.phase = phase;
+    }
+
+    public boolean isCreated() {
+        return status.get() == CREATED;
+    }
+
+    public boolean isDone() {
+        int state = status.get();
+        return state == EXECUTED || state == FAILED || state == SKIPPED;
     }
 
     public Stream<BuildStep> allPredecessors() {
