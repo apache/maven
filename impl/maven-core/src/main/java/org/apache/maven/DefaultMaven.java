@@ -408,7 +408,10 @@ public class DefaultMaven implements Maven {
      */
     @Deprecated
     public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
-        return newCloseableSession(request, new MavenChainedWorkspaceReader());
+        RepositorySystemSession result = newCloseableSession(request, new MavenChainedWorkspaceReader());
+        MavenSession session = new MavenSession(result, request, new DefaultMavenExecutionResult());
+        session.setSession(defaultSessionFactory.newSession(session));
+        return result;
     }
 
     private CloseableSession newCloseableSession(MavenExecutionRequest request, WorkspaceReader workspaceReader) {
