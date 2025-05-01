@@ -1209,8 +1209,12 @@
           <name>version</name>
           <version>3.0.0+</version>
           <description>
-            The version of the dependency, e.g. {@code 3.2.1}. This can also be
-            specified as a range of versions.
+            <![CDATA[
+            The version requirement of the dependency, e.g. {@code 3.2.1}. The actual version will be resolved based on the usage context.
+            Version requirement can also be specified as a range of versions, e.g. {@code [3.2.0,)}. This is discouraged as it may break <i>predictability</i> of resolved version.
+            See <a href="https://s.apache.org/dependency-version">dependency version requirement documentation</a>
+            and <a href="https://s.apache.org/transitive-dependencies-resolution">transitive dependencies resolution</a> for more details.
+            ]]>
           </description>
           <type>String</type>
         </field>
