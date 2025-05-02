@@ -2550,7 +2550,10 @@
     @Deprecated
     public void unsetInheritanceApplied() {
     }
-
+    @Deprecated
+    public void setInherited(boolean value) {
+      setInherited("true");
+    }
             ]]>
           </code>
         </codeSegment>
