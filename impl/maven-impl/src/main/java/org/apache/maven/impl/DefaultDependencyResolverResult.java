@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -35,7 +34,6 @@ import org.apache.maven.api.Dependency;
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathType;
-import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.DependencyResolverResult;
 
@@ -378,18 +376,6 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
         return dependencies;
     }
 
-    @Override
-    public Optional<ModuleDescriptor> getModuleDescriptor(Path dependency) throws IOException {
-        Object value = cache.getModuleInfo(dependency).descriptors.get(dependency);
-        return (value instanceof ModuleDescriptor moduleDescriptor) ? Optional.of(moduleDescriptor) : Optional.empty();
-    }
-
-    @Override
-    public Optional<String> getModuleName(Path dependency) throws IOException {
-        return Optional.ofNullable(
-                name(cache.getModuleInfo(dependency).descriptors.get(dependency)));
-    }
-
     /**
      * Returns the module name for the given value of the {@link PathModularization#descriptors} map.
      */
@@ -400,15 +386,6 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
             return moduleDescriptor.name();
         } else {
             return null;
-        }
-    }
-
-    @Override
-    public Optional<String> warningForFilenameBasedAutomodules() {
-        try {
-            return cache.warningForFilenameBasedAutomodules(dispatchedPaths.get(JavaPathType.MODULES));
-        } catch (IOException e) {
-            throw new DependencyResolverException("Cannot read module information.", e);
         }
     }
 }

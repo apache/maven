@@ -20,13 +20,10 @@ package org.apache.maven.impl;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.function.Predicate;
 
 import org.apache.maven.api.JavaPathType;
@@ -157,33 +154,5 @@ class PathModularizationCache {
             }
         }
         return Optional.ofNullable(selected);
-    }
-
-    /**
-     * If the module-path contains a filename-based auto-module, prepares a warning message.
-     * It is caller's responsibility to send the message to a logger.
-     *
-     * @param modulePaths content of the module path, or {@code null} if none
-     * @return warning message if at least one filename-based auto-module was found
-     * @throws IOException if an error occurred while reading module information
-     */
-    Optional<String> warningForFilenameBasedAutomodules(Collection<Path> modulePaths) throws IOException {
-        if (modulePaths == null) {
-            return Optional.empty();
-        }
-        var automodulesDetected = new ArrayList<String>();
-        for (Path p : modulePaths) {
-            getModuleInfo(p).addIfFilenameBasedAutomodules(automodulesDetected);
-        }
-        if (automodulesDetected.isEmpty()) {
-            return Optional.empty();
-        }
-        String lineSeparator = System.lineSeparator();
-        var joiner = new StringJoiner(
-                lineSeparator + "  - ",
-                "Filename-based automodules detected on the module path: " + lineSeparator + "  - ",
-                lineSeparator + "Please don't publish this project to a public artifact repository.");
-        automodulesDetected.forEach(joiner::add);
-        return Optional.of(joiner.toString());
     }
 }
