@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.jetty.server.Handler;
@@ -56,12 +55,11 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
     }
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    protected void setUp() {
         Handler handler = new AbstractHandler() {
             @Override
             public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
                 System.out.println("Handling URL: '" + request.getRequestURL() + "'");
 
                 userAgent = request.getHeader("User-Agent");
@@ -90,7 +88,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

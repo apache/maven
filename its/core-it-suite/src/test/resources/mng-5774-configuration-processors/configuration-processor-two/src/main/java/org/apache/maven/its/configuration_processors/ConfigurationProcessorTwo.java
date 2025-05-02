@@ -24,5 +24,5 @@ import org.codehaus.plexus.component.annotations.Component;
 
 @Component(role = ConfigurationProcessor.class, hint = "maven-core-it-two")
 public class ConfigurationProcessorTwo implements ConfigurationProcessor {
-    public void process(CliRequest request) throws Exception {}
+    public void process(CliRequest request) {}
 }

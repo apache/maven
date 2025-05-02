@@ -36,17 +36,17 @@ public class SimpleEventSpy implements EventSpy {
     private final List<Object> events = new ArrayList<>();
 
     @Override
-    public void init(Context context) throws Exception {
+    public void init(Context context) {
         System.out.println("Initializing Simple Event Spy");
     }
 
     @Override
-    public void onEvent(Object o) throws Exception {
+    public void onEvent(Object o) {
         events.add(o);
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         System.out.println("Closing Simple Event Spy, checking events");
         checkEvent(SettingsBuilderRequest.class);
         checkEvent(SettingsBuilderResult.class);

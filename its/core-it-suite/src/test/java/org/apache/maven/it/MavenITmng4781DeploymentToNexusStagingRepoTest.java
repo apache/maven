@@ -56,7 +56,7 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest extends AbstractMave
     }
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         Handler repoHandler = new AbstractHandler() {
             private volatile boolean putSeen;
 
@@ -94,7 +94,7 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest extends AbstractMave
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

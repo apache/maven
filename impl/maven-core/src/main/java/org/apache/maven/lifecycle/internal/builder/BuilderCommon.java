@@ -35,7 +35,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
@@ -103,8 +102,7 @@ public class BuilderCommon {
             MavenSession session, MavenProject project, TaskSegment taskSegment, Set<Artifact> projectArtifacts)
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
                     PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
-                    NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException,
-                    LifecycleExecutionException {
+                    NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {
         MavenExecutionPlan executionPlan =
                 lifeCycleExecutionPlanCalculator.calculateExecutionPlan(session, project, taskSegment.getTasks());
 

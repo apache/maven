@@ -285,7 +285,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testLifecyclePluginsRetrievalForDefaultLifecycle() throws Exception {
+    void testLifecyclePluginsRetrievalForDefaultLifecycle() {
         List<Plugin> plugins = new ArrayList<>(lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles("jar"));
 
         assertThat(plugins.toString(), plugins, hasSize(8));

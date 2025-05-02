@@ -100,27 +100,15 @@ public class DefaultModelProcessor implements ModelProcessor {
         Path pomFile = request.getPath();
         if (pomFile != null) {
             Path projectDirectory = pomFile.getParent();
-            List<ModelParserException> exceptions = new ArrayList<>();
             for (ModelParser parser : modelParsers) {
-                try {
-                    Optional<Model> model =
-                            parser.locateAndParse(projectDirectory, Map.of(ModelParser.STRICT, request.isStrict()));
-                    if (model.isPresent()) {
-                        return model.get().withPomFile(pomFile);
-                    }
-                } catch (ModelParserException e) {
-                    exceptions.add(e);
+                Optional<Model> model =
+                        parser.locateAndParse(projectDirectory, Map.of(ModelParser.STRICT, request.isStrict()));
+                if (model.isPresent()) {
+                    return model.get().withPomFile(pomFile);
                 }
             }
-            try {
-                return doRead(request);
-            } catch (IOException e) {
-                exceptions.forEach(e::addSuppressed);
-                throw e;
-            }
-        } else {
-            return doRead(request);
         }
+        return doRead(request);
     }
 
     private Path doLocateExistingPom(Path project) {
@@ -137,7 +125,7 @@ public class DefaultModelProcessor implements ModelProcessor {
         }
     }
 
-    private Model doRead(XmlReaderRequest request) throws IOException {
+    private Model doRead(XmlReaderRequest request) {
         return modelXmlFactory.read(request);
     }
 }

@@ -69,7 +69,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
     }
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    protected void setUp() {
         Handler proxyHandler = new AbstractHandler() {
             @Override
             public void handle(
@@ -166,7 +166,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

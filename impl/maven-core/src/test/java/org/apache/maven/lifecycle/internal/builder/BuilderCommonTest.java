@@ -79,13 +79,13 @@ class BuilderCommonTest {
     }
 
     @Test
-    void testHandleBuildError() throws Exception {}
+    void testHandleBuildError() {}
 
     @Test
-    void testAttachToThread() throws Exception {}
+    void testAttachToThread() {}
 
     @Test
-    void testGetKey() throws Exception {}
+    void testGetKey() {}
 
     public BuilderCommon getBuilderCommon(Logger logger) {
         final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger();

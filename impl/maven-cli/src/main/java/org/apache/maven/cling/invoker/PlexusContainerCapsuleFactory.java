@@ -200,11 +200,11 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         return new Slf4jLoggerManager();
     }
 
-    protected void customizeContainerConfiguration(C context, ContainerConfiguration configuration) throws Exception {}
+    protected void customizeContainerConfiguration(C context, ContainerConfiguration configuration) {}
 
-    protected void customizeContainer(C context, PlexusContainer container) throws Exception {}
+    protected void customizeContainer(C context, PlexusContainer container) {}
 
-    protected List<Path> parseExtClasspath(C context) throws Exception {
+    protected List<Path> parseExtClasspath(C context) {
         ProtoSession protoSession = context.protoSession;
         String extClassPath = protoSession.getUserProperties().get(Constants.MAVEN_EXT_CLASS_PATH);
         if (extClassPath == null) {

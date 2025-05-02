@@ -209,7 +209,7 @@ class DefaultModelResolverTest {
         assertEquals("1", modified.get().getVersion());
     }
 
-    private ModelResolver newModelResolver() throws Exception {
+    private ModelResolver newModelResolver() {
         return new DefaultModelResolver();
     }
 

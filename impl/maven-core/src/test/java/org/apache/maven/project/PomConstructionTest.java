@@ -84,7 +84,7 @@ class PomConstructionTest {
     private File testDirectory;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         testDirectory = new File(getBasedir(), BASE_POM_DIR);
         new File(getBasedir(), BASE_MIXIN_DIR);
         EmptyLifecycleBindingsInjector.useEmpty();
@@ -1226,7 +1226,7 @@ class PomConstructionTest {
     }
 
     @SuppressWarnings("checkstyle:MethodLength")
-    private void testCompleteModel(PomTestWrapper pom) throws Exception {
+    private void testCompleteModel(PomTestWrapper pom) {
         assertEquals("4.0.0", pom.getValue("modelVersion"));
 
         assertEquals("org.apache.maven.its.mng", pom.getValue("groupId"));

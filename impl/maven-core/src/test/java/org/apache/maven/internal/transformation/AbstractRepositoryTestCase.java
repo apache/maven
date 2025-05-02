@@ -61,7 +61,7 @@ public abstract class AbstractRepositoryTestCase {
     protected RepositorySystemSession session;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         session = newMavenRepositorySystemSession(system);
     }
 

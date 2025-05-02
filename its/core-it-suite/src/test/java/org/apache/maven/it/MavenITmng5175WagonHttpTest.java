@@ -84,7 +84,7 @@ public class MavenITmng5175WagonHttpTest extends AbstractMavenIntegrationTestCas
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

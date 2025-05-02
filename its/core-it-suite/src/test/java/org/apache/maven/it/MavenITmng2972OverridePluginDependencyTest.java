@@ -92,7 +92,7 @@ public class MavenITmng2972OverridePluginDependencyTest extends AbstractMavenInt
         verify(pclProps);
     }
 
-    private void verify(Properties pclProps) throws Exception {
+    private void verify(Properties pclProps) {
         assertNotNull(pclProps.getProperty("org.apache.maven.its.mng2972.MNG2972"));
         assertNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassA"));
         assertNull(pclProps.getProperty("org.apache.maven.plugin.coreit.ClassB"));

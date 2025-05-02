@@ -60,7 +60,7 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest extends Abstr
     }
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    protected void setUp() {
         Handler repoHandler = new AbstractHandler() {
             @Override
             public void handle(
@@ -113,7 +113,7 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest extends Abstr
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

@@ -18,7 +18,6 @@
  */
 package ${package};
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -105,7 +104,7 @@ class WrapperList<T, U> extends AbstractList<T> implements Serializable {
         }
     }
 
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
         return new ArrayList<T>(this);
     }
 }

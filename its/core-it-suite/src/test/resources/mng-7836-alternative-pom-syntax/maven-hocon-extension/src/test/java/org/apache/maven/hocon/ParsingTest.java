@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ParsingTest {
 
     @Test
-    void testParse() throws Exception {
+    void testParse() {
         Config config = ConfigFactory.parseFile(new File("src/test/resources/pom.hocon"));
 
         Model model = new HoconReader().parseModel(config.root());

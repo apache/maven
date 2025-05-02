@@ -222,7 +222,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
         return new File(verifier.getArtifactPath("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar"));
     }
 
-    private static void recreateRemoteRepository(File repository) throws IOException {
+    private static void recreateRemoteRepository(File repository) {
         // create a repository (TODO: into verifier)
         FileUtils.deleteDirectory(repository);
         assertFalse(repository.exists());

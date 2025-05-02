@@ -53,7 +53,7 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
     abstract void setUp() throws Exception;
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() {
         activator = null;
     }
 

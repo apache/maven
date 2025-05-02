@@ -65,7 +65,7 @@ class LifecycleExecutorSubModulesTest extends AbstractCoreMavenComponentTestCase
     }
 
     @Test
-    void testCreation() throws Exception {
+    void testCreation() {
         assertNotNull(defaultLifeCycles);
         assertNotNull(mojoExecutor);
         assertNotNull(lifeCycleBuilder);

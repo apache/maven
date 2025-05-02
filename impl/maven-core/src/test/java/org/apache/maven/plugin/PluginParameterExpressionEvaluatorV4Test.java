@@ -54,8 +54,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.CycleDetectedException;
-import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
@@ -293,7 +291,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
 
     @SuppressWarnings("deprecation")
     private static MavenSession createSession(PlexusContainer container, ArtifactRepository repo, Properties properties)
-            throws CycleDetectedException, DuplicateProjectException, NoLocalRepositoryManagerException {
+            throws NoLocalRepositoryManagerException {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setSystemProperties(properties)
                 .setGoals(Collections.emptyList())

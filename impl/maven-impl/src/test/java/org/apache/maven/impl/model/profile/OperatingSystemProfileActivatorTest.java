@@ -51,7 +51,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testVersionStringComparison() throws Exception {
+    void testVersionStringComparison() {
         Profile profile = newProfile(ActivationOS.newBuilder().version("6.5.0-1014-aws"));
 
         assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -61,7 +61,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testVersionRegexMatching() throws Exception {
+    void testVersionRegexMatching() {
         Profile profile = newProfile(ActivationOS.newBuilder().version("regex:.*aws"));
 
         assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));

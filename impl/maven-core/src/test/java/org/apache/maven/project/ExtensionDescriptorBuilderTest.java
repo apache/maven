@@ -42,12 +42,12 @@ class ExtensionDescriptorBuilderTest {
     private ExtensionDescriptorBuilder builder;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         builder = new ExtensionDescriptorBuilder();
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() {
         builder = null;
     }
 

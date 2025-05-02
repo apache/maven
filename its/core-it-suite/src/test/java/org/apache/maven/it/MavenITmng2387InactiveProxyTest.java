@@ -89,7 +89,7 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

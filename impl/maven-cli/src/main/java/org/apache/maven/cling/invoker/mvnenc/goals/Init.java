@@ -235,7 +235,7 @@ public class Init extends InteractiveGoalSupport {
     }
 
     private PromptBuilder configureDispatcher(
-            EncryptContext context, DispatcherMeta dispatcherMeta, PromptBuilder promptBuilder) throws Exception {
+            EncryptContext context, DispatcherMeta dispatcherMeta, PromptBuilder promptBuilder) {
         context.addInHeader(
                 context.style.italic().bold().foreground(Colors.rgbColor("yellow")),
                 "Configure " + dispatcherMeta.displayName());

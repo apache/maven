@@ -38,7 +38,7 @@ class DefaultSettingsValidatorTest {
     private SettingsBuilder validator;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         validator = new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
     }
 

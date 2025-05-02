@@ -41,12 +41,12 @@ class DefaultBeanConfiguratorPathTest {
     private BeanConfigurator configurator;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         configurator = new DefaultBeanConfigurator();
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() {
         configurator = null;
     }
 

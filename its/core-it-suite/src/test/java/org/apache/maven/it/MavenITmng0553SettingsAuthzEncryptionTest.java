@@ -98,7 +98,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

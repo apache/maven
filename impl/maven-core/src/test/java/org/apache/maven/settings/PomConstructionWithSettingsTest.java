@@ -67,7 +67,7 @@ class PomConstructionWithSettingsTest {
     private File testDirectory;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         testDirectory = new File(getBasedir(), BASE_POM_DIR);
     }
 

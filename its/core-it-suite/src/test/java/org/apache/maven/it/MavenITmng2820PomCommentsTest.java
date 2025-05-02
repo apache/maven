@@ -72,7 +72,7 @@ public class MavenITmng2820PomCommentsTest extends AbstractMavenIntegrationTestC
         assertPomComment(pom, "INLINE-COMMENT-3");
     }
 
-    private void assertPomComment(String pom, String comment) throws Exception {
+    private void assertPomComment(String pom, String comment) {
         assertTrue(pom.contains(comment), "Missing comment: " + comment);
     }
 }

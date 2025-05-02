@@ -83,7 +83,7 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
         assertPom(pomFile, pom, chars);
     }
 
-    private void assertPom(File pomFile, String pom, String chars) throws Exception {
+    private void assertPom(File pomFile, String pom, String chars) {
         String prefix = "TEST-CHARS: ";
         int pos = pom.indexOf(prefix);
         assertTrue(

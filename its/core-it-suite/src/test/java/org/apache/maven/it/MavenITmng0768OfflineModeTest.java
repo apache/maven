@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,8 +62,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
 
         Handler repoHandler = new AbstractHandler() {
             public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
                 System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
                 requestedUris.add(request.getRequestURI());

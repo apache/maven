@@ -96,7 +96,7 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();
