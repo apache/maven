@@ -18,10 +18,12 @@
  */
 package org.apache.maven.impl.model.rootlocator;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
@@ -47,7 +49,7 @@ public class DefaultRootLocator implements RootLocator {
     }
 
     @Override
-    public Path findRoot(Path basedir) {
+    public Path findRoot(@Nonnull Path basedir) {
         requireNonNull(basedir, getNoRootMessage());
         Path rootDirectory = basedir;
         while (rootDirectory != null && !isRootDirectory(rootDirectory)) {
@@ -58,17 +60,21 @@ public class DefaultRootLocator implements RootLocator {
 
     @Nonnull
     public Path findMandatoryRoot(@Nonnull Path basedir) {
-        Path rootDirectory = findRoot(basedir);
-        Optional<Path> rdf = getRootDirectoryFallback();
-        if (rootDirectory == null) {
-            rootDirectory = rdf.orElseThrow(() -> new IllegalStateException(getNoRootMessage()));
-            logger.warn(getNoRootMessage());
-        } else {
-            if (rdf.isPresent() && !Objects.equals(rootDirectory, rdf.get())) {
-                logger.warn("Project root directory and multiModuleProjectDirectory are not aligned");
+        try {
+            Path rootDirectory = findRoot(basedir);
+            Optional<Path> rdf = getRootDirectoryFallback();
+            if (rootDirectory == null) {
+                rootDirectory = rdf.orElseThrow(() -> new IllegalStateException(getNoRootMessage()));
+                logger.warn(getNoRootMessage());
+            } else {
+                if (rdf.isPresent() && !Files.isSameFile(rootDirectory, rdf.get())) {
+                    logger.warn("Project root directory and multiModuleProjectDirectory are not aligned");
+                }
             }
+            return rootDirectory;
+        } catch (IOException e) {
+            throw new UncheckedIOException("findMandatoryRoot failed", e);
         }
-        return rootDirectory;
     }
 
     protected boolean isRootDirectory(Path dir) {
@@ -81,11 +87,19 @@ public class DefaultRootLocator implements RootLocator {
         return false;
     }
 
-    protected Optional<Path> getRootDirectoryFallback() {
+    protected Optional<Path> getRootDirectoryFallback() throws IOException {
         String mmpd = System.getProperty("maven.multiModuleProjectDirectory");
         if (mmpd != null) {
-            return Optional.of(Paths.get(mmpd));
+            return Optional.of(getCanonicalPath(Paths.get(mmpd)));
         }
         return Optional.empty();
+    }
+
+    protected Path getCanonicalPath(Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
+        }
     }
 }
