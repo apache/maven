@@ -2550,9 +2550,10 @@
     @Deprecated
     public void unsetInheritanceApplied() {
     }
+
     @Deprecated
     public void setInherited(boolean value) {
-      setInherited("true");
+      setInherited(Boolean.toString(value));
     }
             ]]>
           </code>
