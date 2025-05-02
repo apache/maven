@@ -60,21 +60,23 @@ public class DefaultRootLocator implements RootLocator {
 
     @Nonnull
     public Path findMandatoryRoot(@Nonnull Path basedir) {
-        try {
-            Path rootDirectory = findRoot(basedir);
-            Optional<Path> rdf = getRootDirectoryFallback();
-            if (rootDirectory == null) {
-                rootDirectory = rdf.orElseThrow(() -> new IllegalStateException(getNoRootMessage()));
-                logger.warn(getNoRootMessage());
-            } else {
-                if (rdf.isPresent() && !Files.isSameFile(rootDirectory, rdf.get())) {
-                    logger.warn("Project root directory and multiModuleProjectDirectory are not aligned");
+        Path rootDirectory = findRoot(basedir);
+        Optional<Path> rdf = getRootDirectoryFallback();
+        if (rootDirectory == null) {
+            rootDirectory = rdf.orElseThrow(() -> new IllegalStateException(getNoRootMessage()));
+            logger.warn(getNoRootMessage());
+        } else {
+            if (rdf.isPresent()) {
+                try {
+                    if (!Files.isSameFile(rootDirectory, rdf.orElseThrow())) {
+                        logger.warn("Project root directory and multiModuleProjectDirectory are not aligned");
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException("findMandatoryRoot failed", e);
                 }
             }
-            return rootDirectory;
-        } catch (IOException e) {
-            throw new UncheckedIOException("findMandatoryRoot failed", e);
         }
+        return rootDirectory;
     }
 
     protected boolean isRootDirectory(Path dir) {
@@ -87,7 +89,7 @@ public class DefaultRootLocator implements RootLocator {
         return false;
     }
 
-    protected Optional<Path> getRootDirectoryFallback() throws IOException {
+    protected Optional<Path> getRootDirectoryFallback() {
         String mmpd = System.getProperty("maven.multiModuleProjectDirectory");
         if (mmpd != null) {
             return Optional.of(getCanonicalPath(Paths.get(mmpd)));
