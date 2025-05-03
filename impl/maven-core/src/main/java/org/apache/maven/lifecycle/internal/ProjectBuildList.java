@@ -55,7 +55,7 @@ public class ProjectBuildList implements Iterable<ProjectSegment> {
      */
     public ProjectBuildList getByTaskSegment(TaskSegment taskSegment) {
         return new ProjectBuildList(
-                items.stream().filter(pb -> taskSegment == pb.getTaskSegment()).collect(Collectors.toList()));
+                items.stream().filter(pb -> taskSegment == pb.getTaskSegment()).toList());
     }
 
     public Map<MavenProject, ProjectSegment> selectSegment(TaskSegment taskSegment) {

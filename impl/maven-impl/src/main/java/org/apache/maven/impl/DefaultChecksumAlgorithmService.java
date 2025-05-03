@@ -58,7 +58,7 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
     public Collection<String> getChecksumAlgorithmNames() {
         return checksumAlgorithmFactorySelector.getChecksumAlgorithmFactories().stream()
                 .map(ChecksumAlgorithmFactory::getName)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

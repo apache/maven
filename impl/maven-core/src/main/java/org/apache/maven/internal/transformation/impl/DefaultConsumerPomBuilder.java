@@ -288,7 +288,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
                     return builder.build(null).build();
                 })
                 .filter(p -> !isEmpty(p))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static boolean isEmpty(Profile profile) {
@@ -324,6 +324,6 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
     private static List<Repository> pruneRepositories(List<Repository> repositories) {
         return repositories.stream()
                 .filter(r -> !org.apache.maven.api.Repository.CENTRAL_ID.equals(r.getId()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

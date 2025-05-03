@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
@@ -128,7 +127,7 @@ public class ConcurrentLifecycleStarter implements LifecycleStarter {
                         && !rootProject.getDefaultGoal().isEmpty())) {
             tasks = Stream.of(rootProject.getDefaultGoal().split("\\s+"))
                     .filter(g -> !g.isEmpty())
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return calculateTaskSegments(session, tasks);

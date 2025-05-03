@@ -240,7 +240,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
         @Nonnull
         @Override
         public Collection<DownloadedArtifact> getArtifacts() {
-            return results.values().stream().map(ResultItem::getArtifact).collect(Collectors.toList());
+            return results.values().stream().map(ResultItem::getArtifact).toList();
         }
 
         @Override
