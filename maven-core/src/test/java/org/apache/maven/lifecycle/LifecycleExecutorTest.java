@@ -225,11 +225,10 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         // [12] compiler:testCompile
         // [13] surefire:test
         // [14] jar:jar
-        // [15] plugin:addPluginArtifactMetadata
-        // [16] install:install
+        // [15] install:install
         //
 
-        assertEquals(16, executions.size());
+        assertEquals(15, executions.size());
 
         assertEquals("clean:clean", executions.get(0).getMojoDescriptor().getFullGoalName());
         assertEquals("it:xpp3-writer", executions.get(1).getMojoDescriptor().getFullGoalName());
@@ -249,10 +248,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
                 "compiler:testCompile", executions.get(11).getMojoDescriptor().getFullGoalName());
         assertEquals("surefire:test", executions.get(12).getMojoDescriptor().getFullGoalName());
         assertEquals("jar:jar", executions.get(13).getMojoDescriptor().getFullGoalName());
-        assertEquals(
-                "plugin:addPluginArtifactMetadata",
-                executions.get(14).getMojoDescriptor().getFullGoalName());
-        assertEquals("install:install", executions.get(15).getMojoDescriptor().getFullGoalName());
+        assertEquals("install:install", executions.get(14).getMojoDescriptor().getFullGoalName());
 
         assertEquals(
                 "src/main/mdo/remote-resources.mdo",

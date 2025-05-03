@@ -173,8 +173,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-surefire-plugin:3.2.5:test
               </test>
               <package>
-                org.apache.maven.plugins:maven-jar-plugin:3.4.1:jar,
-                org.apache.maven.plugins:maven-plugin-plugin:3.13.1:addPluginArtifactMetadata
+                org.apache.maven.plugins:maven-jar-plugin:3.4.1:jar
               </package>
               <install>
                 org.apache.maven.plugins:maven-install-plugin:3.1.2:install
