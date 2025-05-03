@@ -199,6 +199,10 @@ export MAVEN_CMD_LINE_ARGS
 # MNG-8248
 if "$JAVACMD" --enable-native-access=ALL-UNNAMED -version >/dev/null 2>&1; then
   MAVEN_OPTS="--enable-native-access=ALL-UNNAMED $MAVEN_OPTS"
+  # MNG-8169
+  if $mingw ; then
+    MAVEN_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED $MAVEN_OPTS"
+  fi
 fi
 
 exec "$JAVACMD" \
