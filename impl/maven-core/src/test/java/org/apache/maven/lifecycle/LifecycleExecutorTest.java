@@ -217,8 +217,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         // [12] compiler:testCompile
         // [13] surefire:test
         // [14] jar:jar
-        // [15] plugin:addPluginArtifactMetadata
-        // [16] install:install
+        // [15] install:install
         //
 
         assertListEquals(
@@ -237,7 +236,6 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
                         "compiler:testCompile",
                         "surefire:test",
                         "jar:jar",
-                        "plugin:addPluginArtifactMetadata",
                         "install:install"),
                 executions.stream()
                         .map(execution -> execution.getMojoDescriptor().getFullGoalName())
