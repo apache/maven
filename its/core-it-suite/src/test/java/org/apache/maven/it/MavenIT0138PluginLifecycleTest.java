@@ -54,11 +54,7 @@ public class MavenIT0138PluginLifecycleTest extends AbstractMavenIntegrationTest
         verifier.verifyFilePresent("target/compiler-test-compile.txt");
         verifier.verifyFilePresent("target/surefire-test.txt");
         verifier.verifyFilePresent("target/jar-jar.txt");
-        verifier.verifyFilePresent("target/plugin-add-plugin-artifact-metadata.txt");
         verifier.verifyFilePresent("target/install-install.txt");
-        if (matchesVersionRange("(,2.2.0)")) {
-            verifier.verifyFilePresent("target/plugin-update-registry.txt");
-        }
         verifier.verifyFilePresent("target/deploy-deploy.txt");
         verifier.verifyErrorFreeLog();
     }
