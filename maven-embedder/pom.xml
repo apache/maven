@@ -75,6 +75,7 @@ under the License.
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
+      <classifier>classes</classifier>
       <exclusions>
         <!-- MNG-7068 Active dependency management for Google Guice / Google Guava. Excludes of Guava are managed in parent POM -->
         <exclusion>
