@@ -71,6 +71,7 @@ under the License.
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
+      <classifier>classes</classifier>
       <optional>true</optional>
       <exclusions>
         <exclusion>
