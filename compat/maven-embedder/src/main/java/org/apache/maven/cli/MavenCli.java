@@ -696,7 +696,7 @@ public class MavenCli {
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)
-                .setStrictClassPathScanning(true)
+                .setStrictClassPathScanning(false)
                 .setName("maven");
 
         Set<String> exportedArtifacts = new HashSet<>(coreEntry.getExportedArtifacts());
@@ -812,7 +812,7 @@ public class MavenCli {
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
                 .setAutoWiring(true) //
                 .setJSR250Lifecycle(true) //
-                .setStrictClassPathScanning(true) //
+                .setStrictClassPathScanning(false) //
                 .setName("maven");
 
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
