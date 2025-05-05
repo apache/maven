@@ -35,6 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -401,6 +402,9 @@ public class DefaultMaven implements Maven {
         }
     }
 
+    private final AtomicBoolean newRepositorySessionMethodHasWarned = new AtomicBoolean(
+            Boolean.parseBoolean(System.getProperty("maven.newRepositorySession.warningsDisabled", "false")));
+
     /**
      * Nobody should ever use this method.
      *
@@ -408,14 +412,16 @@ public class DefaultMaven implements Maven {
      */
     @Deprecated
     public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
-        if (logger.isDebugEnabled()) {
-            logger.warn(
-                    "Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked; please inspect the stack trace and report this issue to the authors of the caller code",
-                    new IllegalStateException(
-                            "Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked"));
-        } else {
-            logger.warn(
-                    "Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked; report this issue to the authors of the caller code (use -X to see stack trace)");
+        if (newRepositorySessionMethodHasWarned.compareAndSet(false, true)) {
+            if (logger.isDebugEnabled()) {
+                logger.warn(
+                        "Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked; please inspect the stack trace and report this issue to the authors of the caller code",
+                        new IllegalStateException(
+                                "Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked"));
+            } else {
+                logger.warn(
+                        "Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked; report this issue to the authors of the caller code (use -X to see stack trace)");
+            }
         }
         RepositorySystemSession result = newCloseableSession(request, new MavenChainedWorkspaceReader());
         MavenSession session = new MavenSession(result, request, new DefaultMavenExecutionResult());
