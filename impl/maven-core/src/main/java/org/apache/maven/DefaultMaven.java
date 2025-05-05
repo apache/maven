@@ -411,7 +411,8 @@ public class DefaultMaven implements Maven {
         if (logger.isDebugEnabled()) {
             logger.warn(
                     "Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked; please inspect the stack trace and report this issue to the authors of the caller code",
-                    new IllegalStateException("Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked"));
+                    new IllegalStateException(
+                            "Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked"));
         } else {
             logger.warn(
                     "Deprecated method `DefaultMaven#newRepositorySession(MavenExecutionRequest)` invoked; report this issue to the authors of the caller code (use -X to see stack trace)");
