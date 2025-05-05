@@ -103,7 +103,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)
-                .setStrictClassPathScanning(true)
+                .setStrictClassPathScanning(false)
                 .setName("maven");
         customizeContainerConfiguration(context, cc);
 
@@ -282,7 +282,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)
-                .setStrictClassPathScanning(true)
+                .setStrictClassPathScanning(false)
                 .setName("maven");
 
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
