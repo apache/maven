@@ -72,7 +72,7 @@ public class DefaultRootLocator implements RootLocator {
                         logger.warn("Project root directory and multiModuleProjectDirectory are not aligned");
                     }
                 } catch (IOException e) {
-                    throw new UncheckedIOException("findMandatoryRoot failed", e);
+                    throw new IllegalStateException("findMandatoryRoot failed", e);
                 }
             }
         }
