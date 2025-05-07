@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
  * the close method has been called, allowing for use with try-with-resources.
  * The {@link #phase()} method can be used to submit tasks and wait for them to be
  * executed without closing the executor.
- *
  * <p>Example usage:
  * <pre>
  * try (PhasingExecutor executor = createExecutor()) {

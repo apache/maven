@@ -27,7 +27,6 @@ import org.apache.maven.api.annotations.Nullable;
  * Represents a source for loading Maven Project Object Model (POM) files. This interface
  * extends the basic {@link Source} interface with specific functionality for handling
  * Maven POM files and resolving related project POMs.
- *
  * <p>The interface provides two types of sources:</p>
  * <ul>
  *   <li>Build sources: Used for POM files of projects being built by Maven in the filesystem.

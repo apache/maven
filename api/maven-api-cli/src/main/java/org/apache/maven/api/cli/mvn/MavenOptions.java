@@ -29,7 +29,6 @@ import org.apache.maven.api.cli.Options;
 /**
  * Defines the options specific to Maven operations.
  * This interface extends the general {@link Options} interface, adding Maven-specific configuration options.
- *
  * <p>These options represent the various flags and settings available through the Maven CLI,
  * as well as those that can be specified in the {@code maven.config} file. They provide fine-grained
  * control over Maven's behavior during the build process.</p>

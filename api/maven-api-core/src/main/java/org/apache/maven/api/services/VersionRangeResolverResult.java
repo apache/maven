@@ -30,7 +30,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * Represents the result of a version range resolution request. This interface provides access to
  * information about resolved versions that match a version range constraint, including any exceptions
  * that occurred during resolution, the available versions, and their source repositories.
- *
  * <p>The versions returned by this interface are guaranteed to be in ascending order.</p>
  *
  * @since 4.0.0

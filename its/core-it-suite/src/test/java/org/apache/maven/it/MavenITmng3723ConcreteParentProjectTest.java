@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3723">MNG-3723</a>.
- *
+ * <p>
  * Tests that the parent MavenProject instance of the current project has been
  * transitioned into a concrete state before a mojo is executed. If this is true,
  * then injecting ${project} into the mojo and traversing to project.getParent().getBasedir()

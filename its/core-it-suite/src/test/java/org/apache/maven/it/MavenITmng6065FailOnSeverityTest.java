@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * An integration test to verify that builds fail when logs occur
  * above or equal to the --fail-on-severity cli property.
- *
+ * <p>
  * <a href="https://issues.apache.org/jira/browse/MNG-6065">MNG-6065</a>.
  *
  */

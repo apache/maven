@@ -82,13 +82,11 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
  * managing Maven sessions in a simplified context, primarily for testing and
  * specialized execution scenarios.
  * </p>
- *
  * <p>Example usage:</p>
  * <pre>
  * Session session = ApiRunner.createSession();
  * // Use session for Maven operations
  * </pre>
- *
  * <p>
  * The standalone mode provides a subset of Maven's functionality, with some
  * features being unavailable or simplified. Operations not supported in

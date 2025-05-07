@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2695">MNG-2695</a>.
- *
+ * <p>
  * Verifies that offline mode functions correctly for snapshot plugins.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>

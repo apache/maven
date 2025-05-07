@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
  * The usage of a <code>${revision}</code> for the version in the pom file and furthermore
  * defining the property in the pom file and overwrite it via command line.
  * <a href="https://issues.apache.org/jira/browse/MNG-5895">MNG-5895</a>.
- *
+ * <p>
  * This will result in a failure without the fix for this issue.
  *
  * @author Karl Heinz Marbaise khmarbaise@apache.org

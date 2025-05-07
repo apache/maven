@@ -27,13 +27,10 @@ import org.apache.maven.api.model.PluginContainer;
 
 /**
  * Represents the packaging of a Maven project.
- *
  * <p>The {@code Packaging} class defines the type of artifact that a Maven project produces during the build process.
  * The packaging type determines the structure of the project's output and how Maven will treat the resulting artifact.</p>
- *
  * <p>Common packaging types include {@code jar}, {@code war}, {@code pom}, {@code maven-plugin}, {@code ear}, and others.
  * These types influence various aspects of the build lifecycle, such as which plugins are executed and how dependencies are managed.</p>
- *
  * <p>The {@code Packaging} class is an immutable value object, ensuring that once a packaging type is defined, it cannot be changed.</p>
  *
  * <h2>Standard Packaging Types</h2>

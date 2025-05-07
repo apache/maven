@@ -59,7 +59,6 @@ import org.apache.maven.api.toolchain.ToolchainModel;
 /**
  * A stub implementation of {@link Session} for basic testing scenarios.
  * Provides minimal implementation of session methods without mock dependencies.
- *
  * <p>For more comprehensive session mocking, consider using {@link SessionMock} instead.</p>
  *
  * @see SessionMock

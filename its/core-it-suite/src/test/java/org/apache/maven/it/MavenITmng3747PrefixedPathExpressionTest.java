@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3747">MNG-3747</a>.
- *
+ * <p>
  * todo Fill in a better description of what this test verifies!
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>

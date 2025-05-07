@@ -19,11 +19,9 @@
 
 /**
  * Provides the API for the Maven Shell tool ({@code mvnsh}).
- *
  * <p>This package contains interfaces and classes for the interactive Maven shell,
  * which provides a command-line interface for executing Maven commands and
  * managing build environments.</p>
- *
  * <p>Key features include:</p>
  * <ul>
  *   <li>Interactive command-line interface</li>

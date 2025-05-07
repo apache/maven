@@ -29,7 +29,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * {@linkplain RemoteRepository remote repositories}.</p>
  *
  * <h2>Repository Resolution Process</h2>
- *
  * <p>When resolving dependencies, Maven follows this order:</p><ol>
  * <li>Check Local Repository: Maven first checks if the artifact is available in the local repository.</li>
  * <li>Check Remote Repositories: If the artifact is not found locally, Maven queries the configured remote repositories in the order they are listed.</li>
@@ -38,7 +37,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * <p>By caching artifacts in the local repository, Maven minimizes the need to repeatedly download the same artifacts, thus optimizing the build process.</p>
  *
  * <h2>Repository Configuration</h2>
- *
  * <p>Repositories can be configured at various levels:<ol>
  * <li>POM: Repositories can be specified in the {@code pom.xml} file under the {@code <repositories>} and {@code <pluginRepositories>} sections.</li>
  * <li>Settings: the {@code settings.xml} can be used to provide additional repositories in the three level of settings (user, project, installation).</li>

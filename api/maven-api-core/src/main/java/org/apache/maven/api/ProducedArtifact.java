@@ -25,13 +25,11 @@ import org.apache.maven.api.annotations.Immutable;
 
 /**
  * An {@link Artifact} that is being produced by a {@link Project} during the build.
- *
  * <p>Produced artifacts includes:</p><ul>
  *     <li>{@linkplain Project#getPomArtifact() the project POM artifact}</li>
  *     <li>{@linkplain Project#getMainArtifact() the main artifact}</li>
  *     <li>{@linkplain org.apache.maven.api.services.ProjectManager#attachArtifact(Session, Project, Path) artifacts to be attached to a project}</li>
  * </ul>
- *
  * <p>For the main artifact and attached artifacts, the
  * {@link org.apache.maven.api.services.ArtifactManager ArtifactManager} service must be used
  * to point the artifact to a {@link Path} during the packaging phase.</p>

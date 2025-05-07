@@ -26,12 +26,11 @@ import org.apache.maven.api.annotations.ThreadSafe;
  * Represents the contract for Mojos to interact with the Maven infrastructure.
  * Implementations of this interface define specific build-process behaviors
  * that are triggered during a Maven build lifecycle.
- *
+ * <p>
  * The primary entry point is the {@link #execute()} method, which encapsulates
  * the behavior of the Mojo and serves as the integration point with Maven. This
  * method may throw an {@link Exception} to signal any issues that prevent
  * successful execution of the Mojo.
- *
  * <p>
  * Annotations:
  * </p>

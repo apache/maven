@@ -20,7 +20,6 @@ package org.apache.maven.api.services;
 
 /**
  * Exception thrown when toolchain factory operations fail.
- *
  * <p>This exception wraps errors that occur during toolchain creation or initialization.</p>
  */
 public class ToolchainFactoryException extends MavenException {

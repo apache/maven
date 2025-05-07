@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This is a collection of test cases for <a href="https://issues.apache.org/jira/browse/MNG-5760">MNG-5760</a>,
  * <code>--resume</code> / <code>-r</code> in case of build failures.
- *
+ * <p>
  * The test uses a multi-module project with three modules:
  * <ul>
  *     <li>module-a</li>

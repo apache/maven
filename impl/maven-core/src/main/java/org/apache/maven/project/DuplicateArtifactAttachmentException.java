@@ -23,7 +23,7 @@ import org.apache.maven.artifact.Artifact;
 /**
  * This exception is thrown if an application attempts to attach
  * two of the same artifacts to a single project.
- *
+ * <p>
  * TODO Make this a checked exception, and modify the API of MavenProjectHelper.
  * Currently, this modification would create compatibility problems for existing plugins.
  */

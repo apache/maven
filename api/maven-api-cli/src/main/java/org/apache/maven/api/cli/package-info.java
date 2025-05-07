@@ -19,7 +19,6 @@
 
 /**
  * Provides the API for Maven's command-line interface and tools.
- *
  * <p>This package contains interfaces and classes for:</p>
  * <ul>
  *   <li>Command-line argument parsing and processing</li>
@@ -27,7 +26,6 @@
  *   <li>Core extensions configuration</li>
  *   <li>Early-stage logging before the full Maven logging system is initialized</li>
  * </ul>
- *
  * <p>The main components are:</p>
  * <ul>
  *   <li>{@link org.apache.maven.api.cli.Invoker} - Base interface for executing Maven tools</li>
@@ -35,7 +33,6 @@
  *   <li>{@link org.apache.maven.api.cli.Options} - Represents Maven configuration options</li>
  *   <li>{@link org.apache.maven.api.cli.extensions.CoreExtensions} - Manages Maven core extensions</li>
  * </ul>
- *
  * <p>Core extensions can be configured through {@code .mvn/extensions.xml} in the project base directory
  * to enhance Maven's capabilities during build execution.</p>
  *

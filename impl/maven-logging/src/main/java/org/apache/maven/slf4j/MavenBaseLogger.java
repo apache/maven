@@ -102,7 +102,6 @@ import org.slf4j.spi.LocationAwareLogger;
  * output for the warn level. Defaults to <code>WARN</code>.</li>
  *
  * </ul>
- *
  * <p>
  * In addition to looking for system properties with the names specified above,
  * this implementation also checks for a class loader resource named
@@ -115,7 +114,6 @@ import org.slf4j.spi.LocationAwareLogger;
  * milliseconds, thread name, the level, logger name, and the message followed
  * by the line separator for the host. In log4j terms it amounts to the "%r [%t]
  * %level %logger - %m%n" pattern.
- *
  * <p>
  * Sample output follows.
  *
@@ -132,7 +130,6 @@ import org.slf4j.spi.LocationAwareLogger;
  *   at org.log4j.examples.Sort.main(Sort.java:64)
  * 467 [main] INFO  examples.Sort - Exiting main method.
  * </pre>
- *
  * <p>
  * This implementation is heavily inspired by
  * <a href="http://commons.apache.org/logging/">Apache Commons Logging</a>'s

@@ -35,12 +35,10 @@ import org.apache.maven.api.annotations.Nonnull;
  * The option of a Java command-line tool where to place the paths to some dependencies.
  * A {@code PathType} can identify the class path, the module path, the patches for a specific module,
  * or another kind of path.
- *
  * <p>One path type is handled in a special way: unlike other options,
  * the paths specified in a {@code --patch-module} Java option is effective only for a specified module.
  * This type is created by calls to {@link #patchModule(String)} and a new instance must be created for
  * every module to patch.</p>
- *
  * <p>Path types are often exclusive. For example, a dependency should not be both on the Java class path
  * and on the Java module path.</p>
  *

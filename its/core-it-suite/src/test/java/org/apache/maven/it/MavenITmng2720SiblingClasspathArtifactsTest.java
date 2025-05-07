@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2720">MNG-2720</a>.
- *
+ * <p>
  * This test will ensure that running the 'package' phase on a multi-module build with child
  * interdependency will result in one child using the JAR of the other child in its compile
  * classpath, NOT the target/classes directory. This is critical, since sibling projects might

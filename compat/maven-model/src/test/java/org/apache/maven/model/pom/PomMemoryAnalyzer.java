@@ -37,10 +37,8 @@ import org.apache.maven.model.v4.MavenStaxReader;
 /**
  * A utility class that analyzes Maven POM files to identify memory usage patterns and potential memory optimizations.
  * This analyzer focuses on identifying duplicate strings and their memory impact across different paths in the POM structure.
- *
  * <p>The analyzer processes POM files recursively, tracking string occurrences and their locations within the POM structure.
  * It can identify areas where string deduplication could provide significant memory savings.</p>
- *
  * <p>Usage example:</p>
  * <pre>
  * PomMemoryAnalyzer analyzer = new PomMemoryAnalyzer();
@@ -48,7 +46,6 @@ import org.apache.maven.model.v4.MavenStaxReader;
  * analyzer.analyzePom(model);
  * analyzer.printAnalysis();
  * </pre>
- *
  * <p>The analysis output includes:</p>
  * <ul>
  *   <li>Total memory usage per POM path</li>
@@ -56,7 +53,6 @@ import org.apache.maven.model.v4.MavenStaxReader;
  *   <li>Most frequent string values and their occurrence counts</li>
  *   <li>Statistics grouped by POM element types</li>
  * </ul>
- *
  * <p>This tool is particularly useful for identifying memory optimization opportunities
  * in large Maven multi-module projects where POM files may contain significant
  * duplicate content.</p>

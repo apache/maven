@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6772">MNG-6772</a>:
  *
  * The test POM references an import scope POM, which also has a dependency on an import scope POM.
- *
+ * <p>
  * Both import POMs can only be found in the repository defined in the test POM.
  * It has a parent POM that defines the same repository with a different location.
  * The test confirms that the dominant repository definition (child) wins while resolving the import POMs.

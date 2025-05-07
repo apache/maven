@@ -22,13 +22,11 @@ import org.apache.maven.api.annotations.Experimental;
 
 /**
  * Represents a Java toolchain in the Maven build system.
- *
  * <p>A Java toolchain is a specific type of toolchain that provides access
  * to Java development tools, such as the Java compiler and Java runtime
  * environment. This interface allows users to define and configure
  * Java-related toolchains that can be utilized during the build process
  * in Maven.</p>
- *
  * <p>Java toolchains are defined in the Maven toolchains.xml file and can
  * be referenced in the project's POM file. This enables developers to
  * specify the exact versions of Java tools they wish to use, ensuring

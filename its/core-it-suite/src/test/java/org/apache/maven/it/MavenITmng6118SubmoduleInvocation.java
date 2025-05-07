@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This is a collection of test cases for <a href="https://issues.apache.org/jira/browse/MNG-6118">MNG-6118</a>,
  * invoking Maven in a submodule of a multi-module project.
- *
+ * <p>
  * The test uses a multi-module project with two modules:
  * <ul>
  *     <li>app (depends on lib)</li>

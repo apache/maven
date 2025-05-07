@@ -31,7 +31,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * local repository to see if the required artifacts are already available.
  * If the artifacts are found locally, Maven uses them directly, which speeds
  * up the build process by avoiding unnecessary downloads.</p>
- *
  * <p>By default, the local repository is located in the {@code .m2/repository}
  * directory within the user's home directory ({@code ~/.m2/repository} on
  * Unix-like systems or {@code C:\Users\YourName\.m2\repository} on Windows).

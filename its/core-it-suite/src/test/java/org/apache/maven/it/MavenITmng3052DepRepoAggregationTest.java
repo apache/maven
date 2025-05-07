@@ -24,12 +24,12 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3052">MNG-3052</a>.
- *
+ * <p>
  * When a project dependency declares its own repositories, they should be used to
  * resolve that dependency's dependencies. This includes both steps: determining
  * the dependency artifact information (version, etc.) AND resolving the actual
  * artifact itself.
- *
+ * <p>
  * NOTE: The SNAPSHOT versions are CRITICAL in this test, since they force the
  * correct resolution of artifact metadata, which depends on having the correct
  * set of repositories present.

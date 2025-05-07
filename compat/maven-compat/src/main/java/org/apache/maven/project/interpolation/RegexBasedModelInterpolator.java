@@ -27,7 +27,7 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
- *
+ * <p>
  * TODO Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
  */
 @Deprecated

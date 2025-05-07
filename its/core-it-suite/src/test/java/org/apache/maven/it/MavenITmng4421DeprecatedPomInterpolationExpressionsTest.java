@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4421">MNG-4421</a>.
- *
+ * <p>
  * But <a href="https://issues.apache.org/jira/browse/MNG-7244">MNG-7244</a> removes the deprecation of
  * <code>pom.X</code>.
  * See {@link MavenITmng7244IgnorePomPrefixInExpressions}.

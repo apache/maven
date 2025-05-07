@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test case for <a href="https://issues.apache.org/jira/browse/MNG-3558">MNG-3558</a>.
- *
+ * <p>
  * Verifies that property references can be properly escaped in both model properties
  * and plugin configuration using backslash.
  */

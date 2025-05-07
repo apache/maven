@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3748">MNG-3748</a>.
- *
+ * <p>
  * Verifies that the settings.xml file is parsed using strict mode, such that invalid
  * xml will cause an error (specifically, when repositories are not contained within a profile declaration)
  *

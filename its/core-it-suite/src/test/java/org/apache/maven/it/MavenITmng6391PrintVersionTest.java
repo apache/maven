@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * An integration test to check the enhancements to print out version
  * information during the reactor summary output at the correct
  * positions.
- *
+ * <p>
  * <a href="https://issues.apache.org/jira/browse/MNG-6391">MNG-6391</a>.
  *
  * @author Karl Heinz Marbaise khmarbaise@apache.org
