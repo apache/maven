@@ -18,10 +18,11 @@
  */
 package org.apache.maven.impl.model.rootlocator;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
@@ -47,7 +48,7 @@ public class DefaultRootLocator implements RootLocator {
     }
 
     @Override
-    public Path findRoot(Path basedir) {
+    public Path findRoot(@Nonnull Path basedir) {
         requireNonNull(basedir, getNoRootMessage());
         Path rootDirectory = basedir;
         while (rootDirectory != null && !isRootDirectory(rootDirectory)) {
@@ -64,8 +65,14 @@ public class DefaultRootLocator implements RootLocator {
             rootDirectory = rdf.orElseThrow(() -> new IllegalStateException(getNoRootMessage()));
             logger.warn(getNoRootMessage());
         } else {
-            if (rdf.isPresent() && !Objects.equals(rootDirectory, rdf.get())) {
-                logger.warn("Project root directory and multiModuleProjectDirectory are not aligned");
+            if (rdf.isPresent()) {
+                try {
+                    if (!Files.isSameFile(rootDirectory, rdf.orElseThrow())) {
+                        logger.warn("Project root directory and multiModuleProjectDirectory are not aligned");
+                    }
+                } catch (IOException e) {
+                    throw new IllegalStateException("findMandatoryRoot failed", e);
+                }
             }
         }
         return rootDirectory;
@@ -84,8 +91,16 @@ public class DefaultRootLocator implements RootLocator {
     protected Optional<Path> getRootDirectoryFallback() {
         String mmpd = System.getProperty("maven.multiModuleProjectDirectory");
         if (mmpd != null) {
-            return Optional.of(Paths.get(mmpd));
+            return Optional.of(getCanonicalPath(Paths.get(mmpd)));
         }
         return Optional.empty();
+    }
+
+    protected Path getCanonicalPath(Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
+        }
     }
 }
