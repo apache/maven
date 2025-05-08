@@ -48,10 +48,16 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
 
     @Override
     public PluginDescriptor read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
-        return read(request, requireNonNull(request).getPath(), request.getURL(), request.getReader(), request.getInputStream());
+        return read(
+                request,
+                requireNonNull(request).getPath(),
+                request.getURL(),
+                request.getReader(),
+                request.getInputStream());
     }
 
-    private static PluginDescriptor read(XmlReaderRequest request, Path path, URL url, Reader reader, InputStream inputStream) {
+    private static PluginDescriptor read(
+            XmlReaderRequest request, Path path, URL url, Reader reader, InputStream inputStream) {
         if (path == null && url == null && reader == null && inputStream == null) {
             throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
         }
@@ -73,7 +79,11 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
 
     @Override
     public void write(XmlWriterRequest<PluginDescriptor> request) throws XmlWriterException {
-        write(request.getWriter(), request.getOutputStream(), request.getPath(), requireNonNull(requireNonNull(request, "request").getContent(), "content"));
+        write(
+                request.getWriter(),
+                request.getOutputStream(),
+                request.getPath(),
+                requireNonNull(requireNonNull(request, "request").getContent(), "content"));
     }
 
     private static void write(Writer writer, OutputStream outputStream, Path path, PluginDescriptor content) {
