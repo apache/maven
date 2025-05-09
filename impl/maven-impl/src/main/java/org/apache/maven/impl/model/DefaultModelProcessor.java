@@ -39,6 +39,9 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
 
+import static java.util.Objects.requireNonNull;
+import static org.apache.maven.api.spi.ModelParser.STRICT;
+
 /**
  *
  * Note: uses @Typed to limit the types it is available for injection to just ModelProcessor.
@@ -77,67 +80,69 @@ public class DefaultModelProcessor implements ModelProcessor {
         this.modelParsers = modelParsers;
     }
 
+    /**
+     * @implNote The ModelProcessor#locatePom never returns null while the ModelParser#locatePom needs to return an existing path!
+     */
     @Override
     public Path locateExistingPom(Path projectDirectory) {
-        // Note that the ModelProcessor#locatePom never returns null
-        // while the ModelParser#locatePom needs to return an existing path!
-        Path pom = modelParsers.stream()
-                .map(m -> m.locate(projectDirectory)
-                        .map(org.apache.maven.api.services.Source::getPath)
-                        .orElse(null))
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElseGet(() -> doLocateExistingPom(projectDirectory));
+        return throwIfWrongProjectDirLocation(
+                projectDirectory,
+                modelParsers.stream()
+                        .map(m -> m.locate(projectDirectory)
+                                .map(org.apache.maven.api.services.Source::getPath)
+                                .orElse(null))
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElseGet(() -> locateExistingPomWithFallback(projectDirectory)));
+    }
+
+    private static Path throwIfWrongProjectDirLocation(Path projectDirectory, Path pom) {
         if (pom != null && !pom.equals(projectDirectory) && !pom.getParent().equals(projectDirectory)) {
             throw new IllegalArgumentException("The POM found does not belong to the given directory: " + pom);
         }
         return pom;
     }
 
+    private Path locateExistingPomWithFallback(Path project) {
+        if (project != null) {
+            if (Files.isDirectory(project)) {
+                Path pom = project.resolve("pom.xml");
+                return Files.isRegularFile(pom) ? pom : null;
+            }
+            return Files.isRegularFile(project) ? project : null;
+        }
+        return locateExistingPomWithFallback(Paths.get(System.getProperty("user.dir"))); // check in user dir
+    }
+
     @Override
     public Model read(XmlReaderRequest request) throws IOException {
-        Objects.requireNonNull(request, "source cannot be null");
-        Path pomFile = request.getPath();
+        Path pomFile = requireNonNull(request, "source cannot be null").getPath();
         if (pomFile != null) {
-            Path projectDirectory = pomFile.getParent();
             List<ModelParserException> exceptions = new ArrayList<>();
             for (ModelParser parser : modelParsers) {
                 try {
-                    Optional<Model> model =
-                            parser.locateAndParse(projectDirectory, Map.of(ModelParser.STRICT, request.isStrict()));
-                    if (model.isPresent()) {
-                        return model.get().withPomFile(pomFile);
+                    Optional<Model> parent = parent(request, parser, pomFile.getParent());
+                    if (parent.isPresent()) {
+                        return parent.get().withPomFile(pomFile);
                     }
                 } catch (ModelParserException e) {
                     exceptions.add(e);
                 }
             }
-            try {
-                return doRead(request);
-            } catch (IOException e) {
-                exceptions.forEach(e::addSuppressed);
-                throw e;
-            }
-        } else {
-            return doRead(request);
+            throwErrorsSuppressed(exceptions);
         }
-    }
-
-    private Path doLocateExistingPom(Path project) {
-        if (project == null) {
-            project = Paths.get(System.getProperty("user.dir"));
-        }
-        if (Files.isDirectory(project)) {
-            Path pom = project.resolve("pom.xml");
-            return Files.isRegularFile(pom) ? pom : null;
-        } else if (Files.isRegularFile(project)) {
-            return project;
-        } else {
-            return null;
-        }
-    }
-
-    private Model doRead(XmlReaderRequest request) throws IOException {
         return modelXmlFactory.read(request);
+    }
+
+    private static Optional<Model> parent(XmlReaderRequest request, ModelParser parser, Path projectDirectory) {
+        return parser.locateAndParse(projectDirectory, Map.of(STRICT, request.isStrict()));
+    }
+
+    private static void throwErrorsSuppressed(List<ModelParserException> exceptions) throws IOException {
+        if (!exceptions.isEmpty()) {
+            IOException ex = new IOException();
+            exceptions.forEach(ex::addSuppressed);
+            throw ex;
+        }
     }
 }
