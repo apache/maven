@@ -348,7 +348,7 @@ public class ReflectionValueExtractorTest {
                         .getClassifier());
     }
 
-    static class Artifact {
+    public static class Artifact {
         private String groupId;
 
         private String artifactId;
