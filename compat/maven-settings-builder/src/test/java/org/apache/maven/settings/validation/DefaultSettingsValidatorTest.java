@@ -33,8 +33,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */
@@ -53,38 +52,38 @@ class DefaultSettingsValidatorTest {
     }
 
     private void assertContains(String msg, String substring) {
-        assertTrue(msg.contains(substring), "\"" + substring + "\" was not found in: " + msg);
+        assertThat(msg.contains(substring)).as("\"" + substring + "\" was not found in: " + msg).isTrue();
     }
 
     @Test
-    void testValidate() {
+    void validate() {
         Settings model = new Settings();
         Profile prof = new Profile();
         prof.setId("xxx");
         model.addProfile(prof);
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(model, problems);
-        assertEquals(0, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(0);
 
         Repository repo = new Repository(org.apache.maven.api.settings.Repository.newInstance(false));
         prof.addRepository(repo);
         problems = new SimpleProblemCollector();
         validator.validate(model, problems);
-        assertEquals(2, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(2);
 
         repo.setUrl("http://xxx.xxx.com");
         problems = new SimpleProblemCollector();
         validator.validate(model, problems);
-        assertEquals(1, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(1);
 
         repo.setId("xxx");
         problems = new SimpleProblemCollector();
         validator.validate(model, problems);
-        assertEquals(0, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(0);
     }
 
     @Test
-    void testValidateMirror() throws Exception {
+    void validateMirror() throws Exception {
         Settings settings = new Settings();
         Mirror mirror = new Mirror();
         mirror.setId("local");
@@ -97,7 +96,7 @@ class DefaultSettingsValidatorTest {
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
-        assertEquals(4, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(4);
         assertContains(problems.messages.get(0), "'mirrors.mirror.id' must not be 'local'");
         assertContains(problems.messages.get(1), "'mirrors.mirror.url' for local is missing");
         assertContains(problems.messages.get(2), "'mirrors.mirror.mirrorOf' for local is missing");
@@ -105,7 +104,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateRepository() throws Exception {
+    void validateRepository() throws Exception {
         Profile profile = new Profile();
         Repository repo = new Repository();
         repo.setId("local");
@@ -119,7 +118,7 @@ class DefaultSettingsValidatorTest {
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
-        assertEquals(3, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(3);
         assertContains(
                 problems.messages.get(0), "'profiles.profile[default].repositories.repository.id' must not be 'local'");
         assertContains(
@@ -131,7 +130,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateUniqueServerId() throws Exception {
+    void validateUniqueServerId() throws Exception {
         Settings settings = new Settings();
         Server server1 = new Server();
         server1.setId("test");
@@ -142,13 +141,13 @@ class DefaultSettingsValidatorTest {
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
-        assertEquals(1, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(1);
         assertContains(
                 problems.messages.get(0), "'servers.server.id' must be unique but found duplicate server with id test");
     }
 
     @Test
-    void testValidateUniqueProfileId() throws Exception {
+    void validateUniqueProfileId() throws Exception {
         Settings settings = new Settings();
         Profile profile1 = new Profile();
         profile1.setId("test");
@@ -159,14 +158,14 @@ class DefaultSettingsValidatorTest {
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
-        assertEquals(1, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(1);
         assertContains(
                 problems.messages.get(0),
                 "'profiles.profile.id' must be unique but found duplicate profile with id test");
     }
 
     @Test
-    void testValidateUniqueRepositoryId() throws Exception {
+    void validateUniqueRepositoryId() throws Exception {
         Settings settings = new Settings();
         Profile profile = new Profile();
         profile.setId("pro");
@@ -182,7 +181,7 @@ class DefaultSettingsValidatorTest {
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
-        assertEquals(1, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(1);
         assertContains(
                 problems.messages.get(0),
                 "'profiles.profile[pro].repositories.repository.id' must be unique"
@@ -190,7 +189,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateUniqueProxyId() throws Exception {
+    void validateUniqueProxyId() throws Exception {
         Settings settings = new Settings();
         Proxy proxy = new Proxy();
         String id = "foo";
@@ -201,21 +200,21 @@ class DefaultSettingsValidatorTest {
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
-        assertEquals(1, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(1);
         assertContains(
                 problems.messages.get(0),
                 "'proxies.proxy.id' must be unique" + " but found duplicate proxy with id " + id);
     }
 
     @Test
-    void testValidateProxy() throws Exception {
+    void validateProxy() throws Exception {
         Settings settings = new Settings();
         Proxy proxy1 = new Proxy();
         settings.addProxy(proxy1);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
-        assertEquals(1, problems.messages.size());
+        assertThat(problems.messages.size()).isEqualTo(1);
         assertContains(problems.messages.get(0), "'proxies.proxy.host' for default is missing");
     }
 

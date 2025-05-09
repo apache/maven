@@ -34,8 +34,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 /**
  * Tests {@link FileProfileActivator}.
@@ -71,17 +71,15 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testRootDirectoryWithNull() {
+    void rootDirectoryWithNull() {
         context.setProjectDirectory(null);
 
-        IllegalStateException e = assertThrows(
-                IllegalStateException.class,
-                () -> assertActivation(false, newExistsProfile("${project.rootDirectory}"), context));
-        assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
+        IllegalStateException e = assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> assertActivation(false, newExistsProfile("${project.rootDirectory}"), context)).actual();
+        assertThat(e.getMessage()).isEqualTo(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
     }
 
     @Test
-    void testRootDirectory() {
+    void rootDirectory() {
         assertActivation(false, newExistsProfile("${project.rootDirectory}/someFile.txt"), context);
         assertActivation(true, newMissingProfile("${project.rootDirectory}/someFile.txt"), context);
         assertActivation(true, newExistsProfile("${project.rootDirectory}"), context);
@@ -91,7 +89,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testIsActiveNoFileWithShortBasedir() {
+    void isActiveNoFileWithShortBasedir() {
         assertActivation(false, newExistsProfile(null), context);
         assertActivation(false, newExistsProfile("someFile.txt"), context);
         assertActivation(false, newExistsProfile("${basedir}/someFile.txt"), context);
@@ -102,7 +100,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testIsActiveNoFile() {
+    void isActiveNoFile() {
         assertActivation(false, newExistsProfile(null), context);
         assertActivation(false, newExistsProfile("someFile.txt"), context);
         assertActivation(false, newExistsProfile("${project.basedir}/someFile.txt"), context);
@@ -113,7 +111,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testIsActiveExistsFileExists() {
+    void isActiveExistsFileExists() {
         assertActivation(true, newExistsProfile("file.txt"), context);
         assertActivation(true, newExistsProfile("${project.basedir}"), context);
         assertActivation(true, newExistsProfile("${project.basedir}/" + "file.txt"), context);
@@ -124,13 +122,13 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testIsActiveExistsLeavesFileUnchanged() {
+    void isActiveExistsLeavesFileUnchanged() {
         Profile profile = newExistsProfile("file.txt");
-        assertEquals("file.txt", profile.getActivation().getFile().getExists());
+        assertThat(profile.getActivation().getFile().getExists()).isEqualTo("file.txt");
 
         assertActivation(true, profile, context);
 
-        assertEquals("file.txt", profile.getActivation().getFile().getExists());
+        assertThat(profile.getActivation().getFile().getExists()).isEqualTo("file.txt");
     }
 
     private Profile newExistsProfile(String filePath) {

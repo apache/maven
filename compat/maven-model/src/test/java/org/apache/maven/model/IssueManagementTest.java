@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code IssueManagement}.
@@ -31,30 +29,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class IssueManagementTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new IssueManagement().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new IssueManagement().equals(null));
+    void equalsNullSafe() {
+        assertThat(new IssueManagement()).isNotEqualTo(null);
 
         new IssueManagement().equals(new IssueManagement());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         IssueManagement thing = new IssueManagement();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new IssueManagement().toString());
+    void toStringNullSafe() {
+        assertThat(new IssueManagement().toString()).isNotNull();
     }
 
     @Test
-    public void testToStringNotNonsense() {
+    void toStringNotNonsense() {
         IssueManagement im = new IssueManagement();
         im.setSystem("Velociraptor");
         im.setUrl("https://velo.localdomain");

@@ -20,9 +20,7 @@ package org.apache.maven.artifact.versioning;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test DefaultArtifactVersion.
@@ -39,16 +37,16 @@ class DefaultArtifactVersionTest {
         String parsed = "'" + version + "' parsed as ('" + artifactVersion.getMajorVersion() + "', '"
                 + artifactVersion.getMinorVersion() + "', '" + artifactVersion.getIncrementalVersion() + "', '"
                 + artifactVersion.getBuildNumber() + "', '" + artifactVersion.getQualifier() + "'), ";
-        assertEquals(major, artifactVersion.getMajorVersion(), parsed + "check major version");
-        assertEquals(minor, artifactVersion.getMinorVersion(), parsed + "check minor version");
-        assertEquals(incremental, artifactVersion.getIncrementalVersion(), parsed + "check incremental version");
-        assertEquals(buildnumber, artifactVersion.getBuildNumber(), parsed + "check build number");
-        assertEquals(qualifier, artifactVersion.getQualifier(), parsed + "check qualifier");
-        assertEquals(version, artifactVersion.toString(), "check " + version + " string value");
+        assertThat(artifactVersion.getMajorVersion()).as(parsed + "check major version").isEqualTo(major);
+        assertThat(artifactVersion.getMinorVersion()).as(parsed + "check minor version").isEqualTo(minor);
+        assertThat(artifactVersion.getIncrementalVersion()).as(parsed + "check incremental version").isEqualTo(incremental);
+        assertThat(artifactVersion.getBuildNumber()).as(parsed + "check build number").isEqualTo(buildnumber);
+        assertThat(artifactVersion.getQualifier()).as(parsed + "check qualifier").isEqualTo(qualifier);
+        assertThat(artifactVersion.toString()).as("check " + version + " string value").isEqualTo(version);
     }
 
     @Test
-    void testVersionParsing() {
+    void versionParsing() {
         checkVersionParsing("1", 1, 0, 0, 0, null);
         checkVersionParsing("1.2", 1, 2, 0, 0, null);
         checkVersionParsing("1.2.3", 1, 2, 3, 0, null);
@@ -85,7 +83,7 @@ class DefaultArtifactVersionTest {
     }
 
     @Test
-    void testVersionComparing() {
+    void versionComparing() {
         assertVersionEqual("1", "1");
         assertVersionOlder("1", "2");
         assertVersionOlder("1.5", "2");
@@ -132,7 +130,7 @@ class DefaultArtifactVersionTest {
     }
 
     @Test
-    void testVersionSnapshotComparing() {
+    void versionSnapshotComparing() {
         assertVersionEqual("1-SNAPSHOT", "1-SNAPSHOT");
         assertVersionOlder("1-SNAPSHOT", "2-SNAPSHOT");
         assertVersionOlder("1.5-SNAPSHOT", "2-SNAPSHOT");
@@ -166,7 +164,7 @@ class DefaultArtifactVersionTest {
     }
 
     @Test
-    void testSnapshotVsReleases() {
+    void snapshotVsReleases() {
         assertVersionOlder("1.0-RC1", "1.0-SNAPSHOT");
         assertVersionOlder("1.0-rc1", "1.0-SNAPSHOT");
         assertVersionOlder("1.0-rc-1", "1.0-SNAPSHOT");
@@ -176,35 +174,27 @@ class DefaultArtifactVersionTest {
     void testHashCode() {
         ArtifactVersion v1 = newArtifactVersion("1");
         ArtifactVersion v2 = newArtifactVersion("1.0");
-        assertTrue(v1.equals(v2));
-        assertEquals(v1.hashCode(), v2.hashCode());
+        assertThat(v2).isEqualTo(v1);
+        assertThat(v2.hashCode()).isEqualTo(v1.hashCode());
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(newArtifactVersion("1").equals(null));
+    void equalsNullSafe() {
+        assertThat(newArtifactVersion("1")).isNotEqualTo(null);
     }
 
     @Test
-    void testEqualsTypeSafe() {
-        assertFalse(newArtifactVersion("1").equals("non-an-artifact-version-instance"));
+    void equalsTypeSafe() {
+        assertThat(newArtifactVersion("1")).isNotEqualTo("non-an-artifact-version-instance");
     }
 
     private void assertVersionOlder(String left, String right) {
-        assertTrue(
-                newArtifactVersion(left).compareTo(newArtifactVersion(right)) < 0,
-                left + " should be older than " + right);
-        assertTrue(
-                newArtifactVersion(right).compareTo(newArtifactVersion(left)) > 0,
-                right + " should be newer than " + left);
+        assertThat(newArtifactVersion(left).compareTo(newArtifactVersion(right)) < 0).as(left + " should be older than " + right).isTrue();
+        assertThat(newArtifactVersion(right).compareTo(newArtifactVersion(left)) > 0).as(right + " should be newer than " + left).isTrue();
     }
 
     private void assertVersionEqual(String left, String right) {
-        assertTrue(
-                newArtifactVersion(left).compareTo(newArtifactVersion(right)) == 0,
-                left + " should be equal to " + right);
-        assertTrue(
-                newArtifactVersion(right).compareTo(newArtifactVersion(left)) == 0,
-                right + " should be equal to " + left);
+        assertThat(newArtifactVersion(left).compareTo(newArtifactVersion(right))).as(left + " should be equal to " + right).isEqualTo(0);
+        assertThat(newArtifactVersion(right).compareTo(newArtifactVersion(left))).as(right + " should be equal to " + left).isEqualTo(0);
     }
 }

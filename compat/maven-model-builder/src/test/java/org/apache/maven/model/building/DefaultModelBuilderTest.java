@@ -26,13 +26,13 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 /**
  */
 @Deprecated
-public class DefaultModelBuilderTest {
+class DefaultModelBuilderTest {
 
     private static final String BASE1_ID = "thegroup:base1:pom";
     private static final String BASE1_ID2 = "thegroup:base1:1";
@@ -77,15 +77,15 @@ public class DefaultModelBuilderTest {
             + "</project>\n";
 
     @Test
-    public void testCycleInImports() throws Exception {
+    void cycleInImports() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        assertNotNull(builder);
+        assertThat(builder).isNotNull();
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         request.setModelSource(new StringModelSource(BASE1));
         request.setModelResolver(new CycleInImportsResolver());
 
-        assertThrows(ModelBuildingException.class, () -> builder.build(request));
+        assertThatExceptionOfType(ModelBuildingException.class).isThrownBy(() -> builder.build(request));
     }
 
     static class CycleInImportsResolver extends BaseModelResolver {

@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code Build}.
@@ -31,30 +29,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BuildTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Build().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new Build().equals(null));
+    void equalsNullSafe() {
+        assertThat(new Build()).isNotEqualTo(null);
 
         new Build().equals(new Build());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Build thing = new Build();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new Build().toString());
+    void toStringNullSafe() {
+        assertThat(new Build().toString()).isNotNull();
     }
 
     @Test
-    public void testToStringNotNonsense() {
+    void toStringNotNonsense() {
         Build build = new Build();
 
         String s = build.toString();

@@ -23,23 +23,23 @@ import java.util.Collections;
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 class DefaultToolchainTest {
+    private AutoCloseable mocks;
     private final Logger logger = mock(Logger.class);
 
     @BeforeEach
     void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
     }
 
     private DefaultToolchain newDefaultToolchain(ToolchainModel model) {
@@ -61,53 +61,53 @@ class DefaultToolchainTest {
     }
 
     @Test
-    void testGetModel() {
+    void getModel() {
         ToolchainModel model = new ToolchainModel();
         DefaultToolchain toolchain = newDefaultToolchain(model);
-        assertEquals(model, toolchain.getModel());
+        assertThat(toolchain.getModel()).isEqualTo(model);
     }
 
     @Test
-    void testGetType() {
+    void getType() {
         ToolchainModel model = new ToolchainModel();
         DefaultToolchain toolchain = newDefaultToolchain(model, "TYPE");
-        assertEquals("TYPE", toolchain.getType());
+        assertThat(toolchain.getType()).isEqualTo("TYPE");
 
         model.setType("MODEL_TYPE");
         toolchain = newDefaultToolchain(model);
-        assertEquals("MODEL_TYPE", toolchain.getType());
+        assertThat(toolchain.getType()).isEqualTo("MODEL_TYPE");
     }
 
     @Test
-    void testGetLogger() {
+    void getLogger() {
         ToolchainModel model = new ToolchainModel();
         DefaultToolchain toolchain = newDefaultToolchain(model);
-        assertEquals(logger, toolchain.getLog());
+        assertThat(toolchain.getLog()).isEqualTo(logger);
     }
 
     @Test
-    void testMissingRequirementProperty() {
+    void missingRequirementProperty() {
         ToolchainModel model = new ToolchainModel();
         model.setType("TYPE");
         DefaultToolchain toolchain = newDefaultToolchain(model);
 
-        assertFalse(toolchain.matchesRequirements(Collections.singletonMap("name", "John Doe")));
+        assertThat(toolchain.matchesRequirements(Collections.singletonMap("name", "John Doe"))).isFalse();
         verify(logger).debug("Toolchain {} is missing required property: {}", toolchain, "name");
     }
 
     @Test
-    void testNonMatchingRequirementProperty() {
+    void nonMatchingRequirementProperty() {
         ToolchainModel model = new ToolchainModel();
         model.setType("TYPE");
         DefaultToolchain toolchain = newDefaultToolchain(model);
         toolchain.addProvideToken("name", RequirementMatcherFactory.createExactMatcher("Jane Doe"));
 
-        assertFalse(toolchain.matchesRequirements(Collections.singletonMap("name", "John Doe")));
+        assertThat(toolchain.matchesRequirements(Collections.singletonMap("name", "John Doe"))).isFalse();
         verify(logger).debug("Toolchain {} doesn't match required property: {}", toolchain, "name");
     }
 
     @Test
-    void testEquals() {
+    void equals() {
         ToolchainModel tm1 = new ToolchainModel();
         tm1.setType("jdk");
         tm1.addProvide("version", "1.5");
@@ -131,9 +131,14 @@ class DefaultToolchainTest {
         DefaultToolchain tc1 = new DefaultJavaToolChain(tm1, null);
         DefaultToolchain tc2 = new DefaultJavaToolChain(tm2, null);
 
-        assertEquals(tc1, tc1);
-        assertNotEquals(tc1, tc2);
-        assertNotEquals(tc2, tc1);
-        assertEquals(tc2, tc2);
+        assertThat(tc1).isEqualTo(tc1);
+        assertThat(tc2).isNotEqualTo(tc1);
+        assertThat(tc1).isNotEqualTo(tc2);
+        assertThat(tc2).isEqualTo(tc2);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        mocks.close();
     }
 }

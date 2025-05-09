@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code DependencyManagement}.
@@ -32,42 +29,42 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DependencyManagementTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new DependencyManagement().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new DependencyManagement().equals(null));
+    void equalsNullSafe() {
+        assertThat(new DependencyManagement()).isNotEqualTo(null);
 
         new DependencyManagement().equals(new DependencyManagement());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         DependencyManagement thing = new DependencyManagement();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new DependencyManagement().toString());
+    void toStringNullSafe() {
+        assertThat(new DependencyManagement().toString()).isNotNull();
     }
 
     @Test
-    void testDependencies() {
+    void dependencies() {
         DependencyManagement dm = new DependencyManagement();
         Dependency d1 = new Dependency();
         d1.setGroupId("myGroupId");
-        assertNotNull(dm.getDependencies());
-        assertEquals(0, dm.getDependencies().size());
+        assertThat(dm.getDependencies()).isNotNull();
+        assertThat(dm.getDependencies().size()).isEqualTo(0);
         dm.addDependency(d1);
-        assertNotNull(dm.getDependencies());
-        assertEquals(1, dm.getDependencies().size());
+        assertThat(dm.getDependencies()).isNotNull();
+        assertThat(dm.getDependencies().size()).isEqualTo(1);
         dm.getDependencies().get(0).setArtifactId("myArtifactId");
-        assertEquals("myArtifactId", dm.getDependencies().get(0).getArtifactId());
+        assertThat(dm.getDependencies().get(0).getArtifactId()).isEqualTo("myArtifactId");
         dm.setDependencies(null);
-        assertNotNull(dm.getDependencies());
-        assertEquals(0, dm.getDependencies().size());
+        assertThat(dm.getDependencies()).isNotNull();
+        assertThat(dm.getDependencies().size()).isEqualTo(0);
     }
 }

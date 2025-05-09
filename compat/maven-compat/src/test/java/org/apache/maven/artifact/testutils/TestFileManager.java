@@ -26,9 +26,7 @@ import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Deprecated
 public class TestFileManager {
@@ -120,9 +118,9 @@ public class TestFileManager {
         File file = new File(dir, filename);
 
         if (shouldExist) {
-            assertTrue(file.exists());
+            assertThat(file.exists()).isTrue();
         } else {
-            assertFalse(file.exists());
+            assertThat(file.exists()).isFalse();
         }
     }
 
@@ -133,7 +131,7 @@ public class TestFileManager {
 
         String contents = FileUtils.fileRead(file, encoding);
 
-        assertEquals(contentsTest, contents);
+        assertThat(contents).isEqualTo(contentsTest);
     }
 
     public File createFile(File dir, String filename, String contents, String encoding) throws IOException {

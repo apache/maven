@@ -39,9 +39,8 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 // It would be cool if there was a hook that I could use to set up a test environment.
 // I want to set up a local/remote repositories for testing but I don't want to have
@@ -79,7 +78,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository() throws Exception {
+    void resolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository() throws Exception {
         Artifact a = createLocalArtifact("a", "1.0");
 
         artifactResolver.resolve(a, remoteRepositories(), localRepository());
@@ -88,7 +87,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepository()
+    void resolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepository()
             throws Exception {
         Artifact b = createRemoteArtifact("b", "1.0-SNAPSHOT");
         deleteLocalArtifact(b);
@@ -103,7 +102,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository() throws Exception {
+    void transitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository() throws Exception {
         Artifact g = createLocalArtifact("g", "1.0");
 
         Artifact h = createLocalArtifact("h", "1.0");
@@ -113,11 +112,11 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
 
         printErrors(result);
 
-        assertEquals(2, result.getArtifacts().size());
+        assertThat(result.getArtifacts().size()).isEqualTo(2);
 
-        assertTrue(result.getArtifacts().contains(g));
+        assertThat(result.getArtifacts().contains(g)).isTrue();
 
-        assertTrue(result.getArtifacts().contains(h));
+        assertThat(result.getArtifacts().contains(h)).isTrue();
 
         assertLocalArtifactPresent(g);
 
@@ -126,7 +125,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
 
     @Test
     void
-            testTransitiveResolutionWhereAllArtifactsAreNotPresentInTheLocalRepositoryAndMustBeRetrievedFromTheRemoteRepository()
+            transitiveResolutionWhereAllArtifactsAreNotPresentInTheLocalRepositoryAndMustBeRetrievedFromTheRemoteRepository()
                     throws Exception {
         Artifact i = createRemoteArtifact("i", "1.0-SNAPSHOT");
         deleteLocalArtifact(i);
@@ -139,11 +138,11 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
 
         printErrors(result);
 
-        assertEquals(2, result.getArtifacts().size());
+        assertThat(result.getArtifacts().size()).isEqualTo(2);
 
-        assertTrue(result.getArtifacts().contains(i));
+        assertThat(result.getArtifacts().contains(i)).isTrue();
 
-        assertTrue(result.getArtifacts().contains(j));
+        assertThat(result.getArtifacts().contains(j)).isTrue();
 
         assertLocalArtifactPresent(i);
 
@@ -151,17 +150,14 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testResolutionFailureWhenArtifactNotPresentInRemoteRepository() throws Exception {
+    void resolutionFailureWhenArtifactNotPresentInRemoteRepository() throws Exception {
         Artifact k = createArtifact("k", "1.0");
 
-        assertThrows(
-                ArtifactNotFoundException.class,
-                () -> artifactResolver.resolve(k, remoteRepositories(), localRepository()),
-                "Resolution succeeded when it should have failed");
+        assertThatExceptionOfType(ArtifactNotFoundException.class).as("Resolution succeeded when it should have failed").isThrownBy(() -> artifactResolver.resolve(k, remoteRepositories(), localRepository()));
     }
 
     @Test
-    void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood() throws Exception {
+    void resolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood() throws Exception {
         Artifact l = createRemoteArtifact("l", "1.0-SNAPSHOT");
         deleteLocalArtifact(l);
 
@@ -175,19 +171,19 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void testReadRepoFromModel() throws Exception {
+    void readRepoFromModel() throws Exception {
         Artifact artifact = createArtifact(TestMavenWorkspaceReader.ARTIFACT_ID, TestMavenWorkspaceReader.VERSION);
         ArtifactMetadataSource source = getContainer().lookup(ArtifactMetadataSource.class, "maven");
         ResolutionGroup group = source.retrieve(artifact, localRepository(), new ArrayList<>());
         List<ArtifactRepository> repositories = group.getResolutionRepositories();
-        assertEquals(1, repositories.size(), "There should be one repository!");
+        assertThat(repositories.size()).as("There should be one repository!").isEqualTo(1);
         ArtifactRepository repository = repositories.get(0);
-        assertEquals(TestMavenWorkspaceReader.REPO_ID, repository.getId());
-        assertEquals(TestMavenWorkspaceReader.REPO_URL, repository.getUrl());
+        assertThat(repository.getId()).isEqualTo(TestMavenWorkspaceReader.REPO_ID);
+        assertThat(repository.getUrl()).isEqualTo(TestMavenWorkspaceReader.REPO_URL);
     }
 
     @Test
-    void testTransitiveResolutionOrder() throws Exception {
+    void transitiveResolutionOrder() throws Exception {
         Artifact m = createLocalArtifact("m", "1.0");
 
         Artifact n = createLocalArtifact("n", "1.0");
@@ -241,8 +237,8 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
         printErrors(result);
 
         Iterator<Artifact> i = result.getArtifacts().iterator();
-        assertEquals(n, i.next(), "n should be first");
-        assertEquals(m, i.next(), "m should be second");
+        assertThat(i.next()).as("n should be first").isEqualTo(n);
+        assertThat(i.next()).as("m should be second").isEqualTo(m);
 
         // inverse order
         set = new LinkedHashSet<>();
@@ -255,8 +251,8 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
         printErrors(result);
 
         i = result.getArtifacts().iterator();
-        assertEquals(m, i.next(), "m should be first");
-        assertEquals(n, i.next(), "n should be second");
+        assertThat(i.next()).as("m should be first").isEqualTo(m);
+        assertThat(i.next()).as("n should be second").isEqualTo(n);
     }
 
     private void printErrors(ArtifactResolutionResult result) {

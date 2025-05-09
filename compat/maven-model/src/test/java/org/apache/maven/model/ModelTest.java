@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code Model}.
@@ -32,38 +29,38 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class ModelTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Model().hashCode();
     }
 
     @Test
-    void testBuild() {
+    void build() {
         Model model = new Model();
         Build build = new Build();
         build.setOutputDirectory("myOutputDirectory");
         model.setBuild(build);
         Build build2 = model.getBuild();
-        assertNotNull(build2);
-        assertEquals("myOutputDirectory", build2.getOutputDirectory());
+        assertThat(build2).isNotNull();
+        assertThat(build2.getOutputDirectory()).isEqualTo("myOutputDirectory");
         model.setBuild(null);
-        assertNull(model.getBuild());
+        assertThat(model.getBuild()).isNull();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertNotEquals(null, new Model());
+    void equalsNullSafe() {
+        assertThat(new Model()).isNotEqualTo(null);
 
         new Model().equals(new Model());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Model thing = new Model();
-        assertEquals(thing, thing);
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new Model().toString());
+    void toStringNullSafe() {
+        assertThat(new Model().toString()).isNotNull();
     }
 }

@@ -24,8 +24,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies scope of root project is preserved regardless of parent dependency management.
@@ -47,7 +46,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagementDoesNotOverrideScopeOfCurrentArtifact() throws Exception {
+    void dependencyManagementDoesNotOverrideScopeOfCurrentArtifact() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -58,9 +57,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project0 = getProjectWithDependencies(pom0);
         MavenProject project1 = getProjectWithDependencies(pom1);
 
-        assertEquals(pom0Basedir, project1.getParent().getBasedir());
-        assertNull(
-                project1.getArtifact().getScope(),
-                "dependencyManagement has overwritten the scope of the currently building child project");
+        assertThat(project1.getParent().getBasedir()).isEqualTo(pom0Basedir);
+        assertThat(project1.getArtifact().getScope()).as("dependencyManagement has overwritten the scope of the currently building child project").isNull();
     }
 }

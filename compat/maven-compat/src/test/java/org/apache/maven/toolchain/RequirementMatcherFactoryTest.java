@@ -20,9 +20,7 @@ package org.apache.maven.toolchain;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -33,33 +31,33 @@ class RequirementMatcherFactoryTest {
      * Test of createExactMatcher method, of class RequirementMatcherFactory.
      */
     @Test
-    void testCreateExactMatcher() {
+    void createExactMatcher() {
         RequirementMatcher matcher;
         matcher = RequirementMatcherFactory.createExactMatcher("foo");
-        assertFalse(matcher.matches("bar"));
-        assertFalse(matcher.matches("foobar"));
-        assertFalse(matcher.matches("foob"));
-        assertTrue(matcher.matches("foo"));
+        assertThat(matcher.matches("bar")).isFalse();
+        assertThat(matcher.matches("foobar")).isFalse();
+        assertThat(matcher.matches("foob")).isFalse();
+        assertThat(matcher.matches("foo")).isTrue();
     }
 
     /**
      * Test of createVersionMatcher method, of class RequirementMatcherFactory.
      */
     @Test
-    void testCreateVersionMatcher() {
+    void createVersionMatcher() {
         RequirementMatcher matcher;
         matcher = RequirementMatcherFactory.createVersionMatcher("1.5.2");
-        assertFalse(matcher.matches("1.5"));
-        assertTrue(matcher.matches("1.5.2"));
-        assertFalse(matcher.matches("[1.4,1.5)"));
-        assertFalse(matcher.matches("[1.5,1.5.2)"));
-        assertFalse(matcher.matches("(1.5.2,1.6)"));
-        assertTrue(matcher.matches("(1.4,1.5.2]"));
-        assertTrue(matcher.matches("(1.5,)"));
-        assertEquals("1.5.2", matcher.toString());
+        assertThat(matcher.matches("1.5")).isFalse();
+        assertThat(matcher.matches("1.5.2")).isTrue();
+        assertThat(matcher.matches("[1.4,1.5)")).isFalse();
+        assertThat(matcher.matches("[1.5,1.5.2)")).isFalse();
+        assertThat(matcher.matches("(1.5.2,1.6)")).isFalse();
+        assertThat(matcher.matches("(1.4,1.5.2]")).isTrue();
+        assertThat(matcher.matches("(1.5,)")).isTrue();
+        assertThat(matcher.toString()).isEqualTo("1.5.2");
 
         // Ensure it is not printed as 1.5.0
         matcher = RequirementMatcherFactory.createVersionMatcher("1.5");
-        assertEquals("1.5", matcher.toString());
+        assertThat(matcher.toString()).isEqualTo("1.5");
     }
 }

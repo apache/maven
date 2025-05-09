@@ -28,7 +28,7 @@ import org.apache.maven.api.model.PluginExecution;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MavenModelVersionTest {
 
@@ -42,34 +42,34 @@ class MavenModelVersionTest {
     }
 
     @Test
-    void testV4Model() {
-        assertEquals("4.0.0", new MavenModelVersion().getModelVersion(model));
+    void v4Model() {
+        assertThat(new MavenModelVersion().getModelVersion(model)).isEqualTo("4.0.0");
     }
 
     @Test
-    void testV4ModelVersion() {
+    void v4ModelVersion() {
         Model m = model.withModelVersion("4.1.0");
-        assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m));
+        assertThat(new MavenModelVersion().getModelVersion(m)).isEqualTo("4.0.0");
     }
 
     @Test
-    void testV4ModelRoot() {
+    void v4ModelRoot() {
         Model m = model.withRoot(true);
-        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
+        assertThat(new MavenModelVersion().getModelVersion(m)).isEqualTo("4.1.0");
     }
 
     @Test
-    void testV4ModelPreserveModelVersion() {
+    void v4ModelPreserveModelVersion() {
         Model m = model.withPreserveModelVersion(true);
-        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
+        assertThat(new MavenModelVersion().getModelVersion(m)).isEqualTo("4.1.0");
     }
 
     @Test
-    void testV4ModelPriority() {
+    void v4ModelPriority() {
         Model m = model.withBuild(Build.newInstance()
                 .withPlugins(Collections.singleton(Plugin.newInstance()
                         .withExecutions(Collections.singleton(
                                 PluginExecution.newInstance().withPriority(5))))));
-        assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m));
+        assertThat(new MavenModelVersion().getModelVersion(m)).isEqualTo("4.0.0");
     }
 }

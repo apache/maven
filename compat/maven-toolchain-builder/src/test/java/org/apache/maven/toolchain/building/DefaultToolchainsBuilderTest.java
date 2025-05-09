@@ -43,8 +43,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -74,16 +73,16 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testBuildEmptyRequest() throws Exception {
+    void buildEmptyRequest() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
-        assertNotNull(result.getEffectiveToolchains());
-        assertNotNull(result.getProblems());
-        assertEquals(0, result.getProblems().size());
+        assertThat(result.getEffectiveToolchains()).isNotNull();
+        assertThat(result.getProblems()).isNotNull();
+        assertThat(result.getProblems().size()).isEqualTo(0);
     }
 
     @Test
-    void testBuildRequestWithUserToolchains() throws Exception {
+    void buildRequestWithUserToolchains() throws Exception {
         Properties props = new Properties();
         props.put("key", "user_value");
         ToolchainModel toolchain = new ToolchainModel();
@@ -97,23 +96,20 @@ class DefaultToolchainsBuilderTest {
         request.setUserToolchainsSource(new StringSource(xml));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
-        assertNotNull(result.getEffectiveToolchains());
-        assertEquals(1, result.getEffectiveToolchains().getToolchains().size());
-        assertEquals(
-                "TYPE", result.getEffectiveToolchains().getToolchains().get(0).getType());
-        assertEquals(
-                "user_value",
-                result.getEffectiveToolchains()
-                        .getToolchains()
-                        .get(0)
-                        .getProvides()
-                        .get("key"));
-        assertNotNull(result.getProblems());
-        assertEquals(0, result.getProblems().size());
+        assertThat(result.getEffectiveToolchains()).isNotNull();
+        assertThat(result.getEffectiveToolchains().getToolchains().size()).isEqualTo(1);
+        assertThat(result.getEffectiveToolchains().getToolchains().get(0).getType()).isEqualTo("TYPE");
+        assertThat(result.getEffectiveToolchains()
+                .getToolchains()
+                .get(0)
+                .getProvides()
+                .get("key")).isEqualTo("user_value");
+        assertThat(result.getProblems()).isNotNull();
+        assertThat(result.getProblems().size()).isEqualTo(0);
     }
 
     @Test
-    void testBuildRequestWithGlobalToolchains() throws Exception {
+    void buildRequestWithGlobalToolchains() throws Exception {
         Properties props = new Properties();
         props.put("key", "global_value");
         ToolchainModel toolchain = new ToolchainModel();
@@ -127,23 +123,20 @@ class DefaultToolchainsBuilderTest {
         request.setGlobalToolchainsSource(new StringSource(xml));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
-        assertNotNull(result.getEffectiveToolchains());
-        assertEquals(1, result.getEffectiveToolchains().getToolchains().size());
-        assertEquals(
-                "TYPE", result.getEffectiveToolchains().getToolchains().get(0).getType());
-        assertEquals(
-                "global_value",
-                result.getEffectiveToolchains()
-                        .getToolchains()
-                        .get(0)
-                        .getProvides()
-                        .get("key"));
-        assertNotNull(result.getProblems());
-        assertEquals(0, result.getProblems().size());
+        assertThat(result.getEffectiveToolchains()).isNotNull();
+        assertThat(result.getEffectiveToolchains().getToolchains().size()).isEqualTo(1);
+        assertThat(result.getEffectiveToolchains().getToolchains().get(0).getType()).isEqualTo("TYPE");
+        assertThat(result.getEffectiveToolchains()
+                .getToolchains()
+                .get(0)
+                .getProvides()
+                .get("key")).isEqualTo("global_value");
+        assertThat(result.getProblems()).isNotNull();
+        assertThat(result.getProblems().size()).isEqualTo(0);
     }
 
     @Test
-    void testBuildRequestWithBothToolchains() throws Exception {
+    void buildRequestWithBothToolchains() throws Exception {
         Properties props = new Properties();
         props.put("key", "user_value");
         ToolchainModel toolchain = new ToolchainModel();
@@ -167,32 +160,26 @@ class DefaultToolchainsBuilderTest {
                 new StringSource(new DefaultToolchainsXmlFactory().toXmlString(globalResult.getDelegate())));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
-        assertNotNull(result.getEffectiveToolchains());
-        assertEquals(2, result.getEffectiveToolchains().getToolchains().size());
-        assertEquals(
-                "TYPE", result.getEffectiveToolchains().getToolchains().get(0).getType());
-        assertEquals(
-                "user_value",
-                result.getEffectiveToolchains()
-                        .getToolchains()
-                        .get(0)
-                        .getProvides()
-                        .get("key"));
-        assertEquals(
-                "TYPE", result.getEffectiveToolchains().getToolchains().get(1).getType());
-        assertEquals(
-                "global_value",
-                result.getEffectiveToolchains()
-                        .getToolchains()
-                        .get(1)
-                        .getProvides()
-                        .get("key"));
-        assertNotNull(result.getProblems());
-        assertEquals(0, result.getProblems().size());
+        assertThat(result.getEffectiveToolchains()).isNotNull();
+        assertThat(result.getEffectiveToolchains().getToolchains().size()).isEqualTo(2);
+        assertThat(result.getEffectiveToolchains().getToolchains().get(0).getType()).isEqualTo("TYPE");
+        assertThat(result.getEffectiveToolchains()
+                .getToolchains()
+                .get(0)
+                .getProvides()
+                .get("key")).isEqualTo("user_value");
+        assertThat(result.getEffectiveToolchains().getToolchains().get(1).getType()).isEqualTo("TYPE");
+        assertThat(result.getEffectiveToolchains()
+                .getToolchains()
+                .get(1)
+                .getProvides()
+                .get("key")).isEqualTo("global_value");
+        assertThat(result.getProblems()).isNotNull();
+        assertThat(result.getProblems().size()).isEqualTo(0);
     }
 
     @Test
-    void testStrictToolchainsParseException() throws Exception {
+    void strictToolchainsParseException() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(new StringSource(""));
         ToolchainsParseException parseException = new ToolchainsParseException("MESSAGE", 4, 2);
@@ -201,15 +188,13 @@ class DefaultToolchainsBuilderTest {
         try {
             toolchainBuilder.build(request);
         } catch (ToolchainsBuildingException e) {
-            assertEquals(
-                    "1 problem was encountered while building the effective toolchains" + LS
-                            + "[FATAL] Non-parseable toolchains (memory): MESSAGE @ line 4, column 2" + LS,
-                    e.getMessage());
+            assertThat(e.getMessage()).isEqualTo("1 problem was encountered while building the effective toolchains" + LS
+                    + "[FATAL] Non-parseable toolchains (memory): MESSAGE @ line 4, column 2" + LS);
         }
     }
 
     @Test
-    void testIOException() throws Exception {
+    void iOException() throws Exception {
         Source src = mock(Source.class);
         IOException ioException = new IOException("MESSAGE");
         doThrow(ioException).when(src).getInputStream();
@@ -221,15 +206,13 @@ class DefaultToolchainsBuilderTest {
         try {
             toolchainBuilder.build(request);
         } catch (ToolchainsBuildingException e) {
-            assertEquals(
-                    "1 problem was encountered while building the effective toolchains" + LS
-                            + "[FATAL] Non-readable toolchains LOCATION: MESSAGE" + LS,
-                    e.getMessage());
+            assertThat(e.getMessage()).isEqualTo("1 problem was encountered while building the effective toolchains" + LS
+                    + "[FATAL] Non-readable toolchains LOCATION: MESSAGE" + LS);
         }
     }
 
     @Test
-    void testEnvironmentVariablesAreInterpolated() throws Exception {
+    void environmentVariablesAreInterpolated() throws Exception {
         Properties props = new Properties();
         props.put("key", "${env.testKey}");
         Xpp3Dom configurationChild = new Xpp3Dom("jdkHome");
@@ -249,23 +232,20 @@ class DefaultToolchainsBuilderTest {
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         String interpolatedValue = "testValue";
-        assertEquals(
-                interpolatedValue,
-                result.getEffectiveToolchains()
-                        .getToolchains()
-                        .get(0)
-                        .getProvides()
-                        .get("key"));
+        assertThat(result.getEffectiveToolchains()
+                .getToolchains()
+                .get(0)
+                .getProvides()
+                .get("key")).isEqualTo(interpolatedValue);
         org.codehaus.plexus.util.xml.Xpp3Dom toolchainConfiguration = (org.codehaus.plexus.util.xml.Xpp3Dom)
                 result.getEffectiveToolchains().getToolchains().get(0).getConfiguration();
-        assertEquals(
-                interpolatedValue, toolchainConfiguration.getChild("jdkHome").getValue());
-        assertNotNull(result.getProblems());
-        assertEquals(0, result.getProblems().size());
+        assertThat(toolchainConfiguration.getChild("jdkHome").getValue()).isEqualTo(interpolatedValue);
+        assertThat(result.getProblems()).isNotNull();
+        assertThat(result.getProblems().size()).isEqualTo(0);
     }
 
     @Test
-    void testNonExistingEnvironmentVariablesAreNotInterpolated() throws Exception {
+    void nonExistingEnvironmentVariablesAreNotInterpolated() throws Exception {
         Properties props = new Properties();
         props.put("key", "${env.testNonExistingKey}");
         ToolchainModel toolchain = new ToolchainModel();
@@ -279,19 +259,17 @@ class DefaultToolchainsBuilderTest {
         request.setUserToolchainsSource(new StringSource(xml));
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
-        assertEquals(
-                "${env.testNonExistingKey}",
-                result.getEffectiveToolchains()
-                        .getToolchains()
-                        .get(0)
-                        .getProvides()
-                        .get("key"));
-        assertNotNull(result.getProblems());
-        assertEquals(0, result.getProblems().size());
+        assertThat(result.getEffectiveToolchains()
+                .getToolchains()
+                .get(0)
+                .getProvides()
+                .get("key")).isEqualTo("${env.testNonExistingKey}");
+        assertThat(result.getProblems()).isNotNull();
+        assertThat(result.getProblems().size()).isEqualTo(0);
     }
 
     @Test
-    void testEnvironmentVariablesWithSpecialCharactersAreInterpolated() throws Exception {
+    void environmentVariablesWithSpecialCharactersAreInterpolated() throws Exception {
         Properties props = new Properties();
         props.put("key", "${env.testSpecialCharactersKey}");
         ToolchainModel toolchain = new ToolchainModel();
@@ -306,15 +284,13 @@ class DefaultToolchainsBuilderTest {
 
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         String interpolatedValue = "<test&Value>";
-        assertEquals(
-                interpolatedValue,
-                result.getEffectiveToolchains()
-                        .getToolchains()
-                        .get(0)
-                        .getProvides()
-                        .get("key"));
-        assertNotNull(result.getProblems());
-        assertEquals(0, result.getProblems().size());
+        assertThat(result.getEffectiveToolchains()
+                .getToolchains()
+                .get(0)
+                .getProvides()
+                .get("key")).isEqualTo(interpolatedValue);
+        assertThat(result.getProblems()).isNotNull();
+        assertThat(result.getProblems().size()).isEqualTo(0);
     }
 
     static class TestEnvVarSource implements OperatingSystemUtils.EnvVarSource {

@@ -32,9 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -65,7 +63,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
     @Test
     @DisabledOnOs(OS.WINDOWS) // need to investigate why it fails on windows
-    void testProjectInheritance() throws Exception {
+    void projectInheritance() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         System.out.println("Local repository is at: " + localRepo.getAbsolutePath());
@@ -87,37 +85,37 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project4 = getProject(pom4);
         MavenProject project5 = getProject(pom5);
 
-        assertEquals("p4", project4.getName());
+        assertThat(project4.getName()).isEqualTo("p4");
 
         // ----------------------------------------------------------------------
         // Value inherited from p3
         // ----------------------------------------------------------------------
 
-        assertEquals("2000", project4.getInceptionYear());
+        assertThat(project4.getInceptionYear()).isEqualTo("2000");
 
         // ----------------------------------------------------------------------
         // Value taken from p2
         // ----------------------------------------------------------------------
 
-        assertEquals("mailing-list", project4.getMailingLists().get(0).getName());
+        assertThat(project4.getMailingLists().get(0).getName()).isEqualTo("mailing-list");
 
         // ----------------------------------------------------------------------
         // Value taken from p1
         // ----------------------------------------------------------------------
 
-        assertEquals("scm-url/p2/p3/p4", project4.getScm().getUrl());
+        assertThat(project4.getScm().getUrl()).isEqualTo("scm-url/p2/p3/p4");
 
         // ----------------------------------------------------------------------
         // Value taken from p4
         // ----------------------------------------------------------------------
 
-        assertEquals("Codehaus", project4.getOrganization().getName());
+        assertThat(project4.getOrganization().getName()).isEqualTo("Codehaus");
 
         // ----------------------------------------------------------------------
         // Value taken from super model
         // ----------------------------------------------------------------------
 
-        assertEquals("4.0.0", project4.getModelVersion());
+        assertThat(project4.getModelVersion()).isEqualTo("4.0.0");
 
         Build build = project4.getBuild();
         List<Plugin> plugins = build.getPlugins();
@@ -139,7 +137,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         for (Plugin plugin : plugins) {
             String pluginArtifactId = plugin.getArtifactId();
 
-            assertTrue(validPluginCounts.containsKey(pluginArtifactId), "Illegal plugin found: " + pluginArtifactId);
+            assertThat(validPluginCounts.containsKey(pluginArtifactId)).as("Illegal plugin found: " + pluginArtifactId).isTrue();
 
             if (pluginArtifactId.equals(testPluginArtifactId)) {
                 testPlugin = plugin;
@@ -147,17 +145,17 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
             Integer count = validPluginCounts.get(pluginArtifactId);
 
-            assertEquals(0, (int) count, "Multiple copies of plugin: " + pluginArtifactId + " found in POM.");
+            assertThat((int) count).as("Multiple copies of plugin: " + pluginArtifactId + " found in POM.").isEqualTo(0);
 
             count = count + 1;
 
             validPluginCounts.put(pluginArtifactId, count);
         }
 
-        assertNotNull(testPlugin);
+        assertThat(testPlugin).isNotNull();
 
         List<PluginExecution> executions = testPlugin.getExecutions();
 
-        assertEquals(1, executions.size());
+        assertThat(executions.size()).isEqualTo(1);
     }
 }

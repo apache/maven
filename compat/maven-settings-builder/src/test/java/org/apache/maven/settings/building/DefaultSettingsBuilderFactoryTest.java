@@ -22,7 +22,7 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */
@@ -33,16 +33,16 @@ class DefaultSettingsBuilderFactoryTest {
     }
 
     @Test
-    void testCompleteWiring() throws Exception {
+    void completeWiring() throws Exception {
         SettingsBuilder builder = new DefaultSettingsBuilderFactory().newInstance();
-        assertNotNull(builder);
+        assertThat(builder).isNotNull();
 
         DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
         request.setSystemProperties(System.getProperties());
         request.setUserSettingsFile(getSettings("simple"));
 
         SettingsBuildingResult result = builder.build(request);
-        assertNotNull(result);
-        assertNotNull(result.getEffectiveSettings());
+        assertThat(result).isNotNull();
+        assertThat(result.getEffectiveSettings()).isNotNull();
     }
 }

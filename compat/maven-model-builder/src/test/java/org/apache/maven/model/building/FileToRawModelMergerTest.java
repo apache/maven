@@ -38,7 +38,7 @@ class FileToRawModelMergerTest {
      * Ensures that all list-merge methods are overridden
      */
     @Test
-    void testOverriddenMergeMethods() {
+    void overriddenMergeMethods() {
         List<String> methodNames = Stream.of(MavenMerger.class.getDeclaredMethods())
                 .filter(m -> m.getName().startsWith("merge"))
                 .filter(m -> {

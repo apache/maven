@@ -22,35 +22,35 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Deprecated
 class DefaultPathTranslatorTest {
 
     @Test
-    void testAlignToBasedirWhereBasedirExpressionIsTheCompleteValue() {
+    void alignToBasedirWhereBasedirExpressionIsTheCompleteValue() {
         File basedir = new File(System.getProperty("java.io.tmpdir"), "test").getAbsoluteFile();
 
         String aligned = new DefaultPathTranslator().alignToBaseDirectory("${basedir}", basedir);
 
-        assertEquals(basedir.getAbsolutePath(), aligned);
+        assertThat(aligned).isEqualTo(basedir.getAbsolutePath());
     }
 
     @Test
-    void testAlignToBasedirWhereBasedirExpressionIsTheValuePrefix() {
+    void alignToBasedirWhereBasedirExpressionIsTheValuePrefix() {
         File basedir = new File(System.getProperty("java.io.tmpdir"), "test").getAbsoluteFile();
 
         String aligned = new DefaultPathTranslator().alignToBaseDirectory("${basedir}/dir", basedir);
 
-        assertEquals(new File(basedir, "dir").getAbsolutePath(), aligned);
+        assertThat(aligned).isEqualTo(new File(basedir, "dir").getAbsolutePath());
     }
 
     @Test
-    void testUnalignToBasedirWherePathEqualsBasedir() {
+    void unalignToBasedirWherePathEqualsBasedir() {
         File basedir = new File(System.getProperty("java.io.tmpdir"), "test").getAbsoluteFile();
 
         String unaligned = new DefaultPathTranslator().unalignFromBaseDirectory(basedir.getAbsolutePath(), basedir);
 
-        assertEquals(".", unaligned);
+        assertThat(unaligned).isEqualTo(".");
     }
 }

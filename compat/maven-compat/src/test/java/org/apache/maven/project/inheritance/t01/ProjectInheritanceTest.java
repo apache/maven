@@ -22,7 +22,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -48,14 +48,14 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testProjectInheritance() throws Exception {
+    void projectInheritance() throws Exception {
         // ----------------------------------------------------------------------
         // Check p0 value for org name
         // ----------------------------------------------------------------------
 
         MavenProject p0 = getProject(projectFile("maven.t01", "p0"));
 
-        assertEquals("p0-org", p0.getOrganization().getName());
+        assertThat(p0.getOrganization().getName()).isEqualTo("p0-org");
 
         // ----------------------------------------------------------------------
         // Check p1 value for org name
@@ -63,7 +63,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
         MavenProject p1 = getProject(projectFile("maven.t01", "p1"));
 
-        assertEquals("p1-org", p1.getOrganization().getName());
+        assertThat(p1.getOrganization().getName()).isEqualTo("p1-org");
 
         // ----------------------------------------------------------------------
         // Check p2 value for org name
@@ -71,7 +71,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
         MavenProject p2 = getProject(projectFile("maven.t01", "p2"));
 
-        assertEquals("p2-org", p2.getOrganization().getName());
+        assertThat(p2.getOrganization().getName()).isEqualTo("p2-org");
 
         // ----------------------------------------------------------------------
         // Check p2 value for org name
@@ -79,7 +79,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
         MavenProject p3 = getProject(projectFile("maven.t01", "p3"));
 
-        assertEquals("p3-org", p3.getOrganization().getName());
+        assertThat(p3.getOrganization().getName()).isEqualTo("p3-org");
 
         // ----------------------------------------------------------------------
         // Check p4 value for org name
@@ -87,6 +87,6 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
         MavenProject p4 = getProject(projectFile("maven.t01", "p4"));
 
-        assertEquals("p4-org", p4.getOrganization().getName());
+        assertThat(p4.getOrganization().getName()).isEqualTo("p4-org");
     }
 }

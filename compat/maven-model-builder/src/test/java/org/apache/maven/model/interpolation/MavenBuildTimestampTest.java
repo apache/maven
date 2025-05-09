@@ -23,16 +23,16 @@ import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Deprecated
 class MavenBuildTimestampTest {
     @Test
-    void testMavenBuildTimestampUsesUTC() {
+    void mavenBuildTimestampUsesUTC() {
         Properties interpolationProperties = new Properties();
         interpolationProperties.put("maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'");
         MavenBuildTimestamp timestamp = new MavenBuildTimestamp(new Date(), interpolationProperties);
         String formattedTimestamp = timestamp.formattedTimestamp();
-        assertTrue(formattedTimestamp.endsWith("Z"), "We expect the UTC marker at the end of the timestamp.");
+        assertThat(formattedTimestamp.endsWith("Z")).as("We expect the UTC marker at the end of the timestamp.").isTrue();
     }
 }

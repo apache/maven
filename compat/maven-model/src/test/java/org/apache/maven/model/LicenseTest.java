@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code License}.
@@ -32,36 +29,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LicenseTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new License().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new License().equals(null));
+    void equalsNullSafe() {
+        assertThat(new License()).isNotEqualTo(null);
 
         new License().equals(new License());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         License thing = new License();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new License().toString());
+    void toStringNullSafe() {
+        assertThat(new License().toString()).isNotNull();
     }
 
     @Test
-    public void testToStringNotNonsense() {
+    void toStringNotNonsense() {
         License license = new License();
         license.setName("Unlicense");
         license.setUrl("http://lic.localdomain");
 
         String s = license.toString();
 
-        assertEquals("License {name=Unlicense, url=http://lic.localdomain}", s);
+        assertThat(s).isEqualTo("License {name=Unlicense, url=http://lic.localdomain}");
     }
 }

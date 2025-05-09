@@ -30,10 +30,7 @@ import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @PlexusTest
 @Deprecated
@@ -45,58 +42,58 @@ class MirrorProcessorTest {
     private ArtifactRepositoryFactory repositorySystem;
 
     @Test
-    void testExternalURL() {
-        assertTrue(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://somehost")));
-        assertTrue(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://somehost:9090/somepath")));
-        assertTrue(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "ftp://somehost")));
-        assertTrue(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://192.168.101.1")));
-        assertTrue(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://")));
+    void externalURL() {
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://somehost"))).isTrue();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://somehost:9090/somepath"))).isTrue();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "ftp://somehost"))).isTrue();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://192.168.101.1"))).isTrue();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://"))).isTrue();
         // these are local
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://localhost:8080")));
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://127.0.0.1:9090")));
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "file://localhost/somepath")));
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "file://localhost/D:/somepath")));
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://localhost")));
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://127.0.0.1")));
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "file:///somepath")));
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "file://D:/somepath")));
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://localhost:8080"))).isFalse();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://127.0.0.1:9090"))).isFalse();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "file://localhost/somepath"))).isFalse();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "file://localhost/D:/somepath"))).isFalse();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://localhost"))).isFalse();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://127.0.0.1"))).isFalse();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "file:///somepath"))).isFalse();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "file://D:/somepath"))).isFalse();
 
         // not a proper url so returns false;
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "192.168.101.1")));
-        assertFalse(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "")));
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "192.168.101.1"))).isFalse();
+        assertThat(DefaultMirrorSelector.isExternalRepo(getRepo("foo", ""))).isFalse();
     }
 
     @Test
-    void testMirrorLookup() {
+    void mirrorLookup() {
         Mirror mirrorA = newMirror("a", "a", "http://a");
         Mirror mirrorB = newMirror("b", "b", "http://b");
 
         List<Mirror> mirrors = Arrays.asList(mirrorA, mirrorB);
 
-        assertSame(mirrorA, mirrorSelector.getMirror(getRepo("a", "http://a.a"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("a", "http://a.a"), mirrors)).isSameAs(mirrorA);
 
-        assertSame(mirrorB, mirrorSelector.getMirror(getRepo("b", "http://a.a"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("b", "http://a.a"), mirrors)).isSameAs(mirrorB);
 
-        assertNull(mirrorSelector.getMirror(getRepo("c", "http://c.c"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("c", "http://c.c"), mirrors)).isNull();
     }
 
     @Test
-    void testMirrorWildcardLookup() {
+    void mirrorWildcardLookup() {
         Mirror mirrorA = newMirror("a", "a", "http://a");
         Mirror mirrorB = newMirror("b", "b", "http://b");
         Mirror mirrorC = newMirror("c", "*", "http://wildcard");
 
         List<Mirror> mirrors = Arrays.asList(mirrorA, mirrorB, mirrorC);
 
-        assertSame(mirrorA, mirrorSelector.getMirror(getRepo("a", "http://a.a"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("a", "http://a.a"), mirrors)).isSameAs(mirrorA);
 
-        assertSame(mirrorB, mirrorSelector.getMirror(getRepo("b", "http://a.a"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("b", "http://a.a"), mirrors)).isSameAs(mirrorB);
 
-        assertSame(mirrorC, mirrorSelector.getMirror(getRepo("c", "http://c.c"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("c", "http://c.c"), mirrors)).isSameAs(mirrorC);
     }
 
     @Test
-    void testMirrorStopOnFirstMatch() {
+    void mirrorStopOnFirstMatch() {
         // exact matches win first
         Mirror mirrorA2 = newMirror("a2", "a,b", "http://a2");
         Mirror mirrorA = newMirror("a", "a", "http://a");
@@ -110,90 +107,90 @@ class MirrorProcessorTest {
 
         List<Mirror> mirrors = Arrays.asList(mirrorA2, mirrorA, mirrorA3, mirrorB, mirrorC, mirrorC2, mirrorC3);
 
-        assertSame(mirrorA, mirrorSelector.getMirror(getRepo("a", "http://a.a"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("a", "http://a.a"), mirrors)).isSameAs(mirrorA);
 
-        assertSame(mirrorB, mirrorSelector.getMirror(getRepo("b", "http://a.a"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("b", "http://a.a"), mirrors)).isSameAs(mirrorB);
 
-        assertSame(mirrorC2, mirrorSelector.getMirror(getRepo("c", "http://c.c"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("c", "http://c.c"), mirrors)).isSameAs(mirrorC2);
 
-        assertSame(mirrorC, mirrorSelector.getMirror(getRepo("d", "http://d"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("d", "http://d"), mirrors)).isSameAs(mirrorC);
 
-        assertSame(mirrorC, mirrorSelector.getMirror(getRepo("e", "http://e"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("e", "http://e"), mirrors)).isSameAs(mirrorC);
 
-        assertSame(mirrorC2, mirrorSelector.getMirror(getRepo("f", "http://f"), mirrors));
+        assertThat(mirrorSelector.getMirror(getRepo("f", "http://f"), mirrors)).isSameAs(mirrorC2);
     }
 
     @Test
-    void testPatterns() {
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "*"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), ",*,"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,"));
+    void patterns() {
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "*")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), ",*,")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,")).isTrue();
 
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "a"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "a,"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), ",a,"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "a,"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "a")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "a,")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), ",a,")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "a,")).isTrue();
 
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("b"), "a"));
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("b"), "a,"));
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("b"), ",a"));
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("b"), ",a,"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("b"), "a")).isFalse();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("b"), "a,")).isFalse();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("b"), ",a")).isFalse();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("b"), ",a,")).isFalse();
 
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "a,b"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("b"), "a,b"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "a,b")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("b"), "a,b")).isTrue();
 
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("c"), "a,b"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("c"), "a,b")).isFalse();
 
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "*"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,b"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,!b"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "*")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,b")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,!b")).isTrue();
 
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,!a"));
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("a"), "!a,*"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,!a")).isFalse();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a"), "!a,*")).isFalse();
 
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("c"), "*,!a"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("c"), "!a,*"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("c"), "*,!a")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("c"), "!a,*")).isTrue();
 
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("c"), "!a,!c"));
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("d"), "!a,!c*"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("c"), "!a,!c")).isFalse();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("d"), "!a,!c*")).isFalse();
     }
 
     @Test
-    void testPatternsWithExternal() {
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "*"));
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "external:*"));
+    void patternsWithExternal() {
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "*")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "external:*")).isFalse();
 
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "external:*,a"));
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "external:*,!a"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "a,external:*"));
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "!a,external:*"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "external:*,a")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "external:*,!a")).isFalse();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "a,external:*")).isTrue();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "!a,external:*")).isFalse();
 
-        assertFalse(DefaultMirrorSelector.matchPattern(getRepo("c", "http://localhost"), "!a,external:*"));
-        assertTrue(DefaultMirrorSelector.matchPattern(getRepo("c", "http://somehost"), "!a,external:*"));
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("c", "http://localhost"), "!a,external:*")).isFalse();
+        assertThat(DefaultMirrorSelector.matchPattern(getRepo("c", "http://somehost"), "!a,external:*")).isTrue();
     }
 
     @Test
-    void testLayoutPattern() {
-        assertTrue(DefaultMirrorSelector.matchesLayout("default", null));
-        assertTrue(DefaultMirrorSelector.matchesLayout("default", ""));
-        assertTrue(DefaultMirrorSelector.matchesLayout("default", "*"));
+    void layoutPattern() {
+        assertThat(DefaultMirrorSelector.matchesLayout("default", null)).isTrue();
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "")).isTrue();
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "*")).isTrue();
 
-        assertTrue(DefaultMirrorSelector.matchesLayout("default", "default"));
-        assertFalse(DefaultMirrorSelector.matchesLayout("default", "legacy"));
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "default")).isTrue();
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "legacy")).isFalse();
 
-        assertTrue(DefaultMirrorSelector.matchesLayout("default", "legacy,default"));
-        assertTrue(DefaultMirrorSelector.matchesLayout("default", "default,legacy"));
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "legacy,default")).isTrue();
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "default,legacy")).isTrue();
 
-        assertFalse(DefaultMirrorSelector.matchesLayout("default", "legacy,!default"));
-        assertFalse(DefaultMirrorSelector.matchesLayout("default", "!default,legacy"));
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "legacy,!default")).isFalse();
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "!default,legacy")).isFalse();
 
-        assertFalse(DefaultMirrorSelector.matchesLayout("default", "*,!default"));
-        assertFalse(DefaultMirrorSelector.matchesLayout("default", "!default,*"));
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "*,!default")).isFalse();
+        assertThat(DefaultMirrorSelector.matchesLayout("default", "!default,*")).isFalse();
     }
 
     @Test
-    void testMirrorLayoutConsideredForMatching() {
+    void mirrorLayoutConsideredForMatching() {
         ArtifactRepository repo = getRepo("a");
 
         Mirror mirrorA = newMirror("a", "a", null, "http://a");
@@ -202,11 +199,11 @@ class MirrorProcessorTest {
         Mirror mirrorC = newMirror("c", "*", null, "http://c");
         Mirror mirrorD = newMirror("d", "*", "p2", "http://d");
 
-        assertSame(mirrorA, mirrorSelector.getMirror(repo, Arrays.asList(mirrorA)));
-        assertNull(mirrorSelector.getMirror(repo, Arrays.asList(mirrorB)));
+        assertThat(mirrorSelector.getMirror(repo, Arrays.asList(mirrorA))).isSameAs(mirrorA);
+        assertThat(mirrorSelector.getMirror(repo, Arrays.asList(mirrorB))).isNull();
 
-        assertSame(mirrorC, mirrorSelector.getMirror(repo, Arrays.asList(mirrorC)));
-        assertNull(mirrorSelector.getMirror(repo, Arrays.asList(mirrorD)));
+        assertThat(mirrorSelector.getMirror(repo, Arrays.asList(mirrorC))).isSameAs(mirrorC);
+        assertThat(mirrorSelector.getMirror(repo, Arrays.asList(mirrorD))).isNull();
     }
 
     /**

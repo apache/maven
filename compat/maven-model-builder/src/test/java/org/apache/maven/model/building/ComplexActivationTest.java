@@ -23,9 +23,7 @@ import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */
@@ -37,12 +35,12 @@ class ComplexActivationTest {
     }
 
     @Test
-    void testAndConditionInActivation() throws Exception {
+    void andConditionInActivation() throws Exception {
         Properties sysProperties = new Properties();
         sysProperties.setProperty("myproperty", "test");
 
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        assertNotNull(builder);
+        assertThat(builder).isNotNull();
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         request.setProcessPlugins(true);
@@ -50,9 +48,9 @@ class ComplexActivationTest {
         request.setSystemProperties(sysProperties);
 
         ModelBuildingResult result = builder.build(request);
-        assertNotNull(result);
-        assertNotNull(result.getEffectiveModel());
-        assertEquals("activated-1", result.getEffectiveModel().getProperties().get("profile.file"));
-        assertNull(result.getEffectiveModel().getProperties().get("profile.miss"));
+        assertThat(result).isNotNull();
+        assertThat(result.getEffectiveModel()).isNotNull();
+        assertThat(result.getEffectiveModel().getProperties().get("profile.file")).isEqualTo("activated-1");
+        assertThat(result.getEffectiveModel().getProperties().get("profile.miss")).isNull();
     }
 }

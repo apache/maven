@@ -24,7 +24,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -51,7 +51,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testProjectInheritance() throws Exception {
+    void projectInheritance() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
 
@@ -63,6 +63,6 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project0 = getProject(pom0);
         MavenProject project1 = getProject(pom1);
 
-        assertEquals(pom0Basedir, project1.getParent().getBasedir());
+        assertThat(project1.getParent().getBasedir()).isEqualTo(pom0Basedir);
     }
 }

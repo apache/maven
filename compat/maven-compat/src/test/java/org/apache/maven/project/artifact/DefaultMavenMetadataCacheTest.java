@@ -30,7 +30,7 @@ import org.apache.maven.repository.TestRepositorySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
@@ -45,7 +45,7 @@ class DefaultMavenMetadataCacheTest {
     }
 
     @Test
-    void testCacheKey() throws Exception {
+    void cacheKey() throws Exception {
         Artifact a1 = repositorySystem.createArtifact("testGroup", "testArtifact", "1.2.3", "jar");
         @SuppressWarnings("deprecation")
         ArtifactRepository lr1 = new DelegatingLocalArtifactRepository(repositorySystem.createDefaultLocalRepository());
@@ -68,6 +68,6 @@ class DefaultMavenMetadataCacheTest {
         DefaultMavenMetadataCache.CacheKey k2 =
                 new DefaultMavenMetadataCache.CacheKey(a2, false, lr2, Collections.singletonList(rr2));
 
-        assertEquals(k1.hashCode(), k2.hashCode());
+        assertThat(k2.hashCode()).isEqualTo(k1.hashCode());
     }
 }

@@ -28,9 +28,7 @@ import org.apache.maven.model.v4.MavenStaxReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */
@@ -45,29 +43,29 @@ class DefaultModelBuilderFactoryTest {
     }
 
     @Test
-    void testCompleteWiring() throws Exception {
+    void completeWiring() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        assertNotNull(builder);
+        assertThat(builder).isNotNull();
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         request.setProcessPlugins(true);
         request.setPomFile(getPom("simple"));
 
         ModelBuildingResult result = builder.build(request);
-        assertNotNull(result);
-        assertNotNull(result.getEffectiveModel());
-        assertEquals("activated", result.getEffectiveModel().getProperties().get("profile.file"));
+        assertThat(result).isNotNull();
+        assertThat(result.getEffectiveModel()).isNotNull();
+        assertThat(result.getEffectiveModel().getProperties().get("profile.file")).isEqualTo("activated");
         Xpp3Dom conf = (Xpp3Dom)
                 result.getEffectiveModel().getBuild().getPlugins().get(0).getConfiguration();
-        assertNotNull(conf);
-        assertEquals("1.5", conf.getChild("source").getValue());
-        assertEquals("  1.5  ", conf.getChild("target").getValue());
+        assertThat(conf).isNotNull();
+        assertThat(conf.getChild("source").getValue()).isEqualTo("1.5");
+        assertThat(conf.getChild("target").getValue()).isEqualTo("  1.5  ");
     }
 
     @Test
-    void testPomChanges() throws Exception {
+    void pomChanges() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        assertNotNull(builder);
+        assertThat(builder).isNotNull();
         File pom = getPom("simple");
 
         String originalExists =
@@ -84,14 +82,14 @@ class DefaultModelBuilderFactoryTest {
                 .getFile()
                 .getExists();
 
-        assertEquals(originalExists, resultExists);
-        assertTrue(result.getEffectiveModel()
+        assertThat(resultExists).isEqualTo(originalExists);
+        assertThat(result.getEffectiveModel()
                 .getProfiles()
                 .get(1)
                 .getActivation()
                 .getFile()
                 .getExists()
-                .contains(BASE_DIR));
+                .contains(BASE_DIR)).isTrue();
     }
 
     private static Model readPom(File file) throws Exception {

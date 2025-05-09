@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code DistributionManagement}.
@@ -31,25 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DistributionManagementTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new DistributionManagement().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new DistributionManagement().equals(null));
+    void equalsNullSafe() {
+        assertThat(new DistributionManagement()).isNotEqualTo(null);
 
         new DistributionManagement().equals(new DistributionManagement());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         DistributionManagement thing = new DistributionManagement();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new DistributionManagement().toString());
+    void toStringNullSafe() {
+        assertThat(new DistributionManagement().toString()).isNotNull();
     }
 }

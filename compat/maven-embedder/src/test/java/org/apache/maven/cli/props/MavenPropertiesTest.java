@@ -31,15 +31,13 @@ import org.apache.maven.impl.model.DefaultInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests on <code>MavenProperties</code>.
  */
 @Deprecated
-public class MavenPropertiesTest {
+class MavenPropertiesTest {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final String COMMENT = "# comment";
@@ -65,13 +63,13 @@ public class MavenPropertiesTest {
      * @see junit.framework.TestCase#setUp()
      */
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         properties = new MavenProperties();
         properties.load(new StringReader(TEST_PROPERTIES));
     }
 
     @Test
-    public void testSpaces() throws Exception {
+    void spaces() throws Exception {
         String config = "\n" + "\n"
                 + "    \n"
                 + "                \n"
@@ -108,74 +106,74 @@ public class MavenPropertiesTest {
         props2.load(new StringReader(config));
 
         String s325 = props1.getProperty(" \r");
-        assertEquals("\n \t \f", s325, "1");
+        assertThat(s325).as("1").isEqualTo("\n \t \f");
         String s324 = props1.getProperty("a");
-        assertEquals("a", s324, "2");
+        assertThat(s324).as("2").isEqualTo("a");
         String s323 = props1.getProperty("b");
-        assertEquals("bb as,dn   ", s323, "3");
+        assertThat(s323).as("3").isEqualTo("bb as,dn   ");
         String s322 = props1.getProperty("c\r \t\nu");
-        assertEquals(":: cu", s322, "4");
+        assertThat(s322).as("4").isEqualTo(":: cu");
         String s321 = props1.getProperty("bu");
-        assertEquals("bu", s321, "5");
+        assertThat(s321).as("5").isEqualTo("bu");
         String s320 = props1.getProperty("d");
-        assertEquals("d\r\ne=e", s320, "6");
+        assertThat(s320).as("6").isEqualTo("d\r\ne=e");
         String s319 = props1.getProperty("f");
-        assertEquals("fff", s319, "7");
+        assertThat(s319).as("7").isEqualTo("fff");
         String s318 = props1.getProperty("g");
-        assertEquals("g", s318, "8");
+        assertThat(s318).as("8").isEqualTo("g");
         String s317 = props1.getProperty("h h");
-        assertEquals("", s317, "9");
+        assertThat(s317).as("9").isEqualTo("");
         String s316 = props1.getProperty(" ");
-        assertEquals("i=i", s316, "10");
+        assertThat(s316).as("10").isEqualTo("i=i");
         String s315 = props1.getProperty("j");
-        assertEquals("   j", s315, "11");
+        assertThat(s315).as("11").isEqualTo("   j");
         String s314 = props1.getProperty("space");
-        assertEquals("   c", s314, "12");
+        assertThat(s314).as("12").isEqualTo("   c");
         String s313 = props1.getProperty("dblbackslash");
-        assertEquals("\\", s313, "13");
+        assertThat(s313).as("13").isEqualTo("\\");
 
         String s312 = props2.getProperty(" \r");
-        assertEquals("\n \t \f", s312, "1");
+        assertThat(s312).as("1").isEqualTo("\n \t \f");
         String s311 = props2.getProperty("a");
-        assertEquals("a", s311, "2");
+        assertThat(s311).as("2").isEqualTo("a");
         String s310 = props2.getProperty("b");
-        assertEquals("bb as,dn   ", s310, "3");
+        assertThat(s310).as("3").isEqualTo("bb as,dn   ");
         String s39 = props2.getProperty("c\r \t\nu");
-        assertEquals(":: cu", s39, "4");
+        assertThat(s39).as("4").isEqualTo(":: cu");
         String s38 = props2.getProperty("bu");
-        assertEquals("bu", s38, "5");
+        assertThat(s38).as("5").isEqualTo("bu");
         String s37 = props2.getProperty("d");
-        assertEquals("d\r\ne=e", s37, "6");
+        assertThat(s37).as("6").isEqualTo("d\r\ne=e");
         String s36 = props2.getProperty("f");
-        assertEquals("fff", s36, "7");
+        assertThat(s36).as("7").isEqualTo("fff");
         String s35 = props2.getProperty("g");
-        assertEquals("g", s35, "8");
+        assertThat(s35).as("8").isEqualTo("g");
         String s34 = props2.getProperty("h h");
-        assertEquals("", s34, "9");
+        assertThat(s34).as("9").isEqualTo("");
         String s33 = props2.getProperty(" ");
-        assertEquals("i=i", s33, "10");
+        assertThat(s33).as("10").isEqualTo("i=i");
         String s32 = props2.getProperty("j");
-        assertEquals("   j", s32, "11");
+        assertThat(s32).as("11").isEqualTo("   j");
         String s31 = props2.getProperty("space");
-        assertEquals("   c", s31, "12");
+        assertThat(s31).as("12").isEqualTo("   c");
         String s3 = props2.getProperty("dblbackslash");
-        assertEquals("\\", s3, "13");
-        assertEquals(props1, props2);
+        assertThat(s3).as("13").isEqualTo("\\");
+        assertThat(props2).isEqualTo(props1);
     }
 
     @Test
-    public void testConfigInterpolation() throws IOException {
+    void configInterpolation() throws IOException {
         String config = "a=$\\\\\\\\{var}\n" + "ab=${a}b\n" + "abc=${ab}c";
         Map<String, String> expected = Map.of("a", "$\\{var}", "ab", "$\\{var}b", "abc", "$\\{var}bc");
 
         java.util.Properties props1 = new java.util.Properties();
         props1.load(new StringReader(config));
         new DefaultInterpolator().performSubstitution((Map) props1, null, true);
-        assertEquals(expected, props1);
+        assertThat(props1).isEqualTo(expected);
 
         MavenProperties props2 = new MavenProperties();
         props2.load(new StringReader(config));
-        assertEquals(expected, props2);
+        assertThat(props2).isEqualTo(expected);
     }
 
     /**
@@ -186,13 +184,13 @@ public class MavenPropertiesTest {
      * @throws Exception
      */
     @Test
-    public void testGettingProperty() throws Exception {
+    void gettingProperty() throws Exception {
         Object o2 = properties.get("test");
-        assertEquals("test", o2);
+        assertThat(o2).isEqualTo("test");
     }
 
     @Test
-    public void testLoadSave() throws IOException {
+    void loadSave() throws IOException {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         pw.println("# ");
@@ -225,19 +223,19 @@ public class MavenPropertiesTest {
     }
 
     @Test
-    public void testJavaUtilPropertiesCompatibility() throws Exception {
+    void javaUtilPropertiesCompatibility() throws Exception {
         MavenProperties properties = new MavenProperties();
         properties.load(new StringReader(TEST_PROPERTIES));
 
         String test = properties.getProperty("test");
-        assertEquals("test", test);
+        assertThat(test).isEqualTo("test");
 
         String defaultValue = properties.getProperty("notfound", "default");
-        assertEquals("default", defaultValue);
+        assertThat(defaultValue).isEqualTo("default");
 
         properties.setProperty("another", "another");
         Object o1 = properties.getProperty("another");
-        assertEquals("another", o1);
+        assertThat(o1).isEqualTo("another");
 
         properties.store(System.err, null);
         System.err.println("====");
@@ -246,55 +244,55 @@ public class MavenPropertiesTest {
     private static final String RESULT1 = COMMENT + LINE_SEPARATOR + KEY1A + " = " + VALUE1 + LINE_SEPARATOR;
 
     @Test
-    public void testSaveComment1() throws Exception {
+    void saveComment1() throws Exception {
         properties.put(KEY1, COMMENT, VALUE1);
         StringWriter sw = new StringWriter();
         properties.save(sw);
         String msg = sw.toString();
-        assertTrue(sw.toString().endsWith(RESULT1), msg);
+        assertThat(sw.toString().endsWith(RESULT1)).as(msg).isTrue();
     }
 
     private static final String RESULT1A = COMMENT + LINE_SEPARATOR + KEY2A + " = " + VALUE1 + LINE_SEPARATOR;
 
     @Test
-    public void testSaveComment1a() throws Exception {
+    void saveComment1a() throws Exception {
         properties.put(KEY2, COMMENT, VALUE1);
         StringWriter sw = new StringWriter();
         properties.save(sw);
         String msg = sw.toString();
-        assertTrue(sw.toString().endsWith(RESULT1A), msg);
+        assertThat(sw.toString().endsWith(RESULT1A)).as(msg).isTrue();
     }
 
     private static final String RESULT2 =
             COMMENT + LINE_SEPARATOR + COMMENT + LINE_SEPARATOR + KEY1A + " = " + VALUE1 + LINE_SEPARATOR;
 
     @Test
-    public void testSaveComment2() throws Exception {
+    void saveComment2() throws Exception {
         properties.put(KEY1, List.of(new String[] {COMMENT, COMMENT}), VALUE1);
         StringWriter sw = new StringWriter();
         properties.save(sw);
         String msg = sw.toString();
-        assertTrue(sw.toString().endsWith(RESULT2), msg);
+        assertThat(sw.toString().endsWith(RESULT2)).as(msg).isTrue();
     }
 
     private static final String RESULT3 = COMMENT + LINE_SEPARATOR + COMMENT + LINE_SEPARATOR + KEY1A + " = " + VALUE1
             + "\\" + LINE_SEPARATOR + VALUE1 + LINE_SEPARATOR;
 
     @Test
-    public void testSaveComment3() throws Exception {
+    void saveComment3() throws Exception {
         properties.put(KEY1, List.of(new String[] {COMMENT, COMMENT}), List.of(new String[] {VALUE1, VALUE1}));
         StringWriter sw = new StringWriter();
         properties.save(sw);
         String msg = sw.toString();
-        assertTrue(sw.toString().endsWith(RESULT3), msg);
+        assertThat(sw.toString().endsWith(RESULT3)).as(msg).isTrue();
         List<String> rawValue = properties.getRaw(KEY1);
-        assertEquals(2, (Object) rawValue.size());
-        assertEquals(KEY1A + " = " + VALUE1, rawValue.get(0));
-        assertEquals(VALUE1, rawValue.get(1));
+        assertThat((Object) rawValue.size()).isEqualTo(2);
+        assertThat(rawValue.get(0)).isEqualTo(KEY1A + " = " + VALUE1);
+        assertThat(rawValue.get(1)).isEqualTo(VALUE1);
     }
 
     @Test
-    public void testEntrySetValue() throws Exception {
+    void entrySetValue() throws Exception {
         properties.put(KEY1, VALUE1);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -303,12 +301,12 @@ public class MavenPropertiesTest {
         properties = new MavenProperties();
         properties.load(new ByteArrayInputStream(baos.toByteArray()));
         Object o22 = properties.get(KEY1);
-        assertEquals(VALUE1, o22);
+        assertThat(o22).isEqualTo(VALUE1);
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             entry.setValue(entry.getValue() + "x");
         }
         Object o21 = properties.get(KEY1);
-        assertEquals(VALUE1 + "x", o21);
+        assertThat(o21).isEqualTo(VALUE1 + "x");
 
         baos = new ByteArrayOutputStream();
         properties.save(baos);
@@ -316,11 +314,11 @@ public class MavenPropertiesTest {
         properties = new MavenProperties();
         properties.load(new ByteArrayInputStream(baos.toByteArray()));
         Object o2 = properties.get(KEY1);
-        assertEquals(VALUE1 + "x", o2);
+        assertThat(o2).isEqualTo(VALUE1 + "x");
     }
 
     @Test
-    public void testMultiValueEscaping() throws IOException {
+    void multiValueEscaping() throws IOException {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         pw.println("fruits                           apple, banana, pear, \\");
@@ -330,16 +328,16 @@ public class MavenPropertiesTest {
         java.util.Properties p = new java.util.Properties();
         p.load(new StringReader(sw.toString()));
         Object o24 = p.getProperty("fruits");
-        assertEquals("apple, banana, pear, cantaloupe, watermelon, kiwi, mango", o24);
+        assertThat(o24).isEqualTo("apple, banana, pear, cantaloupe, watermelon, kiwi, mango");
 
         MavenProperties props = new MavenProperties();
         props.load(new StringReader(sw.toString()));
         Object o23 = props.getProperty("fruits");
-        assertEquals("apple, banana, pear, cantaloupe, watermelon, kiwi, mango", o23);
+        assertThat(o23).isEqualTo("apple, banana, pear, cantaloupe, watermelon, kiwi, mango");
         List<String> raw = props.getRaw("fruits");
-        assertNotNull(raw);
-        assertEquals(3, (Object) raw.size());
-        assertEquals("fruits                           apple, banana, pear, ", raw.get(0));
+        assertThat(raw).isNotNull();
+        assertThat((Object) raw.size()).isEqualTo(3);
+        assertThat(raw.get(0)).isEqualTo("fruits                           apple, banana, pear, ");
 
         props = new MavenProperties();
         props.put(
@@ -350,22 +348,22 @@ public class MavenPropertiesTest {
                         "                                 cantaloupe, watermelon, ",
                         "                                 kiwi, mango"));
         Object o22 = props.getProperty("fruits");
-        assertEquals("apple, banana, pear, cantaloupe, watermelon, kiwi, mango", o22);
+        assertThat(o22).isEqualTo("apple, banana, pear, cantaloupe, watermelon, kiwi, mango");
         raw = props.getRaw("fruits");
-        assertNotNull(raw);
-        assertEquals(3, (Object) raw.size());
-        assertEquals("fruits                           apple, banana, pear, ", raw.get(0));
+        assertThat(raw).isNotNull();
+        assertThat((Object) raw.size()).isEqualTo(3);
+        assertThat(raw.get(0)).isEqualTo("fruits                           apple, banana, pear, ");
 
         sw = new StringWriter();
         props.save(sw);
         props = new MavenProperties();
         props.load(new StringReader(sw.toString()));
         Object o21 = props.getProperty("fruits");
-        assertEquals("apple, banana, pear, cantaloupe, watermelon, kiwi, mango", o21);
+        assertThat(o21).isEqualTo("apple, banana, pear, cantaloupe, watermelon, kiwi, mango");
         raw = props.getRaw("fruits");
-        assertNotNull(raw);
-        assertEquals(3, (Object) raw.size());
-        assertEquals("fruits                           apple, banana, pear, ", raw.get(0));
+        assertThat(raw).isNotNull();
+        assertThat((Object) raw.size()).isEqualTo(3);
+        assertThat(raw.get(0)).isEqualTo("fruits                           apple, banana, pear, ");
 
         props = new MavenProperties();
         props.put(
@@ -376,15 +374,15 @@ public class MavenPropertiesTest {
                         "                                 cantaloupe, watermelon, ",
                         "                                 kiwi, mango"));
         Object o2 = props.getProperty("fruits");
-        assertEquals("apple, banana, pear, cantaloupe, watermelon, kiwi, mango", o2);
+        assertThat(o2).isEqualTo("apple, banana, pear, cantaloupe, watermelon, kiwi, mango");
         raw = props.getRaw("fruits");
-        assertNotNull(raw);
-        assertEquals(3, (Object) raw.size());
-        assertEquals("fruits =                            apple, banana, pear, ", raw.get(0));
+        assertThat(raw).isNotNull();
+        assertThat((Object) raw.size()).isEqualTo(3);
+        assertThat(raw.get(0)).isEqualTo("fruits =                            apple, banana, pear, ");
     }
 
     @Test
-    public void testUpdate() throws Exception {
+    void update() throws Exception {
         MavenProperties p1 = new MavenProperties();
         p1.put(
                 "fruits",
@@ -404,19 +402,19 @@ public class MavenPropertiesTest {
         p2.put("trees", "fir, oak, maple");
         p1.update(p2);
 
-        assertEquals(2, (Object) p1.size());
+        assertThat((Object) p1.size()).isEqualTo(2);
         Object o23 = p1.getComments("trees");
-        assertEquals(List.of("#", "# List of trees", "#"), o23);
+        assertThat(o23).isEqualTo(List.of("#", "# List of trees", "#"));
         Object o22 = p1.getProperty("trees");
-        assertEquals("fir, oak, maple", o22);
+        assertThat(o22).isEqualTo("fir, oak, maple");
         Object o21 = p1.getComments("fruits");
-        assertEquals(List.of("#", "# List of good fruits", "#"), o21);
+        assertThat(o21).isEqualTo(List.of("#", "# List of good fruits", "#"));
         Object o2 = p1.getProperty("fruits");
-        assertEquals("apple, banana, pear", o2);
+        assertThat(o2).isEqualTo("apple, banana, pear");
     }
 
     @Test
-    public void testSubstitution() throws IOException {
+    void substitution() throws IOException {
         String str = "port = 4141" + LINE_SEPARATOR + "host = localhost"
                 + LINE_SEPARATOR + "url = https://${host}:${port}/service"
                 + LINE_SEPARATOR;
@@ -426,6 +424,6 @@ public class MavenPropertiesTest {
         StringWriter sw = new StringWriter();
         properties.save(sw);
         Object o2 = sw.toString();
-        assertEquals(str, o2);
+        assertThat(o2).isEqualTo(str);
     }
 }

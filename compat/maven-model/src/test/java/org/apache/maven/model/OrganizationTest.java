@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code Organization}.
@@ -32,57 +29,57 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class OrganizationTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Organization().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new Organization().equals(null));
+    void equalsNullSafe() {
+        assertThat(new Organization()).isNotEqualTo(null);
 
         new Organization().equals(new Organization());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Organization thing = new Organization();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new Organization().toString());
+    void toStringNullSafe() {
+        assertThat(new Organization().toString()).isNotNull();
     }
 
     @Test
-    public void testToStringNotNonsense11() {
+    void toStringNotNonsense11() {
         Organization org = new Organization();
         org.setName("Testing Maven Unit");
         org.setUrl("https://maven.localdomain");
 
-        assertEquals("Organization {name=Testing Maven Unit, url=https://maven.localdomain}", org.toString());
+        assertThat(org.toString()).isEqualTo("Organization {name=Testing Maven Unit, url=https://maven.localdomain}");
     }
 
     @Test
-    public void testToStringNotNonsense10() {
+    void toStringNotNonsense10() {
         Organization org = new Organization();
         org.setName("Testing Maven Unit");
 
-        assertEquals("Organization {name=Testing Maven Unit, url=null}", org.toString());
+        assertThat(org.toString()).isEqualTo("Organization {name=Testing Maven Unit, url=null}");
     }
 
     @Test
-    public void testToStringNotNonsense01() {
+    void toStringNotNonsense01() {
         Organization org = new Organization();
         org.setUrl("https://maven.localdomain");
 
-        assertEquals("Organization {name=null, url=https://maven.localdomain}", org.toString());
+        assertThat(org.toString()).isEqualTo("Organization {name=null, url=https://maven.localdomain}");
     }
 
     @Test
-    public void testToStringNotNonsense00() {
+    void toStringNotNonsense00() {
         Organization org = new Organization();
 
-        assertEquals("Organization {name=null, url=null}", org.toString());
+        assertThat(org.toString()).isEqualTo("Organization {name=null, url=null}");
     }
 }

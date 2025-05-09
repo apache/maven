@@ -33,10 +33,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MetadataTest {
 
@@ -54,7 +51,7 @@ class MetadataTest {
     @Test
     void mergeEmptyMetadata() throws Exception {
         Metadata metadata = new Metadata();
-        assertFalse(metadata.merge(new Metadata()));
+        assertThat(metadata.merge(new Metadata())).isFalse();
     }
 
     @Test
@@ -64,10 +61,10 @@ class MetadataTest {
         source.setArtifactId("source-artifact");
         source.setGroupId("source-group");
         source.setVersion("2.0");
-        assertFalse(target.merge(source));
-        assertEquals("myArtifact", target.getArtifactId());
-        assertEquals("myGroup", target.getGroupId());
-        assertEquals("1.0-SNAPSHOT", target.getVersion());
+        assertThat(target.merge(source)).isFalse();
+        assertThat(target.getArtifactId()).isEqualTo("myArtifact");
+        assertThat(target.getGroupId()).isEqualTo("myGroup");
+        assertThat(target.getVersion()).isEqualTo("1.0-SNAPSHOT");
     }
     /*--- END test common metadata ---*/
 
@@ -87,24 +84,21 @@ class MetadataTest {
 
         Metadata source = createMetadataFromArtifact(artifact);
         // nothing should be actually changed, but still merge returns true
-        assertTrue(target.merge(source));
+        assertThat(target.merge(source)).isTrue();
 
         // NOTE! Merge updates last updated to source
-        assertEquals("20200921071745", source.getVersioning().getLastUpdated());
+        assertThat(source.getVersioning().getLastUpdated()).isEqualTo("20200921071745");
 
-        assertEquals("myArtifact", target.getArtifactId());
-        assertEquals("myGroup", target.getGroupId());
+        assertThat(target.getArtifactId()).isEqualTo("myArtifact");
+        assertThat(target.getGroupId()).isEqualTo("myGroup");
 
-        assertEquals(3, target.getVersioning().getSnapshot().getBuildNumber());
-        assertEquals("20200710.072412", target.getVersioning().getSnapshot().getTimestamp());
+        assertThat(target.getVersioning().getSnapshot().getBuildNumber()).isEqualTo(3);
+        assertThat(target.getVersioning().getSnapshot().getTimestamp()).isEqualTo("20200710.072412");
 
-        assertEquals(1, target.getVersioning().getSnapshotVersions().size());
-        assertEquals(
-                "sources", target.getVersioning().getSnapshotVersions().get(0).getClassifier());
-        assertEquals("jar", target.getVersioning().getSnapshotVersions().get(0).getExtension());
-        assertEquals(
-                "20200710072412",
-                target.getVersioning().getSnapshotVersions().get(0).getUpdated());
+        assertThat(target.getVersioning().getSnapshotVersions().size()).isEqualTo(1);
+        assertThat(target.getVersioning().getSnapshotVersions().get(0).getClassifier()).isEqualTo("sources");
+        assertThat(target.getVersioning().getSnapshotVersions().get(0).getExtension()).isEqualTo("jar");
+        assertThat(target.getVersioning().getSnapshotVersions().get(0).getUpdated()).isEqualTo("20200710072412");
     }
 
     @Test
@@ -117,14 +111,14 @@ class MetadataTest {
                 addSnapshotVersion(source.getVersioning(), "jar", after, "1.0-" + formatDate(after, true) + "-2", 2);
         SnapshotVersion sv3 =
                 addSnapshotVersion(source.getVersioning(), "pom", after, "1.0-" + formatDate(after, true) + "-2", 2);
-        assertTrue(target.merge(source));
+        assertThat(target.merge(source)).isTrue();
         Versioning actualVersioning = target.getVersioning();
-        assertEquals(2, actualVersioning.getSnapshotVersions().size());
-        assertEquals(sv2, actualVersioning.getSnapshotVersions().get(0));
-        assertEquals(sv3, actualVersioning.getSnapshotVersions().get(1));
-        assertEquals(formatDate(after, false), actualVersioning.getLastUpdated());
-        assertEquals(formatDate(after, true), actualVersioning.getSnapshot().getTimestamp());
-        assertEquals(2, actualVersioning.getSnapshot().getBuildNumber());
+        assertThat(actualVersioning.getSnapshotVersions().size()).isEqualTo(2);
+        assertThat(actualVersioning.getSnapshotVersions().get(0)).isEqualTo(sv2);
+        assertThat(actualVersioning.getSnapshotVersions().get(1)).isEqualTo(sv3);
+        assertThat(actualVersioning.getLastUpdated()).isEqualTo(formatDate(after, false));
+        assertThat(actualVersioning.getSnapshot().getTimestamp()).isEqualTo(formatDate(after, true));
+        assertThat(actualVersioning.getSnapshot().getBuildNumber()).isEqualTo(2);
     }
 
     @Test
@@ -135,12 +129,11 @@ class MetadataTest {
         SnapshotVersion sv1 = addSnapshotVersion(target.getVersioning(), after, artifact);
         addSnapshotVersion(source.getVersioning(), before, artifact);
         // nothing should be updated, as the target was already updated at a later date than source
-        assertFalse(target.merge(source));
-        assertEquals(1, target.getVersioning().getSnapshotVersions().size());
-        assertEquals(sv1, target.getVersioning().getSnapshotVersions().get(0));
-        assertEquals(formatDate(after, false), target.getVersioning().getLastUpdated());
-        assertEquals(
-                formatDate(after, true), target.getVersioning().getSnapshot().getTimestamp());
+        assertThat(target.merge(source)).isFalse();
+        assertThat(target.getVersioning().getSnapshotVersions().size()).isEqualTo(1);
+        assertThat(target.getVersioning().getSnapshotVersions().get(0)).isEqualTo(sv1);
+        assertThat(target.getVersioning().getLastUpdated()).isEqualTo(formatDate(after, false));
+        assertThat(target.getVersioning().getSnapshot().getTimestamp()).isEqualTo(formatDate(after, true));
     }
 
     @Test
@@ -151,12 +144,11 @@ class MetadataTest {
         SnapshotVersion sv1 = addSnapshotVersion(source.getVersioning(), date, artifact);
         // although nothing has changed merge returns true, as the last modified date is equal
         // TODO: improve merge here?
-        assertTrue(target.merge(source));
-        assertEquals(1, target.getVersioning().getSnapshotVersions().size());
-        assertEquals(sv1, target.getVersioning().getSnapshotVersions().get(0));
-        assertEquals(formatDate(date, false), target.getVersioning().getLastUpdated());
-        assertEquals(
-                formatDate(date, true), target.getVersioning().getSnapshot().getTimestamp());
+        assertThat(target.merge(source)).isTrue();
+        assertThat(target.getVersioning().getSnapshotVersions().size()).isEqualTo(1);
+        assertThat(target.getVersioning().getSnapshotVersions().get(0)).isEqualTo(sv1);
+        assertThat(target.getVersioning().getLastUpdated()).isEqualTo(formatDate(date, false));
+        assertThat(target.getVersioning().getSnapshot().getTimestamp()).isEqualTo(formatDate(date, true));
     }
 
     @Test
@@ -169,11 +161,10 @@ class MetadataTest {
         addSnapshotVersionLegacy(source.getVersioning(), after, 2);
         // although nothing has changed merge returns true, as the last modified date is equal
         // TODO: improve merge here?
-        assertTrue(target.merge(source));
-        assertEquals(0, target.getVersioning().getSnapshotVersions().size());
-        assertEquals(formatDate(after, false), target.getVersioning().getLastUpdated());
-        assertEquals(
-                formatDate(after, true), target.getVersioning().getSnapshot().getTimestamp());
+        assertThat(target.merge(source)).isTrue();
+        assertThat(target.getVersioning().getSnapshotVersions().size()).isEqualTo(0);
+        assertThat(target.getVersioning().getLastUpdated()).isEqualTo(formatDate(after, false));
+        assertThat(target.getVersioning().getSnapshot().getTimestamp()).isEqualTo(formatDate(after, true));
     }
 
     @Test
@@ -186,12 +177,11 @@ class MetadataTest {
         addSnapshotVersion(source.getVersioning(), after, artifact);
         // although nothing has changed merge returns true, as the last modified date is equal
         // TODO: improve merge here?
-        assertTrue(target.merge(source));
+        assertThat(target.merge(source)).isTrue();
         // never convert from legacy format to v1.1 format
-        assertEquals(0, target.getVersioning().getSnapshotVersions().size());
-        assertEquals(formatDate(after, false), target.getVersioning().getLastUpdated());
-        assertEquals(
-                formatDate(after, true), target.getVersioning().getSnapshot().getTimestamp());
+        assertThat(target.getVersioning().getSnapshotVersions().size()).isEqualTo(0);
+        assertThat(target.getVersioning().getLastUpdated()).isEqualTo(formatDate(after, false));
+        assertThat(target.getVersioning().getSnapshot().getTimestamp()).isEqualTo(formatDate(after, true));
     }
 
     @Test
@@ -204,18 +194,17 @@ class MetadataTest {
         addSnapshotVersionLegacy(source.getVersioning(), after, 2);
         // although nothing has changed merge returns true, as the last modified date is equal
         // TODO: improve merge here?
-        assertTrue(target.merge(source));
+        assertThat(target.merge(source)).isTrue();
         // the result must be legacy format as well
-        assertEquals(0, target.getVersioning().getSnapshotVersions().size());
-        assertEquals(formatDate(after, false), target.getVersioning().getLastUpdated());
-        assertEquals(
-                formatDate(after, true), target.getVersioning().getSnapshot().getTimestamp());
-        assertEquals(2, target.getVersioning().getSnapshot().getBuildNumber());
+        assertThat(target.getVersioning().getSnapshotVersions().size()).isEqualTo(0);
+        assertThat(target.getVersioning().getLastUpdated()).isEqualTo(formatDate(after, false));
+        assertThat(target.getVersioning().getSnapshot().getTimestamp()).isEqualTo(formatDate(after, true));
+        assertThat(target.getVersioning().getSnapshot().getBuildNumber()).isEqualTo(2);
     }
     /*-- END test "groupId/artifactId/version" metadata ---*/
 
     @Test
-    void testRoundtrip() throws Exception {
+    void roundtrip() throws Exception {
         Metadata source = new Metadata(org.apache.maven.api.metadata.Metadata.newBuilder(
                         createMetadataFromArtifact(artifact).getDelegate(), true)
                 .modelEncoding("UTF-16")
@@ -224,7 +213,7 @@ class MetadataTest {
         new MetadataStaxWriter().write(baos, source.getDelegate());
         Metadata source2 =
                 new Metadata(new MetadataStaxReader().read(new ByteArrayInputStream(baos.toByteArray()), true));
-        assertNotNull(source2);
+        assertThat(source2).isNotNull();
     }
 
     /*-- START helper methods to populate metadata objects ---*/

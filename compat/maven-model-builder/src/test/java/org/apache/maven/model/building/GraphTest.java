@@ -27,20 +27,20 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 @Deprecated
-public class GraphTest {
+class GraphTest {
 
     @Test
-    void testCycle() throws Graph.CycleDetectedException {
+    void cycle() throws Graph.CycleDetectedException {
         Graph graph = new Graph();
         graph.addEdge("a1", "a2");
-        assertThrows(Graph.CycleDetectedException.class, () -> graph.addEdge("a2", "a1"));
+        assertThatExceptionOfType(Graph.CycleDetectedException.class).isThrownBy(() -> graph.addEdge("a2", "a1"));
     }
 
     @Test
-    public void testPerf() throws IOException {
+    void perf() throws IOException {
         List<String[]> data = new ArrayList<>();
         String k = null;
         for (String line : Files.readAllLines(Paths.get("src/test/resources/dag.txt"))) {

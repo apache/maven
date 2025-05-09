@@ -33,28 +33,24 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RepositorySystemTest extends AbstractRepositoryTestCase {
     @Test
-    void testResolveVersionRange() throws Exception {
+    void resolveVersionRange() throws Exception {
         // VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
         //                throws VersionRangeResolutionException;
 
     }
 
     @Test
-    void testResolveVersion() throws Exception {
+    void resolveVersion() throws Exception {
         // VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
         //                throws VersionResolutionException;
     }
 
     @Test
-    void testReadArtifactDescriptor() throws Exception {
+    void readArtifactDescriptor() throws Exception {
         Artifact artifact = new DefaultArtifact("ut.simple:artifact:extension:classifier:1.0");
 
         ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
@@ -64,7 +60,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
         ArtifactDescriptorResult result = system.readArtifactDescriptor(session, request);
 
         List<Dependency> deps = result.getDependencies();
-        assertEquals(2, deps.size());
+        assertThat(deps.size()).isEqualTo(2);
         checkUtSimpleArtifactDependencies(deps.get(0), deps.get(1));
     }
 
@@ -72,48 +68,45 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
      * check ut.simple:artifact:1.0 dependencies
      */
     private void checkUtSimpleArtifactDependencies(Dependency dep1, Dependency dep2) {
-        assertEquals("compile", dep1.getScope());
-        assertFalse(dep1.isOptional());
-        assertEquals(0, dep1.getExclusions().size());
+        assertThat(dep1.getScope()).isEqualTo("compile");
+        assertThat(dep1.isOptional()).isFalse();
+        assertThat(dep1.getExclusions().size()).isEqualTo(0);
         Artifact depArtifact = dep1.getArtifact();
-        assertEquals("ut.simple", depArtifact.getGroupId());
-        assertEquals("dependency", depArtifact.getArtifactId());
-        assertEquals("1.0", depArtifact.getVersion());
-        assertEquals("1.0", depArtifact.getBaseVersion());
-        assertNull(depArtifact.getFile());
-        assertFalse(depArtifact.isSnapshot());
-        assertEquals("", depArtifact.getClassifier());
-        assertEquals("jar", depArtifact.getExtension());
-        assertEquals("java", depArtifact.getProperty("language", null));
-        assertEquals("jar", depArtifact.getProperty("type", null));
-        assertEquals("true", depArtifact.getProperty("constitutesBuildPath", null));
-        assertEquals("false", depArtifact.getProperty("includesDependencies", null));
-        assertEquals(4, depArtifact.getProperties().size());
+        assertThat(depArtifact.getGroupId()).isEqualTo("ut.simple");
+        assertThat(depArtifact.getArtifactId()).isEqualTo("dependency");
+        assertThat(depArtifact.getVersion()).isEqualTo("1.0");
+        assertThat(depArtifact.getBaseVersion()).isEqualTo("1.0");
+        assertThat(depArtifact.getFile()).isNull();
+        assertThat(depArtifact.isSnapshot()).isFalse();
+        assertThat(depArtifact.getClassifier()).isEqualTo("");
+        assertThat(depArtifact.getExtension()).isEqualTo("jar");
+        assertThat(depArtifact.getProperty("language", null)).isEqualTo("java");
+        assertThat(depArtifact.getProperty("type", null)).isEqualTo("jar");
+        assertThat(depArtifact.getProperty("constitutesBuildPath", null)).isEqualTo("true");
+        assertThat(depArtifact.getProperty("includesDependencies", null)).isEqualTo("false");
+        assertThat(depArtifact.getProperties().size()).isEqualTo(4);
 
-        assertEquals("compile", dep2.getScope());
-        assertFalse(dep2.isOptional());
-        assertEquals(0, dep2.getExclusions().size());
+        assertThat(dep2.getScope()).isEqualTo("compile");
+        assertThat(dep2.isOptional()).isFalse();
+        assertThat(dep2.getExclusions().size()).isEqualTo(0);
         depArtifact = dep2.getArtifact();
-        assertEquals("ut.simple", depArtifact.getGroupId());
-        assertEquals("dependency", depArtifact.getArtifactId());
-        assertEquals("1.0", depArtifact.getVersion());
-        assertEquals("1.0", depArtifact.getBaseVersion());
-        assertNull(depArtifact.getFile());
-        assertFalse(depArtifact.isSnapshot());
-        assertEquals("sources", depArtifact.getClassifier());
-        assertEquals("jar", depArtifact.getExtension());
-        assertEquals("java", depArtifact.getProperty("language", null));
-        assertEquals(
-                "jar", depArtifact.getProperty("type", null)); // shouldn't it be java-sources given the classifier?
-        assertEquals(
-                "true",
-                depArtifact.getProperty("constitutesBuildPath", null)); // shouldn't it be false given the classifier?
-        assertEquals("false", depArtifact.getProperty("includesDependencies", null));
-        assertEquals(4, depArtifact.getProperties().size());
+        assertThat(depArtifact.getGroupId()).isEqualTo("ut.simple");
+        assertThat(depArtifact.getArtifactId()).isEqualTo("dependency");
+        assertThat(depArtifact.getVersion()).isEqualTo("1.0");
+        assertThat(depArtifact.getBaseVersion()).isEqualTo("1.0");
+        assertThat(depArtifact.getFile()).isNull();
+        assertThat(depArtifact.isSnapshot()).isFalse();
+        assertThat(depArtifact.getClassifier()).isEqualTo("sources");
+        assertThat(depArtifact.getExtension()).isEqualTo("jar");
+        assertThat(depArtifact.getProperty("language", null)).isEqualTo("java");
+        assertThat(depArtifact.getProperty("type", null)).isEqualTo("jar"); // shouldn't it be java-sources given the classifier?
+        assertThat(depArtifact.getProperty("constitutesBuildPath", null)).isEqualTo("true"); // shouldn't it be false given the classifier?
+        assertThat(depArtifact.getProperty("includesDependencies", null)).isEqualTo("false");
+        assertThat(depArtifact.getProperties().size()).isEqualTo(4);
     }
 
     @Test
-    void testCollectDependencies() throws Exception {
+    void collectDependencies() throws Exception {
         Artifact artifact = new DefaultArtifact("ut.simple:artifact:extension:classifier:1.0");
         // notice: extension and classifier not really used in this test...
 
@@ -124,13 +117,13 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
         CollectResult collectResult = system.collectDependencies(session, collectRequest);
 
         List<DependencyNode> nodes = collectResult.getRoot().getChildren();
-        assertEquals(2, nodes.size());
+        assertThat(nodes.size()).isEqualTo(2);
         checkUtSimpleArtifactDependencies(
                 nodes.get(0).getDependency(), nodes.get(1).getDependency());
     }
 
     @Test
-    void testResolveArtifact() throws Exception {
+    void resolveArtifact() throws Exception {
         Artifact artifact = new DefaultArtifact("ut.simple:artifact:1.0");
 
         ArtifactRequest artifactRequest = new ArtifactRequest();
@@ -152,15 +145,15 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
     }
 
     private void checkArtifactResult(ArtifactResult result, String filename) {
-        assertFalse(result.isMissing());
-        assertTrue(result.isResolved());
+        assertThat(result.isMissing()).isFalse();
+        assertThat(result.isResolved()).isTrue();
         Artifact artifact = result.getArtifact();
-        assertNotNull(artifact.getFile());
-        assertEquals(filename, artifact.getFile().getName());
+        assertThat(artifact.getFile()).isNotNull();
+        assertThat(artifact.getFile().getName()).isEqualTo(filename);
     }
 
     @Test
-    void testResolveArtifacts() throws Exception {
+    void resolveArtifacts() throws Exception {
         ArtifactRequest req1 = new ArtifactRequest();
         req1.setArtifact(new DefaultArtifact("ut.simple:artifact:1.0"));
         req1.addRepository(newTestRepository());
@@ -177,38 +170,38 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
 
         List<ArtifactResult> results = system.resolveArtifacts(session, requests);
 
-        assertEquals(3, results.size());
+        assertThat(results.size()).isEqualTo(3);
         checkArtifactResult(results.get(0), "artifact-1.0.jar");
         checkArtifactResult(results.get(1), "artifact-1.0.zip");
         checkArtifactResult(results.get(2), "artifact-1.0-classifier.zip");
     }
 
     @Test
-    void testResolveMetadata() throws Exception {
+    void resolveMetadata() throws Exception {
         // List<MetadataResult> resolveMetadata( RepositorySystemSession session,
         //                                      Collection<? extends MetadataRequest> requests );
     }
 
     @Test
-    void testInstall() throws Exception {
+    void install() throws Exception {
         // InstallResult install( RepositorySystemSession session, InstallRequest request )
         //                throws InstallationException;
         // release, snapshot unique ou non unique, attachment
     }
 
     @Test
-    void testDeploy() throws Exception {
+    void deploy() throws Exception {
         // DeployResult deploy( RepositorySystemSession session, DeployRequest request )
         //                throws DeploymentException;
     }
 
     @Test
-    void testNewLocalRepositoryManager() throws Exception {
+    void newLocalRepositoryManager() throws Exception {
         // LocalRepositoryManager newLocalRepositoryManager( LocalRepository localRepository );
     }
 
     @Test
-    void testNewSyncContext() throws Exception {
+    void newSyncContext() throws Exception {
         // SyncContext newSyncContext( RepositorySystemSession session, boolean shared );
     }
 }

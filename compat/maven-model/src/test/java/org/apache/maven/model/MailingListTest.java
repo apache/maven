@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code MailingList}.
@@ -32,35 +29,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MailingListTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new MailingList().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new MailingList().equals(null));
+    void equalsNullSafe() {
+        assertThat(new MailingList()).isNotEqualTo(null);
 
         new MailingList().equals(new MailingList());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         MailingList thing = new MailingList();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new MailingList().toString());
+    void toStringNullSafe() {
+        assertThat(new MailingList().toString()).isNotNull();
     }
 
     @Test
-    public void testToStringNotNonsense() {
+    void toStringNotNonsense() {
         MailingList list = new MailingList();
         list.setName("modello-dev");
 
         String s = list.toString();
 
-        assertEquals("MailingList {name=modello-dev, archive=null}", s);
+        assertThat(s).isEqualTo("MailingList {name=modello-dev, archive=null}");
     }
 }

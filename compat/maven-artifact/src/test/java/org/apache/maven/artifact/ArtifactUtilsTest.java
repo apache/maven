@@ -25,10 +25,7 @@ import java.util.Map;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@link ArtifactUtils}.
@@ -41,29 +38,29 @@ class ArtifactUtilsTest {
     }
 
     @Test
-    void testIsSnapshot() {
-        assertFalse(ArtifactUtils.isSnapshot(null));
-        assertFalse(ArtifactUtils.isSnapshot(""));
-        assertFalse(ArtifactUtils.isSnapshot("1.2.3"));
-        assertTrue(ArtifactUtils.isSnapshot("1.2.3-SNAPSHOT"));
-        assertTrue(ArtifactUtils.isSnapshot("1.2.3-snapshot"));
-        assertTrue(ArtifactUtils.isSnapshot("1.2.3-20090413.094722-2"));
-        assertFalse(ArtifactUtils.isSnapshot("1.2.3-20090413X094722-2"));
+    void isSnapshot() {
+        assertThat(ArtifactUtils.isSnapshot(null)).isFalse();
+        assertThat(ArtifactUtils.isSnapshot("")).isFalse();
+        assertThat(ArtifactUtils.isSnapshot("1.2.3")).isFalse();
+        assertThat(ArtifactUtils.isSnapshot("1.2.3-SNAPSHOT")).isTrue();
+        assertThat(ArtifactUtils.isSnapshot("1.2.3-snapshot")).isTrue();
+        assertThat(ArtifactUtils.isSnapshot("1.2.3-20090413.094722-2")).isTrue();
+        assertThat(ArtifactUtils.isSnapshot("1.2.3-20090413X094722-2")).isFalse();
     }
 
     @Test
-    void testToSnapshotVersion() {
-        assertEquals("1.2.3", ArtifactUtils.toSnapshotVersion("1.2.3"));
-        assertEquals("1.2.3-SNAPSHOT", ArtifactUtils.toSnapshotVersion("1.2.3-SNAPSHOT"));
-        assertEquals("1.2.3-SNAPSHOT", ArtifactUtils.toSnapshotVersion("1.2.3-20090413.094722-2"));
-        assertEquals("1.2.3-20090413X094722-2", ArtifactUtils.toSnapshotVersion("1.2.3-20090413X094722-2"));
+    void toSnapshotVersion() {
+        assertThat(ArtifactUtils.toSnapshotVersion("1.2.3")).isEqualTo("1.2.3");
+        assertThat(ArtifactUtils.toSnapshotVersion("1.2.3-SNAPSHOT")).isEqualTo("1.2.3-SNAPSHOT");
+        assertThat(ArtifactUtils.toSnapshotVersion("1.2.3-20090413.094722-2")).isEqualTo("1.2.3-SNAPSHOT");
+        assertThat(ArtifactUtils.toSnapshotVersion("1.2.3-20090413X094722-2")).isEqualTo("1.2.3-20090413X094722-2");
     }
 
     /**
      * Tests that the ordering of the map resembles the ordering of the input collection of artifacts.
      */
     @Test
-    void testArtifactMapByVersionlessIdOrdering() throws Exception {
+    void artifactMapByVersionlessIdOrdering() throws Exception {
         List<Artifact> list = new ArrayList<>();
         list.add(newArtifact("b"));
         list.add(newArtifact("a"));
@@ -72,7 +69,7 @@ class ArtifactUtilsTest {
         list.add(newArtifact("d"));
 
         Map<String, Artifact> map = ArtifactUtils.artifactMapByVersionlessId(list);
-        assertNotNull(map);
-        assertEquals(list, new ArrayList<>(map.values()));
+        assertThat(map).isNotNull();
+        assertThat(new ArrayList<>(map.values())).isEqualTo(list);
     }
 }

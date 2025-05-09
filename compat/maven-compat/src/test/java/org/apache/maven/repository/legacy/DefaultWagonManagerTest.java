@@ -48,13 +48,10 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -73,7 +70,7 @@ class DefaultWagonManagerTest {
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     @Test
-    void testUnnecessaryRepositoryLookup() throws Exception {
+    void unnecessaryRepositoryLookup() throws Exception {
         Artifact artifact = createTestPomArtifact("target/test-data/get-missing-pom");
 
         List<ArtifactRepository> repos = new ArrayList<>();
@@ -101,33 +98,33 @@ class DefaultWagonManagerTest {
 
         TransferListener listener = new TransferListener();
         wagonManager.getArtifact(artifact, repos, listener, false);
-        assertEquals(1, listener.events.size());
+        assertThat(listener.events.size()).isEqualTo(1);
     }
 
     @Test
-    void testGetMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException {
+    void getMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException {
         Artifact artifact = createTestArtifact("target/test-data/get-missing-jar", "jar");
 
         ArtifactRepository repo = createStringRepo();
 
-        assertThrows(ResourceDoesNotExistException.class, () -> wagonManager.getArtifact(artifact, repo, null, false));
+        assertThatExceptionOfType(ResourceDoesNotExistException.class).isThrownBy(() -> wagonManager.getArtifact(artifact, repo, null, false));
 
-        assertFalse(artifact.getFile().exists());
+        assertThat(artifact.getFile().exists()).isFalse();
     }
 
     @Test
-    void testGetMissingJarForced() throws TransferFailedException, UnsupportedProtocolException, IOException {
+    void getMissingJarForced() throws TransferFailedException, UnsupportedProtocolException, IOException {
         Artifact artifact = createTestArtifact("target/test-data/get-missing-jar", "jar");
 
         ArtifactRepository repo = createStringRepo();
 
-        assertThrows(ResourceDoesNotExistException.class, () -> wagonManager.getArtifact(artifact, repo, null, true));
+        assertThatExceptionOfType(ResourceDoesNotExistException.class).isThrownBy(() -> wagonManager.getArtifact(artifact, repo, null, true));
 
-        assertFalse(artifact.getFile().exists());
+        assertThat(artifact.getFile().exists()).isFalse();
     }
 
     @Test
-    void testGetRemoteJar()
+    void getRemoteJar()
             throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException {
         Artifact artifact = createTestArtifact("target/test-data/get-remote-jar", "jar");
 
@@ -139,8 +136,8 @@ class DefaultWagonManagerTest {
 
         wagonManager.getArtifact(artifact, repo, null, false);
 
-        assertTrue(artifact.getFile().exists());
-        assertEquals("expected", FileUtils.fileRead(artifact.getFile(), "UTF-8"));
+        assertThat(artifact.getFile().exists()).isTrue();
+        assertThat(FileUtils.fileRead(artifact.getFile(), "UTF-8")).isEqualTo("expected");
     }
 
     private Artifact createTestPomArtifact(String directory) throws IOException {
@@ -150,7 +147,7 @@ class DefaultWagonManagerTest {
 
         Artifact artifact = artifactFactory.createProjectArtifact("test", "test", "1.0");
         artifact.setFile(new File(testData, "test-1.0.pom"));
-        assertFalse(artifact.getFile().exists());
+        assertThat(artifact.getFile().exists()).isFalse();
         return artifact;
     }
 
@@ -167,7 +164,7 @@ class DefaultWagonManagerTest {
         artifact.setFile(new File(
                 testData,
                 "test-" + version + "." + artifact.getArtifactHandler().getExtension()));
-        assertFalse(artifact.getFile().exists());
+        assertThat(artifact.getFile().exists()).isFalse();
         return artifact;
     }
 
@@ -198,7 +195,7 @@ class DefaultWagonManagerTest {
     }
 
     @Test
-    void testDefaultWagonManager() throws Exception {
+    void defaultWagonManager() throws Exception {
         assertWagon("a");
 
         assertWagon("b");
@@ -207,14 +204,14 @@ class DefaultWagonManagerTest {
 
         assertWagon("string");
 
-        assertThrows(UnsupportedProtocolException.class, () -> assertWagon("d"));
+        assertThatExceptionOfType(UnsupportedProtocolException.class).isThrownBy(() -> assertWagon("d"));
     }
 
     /**
      * Check that transfer listeners are properly removed after getArtifact and putArtifact
      */
     @Test
-    void testWagonTransferListenerRemovedAfterGetArtifactAndPutArtifact() throws Exception {
+    void wagonTransferListenerRemovedAfterGetArtifactAndPutArtifact() throws Exception {
         Artifact artifact = createTestArtifact("target/test-data/transfer-listener", "jar");
         ArtifactRepository repo = createStringRepo();
         StringWagon wagon = (StringWagon) wagonManager.getWagon("string");
@@ -222,25 +219,17 @@ class DefaultWagonManagerTest {
         wagon.addExpectedContent(repo.getLayout().pathOf(artifact) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac");
 
         /* getArtifact */
-        assertFalse(
-                wagon.getTransferEventSupport().hasTransferListener(transferListener),
-                "Transfer listener is registered before test");
+        assertThat(wagon.getTransferEventSupport().hasTransferListener(transferListener)).as("Transfer listener is registered before test").isFalse();
         wagonManager.getArtifact(artifact, repo, transferListener, false);
-        assertFalse(
-                wagon.getTransferEventSupport().hasTransferListener(transferListener),
-                "Transfer listener still registered after getArtifact");
+        assertThat(wagon.getTransferEventSupport().hasTransferListener(transferListener)).as("Transfer listener still registered after getArtifact").isFalse();
 
         /* putArtifact */
         File sampleFile = getTestFile("target/test-file");
         FileUtils.fileWrite(sampleFile.getAbsolutePath(), "sample file");
 
-        assertFalse(
-                wagon.getTransferEventSupport().hasTransferListener(transferListener),
-                "Transfer listener is registered before test");
+        assertThat(wagon.getTransferEventSupport().hasTransferListener(transferListener)).as("Transfer listener is registered before test").isFalse();
         wagonManager.putArtifact(sampleFile, artifact, repo, transferListener);
-        assertFalse(
-                wagon.getTransferEventSupport().hasTransferListener(transferListener),
-                "Transfer listener still registered after putArtifact");
+        assertThat(wagon.getTransferEventSupport().hasTransferListener(transferListener)).as("Transfer listener still registered after putArtifact").isFalse();
     }
 
     /**
@@ -248,7 +237,7 @@ class DefaultWagonManagerTest {
      */
     @Disabled
     @Test
-    void testChecksumVerification() throws Exception {
+    void checksumVerification() throws Exception {
         ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy(
                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL);
 
@@ -280,10 +269,7 @@ class DefaultWagonManagerTest {
         wagon.clearExpectedContent();
         wagon.addExpectedContent("path", "expected-failure");
         wagon.addExpectedContent("path.sha1", "b7bb97d7d0b9244398d9b47296907f73313663e6");
-        assertThrows(
-                ChecksumFailedException.class,
-                () -> wagonManager.getArtifact(artifact, repo, null, false),
-                "Checksum verification did not fail");
+        assertThatExceptionOfType(ChecksumFailedException.class).as("Checksum verification did not fail").isThrownBy(() -> wagonManager.getArtifact(artifact, repo, null, false));
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent("path", "lower-case-checksum");
@@ -298,14 +284,11 @@ class DefaultWagonManagerTest {
         wagon.clearExpectedContent();
         wagon.addExpectedContent("path", "expected-failure");
         wagon.addExpectedContent("path.md5", "b7bb97d7d0b9244398d9b47296907f73313663e6");
-        assertThrows(
-                ChecksumFailedException.class,
-                () -> wagonManager.getArtifact(artifact, repo, null, false),
-                "Checksum verification did not fail");
+        assertThatExceptionOfType(ChecksumFailedException.class).as("Checksum verification did not fail").isThrownBy(() -> wagonManager.getArtifact(artifact, repo, null, false));
     }
 
     @Test
-    void testPerLookupInstantiation() throws Exception {
+    void perLookupInstantiation() throws Exception {
         String protocol = "perlookup";
 
         Wagon one = wagonManager.getWagon(protocol);
@@ -317,7 +300,7 @@ class DefaultWagonManagerTest {
     private void assertWagon(String protocol) throws Exception {
         Wagon wagon = wagonManager.getWagon(protocol);
 
-        assertNotNull(wagon, "Check wagon, protocol=" + protocol);
+        assertThat(wagon).as("Check wagon, protocol=" + protocol).isNotNull();
     }
 
     private final class ArtifactRepositoryLayoutStub implements ArtifactRepositoryLayout {

@@ -25,32 +25,31 @@ import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 class UrlSourceTest {
 
     @Test
-    void testUrlSource() {
-        NullPointerException e = assertThrows(
-                NullPointerException.class, () -> new UrlSource(null), "Should fail, since you must specify a url");
-        assertEquals("url cannot be null", e.getMessage());
+    void urlSource() {
+        NullPointerException e = assertThatExceptionOfType(NullPointerException.class).as("Should fail, since you must specify a url").isThrownBy(() -> new UrlSource(null)).actual();
+        assertThat(e.getMessage()).isEqualTo("url cannot be null");
     }
 
     @Test
-    void testGetInputStream() throws Exception {
+    void getInputStream() throws Exception {
         URL txtFile = new File("target/test-classes/source.txt").toURI().toURL();
         UrlSource source = new UrlSource(txtFile);
         try (InputStream is = source.getInputStream();
                 Scanner scanner = new Scanner(is)) {
-            assertEquals("Hello World!", scanner.nextLine());
+            assertThat(scanner.nextLine()).isEqualTo("Hello World!");
         }
     }
 
     @Test
-    void testGetLocation() throws Exception {
+    void getLocation() throws Exception {
         URL txtFile = new File("target/test-classes/source.txt").toURI().toURL();
         UrlSource source = new UrlSource(txtFile);
-        assertEquals(txtFile.toExternalForm(), source.getLocation());
+        assertThat(source.getLocation()).isEqualTo(txtFile.toExternalForm());
     }
 }

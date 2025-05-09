@@ -21,194 +21,194 @@ package org.apache.maven.cli.transfer;
 import org.apache.maven.cli.transfer.FileSizeFormat.ScaleUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 @Deprecated
 class FileSizeFormatTest {
 
     @Test
-    void testNegativeSize() {
+    void negativeSize() {
         FileSizeFormat format = new FileSizeFormat();
 
         long negativeSize = -100L;
-        assertThrows(IllegalArgumentException.class, () -> format.format(negativeSize));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> format.format(negativeSize));
     }
 
     @Test
-    void testSize() {
+    void size() {
         FileSizeFormat format = new FileSizeFormat();
 
-        assertEquals("0 B", format.format(0L));
-        assertEquals("5 B", format.format(5L));
-        assertEquals("10 B", format.format(10L));
-        assertEquals("15 B", format.format(15L));
-        assertEquals("999 B", format.format(999L));
-        assertEquals("1.0 kB", format.format(1000L));
-        assertEquals("5.5 kB", format.format(5500L));
-        assertEquals("10 kB", format.format(10L * 1000L));
-        assertEquals("15 kB", format.format(15L * 1000L));
-        assertEquals("999 kB", format.format(999L * 1000L));
-        assertEquals("1.0 MB", format.format(1000L * 1000L));
-        assertEquals("5.5 MB", format.format(5500L * 1000L));
-        assertEquals("10 MB", format.format(10L * 1000L * 1000L));
-        assertEquals("15 MB", format.format(15L * 1000L * 1000L));
-        assertEquals("999 MB", format.format(999L * 1000L * 1000L));
-        assertEquals("1.0 GB", format.format(1000L * 1000L * 1000L));
-        assertEquals("5.5 GB", format.format(5500L * 1000L * 1000L));
-        assertEquals("10 GB", format.format(10L * 1000L * 1000L * 1000L));
-        assertEquals("15 GB", format.format(15L * 1000L * 1000L * 1000L));
-        assertEquals("1000 GB", format.format(1000L * 1000L * 1000L * 1000L));
+        assertThat(format.format(0L)).isEqualTo("0 B");
+        assertThat(format.format(5L)).isEqualTo("5 B");
+        assertThat(format.format(10L)).isEqualTo("10 B");
+        assertThat(format.format(15L)).isEqualTo("15 B");
+        assertThat(format.format(999L)).isEqualTo("999 B");
+        assertThat(format.format(1000L)).isEqualTo("1.0 kB");
+        assertThat(format.format(5500L)).isEqualTo("5.5 kB");
+        assertThat(format.format(10L * 1000L)).isEqualTo("10 kB");
+        assertThat(format.format(15L * 1000L)).isEqualTo("15 kB");
+        assertThat(format.format(999L * 1000L)).isEqualTo("999 kB");
+        assertThat(format.format(1000L * 1000L)).isEqualTo("1.0 MB");
+        assertThat(format.format(5500L * 1000L)).isEqualTo("5.5 MB");
+        assertThat(format.format(10L * 1000L * 1000L)).isEqualTo("10 MB");
+        assertThat(format.format(15L * 1000L * 1000L)).isEqualTo("15 MB");
+        assertThat(format.format(999L * 1000L * 1000L)).isEqualTo("999 MB");
+        assertThat(format.format(1000L * 1000L * 1000L)).isEqualTo("1.0 GB");
+        assertThat(format.format(5500L * 1000L * 1000L)).isEqualTo("5.5 GB");
+        assertThat(format.format(10L * 1000L * 1000L * 1000L)).isEqualTo("10 GB");
+        assertThat(format.format(15L * 1000L * 1000L * 1000L)).isEqualTo("15 GB");
+        assertThat(format.format(1000L * 1000L * 1000L * 1000L)).isEqualTo("1000 GB");
     }
 
     @Test
-    void testSizeWithSelectedScaleUnit() {
+    void sizeWithSelectedScaleUnit() {
         FileSizeFormat format = new FileSizeFormat();
 
-        assertEquals("0 B", format.format(0L));
-        assertEquals("0 B", format.format(0L, ScaleUnit.BYTE));
-        assertEquals("0 kB", format.format(0L, ScaleUnit.KILOBYTE));
-        assertEquals("0 MB", format.format(0L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(0L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(0L)).isEqualTo("0 B");
+        assertThat(format.format(0L, ScaleUnit.BYTE)).isEqualTo("0 B");
+        assertThat(format.format(0L, ScaleUnit.KILOBYTE)).isEqualTo("0 kB");
+        assertThat(format.format(0L, ScaleUnit.MEGABYTE)).isEqualTo("0 MB");
+        assertThat(format.format(0L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("5 B", format.format(5L));
-        assertEquals("5 B", format.format(5L, ScaleUnit.BYTE));
-        assertEquals("0 kB", format.format(5L, ScaleUnit.KILOBYTE));
-        assertEquals("0 MB", format.format(5L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(5L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(5L)).isEqualTo("5 B");
+        assertThat(format.format(5L, ScaleUnit.BYTE)).isEqualTo("5 B");
+        assertThat(format.format(5L, ScaleUnit.KILOBYTE)).isEqualTo("0 kB");
+        assertThat(format.format(5L, ScaleUnit.MEGABYTE)).isEqualTo("0 MB");
+        assertThat(format.format(5L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("49 B", format.format(49L));
-        assertEquals("49 B", format.format(49L, ScaleUnit.BYTE));
-        assertEquals("0 kB", format.format(49L, ScaleUnit.KILOBYTE));
-        assertEquals("0 MB", format.format(49L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(49L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(49L)).isEqualTo("49 B");
+        assertThat(format.format(49L, ScaleUnit.BYTE)).isEqualTo("49 B");
+        assertThat(format.format(49L, ScaleUnit.KILOBYTE)).isEqualTo("0 kB");
+        assertThat(format.format(49L, ScaleUnit.MEGABYTE)).isEqualTo("0 MB");
+        assertThat(format.format(49L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("50 B", format.format(50L));
-        assertEquals("50 B", format.format(50L, ScaleUnit.BYTE));
-        assertEquals("0.1 kB", format.format(50L, ScaleUnit.KILOBYTE));
-        assertEquals("0 MB", format.format(50L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(50L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(50L)).isEqualTo("50 B");
+        assertThat(format.format(50L, ScaleUnit.BYTE)).isEqualTo("50 B");
+        assertThat(format.format(50L, ScaleUnit.KILOBYTE)).isEqualTo("0.1 kB");
+        assertThat(format.format(50L, ScaleUnit.MEGABYTE)).isEqualTo("0 MB");
+        assertThat(format.format(50L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("999 B", format.format(999L));
-        assertEquals("999 B", format.format(999L, ScaleUnit.BYTE));
-        assertEquals("1.0 kB", format.format(999L, ScaleUnit.KILOBYTE));
-        assertEquals("0 MB", format.format(999L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(999L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(999L)).isEqualTo("999 B");
+        assertThat(format.format(999L, ScaleUnit.BYTE)).isEqualTo("999 B");
+        assertThat(format.format(999L, ScaleUnit.KILOBYTE)).isEqualTo("1.0 kB");
+        assertThat(format.format(999L, ScaleUnit.MEGABYTE)).isEqualTo("0 MB");
+        assertThat(format.format(999L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("1.0 kB", format.format(1000L));
-        assertEquals("1000 B", format.format(1000L, ScaleUnit.BYTE));
-        assertEquals("1.0 kB", format.format(1000L, ScaleUnit.KILOBYTE));
-        assertEquals("0 MB", format.format(1000L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(1000L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(1000L)).isEqualTo("1.0 kB");
+        assertThat(format.format(1000L, ScaleUnit.BYTE)).isEqualTo("1000 B");
+        assertThat(format.format(1000L, ScaleUnit.KILOBYTE)).isEqualTo("1.0 kB");
+        assertThat(format.format(1000L, ScaleUnit.MEGABYTE)).isEqualTo("0 MB");
+        assertThat(format.format(1000L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("49 kB", format.format(49L * 1000L));
-        assertEquals("49000 B", format.format(49L * 1000L, ScaleUnit.BYTE));
-        assertEquals("49 kB", format.format(49L * 1000L, ScaleUnit.KILOBYTE));
-        assertEquals("0 MB", format.format(49L * 1000L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(49L * 1000L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(49L * 1000L)).isEqualTo("49 kB");
+        assertThat(format.format(49L * 1000L, ScaleUnit.BYTE)).isEqualTo("49000 B");
+        assertThat(format.format(49L * 1000L, ScaleUnit.KILOBYTE)).isEqualTo("49 kB");
+        assertThat(format.format(49L * 1000L, ScaleUnit.MEGABYTE)).isEqualTo("0 MB");
+        assertThat(format.format(49L * 1000L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("50 kB", format.format(50L * 1000L));
-        assertEquals("50000 B", format.format(50L * 1000L, ScaleUnit.BYTE));
-        assertEquals("50 kB", format.format(50L * 1000L, ScaleUnit.KILOBYTE));
-        assertEquals("0.1 MB", format.format(50L * 1000L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(50L * 1000L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(50L * 1000L)).isEqualTo("50 kB");
+        assertThat(format.format(50L * 1000L, ScaleUnit.BYTE)).isEqualTo("50000 B");
+        assertThat(format.format(50L * 1000L, ScaleUnit.KILOBYTE)).isEqualTo("50 kB");
+        assertThat(format.format(50L * 1000L, ScaleUnit.MEGABYTE)).isEqualTo("0.1 MB");
+        assertThat(format.format(50L * 1000L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("999 kB", format.format(999L * 1000L));
-        assertEquals("999000 B", format.format(999L * 1000L, ScaleUnit.BYTE));
-        assertEquals("999 kB", format.format(999L * 1000L, ScaleUnit.KILOBYTE));
-        assertEquals("1.0 MB", format.format(999L * 1000L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(999L * 1000L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(999L * 1000L)).isEqualTo("999 kB");
+        assertThat(format.format(999L * 1000L, ScaleUnit.BYTE)).isEqualTo("999000 B");
+        assertThat(format.format(999L * 1000L, ScaleUnit.KILOBYTE)).isEqualTo("999 kB");
+        assertThat(format.format(999L * 1000L, ScaleUnit.MEGABYTE)).isEqualTo("1.0 MB");
+        assertThat(format.format(999L * 1000L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("1.0 MB", format.format(1000L * 1000L));
-        assertEquals("1000000 B", format.format(1000L * 1000L, ScaleUnit.BYTE));
-        assertEquals("1000 kB", format.format(1000L * 1000L, ScaleUnit.KILOBYTE));
-        assertEquals("1.0 MB", format.format(1000L * 1000L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(1000L * 1000L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(1000L * 1000L)).isEqualTo("1.0 MB");
+        assertThat(format.format(1000L * 1000L, ScaleUnit.BYTE)).isEqualTo("1000000 B");
+        assertThat(format.format(1000L * 1000L, ScaleUnit.KILOBYTE)).isEqualTo("1000 kB");
+        assertThat(format.format(1000L * 1000L, ScaleUnit.MEGABYTE)).isEqualTo("1.0 MB");
+        assertThat(format.format(1000L * 1000L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("49 MB", format.format(49L * 1000L * 1000L));
-        assertEquals("49000000 B", format.format(49L * 1000L * 1000L, ScaleUnit.BYTE));
-        assertEquals("49000 kB", format.format(49L * 1000L * 1000L, ScaleUnit.KILOBYTE));
-        assertEquals("49 MB", format.format(49L * 1000L * 1000L, ScaleUnit.MEGABYTE));
-        assertEquals("0 GB", format.format(49L * 1000L * 1000L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(49L * 1000L * 1000L)).isEqualTo("49 MB");
+        assertThat(format.format(49L * 1000L * 1000L, ScaleUnit.BYTE)).isEqualTo("49000000 B");
+        assertThat(format.format(49L * 1000L * 1000L, ScaleUnit.KILOBYTE)).isEqualTo("49000 kB");
+        assertThat(format.format(49L * 1000L * 1000L, ScaleUnit.MEGABYTE)).isEqualTo("49 MB");
+        assertThat(format.format(49L * 1000L * 1000L, ScaleUnit.GIGABYTE)).isEqualTo("0 GB");
 
-        assertEquals("50 MB", format.format(50L * 1000L * 1000L));
-        assertEquals("50000000 B", format.format(50L * 1000L * 1000L, ScaleUnit.BYTE));
-        assertEquals("50000 kB", format.format(50L * 1000L * 1000L, ScaleUnit.KILOBYTE));
-        assertEquals("50 MB", format.format(50L * 1000L * 1000L, ScaleUnit.MEGABYTE));
-        assertEquals("0.1 GB", format.format(50L * 1000L * 1000L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(50L * 1000L * 1000L)).isEqualTo("50 MB");
+        assertThat(format.format(50L * 1000L * 1000L, ScaleUnit.BYTE)).isEqualTo("50000000 B");
+        assertThat(format.format(50L * 1000L * 1000L, ScaleUnit.KILOBYTE)).isEqualTo("50000 kB");
+        assertThat(format.format(50L * 1000L * 1000L, ScaleUnit.MEGABYTE)).isEqualTo("50 MB");
+        assertThat(format.format(50L * 1000L * 1000L, ScaleUnit.GIGABYTE)).isEqualTo("0.1 GB");
 
-        assertEquals("999 MB", format.format(999L * 1000L * 1000L));
-        assertEquals("999000000 B", format.format(999L * 1000L * 1000L, ScaleUnit.BYTE));
-        assertEquals("999000 kB", format.format(999L * 1000L * 1000L, ScaleUnit.KILOBYTE));
-        assertEquals("999 MB", format.format(999L * 1000L * 1000L, ScaleUnit.MEGABYTE));
-        assertEquals("1.0 GB", format.format(999L * 1000L * 1000L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(999L * 1000L * 1000L)).isEqualTo("999 MB");
+        assertThat(format.format(999L * 1000L * 1000L, ScaleUnit.BYTE)).isEqualTo("999000000 B");
+        assertThat(format.format(999L * 1000L * 1000L, ScaleUnit.KILOBYTE)).isEqualTo("999000 kB");
+        assertThat(format.format(999L * 1000L * 1000L, ScaleUnit.MEGABYTE)).isEqualTo("999 MB");
+        assertThat(format.format(999L * 1000L * 1000L, ScaleUnit.GIGABYTE)).isEqualTo("1.0 GB");
 
-        assertEquals("1.0 GB", format.format(1000L * 1000L * 1000L));
-        assertEquals("1000000000 B", format.format(1000L * 1000L * 1000L, ScaleUnit.BYTE));
-        assertEquals("1000000 kB", format.format(1000L * 1000L * 1000L, ScaleUnit.KILOBYTE));
-        assertEquals("1000 MB", format.format(1000L * 1000L * 1000L, ScaleUnit.MEGABYTE));
-        assertEquals("1.0 GB", format.format(1000L * 1000L * 1000L, ScaleUnit.GIGABYTE));
+        assertThat(format.format(1000L * 1000L * 1000L)).isEqualTo("1.0 GB");
+        assertThat(format.format(1000L * 1000L * 1000L, ScaleUnit.BYTE)).isEqualTo("1000000000 B");
+        assertThat(format.format(1000L * 1000L * 1000L, ScaleUnit.KILOBYTE)).isEqualTo("1000000 kB");
+        assertThat(format.format(1000L * 1000L * 1000L, ScaleUnit.MEGABYTE)).isEqualTo("1000 MB");
+        assertThat(format.format(1000L * 1000L * 1000L, ScaleUnit.GIGABYTE)).isEqualTo("1.0 GB");
     }
 
     @Test
-    void testNegativeProgressedSize() {
+    void negativeProgressedSize() {
         FileSizeFormat format = new FileSizeFormat();
 
         long negativeProgressedSize = -100L;
-        assertThrows(IllegalArgumentException.class, () -> format.formatProgress(negativeProgressedSize, 10L));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> format.formatProgress(negativeProgressedSize, 10L));
     }
 
     @Test
-    void testNegativeProgressedSizeBiggerThanSize() {
+    void negativeProgressedSizeBiggerThanSize() {
         FileSizeFormat format = new FileSizeFormat();
 
-        assertThrows(IllegalArgumentException.class, () -> format.formatProgress(100L, 10L));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> format.formatProgress(100L, 10L));
     }
 
     @Test
-    void testProgressedSizeWithoutSize() {
+    void progressedSizeWithoutSize() {
         FileSizeFormat format = new FileSizeFormat();
 
-        assertEquals("0 B", format.formatProgress(0L, -1L));
-        assertEquals("1.0 kB", format.formatProgress(1000L, -1L));
-        assertEquals("1.0 MB", format.formatProgress(1000L * 1000L, -1L));
-        assertEquals("1.0 GB", format.formatProgress(1000L * 1000L * 1000L, -1L));
+        assertThat(format.formatProgress(0L, -1L)).isEqualTo("0 B");
+        assertThat(format.formatProgress(1000L, -1L)).isEqualTo("1.0 kB");
+        assertThat(format.formatProgress(1000L * 1000L, -1L)).isEqualTo("1.0 MB");
+        assertThat(format.formatProgress(1000L * 1000L * 1000L, -1L)).isEqualTo("1.0 GB");
     }
 
     @Test
-    void testProgressedBothZero() {
+    void progressedBothZero() {
         FileSizeFormat format = new FileSizeFormat();
 
-        assertEquals("0 B", format.formatProgress(0L, 0L));
+        assertThat(format.formatProgress(0L, 0L)).isEqualTo("0 B");
     }
 
     @Test
-    void testProgressedSizeWithSize() {
+    void progressedSizeWithSize() {
         FileSizeFormat format = new FileSizeFormat();
 
-        assertEquals("0/800 B", format.formatProgress(0L, 800L));
-        assertEquals("400/800 B", format.formatProgress(400L, 800L));
-        assertEquals("800 B", format.formatProgress(800L, 800L));
+        assertThat(format.formatProgress(0L, 800L)).isEqualTo("0/800 B");
+        assertThat(format.formatProgress(400L, 800L)).isEqualTo("400/800 B");
+        assertThat(format.formatProgress(800L, 800L)).isEqualTo("800 B");
 
-        assertEquals("0/8.0 kB", format.formatProgress(0L, 8000L));
-        assertEquals("0.4/8.0 kB", format.formatProgress(400L, 8000L));
-        assertEquals("4.0/8.0 kB", format.formatProgress(4000L, 8000L));
-        assertEquals("8.0 kB", format.formatProgress(8000L, 8000L));
-        assertEquals("8.0/50 kB", format.formatProgress(8000L, 50000L));
-        assertEquals("16/50 kB", format.formatProgress(16000L, 50000L));
-        assertEquals("50 kB", format.formatProgress(50000L, 50000L));
+        assertThat(format.formatProgress(0L, 8000L)).isEqualTo("0/8.0 kB");
+        assertThat(format.formatProgress(400L, 8000L)).isEqualTo("0.4/8.0 kB");
+        assertThat(format.formatProgress(4000L, 8000L)).isEqualTo("4.0/8.0 kB");
+        assertThat(format.formatProgress(8000L, 8000L)).isEqualTo("8.0 kB");
+        assertThat(format.formatProgress(8000L, 50000L)).isEqualTo("8.0/50 kB");
+        assertThat(format.formatProgress(16000L, 50000L)).isEqualTo("16/50 kB");
+        assertThat(format.formatProgress(50000L, 50000L)).isEqualTo("50 kB");
 
-        assertEquals("0/5.0 MB", format.formatProgress(0L, 5000000L));
-        assertEquals("0.5/5.0 MB", format.formatProgress(500000L, 5000000L));
-        assertEquals("1.0/5.0 MB", format.formatProgress(1000000L, 5000000L));
-        assertEquals("5.0 MB", format.formatProgress(5000000L, 5000000L));
-        assertEquals("5.0/15 MB", format.formatProgress(5000000L, 15000000L));
-        assertEquals("15 MB", format.formatProgress(15000000L, 15000000L));
+        assertThat(format.formatProgress(0L, 5000000L)).isEqualTo("0/5.0 MB");
+        assertThat(format.formatProgress(500000L, 5000000L)).isEqualTo("0.5/5.0 MB");
+        assertThat(format.formatProgress(1000000L, 5000000L)).isEqualTo("1.0/5.0 MB");
+        assertThat(format.formatProgress(5000000L, 5000000L)).isEqualTo("5.0 MB");
+        assertThat(format.formatProgress(5000000L, 15000000L)).isEqualTo("5.0/15 MB");
+        assertThat(format.formatProgress(15000000L, 15000000L)).isEqualTo("15 MB");
 
-        assertEquals("0/500 MB", format.formatProgress(0L, 500000000L));
-        assertEquals("1.0/5.0 GB", format.formatProgress(1000000000L, 5000000000L));
-        assertEquals("5.0 GB", format.formatProgress(5000000000L, 5000000000L));
-        assertEquals("5.0/15 GB", format.formatProgress(5000000000L, 15000000000L));
-        assertEquals("15 GB", format.formatProgress(15000000000L, 15000000000L));
+        assertThat(format.formatProgress(0L, 500000000L)).isEqualTo("0/500 MB");
+        assertThat(format.formatProgress(1000000000L, 5000000000L)).isEqualTo("1.0/5.0 GB");
+        assertThat(format.formatProgress(5000000000L, 5000000000L)).isEqualTo("5.0 GB");
+        assertThat(format.formatProgress(5000000000L, 15000000000L)).isEqualTo("5.0/15 GB");
+        assertThat(format.formatProgress(15000000000L, 15000000000L)).isEqualTo("15 GB");
     }
 }

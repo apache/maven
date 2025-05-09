@@ -24,43 +24,40 @@ import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 class FileSourceTest {
 
     @Test
-    void testFileSource() {
-        NullPointerException e = assertThrows(
-                NullPointerException.class,
-                () -> new FileSource((File) null),
-                "Should fail, since you must specify a file");
-        assertEquals("file cannot be null", e.getMessage());
+    void fileSource() {
+        NullPointerException e = assertThatExceptionOfType(NullPointerException.class).as("Should fail, since you must specify a file").isThrownBy(() -> new FileSource((File) null)).actual();
+        assertThat(e.getMessage()).isEqualTo("file cannot be null");
     }
 
     @Test
-    void testGetInputStream() throws Exception {
+    void getInputStream() throws Exception {
         File txtFile = new File("target/test-classes/source.txt");
         FileSource source = new FileSource(txtFile);
 
         try (InputStream is = source.getInputStream();
                 Scanner scanner = new Scanner(is)) {
 
-            assertEquals("Hello World!", scanner.nextLine());
+            assertThat(scanner.nextLine()).isEqualTo("Hello World!");
         }
     }
 
     @Test
-    void testGetLocation() {
+    void getLocation() {
         File txtFile = new File("target/test-classes/source.txt");
         FileSource source = new FileSource(txtFile);
-        assertEquals(txtFile.getAbsolutePath(), source.getLocation());
+        assertThat(source.getLocation()).isEqualTo(txtFile.getAbsolutePath());
     }
 
     @Test
-    void testGetFile() {
+    void getFile() {
         File txtFile = new File("target/test-classes/source.txt");
         FileSource source = new FileSource(txtFile);
-        assertEquals(txtFile.getAbsoluteFile(), source.getFile());
+        assertThat(source.getFile()).isEqualTo(txtFile.getAbsoluteFile());
     }
 }

@@ -25,10 +25,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies exclusions listed in dependencyManagement are valid for
@@ -62,7 +59,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
      * a &amp; b only.
      */
     @Test
-    void testDependencyManagementExclusionsExcludeTransitively() throws Exception {
+    void dependencyManagementExclusionsExcludeTransitively() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -73,17 +70,17 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project0 = getProjectWithDependencies(pom0);
         MavenProject project1 = getProjectWithDependencies(pom1);
 
-        assertNotNull(project1.getParent(), "Parent is null");
-        assertEquals(pom0Basedir, project1.getParent().getBasedir());
+        assertThat(project1.getParent()).as("Parent is null").isNotNull();
+        assertThat(project1.getParent().getBasedir()).isEqualTo(pom0Basedir);
         Map map = project1.getArtifactMap();
 
-        assertNotNull(map, "No artifacts");
-        assertTrue(map.size() > 0, "No Artifacts");
-        assertTrue(map.size() == 2, "Set size should be 2, is " + map.size());
+        assertThat(map).as("No artifacts").isNotNull();
+        assertThat(map.size() > 0).as("No Artifacts").isTrue();
+        assertThat(map.size()).as("Set size should be 2, is " + map.size()).isEqualTo(2);
 
-        assertTrue(map.containsKey("maven-test:t09-a"), "maven-test:t09-a is not in the project");
-        assertTrue(map.containsKey("maven-test:t09-b"), "maven-test:t09-b is not in the project");
-        assertFalse(map.containsKey("maven-test:t09-c"), "maven-test:t09-c is in the project");
+        assertThat(map.containsKey("maven-test:t09-a")).as("maven-test:t09-a is not in the project").isTrue();
+        assertThat(map.containsKey("maven-test:t09-b")).as("maven-test:t09-b is not in the project").isTrue();
+        assertThat(map.containsKey("maven-test:t09-c")).as("maven-test:t09-c is in the project").isFalse();
     }
 
     /**
@@ -97,7 +94,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
      * @throws Exception
      */
     @Test
-    void testDependencyManagementExclusionDoesNotOverrideGloballyForTransitives() throws Exception {
+    void dependencyManagementExclusionDoesNotOverrideGloballyForTransitives() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -108,15 +105,15 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project0 = getProjectWithDependencies(pom0);
         MavenProject project2 = getProjectWithDependencies(pom2);
 
-        assertEquals(pom0Basedir, project2.getParent().getBasedir());
+        assertThat(project2.getParent().getBasedir()).isEqualTo(pom0Basedir);
         Map map = project2.getArtifactMap();
-        assertNotNull(map, "No artifacts");
-        assertTrue(map.size() > 0, "No Artifacts");
-        assertTrue(map.size() == 4, "Set size should be 4, is " + map.size());
+        assertThat(map).as("No artifacts").isNotNull();
+        assertThat(map.size() > 0).as("No Artifacts").isTrue();
+        assertThat(map.size()).as("Set size should be 4, is " + map.size()).isEqualTo(4);
 
-        assertTrue(map.containsKey("maven-test:t09-a"), "maven-test:t09-a is not in the project");
-        assertTrue(map.containsKey("maven-test:t09-b"), "maven-test:t09-b is not in the project");
-        assertTrue(map.containsKey("maven-test:t09-c"), "maven-test:t09-c is not in the project");
-        assertTrue(map.containsKey("maven-test:t09-d"), "maven-test:t09-d is not in the project");
+        assertThat(map.containsKey("maven-test:t09-a")).as("maven-test:t09-a is not in the project").isTrue();
+        assertThat(map.containsKey("maven-test:t09-b")).as("maven-test:t09-b is not in the project").isTrue();
+        assertThat(map.containsKey("maven-test:t09-c")).as("maven-test:t09-c is not in the project").isTrue();
+        assertThat(map.containsKey("maven-test:t09-d")).as("maven-test:t09-d is not in the project").isTrue();
     }
 }

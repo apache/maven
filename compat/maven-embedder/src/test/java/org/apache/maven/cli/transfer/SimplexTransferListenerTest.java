@@ -29,7 +29,7 @@ import org.eclipse.aether.transfer.TransferResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 @Deprecated
 class SimplexTransferListenerTest {
@@ -75,9 +75,7 @@ class SimplexTransferListenerTest {
         Thread.sleep(500); // to make sure queue is processed, cancellation applied
 
         // subsequent call will cancel
-        assertThrows(
-                TransferCancelledException.class,
-                () -> listener.transferStarted(event(session, resource, TransferEvent.EventType.STARTED)));
+        assertThatExceptionOfType(TransferCancelledException.class).isThrownBy(() -> listener.transferStarted(event(session, resource, TransferEvent.EventType.STARTED)));
     }
 
     @Test

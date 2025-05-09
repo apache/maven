@@ -23,34 +23,34 @@ import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class StringSourceTest {
     @Test
-    void testGetInputStream() throws Exception {
+    void getInputStream() throws Exception {
         StringSource source = new StringSource("Hello World!");
 
         try (InputStream is = source.getInputStream();
                 Scanner scanner = new Scanner(is)) {
-            assertEquals("Hello World!", scanner.nextLine());
+            assertThat(scanner.nextLine()).isEqualTo("Hello World!");
         }
     }
 
     @Test
-    void testGetLocation() {
+    void getLocation() {
         StringSource source = new StringSource("Hello World!");
-        assertEquals("(memory)", source.getLocation());
+        assertThat(source.getLocation()).isEqualTo("(memory)");
 
         source = new StringSource("Hello World!", "LOCATION");
-        assertEquals("LOCATION", source.getLocation());
+        assertThat(source.getLocation()).isEqualTo("LOCATION");
     }
 
     @Test
-    void testGetContent() {
+    void getContent() {
         StringSource source = new StringSource(null);
-        assertEquals("", source.getContent());
+        assertThat(source.getContent()).isEqualTo("");
 
         source = new StringSource("Hello World!", "LOCATION");
-        assertEquals("Hello World!", source.getContent());
+        assertThat(source.getContent()).isEqualTo("Hello World!");
     }
 }

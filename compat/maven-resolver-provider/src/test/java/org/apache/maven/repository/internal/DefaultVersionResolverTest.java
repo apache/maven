@@ -26,14 +26,14 @@ import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResult;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
     @Inject
     private DefaultVersionResolver versionResolver;
 
     @Test
-    void testResolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts() throws Exception {
+    void resolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts() throws Exception {
         VersionRequest requestB = new VersionRequest();
         requestB.addRepository(newTestRepository());
         Artifact artifactB =
@@ -41,7 +41,7 @@ class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
         requestB.setArtifact(artifactB);
 
         VersionResult resultB = versionResolver.resolveVersion(session, requestB);
-        assertEquals("07.20.3-20120809.112920-97", resultB.getVersion());
+        assertThat(resultB.getVersion()).isEqualTo("07.20.3-20120809.112920-97");
 
         VersionRequest requestA = new VersionRequest();
         requestA.addRepository(newTestRepository());
@@ -51,11 +51,11 @@ class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
         requestA.setArtifact(artifactA);
 
         VersionResult resultA = versionResolver.resolveVersion(session, requestA);
-        assertEquals("07.20.3-20120809.112124-88", resultA.getVersion());
+        assertThat(resultA.getVersion()).isEqualTo("07.20.3-20120809.112124-88");
     }
 
     @Test
-    void testResolveSeparateInstalledClassifiedNonVersionedArtifacts() throws Exception {
+    void resolveSeparateInstalledClassifiedNonVersionedArtifacts() throws Exception {
         VersionRequest requestA = new VersionRequest();
         requestA.addRepository(newTestRepository());
         String versionA = "07.20.3-20120809.112124-88";
@@ -63,7 +63,7 @@ class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
         requestA.setArtifact(artifactA);
 
         VersionResult resultA = versionResolver.resolveVersion(session, requestA);
-        assertEquals(versionA, resultA.getVersion());
+        assertThat(resultA.getVersion()).isEqualTo(versionA);
 
         VersionRequest requestB = new VersionRequest();
         requestB.addRepository(newTestRepository());
@@ -72,6 +72,6 @@ class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
         requestB.setArtifact(artifactB);
 
         VersionResult resultB = versionResolver.resolveVersion(session, requestB);
-        assertEquals(versionB, resultB.getVersion());
+        assertThat(resultB.getVersion()).isEqualTo(versionB);
     }
 }

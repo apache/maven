@@ -26,8 +26,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies that plugin execution sections in the parent POM that have
@@ -48,7 +47,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testFalsePluginExecutionInheritValue() throws Exception {
+    void falsePluginExecutionInheritValue() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -61,11 +60,9 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         Map pluginMap = project1.getBuild().getPluginsAsMap();
         Plugin compilerPlugin = (Plugin) pluginMap.get("org.apache.maven.plugins:maven-compiler-plugin");
 
-        assertNotNull(compilerPlugin);
+        assertThat(compilerPlugin).isNotNull();
 
         Map executionMap = compilerPlugin.getExecutionsAsMap();
-        assertNull(
-                executionMap.get("test"),
-                "Plugin execution: 'test' should NOT exist in the compiler plugin specification for the child project!");
+        assertThat(executionMap.get("test")).as("Plugin execution: 'test' should NOT exist in the compiler plugin specification for the child project!").isNull();
     }
 }

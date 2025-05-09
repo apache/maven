@@ -56,7 +56,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testVersionStringComparison() throws Exception {
+    void versionStringComparison() throws Exception {
         Profile profile = newProfile(ActivationOS.newBuilder().version("6.5.0-1014-aws"));
 
         assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -66,7 +66,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testVersionRegexMatching() throws Exception {
+    void versionRegexMatching() throws Exception {
         Profile profile = newProfile(ActivationOS.newBuilder().version("regex:.*aws"));
 
         assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -76,7 +76,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testName() {
+    void name() {
         Profile profile = newProfile(ActivationOS.newBuilder().name("windows"));
 
         assertActivation(false, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -84,7 +84,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testNegatedName() {
+    void negatedName() {
         Profile profile = newProfile(ActivationOS.newBuilder().name("!windows"));
 
         assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -92,7 +92,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testArch() {
+    void arch() {
         Profile profile = newProfile(ActivationOS.newBuilder().arch("amd64"));
 
         assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -100,7 +100,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testNegatedArch() {
+    void negatedArch() {
         Profile profile = newProfile(ActivationOS.newBuilder().arch("!amd64"));
 
         assertActivation(false, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -108,7 +108,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testFamily() {
+    void family() {
         Profile profile = newProfile(ActivationOS.newBuilder().family("windows"));
 
         assertActivation(false, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -116,7 +116,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testNegatedFamily() {
+    void negatedFamily() {
         Profile profile = newProfile(ActivationOS.newBuilder().family("!windows"));
 
         assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -124,7 +124,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    void testAllOsConditions() {
+    void allOsConditions() {
         Profile profile = newProfile(ActivationOS.newBuilder()
                 .family("windows")
                 .name("windows")
@@ -138,7 +138,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
-    public void testCapitalOsName() {
+    void capitalOsName() {
         Profile profile = newProfile(ActivationOS.newBuilder()
                 .family("Mac")
                 .name("Mac OS X")

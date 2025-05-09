@@ -22,8 +22,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@link ScopeArtifactFilter}.
@@ -36,57 +35,57 @@ class ScopeArtifactFilterTest {
     }
 
     @Test
-    void testIncludeCompile() {
+    void includeCompile() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE);
 
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_SYSTEM)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_PROVIDED)));
-        assertFalse(filter.include(newArtifact(Artifact.SCOPE_RUNTIME)));
-        assertFalse(filter.include(newArtifact(Artifact.SCOPE_TEST)));
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_COMPILE))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_SYSTEM))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_PROVIDED))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_RUNTIME))).isFalse();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_TEST))).isFalse();
     }
 
     @Test
-    void testIncludeCompilePlusRuntime() {
+    void includeCompilePlusRuntime() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE_PLUS_RUNTIME);
 
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_SYSTEM)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_PROVIDED)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_RUNTIME)));
-        assertFalse(filter.include(newArtifact(Artifact.SCOPE_TEST)));
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_COMPILE))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_SYSTEM))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_PROVIDED))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_RUNTIME))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_TEST))).isFalse();
     }
 
     @Test
-    void testIncludeRuntime() {
+    void includeRuntime() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME);
 
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
-        assertFalse(filter.include(newArtifact(Artifact.SCOPE_SYSTEM)));
-        assertFalse(filter.include(newArtifact(Artifact.SCOPE_PROVIDED)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_RUNTIME)));
-        assertFalse(filter.include(newArtifact(Artifact.SCOPE_TEST)));
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_COMPILE))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_SYSTEM))).isFalse();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_PROVIDED))).isFalse();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_RUNTIME))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_TEST))).isFalse();
     }
 
     @Test
-    void testIncludeRuntimePlusSystem() {
+    void includeRuntimePlusSystem() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME_PLUS_SYSTEM);
 
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_SYSTEM)));
-        assertFalse(filter.include(newArtifact(Artifact.SCOPE_PROVIDED)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_RUNTIME)));
-        assertFalse(filter.include(newArtifact(Artifact.SCOPE_TEST)));
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_COMPILE))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_SYSTEM))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_PROVIDED))).isFalse();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_RUNTIME))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_TEST))).isFalse();
     }
 
     @Test
-    void testIncludeTest() {
+    void includeTest() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_TEST);
 
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_SYSTEM)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_PROVIDED)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_RUNTIME)));
-        assertTrue(filter.include(newArtifact(Artifact.SCOPE_TEST)));
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_COMPILE))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_SYSTEM))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_PROVIDED))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_RUNTIME))).isTrue();
+        assertThat(filter.include(newArtifact(Artifact.SCOPE_TEST))).isTrue();
     }
 }

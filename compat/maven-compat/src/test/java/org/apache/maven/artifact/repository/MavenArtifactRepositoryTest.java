@@ -20,8 +20,7 @@ package org.apache.maven.artifact.repository;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Deprecated
 class MavenArtifactRepositoryTest {
@@ -39,18 +38,18 @@ class MavenArtifactRepositoryTest {
     }
 
     @Test
-    void testHashCodeEquals() {
+    void hashCodeEquals() {
         MavenArtifactRepositorySubclass r1 = new MavenArtifactRepositorySubclass("foo");
         MavenArtifactRepositorySubclass r2 = new MavenArtifactRepositorySubclass("foo");
         MavenArtifactRepositorySubclass r3 = new MavenArtifactRepositorySubclass("bar");
 
-        assertTrue(r1.hashCode() == r2.hashCode());
-        assertFalse(r1.hashCode() == r3.hashCode());
+        assertThat(r2.hashCode()).isEqualTo(r1.hashCode());
+        assertThat(r1.hashCode() == r3.hashCode()).isFalse();
 
-        assertTrue(r1.equals(r2));
-        assertTrue(r2.equals(r1));
+        assertThat(r2).isEqualTo(r1);
+        assertThat(r1).isEqualTo(r2);
 
-        assertFalse(r1.equals(r3));
-        assertFalse(r3.equals(r1));
+        assertThat(r3).isNotEqualTo(r1);
+        assertThat(r1).isNotEqualTo(r3);
     }
 }

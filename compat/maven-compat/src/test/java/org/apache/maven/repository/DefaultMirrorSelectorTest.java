@@ -22,14 +22,14 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Deprecated
 class DefaultMirrorSelectorTest {
     @Test
-    void testMirrorWithMirrorOfPatternContainingANegationIsNotSelected() {
+    void mirrorWithMirrorOfPatternContainingANegationIsNotSelected() {
         ArtifactRepository repository = new DefaultArtifactRepository("snapshots.repo", "http://whatever", null);
         String pattern = "external:*, !snapshots.repo";
-        assertFalse(DefaultMirrorSelector.matchPattern(repository, pattern));
+        assertThat(DefaultMirrorSelector.matchPattern(repository, pattern)).isFalse();
     }
 }

@@ -28,14 +28,13 @@ import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@link DefaultProfileSelector}.
  */
 @Deprecated
-public class DefaultProfileSelectorTest {
+class DefaultProfileSelectorTest {
     private Profile newProfile(String id) {
         Activation activation = new Activation();
         Profile profile = new Profile();
@@ -45,7 +44,7 @@ public class DefaultProfileSelectorTest {
     }
 
     @Test
-    void testThrowingActivator() {
+    void throwingActivator() {
         DefaultProfileSelector selector = new DefaultProfileSelector();
         selector.addProfileActivator(new ProfileActivator() {
             @Override
@@ -64,10 +63,8 @@ public class DefaultProfileSelectorTest {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext();
         SimpleProblemCollector problems = new SimpleProblemCollector();
         List<Profile> active = selector.getActiveProfiles(profiles, context, problems);
-        assertTrue(active.isEmpty());
-        assertEquals(1, problems.getErrors().size());
-        assertEquals(
-                "Failed to determine activation for profile one: BOOM",
-                problems.getErrors().get(0));
+        assertThat(active.isEmpty()).isTrue();
+        assertThat(problems.getErrors().size()).isEqualTo(1);
+        assertThat(problems.getErrors().get(0)).isEqualTo("Failed to determine activation for profile one: BOOM");
     }
 }

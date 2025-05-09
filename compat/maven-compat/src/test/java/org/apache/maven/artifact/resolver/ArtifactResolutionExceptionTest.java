@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test the artifact resolution exception message
@@ -33,7 +33,7 @@ class ArtifactResolutionExceptionTest {
     private static final String LS = System.lineSeparator();
 
     @Test
-    void testMissingArtifactMessageFormat() {
+    void missingArtifactMessageFormat() {
         String message = "Missing artifact";
         String indentation = "  ";
         String groupId = "aGroupId";
@@ -54,6 +54,6 @@ class ArtifactResolutionExceptionTest {
                 + LS + "  \t2) dependency2" + LS + LS;
         String actual = AbstractArtifactResolutionException.constructMissingArtifactMessage(
                 message, indentation, groupId, artifactId, version, type, classifier, downloadUrl, path);
-        assertEquals(expected, actual);
+        assertThat(actual).isEqualTo(expected);
     }
 }

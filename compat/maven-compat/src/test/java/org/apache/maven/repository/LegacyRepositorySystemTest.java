@@ -68,10 +68,8 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link LegacyRepositorySystem}.
@@ -116,7 +114,7 @@ class LegacyRepositorySystemTest {
     }
 
     @Test
-    void testThatASystemScopedDependencyIsNotResolvedFromRepositories() throws Exception {
+    void thatASystemScopedDependencyIsNotResolvedFromRepositories() throws Exception {
         //
         // We should get a whole slew of dependencies resolving this artifact transitively
         //
@@ -178,14 +176,14 @@ class LegacyRepositorySystemTest {
 
         ArtifactResolutionResult result = repositorySystem.resolve(request);
         resolutionErrorHandler.throwErrors(request, result);
-        assertEquals(2, result.getArtifacts().size());
+        assertThat(result.getArtifacts().size()).isEqualTo(2);
 
         //
         // System scoped version which should
         //
         d.setScope(Artifact.SCOPE_SYSTEM);
         File file = new File(getBasedir(), "src/test/repository-system/maven-core-2.1.0.jar");
-        assertTrue(file.exists());
+        assertThat(file.exists()).isTrue();
         d.setSystemPath(file.getCanonicalPath());
 
         artifact = repositorySystem.createDependencyArtifact(d);
@@ -202,13 +200,13 @@ class LegacyRepositorySystemTest {
 
         result = repositorySystem.resolve(request);
         resolutionErrorHandler.throwErrors(request, result);
-        assertEquals(1, result.getArtifacts().size());
+        assertThat(result.getArtifacts().size()).isEqualTo(1);
 
         //
         // Put in a bogus file to make sure missing files cause the resolution to fail.
         //
         file = new File(getBasedir(), "src/test/repository-system/maven-monkey-2.1.0.jar");
-        assertFalse(file.exists());
+        assertThat(file.exists()).isFalse();
         d.setSystemPath(file.getCanonicalPath());
         artifact = repositorySystem.createDependencyArtifact(d);
 
@@ -226,24 +224,24 @@ class LegacyRepositorySystemTest {
             result = repositorySystem.resolve(request);
             resolutionErrorHandler.throwErrors(request, result);
         } catch (Exception e) {
-            assertTrue(result.hasMissingArtifacts());
+            assertThat(result.hasMissingArtifacts()).isTrue();
         }
     }
 
     @Test
-    void testLocalRepositoryBasedir() throws Exception {
+    void localRepositoryBasedir() throws Exception {
         File localRepoDir = new File("").getAbsoluteFile();
 
         ArtifactRepository localRepo = repositorySystem.createLocalRepository(localRepoDir);
 
         String basedir = localRepo.getBasedir();
 
-        assertFalse(basedir.endsWith("/"));
-        assertFalse(basedir.endsWith("\\"));
+        assertThat(basedir.endsWith("/")).isFalse();
+        assertThat(basedir.endsWith("\\")).isFalse();
 
-        assertEquals(localRepoDir, new File(basedir));
+        assertThat(new File(basedir)).isEqualTo(localRepoDir);
 
-        assertEquals(localRepoDir.getPath(), basedir);
+        assertThat(basedir).isEqualTo(localRepoDir.getPath());
     }
 
     @Inject

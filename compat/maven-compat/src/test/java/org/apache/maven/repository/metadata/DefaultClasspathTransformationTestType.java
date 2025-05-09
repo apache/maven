@@ -25,8 +25,7 @@ import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -76,44 +75,44 @@ class DefaultClasspathTransformationTestType {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testCompileClasspathTransform() throws Exception {
+    void compileClasspathTransform() throws Exception {
         ClasspathContainer res;
 
         res = transform.transform(graph, ArtifactScopeEnum.compile, false);
 
-        assertNotNull(res, "null classpath container after compile transform");
-        assertNotNull(res.getClasspath(), "null classpath after compile transform");
-        assertEquals(3, res.getClasspath().size(), "compile classpath should have 3 entries");
+        assertThat(res).as("null classpath container after compile transform").isNotNull();
+        assertThat(res.getClasspath()).as("null classpath after compile transform").isNotNull();
+        assertThat(res.getClasspath().size()).as("compile classpath should have 3 entries").isEqualTo(3);
     }
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testRuntimeClasspathTransform() throws Exception {
+    void runtimeClasspathTransform() throws Exception {
         ClasspathContainer res;
 
         res = transform.transform(graph, ArtifactScopeEnum.runtime, false);
 
-        assertNotNull(res, "null classpath container after runtime transform");
-        assertNotNull(res.getClasspath(), "null classpath after runtime transform");
-        assertEquals(4, res.getClasspath().size(), "runtime classpath should have 4 entries");
+        assertThat(res).as("null classpath container after runtime transform").isNotNull();
+        assertThat(res.getClasspath()).as("null classpath after runtime transform").isNotNull();
+        assertThat(res.getClasspath().size()).as("runtime classpath should have 4 entries").isEqualTo(4);
 
         ArtifactMetadata md = res.getClasspath().get(3);
-        assertEquals("1.1", md.getVersion(), "runtime artifact version should be 1.1");
+        assertThat(md.getVersion()).as("runtime artifact version should be 1.1").isEqualTo("1.1");
     }
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testTestClasspathTransform() throws Exception {
+    void testClasspathTransform() throws Exception {
         ClasspathContainer res;
 
         res = transform.transform(graph, ArtifactScopeEnum.test, false);
 
-        assertNotNull(res, "null classpath container after test transform");
-        assertNotNull(res.getClasspath(), "null classpath after test transform");
-        assertEquals(4, res.getClasspath().size(), "test classpath should have 4 entries");
+        assertThat(res).as("null classpath container after test transform").isNotNull();
+        assertThat(res.getClasspath()).as("null classpath after test transform").isNotNull();
+        assertThat(res.getClasspath().size()).as("test classpath should have 4 entries").isEqualTo(4);
 
         ArtifactMetadata md = res.getClasspath().get(3);
-        assertEquals("1.2", md.getVersion(), "test artifact version should be 1.2");
+        assertThat(md.getVersion()).as("test artifact version should be 1.2").isEqualTo("1.2");
     }
     // ------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------

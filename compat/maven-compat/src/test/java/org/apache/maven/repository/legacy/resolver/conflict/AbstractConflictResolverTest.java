@@ -31,8 +31,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.BeforeEach;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Provides a basis for testing conflict resolvers.
@@ -93,8 +92,8 @@ public abstract class AbstractConflictResolverTest {
             ResolutionNode expectedNode, ResolutionNode actualNode1, ResolutionNode actualNode2) {
         ResolutionNode resolvedNode = getConflictResolver().resolveConflict(actualNode1, actualNode2);
 
-        assertNotNull(resolvedNode, "Expected resolvable");
-        assertEquals(expectedNode, resolvedNode, "Resolution node");
+        assertThat(resolvedNode).as("Expected resolvable").isNotNull();
+        assertThat(resolvedNode).as("Resolution node").isEqualTo(expectedNode);
     }
 
     protected Artifact createArtifact(String id, String version) throws InvalidVersionSpecificationException {

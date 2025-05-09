@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ComparableVersionIT {
 
@@ -52,7 +52,7 @@ class ComparableVersionIT {
                     });
 
                     try {
-                        assertEquals(0, p.waitFor(), "Unexpected exit code");
+                        assertThat(p.waitFor()).as("Unexpected exit code").isEqualTo(0);
                     } catch (InterruptedException e) {
                         throw new InterruptedIOException(e.toString());
                     }

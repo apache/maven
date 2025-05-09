@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code CiManagement}.
@@ -31,25 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CiManagementTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new CiManagement().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new CiManagement().equals(null));
+    void equalsNullSafe() {
+        assertThat(new CiManagement()).isNotEqualTo(null);
 
         new CiManagement().equals(new CiManagement());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         CiManagement thing = new CiManagement();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new CiManagement().toString());
+    void toStringNullSafe() {
+        assertThat(new CiManagement().toString()).isNotNull();
     }
 }

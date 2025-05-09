@@ -21,108 +21,106 @@ package org.apache.maven.building;
 import org.apache.maven.building.Problem.Severity;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultProblemTest {
 
     @Test
-    void testGetSeverity() {
+    void getSeverity() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
-        assertEquals(Severity.ERROR, problem.getSeverity());
+        assertThat(problem.getSeverity()).isEqualTo(Severity.ERROR);
 
         problem = new DefaultProblem(null, Severity.FATAL, null, -1, -1, null);
-        assertEquals(Severity.FATAL, problem.getSeverity());
+        assertThat(problem.getSeverity()).isEqualTo(Severity.FATAL);
 
         problem = new DefaultProblem(null, Severity.ERROR, null, -1, -1, null);
-        assertEquals(Severity.ERROR, problem.getSeverity());
+        assertThat(problem.getSeverity()).isEqualTo(Severity.ERROR);
 
         problem = new DefaultProblem(null, Severity.WARNING, null, -1, -1, null);
-        assertEquals(Severity.WARNING, problem.getSeverity());
+        assertThat(problem.getSeverity()).isEqualTo(Severity.WARNING);
     }
 
     @Test
-    void testGetLineNumber() {
+    void getLineNumber() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
-        assertEquals(-1, problem.getLineNumber());
+        assertThat(problem.getLineNumber()).isEqualTo(-1);
 
         problem = new DefaultProblem(null, null, null, 42, -1, null);
-        assertEquals(42, problem.getLineNumber());
+        assertThat(problem.getLineNumber()).isEqualTo(42);
 
         problem = new DefaultProblem(null, null, null, Integer.MAX_VALUE, -1, null);
-        assertEquals(Integer.MAX_VALUE, problem.getLineNumber());
+        assertThat(problem.getLineNumber()).isEqualTo(Integer.MAX_VALUE);
 
         // this case is not specified, might also return -1
         problem = new DefaultProblem(null, null, null, Integer.MIN_VALUE, -1, null);
-        assertEquals(Integer.MIN_VALUE, problem.getLineNumber());
+        assertThat(problem.getLineNumber()).isEqualTo(Integer.MIN_VALUE);
     }
 
     @Test
-    void testGetColumnNumber() {
+    void getColumnNumber() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
-        assertEquals(-1, problem.getColumnNumber());
+        assertThat(problem.getColumnNumber()).isEqualTo(-1);
 
         problem = new DefaultProblem(null, null, null, -1, 42, null);
-        assertEquals(42, problem.getColumnNumber());
+        assertThat(problem.getColumnNumber()).isEqualTo(42);
 
         problem = new DefaultProblem(null, null, null, -1, Integer.MAX_VALUE, null);
-        assertEquals(Integer.MAX_VALUE, problem.getColumnNumber());
+        assertThat(problem.getColumnNumber()).isEqualTo(Integer.MAX_VALUE);
 
         // this case is not specified, might also return -1
         problem = new DefaultProblem(null, null, null, -1, Integer.MIN_VALUE, null);
-        assertEquals(Integer.MIN_VALUE, problem.getColumnNumber());
+        assertThat(problem.getColumnNumber()).isEqualTo(Integer.MIN_VALUE);
     }
 
     @Test
-    void testGetException() {
+    void getException() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
-        assertNull(problem.getException());
+        assertThat(problem.getException()).isNull();
 
         Exception e = new Exception();
         problem = new DefaultProblem(null, null, null, -1, -1, e);
-        assertSame(e, problem.getException());
+        assertThat(problem.getException()).isSameAs(e);
     }
 
     @Test
-    void testGetSource() {
+    void getSource() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
-        assertEquals("", problem.getSource());
+        assertThat(problem.getSource()).isEqualTo("");
 
         problem = new DefaultProblem(null, null, "", -1, -1, null);
-        assertEquals("", problem.getSource());
+        assertThat(problem.getSource()).isEqualTo("");
 
         problem = new DefaultProblem(null, null, "SOURCE", -1, -1, null);
-        assertEquals("SOURCE", problem.getSource());
+        assertThat(problem.getSource()).isEqualTo("SOURCE");
     }
 
     @Test
-    void testGetLocation() {
+    void getLocation() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
-        assertEquals("", problem.getLocation());
+        assertThat(problem.getLocation()).isEqualTo("");
 
         problem = new DefaultProblem(null, null, "SOURCE", -1, -1, null);
-        assertEquals("SOURCE", problem.getLocation());
+        assertThat(problem.getLocation()).isEqualTo("SOURCE");
 
         problem = new DefaultProblem(null, null, null, 42, -1, null);
-        assertEquals("line 42", problem.getLocation());
+        assertThat(problem.getLocation()).isEqualTo("line 42");
 
         problem = new DefaultProblem(null, null, null, -1, 127, null);
-        assertEquals("column 127", problem.getLocation());
+        assertThat(problem.getLocation()).isEqualTo("column 127");
 
         problem = new DefaultProblem(null, null, "SOURCE", 42, 127, null);
-        assertEquals("SOURCE, line 42, column 127", problem.getLocation());
+        assertThat(problem.getLocation()).isEqualTo("SOURCE, line 42, column 127");
     }
 
     @Test
-    void testGetMessage() {
+    void getMessage() {
         DefaultProblem problem = new DefaultProblem("MESSAGE", null, null, -1, -1, null);
-        assertEquals("MESSAGE", problem.getMessage());
+        assertThat(problem.getMessage()).isEqualTo("MESSAGE");
 
         problem = new DefaultProblem(null, null, null, -1, -1, new Exception());
-        assertEquals("", problem.getMessage());
+        assertThat(problem.getMessage()).isEqualTo("");
 
         problem = new DefaultProblem(null, null, null, -1, -1, new Exception("EXCEPTION MESSAGE"));
-        assertEquals("EXCEPTION MESSAGE", problem.getMessage());
+        assertThat(problem.getMessage()).isEqualTo("EXCEPTION MESSAGE");
     }
 }

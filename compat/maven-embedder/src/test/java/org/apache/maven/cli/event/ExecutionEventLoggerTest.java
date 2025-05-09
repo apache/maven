@@ -65,7 +65,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    void testProjectStarted() {
+    void projectStarted() {
         // prepare
         File basedir = new File("").getAbsoluteFile();
         ExecutionEvent event = mock(ExecutionEvent.class);
@@ -98,7 +98,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    void testProjectStartedOverflow() {
+    void projectStartedOverflow() {
         // prepare
         File basedir = new File("").getAbsoluteFile();
         ExecutionEvent event = mock(ExecutionEvent.class);
@@ -130,7 +130,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    void testTerminalWidth() {
+    void terminalWidth() {
         // prepare
         Logger logger = mock(Logger.class);
         when(logger.isInfoEnabled()).thenReturn(true);
@@ -170,7 +170,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    void testProjectStartedNoPom() {
+    void projectStartedNoPom() {
         // prepare
         File basedir = new File("").getAbsoluteFile();
         ExecutionEvent event = mock(ExecutionEvent.class);
@@ -196,7 +196,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    void testMultiModuleProjectProgress() {
+    void multiModuleProjectProgress() {
         // prepare
         MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
         MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
@@ -229,7 +229,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    void testMultiModuleProjectResumeFromProgress() {
+    void multiModuleProjectResumeFromProgress() {
         // prepare
         MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
         MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");

@@ -113,7 +113,7 @@ class CLIManagerDocumentationTest {
     }
 
     @Test
-    void testOptionsAsHtml() throws IOException {
+    void optionsAsHtml() throws IOException {
         Path options = Paths.get("target/test-classes/options.html");
         Files.writeString(options, getOptionsAsHtml(), StandardCharsets.UTF_8);
     }

@@ -23,26 +23,26 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */
 class FilterHashEqualsTest {
 
     @Test
-    void testIncludesExcludesArtifactFilter() {
+    void includesExcludesArtifactFilter() {
         List<String> patterns = Arrays.asList("c", "d", "e");
 
         IncludesArtifactFilter f1 = new IncludesArtifactFilter(patterns);
 
         IncludesArtifactFilter f2 = new IncludesArtifactFilter(patterns);
 
-        assertTrue(f1.equals(f2));
-        assertTrue(f2.equals(f1));
-        assertTrue(f1.hashCode() == f2.hashCode());
+        assertThat(f2).isEqualTo(f1);
+        assertThat(f1).isEqualTo(f2);
+        assertThat(f2.hashCode()).isEqualTo(f1.hashCode());
 
         IncludesArtifactFilter f3 = new IncludesArtifactFilter(Arrays.asList("d", "c", "e"));
-        assertTrue(f1.equals(f3));
-        assertTrue(f1.hashCode() == f3.hashCode());
+        assertThat(f3).isEqualTo(f1);
+        assertThat(f3.hashCode()).isEqualTo(f1.hashCode());
     }
 }

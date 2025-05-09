@@ -26,9 +26,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * A test which demonstrates maven's dependency management
@@ -49,7 +47,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagement() throws Exception {
+    void dependencyManagement() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
 
@@ -61,17 +59,16 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project0 = getProjectWithDependencies(pom0);
         MavenProject project1 = getProjectWithDependencies(pom1);
 
-        assertEquals(pom0Basedir, project1.getParent().getBasedir());
+        assertThat(project1.getParent().getBasedir()).isEqualTo(pom0Basedir);
         Set set = project1.getArtifacts();
-        assertNotNull(set, "No artifacts");
-        assertTrue(set.size() > 0, "No Artifacts");
+        assertThat(set).as("No artifacts").isNotNull();
+        assertThat(set.size() > 0).as("No Artifacts").isTrue();
 
         for (Object aSet : set) {
             Artifact artifact = (Artifact) aSet;
             System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
                     + " Scope: " + artifact.getScope());
-            assertTrue(
-                    artifact.getVersion().equals("1.0"), "Incorrect version for " + artifact.getDependencyConflictId());
+            assertThat(artifact.getVersion()).as("Incorrect version for " + artifact.getDependencyConflictId()).isEqualTo("1.0");
         }
     }
 }

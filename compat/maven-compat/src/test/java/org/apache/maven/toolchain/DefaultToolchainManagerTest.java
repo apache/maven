@@ -32,6 +32,7 @@ import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -39,7 +40,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -50,6 +51,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DefaultToolchainManagerTest {
+    private AutoCloseable mocks;
     // Mocks to inject into toolchainManager
     @Mock
     private Logger logger;
@@ -67,7 +69,7 @@ class DefaultToolchainManagerTest {
 
     @BeforeEach
     void onSetup() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
 
         Map<String, ToolchainFactory> factories = new HashMap<>();
         factories.put("basic", toolchainFactoryBasicType);
@@ -81,18 +83,18 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testNoModels() {
+    void noModels() {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         when(session.getRequest()).thenReturn(executionRequest);
 
         List<Toolchain> toolchains = toolchainManager.getToolchains(session, "unknown", null);
 
-        assertEquals(0, toolchains.size());
+        assertThat(toolchains.size()).isEqualTo(0);
     }
 
     @Test
-    void testModelNoFactory() {
+    void modelNoFactory() {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         List<ToolchainModel> toolchainModels = new ArrayList<>();
@@ -104,12 +106,12 @@ class DefaultToolchainManagerTest {
 
         List<Toolchain> toolchains = toolchainManager.getToolchains(session, "unknown", null);
 
-        assertEquals(0, toolchains.size());
+        assertThat(toolchains.size()).isEqualTo(0);
         verify(logger).error("Missing toolchain factory for type: unknown. Possibly caused by misconfigured project.");
     }
 
     @Test
-    void testModelAndFactory() {
+    void modelAndFactory() {
         MavenSession session = mock(MavenSession.class);
         List<ToolchainModel> toolchainModels = List.of(
                 ToolchainModel.newBuilder().type("basic").build(),
@@ -124,11 +126,11 @@ class DefaultToolchainManagerTest {
 
         List<Toolchain> toolchains = toolchainManager.getToolchains(session, "rare", null);
 
-        assertEquals(1, toolchains.size());
+        assertThat(toolchains.size()).isEqualTo(1);
     }
 
     @Test
-    void testModelsAndFactory() {
+    void modelsAndFactory() {
         MavenSession session = mock(MavenSession.class);
         Session sessionv4 = mock(Session.class);
         when(session.getSession()).thenReturn(sessionv4);
@@ -145,11 +147,11 @@ class DefaultToolchainManagerTest {
 
         List<Toolchain> toolchains = toolchainManager.getToolchains(session, "basic", null);
 
-        assertEquals(2, toolchains.size());
+        assertThat(toolchains.size()).isEqualTo(2);
     }
 
     @Test
-    void testRequirements() throws Exception {
+    void requirements() throws Exception {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         when(session.getRequest()).thenReturn(executionRequest);
@@ -170,11 +172,11 @@ class DefaultToolchainManagerTest {
         List<Toolchain> toolchains =
                 toolchainManager.getToolchains(session, "basic", Collections.singletonMap("key", "value"));
 
-        assertEquals(1, toolchains.size());
+        assertThat(toolchains.size()).isEqualTo(1);
     }
 
     @Test
-    void testToolchainsForAvailableType() throws Exception {
+    void toolchainsForAvailableType() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -192,11 +194,11 @@ class DefaultToolchainManagerTest {
 
         // verify
         verify(logger, never()).error(anyString());
-        assertEquals(1, toolchains.length);
+        assertThat(toolchains.length).isEqualTo(1);
     }
 
     @Test
-    void testToolchainsForUnknownType() throws Exception {
+    void toolchainsForUnknownType() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -212,11 +214,11 @@ class DefaultToolchainManagerTest {
 
         // verify
         verify(logger).error("Missing toolchain factory for type: unknown. Possibly caused by misconfigured project.");
-        assertEquals(0, toolchains.length);
+        assertThat(toolchains.length).isEqualTo(0);
     }
 
     @Test
-    void testToolchainsForConfiguredType() throws Exception {
+    void toolchainsForConfiguredType() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -243,11 +245,11 @@ class DefaultToolchainManagerTest {
 
         // verify
         verify(logger, never()).error(anyString());
-        assertEquals(2, toolchains.length);
+        assertThat(toolchains.length).isEqualTo(2);
     }
 
     @Test
-    void testMisconfiguredToolchain() throws Exception {
+    void misconfiguredToolchain() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -259,6 +261,11 @@ class DefaultToolchainManagerTest {
         ToolchainPrivate[] basics = toolchainManager.getToolchainsForType("basic", session);
 
         // verify
-        assertEquals(0, basics.length);
+        assertThat(basics.length).isEqualTo(0);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        mocks.close();
     }
 }

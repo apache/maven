@@ -27,12 +27,12 @@ import java.io.ObjectOutputStream;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class SerializationTest {
 
     @Test
-    void testModelSerialization() throws Exception {
+    void modelSerialization() throws Exception {
         Model model;
         try (InputStream is = getClass().getResourceAsStream("/xml/pom.xml")) {
             model = new MavenXpp3Reader().read(is);
@@ -52,11 +52,11 @@ class SerializationTest {
             build2 = (Build) ois.readObject();
         }
 
-        assertNotNull(build2);
+        assertThat(build2).isNotNull();
     }
 
     @Test
-    void testModelPropertiesAndListSerialization() throws Exception {
+    void modelPropertiesAndListSerialization() throws Exception {
         Model model;
         try (InputStream is = getClass().getResourceAsStream("/xml/pom.xml")) {
             model = new MavenXpp3Reader().read(is);

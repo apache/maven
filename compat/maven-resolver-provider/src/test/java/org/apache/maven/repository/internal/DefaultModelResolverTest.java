@@ -31,10 +31,8 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 /**
  * Test cases for the default {@code ModelResolver} implementation.
@@ -51,134 +49,116 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void resolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
         parent.setVersion("0");
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel(parent),
-                "Expected 'UnresolvableModelException' not thrown.");
-        assertNotNull(e.getMessage());
-        assertTrue(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo"));
+        UnresolvableModelException e = assertThatExceptionOfType(UnresolvableModelException.class).as("Expected 'UnresolvableModelException' not thrown.").isThrownBy(() -> newModelResolver().resolveModel(parent)).actual();
+        assertThat(e.getMessage()).isNotNull();
+        assertThat(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo")).isTrue();
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void resolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
         parent.setVersion("[2.0,2.1)");
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel(parent),
-                "Expected 'UnresolvableModelException' not thrown.");
-        assertNotNull(e.getMessage());
-        assertEquals("No versions matched the requested parent version range '[2.0,2.1)'", e.getMessage());
+        UnresolvableModelException e = assertThatExceptionOfType(UnresolvableModelException.class).as("Expected 'UnresolvableModelException' not thrown.").isThrownBy(() -> newModelResolver().resolveModel(parent)).actual();
+        assertThat(e.getMessage()).isNotNull();
+        assertThat(e.getMessage()).isEqualTo("No versions matched the requested parent version range '[2.0,2.1)'");
     }
 
     @Test
-    void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void resolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
         parent.setVersion("[1.0,)");
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel(parent),
-                "Expected 'UnresolvableModelException' not thrown.");
-        assertEquals("The requested parent version range '[1.0,)' does not specify an upper bound", e.getMessage());
+        UnresolvableModelException e = assertThatExceptionOfType(UnresolvableModelException.class).as("Expected 'UnresolvableModelException' not thrown.").isThrownBy(() -> newModelResolver().resolveModel(parent)).actual();
+        assertThat(e.getMessage()).isEqualTo("The requested parent version range '[1.0,)' does not specify an upper bound");
     }
 
     @Test
-    void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
+    void resolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
         parent.setVersion("1.0");
 
-        assertNotNull(this.newModelResolver().resolveModel(parent));
-        assertEquals("1.0", parent.getVersion());
+        assertThat(this.newModelResolver().resolveModel(parent)).isNotNull();
+        assertThat(parent.getVersion()).isEqualTo("1.0");
     }
 
     @Test
-    void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
+    void resolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
         parent.setVersion("(,2.0)");
 
-        assertNotNull(this.newModelResolver().resolveModel(parent));
-        assertEquals("1.0", parent.getVersion());
+        assertThat(this.newModelResolver().resolveModel(parent)).isNotNull();
+        assertThat(parent.getVersion()).isEqualTo("1.0");
     }
 
     @Test
-    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void resolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");
         dependency.setVersion("0");
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel(dependency),
-                "Expected 'UnresolvableModelException' not thrown.");
-        assertNotNull(e.getMessage());
-        assertTrue(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo"));
+        UnresolvableModelException e = assertThatExceptionOfType(UnresolvableModelException.class).as("Expected 'UnresolvableModelException' not thrown.").isThrownBy(() -> newModelResolver().resolveModel(dependency)).actual();
+        assertThat(e.getMessage()).isNotNull();
+        assertThat(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo")).isTrue();
     }
 
     @Test
-    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void resolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");
         dependency.setVersion("[2.0,2.1)");
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel(dependency),
-                "Expected 'UnresolvableModelException' not thrown.");
-        assertEquals("No versions matched the requested dependency version range '[2.0,2.1)'", e.getMessage());
+        UnresolvableModelException e = assertThatExceptionOfType(UnresolvableModelException.class).as("Expected 'UnresolvableModelException' not thrown.").isThrownBy(() -> newModelResolver().resolveModel(dependency)).actual();
+        assertThat(e.getMessage()).isEqualTo("No versions matched the requested dependency version range '[2.0,2.1)'");
     }
 
     @Test
-    void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void resolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");
         dependency.setVersion("[1.0,)");
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel(dependency),
-                "Expected 'UnresolvableModelException' not thrown.");
-        assertEquals("The requested dependency version range '[1.0,)' does not specify an upper bound", e.getMessage());
+        UnresolvableModelException e = assertThatExceptionOfType(UnresolvableModelException.class).as("Expected 'UnresolvableModelException' not thrown.").isThrownBy(() -> newModelResolver().resolveModel(dependency)).actual();
+        assertThat(e.getMessage()).isEqualTo("The requested dependency version range '[1.0,)' does not specify an upper bound");
     }
 
     @Test
-    void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
+    void resolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");
         dependency.setVersion("1.0");
 
-        assertNotNull(this.newModelResolver().resolveModel(dependency));
-        assertEquals("1.0", dependency.getVersion());
+        assertThat(this.newModelResolver().resolveModel(dependency)).isNotNull();
+        assertThat(dependency.getVersion()).isEqualTo("1.0");
     }
 
     @Test
-    void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
+    void resolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");
         dependency.setVersion("(,2.0)");
 
-        assertNotNull(this.newModelResolver().resolveModel(dependency));
-        assertEquals("1.0", dependency.getVersion());
+        assertThat(this.newModelResolver().resolveModel(dependency)).isNotNull();
+        assertThat(dependency.getVersion()).isEqualTo("1.0");
     }
 
     private ModelResolver newModelResolver() throws ComponentLookupException, MalformedURLException {

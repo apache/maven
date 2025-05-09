@@ -21,42 +21,40 @@ package org.apache.maven.building;
 import org.apache.maven.building.Problem.Severity;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultProblemCollectorTest {
 
     @Test
-    void testGetProblems() {
+    void getProblems() {
         DefaultProblemCollector collector = new DefaultProblemCollector(null);
-        assertNotNull(collector.getProblems());
-        assertEquals(0, collector.getProblems().size());
+        assertThat(collector.getProblems()).isNotNull();
+        assertThat(collector.getProblems().size()).isEqualTo(0);
 
         collector.add(null, "MESSAGE1", -1, -1, null);
 
         Exception e2 = new Exception();
         collector.add(Severity.WARNING, null, 42, 127, e2);
 
-        assertEquals(2, collector.getProblems().size());
+        assertThat(collector.getProblems().size()).isEqualTo(2);
 
         Problem p1 = collector.getProblems().get(0);
-        assertEquals(Severity.ERROR, p1.getSeverity());
-        assertEquals("MESSAGE1", p1.getMessage());
-        assertEquals(-1, p1.getLineNumber());
-        assertEquals(-1, p1.getColumnNumber());
-        assertNull(p1.getException());
+        assertThat(p1.getSeverity()).isEqualTo(Severity.ERROR);
+        assertThat(p1.getMessage()).isEqualTo("MESSAGE1");
+        assertThat(p1.getLineNumber()).isEqualTo(-1);
+        assertThat(p1.getColumnNumber()).isEqualTo(-1);
+        assertThat(p1.getException()).isNull();
 
         Problem p2 = collector.getProblems().get(1);
-        assertEquals(Severity.WARNING, p2.getSeverity());
-        assertEquals("", p2.getMessage());
-        assertEquals(42, p2.getLineNumber());
-        assertEquals(127, p2.getColumnNumber());
-        assertEquals(e2, p2.getException());
+        assertThat(p2.getSeverity()).isEqualTo(Severity.WARNING);
+        assertThat(p2.getMessage()).isEqualTo("");
+        assertThat(p2.getLineNumber()).isEqualTo(42);
+        assertThat(p2.getColumnNumber()).isEqualTo(127);
+        assertThat(p2.getException()).isEqualTo(e2);
     }
 
     @Test
-    void testSetSource() {
+    void setSource() {
         DefaultProblemCollector collector = new DefaultProblemCollector(null);
 
         collector.add(null, "PROBLEM1", -1, -1, null);
@@ -67,8 +65,8 @@ class DefaultProblemCollectorTest {
         collector.setSource("SOURCE_PROBLEM3");
         collector.add(null, "PROBLEM3", -1, -1, null);
 
-        assertEquals("", collector.getProblems().get(0).getSource());
-        assertEquals("SOURCE_PROBLEM2", collector.getProblems().get(1).getSource());
-        assertEquals("SOURCE_PROBLEM3", collector.getProblems().get(2).getSource());
+        assertThat(collector.getProblems().get(0).getSource()).isEqualTo("");
+        assertThat(collector.getProblems().get(1).getSource()).isEqualTo("SOURCE_PROBLEM2");
+        assertThat(collector.getProblems().get(2).getSource()).isEqualTo("SOURCE_PROBLEM3");
     }
 }

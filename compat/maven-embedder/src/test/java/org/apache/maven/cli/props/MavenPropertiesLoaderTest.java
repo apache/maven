@@ -28,15 +28,14 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 @Deprecated
 class MavenPropertiesLoaderTest {
 
     @Test
-    void testIncludes() throws Exception {
+    void includes() throws Exception {
         FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
 
         Path mavenHome = fs.getPath("/maven");
@@ -52,17 +51,16 @@ class MavenPropertiesLoaderTest {
 
         Properties p = new Properties();
         p.put("java.version", "11");
-        assertThrows(
-                NoSuchFileException.class, () -> MavenPropertiesLoader.loadProperties(p, mavenUserProps, null, false));
+        assertThatExceptionOfType(NoSuchFileException.class).isThrownBy(() -> MavenPropertiesLoader.loadProperties(p, mavenUserProps, null, false));
 
         Path another = propsPath.resolveSibling("another.properties");
         Files.writeString(another, "bar = chti${java.version}\n");
         MavenPropertiesLoader.loadProperties(p, mavenUserProps, null, false);
-        assertEquals("chti11z", p.getProperty("fro"));
+        assertThat(p.getProperty("fro")).isEqualTo("chti11z");
     }
 
     @Test
-    void testIncludes3() throws Exception {
+    void includes3() throws Exception {
         FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
 
         Path mavenHome = fs.getPath("/maven");
@@ -83,14 +81,14 @@ class MavenPropertiesLoaderTest {
         Properties p = new Properties();
         p.put("user.home", userDirectory.toString());
         MavenPropertiesLoader.loadProperties(p, mavenUserProps, p::getProperty, false);
-        assertEquals("bar", p.getProperty("foo"));
-        assertNull(p.getProperty("foo-env"));
+        assertThat(p.getProperty("foo")).isEqualTo("bar");
+        assertThat(p.getProperty("foo-env")).isNull();
 
         p = new Properties();
         p.put("user.home", userDirectory.toString());
         p.put("env.envName", "ci");
         MavenPropertiesLoader.loadProperties(p, mavenUserProps, p::getProperty, false);
-        assertEquals("bar-env", p.getProperty("foo"));
-        assertEquals("bar", p.getProperty("foo-env"));
+        assertThat(p.getProperty("foo")).isEqualTo("bar-env");
+        assertThat(p.getProperty("foo-env")).isEqualTo("bar");
     }
 }

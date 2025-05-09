@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code Notifier}.
@@ -31,25 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class NotifierTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Notifier().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new Notifier().equals(null));
+    void equalsNullSafe() {
+        assertThat(new Notifier()).isNotEqualTo(null);
 
         new Notifier().equals(new Notifier());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Notifier thing = new Notifier();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new Notifier().toString());
+    void toStringNullSafe() {
+        assertThat(new Notifier().toString()).isNotNull();
     }
 }

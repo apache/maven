@@ -24,7 +24,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies SCM inheritance uses modules statement from parent.
@@ -43,7 +43,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testScmInfoCalculatedCorrectlyOnParentAndChildRead() throws Exception {
+    void scmInfoCalculatedCorrectlyOnParentAndChildRead() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -54,14 +54,13 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project0 = getProject(pom0);
         MavenProject project1 = getProject(pom1);
 
-        assertEquals(project1.getScm().getUrl(), project0.getScm().getUrl() + "/modules/p1");
-        assertEquals(project1.getScm().getConnection(), project0.getScm().getConnection() + "/modules/p1");
-        assertEquals(
-                project1.getScm().getDeveloperConnection(), project0.getScm().getDeveloperConnection() + "/modules/p1");
+        assertThat(project0.getScm().getUrl() + "/modules/p1").isEqualTo(project1.getScm().getUrl());
+        assertThat(project0.getScm().getConnection() + "/modules/p1").isEqualTo(project1.getScm().getConnection());
+        assertThat(project0.getScm().getDeveloperConnection() + "/modules/p1").isEqualTo(project1.getScm().getDeveloperConnection());
     }
 
     @Test
-    void testScmInfoCalculatedCorrectlyOnChildOnlyRead() throws Exception {
+    void scmInfoCalculatedCorrectlyOnChildOnlyRead() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom1 = new File(localRepo, "p0/modules/p1/pom.xml");
@@ -69,8 +68,8 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         // load the child project, which inherits from p0...
         MavenProject project1 = getProject(pom1);
 
-        assertEquals("http://host/viewer?path=/p0/modules/p1", project1.getScm().getUrl());
-        assertEquals("scm:svn:http://host/p0/modules/p1", project1.getScm().getConnection());
-        assertEquals("scm:svn:https://host/p0/modules/p1", project1.getScm().getDeveloperConnection());
+        assertThat(project1.getScm().getUrl()).isEqualTo("http://host/viewer?path=/p0/modules/p1");
+        assertThat(project1.getScm().getConnection()).isEqualTo("scm:svn:http://host/p0/modules/p1");
+        assertThat(project1.getScm().getDeveloperConnection()).isEqualTo("scm:svn:https://host/p0/modules/p1");
     }
 }

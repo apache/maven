@@ -24,8 +24,7 @@ import java.io.IOException;
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
@@ -39,18 +38,18 @@ class FileModelSourceTest {
      * Test of equals method, of class FileModelSource.
      */
     @Test
-    void testEquals() throws Exception {
+    void equals() throws Exception {
         File tempFile = createTempFile("pomTest");
         FileModelSource instance = new FileModelSource(tempFile);
 
-        assertFalse(instance.equals(null));
-        assertFalse(instance.equals(new Object()));
-        assertTrue(instance.equals(instance));
-        assertTrue(instance.equals(new FileModelSource(tempFile)));
+        assertThat(instance).isNotEqualTo(null);
+        assertThat(new Object()).isNotEqualTo(instance);
+        assertThat(instance).isEqualTo(instance);
+        assertThat(new FileModelSource(tempFile)).isEqualTo(instance);
     }
 
     @Test
-    void testWindowsPaths() throws Exception {
+    void windowsPaths() throws Exception {
         assumeTrue(Os.isFamily("Windows"));
 
         File upperCaseFile = createTempFile("TESTE");
@@ -60,7 +59,7 @@ class FileModelSourceTest {
         FileModelSource upperCaseFileSource = new FileModelSource(upperCaseFile);
         FileModelSource lowerCaseFileSource = new FileModelSource(lowerCaseFile);
 
-        assertTrue(upperCaseFileSource.equals(lowerCaseFileSource));
+        assertThat(lowerCaseFileSource).isEqualTo(upperCaseFileSource);
     }
 
     private File createTempFile(String name) throws IOException {

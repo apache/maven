@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code Contributor}.
@@ -31,25 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ContributorTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Contributor().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new Contributor().equals(null));
+    void equalsNullSafe() {
+        assertThat(new Contributor()).isNotEqualTo(null);
 
         new Contributor().equals(new Contributor());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Contributor thing = new Contributor();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new Contributor().toString());
+    void toStringNullSafe() {
+        assertThat(new Contributor().toString()).isNotNull();
     }
 }

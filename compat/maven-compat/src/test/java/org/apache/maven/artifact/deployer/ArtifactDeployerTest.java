@@ -31,9 +31,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -51,7 +50,7 @@ class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testArtifactInstallation() throws Exception {
+    void artifactInstallation() throws Exception {
         sessionScope.enter();
         try {
             sessionScope.seed(MavenSession.class, mock(MavenSession.class));
@@ -61,14 +60,14 @@ class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
             Artifact artifact = createArtifact("artifact", "1.0");
 
             File file = new File(artifactBasedir, "artifact-1.0.jar");
-            assertEquals("dummy", new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8).trim());
+            assertThat(new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8).trim()).isEqualTo("dummy");
 
             artifactDeployer.deploy(file, artifact, remoteRepository(), localRepository());
 
             ArtifactRepository remoteRepository = remoteRepository();
             File deployedFile = new File(remoteRepository.getBasedir(), remoteRepository.pathOf(artifact));
-            assertTrue(deployedFile.exists());
-            assertEquals("dummy", new String(Files.readAllBytes(deployedFile.toPath()), StandardCharsets.UTF_8).trim());
+            assertThat(deployedFile.exists()).isTrue();
+            assertThat(new String(Files.readAllBytes(deployedFile.toPath()), StandardCharsets.UTF_8).trim()).isEqualTo("dummy");
         } finally {
             sessionScope.exit();
         }

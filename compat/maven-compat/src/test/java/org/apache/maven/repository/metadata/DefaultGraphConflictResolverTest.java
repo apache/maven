@@ -25,8 +25,7 @@ import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -76,126 +75,75 @@ class DefaultGraphConflictResolverTest {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testCompileResolution() throws Exception {
+    void compileResolution() throws Exception {
         MetadataGraph res;
 
         res = resolver.resolveConflicts(graph, ArtifactScopeEnum.compile);
 
-        assertNotNull(res, "null graph after resolver");
-        assertNotNull(res.getVertices(), "no vertices in the resulting graph after resolver");
+        assertThat(res).as("null graph after resolver").isNotNull();
+        assertThat(res.getVertices()).as("no vertices in the resulting graph after resolver").isNotNull();
 
-        assertNotNull(res.getExcidentEdges(v1), "no edges in the resulting graph after resolver");
+        assertThat(res.getExcidentEdges(v1)).as("no edges in the resulting graph after resolver").isNotNull();
 
-        assertEquals(4, res.getVertices().size(), "wrong # of vertices in the resulting graph after resolver");
-        assertEquals(
-                2,
-                res.getExcidentEdges(v1).size(),
-                "wrong # of excident edges in the resulting graph entry after resolver");
+        assertThat(res.getVertices().size()).as("wrong # of vertices in the resulting graph after resolver").isEqualTo(4);
+        assertThat(res.getExcidentEdges(v1).size()).as("wrong # of excident edges in the resulting graph entry after resolver").isEqualTo(2);
 
-        assertEquals(
-                1,
-                res.getIncidentEdges(v2).size(),
-                "wrong # of v2 incident edges in the resulting graph after resolver");
-        assertEquals(
-                "1.2",
-                res.getIncidentEdges(v2).get(0).getVersion(),
-                "wrong edge v1-v2 in the resulting graph after resolver");
+        assertThat(res.getIncidentEdges(v2).size()).as("wrong # of v2 incident edges in the resulting graph after resolver").isEqualTo(1);
+        assertThat(res.getIncidentEdges(v2).get(0).getVersion()).as("wrong edge v1-v2 in the resulting graph after resolver").isEqualTo("1.2");
 
-        assertEquals(
-                1, res.getIncidentEdges(v3).size(), "wrong # of edges v1-v3 in the resulting graph after resolver");
-        assertEquals(
-                "1.1",
-                res.getIncidentEdges(v3).get(0).getVersion(),
-                "wrong edge v1-v3 in the resulting graph after resolver");
+        assertThat(res.getIncidentEdges(v3).size()).as("wrong # of edges v1-v3 in the resulting graph after resolver").isEqualTo(1);
+        assertThat(res.getIncidentEdges(v3).get(0).getVersion()).as("wrong edge v1-v3 in the resulting graph after resolver").isEqualTo("1.1");
 
-        assertEquals(
-                1, res.getIncidentEdges(v4).size(), "wrong # of edges v3-v4 in the resulting graph after resolver");
-        assertEquals(
-                "1.2",
-                res.getIncidentEdges(v4).get(0).getVersion(),
-                "wrong edge v3-v4 in the resulting graph after resolver");
+        assertThat(res.getIncidentEdges(v4).size()).as("wrong # of edges v3-v4 in the resulting graph after resolver").isEqualTo(1);
+        assertThat(res.getIncidentEdges(v4).get(0).getVersion()).as("wrong edge v3-v4 in the resulting graph after resolver").isEqualTo("1.2");
     }
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testRuntimeResolution() throws Exception {
+    void runtimeResolution() throws Exception {
         MetadataGraph res;
 
         res = resolver.resolveConflicts(graph, ArtifactScopeEnum.runtime);
 
-        assertNotNull(res, "null graph after resolver");
-        assertNotNull(res.getVertices(), "no vertices in the resulting graph after resolver");
-        assertNotNull(res.getExcidentEdges(v1), "no edges in the resulting graph after resolver");
+        assertThat(res).as("null graph after resolver").isNotNull();
+        assertThat(res.getVertices()).as("no vertices in the resulting graph after resolver").isNotNull();
+        assertThat(res.getExcidentEdges(v1)).as("no edges in the resulting graph after resolver").isNotNull();
 
-        assertEquals(4, res.getVertices().size(), "wrong # of vertices in the resulting graph after resolver");
-        assertEquals(
-                2,
-                res.getExcidentEdges(v1).size(),
-                "wrong # of excident edges in the resulting graph entry after resolver");
+        assertThat(res.getVertices().size()).as("wrong # of vertices in the resulting graph after resolver").isEqualTo(4);
+        assertThat(res.getExcidentEdges(v1).size()).as("wrong # of excident edges in the resulting graph entry after resolver").isEqualTo(2);
 
-        assertEquals(
-                1,
-                res.getIncidentEdges(v2).size(),
-                "wrong # of v2 incident edges in the resulting graph after resolver");
-        assertEquals(
-                "1.2",
-                res.getIncidentEdges(v2).get(0).getVersion(),
-                "wrong edge v1-v2 in the resulting graph after resolver");
+        assertThat(res.getIncidentEdges(v2).size()).as("wrong # of v2 incident edges in the resulting graph after resolver").isEqualTo(1);
+        assertThat(res.getIncidentEdges(v2).get(0).getVersion()).as("wrong edge v1-v2 in the resulting graph after resolver").isEqualTo("1.2");
 
-        assertEquals(
-                1, res.getIncidentEdges(v3).size(), "wrong # of edges v1-v3 in the resulting graph after resolver");
-        assertEquals(
-                "1.1",
-                res.getIncidentEdges(v3).get(0).getVersion(),
-                "wrong edge v1-v3 in the resulting graph after resolver");
+        assertThat(res.getIncidentEdges(v3).size()).as("wrong # of edges v1-v3 in the resulting graph after resolver").isEqualTo(1);
+        assertThat(res.getIncidentEdges(v3).get(0).getVersion()).as("wrong edge v1-v3 in the resulting graph after resolver").isEqualTo("1.1");
 
-        assertEquals(
-                1, res.getIncidentEdges(v4).size(), "wrong # of edges v3-v4 in the resulting graph after resolver");
-        assertEquals(
-                "1.1",
-                res.getIncidentEdges(v4).get(0).getVersion(),
-                "wrong edge v3-v4 in the resulting graph after resolver");
+        assertThat(res.getIncidentEdges(v4).size()).as("wrong # of edges v3-v4 in the resulting graph after resolver").isEqualTo(1);
+        assertThat(res.getIncidentEdges(v4).get(0).getVersion()).as("wrong edge v3-v4 in the resulting graph after resolver").isEqualTo("1.1");
     }
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testTestResolution() throws Exception {
+    void testResolution() throws Exception {
         MetadataGraph res;
 
         res = resolver.resolveConflicts(graph, ArtifactScopeEnum.test);
 
-        assertNotNull(res, "null graph after resolver");
-        assertNotNull(res.getVertices(), "no vertices in the resulting graph after resolver");
-        assertNotNull(res.getExcidentEdges(v1), "no edges in the resulting graph after resolver");
+        assertThat(res).as("null graph after resolver").isNotNull();
+        assertThat(res.getVertices()).as("no vertices in the resulting graph after resolver").isNotNull();
+        assertThat(res.getExcidentEdges(v1)).as("no edges in the resulting graph after resolver").isNotNull();
 
-        assertEquals(4, res.getVertices().size(), "wrong # of vertices in the resulting graph after resolver");
-        assertEquals(
-                2,
-                res.getExcidentEdges(v1).size(),
-                "wrong # of excident edges in the resulting graph entry after resolver");
+        assertThat(res.getVertices().size()).as("wrong # of vertices in the resulting graph after resolver").isEqualTo(4);
+        assertThat(res.getExcidentEdges(v1).size()).as("wrong # of excident edges in the resulting graph entry after resolver").isEqualTo(2);
 
-        assertEquals(
-                1,
-                res.getIncidentEdges(v2).size(),
-                "wrong # of v2 incident edges in the resulting graph after resolver");
-        assertEquals(
-                "1.2",
-                res.getIncidentEdges(v2).get(0).getVersion(),
-                "wrong edge v1-v2 in the resulting graph after resolver");
+        assertThat(res.getIncidentEdges(v2).size()).as("wrong # of v2 incident edges in the resulting graph after resolver").isEqualTo(1);
+        assertThat(res.getIncidentEdges(v2).get(0).getVersion()).as("wrong edge v1-v2 in the resulting graph after resolver").isEqualTo("1.2");
 
-        assertEquals(
-                1, res.getIncidentEdges(v3).size(), "wrong # of edges v1-v3 in the resulting graph after resolver");
-        assertEquals(
-                "1.1",
-                res.getIncidentEdges(v3).get(0).getVersion(),
-                "wrong edge v1-v3 in the resulting graph after resolver");
+        assertThat(res.getIncidentEdges(v3).size()).as("wrong # of edges v1-v3 in the resulting graph after resolver").isEqualTo(1);
+        assertThat(res.getIncidentEdges(v3).get(0).getVersion()).as("wrong edge v1-v3 in the resulting graph after resolver").isEqualTo("1.1");
 
-        assertEquals(
-                1, res.getIncidentEdges(v4).size(), "wrong # of edges v3-v4 in the resulting graph after resolver");
-        assertEquals(
-                "1.2",
-                res.getIncidentEdges(v4).get(0).getVersion(),
-                "wrong edge v3-v4 in the resulting graph after resolver");
+        assertThat(res.getIncidentEdges(v4).size()).as("wrong # of edges v3-v4 in the resulting graph after resolver").isEqualTo(1);
+        assertThat(res.getIncidentEdges(v4).get(0).getVersion()).as("wrong edge v3-v4 in the resulting graph after resolver").isEqualTo("1.2");
     }
     // ------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------

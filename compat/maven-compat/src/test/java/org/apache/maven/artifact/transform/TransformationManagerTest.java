@@ -30,8 +30,7 @@ import org.apache.maven.repository.legacy.resolver.transform.SnapshotTransformat
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @PlexusTest
 @Deprecated
@@ -40,21 +39,15 @@ class TransformationManagerTest {
     ArtifactTransformationManager tm;
 
     @Test
-    void testTransformationManager() {
+    void transformationManager() {
         List<ArtifactTransformation> tms = tm.getArtifactTransformations();
 
-        assertEquals(3, tms.size());
+        assertThat(tms.size()).isEqualTo(3);
 
-        assertTrue(
-                tms.get(0) instanceof ReleaseArtifactTransformation,
-                "We expected the release transformation and got " + tms.get(0));
+        assertThat((tms.get(0) instanceof ReleaseArtifactTransformation)).as("We expected the release transformation and got " + tms.get(0)).isTrue();
 
-        assertTrue(
-                tms.get(1) instanceof LatestArtifactTransformation,
-                "We expected the latest transformation and got " + tms.get(1));
+        assertThat((tms.get(1) instanceof LatestArtifactTransformation)).as("We expected the latest transformation and got " + tms.get(1)).isTrue();
 
-        assertTrue(
-                tms.get(2) instanceof SnapshotTransformation,
-                "We expected the snapshot transformation and got " + tms.get(2));
+        assertThat((tms.get(2) instanceof SnapshotTransformation)).as("We expected the snapshot transformation and got " + tms.get(2)).isTrue();
     }
 }

@@ -34,9 +34,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */
@@ -48,7 +46,7 @@ class DefaultModelValidatorTest {
     private Model read(String pom) throws Exception {
         String resource = "/poms/validation/" + pom;
         try (InputStream is = getClass().getResourceAsStream(resource)) {
-            assertNotNull(is, "missing resource: " + resource);
+            assertThat(is).as("missing resource: " + resource).isNotNull();
             return new Model(new MavenStaxReader().read(is));
         }
     }
@@ -96,7 +94,7 @@ class DefaultModelValidatorTest {
     }
 
     private void assertContains(String msg, String substring) {
-        assertTrue(msg.contains(substring), "\"" + substring + "\" was not found in: " + msg);
+        assertThat(msg.contains(substring)).as("\"" + substring + "\" was not found in: " + msg).isTrue();
     }
 
     @BeforeEach
@@ -110,257 +108,238 @@ class DefaultModelValidatorTest {
     }
 
     private void assertViolations(SimpleProblemCollector result, int fatals, int errors, int warnings) {
-        assertEquals(fatals, result.getFatals().size(), String.valueOf(result.getFatals()));
-        assertEquals(errors, result.getErrors().size(), String.valueOf(result.getErrors()));
-        assertEquals(warnings, result.getWarnings().size(), String.valueOf(result.getWarnings()));
+        assertThat(result.getFatals().size()).as(String.valueOf(result.getFatals())).isEqualTo(fatals);
+        assertThat(result.getErrors().size()).as(String.valueOf(result.getErrors())).isEqualTo(errors);
+        assertThat(result.getWarnings().size()).as(String.valueOf(result.getWarnings())).isEqualTo(warnings);
     }
 
     @Test
-    void testMissingModelVersion() throws Exception {
+    void missingModelVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-modelVersion-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'modelVersion' is missing.", result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'modelVersion' is missing.");
     }
 
     @Test
-    void testBadModelVersion() throws Exception {
+    void badModelVersion() throws Exception {
         SimpleProblemCollector result =
                 validateRaw("bad-modelVersion.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
 
         assertViolations(result, 1, 0, 0);
 
-        assertTrue(result.getFatals().get(0).contains("modelVersion"));
+        assertThat(result.getFatals().get(0).contains("modelVersion")).isTrue();
     }
 
     @Test
-    void testModelVersionMessage() throws Exception {
+    void modelVersionMessage() throws Exception {
         SimpleProblemCollector result =
                 validateRaw("modelVersion-4_0.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("'modelVersion' must be one of"));
+        assertThat(result.getErrors().get(0).contains("'modelVersion' must be one of")).isTrue();
     }
 
     @Test
-    void testMissingArtifactId() throws Exception {
+    void missingArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-artifactId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'artifactId' is missing.", result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'artifactId' is missing.");
     }
 
     @Test
-    void testMissingGroupId() throws Exception {
+    void missingGroupId() throws Exception {
         SimpleProblemCollector result = validate("missing-groupId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'groupId' is missing.", result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'groupId' is missing.");
     }
 
     @Test
-    void testInvalidCoordinateIds() throws Exception {
+    void invalidCoordinateIds() throws Exception {
         SimpleProblemCollector result = validate("invalid-coordinate-ids-pom.xml");
 
         assertViolations(result, 0, 2, 0);
 
-        assertEquals(
-                "'groupId' with value 'o/a/m' does not match a valid id pattern.",
-                result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'groupId' with value 'o/a/m' does not match a valid id pattern.");
 
-        assertEquals(
-                "'artifactId' with value 'm$-do$' does not match a valid id pattern.",
-                result.getErrors().get(1));
+        assertThat(result.getErrors().get(1)).isEqualTo("'artifactId' with value 'm$-do$' does not match a valid id pattern.");
     }
 
     @Test
-    void testMissingType() throws Exception {
+    void missingType() throws Exception {
         SimpleProblemCollector result = validate("missing-type-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'packaging' is missing.", result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'packaging' is missing.");
     }
 
     @Test
-    void testMissingVersion() throws Exception {
+    void missingVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-version-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'version' is missing.", result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'version' is missing.");
     }
 
     @Test
-    void testInvalidAggregatorPackaging() throws Exception {
+    void invalidAggregatorPackaging() throws Exception {
         SimpleProblemCollector result = validate("invalid-aggregator-packaging-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("Aggregator projects require 'pom' as packaging."));
+        assertThat(result.getErrors().get(0).contains("Aggregator projects require 'pom' as packaging.")).isTrue();
     }
 
     @Test
-    void testMissingDependencyArtifactId() throws Exception {
+    void missingDependencyArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-artifactId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
+        assertThat(result.getErrors()
                 .get(0)
-                .contains("'dependencies.dependency.artifactId' for groupId:null:jar is missing"));
+                .contains("'dependencies.dependency.artifactId' for groupId:null:jar is missing")).isTrue();
     }
 
     @Test
-    void testMissingDependencyGroupId() throws Exception {
+    void missingDependencyGroupId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-groupId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
+        assertThat(result.getErrors()
                 .get(0)
-                .contains("'dependencies.dependency.groupId' for null:artifactId:jar is missing"));
+                .contains("'dependencies.dependency.groupId' for null:artifactId:jar is missing")).isTrue();
     }
 
     @Test
-    void testMissingDependencyVersion() throws Exception {
+    void missingDependencyVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-version-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
+        assertThat(result.getErrors()
                 .get(0)
-                .contains("'dependencies.dependency.version' for groupId:artifactId:jar is missing"));
+                .contains("'dependencies.dependency.version' for groupId:artifactId:jar is missing")).isTrue();
     }
 
     @Test
-    void testMissingDependencyManagementArtifactId() throws Exception {
+    void missingDependencyManagementArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-mgmt-artifactId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
+        assertThat(result.getErrors()
                 .get(0)
-                .contains("'dependencyManagement.dependencies.dependency.artifactId' for groupId:null:jar is missing"));
+                .contains("'dependencyManagement.dependencies.dependency.artifactId' for groupId:null:jar is missing")).isTrue();
     }
 
     @Test
-    void testMissingDependencyManagementGroupId() throws Exception {
+    void missingDependencyManagementGroupId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-mgmt-groupId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors()
+        assertThat(result.getErrors()
                 .get(0)
-                .contains("'dependencyManagement.dependencies.dependency.groupId' for null:artifactId:jar is missing"));
+                .contains("'dependencyManagement.dependencies.dependency.groupId' for null:artifactId:jar is missing")).isTrue();
     }
 
     @Test
-    void testMissingAll() throws Exception {
+    void missingAll() throws Exception {
         SimpleProblemCollector result = validate("missing-1-pom.xml");
 
         assertViolations(result, 0, 4, 0);
 
         List<String> messages = result.getErrors();
 
-        assertTrue(messages.contains("'modelVersion' is missing."));
-        assertTrue(messages.contains("'groupId' is missing."));
-        assertTrue(messages.contains("'artifactId' is missing."));
-        assertTrue(messages.contains("'version' is missing."));
+        assertThat(messages.contains("'modelVersion' is missing.")).isTrue();
+        assertThat(messages.contains("'groupId' is missing.")).isTrue();
+        assertThat(messages.contains("'artifactId' is missing.")).isTrue();
+        assertThat(messages.contains("'version' is missing.")).isTrue();
         // type is inherited from the super pom
     }
 
     @Test
-    void testMissingPluginArtifactId() throws Exception {
+    void missingPluginArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-plugin-artifactId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals(
-                "'build.plugins.plugin.artifactId' is missing.",
-                result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'build.plugins.plugin.artifactId' is missing.");
     }
 
     @Test
-    void testEmptyPluginVersion() throws Exception {
+    void emptyPluginVersion() throws Exception {
         SimpleProblemCollector result = validate("empty-plugin-version.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals(
-                "'build.plugins.plugin.version' for org.apache.maven.plugins:maven-it-plugin"
-                        + " must be a valid version but is ''.",
-                result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'build.plugins.plugin.version' for org.apache.maven.plugins:maven-it-plugin"
+                + " must be a valid version but is ''.");
     }
 
     @Test
-    void testMissingRepositoryId() throws Exception {
+    void missingRepositoryId() throws Exception {
         SimpleProblemCollector result =
                 validateRaw("missing-repository-id-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
 
         assertViolations(result, 0, 4, 0);
 
-        assertEquals(
-                "'repositories.repository.id' is missing.", result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'repositories.repository.id' is missing.");
 
-        assertEquals(
-                "'repositories.repository.[null].url' is missing.",
-                result.getErrors().get(1));
+        assertThat(result.getErrors().get(1)).isEqualTo("'repositories.repository.[null].url' is missing.");
 
-        assertEquals(
-                "'pluginRepositories.pluginRepository.id' is missing.",
-                result.getErrors().get(2));
+        assertThat(result.getErrors().get(2)).isEqualTo("'pluginRepositories.pluginRepository.id' is missing.");
 
-        assertEquals(
-                "'pluginRepositories.pluginRepository.[null].url' is missing.",
-                result.getErrors().get(3));
+        assertThat(result.getErrors().get(3)).isEqualTo("'pluginRepositories.pluginRepository.[null].url' is missing.");
     }
 
     @Test
-    void testMissingResourceDirectory() throws Exception {
+    void missingResourceDirectory() throws Exception {
         SimpleProblemCollector result = validate("missing-resource-directory-pom.xml");
 
         assertViolations(result, 0, 2, 0);
 
-        assertEquals(
-                "'build.resources.resource.directory' is missing.",
-                result.getErrors().get(0));
+        assertThat(result.getErrors().get(0)).isEqualTo("'build.resources.resource.directory' is missing.");
 
-        assertEquals(
-                "'build.testResources.testResource.directory' is missing.",
-                result.getErrors().get(1));
+        assertThat(result.getErrors().get(1)).isEqualTo("'build.testResources.testResource.directory' is missing.");
     }
 
     @Test
-    void testBadPluginDependencyScope() throws Exception {
+    void badPluginDependencyScope() throws Exception {
         SimpleProblemCollector result = validate("bad-plugin-dependency-scope.xml");
 
         assertViolations(result, 0, 3, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:d"));
+        assertThat(result.getErrors().get(0).contains("test:d")).isTrue();
 
-        assertTrue(result.getErrors().get(1).contains("test:e"));
+        assertThat(result.getErrors().get(1).contains("test:e")).isTrue();
 
-        assertTrue(result.getErrors().get(2).contains("test:f"));
+        assertThat(result.getErrors().get(2).contains("test:f")).isTrue();
     }
 
     @Test
-    void testBadDependencyScope() throws Exception {
+    void badDependencyScope() throws Exception {
         SimpleProblemCollector result = validate("bad-dependency-scope.xml");
 
         assertViolations(result, 0, 0, 2);
 
-        assertTrue(result.getWarnings().get(0).contains("test:f"));
+        assertThat(result.getWarnings().get(0).contains("test:f")).isTrue();
 
-        assertTrue(result.getWarnings().get(1).contains("test:g"));
+        assertThat(result.getWarnings().get(1).contains("test:g")).isTrue();
     }
 
     @Test
-    void testBadDependencyManagementScope() throws Exception {
+    void badDependencyManagementScope() throws Exception {
         SimpleProblemCollector result = validate("bad-dependency-management-scope.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -369,7 +348,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadDependencyVersion() throws Exception {
+    void badDependencyVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-dependency-version.xml");
 
         assertViolations(result, 0, 2, 0);
@@ -382,25 +361,25 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testDuplicateModule() throws Exception {
+    void duplicateModule() throws Exception {
         SimpleProblemCollector result = validate("duplicate-module.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("child"));
+        assertThat(result.getErrors().get(0).contains("child")).isTrue();
     }
 
     @Test
-    void testDuplicateProfileId() throws Exception {
+    void duplicateProfileId() throws Exception {
         SimpleProblemCollector result = validateRaw("duplicate-profile-id.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("non-unique-id"));
+        assertThat(result.getErrors().get(0).contains("non-unique-id")).isTrue();
     }
 
     @Test
-    void testBadPluginVersion() throws Exception {
+    void badPluginVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-plugin-version.xml");
 
         assertViolations(result, 0, 4, 0);
@@ -417,26 +396,26 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testDistributionManagementStatus() throws Exception {
+    void distributionManagementStatus() throws Exception {
         SimpleProblemCollector result = validate("distribution-management-status.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("distributionManagement.status"));
+        assertThat(result.getErrors().get(0).contains("distributionManagement.status")).isTrue();
     }
 
     @Test
-    void testIncompleteParent() throws Exception {
+    void incompleteParent() throws Exception {
         SimpleProblemCollector result = validateRaw("incomplete-parent.xml");
 
         assertViolations(result, 3, 0, 0);
-        assertTrue(result.getFatals().get(0).contains("parent.groupId"));
-        assertTrue(result.getFatals().get(1).contains("parent.artifactId"));
-        assertTrue(result.getFatals().get(2).contains("parent.version"));
+        assertThat(result.getFatals().get(0).contains("parent.groupId")).isTrue();
+        assertThat(result.getFatals().get(1).contains("parent.artifactId")).isTrue();
+        assertThat(result.getFatals().get(2).contains("parent.version")).isTrue();
     }
 
     @Test
-    void testHardCodedSystemPath() throws Exception {
+    void hardCodedSystemPath() throws Exception {
         SimpleProblemCollector result = validateRaw("hard-coded-system-path.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -464,28 +443,28 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testEmptyModule() throws Exception {
+    void emptyModule() throws Exception {
         SimpleProblemCollector result = validate("empty-module.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("'modules.module[0]' has been specified without a path"));
+        assertThat(result.getErrors().get(0).contains("'modules.module[0]' has been specified without a path")).isTrue();
     }
 
     @Test
-    void testDuplicatePlugin() throws Exception {
+    void duplicatePlugin() throws Exception {
         SimpleProblemCollector result = validateRaw("duplicate-plugin.xml");
 
         assertViolations(result, 0, 0, 4);
 
-        assertTrue(result.getWarnings().get(0).contains("duplicate declaration of plugin test:duplicate"));
-        assertTrue(result.getWarnings().get(1).contains("duplicate declaration of plugin test:managed-duplicate"));
-        assertTrue(result.getWarnings().get(2).contains("duplicate declaration of plugin profile:duplicate"));
-        assertTrue(result.getWarnings().get(3).contains("duplicate declaration of plugin profile:managed-duplicate"));
+        assertThat(result.getWarnings().get(0).contains("duplicate declaration of plugin test:duplicate")).isTrue();
+        assertThat(result.getWarnings().get(1).contains("duplicate declaration of plugin test:managed-duplicate")).isTrue();
+        assertThat(result.getWarnings().get(2).contains("duplicate declaration of plugin profile:duplicate")).isTrue();
+        assertThat(result.getWarnings().get(3).contains("duplicate declaration of plugin profile:managed-duplicate")).isTrue();
     }
 
     @Test
-    void testDuplicatePluginExecution() throws Exception {
+    void duplicatePluginExecution() throws Exception {
         SimpleProblemCollector result = validateRaw("duplicate-plugin-execution.xml");
 
         assertViolations(result, 0, 4, 0);
@@ -497,7 +476,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testReservedRepositoryId() throws Exception {
+    void reservedRepositoryId() throws Exception {
         SimpleProblemCollector result = validate("reserved-repository-id.xml");
 
         assertViolations(result, 0, 0, 4);
@@ -510,43 +489,43 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingPluginDependencyGroupId() throws Exception {
+    void missingPluginDependencyGroupId() throws Exception {
         SimpleProblemCollector result = validate("missing-plugin-dependency-groupId.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains(":a:"));
+        assertThat(result.getErrors().get(0).contains(":a:")).isTrue();
     }
 
     @Test
-    void testMissingPluginDependencyArtifactId() throws Exception {
+    void missingPluginDependencyArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-plugin-dependency-artifactId.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:"));
+        assertThat(result.getErrors().get(0).contains("test:")).isTrue();
     }
 
     @Test
-    void testMissingPluginDependencyVersion() throws Exception {
+    void missingPluginDependencyVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-plugin-dependency-version.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:a"));
+        assertThat(result.getErrors().get(0).contains("test:a")).isTrue();
     }
 
     @Test
-    void testBadPluginDependencyVersion() throws Exception {
+    void badPluginDependencyVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-plugin-dependency-version.xml");
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:b"));
+        assertThat(result.getErrors().get(0).contains("test:b")).isTrue();
     }
 
     @Test
-    void testBadVersion() throws Exception {
+    void badVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-version.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -555,7 +534,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadSnapshotVersion() throws Exception {
+    void badSnapshotVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-snapshot-version.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -564,7 +543,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadRepositoryId() throws Exception {
+    void badRepositoryId() throws Exception {
         SimpleProblemCollector result = validate("bad-repository-id.xml");
 
         assertViolations(result, 0, 0, 4);
@@ -583,7 +562,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadDependencyExclusionId() throws Exception {
+    void badDependencyExclusionId() throws Exception {
         SimpleProblemCollector result =
                 validateEffective("bad-dependency-exclusion-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0);
 
@@ -603,7 +582,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingDependencyExclusionId() throws Exception {
+    void missingDependencyExclusionId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-exclusion-id.xml");
 
         assertViolations(result, 0, 0, 2);
@@ -617,7 +596,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadImportScopeType() throws Exception {
+    void badImportScopeType() throws Exception {
         SimpleProblemCollector result = validateRaw("bad-import-scope-type.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -628,7 +607,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadImportScopeClassifier() throws Exception {
+    void badImportScopeClassifier() throws Exception {
         SimpleProblemCollector result = validateRaw("bad-import-scope-classifier.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -639,7 +618,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testSystemPathRefersToProjectBasedir() throws Exception {
+    void systemPathRefersToProjectBasedir() throws Exception {
         SimpleProblemCollector result = validateRaw("basedir-system-path.xml");
 
         assertViolations(result, 0, 0, 2);
@@ -671,62 +650,52 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testInvalidVersionInPluginManagement() throws Exception {
+    void invalidVersionInPluginManagement() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/missing-plugin-version-pluginManagement.xml");
 
         assertViolations(result, 1, 0, 0);
 
-        assertEquals(
-                "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' version of a plugin must be defined. ",
-                result.getFatals().get(0));
+        assertThat(result.getFatals().get(0)).isEqualTo("'build.pluginManagement.plugins.plugin.(groupId:artifactId)' version of a plugin must be defined. ");
     }
 
     @Test
-    void testInvalidGroupIdInPluginManagement() throws Exception {
+    void invalidGroupIdInPluginManagement() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/missing-groupId-pluginManagement.xml");
 
         assertViolations(result, 1, 0, 0);
 
-        assertEquals(
-                "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' groupId of a plugin must be defined. ",
-                result.getFatals().get(0));
+        assertThat(result.getFatals().get(0)).isEqualTo("'build.pluginManagement.plugins.plugin.(groupId:artifactId)' groupId of a plugin must be defined. ");
     }
 
     @Test
-    void testInvalidArtifactIdInPluginManagement() throws Exception {
+    void invalidArtifactIdInPluginManagement() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/missing-artifactId-pluginManagement.xml");
 
         assertViolations(result, 1, 0, 0);
 
-        assertEquals(
-                "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' artifactId of a plugin must be defined. ",
-                result.getFatals().get(0));
+        assertThat(result.getFatals().get(0)).isEqualTo("'build.pluginManagement.plugins.plugin.(groupId:artifactId)' artifactId of a plugin must be defined. ");
     }
 
     @Test
-    void testInvalidGroupAndArtifactIdInPluginManagement() throws Exception {
+    void invalidGroupAndArtifactIdInPluginManagement() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/missing-ga-pluginManagement.xml");
 
         assertViolations(result, 2, 0, 0);
 
-        assertEquals(
-                "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' groupId of a plugin must be defined. ",
-                result.getFatals().get(0));
+        assertThat(result.getFatals().get(0)).isEqualTo("'build.pluginManagement.plugins.plugin.(groupId:artifactId)' groupId of a plugin must be defined. ");
 
-        assertEquals(
-                "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' artifactId of a plugin must be defined. ",
-                result.getFatals().get(1));
+        assertThat(result.getFatals().get(1)).isEqualTo("'build.pluginManagement.plugins.plugin.(groupId:artifactId)' artifactId of a plugin must be defined. ");
     }
 
     @Test
-    void testMissingReportPluginVersion() throws Exception {
+    void missingReportPluginVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-report-version-pom.xml");
 
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testDeprecatedDependencyMetaversionsLatestAndRelease() throws Exception {
+    void deprecatedDependencyMetaversionsLatestAndRelease() throws Exception {
         SimpleProblemCollector result = validateRaw("deprecated-dependency-metaversions-latest-and-release.xml");
 
         assertViolations(result, 0, 0, 2);
@@ -740,90 +709,78 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testSelfReferencingDependencyInRawModel() throws Exception {
+    void selfReferencingDependencyInRawModel() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/self-referencing.xml");
 
         assertViolations(result, 1, 0, 0);
 
-        assertEquals(
-                "'dependencies.dependency[com.example.group:testinvalidpom:0.0.1-SNAPSHOT]' for com.example.group:testinvalidpom:0.0.1-SNAPSHOT is referencing itself.",
-                result.getFatals().get(0));
+        assertThat(result.getFatals().get(0)).isEqualTo("'dependencies.dependency[com.example.group:testinvalidpom:0.0.1-SNAPSHOT]' for com.example.group:testinvalidpom:0.0.1-SNAPSHOT is referencing itself.");
     }
 
     @Test
-    void testSelfReferencingDependencyWithClassifierInRawModel() throws Exception {
+    void selfReferencingDependencyWithClassifierInRawModel() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/self-referencing-classifier.xml");
 
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlySha1() throws Exception {
+    void ciFriendlySha1() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/ok-ci-friendly-sha1.xml");
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlyRevision() throws Exception {
+    void ciFriendlyRevision() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/ok-ci-friendly-revision.xml");
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlyChangeList() throws Exception {
+    void ciFriendlyChangeList() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/ok-ci-friendly-changelist.xml");
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlyAllExpressions() throws Exception {
+    void ciFriendlyAllExpressions() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/ok-ci-friendly-all-expressions.xml");
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlyBad() throws Exception {
+    void ciFriendlyBad() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-ci-friendly.xml");
         assertViolations(result, 0, 0, 1);
-        assertEquals(
-                "'version' contains an expression but should be a constant.",
-                result.getWarnings().get(0));
+        assertThat(result.getWarnings().get(0)).isEqualTo("'version' contains an expression but should be a constant.");
     }
 
     @Test
-    void testCiFriendlyBadSha1Plus() throws Exception {
+    void ciFriendlyBadSha1Plus() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-ci-friendly-sha1plus.xml");
         assertViolations(result, 0, 0, 1);
-        assertEquals(
-                "'version' contains an expression but should be a constant.",
-                result.getWarnings().get(0));
+        assertThat(result.getWarnings().get(0)).isEqualTo("'version' contains an expression but should be a constant.");
     }
 
     @Test
-    void testCiFriendlyBadSha1Plus2() throws Exception {
+    void ciFriendlyBadSha1Plus2() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-ci-friendly-sha1plus2.xml");
         assertViolations(result, 0, 0, 1);
-        assertEquals(
-                "'version' contains an expression but should be a constant.",
-                result.getWarnings().get(0));
+        assertThat(result.getWarnings().get(0)).isEqualTo("'version' contains an expression but should be a constant.");
     }
 
     @Test
-    void testParentVersionLATEST() throws Exception {
+    void parentVersionLATEST() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-parent-version-latest.xml");
         assertViolations(result, 0, 0, 1);
-        assertEquals(
-                "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)",
-                result.getWarnings().get(0));
+        assertThat(result.getWarnings().get(0)).isEqualTo("'parent.version' is either LATEST or RELEASE (both of them are being deprecated)");
     }
 
     @Test
-    void testParentVersionRELEASE() throws Exception {
+    void parentVersionRELEASE() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-parent-version-release.xml");
         assertViolations(result, 0, 0, 1);
-        assertEquals(
-                "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)",
-                result.getWarnings().get(0));
+        assertThat(result.getWarnings().get(0)).isEqualTo("'parent.version' is either LATEST or RELEASE (both of them are being deprecated)");
     }
 
     @Test
@@ -859,17 +816,13 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateRaw("raw-model/profile-activation-file-with-project-expressions.xml");
         assertViolations(result, 0, 0, 2);
 
-        assertEquals(
-                "'profiles.profile[exists-project-version].activation.file.exists' "
-                        + "Failed to interpolate profile activation property ${project.version}/test.txt: "
-                        + "${project.version} expressions are not supported during profile activation.",
-                result.getWarnings().get(0));
+        assertThat(result.getWarnings().get(0)).isEqualTo("'profiles.profile[exists-project-version].activation.file.exists' "
+                + "Failed to interpolate profile activation property ${project.version}/test.txt: "
+                + "${project.version} expressions are not supported during profile activation.");
 
-        assertEquals(
-                "'profiles.profile[missing-project-version].activation.file.missing' "
-                        + "Failed to interpolate profile activation property ${project.version}/test.txt: "
-                        + "${project.version} expressions are not supported during profile activation.",
-                result.getWarnings().get(1));
+        assertThat(result.getWarnings().get(1)).isEqualTo("'profiles.profile[missing-project-version].activation.file.missing' "
+                + "Failed to interpolate profile activation property ${project.version}/test.txt: "
+                + "${project.version} expressions are not supported during profile activation.");
     }
 
     @Test
@@ -878,16 +831,12 @@ class DefaultModelValidatorTest {
                 validateRaw("raw-model/profile-activation-property-with-project-expressions.xml");
         assertViolations(result, 0, 0, 2);
 
-        assertEquals(
-                "'profiles.profile[property-name-project-version].activation.property.name' "
-                        + "Failed to interpolate profile activation property ${project.version}: "
-                        + "${project.version} expressions are not supported during profile activation.",
-                result.getWarnings().get(0));
+        assertThat(result.getWarnings().get(0)).isEqualTo("'profiles.profile[property-name-project-version].activation.property.name' "
+                + "Failed to interpolate profile activation property ${project.version}: "
+                + "${project.version} expressions are not supported during profile activation.");
 
-        assertEquals(
-                "'profiles.profile[property-value-project-version].activation.property.value' "
-                        + "Failed to interpolate profile activation property ${project.version}: "
-                        + "${project.version} expressions are not supported during profile activation.",
-                result.getWarnings().get(1));
+        assertThat(result.getWarnings().get(1)).isEqualTo("'profiles.profile[property-value-project-version].activation.property.value' "
+                + "Failed to interpolate profile activation property ${project.version}: "
+                + "${project.version} expressions are not supported during profile activation.");
     }
 }

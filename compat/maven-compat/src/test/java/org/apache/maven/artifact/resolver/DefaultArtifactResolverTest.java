@@ -27,8 +27,7 @@ import org.apache.maven.artifact.Artifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Deprecated
 class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
@@ -50,7 +49,7 @@ class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testMNG4738() throws Exception {
+    void mng4738() throws Exception {
         Artifact g = createLocalArtifact("g", "1.0");
         createLocalArtifact("h", "1.0");
         artifactResolver.resolveTransitively(
@@ -81,16 +80,16 @@ class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
             for (Thread active : ts) {
                 String name = active.getName();
                 boolean daemon = active.isDaemon();
-                assertTrue(daemon, name + " is no daemon Thread.");
+                assertThat(daemon).as(name + " is no daemon Thread.").isTrue();
             }
         }
 
-        assertTrue(seen, "Could not find ThreadGroup: " + DefaultArtifactResolver.DaemonThreadCreator.THREADGROUP_NAME);
+        assertThat(seen).as("Could not find ThreadGroup: " + DefaultArtifactResolver.DaemonThreadCreator.THREADGROUP_NAME).isTrue();
     }
 
     @Test
-    void testLookup() throws Exception {
+    void lookup() throws Exception {
         ArtifactResolver resolver = getContainer().lookup(ArtifactResolver.class, "default");
-        assertNotNull(resolver);
+        assertThat(resolver).isNotNull();
     }
 }

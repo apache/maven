@@ -27,11 +27,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@link PluginDescriptorBuilder}.
@@ -46,85 +42,85 @@ class PluginDescriptorBuilderTest {
     }
 
     @Test
-    void testBuildReader() throws Exception {
+    void buildReader() throws Exception {
         PluginDescriptor pd = build("/plugin.xml");
 
-        assertEquals("org.apache.maven.plugins", pd.getGroupId());
-        assertEquals("maven-jar-plugin", pd.getArtifactId());
-        assertEquals("2.3-SNAPSHOT", pd.getVersion());
-        assertEquals("jar", pd.getGoalPrefix());
-        assertEquals("plugin-description", pd.getDescription());
-        assertFalse(pd.isIsolatedRealm());
-        assertTrue(pd.isInheritedByDefault());
-        assertEquals(2, pd.getMojos().size());
-        assertEquals(1, pd.getDependencies().size());
+        assertThat(pd.getGroupId()).isEqualTo("org.apache.maven.plugins");
+        assertThat(pd.getArtifactId()).isEqualTo("maven-jar-plugin");
+        assertThat(pd.getVersion()).isEqualTo("2.3-SNAPSHOT");
+        assertThat(pd.getGoalPrefix()).isEqualTo("jar");
+        assertThat(pd.getDescription()).isEqualTo("plugin-description");
+        assertThat(pd.isIsolatedRealm()).isFalse();
+        assertThat(pd.isInheritedByDefault()).isTrue();
+        assertThat(pd.getMojos().size()).isEqualTo(2);
+        assertThat(pd.getDependencies().size()).isEqualTo(1);
 
         MojoDescriptor md = pd.getMojos().get(0);
 
-        assertEquals("jar", md.getGoal());
-        assertEquals("mojo-description", md.getDescription());
-        assertEquals("runtime", md.getDependencyResolutionRequired());
-        assertEquals("test", md.getDependencyCollectionRequired());
-        assertFalse(md.isAggregator());
-        assertFalse(md.isDirectInvocationOnly());
-        assertTrue(md.isInheritedByDefault());
-        assertFalse(md.isOnlineRequired());
-        assertTrue(md.isProjectRequired());
-        assertFalse(md.isThreadSafe());
-        assertEquals("package", md.getPhase());
-        assertEquals("org.apache.maven.plugin.jar.JarMojo", md.getImplementation());
-        assertEquals("antrun", md.getComponentConfigurator());
-        assertEquals("java", md.getLanguage());
-        assertEquals("per-lookup", md.getInstantiationStrategy());
-        assertEquals("some-goal", md.getExecuteGoal());
-        assertEquals("generate-sources", md.getExecutePhase());
-        assertEquals("cobertura", md.getExecuteLifecycle());
-        assertEquals("2.2", md.getSince());
-        assertEquals("deprecated-mojo", md.getDeprecated());
-        assertEquals(1, md.getRequirements().size());
-        assertEquals(1, md.getParameters().size());
+        assertThat(md.getGoal()).isEqualTo("jar");
+        assertThat(md.getDescription()).isEqualTo("mojo-description");
+        assertThat(md.getDependencyResolutionRequired()).isEqualTo("runtime");
+        assertThat(md.getDependencyCollectionRequired()).isEqualTo("test");
+        assertThat(md.isAggregator()).isFalse();
+        assertThat(md.isDirectInvocationOnly()).isFalse();
+        assertThat(md.isInheritedByDefault()).isTrue();
+        assertThat(md.isOnlineRequired()).isFalse();
+        assertThat(md.isProjectRequired()).isTrue();
+        assertThat(md.isThreadSafe()).isFalse();
+        assertThat(md.getPhase()).isEqualTo("package");
+        assertThat(md.getImplementation()).isEqualTo("org.apache.maven.plugin.jar.JarMojo");
+        assertThat(md.getComponentConfigurator()).isEqualTo("antrun");
+        assertThat(md.getLanguage()).isEqualTo("java");
+        assertThat(md.getInstantiationStrategy()).isEqualTo("per-lookup");
+        assertThat(md.getExecuteGoal()).isEqualTo("some-goal");
+        assertThat(md.getExecutePhase()).isEqualTo("generate-sources");
+        assertThat(md.getExecuteLifecycle()).isEqualTo("cobertura");
+        assertThat(md.getSince()).isEqualTo("2.2");
+        assertThat(md.getDeprecated()).isEqualTo("deprecated-mojo");
+        assertThat(md.getRequirements().size()).isEqualTo(1);
+        assertThat(md.getParameters().size()).isEqualTo(1);
 
-        assertNotNull(md.getMojoConfiguration());
-        assertEquals(1, md.getMojoConfiguration().getChildCount());
+        assertThat(md.getMojoConfiguration()).isNotNull();
+        assertThat(md.getMojoConfiguration().getChildCount()).isEqualTo(1);
 
         PlexusConfiguration pc = md.getMojoConfiguration().getChild(0);
 
-        assertEquals("${jar.finalName}", pc.getValue());
-        assertEquals("${project.build.finalName}", pc.getAttribute("default-value"));
-        assertEquals("java.lang.String", pc.getAttribute("implementation"));
+        assertThat(pc.getValue()).isEqualTo("${jar.finalName}");
+        assertThat(pc.getAttribute("default-value")).isEqualTo("${project.build.finalName}");
+        assertThat(pc.getAttribute("implementation")).isEqualTo("java.lang.String");
 
         Parameter mp = md.getParameters().get(0);
 
-        assertEquals("finalName", mp.getName());
-        assertEquals("jarName", mp.getAlias());
-        assertEquals("java.lang.String", mp.getType());
-        assertEquals("java.lang.String", mp.getImplementation());
-        assertTrue(mp.isEditable());
-        assertFalse(mp.isRequired());
-        assertEquals("parameter-description", mp.getDescription());
-        assertEquals("deprecated-parameter", mp.getDeprecated());
-        assertEquals("${jar.finalName}", mp.getExpression());
-        assertEquals("${project.build.finalName}", mp.getDefaultValue());
-        assertEquals("3.0.0", mp.getSince());
+        assertThat(mp.getName()).isEqualTo("finalName");
+        assertThat(mp.getAlias()).isEqualTo("jarName");
+        assertThat(mp.getType()).isEqualTo("java.lang.String");
+        assertThat(mp.getImplementation()).isEqualTo("java.lang.String");
+        assertThat(mp.isEditable()).isTrue();
+        assertThat(mp.isRequired()).isFalse();
+        assertThat(mp.getDescription()).isEqualTo("parameter-description");
+        assertThat(mp.getDeprecated()).isEqualTo("deprecated-parameter");
+        assertThat(mp.getExpression()).isEqualTo("${jar.finalName}");
+        assertThat(mp.getDefaultValue()).isEqualTo("${project.build.finalName}");
+        assertThat(mp.getSince()).isEqualTo("3.0.0");
 
         ComponentRequirement cr = md.getRequirements().get(0);
 
-        assertEquals("org.codehaus.plexus.archiver.Archiver", cr.getRole());
-        assertEquals("jar", cr.getRoleHint());
-        assertEquals("jarArchiver", cr.getFieldName());
+        assertThat(cr.getRole()).isEqualTo("org.codehaus.plexus.archiver.Archiver");
+        assertThat(cr.getRoleHint()).isEqualTo("jar");
+        assertThat(cr.getFieldName()).isEqualTo("jarArchiver");
 
         ComponentDependency cd = pd.getDependencies().get(0);
 
-        assertEquals("org.apache.maven", cd.getGroupId());
-        assertEquals("maven-plugin-api", cd.getArtifactId());
-        assertEquals("2.0.6", cd.getVersion());
-        assertEquals("jar", cd.getType());
+        assertThat(cd.getGroupId()).isEqualTo("org.apache.maven");
+        assertThat(cd.getArtifactId()).isEqualTo("maven-plugin-api");
+        assertThat(cd.getVersion()).isEqualTo("2.0.6");
+        assertThat(cd.getType()).isEqualTo("jar");
 
         md = pd.getMojos().get(1);
 
-        assertEquals("war", md.getGoal());
-        assertNull(md.getDependencyResolutionRequired());
-        assertNull(md.getDependencyCollectionRequired());
-        assertTrue(md.isThreadSafe());
+        assertThat(md.getGoal()).isEqualTo("war");
+        assertThat(md.getDependencyResolutionRequired()).isNull();
+        assertThat(md.getDependencyCollectionRequired()).isNull();
+        assertThat(md.isThreadSafe()).isTrue();
     }
 }

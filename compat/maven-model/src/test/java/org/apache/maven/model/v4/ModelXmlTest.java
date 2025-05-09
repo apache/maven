@@ -31,14 +31,12 @@ import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.xml.XmlNode;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ModelXmlTest {
 
     @Test
-    void testXmlRoundtripWithProperties() throws Exception {
+    void xmlRoundtripWithProperties() throws Exception {
         Map<String, String> props = new LinkedHashMap<>();
         props.put("javax.version", "3.1.0");
         props.put("mockito.version", "1.10.19");
@@ -50,12 +48,12 @@ class ModelXmlTest {
 
         for (int i = 0; i < 10; i++) {
             String newStr = toXml(fromXml(xml));
-            assertEquals(newStr, xml);
+            assertThat(xml).isEqualTo(newStr);
         }
     }
 
     @Test
-    void testNamespaceInXmlNode() throws XMLStreamException {
+    void namespaceInXmlNode() throws XMLStreamException {
         String xml = "<project xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
                 + "         xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
                 + "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/POM/4.0.0\">\n"
@@ -73,17 +71,17 @@ class ModelXmlTest {
         Model model = fromXml(xml);
         Plugin plugin = model.getBuild().getPlugins().get(0);
         XmlNode node = plugin.getConfiguration();
-        assertNotNull(node);
-        assertEquals("http://maven.apache.org/POM/4.0.0", node.namespaceUri());
-        assertEquals("m", node.prefix());
-        assertEquals("configuration", node.name());
-        assertEquals(1, node.children().size());
+        assertThat(node).isNotNull();
+        assertThat(node.namespaceUri()).isEqualTo("http://maven.apache.org/POM/4.0.0");
+        assertThat(node.prefix()).isEqualTo("m");
+        assertThat(node.name()).isEqualTo("configuration");
+        assertThat(node.children().size()).isEqualTo(1);
         XmlNode myConfig = node.children().get(0);
-        assertEquals("http://fabric8.io/fabric8-maven-plugin", myConfig.namespaceUri());
-        assertEquals("", myConfig.prefix());
-        assertEquals("myConfig", myConfig.name());
+        assertThat(myConfig.namespaceUri()).isEqualTo("http://fabric8.io/fabric8-maven-plugin");
+        assertThat(myConfig.prefix()).isEqualTo("");
+        assertThat(myConfig.name()).isEqualTo("myConfig");
         String config = node.toString();
-        assertFalse(config.isEmpty());
+        assertThat(config.isEmpty()).isFalse();
     }
 
     String toXml(Model model) throws IOException, XMLStreamException {

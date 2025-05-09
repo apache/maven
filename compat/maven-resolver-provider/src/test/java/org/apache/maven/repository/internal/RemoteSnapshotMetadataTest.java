@@ -33,8 +33,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RemoteSnapshotMetadataTest {
     private Locale defaultLocale;
@@ -74,7 +73,7 @@ class RemoteSnapshotMetadataTest {
 
         /* Allow for this test running across midnight */
         Set<String> expected = new HashSet<>(Arrays.asList(dateBefore, dateAfter));
-        assertTrue(expected.contains(datePart), "Expected " + datePart + " to be in " + expected);
+        assertThat(expected.contains(datePart)).as("Expected " + datePart + " to be in " + expected).isTrue();
     }
 
     @Test
@@ -84,7 +83,7 @@ class RemoteSnapshotMetadataTest {
         metadata.merge(new Metadata());
 
         int buildNumber = metadata.metadata.getVersioning().getSnapshot().getBuildNumber();
-        assertEquals(1, buildNumber);
+        assertThat(buildNumber).isEqualTo(1);
     }
 
     @Test
@@ -94,6 +93,6 @@ class RemoteSnapshotMetadataTest {
         metadata.merge(new Metadata());
 
         int buildNumber = metadata.metadata.getVersioning().getSnapshot().getBuildNumber();
-        assertEquals(42, buildNumber);
+        assertThat(buildNumber).isEqualTo(42);
     }
 }

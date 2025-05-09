@@ -27,7 +27,7 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
@@ -55,9 +55,9 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
     protected void assertActivation(boolean active, Profile profile, ProfileActivationContext context) {
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        assertEquals(active, activator.isActive(new org.apache.maven.model.Profile(profile), context, problems));
+        assertThat(activator.isActive(new org.apache.maven.model.Profile(profile), context, problems)).isEqualTo(active);
 
-        assertEquals(0, problems.getErrors().size(), problems.getErrors().toString());
-        assertEquals(0, problems.getWarnings().size(), problems.getWarnings().toString());
+        assertThat(problems.getErrors().size()).as(problems.getErrors().toString()).isEqualTo(0);
+        assertThat(problems.getWarnings().size()).as(problems.getWarnings().toString()).isEqualTo(0);
     }
 }

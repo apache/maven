@@ -21,7 +21,7 @@ package org.apache.maven.repository.metadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -45,14 +45,14 @@ class DefaultGraphConflictResolutionPolicyTest {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testDefaultPolicy() throws Exception {
+    void defaultPolicy() throws Exception {
         MetadataGraphEdge res;
 
         res = policy.apply(e1, e2);
-        assertEquals("1.1", res.getVersion(), "Wrong depth edge selected");
+        assertThat(res.getVersion()).as("Wrong depth edge selected").isEqualTo("1.1");
 
         res = policy.apply(e1, e3);
-        assertEquals("1.2", res.getVersion(), "Wrong version edge selected");
+        assertThat(res.getVersion()).as("Wrong version edge selected").isEqualTo("1.2");
     }
     // ------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------

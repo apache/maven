@@ -32,8 +32,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @PlexusTest
 @Deprecated
@@ -47,7 +46,7 @@ class DefaultProfileManagerTest {
     }
 
     @Test
-    void testShouldActivateDefaultProfile() throws Exception {
+    void shouldActivateDefaultProfile() throws Exception {
         Profile notActivated = new Profile();
         notActivated.setId("notActivated");
 
@@ -75,13 +74,13 @@ class DefaultProfileManagerTest {
 
         List active = profileManager.getActiveProfiles();
 
-        assertNotNull(active);
-        assertEquals(1, active.size());
-        assertEquals("defaultActivated", ((Profile) active.get(0)).getId());
+        assertThat(active).isNotNull();
+        assertThat(active.size()).isEqualTo(1);
+        assertThat(((Profile) active.get(0)).getId()).isEqualTo("defaultActivated");
     }
 
     @Test
-    void testShouldNotActivateDefaultProfile() throws Exception {
+    void shouldNotActivateDefaultProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -112,13 +111,13 @@ class DefaultProfileManagerTest {
 
         List active = profileManager.getActiveProfiles();
 
-        assertNotNull(active);
-        assertEquals(1, active.size());
-        assertEquals("syspropActivated", ((Profile) active.get(0)).getId());
+        assertThat(active).isNotNull();
+        assertThat(active.size()).isEqualTo(1);
+        assertThat(((Profile) active.get(0)).getId()).isEqualTo("syspropActivated");
     }
 
     @Test
-    void testShouldNotActivateReversalOfPresentSystemProperty() throws Exception {
+    void shouldNotActivateReversalOfPresentSystemProperty() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -139,12 +138,12 @@ class DefaultProfileManagerTest {
 
         List active = profileManager.getActiveProfiles();
 
-        assertNotNull(active);
-        assertEquals(0, active.size());
+        assertThat(active).isNotNull();
+        assertThat(active.size()).isEqualTo(0);
     }
 
     @Test
-    void testShouldOverrideAndActivateInactiveProfile() throws Exception {
+    void shouldOverrideAndActivateInactiveProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -167,13 +166,13 @@ class DefaultProfileManagerTest {
 
         List active = profileManager.getActiveProfiles();
 
-        assertNotNull(active);
-        assertEquals(1, active.size());
-        assertEquals("syspropActivated", ((Profile) active.get(0)).getId());
+        assertThat(active).isNotNull();
+        assertThat(active.size()).isEqualTo(1);
+        assertThat(((Profile) active.get(0)).getId()).isEqualTo("syspropActivated");
     }
 
     @Test
-    void testShouldOverrideAndDeactivateActiveProfile() throws Exception {
+    void shouldOverrideAndDeactivateActiveProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -196,7 +195,7 @@ class DefaultProfileManagerTest {
 
         List active = profileManager.getActiveProfiles();
 
-        assertNotNull(active);
-        assertEquals(0, active.size());
+        assertThat(active).isNotNull();
+        assertThat(active.size()).isEqualTo(0);
     }
 }

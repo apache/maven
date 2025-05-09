@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code Scm}.
@@ -31,35 +28,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ScmTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Scm().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new Scm().equals(null));
+    void equalsNullSafe() {
+        assertThat(new Scm()).isNotEqualTo(null);
 
         new Scm().equals(new Scm());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Scm thing = new Scm();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new Scm().toString());
+    void toStringNullSafe() {
+        assertThat(new Scm().toString()).isNotNull();
     }
 
     @Test
-    public void testToStringNotNonsense() {
+    void toStringNotNonsense() {
         Scm scm = new Scm();
         scm.setConnection("scm:git:git://git.localdomain/model");
 
         String s = scm.toString();
 
-        assertEquals("Scm {connection=scm:git:git://git.localdomain/model}", s);
+        assertThat(s).isEqualTo("Scm {connection=scm:git:git://git.localdomain/model}");
     }
 }

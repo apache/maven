@@ -75,9 +75,8 @@ import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.junit.jupiter.api.BeforeEach;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -176,7 +175,7 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
 
         File file = new File(remoteRepo.getBasedir(), path);
 
-        assertTrue(file.exists(), "Remote artifact " + file + " should be present.");
+        assertThat(file.exists()).as("Remote artifact " + file + " should be present.").isTrue();
     }
 
     protected void assertLocalArtifactPresent(Artifact artifact) throws Exception {
@@ -186,7 +185,7 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
 
         File file = new File(localRepo.getBasedir(), path);
 
-        assertTrue(file.exists(), "Local artifact " + file + " should be present.");
+        assertThat(file.exists()).as("Local artifact " + file + " should be present.").isTrue();
     }
 
     protected void assertRemoteArtifactNotPresent(Artifact artifact) throws Exception {
@@ -196,7 +195,7 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
 
         File file = new File(remoteRepo.getBasedir(), path);
 
-        assertFalse(file.exists(), "Remote artifact " + file + " should not be present.");
+        assertThat(file.exists()).as("Remote artifact " + file + " should not be present.").isFalse();
     }
 
     protected void assertLocalArtifactNotPresent(Artifact artifact) throws Exception {
@@ -206,7 +205,7 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
 
         File file = new File(localRepo.getBasedir(), path);
 
-        assertFalse(file.exists(), "Local artifact " + file + " should not be present.");
+        assertThat(file.exists()).as("Local artifact " + file + " should not be present.").isFalse();
     }
 
     // ----------------------------------------------------------------------

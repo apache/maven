@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code RepositoryPolicy}.
@@ -31,25 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RepositoryPolicyTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new RepositoryPolicy().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new RepositoryPolicy().equals(null));
+    void equalsNullSafe() {
+        assertThat(new RepositoryPolicy()).isNotEqualTo(null);
 
         new RepositoryPolicy().equals(new RepositoryPolicy());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         RepositoryPolicy thing = new RepositoryPolicy();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new RepositoryPolicy().toString());
+    void toStringNullSafe() {
+        assertThat(new RepositoryPolicy().toString()).isNotNull();
     }
 }

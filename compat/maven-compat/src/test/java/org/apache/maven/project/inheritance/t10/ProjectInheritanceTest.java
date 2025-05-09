@@ -26,9 +26,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies scope inheritance of direct and transitive dependencies.
@@ -56,7 +54,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
+    void dependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -67,29 +65,29 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project0 = getProjectWithDependencies(pom0);
         MavenProject project1 = getProjectWithDependencies(pom1);
 
-        assertEquals(pom0Basedir, project1.getParent().getBasedir());
+        assertThat(project1.getParent().getBasedir()).isEqualTo(pom0Basedir);
         System.out.println("Project " + project1.getId() + " " + project1);
         Map map = project1.getArtifactMap();
-        assertNotNull(map, "No artifacts");
-        assertTrue(map.size() > 0, "No Artifacts");
-        assertTrue(map.size() == 3, "Set size should be 3, is " + map.size());
+        assertThat(map).as("No artifacts").isNotNull();
+        assertThat(map.size() > 0).as("No Artifacts").isTrue();
+        assertThat(map.size()).as("Set size should be 3, is " + map.size()).isEqualTo(3);
 
         Artifact a = (Artifact) map.get("maven-test:t10-a");
         Artifact b = (Artifact) map.get("maven-test:t10-b");
         Artifact c = (Artifact) map.get("maven-test:t10-c");
 
-        assertNotNull(a);
-        assertNotNull(b);
-        assertNotNull(c);
+        assertThat(a).isNotNull();
+        assertThat(b).isNotNull();
+        assertThat(c).isNotNull();
 
         // inherited from depMgmt
         System.out.println(a.getScope());
-        assertTrue(a.getScope().equals("test"), "Incorrect scope for " + a.getDependencyConflictId());
+        assertThat(a.getScope()).as("Incorrect scope for " + a.getDependencyConflictId()).isEqualTo("test");
 
         // transitive dep, overridden b depMgmt
-        assertTrue(b.getScope().equals("runtime"), "Incorrect scope for " + b.getDependencyConflictId());
+        assertThat(b.getScope()).as("Incorrect scope for " + b.getDependencyConflictId()).isEqualTo("runtime");
 
         // direct dep, overrides depMgmt
-        assertTrue(c.getScope().equals("runtime"), "Incorrect scope for " + c.getDependencyConflictId());
+        assertThat(c.getScope()).as("Incorrect scope for " + c.getDependencyConflictId()).isEqualTo("runtime");
     }
 }

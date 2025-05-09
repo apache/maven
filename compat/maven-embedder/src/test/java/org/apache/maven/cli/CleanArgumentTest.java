@@ -20,7 +20,7 @@ package org.apache.maven.cli;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */
@@ -39,26 +39,26 @@ class CleanArgumentTest {
     void cleanArgsShouldRemoveWrongSurroundingQuotes() {
         String[] args = {"\"-Dfoo=bar", "\"-Dfoo2=bar two\""};
         String[] cleanArgs = CleanArgument.cleanArgs(args);
-        assertEquals(args.length, cleanArgs.length);
-        assertEquals("-Dfoo=bar", cleanArgs[0]);
-        assertEquals("-Dfoo2=bar two", cleanArgs[1]);
+        assertThat(cleanArgs.length).isEqualTo(args.length);
+        assertThat(cleanArgs[0]).isEqualTo("-Dfoo=bar");
+        assertThat(cleanArgs[1]).isEqualTo("-Dfoo2=bar two");
     }
 
     @Test
-    void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes() {
+    void cleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes() {
         String information = "-Dinformation=\"The Information is important.\"";
         String[] args = {information};
         String[] cleanArgs = CleanArgument.cleanArgs(args);
-        assertEquals(args.length, cleanArgs.length);
-        assertEquals(information, cleanArgs[0]);
+        assertThat(cleanArgs.length).isEqualTo(args.length);
+        assertThat(cleanArgs[0]).isEqualTo(information);
     }
 
     @Test
-    void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingSingleQuotes() {
+    void cleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingSingleQuotes() {
         String information = "-Dinformation='The Information is important.'";
         String[] args = {information};
         String[] cleanArgs = CleanArgument.cleanArgs(args);
-        assertEquals(args.length, cleanArgs.length);
-        assertEquals(information, cleanArgs[0]);
+        assertThat(cleanArgs.length).isEqualTo(args.length);
+        assertThat(cleanArgs[0]).isEqualTo(information);
     }
 }

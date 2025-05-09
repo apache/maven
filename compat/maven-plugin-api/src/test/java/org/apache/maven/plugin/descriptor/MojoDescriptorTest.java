@@ -20,7 +20,7 @@ package org.apache.maven.plugin.descriptor;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MojoDescriptorTest {
     @Test
@@ -31,20 +31,16 @@ class MojoDescriptorTest {
         param1.setDefaultValue("value1");
         mojoDescriptor.addParameter(param1);
 
-        assertEquals(1, mojoDescriptor.getParameters().size());
+        assertThat(mojoDescriptor.getParameters().size()).isEqualTo(1);
 
-        assertEquals(
-                mojoDescriptor.getParameters().size(),
-                mojoDescriptor.getParameterMap().size());
+        assertThat(mojoDescriptor.getParameterMap().size()).isEqualTo(mojoDescriptor.getParameters().size());
 
         Parameter param2 = new Parameter();
         param2.setName("param2");
         param2.setDefaultValue("value2");
         mojoDescriptor.addParameter(param2);
 
-        assertEquals(2, mojoDescriptor.getParameters().size());
-        assertEquals(
-                mojoDescriptor.getParameters().size(),
-                mojoDescriptor.getParameterMap().size());
+        assertThat(mojoDescriptor.getParameters().size()).isEqualTo(2);
+        assertThat(mojoDescriptor.getParameterMap().size()).isEqualTo(mojoDescriptor.getParameters().size());
     }
 }

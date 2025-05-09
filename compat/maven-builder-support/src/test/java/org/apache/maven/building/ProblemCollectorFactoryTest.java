@@ -22,20 +22,20 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 class ProblemCollectorFactoryTest {
 
     @Test
-    void testNewInstance() {
+    void newInstance() {
         ProblemCollector collector1 = ProblemCollectorFactory.newInstance(null);
 
         Problem problem = new DefaultProblem("MESSAGE1", null, null, -1, -1, null);
         ProblemCollector collector2 = ProblemCollectorFactory.newInstance(Collections.singletonList(problem));
 
         assertNotSame(collector1, collector2);
-        assertEquals(0, collector1.getProblems().size());
-        assertEquals(1, collector2.getProblems().size());
+        assertThat(collector1.getProblems().size()).isEqualTo(0);
+        assertThat(collector2.getProblems().size()).isEqualTo(1);
     }
 }

@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@code DeploymentRepository}.
@@ -31,25 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DeploymentRepositoryTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new DeploymentRepository().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new DeploymentRepository().equals(null));
+    void equalsNullSafe() {
+        assertThat(new DeploymentRepository()).isNotEqualTo(null);
 
         new DeploymentRepository().equals(new DeploymentRepository());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         DeploymentRepository thing = new DeploymentRepository();
-        assertTrue(thing.equals(thing));
+        assertThat(thing).isEqualTo(thing);
     }
 
     @Test
-    void testToStringNullSafe() {
-        assertNotNull(new DeploymentRepository().toString());
+    void toStringNullSafe() {
+        assertThat(new DeploymentRepository().toString()).isNotNull();
     }
 }

@@ -26,9 +26,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies the version of a dependency listed in a parent's
@@ -55,7 +53,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
+    void dependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
         File pom0Basedir = pom0.getParentFile();
@@ -65,18 +63,17 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         MavenProject project0 = getProjectWithDependencies(pom0);
         MavenProject project1 = getProjectWithDependencies(pom1);
 
-        assertEquals(pom0Basedir, project1.getParent().getBasedir());
+        assertThat(project1.getParent().getBasedir()).isEqualTo(pom0Basedir);
         Set set = project1.getArtifacts();
-        assertNotNull(set, "No artifacts");
-        assertTrue(set.size() > 0, "No Artifacts");
-        assertTrue(set.size() == 3, "Set size should be 3, is " + set.size());
+        assertThat(set).as("No artifacts").isNotNull();
+        assertThat(set.size() > 0).as("No Artifacts").isTrue();
+        assertThat(set.size()).as("Set size should be 3, is " + set.size()).isEqualTo(3);
 
         for (Object aSet : set) {
             Artifact artifact = (Artifact) aSet;
             System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
                     + " Optional=" + (artifact.isOptional() ? "true" : "false"));
-            assertTrue(
-                    artifact.getVersion().equals("1.0"), "Incorrect version for " + artifact.getDependencyConflictId());
+            assertThat(artifact.getVersion()).as("Incorrect version for " + artifact.getDependencyConflictId()).isEqualTo("1.0");
         }
     }
 }

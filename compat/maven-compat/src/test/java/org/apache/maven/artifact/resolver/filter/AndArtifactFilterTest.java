@@ -22,9 +22,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@link AndArtifactFilter}.
@@ -37,16 +35,16 @@ class AndArtifactFilterTest {
     }
 
     @Test
-    void testEquals() {
+    void equals() {
         AndArtifactFilter filter1 = new AndArtifactFilter();
 
         AndArtifactFilter filter2 = new AndArtifactFilter(Arrays.asList(newSubFilter()));
 
-        assertFalse(filter1.equals(null));
-        assertTrue(filter1.equals(filter1));
-        assertEquals(filter1.hashCode(), filter1.hashCode());
+        assertThat(filter1).isNotEqualTo(null);
+        assertThat(filter1).isEqualTo(filter1);
+        assertThat(filter1.hashCode()).isEqualTo(filter1.hashCode());
 
-        assertFalse(filter1.equals(filter2));
-        assertFalse(filter2.equals(filter1));
+        assertThat(filter2).isNotEqualTo(filter1);
+        assertThat(filter1).isNotEqualTo(filter2);
     }
 }

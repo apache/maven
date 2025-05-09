@@ -29,15 +29,14 @@ import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 class DefaultArtifactDescriptorReaderTest extends AbstractRepositoryTestCase {
 
     @Test
-    void testMng5459() throws Exception {
+    void mng5459() throws Exception {
         // prepare
         DefaultArtifactDescriptorReader reader =
                 (DefaultArtifactDescriptorReader) getContainer().lookup(ArtifactDescriptorReader.class);
@@ -66,16 +65,12 @@ class DefaultArtifactDescriptorReaderTest extends AbstractRepositoryTestCase {
 
         for (RepositoryEvent evt : event.getAllValues()) {
             if (EventType.ARTIFACT_DESCRIPTOR_MISSING.equals(evt.getType())) {
-                assertEquals(
-                        "Could not find artifact org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2 in repo ("
-                                + newTestRepository().getUrl() + ")",
-                        evt.getException().getMessage());
+                assertThat(evt.getException().getMessage()).isEqualTo("Could not find artifact org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2 in repo ("
+                        + newTestRepository().getUrl() + ")");
                 missingArtifactDescriptor = true;
             }
         }
 
-        assertTrue(
-                missingArtifactDescriptor,
-                "Expected missing artifact descriptor for org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2");
+        assertThat(missingArtifactDescriptor).as("Expected missing artifact descriptor for org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2").isTrue();
     }
 }

@@ -29,8 +29,7 @@ import org.apache.maven.settings.Server;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@link LegacyRepositorySystem}.
@@ -43,14 +42,14 @@ class LegacyRepositorySystemTest {
     private LegacyRepositorySystem repositorySystem;
 
     @Test
-    void testThatLocalRepositoryWithSpacesIsProperlyHandled() throws Exception {
+    void thatLocalRepositoryWithSpacesIsProperlyHandled() throws Exception {
         File basedir = new File("target/spacy path").getAbsoluteFile();
         ArtifactRepository repo = repositorySystem.createLocalRepository(basedir);
-        assertEquals(basedir, new File(repo.getBasedir()));
+        assertThat(new File(repo.getBasedir())).isEqualTo(basedir);
     }
 
     @Test
-    void testAuthenticationHandling() {
+    void authenticationHandling() {
         Server server = new Server();
         server.setId("repository");
         server.setUsername("jason");
@@ -60,8 +59,8 @@ class LegacyRepositorySystemTest {
                 repositorySystem.createArtifactRepository("repository", "http://foo", null, null, null);
         repositorySystem.injectAuthentication(Arrays.asList(repository), Arrays.asList(server));
         Authentication authentication = repository.getAuthentication();
-        assertNotNull(authentication);
-        assertEquals("jason", authentication.getUsername());
-        assertEquals("abc123", authentication.getPassword());
+        assertThat(authentication).isNotNull();
+        assertThat(authentication.getUsername()).isEqualTo("jason");
+        assertThat(authentication.getPassword()).isEqualTo("abc123");
     }
 }

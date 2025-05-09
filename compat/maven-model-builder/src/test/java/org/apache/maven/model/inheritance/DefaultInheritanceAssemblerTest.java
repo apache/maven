@@ -30,9 +30,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.matchers.CompareMatcher;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -60,7 +60,7 @@ class DefaultInheritanceAssemblerTest {
     }
 
     @Test
-    void testPluginConfiguration() throws Exception {
+    void pluginConfiguration() throws Exception {
         testInheritance("plugin-configuration");
     }
 
@@ -70,7 +70,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws IOException Model read problem
      */
     @Test
-    void testUrls() throws Exception {
+    void urls() throws Exception {
         testInheritance("urls");
     }
 
@@ -79,7 +79,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws IOException Model read problem
      */
     @Test
-    void testFlatUrls() throws IOException {
+    void flatUrls() throws IOException {
         testInheritance("flat-urls");
     }
 
@@ -88,7 +88,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws Exception
      */
     @Test
-    void testNoAppendUrls() throws Exception {
+    void noAppendUrls() throws Exception {
         testInheritance("no-append-urls");
     }
 
@@ -97,7 +97,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws Exception
      */
     @Test
-    void testNoAppendUrls2() throws Exception {
+    void noAppendUrls2() throws Exception {
         testInheritance("no-append-urls2");
     }
 
@@ -106,7 +106,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws Exception
      */
     @Test
-    void testNoAppendUrls3() throws Exception {
+    void noAppendUrls3() throws Exception {
         testInheritance("no-append-urls3");
     }
 
@@ -117,7 +117,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws IOException Model read problem
      */
     @Test
-    void testFlatTrickyUrls() throws IOException {
+    void flatTrickyUrls() throws IOException {
         // parent references child with artifactId (which is not directory name)
         // then relative path calculation will fail during build from disk but success when calculated from repo
         try {
@@ -126,12 +126,10 @@ class DefaultInheritanceAssemblerTest {
             // fail( "should have failed since module reference == artifactId != directory name" );
         } catch (AssertionError afe) {
             // expected failure: wrong relative path calculation
-            assertTrue(
-                    afe.getMessage()
-                            .contains(
-                                    "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was "
-                                            + "'http://www.apache.org/path/to/parent/../child-artifact-id/'"),
-                    afe.getMessage());
+            assertThat(afe.getMessage()
+                    .contains(
+                            "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was "
+                                    + "'http://www.apache.org/path/to/parent/../child-artifact-id/'")).as(afe.getMessage()).isTrue();
         }
         // but ok from repo: local disk is ignored
         testInheritance("tricky-flat-artifactId-urls", true);
@@ -140,21 +138,16 @@ class DefaultInheritanceAssemblerTest {
         // then relative path calculation will success during build from disk but fail when calculated from repo
         testInheritance("tricky-flat-directory-urls", false);
 
-        AssertionError afe = assertThrows(
-                AssertionError.class,
-                () -> testInheritance("tricky-flat-directory-urls", true),
-                "should have failed since module reference == directory name != artifactId");
+        AssertionError afe = assertThatExceptionOfType(AssertionError.class).as("should have failed since module reference == directory name != artifactId").isThrownBy(() -> testInheritance("tricky-flat-directory-urls", true)).actual();
         // expected failure
-        assertTrue(
-                afe.getMessage()
-                        .contains(
-                                "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was "
-                                        + "'http://www.apache.org/path/to/parent/child-artifact-id/'"),
-                afe.getMessage());
+        assertThat(afe.getMessage()
+                .contains(
+                        "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was "
+                                + "'http://www.apache.org/path/to/parent/child-artifact-id/'")).as(afe.getMessage()).isTrue();
     }
 
     @Test
-    void testWithEmptyUrl() throws IOException {
+    void withEmptyUrl() throws IOException {
         testInheritance("empty-urls", false);
     }
 
@@ -195,7 +188,7 @@ class DefaultInheritanceAssemblerTest {
     }
 
     @Test
-    void testModulePathNotArtifactId() throws IOException {
+    void modulePathNotArtifactId() throws IOException {
         Model parent = getModel("module-path-not-artifactId-parent");
 
         Model child = getModel("module-path-not-artifactId-child");
