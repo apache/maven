@@ -28,10 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 class DefaultModelBuilderResultTest {
@@ -57,56 +54,56 @@ class DefaultModelBuilderResultTest {
     }
 
     @Test
-    void testModelLifecycle() {
+    void modelLifecycle() {
         // Test initial state
-        assertNull(result.getSource());
-        assertNull(result.getFileModel());
-        assertNull(result.getRawModel());
-        assertNull(result.getEffectiveModel());
-        assertEquals(0L, result.getProblemCollector().problems().count());
+        assertThat(result.getSource()).isNull();
+        assertThat(result.getFileModel()).isNull();
+        assertThat(result.getRawModel()).isNull();
+        assertThat(result.getEffectiveModel()).isNull();
+        assertThat(result.getProblemCollector().problems().count()).isEqualTo(0L);
 
         // Set and verify source
         result.setSource(source);
-        assertSame(source, result.getSource());
+        assertThat(result.getSource()).isSameAs(source);
 
         // Set and verify file model
         result.setFileModel(fileModel);
-        assertSame(fileModel, result.getFileModel());
+        assertThat(result.getFileModel()).isSameAs(fileModel);
 
         // Set and verify raw model
         result.setRawModel(rawModel);
-        assertSame(rawModel, result.getRawModel());
+        assertThat(result.getRawModel()).isSameAs(rawModel);
 
         // Set and verify effective model
         result.setEffectiveModel(effectiveModel);
-        assertSame(effectiveModel, result.getEffectiveModel());
+        assertThat(result.getEffectiveModel()).isSameAs(effectiveModel);
     }
 
     @Test
-    void testProblemCollection() {
+    void problemCollection() {
         ModelProblem problem = mock(ModelProblem.class);
         Mockito.when(problem.getSeverity()).thenReturn(BuilderProblem.Severity.ERROR);
         problemCollector.reportProblem(problem);
 
-        assertEquals(1, result.getProblemCollector().problems().count());
-        assertSame(problem, result.getProblemCollector().problems().findFirst().get());
+        assertThat(result.getProblemCollector().problems().count()).isEqualTo(1);
+        assertThat(result.getProblemCollector().problems().findFirst().get()).isSameAs(problem);
     }
 
     @Test
-    void testChildrenManagement() {
+    void childrenManagement() {
         DefaultModelBuilderResult child1 = new DefaultModelBuilderResult(request, problemCollector);
         DefaultModelBuilderResult child2 = new DefaultModelBuilderResult(request, problemCollector);
 
         result.getChildren().add(child1);
         result.getChildren().add(child2);
 
-        assertEquals(2, result.getChildren().size());
-        assertTrue(result.getChildren().contains(child1));
-        assertTrue(result.getChildren().contains(child2));
+        assertThat(result.getChildren().size()).isEqualTo(2);
+        assertThat(result.getChildren().contains(child1)).isTrue();
+        assertThat(result.getChildren().contains(child2)).isTrue();
     }
 
     @Test
-    void testRequestAssociation() {
-        assertSame(request, result.getRequest());
+    void requestAssociation() {
+        assertThat(result.getRequest()).isSameAs(request);
     }
 }

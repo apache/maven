@@ -27,12 +27,12 @@ import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultNodeTest {
 
     @Test
-    void testAsString() {
+    void asString() {
         InternalSession session = Mockito.mock(InternalSession.class);
 
         // Create a basic dependency node
@@ -42,21 +42,19 @@ class DefaultNodeTest {
 
         // Test non-verbose mode
         DefaultNode defaultNode = new DefaultNode(session, node, false);
-        assertEquals("org.example:myapp:jar:1.0:compile", defaultNode.asString());
+        assertThat(defaultNode.asString()).isEqualTo("org.example:myapp:jar:1.0:compile");
 
         // Test verbose mode with managed version
         node.setData(DependencyManagerUtils.NODE_DATA_PREMANAGED_VERSION, "0.9");
         node.setManagedBits(DependencyNode.MANAGED_VERSION);
         defaultNode = new DefaultNode(session, node, true);
-        assertEquals("org.example:myapp:jar:1.0:compile (version managed from 0.9)", defaultNode.asString());
+        assertThat(defaultNode.asString()).isEqualTo("org.example:myapp:jar:1.0:compile (version managed from 0.9)");
 
         // Test verbose mode with managed scope
         node.setData(DependencyManagerUtils.NODE_DATA_PREMANAGED_SCOPE, "runtime");
         node.setManagedBits(DependencyNode.MANAGED_VERSION | DependencyNode.MANAGED_SCOPE);
         defaultNode = new DefaultNode(session, node, true);
-        assertEquals(
-                "org.example:myapp:jar:1.0:compile (version managed from 0.9; scope managed from runtime)",
-                defaultNode.asString());
+        assertThat(defaultNode.asString()).isEqualTo("org.example:myapp:jar:1.0:compile (version managed from 0.9; scope managed from runtime)");
 
         // Test verbose mode with conflict resolution
         DefaultDependencyNode winner =
@@ -64,6 +62,6 @@ class DefaultNodeTest {
         node.setData(ConflictResolver.NODE_DATA_WINNER, winner);
         node.setManagedBits(0);
         defaultNode = new DefaultNode(session, node, true);
-        assertEquals("(org.example:myapp:jar:1.0:compile - omitted for conflict with 2.0)", defaultNode.asString());
+        assertThat(defaultNode.asString()).isEqualTo("(org.example:myapp:jar:1.0:compile - omitted for conflict with 2.0)");
     }
 }

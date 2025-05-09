@@ -32,10 +32,7 @@ import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -49,11 +46,11 @@ class ComplexActivationTest {
     void setup() {
         session = ApiRunner.createSession();
         builder = session.getService(ModelBuilder.class);
-        assertNotNull(builder);
+        assertThat(builder).isNotNull();
     }
 
     @Test
-    void testAndConditionInActivation() throws Exception {
+    void andConditionInActivation() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
@@ -61,25 +58,25 @@ class ComplexActivationTest {
                 .systemProperties(Map.of("myproperty", "test"))
                 .build();
         ModelBuilderResult result = builder.newSession().build(request);
-        assertNotNull(result);
-        assertNotNull(result.getEffectiveModel());
-        assertEquals("activated-1", result.getEffectiveModel().getProperties().get("profile.file"));
-        assertNull(result.getEffectiveModel().getProperties().get("profile.miss"));
+        assertThat(result).isNotNull();
+        assertThat(result.getEffectiveModel()).isNotNull();
+        assertThat(result.getEffectiveModel().getProperties().get("profile.file")).isEqualTo("activated-1");
+        assertThat(result.getEffectiveModel().getProperties().get("profile.miss")).isNull();
     }
 
     @Test
-    public void testConditionExistingAndMissingInActivation() throws Exception {
+    void conditionExistingAndMissingInActivation() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                 .source(Sources.buildSource(getPom("complexExistsAndMissing")))
                 .build();
         ModelBuilderResult result = builder.newSession().build(request);
-        assertNotNull(result);
-        assertTrue(result.getProblemCollector()
+        assertThat(result).isNotNull();
+        assertThat(result.getProblemCollector()
                 .problems()
                 .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.WARNING
-                        && p.getMessage().contains("The 'missing' assertion will be ignored.")));
+                        && p.getMessage().contains("The 'missing' assertion will be ignored."))).isTrue();
     }
 
     private Path getPom(String name) {

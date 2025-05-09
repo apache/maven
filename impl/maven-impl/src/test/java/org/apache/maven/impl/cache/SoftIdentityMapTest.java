@@ -29,10 +29,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SoftIdentityMapTest {
     private SoftIdentityMap<Object, String> map;
@@ -57,9 +56,9 @@ class SoftIdentityMapTest {
             return "different value";
         });
 
-        assertEquals("value", result1);
-        assertEquals("value", result2);
-        assertEquals(1, computeCount.get());
+        assertThat(result1).isEqualTo("value");
+        assertThat(result2).isEqualTo("value");
+        assertThat(computeCount.get()).isEqualTo(1);
     }
 
     @RepeatedTest(10)
@@ -128,14 +127,8 @@ class SoftIdentityMapTest {
         sink.accept("Final compute count: " + computeCount.get());
         sink.accept("Unique results size: " + uniqueResults.size());
 
-        assertEquals(
-                1,
-                computeCount.get(),
-                "Value should be computed exactly once, but was computed " + computeCount.get() + " times");
-        assertEquals(
-                1,
-                uniqueResults.size(),
-                "All threads should see the same value, but saw " + uniqueResults.size() + " different values");
+        assertThat(computeCount.get()).as("Value should be computed exactly once, but was computed " + computeCount.get() + " times").isEqualTo(1);
+        assertThat(uniqueResults.size()).as("All threads should see the same value, but saw " + uniqueResults.size() + " different values").isEqualTo(1);
     }
 
     @Test
@@ -144,7 +137,7 @@ class SoftIdentityMapTest {
         String key1 = new String("key");
         String key2 = new String("key");
 
-        assertTrue(key1.equals(key2), "Sanity check: keys should be equal");
+        assertThat(key2).as("Sanity check: keys should be equal").isEqualTo(key1);
         assertNotSame(key1, key2, "Sanity check: keys should be distinct objects");
 
         AtomicInteger computeCount = new AtomicInteger(0);
@@ -159,7 +152,7 @@ class SoftIdentityMapTest {
             return "value2";
         });
 
-        assertEquals(1, computeCount.get(), "Should compute once for equal but distinct keys");
+        assertThat(computeCount.get()).as("Should compute once for equal but distinct keys").isEqualTo(1);
     }
 
     @Test
@@ -187,14 +180,14 @@ class SoftIdentityMapTest {
             return "new value";
         });
 
-        assertEquals(2, computeCount.get(), "Should compute again after original key is garbage collected");
+        assertThat(computeCount.get()).as("Should compute again after original key is garbage collected").isEqualTo(2);
     }
 
     @Test
     void shouldHandleNullInputs() {
-        assertThrows(NullPointerException.class, () -> map.computeIfAbsent(null, k -> "value"));
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> map.computeIfAbsent(null, k -> "value"));
 
         Object key = new Object();
-        assertThrows(NullPointerException.class, () -> map.computeIfAbsent(key, null));
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> map.computeIfAbsent(key, null));
     }
 }

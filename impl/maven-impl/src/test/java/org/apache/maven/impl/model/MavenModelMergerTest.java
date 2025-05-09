@@ -25,70 +25,69 @@ import org.apache.maven.api.model.Prerequisites;
 import org.apache.maven.api.model.Profile;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MavenModelMergerTest {
     private MavenModelMerger modelMerger = new MavenModelMerger();
 
     // modelVersion is neither inherited nor injected
     @Test
-    void testMergeModelModelVersion() {
+    void mergeModelModelVersion() {
         Model parent = Model.newBuilder().modelVersion("4.0.0").build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
         modelMerger.mergeModel_ModelVersion(builder, model, parent, false, null);
-        assertNull(builder.build().getModelVersion());
+        assertThat(builder.build().getModelVersion()).isNull();
 
         model = Model.newBuilder().modelVersion("5.0.0").build();
         builder = Model.newBuilder(model);
         modelMerger.mergeModel_ModelVersion(builder, model, parent, false, null);
-        assertEquals("5.0.0", builder.build().getModelVersion());
+        assertThat(builder.build().getModelVersion()).isEqualTo("5.0.0");
     }
 
     // ArtifactId is neither inherited nor injected
     @Test
-    void testMergeModelArtifactId() {
+    void mergeModelArtifactId() {
         Model parent = Model.newBuilder().artifactId("PARENT").build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
         modelMerger.mergeModel_ArtifactId(builder, model, parent, false, null);
-        assertNull(model.getArtifactId());
+        assertThat(model.getArtifactId()).isNull();
 
         model = Model.newBuilder().artifactId("MODEL").build();
         builder = Model.newBuilder(model);
         modelMerger.mergeModel_ArtifactId(builder, model, parent, false, null);
-        assertEquals("MODEL", builder.build().getArtifactId());
+        assertThat(builder.build().getArtifactId()).isEqualTo("MODEL");
     }
 
     // Prerequisites are neither inherited nor injected
     @Test
-    void testMergeModelPrerequisites() {
+    void mergeModelPrerequisites() {
         Model parent =
                 Model.newBuilder().prerequisites(Prerequisites.newInstance()).build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
         modelMerger.mergeModel_Prerequisites(builder, model, parent, false, null);
-        assertNull(builder.build().getPrerequisites());
+        assertThat(builder.build().getPrerequisites()).isNull();
 
         Prerequisites modelPrerequisites =
                 Prerequisites.newBuilder().maven("3.0").build();
         model = Model.newBuilder().prerequisites(modelPrerequisites).build();
         builder = Model.newBuilder(model);
         modelMerger.mergeModel_Prerequisites(builder, model, parent, false, null);
-        assertEquals(modelPrerequisites, builder.build().getPrerequisites());
+        assertThat(builder.build().getPrerequisites()).isEqualTo(modelPrerequisites);
     }
 
     // Profiles are neither inherited nor injected
     @Test
-    void testMergeModelProfiles() {
+    void mergeModelProfiles() {
         Model parent = Model.newBuilder()
                 .profiles(Collections.singletonList(Profile.newInstance()))
                 .build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
         modelMerger.mergeModel_Profiles(builder, model, parent, false, null);
-        assertEquals(0, builder.build().getProfiles().size());
+        assertThat(builder.build().getProfiles().size()).isEqualTo(0);
 
         Profile modelProfile = Profile.newBuilder().id("MODEL").build();
         model = Model.newBuilder()
@@ -96,6 +95,6 @@ class MavenModelMergerTest {
                 .build();
         builder = Model.newBuilder(model);
         modelMerger.mergeModel_Prerequisites(builder, model, parent, false, null);
-        assertEquals(Collections.singletonList(modelProfile), builder.build().getProfiles());
+        assertThat(builder.build().getProfiles()).isEqualTo(Collections.singletonList(modelProfile));
     }
 }

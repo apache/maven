@@ -26,9 +26,8 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 class DefaultModelXmlFactoryTest {
 
@@ -40,7 +39,7 @@ class DefaultModelXmlFactoryTest {
     }
 
     @Test
-    void testValidNamespaceWithModelVersion400() throws Exception {
+    void validNamespaceWithModelVersion400() throws Exception {
         String xml =
                 """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -51,12 +50,12 @@ class DefaultModelXmlFactoryTest {
                 XmlReaderRequest.builder().reader(new StringReader(xml)).build();
 
         Model model = factory.read(request);
-        assertEquals("4.0.0", model.getModelVersion());
-        assertEquals("http://maven.apache.org/POM/4.0.0", model.getNamespaceUri());
+        assertThat(model.getModelVersion()).isEqualTo("4.0.0");
+        assertThat(model.getNamespaceUri()).isEqualTo("http://maven.apache.org/POM/4.0.0");
     }
 
     @Test
-    void testValidNamespaceWithModelVersion410() throws Exception {
+    void validNamespaceWithModelVersion410() throws Exception {
         String xml =
                 """
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
@@ -67,12 +66,12 @@ class DefaultModelXmlFactoryTest {
                 XmlReaderRequest.builder().reader(new StringReader(xml)).build();
 
         Model model = factory.read(request);
-        assertEquals("4.1.0", model.getModelVersion());
-        assertEquals("http://maven.apache.org/POM/4.1.0", model.getNamespaceUri());
+        assertThat(model.getModelVersion()).isEqualTo("4.1.0");
+        assertThat(model.getNamespaceUri()).isEqualTo("http://maven.apache.org/POM/4.1.0");
     }
 
     @Test
-    void testInvalidNamespaceWithModelVersion410() {
+    void invalidNamespaceWithModelVersion410() {
         String xml =
                 """
                 <project xmlns="http://invalid.namespace/4.1.0">
@@ -82,13 +81,13 @@ class DefaultModelXmlFactoryTest {
         XmlReaderRequest request =
                 XmlReaderRequest.builder().reader(new StringReader(xml)).build();
 
-        XmlReaderException ex = assertThrows(XmlReaderException.class, () -> factory.read(request));
-        assertTrue(ex.getMessage().contains("Invalid namespace 'http://invalid.namespace/4.1.0'"));
-        assertTrue(ex.getMessage().contains("4.1.0"));
+        XmlReaderException ex = assertThatExceptionOfType(XmlReaderException.class).isThrownBy(() -> factory.read(request)).actual();
+        assertThat(ex.getMessage().contains("Invalid namespace 'http://invalid.namespace/4.1.0'")).isTrue();
+        assertThat(ex.getMessage().contains("4.1.0")).isTrue();
     }
 
     @Test
-    void testNoNamespaceWithModelVersion400() throws Exception {
+    void noNamespaceWithModelVersion400() throws Exception {
         String xml =
                 """
                 <project>
@@ -99,17 +98,17 @@ class DefaultModelXmlFactoryTest {
                 XmlReaderRequest.builder().reader(new StringReader(xml)).build();
 
         Model model = factory.read(request);
-        assertEquals("4.0.0", model.getModelVersion());
-        assertEquals("", model.getNamespaceUri());
+        assertThat(model.getModelVersion()).isEqualTo("4.0.0");
+        assertThat(model.getNamespaceUri()).isEqualTo("");
     }
 
     @Test
-    void testNullRequest() {
-        assertThrows(IllegalArgumentException.class, () -> factory.read((XmlReaderRequest) null));
+    void nullRequest() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> factory.read((XmlReaderRequest) null));
     }
 
     @Test
-    void testMalformedModelVersion() throws Exception {
+    void malformedModelVersion() throws Exception {
         String xml =
                 """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -120,6 +119,6 @@ class DefaultModelXmlFactoryTest {
                 XmlReaderRequest.builder().reader(new StringReader(xml)).build();
 
         Model model = factory.read(request);
-        assertEquals("invalid.version", model.getModelVersion());
+        assertThat(model.getModelVersion()).isEqualTo("invalid.version");
     }
 }

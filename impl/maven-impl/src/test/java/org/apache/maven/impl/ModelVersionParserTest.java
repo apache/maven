@@ -23,13 +23,10 @@ import org.apache.maven.api.services.VersionParserException;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
-public class ModelVersionParserTest {
+class ModelVersionParserTest {
 
     private final DefaultModelVersionParser versionParser = new DefaultModelVersionParser(new GenericVersionScheme());
 
@@ -38,23 +35,23 @@ public class ModelVersionParserTest {
             versionParser.parseVersionConstraint(constraint);
             fail("expected exception for constraint " + constraint);
         } catch (VersionParserException e) {
-            assertNotNull(e.getMessage());
+            assertThat(e.getMessage()).isNotNull();
         }
     }
 
     @Test
-    void testEnumeratedVersions() throws VersionParserException {
+    void enumeratedVersions() throws VersionParserException {
         VersionConstraint c = versionParser.parseVersionConstraint("1.0");
-        assertEquals("1.0", c.getRecommendedVersion().toString());
-        assertTrue(c.contains(versionParser.parseVersion("1.0")));
+        assertThat(c.getRecommendedVersion().toString()).isEqualTo("1.0");
+        assertThat(c.contains(versionParser.parseVersion("1.0"))).isTrue();
 
         c = versionParser.parseVersionConstraint("[1.0]");
-        assertNull(c.getRecommendedVersion());
-        assertTrue(c.contains(versionParser.parseVersion("1.0")));
+        assertThat(c.getRecommendedVersion()).isNull();
+        assertThat(c.contains(versionParser.parseVersion("1.0"))).isTrue();
 
         c = versionParser.parseVersionConstraint("[1.0],[2.0]");
-        assertTrue(c.contains(versionParser.parseVersion("1.0")));
-        assertTrue(c.contains(versionParser.parseVersion("2.0")));
+        assertThat(c.contains(versionParser.parseVersion("1.0"))).isTrue();
+        assertThat(c.contains(versionParser.parseVersion("2.0"))).isTrue();
 
         c = versionParser.parseVersionConstraint("[1.0],[2.0],[3.0]");
         assertContains(c, "1.0", "2.0", "3.0");
@@ -75,7 +72,7 @@ public class ModelVersionParserTest {
 
     private void assertContains(String msg, VersionConstraint c, boolean b, String... versions) {
         for (String v : versions) {
-            assertEquals(b, c.contains(versionParser.parseVersion(v)), String.format(msg, v));
+            assertThat(c.contains(versionParser.parseVersion(v))).as(String.format(msg, v)).isEqualTo(b);
         }
     }
 
@@ -84,18 +81,18 @@ public class ModelVersionParserTest {
     }
 
     @Test
-    void testInvalid() {
+    void invalid() {
         parseInvalid("[1,");
         parseInvalid("[1,2],(3,");
         parseInvalid("[1,2],3");
     }
 
     @Test
-    void testSameUpperAndLowerBound() throws VersionParserException {
+    void sameUpperAndLowerBound() throws VersionParserException {
         VersionConstraint c = versionParser.parseVersionConstraint("[1.0]");
-        assertEquals("[1.0,1.0]", c.toString());
+        assertThat(c.toString()).isEqualTo("[1.0,1.0]");
         VersionConstraint c2 = versionParser.parseVersionConstraint(c.toString());
-        assertEquals(c, c2);
-        assertTrue(c.contains(versionParser.parseVersion("1.0")));
+        assertThat(c2).isEqualTo(c);
+        assertThat(c.contains(versionParser.parseVersion("1.0"))).isTrue();
     }
 }

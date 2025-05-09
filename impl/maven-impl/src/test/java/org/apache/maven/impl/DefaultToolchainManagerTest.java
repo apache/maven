@@ -36,9 +36,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -80,14 +79,14 @@ class DefaultToolchainManagerTest {
 
         List<Toolchain> result = manager.getToolchains(session, "jdk", Map.of("version", "11"));
 
-        assertEquals(1, result.size());
-        assertEquals(mockToolchain, result.get(0));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0)).isEqualTo(mockToolchain);
     }
 
     @Test
     void getToolchainsWithInvalidType() {
         List<Toolchain> result = manager.getToolchains(session, "invalid", null);
-        assertTrue(result.isEmpty());
+        assertThat(result.isEmpty()).isTrue();
     }
 
     @Test
@@ -106,8 +105,8 @@ class DefaultToolchainManagerTest {
         manager.storeToolchainToBuildContext(session, mockToolchain);
         Optional<Toolchain> result = manager.getToolchainFromBuildContext(session, "jdk");
 
-        assertTrue(result.isPresent());
-        assertEquals(mockToolchain, result.get());
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get()).isEqualTo(mockToolchain);
     }
 
     @Test
@@ -115,11 +114,11 @@ class DefaultToolchainManagerTest {
         when(session.getService(Lookup.class)).thenReturn(lookup);
         when(lookup.lookupOptional(Project.class)).thenReturn(Optional.empty());
 
-        assertTrue(manager.retrieveContext(session).isEmpty());
+        assertThat(manager.retrieveContext(session).isEmpty()).isTrue();
     }
 
     @Test
     void getToolchainsWithNullType() {
-        assertThrows(NullPointerException.class, () -> manager.getToolchains(session, null, null));
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> manager.getToolchains(session, null, null));
     }
 }

@@ -39,12 +39,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<ConditionProfileActivator> {
+class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<ConditionProfileActivator> {
 
     @TempDir
     Path tempDir;
@@ -75,7 +73,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testNullSafe() throws Exception {
+    void nullSafe() throws Exception {
         Profile p = Profile.newInstance();
 
         assertActivation(false, p, newContext(null, null));
@@ -86,7 +84,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkPrefix() throws Exception {
+    void jdkPrefix() throws Exception {
         Profile profile = newProfile("inrange(${java.version}, '[1.4,1.5)')");
 
         assertActivation(true, profile, newContext(null, newJdkProperties("1.4")));
@@ -100,7 +98,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkPrefixNegated() throws Exception {
+    void jdkPrefixNegated() throws Exception {
         Profile profile = newProfile("not(inrange(${java.version}, '[1.4,1.5)'))");
 
         assertActivation(false, profile, newContext(null, newJdkProperties("1.4")));
@@ -114,7 +112,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkVersionRangeInclusiveBounds() throws Exception {
+    void jdkVersionRangeInclusiveBounds() throws Exception {
         Profile profile = newProfile("inrange(${java.version}, '[1.5,1.6.1]')");
 
         assertActivation(false, profile, newContext(null, newJdkProperties("1.4")));
@@ -135,7 +133,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkVersionRangeExclusiveBounds() throws Exception {
+    void jdkVersionRangeExclusiveBounds() throws Exception {
         Profile profile = newProfile("inrange(${java.version}, '[1.3.1,1.6)')");
 
         assertActivation(false, profile, newContext(null, newJdkProperties("1.3")));
@@ -157,7 +155,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkVersionRangeInclusiveLowerBound() throws Exception {
+    void jdkVersionRangeInclusiveLowerBound() throws Exception {
         Profile profile = newProfile("inrange(${java.version}, '[1.5,)')");
 
         assertActivation(false, profile, newContext(null, newJdkProperties("1.4")));
@@ -178,7 +176,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkVersionRangeExclusiveUpperBound() throws Exception {
+    void jdkVersionRangeExclusiveUpperBound() throws Exception {
         Profile profile = newProfile("inrange(${java.version}, '(,1.6)')");
 
         assertActivation(true, profile, newContext(null, newJdkProperties("1.5")));
@@ -195,7 +193,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
 
     @Disabled
     @Test
-    void testJdkRubbishJavaVersion() {
+    void jdkRubbishJavaVersion() {
         Profile profile = newProfile("inrange(${java.version}, '[1.8,)')");
 
         assertActivationWithProblems(profile, newContext(null, newJdkProperties("Pūteketeke")), "invalid JDK version");
@@ -208,13 +206,11 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
             Profile profile, ProfileActivationContext context, String warningContains) {
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        assertFalse(activator.isActive(profile, context, problems));
+        assertThat(activator.isActive(profile, context, problems)).isFalse();
 
-        assertEquals(0, problems.getErrors().size(), problems.getErrors().toString());
-        assertEquals(1, problems.getWarnings().size(), problems.getWarnings().toString());
-        assertTrue(
-                problems.getWarnings().get(0).contains(warningContains),
-                problems.getWarnings().toString());
+        assertThat(problems.getErrors().size()).as(problems.getErrors().toString()).isEqualTo(0);
+        assertThat(problems.getWarnings().size()).as(problems.getWarnings().toString()).isEqualTo(1);
+        assertThat(problems.getWarnings().get(0).contains(warningContains)).as(problems.getWarnings().toString()).isTrue();
     }
 
     private Map<String, String> newOsProperties(String osName, String osVersion, String osArch) {
@@ -222,7 +218,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testOsVersionStringComparison() throws Exception {
+    void osVersionStringComparison() throws Exception {
         Profile profile = newProfile("inrange(${os.version}, '[6.5.0-1014-aws,6.6)')");
 
         assertActivation(true, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -232,7 +228,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testOsVersionRegexMatching() throws Exception {
+    void osVersionRegexMatching() throws Exception {
         Profile profile = newProfile("matches(${os.version}, '.*aws')");
 
         assertActivation(true, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -242,7 +238,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testOsName() {
+    void osName() {
         Profile profile = newProfile("${os.name} == 'windows'");
 
         assertActivation(false, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -250,7 +246,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testOsNegatedName() {
+    void osNegatedName() {
         Profile profile = newProfile("${os.name} != 'windows'");
 
         assertActivation(true, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -258,7 +254,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testOsArch() {
+    void osArch() {
         Profile profile = newProfile("${os.arch} == 'amd64'");
 
         assertActivation(true, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -266,7 +262,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testOsNegatedArch() {
+    void osNegatedArch() {
         Profile profile = newProfile("${os.arch} != 'amd64'");
 
         assertActivation(false, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -274,7 +270,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testOsAllConditions() {
+    void osAllConditions() {
         Profile profile =
                 newProfile("${os.name} == 'windows' && ${os.arch} != 'amd64' && inrange(${os.version}, '[99,)')");
 
@@ -285,7 +281,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    public void testOsCapitalName() {
+    void osCapitalName() {
         Profile profile = newProfile("lower(${os.name}) == 'mac os x'");
 
         assertActivation(false, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -299,7 +295,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNameOnlyUserProperty() throws Exception {
+    void propWithNameOnlyUserProperty() throws Exception {
         Profile profile = newProfile("${prop}");
 
         assertActivation(true, profile, newContext(newPropProperties("prop", "value"), null));
@@ -308,7 +304,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNameOnlySystemProperty() throws Exception {
+    void propWithNameOnlySystemProperty() throws Exception {
         Profile profile = newProfile("${prop}");
 
         assertActivation(true, profile, newContext(null, newPropProperties("prop", "value")));
@@ -317,7 +313,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedNameOnlyUserProperty() throws Exception {
+    void propWithNegatedNameOnlyUserProperty() throws Exception {
         Profile profile = newProfile("not(${prop})");
 
         assertActivation(false, profile, newContext(newPropProperties("prop", "value"), null));
@@ -326,7 +322,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedNameOnlySystemProperty() throws Exception {
+    void propWithNegatedNameOnlySystemProperty() throws Exception {
         Profile profile = newProfile("not(${prop})");
 
         assertActivation(false, profile, newContext(null, newPropProperties("prop", "value")));
@@ -335,7 +331,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithValueUserProperty() throws Exception {
+    void propWithValueUserProperty() throws Exception {
         Profile profile = newProfile("${prop} == 'value'");
 
         assertActivation(true, profile, newContext(newPropProperties("prop", "value"), null));
@@ -344,7 +340,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithValueSystemProperty() throws Exception {
+    void propWithValueSystemProperty() throws Exception {
         Profile profile = newProfile("${prop} == 'value'");
 
         assertActivation(true, profile, newContext(null, newPropProperties("prop", "value")));
@@ -353,7 +349,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedValueUserProperty() throws Exception {
+    void propWithNegatedValueUserProperty() throws Exception {
         Profile profile = newProfile("${prop} != 'value'");
 
         assertActivation(false, profile, newContext(newPropProperties("prop", "value"), null));
@@ -362,7 +358,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedValueSystemProperty() throws Exception {
+    void propWithNegatedValueSystemProperty() throws Exception {
         Profile profile = newProfile("${prop} != 'value'");
 
         assertActivation(false, profile, newContext(null, newPropProperties("prop", "value")));
@@ -371,7 +367,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithValueUserPropertyDominantOverSystemProperty() throws Exception {
+    void propWithValueUserPropertyDominantOverSystemProperty() throws Exception {
         Profile profile = newProfile("${prop} == 'value'");
 
         Map<String, String> props1 = newPropProperties("prop", "value");
@@ -383,15 +379,13 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
 
     @Test
     @Disabled
-    void testFileRootDirectoryWithNull() {
-        IllegalStateException e = assertThrows(
-                IllegalStateException.class,
-                () -> assertActivation(false, newProfile("exists('${project.rootDirectory}')"), newFileContext(null)));
-        assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
+    void fileRootDirectoryWithNull() {
+        IllegalStateException e = assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> assertActivation(false, newProfile("exists('${project.rootDirectory}')"), newFileContext(null))).actual();
+        assertThat(e.getMessage()).isEqualTo(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
     }
 
     @Test
-    void testFileRootDirectory() {
+    void fileRootDirectory() {
         assertActivation(false, newProfile("exists('${project.rootDirectory}/someFile.txt')"), newFileContext());
         assertActivation(true, newProfile("missing('${project.rootDirectory}/someFile.txt')"), newFileContext());
         assertActivation(true, newProfile("exists('${project.rootDirectory}')"), newFileContext());
@@ -402,7 +396,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
 
     @Test
     @Disabled
-    void testFileWilcards() {
+    void fileWilcards() {
         assertActivation(true, newProfile("exists('${project.rootDirectory}/**/*.xsd')"), newFileContext());
         assertActivation(true, newProfile("exists('${project.basedir}/**/*.xsd')"), newFileContext());
         assertActivation(true, newProfile("exists('${project.basedir}/**/*.xsd')"), newFileContext());
@@ -411,7 +405,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testFileIsActiveNoFileWithShortBasedir() {
+    void fileIsActiveNoFileWithShortBasedir() {
         assertActivation(false, newExistsProfile(null), newFileContext());
         assertActivation(false, newProfile("exists('someFile.txt')"), newFileContext());
         assertActivation(false, newProfile("exists('${basedir}/someFile.txt')"), newFileContext());
@@ -422,7 +416,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testFileIsActiveNoFile() {
+    void fileIsActiveNoFile() {
         assertActivation(false, newExistsProfile(null), newFileContext());
         assertActivation(false, newProfile("exists('someFile.txt')"), newFileContext());
         assertActivation(false, newProfile("exists('${project.basedir}/someFile.txt')"), newFileContext());
@@ -433,7 +427,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testFileIsActiveExistsFileExists() {
+    void fileIsActiveExistsFileExists() {
         assertActivation(true, newProfile("exists('file.txt')"), newFileContext());
         assertActivation(true, newProfile("exists('${project.basedir}')"), newFileContext());
         assertActivation(true, newProfile("exists('${project.basedir}/file.txt')"), newFileContext());
