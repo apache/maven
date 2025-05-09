@@ -794,6 +794,13 @@ under the License.</licenseText>
           <groupId>org.eclipse.sisu</groupId>
           <artifactId>sisu-maven-plugin</artifactId>
           <version>${sisuVersion}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm</artifactId>
+              <version>${asmVersion}</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>
