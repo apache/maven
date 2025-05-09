@@ -26,13 +26,13 @@ import java.util.function.UnaryOperator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 class DefaultInterpolatorTest {
 
     @Test
-    void testBasicSubstitution() {
+    void basicSubstitution() {
         Map<String, String> props = new HashMap<>();
         props.put("key0", "value0");
         props.put("key1", "${value1}");
@@ -40,67 +40,64 @@ class DefaultInterpolatorTest {
 
         performSubstitution(props, Map.of("value1", "sub_value1")::get);
 
-        assertEquals("value0", props.get("key0"));
-        assertEquals("sub_value1", props.get("key1"));
-        assertEquals("", props.get("key2"));
+        assertThat(props.get("key0")).isEqualTo("value0");
+        assertThat(props.get("key1")).isEqualTo("sub_value1");
+        assertThat(props.get("key2")).isEqualTo("");
     }
 
     @Test
-    void testBasicSubstitutionWithContext() {
+    void basicSubstitutionWithContext() {
         HashMap<String, String> props = new HashMap<>();
         props.put("key0", "value0");
         props.put("key1", "${value1}");
 
         performSubstitution(props, Map.of("value1", "sub_value1")::get);
 
-        assertEquals("value0", props.get("key0"));
-        assertEquals("sub_value1", props.get("key1"));
+        assertThat(props.get("key0")).isEqualTo("value0");
+        assertThat(props.get("key1")).isEqualTo("sub_value1");
     }
 
     @Test
-    void testSubstitutionFailures() {
-        assertEquals("a}", substVars("a}", "b"));
-        assertEquals("${a", substVars("${a", "b"));
+    void substitutionFailures() {
+        assertThat(substVars("a}", "b")).isEqualTo("a}");
+        assertThat(substVars("${a", "b")).isEqualTo("${a");
     }
 
     @Test
-    void testEmptyVariable() {
-        assertEquals("", substVars("${}", "b"));
+    void emptyVariable() {
+        assertThat(substVars("${}", "b")).isEqualTo("");
     }
 
     @Test
-    void testInnerSubst() {
-        assertEquals("c", substVars("${${a}}", "z", Map.of("a", "b", "b", "c")));
+    void innerSubst() {
+        assertThat(substVars("${${a}}", "z", Map.of("a", "b", "b", "c"))).isEqualTo("c");
     }
 
     @Test
-    void testSubstLoop() {
-        assertThrows(
-                InterpolatorException.class,
-                () -> substVars("${a}", "a"),
-                "Expected substVars() to throw an InterpolatorException, but it didn't");
+    void substLoop() {
+        assertThatExceptionOfType(InterpolatorException.class).as("Expected substVars() to throw an InterpolatorException, but it didn't").isThrownBy(() -> substVars("${a}", "a"));
     }
 
     @Test
-    void testLoopEmpty() {
-        assertEquals("${a}", substVars("${a}", null, null, null, false));
+    void loopEmpty() {
+        assertThat(substVars("${a}", null, null, null, false)).isEqualTo("${a}");
     }
 
     @Test
-    void testLoopEmpty2() {
-        assertEquals("${a}", substVars("${a}", null, null, null, false));
+    void loopEmpty2() {
+        assertThat(substVars("${a}", null, null, null, false)).isEqualTo("${a}");
     }
 
     @Test
-    void testSubstitutionEscape() {
-        assertEquals("${a}", substVars("$\\{a${#}\\}", "b"));
-        assertEquals("${a}", substVars("$\\{a\\}${#}", "b"));
-        assertEquals("${a}", substVars("$\\{a\\}", "b"));
-        assertEquals("\\\\", substVars("\\\\", "b"));
+    void substitutionEscape() {
+        assertThat(substVars("$\\{a${#}\\}", "b")).isEqualTo("${a}");
+        assertThat(substVars("$\\{a\\}${#}", "b")).isEqualTo("${a}");
+        assertThat(substVars("$\\{a\\}", "b")).isEqualTo("${a}");
+        assertThat(substVars("\\\\", "b")).isEqualTo("\\\\");
     }
 
     @Test
-    void testSubstitutionOrder() {
+    void substitutionOrder() {
         LinkedHashMap<String, String> map1 = new LinkedHashMap<>();
         map1.put("a", "$\\\\{var}");
         map1.put("abc", "${ab}c");
@@ -113,39 +110,39 @@ class DefaultInterpolatorTest {
         map2.put("abc", "${ab}c");
         performSubstitution(map2);
 
-        assertEquals(map1, map2);
+        assertThat(map2).isEqualTo(map1);
     }
 
     @Test
-    void testMultipleEscapes() {
+    void multipleEscapes() {
         LinkedHashMap<String, String> map1 = new LinkedHashMap<>();
         map1.put("a", "$\\\\{var}");
         map1.put("abc", "${ab}c");
         map1.put("ab", "${a}b");
         performSubstitution(map1);
 
-        assertEquals("$\\{var}", map1.get("a"));
-        assertEquals("$\\{var}b", map1.get("ab"));
-        assertEquals("$\\{var}bc", map1.get("abc"));
+        assertThat(map1.get("a")).isEqualTo("$\\{var}");
+        assertThat(map1.get("ab")).isEqualTo("$\\{var}b");
+        assertThat(map1.get("abc")).isEqualTo("$\\{var}bc");
     }
 
     @Test
-    void testPreserveUnresolved() {
+    void preserveUnresolved() {
         Map<String, String> props = new HashMap<>();
         props.put("a", "${b}");
-        assertEquals("", substVars("${b}", "a", props, null, true));
-        assertEquals("${b}", substVars("${b}", "a", props, null, false));
+        assertThat(substVars("${b}", "a", props, null, true)).isEqualTo("");
+        assertThat(substVars("${b}", "a", props, null, false)).isEqualTo("${b}");
 
         props.put("b", "c");
-        assertEquals("c", substVars("${b}", "a", props, null, true));
-        assertEquals("c", substVars("${b}", "a", props, null, false));
+        assertThat(substVars("${b}", "a", props, null, true)).isEqualTo("c");
+        assertThat(substVars("${b}", "a", props, null, false)).isEqualTo("c");
 
         props.put("c", "${d}${d}");
-        assertEquals("${d}${d}", substVars("${d}${d}", "c", props, null, false));
+        assertThat(substVars("${d}${d}", "c", props, null, false)).isEqualTo("${d}${d}");
     }
 
     @Test
-    void testExpansion() {
+    void expansion() {
         Map<String, String> props = new LinkedHashMap<>();
         props.put("a", "foo");
         props.put("b", "");
@@ -160,17 +157,17 @@ class DefaultInterpolatorTest {
 
         performSubstitution(props);
 
-        assertEquals("foo", props.get("a_cm"));
-        assertEquals("bar", props.get("b_cm"));
-        assertEquals("bar", props.get("c_cm"));
+        assertThat(props.get("a_cm")).isEqualTo("foo");
+        assertThat(props.get("b_cm")).isEqualTo("bar");
+        assertThat(props.get("c_cm")).isEqualTo("bar");
 
-        assertEquals("bar", props.get("a_cp"));
-        assertEquals("", props.get("b_cp"));
-        assertEquals("", props.get("c_cp"));
+        assertThat(props.get("a_cp")).isEqualTo("bar");
+        assertThat(props.get("b_cp")).isEqualTo("");
+        assertThat(props.get("c_cp")).isEqualTo("");
     }
 
     @Test
-    void testTernary() {
+    void ternary() {
         Map<String, String> props;
 
         props = new LinkedHashMap<>();
@@ -178,7 +175,7 @@ class DefaultInterpolatorTest {
         props.put("bar", "-BAR");
         props.put("version", "1.0${release:+${foo}:-${bar}}");
         performSubstitution(props);
-        assertEquals("1.0-BAR", props.get("version"));
+        assertThat(props.get("version")).isEqualTo("1.0-BAR");
 
         props = new LinkedHashMap<>();
         props.put("release", "true");
@@ -186,14 +183,14 @@ class DefaultInterpolatorTest {
         props.put("bar", "-BAR");
         props.put("version", "1.0${release:+${foo}:-${bar}}");
         performSubstitution(props);
-        assertEquals("1.0-FOO", props.get("version"));
+        assertThat(props.get("version")).isEqualTo("1.0-FOO");
 
         props = new LinkedHashMap<>();
         props.put("foo", "");
         props.put("bar", "-BAR");
         props.put("version", "1.0${release:+${foo}:-${bar}}");
         performSubstitution(props);
-        assertEquals("1.0-BAR", props.get("version"));
+        assertThat(props.get("version")).isEqualTo("1.0-BAR");
 
         props = new LinkedHashMap<>();
         props.put("release", "true");
@@ -201,22 +198,22 @@ class DefaultInterpolatorTest {
         props.put("bar", "-BAR");
         props.put("version", "1.0${release:+${foo}:-${bar}}");
         performSubstitution(props);
-        assertEquals("1.0", props.get("version"));
+        assertThat(props.get("version")).isEqualTo("1.0");
 
         props = new LinkedHashMap<>();
         props.put("version", "1.0${release:+:--BAR}");
         performSubstitution(props);
-        assertEquals("1.0-BAR", props.get("version"));
+        assertThat(props.get("version")).isEqualTo("1.0-BAR");
 
         props = new LinkedHashMap<>();
         props.put("release", "true");
         props.put("version", "1.0${release:+:--BAR}");
         performSubstitution(props);
-        assertEquals("1.0", props.get("version"));
+        assertThat(props.get("version")).isEqualTo("1.0");
     }
 
     @Test
-    void testXdg() {
+    void xdg() {
         Map<String, String> props;
 
         props = new LinkedHashMap<>();
@@ -225,7 +222,7 @@ class DefaultInterpolatorTest {
                 "maven.user.config",
                 "${env.MAVEN_XDG:+${env.XDG_CONFIG_HOME:-${user.home}/.config/maven}:-${user.home}/.m2}");
         performSubstitution(props);
-        assertEquals("/Users/gnodet/.m2", props.get("maven.user.config"));
+        assertThat(props.get("maven.user.config")).isEqualTo("/Users/gnodet/.m2");
 
         props = new LinkedHashMap<>();
         props.put("user.home", "/Users/gnodet");
@@ -234,7 +231,7 @@ class DefaultInterpolatorTest {
                 "${env.MAVEN_XDG:+${env.XDG_CONFIG_HOME:-${user.home}/.config/maven}:-${user.home}/.m2}");
         props.put("env.MAVEN_XDG", "true");
         performSubstitution(props);
-        assertEquals("/Users/gnodet/.config/maven", props.get("maven.user.config"));
+        assertThat(props.get("maven.user.config")).isEqualTo("/Users/gnodet/.config/maven");
 
         props = new LinkedHashMap<>();
         props.put("user.home", "/Users/gnodet");
@@ -244,7 +241,7 @@ class DefaultInterpolatorTest {
         props.put("env.MAVEN_XDG", "true");
         props.put("env.XDG_CONFIG_HOME", "/Users/gnodet/.xdg/maven");
         performSubstitution(props);
-        assertEquals("/Users/gnodet/.xdg/maven", props.get("maven.user.config"));
+        assertThat(props.get("maven.user.config")).isEqualTo("/Users/gnodet/.xdg/maven");
     }
 
     private void performSubstitution(Map<String, String> props) {

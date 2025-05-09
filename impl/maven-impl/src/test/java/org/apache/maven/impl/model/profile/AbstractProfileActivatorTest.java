@@ -32,7 +32,7 @@ import org.apache.maven.impl.model.rootlocator.DefaultRootLocator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
@@ -74,8 +74,8 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
         boolean res = activator.isActive(profile, context, problems);
-        assertEquals(0, problems.getErrors().size(), problems.getErrors().toString());
-        assertEquals(0, problems.getWarnings().size(), problems.getWarnings().toString());
-        assertEquals(active, res);
+        assertThat(problems.getErrors().size()).as(problems.getErrors().toString()).isEqualTo(0);
+        assertThat(problems.getWarnings().size()).as(problems.getWarnings().toString()).isEqualTo(0);
+        assertThat(res).isEqualTo(active);
     }
 }

@@ -36,7 +36,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */
@@ -54,10 +54,10 @@ class DefaultSettingsBuilderFactoryTest {
     }
 
     @Test
-    void testCompleteWiring() {
+    void completeWiring() {
         SettingsBuilder builder =
                 new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
-        assertNotNull(builder);
+        assertThat(builder).isNotNull();
 
         SettingsBuilderRequest request = SettingsBuilderRequest.builder()
                 .session(session)
@@ -65,8 +65,8 @@ class DefaultSettingsBuilderFactoryTest {
                 .build();
 
         SettingsBuilderResult result = builder.build(request);
-        assertNotNull(result);
-        assertNotNull(result.getEffectiveSettings());
+        assertThat(result).isNotNull();
+        assertThat(result.getEffectiveSettings()).isNotNull();
     }
 
     private Path getSettings(String name) {

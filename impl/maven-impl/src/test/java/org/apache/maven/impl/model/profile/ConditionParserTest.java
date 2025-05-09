@@ -33,11 +33,10 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConditionParserTest {
     ConditionParser parser;
@@ -71,117 +70,111 @@ class ConditionParserTest {
     }
 
     @Test
-    void testStringLiterals() {
-        assertEquals("Hello, World!", parser.parse("'Hello, World!'"));
-        assertEquals("Hello, World!", parser.parse("\"Hello, World!\""));
+    void stringLiterals() {
+        assertThat(parser.parse("'Hello, World!'")).isEqualTo("Hello, World!");
+        assertThat(parser.parse("\"Hello, World!\"")).isEqualTo("Hello, World!");
     }
 
     @Test
-    void testStringConcatenation() {
-        assertEquals("HelloWorld", parser.parse("'Hello' + 'World'"));
-        assertEquals("Hello123", parser.parse("'Hello' + 123"));
+    void stringConcatenation() {
+        assertThat(parser.parse("'Hello' + 'World'")).isEqualTo("HelloWorld");
+        assertThat(parser.parse("'Hello' + 123")).isEqualTo("Hello123");
     }
 
     @Test
-    void testLengthFunction() {
-        assertEquals(13, parser.parse("length('Hello, World!')"));
-        assertEquals(5, parser.parse("length(\"Hello\")"));
+    void lengthFunction() {
+        assertThat(parser.parse("length('Hello, World!')")).isEqualTo(13);
+        assertThat(parser.parse("length(\"Hello\")")).isEqualTo(5);
     }
 
     @Test
-    void testCaseConversionFunctions() {
-        assertEquals("HELLO", parser.parse("upper('hello')"));
-        assertEquals("world", parser.parse("lower('WORLD')"));
+    void caseConversionFunctions() {
+        assertThat(parser.parse("upper('hello')")).isEqualTo("HELLO");
+        assertThat(parser.parse("lower('WORLD')")).isEqualTo("world");
     }
 
     @Test
-    void testConcatFunction() {
-        assertEquals("HelloWorld", parser.parse("'Hello' + 'World'"));
-        assertEquals("The answer is 42", parser.parse("'The answer is ' + 42"));
-        assertEquals("The answer is 42", parser.parse("'The answer is ' + 42.0"));
-        assertEquals("The answer is 42", parser.parse("'The answer is ' + 42.0f"));
-        assertEquals("Pi is approximately 3.14", parser.parse("'Pi is approximately ' + 3.14"));
-        assertEquals("Pi is approximately 3.14", parser.parse("'Pi is approximately ' + 3.14f"));
+    void concatFunction() {
+        assertThat(parser.parse("'Hello' + 'World'")).isEqualTo("HelloWorld");
+        assertThat(parser.parse("'The answer is ' + 42")).isEqualTo("The answer is 42");
+        assertThat(parser.parse("'The answer is ' + 42.0")).isEqualTo("The answer is 42");
+        assertThat(parser.parse("'The answer is ' + 42.0f")).isEqualTo("The answer is 42");
+        assertThat(parser.parse("'Pi is approximately ' + 3.14")).isEqualTo("Pi is approximately 3.14");
+        assertThat(parser.parse("'Pi is approximately ' + 3.14f")).isEqualTo("Pi is approximately 3.14");
     }
 
     @Test
     void testToString() {
-        assertEquals("42", ConditionParser.toString(42));
-        assertEquals("42", ConditionParser.toString(42L));
-        assertEquals("42", ConditionParser.toString(42.0));
-        assertEquals("42", ConditionParser.toString(42.0f));
-        assertEquals("3.14", ConditionParser.toString(3.14));
-        assertEquals("3.14", ConditionParser.toString(3.14f));
-        assertEquals("true", ConditionParser.toString(true));
-        assertEquals("false", ConditionParser.toString(false));
-        assertEquals("hello", ConditionParser.toString("hello"));
+        assertThat(ConditionParser.toString(42)).isEqualTo("42");
+        assertThat(ConditionParser.toString(42L)).isEqualTo("42");
+        assertThat(ConditionParser.toString(42.0)).isEqualTo("42");
+        assertThat(ConditionParser.toString(42.0f)).isEqualTo("42");
+        assertThat(ConditionParser.toString(3.14)).isEqualTo("3.14");
+        assertThat(ConditionParser.toString(3.14f)).isEqualTo("3.14");
+        assertThat(ConditionParser.toString(true)).isEqualTo("true");
+        assertThat(ConditionParser.toString(false)).isEqualTo("false");
+        assertThat(ConditionParser.toString("hello")).isEqualTo("hello");
     }
 
     @Test
-    void testSubstringFunction() {
-        assertEquals("World", parser.parse("substring('Hello, World!', 7, 12)"));
-        assertEquals("World!", parser.parse("substring('Hello, World!', 7)"));
+    void substringFunction() {
+        assertThat(parser.parse("substring('Hello, World!', 7, 12)")).isEqualTo("World");
+        assertThat(parser.parse("substring('Hello, World!', 7)")).isEqualTo("World!");
     }
 
     @Test
-    void testIndexOf() {
-        assertEquals(7, parser.parse("indexOf('Hello, World!', 'World')"));
-        assertEquals(-1, parser.parse("indexOf('Hello, World!', 'OpenAI')"));
+    void indexOf() {
+        assertThat(parser.parse("indexOf('Hello, World!', 'World')")).isEqualTo(7);
+        assertThat(parser.parse("indexOf('Hello, World!', 'OpenAI')")).isEqualTo(-1);
     }
 
     @Test
-    void testInRange() {
-        assertTrue((Boolean) parser.parse("inrange('1.8.0_292', '[1.8,2.0)')"));
-        assertFalse((Boolean) parser.parse("inrange('1.7.0', '[1.8,2.0)')"));
+    void inRange() {
+        assertThat((Boolean) parser.parse("inrange('1.8.0_292', '[1.8,2.0)')")).isTrue();
+        assertThat((Boolean) parser.parse("inrange('1.7.0', '[1.8,2.0)')")).isFalse();
     }
 
     @Test
-    void testIfFunction() {
-        assertEquals("long", parser.parse("if(length('test') > 3, 'long', 'short')"));
-        assertEquals("short", parser.parse("if(length('hi') > 3, 'long', 'short')"));
+    void ifFunction() {
+        assertThat(parser.parse("if(length('test') > 3, 'long', 'short')")).isEqualTo("long");
+        assertThat(parser.parse("if(length('hi') > 3, 'long', 'short')")).isEqualTo("short");
     }
 
     @Test
-    void testContainsFunction() {
-        assertTrue((Boolean) parser.parse("contains('Hello, World!', 'World')"));
-        assertFalse((Boolean) parser.parse("contains('Hello, World!', 'OpenAI')"));
+    void containsFunction() {
+        assertThat((Boolean) parser.parse("contains('Hello, World!', 'World')")).isTrue();
+        assertThat((Boolean) parser.parse("contains('Hello, World!', 'OpenAI')")).isFalse();
     }
 
     @Test
-    void testMatchesFunction() {
-        assertTrue((Boolean) parser.parse("matches('test123', '\\w+')"));
-        assertFalse((Boolean) parser.parse("matches('test123', '\\d+')"));
+    void matchesFunction() {
+        assertThat((Boolean) parser.parse("matches('test123', '\\w+')")).isTrue();
+        assertThat((Boolean) parser.parse("matches('test123', '\\d+')")).isFalse();
     }
 
     @Test
-    void testComplexExpression() {
+    void complexExpression() {
         String expression = "if(contains(lower('HELLO WORLD'), 'hello'), upper('success') + '!', 'failure')";
-        assertEquals("SUCCESS!", parser.parse(expression));
+        assertThat(parser.parse(expression)).isEqualTo("SUCCESS!");
     }
 
     @Test
-    void testStringComparison() {
-        assertTrue((Boolean) parser.parse("'abc' != 'cdf'"));
-        assertFalse((Boolean) parser.parse("'abc' != 'abc'"));
-        assertTrue((Boolean) parser.parse("'abc' == 'abc'"));
-        assertFalse((Boolean) parser.parse("'abc' == 'cdf'"));
+    void stringComparison() {
+        assertThat((Boolean) parser.parse("'abc' != 'cdf'")).isTrue();
+        assertThat((Boolean) parser.parse("'abc' != 'abc'")).isFalse();
+        assertThat((Boolean) parser.parse("'abc' == 'abc'")).isTrue();
+        assertThat((Boolean) parser.parse("'abc' == 'cdf'")).isFalse();
     }
 
     @Test
-    void testParenthesesMismatch() {
+    void parenthesesMismatch() {
         functions.put("property", args -> "foo");
         functions.put("inrange", args -> false);
-        assertThrows(
-                RuntimeException.class,
-                () -> parser.parse(
-                        "property('os.name') == 'windows' && property('os.arch') != 'amd64') && inrange(property('os.version'), '[99,)')"),
-                "Should throw RuntimeException due to parentheses mismatch");
+        assertThatExceptionOfType(RuntimeException.class).as("Should throw RuntimeException due to parentheses mismatch").isThrownBy(() -> parser.parse(
+                "property('os.name') == 'windows' && property('os.arch') != 'amd64') && inrange(property('os.version'), '[99,)')"));
 
-        assertThrows(
-                RuntimeException.class,
-                () -> parser.parse(
-                        "(property('os.name') == 'windows' && property('os.arch') != 'amd64') && inrange(property('os.version'), '[99,)'"),
-                "Should throw RuntimeException due to parentheses mismatch");
+        assertThatExceptionOfType(RuntimeException.class).as("Should throw RuntimeException due to parentheses mismatch").isThrownBy(() -> parser.parse(
+                "(property('os.name') == 'windows' && property('os.arch') != 'amd64') && inrange(property('os.version'), '[99,)'"));
 
         // This should not throw an exception if parentheses are balanced and properties are handled correctly
         assertDoesNotThrow(
@@ -190,80 +183,80 @@ class ConditionParserTest {
     }
 
     @Test
-    void testBasicArithmetic() {
-        assertEquals(5.0, parser.parse("2 + 3"));
-        assertEquals(10.0, parser.parse("15 - 5"));
-        assertEquals(24.0, parser.parse("6 * 4"));
-        assertEquals(3.0, parser.parse("9 / 3"));
+    void basicArithmetic() {
+        assertThat(parser.parse("2 + 3")).isEqualTo(5.0);
+        assertThat(parser.parse("15 - 5")).isEqualTo(10.0);
+        assertThat(parser.parse("6 * 4")).isEqualTo(24.0);
+        assertThat(parser.parse("9 / 3")).isEqualTo(3.0);
     }
 
     @Test
-    void testArithmeticPrecedence() {
-        assertEquals(14.0, parser.parse("2 + 3 * 4"));
-        assertEquals(20.0, parser.parse("(2 + 3) * 4"));
-        assertEquals(11.0, parser.parse("15 - 6 + 2"));
-        assertEquals(10.0, parser.parse("10 / 2 + 2 * 2.5"));
+    void arithmeticPrecedence() {
+        assertThat(parser.parse("2 + 3 * 4")).isEqualTo(14.0);
+        assertThat(parser.parse("(2 + 3) * 4")).isEqualTo(20.0);
+        assertThat(parser.parse("15 - 6 + 2")).isEqualTo(11.0);
+        assertThat(parser.parse("10 / 2 + 2 * 2.5")).isEqualTo(10.0);
     }
 
     @Test
-    void testFloatingPointArithmetic() {
-        assertEquals(5.5, parser.parse("2.2 + 3.3"));
-        assertEquals(0.1, (Double) parser.parse("3.3 - 3.2"), 1e-10);
-        assertEquals(6.25, parser.parse("2.5 * 2.5"));
-        assertEquals(2.5, parser.parse("5 / 2"));
+    void floatingPointArithmetic() {
+        assertThat(parser.parse("2.2 + 3.3")).isEqualTo(5.5);
+        assertThat((Double) parser.parse("3.3 - 3.2")).isCloseTo(0.1, within(1e-10));
+        assertThat(parser.parse("2.5 * 2.5")).isEqualTo(6.25);
+        assertThat(parser.parse("5 / 2")).isEqualTo(2.5);
     }
 
     @Test
-    void testArithmeticComparisons() {
-        assertTrue((Boolean) parser.parse("5 > 3"));
-        assertTrue((Boolean) parser.parse("3 < 5"));
-        assertTrue((Boolean) parser.parse("5 >= 5"));
-        assertTrue((Boolean) parser.parse("3 <= 3"));
-        assertTrue((Boolean) parser.parse("5 == 5"));
-        assertTrue((Boolean) parser.parse("5 != 3"));
-        assertFalse((Boolean) parser.parse("5 < 3"));
-        assertFalse((Boolean) parser.parse("3 > 5"));
-        assertFalse((Boolean) parser.parse("5 != 5"));
+    void arithmeticComparisons() {
+        assertThat((Boolean) parser.parse("5 > 3")).isTrue();
+        assertThat((Boolean) parser.parse("3 < 5")).isTrue();
+        assertThat((Boolean) parser.parse("5 >= 5")).isTrue();
+        assertThat((Boolean) parser.parse("3 <= 3")).isTrue();
+        assertThat((Boolean) parser.parse("5 == 5")).isTrue();
+        assertThat((Boolean) parser.parse("5 != 3")).isTrue();
+        assertThat((Boolean) parser.parse("5 < 3")).isFalse();
+        assertThat((Boolean) parser.parse("3 > 5")).isFalse();
+        assertThat((Boolean) parser.parse("5 != 5")).isFalse();
     }
 
     @Test
-    void testComplexArithmeticExpressions() {
-        assertFalse((Boolean) parser.parse("(2 + 3 * 4) > (10 + 5)"));
-        assertTrue((Boolean) parser.parse("(2 + 3 * 4) < (10 + 5)"));
-        assertTrue((Boolean) parser.parse("(10 / 2 + 3) == 8"));
-        assertTrue((Boolean) parser.parse("(10 / 2 + 3) != 9"));
+    void complexArithmeticExpressions() {
+        assertThat((Boolean) parser.parse("(2 + 3 * 4) > (10 + 5)")).isFalse();
+        assertThat((Boolean) parser.parse("(2 + 3 * 4) < (10 + 5)")).isTrue();
+        assertThat((Boolean) parser.parse("(10 / 2 + 3) == 8")).isTrue();
+        assertThat((Boolean) parser.parse("(10 / 2 + 3) != 9")).isTrue();
     }
 
     @Test
-    void testArithmeticFunctions() {
-        assertEquals(5.0, parser.parse("2 + 3"));
-        assertEquals(2.0, parser.parse("5 - 3"));
-        assertEquals(15.0, parser.parse("3 * 5"));
-        assertEquals(2.5, parser.parse("5 / 2"));
+    void arithmeticFunctions() {
+        assertThat(parser.parse("2 + 3")).isEqualTo(5.0);
+        assertThat(parser.parse("5 - 3")).isEqualTo(2.0);
+        assertThat(parser.parse("3 * 5")).isEqualTo(15.0);
+        assertThat(parser.parse("5 / 2")).isEqualTo(2.5);
     }
 
     @Test
-    void testCombinedArithmeticAndLogic() {
-        assertTrue((Boolean) parser.parse("(5 > 3) && (10 / 2 == 5)"));
-        assertFalse((Boolean) parser.parse("(5 < 3) || (10 / 2 != 5)"));
-        assertTrue((Boolean) parser.parse("2 + 3 == 1 * 5"));
+    void combinedArithmeticAndLogic() {
+        assertThat((Boolean) parser.parse("(5 > 3) && (10 / 2 == 5)")).isTrue();
+        assertThat((Boolean) parser.parse("(5 < 3) || (10 / 2 != 5)")).isFalse();
+        assertThat((Boolean) parser.parse("2 + 3 == 1 * 5")).isTrue();
     }
 
     @Test
-    void testDivisionByZero() {
-        assertThrows(ArithmeticException.class, () -> parser.parse("5 / 0"));
+    void divisionByZero() {
+        assertThatExceptionOfType(ArithmeticException.class).isThrownBy(() -> parser.parse("5 / 0"));
     }
 
     @Test
-    void testPropertyAlias() {
-        assertTrue((Boolean) parser.parse("${os.name} == 'windows'"));
-        assertFalse((Boolean) parser.parse("${os.name} == 'linux'"));
-        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' && ${os.name} == 'windows'"));
-        assertThrows(RuntimeException.class, () -> parser.parse("${unclosed"));
+    void propertyAlias() {
+        assertThat((Boolean) parser.parse("${os.name} == 'windows'")).isTrue();
+        assertThat((Boolean) parser.parse("${os.name} == 'linux'")).isFalse();
+        assertThat((Boolean) parser.parse("${os.arch} == 'amd64' && ${os.name} == 'windows'")).isTrue();
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> parser.parse("${unclosed"));
     }
 
     @Test
-    void testNestedPropertyAlias() {
+    void nestedPropertyAlias() {
         functions.put("property", args -> {
             if (args.get(0).equals("project.rootDirectory")) {
                 return "/home/user/project";
@@ -273,27 +266,27 @@ class ConditionParserTest {
         functions.put("exists", args -> true); // Mock implementation
 
         Object result = parser.parse("exists('${project.rootDirectory}/someFile.txt')");
-        assertTrue((Boolean) result);
+        assertThat((Boolean) result).isTrue();
 
         result = parser.parse("exists('${project.rootDirectory}/${nested.property}/someFile.txt')");
-        assertTrue((Boolean) result);
+        assertThat((Boolean) result).isTrue();
 
         assertDoesNotThrow(() -> parser.parse("property('')"));
     }
 
     @Test
-    void testToInt() {
-        assertEquals(123, ConditionParser.toInt(123));
-        assertEquals(123, ConditionParser.toInt(123L));
-        assertEquals(123, ConditionParser.toInt(123.0));
-        assertEquals(123, ConditionParser.toInt(123.5)); // This will truncate the decimal part
-        assertEquals(123, ConditionParser.toInt("123"));
-        assertEquals(123, ConditionParser.toInt("123.0"));
-        assertEquals(123, ConditionParser.toInt("123.5")); // This will truncate the decimal part
-        assertEquals(1, ConditionParser.toInt(true));
-        assertEquals(0, ConditionParser.toInt(false));
+    void toInt() {
+        assertThat(ConditionParser.toInt(123)).isEqualTo(123);
+        assertThat(ConditionParser.toInt(123L)).isEqualTo(123);
+        assertThat(ConditionParser.toInt(123.0)).isEqualTo(123);
+        assertThat(ConditionParser.toInt(123.5)).isEqualTo(123); // This will truncate the decimal part
+        assertThat(ConditionParser.toInt("123")).isEqualTo(123);
+        assertThat(ConditionParser.toInt("123.0")).isEqualTo(123);
+        assertThat(ConditionParser.toInt("123.5")).isEqualTo(123); // This will truncate the decimal part
+        assertThat(ConditionParser.toInt(true)).isEqualTo(1);
+        assertThat(ConditionParser.toInt(false)).isEqualTo(0);
 
-        assertThrows(RuntimeException.class, () -> ConditionParser.toInt("not a number"));
-        assertThrows(RuntimeException.class, () -> ConditionParser.toInt(new Object()));
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ConditionParser.toInt("not a number"));
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> ConditionParser.toInt(new Object()));
     }
 }

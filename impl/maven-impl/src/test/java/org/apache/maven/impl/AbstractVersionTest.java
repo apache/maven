@@ -20,8 +20,7 @@ package org.apache.maven.impl;
 
 import org.apache.maven.api.Version;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  */
@@ -40,21 +39,21 @@ abstract class AbstractVersionTest {
         Version v2 = newVersion(version2);
 
         if (expected > 0) {
-            assertEquals(1, Integer.signum(v1.compareTo(v2)), "expected " + v1 + " > " + v2);
-            assertEquals(-1, Integer.signum(v2.compareTo(v1)), "expected " + v2 + " < " + v1);
-            assertNotEquals(v1, v2, "expected " + v1 + " != " + v2);
-            assertNotEquals(v2, v1, "expected " + v2 + " != " + v1);
+            assertThat(Integer.signum(v1.compareTo(v2))).as("expected " + v1 + " > " + v2).isEqualTo(1);
+            assertThat(Integer.signum(v2.compareTo(v1))).as("expected " + v2 + " < " + v1).isEqualTo(-1);
+            assertThat(v2).as("expected " + v1 + " != " + v2).isNotEqualTo(v1);
+            assertThat(v1).as("expected " + v2 + " != " + v1).isNotEqualTo(v2);
         } else if (expected < 0) {
-            assertEquals(-1, Integer.signum(v1.compareTo(v2)), "expected " + v1 + " < " + v2);
-            assertEquals(1, Integer.signum(v2.compareTo(v1)), "expected " + v2 + " > " + v1);
-            assertNotEquals(v1, v2, "expected " + v1 + " != " + v2);
-            assertNotEquals(v2, v1, "expected " + v2 + " != " + v1);
+            assertThat(Integer.signum(v1.compareTo(v2))).as("expected " + v1 + " < " + v2).isEqualTo(-1);
+            assertThat(Integer.signum(v2.compareTo(v1))).as("expected " + v2 + " > " + v1).isEqualTo(1);
+            assertThat(v2).as("expected " + v1 + " != " + v2).isNotEqualTo(v1);
+            assertThat(v1).as("expected " + v2 + " != " + v1).isNotEqualTo(v2);
         } else {
-            assertEquals(0, v1.compareTo(v2), "expected " + v1 + " == " + v2);
-            assertEquals(0, v2.compareTo(v1), "expected " + v2 + " == " + v1);
-            assertEquals(v1, v2, "expected " + v1 + " == " + v2);
-            assertEquals(v2, v1, "expected " + v2 + " == " + v1);
-            assertEquals(v1.hashCode(), v2.hashCode(), "expected #(" + v1 + ") == #(" + v1 + ")");
+            assertThat(v1.compareTo(v2)).as("expected " + v1 + " == " + v2).isEqualTo(0);
+            assertThat(v2.compareTo(v1)).as("expected " + v2 + " == " + v1).isEqualTo(0);
+            assertThat(v2).as("expected " + v1 + " == " + v2).isEqualTo(v1);
+            assertThat(v1).as("expected " + v2 + " == " + v1).isEqualTo(v2);
+            assertThat(v2.hashCode()).as("expected #(" + v1 + ") == #(" + v1 + ")").isEqualTo(v1.hashCode());
         }
     }
 

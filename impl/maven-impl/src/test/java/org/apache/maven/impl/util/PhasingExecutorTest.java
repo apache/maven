@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 class PhasingExecutorTest {
 
     @Test
-    void testPhaser() {
+    void phaser() {
         try (PhasingExecutor p = new PhasingExecutor(Executors.newFixedThreadPool(4))) {
             p.execute(() -> waitSomeTime(p, 2));
         }
