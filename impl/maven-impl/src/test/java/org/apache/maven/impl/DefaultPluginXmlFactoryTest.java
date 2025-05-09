@@ -79,7 +79,8 @@ class DefaultPluginXmlFactoryReadWriteTest {
     void testParsePlugin() {
         assertEquals(
                 "Sample Plugin",
-                defaultPluginXmlFactory.read(XmlReaderRequest.builder()
+                defaultPluginXmlFactory
+                        .read(XmlReaderRequest.builder()
                                 .reader(new StringReader(SAMPLE_PLUGIN_XML))
                                 .build())
                         .getName());
@@ -91,7 +92,9 @@ class DefaultPluginXmlFactoryReadWriteTest {
         Files.write(xmlFile, SAMPLE_PLUGIN_XML.getBytes());
         assertEquals(
                 "Sample Plugin",
-                defaultPluginXmlFactory.read(XmlReaderRequest.builder().path(xmlFile).build()).getName());
+                defaultPluginXmlFactory
+                        .read(XmlReaderRequest.builder().path(xmlFile).build())
+                        .getName());
     }
 
     @Test
