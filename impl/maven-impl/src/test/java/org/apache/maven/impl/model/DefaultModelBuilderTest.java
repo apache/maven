@@ -63,7 +63,8 @@ class DefaultModelBuilderTest {
                 .build();
         ModelBuilderResult result = builder.newSession().build(request);
         assertThat(result).isNotNull();
-        assertThat(result.getEffectiveModel().getProperties().get("maven.compiler.release")).isEqualTo("21");
+        assertThat(result.getEffectiveModel().getProperties().get("maven.compiler.release"))
+                .isEqualTo("21");
     }
 
     @Test

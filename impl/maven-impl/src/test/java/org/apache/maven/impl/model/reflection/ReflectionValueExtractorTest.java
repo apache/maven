@@ -89,21 +89,26 @@ class ReflectionValueExtractorTest {
         // Top level values
         // ----------------------------------------------------------------------
 
-        assertThat(ReflectionValueExtractor.evaluate("project.modelVersion", project)).isEqualTo("4.0.0");
+        assertThat(ReflectionValueExtractor.evaluate("project.modelVersion", project))
+                .isEqualTo("4.0.0");
 
-        assertThat(ReflectionValueExtractor.evaluate("project.groupId", project)).isEqualTo("org.apache.maven");
+        assertThat(ReflectionValueExtractor.evaluate("project.groupId", project))
+                .isEqualTo("org.apache.maven");
 
-        assertThat(ReflectionValueExtractor.evaluate("project.artifactId", project)).isEqualTo("maven-core");
+        assertThat(ReflectionValueExtractor.evaluate("project.artifactId", project))
+                .isEqualTo("maven-core");
 
         assertThat(ReflectionValueExtractor.evaluate("project.name", project)).isEqualTo("Maven");
 
-        assertThat(ReflectionValueExtractor.evaluate("project.version", project)).isEqualTo("2.0-SNAPSHOT");
+        assertThat(ReflectionValueExtractor.evaluate("project.version", project))
+                .isEqualTo("2.0-SNAPSHOT");
 
         // ----------------------------------------------------------------------
         // SCM
         // ----------------------------------------------------------------------
 
-        assertThat(ReflectionValueExtractor.evaluate("project.scm.connection", project)).isEqualTo("scm-connection");
+        assertThat(ReflectionValueExtractor.evaluate("project.scm.connection", project))
+                .isEqualTo("scm-connection");
 
         // ----------------------------------------------------------------------
         // Dependencies
@@ -171,8 +176,10 @@ class ReflectionValueExtractorTest {
     @Test
     void valueExtractorWithAInvalidExpression() throws Exception {
         assertThat(ReflectionValueExtractor.evaluate("project.foo", project)).isNull();
-        assertThat(ReflectionValueExtractor.evaluate("project.dependencies[10]", project)).isNull();
-        assertThat(ReflectionValueExtractor.evaluate("project.dependencies[0].foo", project)).isNull();
+        assertThat(ReflectionValueExtractor.evaluate("project.dependencies[10]", project))
+                .isNull();
+        assertThat(ReflectionValueExtractor.evaluate("project.dependencies[0].foo", project))
+                .isNull();
     }
 
     /**
@@ -185,7 +192,8 @@ class ReflectionValueExtractorTest {
         Map<String, String> map = new HashMap<String, String>();
         map.put("a.b", "a.b-value");
 
-        assertThat(ReflectionValueExtractor.evaluate("h.value(a.b)", new ValueHolder(map))).isEqualTo("a.b-value");
+        assertThat(ReflectionValueExtractor.evaluate("h.value(a.b)", new ValueHolder(map)))
+                .isEqualTo("a.b-value");
     }
 
     /**
@@ -200,7 +208,8 @@ class ReflectionValueExtractorTest {
         List<Object> list = new ArrayList<Object>();
         list.add(map);
 
-        assertThat(ReflectionValueExtractor.evaluate("h.value[0](a)", new ValueHolder(list))).isEqualTo("a-value");
+        assertThat(ReflectionValueExtractor.evaluate("h.value[0](a)", new ValueHolder(list)))
+                .isEqualTo("a-value");
     }
 
     /**
@@ -214,7 +223,8 @@ class ReflectionValueExtractorTest {
         list.add("a-value");
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("a", list);
-        assertThat(ReflectionValueExtractor.evaluate("h.value(a)[0]", new ValueHolder(map))).isEqualTo("a-value");
+        assertThat(ReflectionValueExtractor.evaluate("h.value(a)[0]", new ValueHolder(map)))
+                .isEqualTo("a-value");
     }
 
     /**
@@ -226,7 +236,8 @@ class ReflectionValueExtractorTest {
     void mappedMissingDot() throws Exception {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("a", new ValueHolder("a-value"));
-        assertThat(ReflectionValueExtractor.evaluate("h.value(a)value", new ValueHolder(map))).isNull();
+        assertThat(ReflectionValueExtractor.evaluate("h.value(a)value", new ValueHolder(map)))
+                .isNull();
     }
 
     /**
@@ -238,7 +249,8 @@ class ReflectionValueExtractorTest {
     void indexedMissingDot() throws Exception {
         List<Object> list = new ArrayList<Object>();
         list.add(new ValueHolder("a-value"));
-        assertThat(ReflectionValueExtractor.evaluate("h.value[0]value", new ValueHolder(list))).isNull();
+        assertThat(ReflectionValueExtractor.evaluate("h.value[0]value", new ValueHolder(list)))
+                .isNull();
     }
 
     /**
@@ -248,7 +260,8 @@ class ReflectionValueExtractorTest {
      */
     @Test
     void dotDot() throws Exception {
-        assertThat(ReflectionValueExtractor.evaluate("h..value", new ValueHolder("value"))).isNull();
+        assertThat(ReflectionValueExtractor.evaluate("h..value", new ValueHolder("value")))
+                .isNull();
     }
 
     /**
@@ -332,11 +345,15 @@ class ReflectionValueExtractorTest {
      */
     @Test
     void artifactMap() throws Exception {
-        assertThat(((Artifact) ReflectionValueExtractor.evaluate("project.artifactMap(g0:a0:c0)", project)).getGroupId()).isEqualTo("g0");
+        assertThat(((Artifact) ReflectionValueExtractor.evaluate("project.artifactMap(g0:a0:c0)", project))
+                        .getGroupId())
+                .isEqualTo("g0");
         assertThat(((Artifact) ReflectionValueExtractor.evaluate("project.artifactMap(g1:a1:c1)", project))
-                .getArtifactId()).isEqualTo("a1");
+                        .getArtifactId())
+                .isEqualTo("a1");
         assertThat(((Artifact) ReflectionValueExtractor.evaluate("project.artifactMap(g2:a2:c2)", project))
-                .getClassifier()).isEqualTo("c2");
+                        .getClassifier())
+                .isEqualTo("c2");
     }
 
     public static class Artifact {
@@ -539,8 +556,7 @@ class ReflectionValueExtractorTest {
         }
     }
 
-    public record ValueHolder(Object value) {
-    }
+    public record ValueHolder(Object value) {}
 
     /**
      * <p>testRootPropertyRegression.</p>

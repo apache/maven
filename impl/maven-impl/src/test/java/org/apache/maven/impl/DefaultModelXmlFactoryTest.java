@@ -81,8 +81,11 @@ class DefaultModelXmlFactoryTest {
         XmlReaderRequest request =
                 XmlReaderRequest.builder().reader(new StringReader(xml)).build();
 
-        XmlReaderException ex = assertThatExceptionOfType(XmlReaderException.class).isThrownBy(() -> factory.read(request)).actual();
-        assertThat(ex.getMessage().contains("Invalid namespace 'http://invalid.namespace/4.1.0'")).isTrue();
+        XmlReaderException ex = assertThatExceptionOfType(XmlReaderException.class)
+                .isThrownBy(() -> factory.read(request))
+                .actual();
+        assertThat(ex.getMessage().contains("Invalid namespace 'http://invalid.namespace/4.1.0'"))
+                .isTrue();
         assertThat(ex.getMessage().contains("4.1.0")).isTrue();
     }
 
@@ -104,7 +107,8 @@ class DefaultModelXmlFactoryTest {
 
     @Test
     void nullRequest() {
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> factory.read((XmlReaderRequest) null));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> factory.read((XmlReaderRequest) null));
     }
 
     @Test

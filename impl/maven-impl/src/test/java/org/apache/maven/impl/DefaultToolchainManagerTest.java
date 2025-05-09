@@ -119,6 +119,7 @@ class DefaultToolchainManagerTest {
 
     @Test
     void getToolchainsWithNullType() {
-        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> manager.getToolchains(session, null, null));
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> manager.getToolchains(session, null, null));
     }
 }

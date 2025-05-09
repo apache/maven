@@ -74,8 +74,12 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
         boolean res = activator.isActive(profile, context, problems);
-        assertThat(problems.getErrors().size()).as(problems.getErrors().toString()).isEqualTo(0);
-        assertThat(problems.getWarnings().size()).as(problems.getWarnings().toString()).isEqualTo(0);
+        assertThat(problems.getErrors().size())
+                .as(problems.getErrors().toString())
+                .isEqualTo(0);
+        assertThat(problems.getWarnings().size())
+                .as(problems.getWarnings().toString())
+                .isEqualTo(0);
         assertThat(res).isEqualTo(active);
     }
 }

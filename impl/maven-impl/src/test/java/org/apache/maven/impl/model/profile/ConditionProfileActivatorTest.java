@@ -208,9 +208,15 @@ class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<Conditi
 
         assertThat(activator.isActive(profile, context, problems)).isFalse();
 
-        assertThat(problems.getErrors().size()).as(problems.getErrors().toString()).isEqualTo(0);
-        assertThat(problems.getWarnings().size()).as(problems.getWarnings().toString()).isEqualTo(1);
-        assertThat(problems.getWarnings().get(0).contains(warningContains)).as(problems.getWarnings().toString()).isTrue();
+        assertThat(problems.getErrors().size())
+                .as(problems.getErrors().toString())
+                .isEqualTo(0);
+        assertThat(problems.getWarnings().size())
+                .as(problems.getWarnings().toString())
+                .isEqualTo(1);
+        assertThat(problems.getWarnings().get(0).contains(warningContains))
+                .as(problems.getWarnings().toString())
+                .isTrue();
     }
 
     private Map<String, String> newOsProperties(String osName, String osVersion, String osArch) {
@@ -380,7 +386,10 @@ class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<Conditi
     @Test
     @Disabled
     void fileRootDirectoryWithNull() {
-        IllegalStateException e = assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> assertActivation(false, newProfile("exists('${project.rootDirectory}')"), newFileContext(null))).actual();
+        IllegalStateException e = assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() ->
+                        assertActivation(false, newProfile("exists('${project.rootDirectory}')"), newFileContext(null)))
+                .actual();
         assertThat(e.getMessage()).isEqualTo(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
     }
 

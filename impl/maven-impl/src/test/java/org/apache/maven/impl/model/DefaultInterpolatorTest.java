@@ -75,7 +75,9 @@ class DefaultInterpolatorTest {
 
     @Test
     void substLoop() {
-        assertThatExceptionOfType(InterpolatorException.class).as("Expected substVars() to throw an InterpolatorException, but it didn't").isThrownBy(() -> substVars("${a}", "a"));
+        assertThatExceptionOfType(InterpolatorException.class)
+                .as("Expected substVars() to throw an InterpolatorException, but it didn't")
+                .isThrownBy(() -> substVars("${a}", "a"));
     }
 
     @Test

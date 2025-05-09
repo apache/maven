@@ -75,8 +75,7 @@ class DefaultModelInterpolatorTest {
         context.put("anotherdir", "anotherBasedir");
         context.put("project.baseUri", "myBaseUri");
 
-        session = ApiRunner.createSession(injector ->
-            injector.bindInstance(DefaultModelInterpolatorTest.class, this));
+        session = ApiRunner.createSession(injector -> injector.bindInstance(DefaultModelInterpolatorTest.class, this));
         interpolator = session.getService(Lookup.class).lookup(DefaultModelInterpolator.class);
     }
 
@@ -345,7 +344,8 @@ class DefaultModelInterpolatorTest {
                 model, projectBasedir, createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertThat((out.getRepositories().get(0)).getUrl()).isEqualTo(projectBasedir.resolve("temp-repo").toUri().toString());
+        assertThat((out.getRepositories().get(0)).getUrl())
+                .isEqualTo(projectBasedir.resolve("temp-repo").toUri().toString());
     }
 
     @Test
@@ -385,7 +385,8 @@ class DefaultModelInterpolatorTest {
                 model, rootDirectory, createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertThat((out.getRepositories().get(0)).getUrl()).isEqualTo(rootDirectory.resolve("temp-repo").toUri().toString());
+        assertThat((out.getRepositories().get(0)).getUrl())
+                .isEqualTo(rootDirectory.resolve("temp-repo").toUri().toString());
     }
 
     @Test
@@ -402,11 +403,13 @@ class DefaultModelInterpolatorTest {
                 .build();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        IllegalStateException e = assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> interpolator.interpolateModel(
-                model,
-                projectDirectory,
-                createModelBuildingRequest(context).build(),
-                collector)).actual();
+        IllegalStateException e = assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> interpolator.interpolateModel(
+                        model,
+                        projectDirectory,
+                        createModelBuildingRequest(context).build(),
+                        collector))
+                .actual();
 
         assertThat(e.getMessage()).isEqualTo(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
     }
@@ -498,7 +501,8 @@ class DefaultModelInterpolatorTest {
         List<Dependency> rDeps = result.getDependencies();
         assertThat(rDeps).isNotNull();
         assertThat(rDeps.size()).isEqualTo(1);
-        assertThat(Paths.get(rDeps.get(0).getSystemPath()).toAbsolutePath()).isEqualTo(basedir.resolve("artifact.jar").toAbsolutePath());
+        assertThat(Paths.get(rDeps.get(0).getSystemPath()).toAbsolutePath())
+                .isEqualTo(basedir.resolve("artifact.jar").toAbsolutePath());
     }
 
     @Test
@@ -515,7 +519,8 @@ class DefaultModelInterpolatorTest {
         interpolator.interpolateModel(model, null, request, collector);
 
         assertCollectorState(0, 2, 0, collector);
-        assertThat(collector.getErrors().get(0).contains("recursive variable reference")).isTrue();
+        assertThat(collector.getErrors().get(0).contains("recursive variable reference"))
+                .isTrue();
     }
 
     @Disabled("per def cannot be recursive: ${basedir} is immediately going for project.basedir")

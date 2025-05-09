@@ -127,8 +127,12 @@ class SoftIdentityMapTest {
         sink.accept("Final compute count: " + computeCount.get());
         sink.accept("Unique results size: " + uniqueResults.size());
 
-        assertThat(computeCount.get()).as("Value should be computed exactly once, but was computed " + computeCount.get() + " times").isEqualTo(1);
-        assertThat(uniqueResults.size()).as("All threads should see the same value, but saw " + uniqueResults.size() + " different values").isEqualTo(1);
+        assertThat(computeCount.get())
+                .as("Value should be computed exactly once, but was computed " + computeCount.get() + " times")
+                .isEqualTo(1);
+        assertThat(uniqueResults.size())
+                .as("All threads should see the same value, but saw " + uniqueResults.size() + " different values")
+                .isEqualTo(1);
     }
 
     @Test
@@ -152,7 +156,9 @@ class SoftIdentityMapTest {
             return "value2";
         });
 
-        assertThat(computeCount.get()).as("Should compute once for equal but distinct keys").isEqualTo(1);
+        assertThat(computeCount.get())
+                .as("Should compute once for equal but distinct keys")
+                .isEqualTo(1);
     }
 
     @Test
@@ -180,7 +186,9 @@ class SoftIdentityMapTest {
             return "new value";
         });
 
-        assertThat(computeCount.get()).as("Should compute again after original key is garbage collected").isEqualTo(2);
+        assertThat(computeCount.get())
+                .as("Should compute again after original key is garbage collected")
+                .isEqualTo(2);
     }
 
     @Test

@@ -143,7 +143,8 @@ class ConditionParserTest {
     @Test
     void containsFunction() {
         assertThat((Boolean) parser.parse("contains('Hello, World!', 'World')")).isTrue();
-        assertThat((Boolean) parser.parse("contains('Hello, World!', 'OpenAI')")).isFalse();
+        assertThat((Boolean) parser.parse("contains('Hello, World!', 'OpenAI')"))
+                .isFalse();
     }
 
     @Test
@@ -170,11 +171,17 @@ class ConditionParserTest {
     void parenthesesMismatch() {
         functions.put("property", args -> "foo");
         functions.put("inrange", args -> false);
-        assertThatExceptionOfType(RuntimeException.class).as("Should throw RuntimeException due to parentheses mismatch").isThrownBy(() -> parser.parse(
-                "property('os.name') == 'windows' && property('os.arch') != 'amd64') && inrange(property('os.version'), '[99,)')"));
+        assertThatExceptionOfType(RuntimeException.class)
+                .as("Should throw RuntimeException due to parentheses mismatch")
+                .isThrownBy(
+                        () -> parser.parse(
+                                "property('os.name') == 'windows' && property('os.arch') != 'amd64') && inrange(property('os.version'), '[99,)')"));
 
-        assertThatExceptionOfType(RuntimeException.class).as("Should throw RuntimeException due to parentheses mismatch").isThrownBy(() -> parser.parse(
-                "(property('os.name') == 'windows' && property('os.arch') != 'amd64') && inrange(property('os.version'), '[99,)'"));
+        assertThatExceptionOfType(RuntimeException.class)
+                .as("Should throw RuntimeException due to parentheses mismatch")
+                .isThrownBy(
+                        () -> parser.parse(
+                                "(property('os.name') == 'windows' && property('os.arch') != 'amd64') && inrange(property('os.version'), '[99,)'"));
 
         // This should not throw an exception if parentheses are balanced and properties are handled correctly
         assertDoesNotThrow(
@@ -251,7 +258,8 @@ class ConditionParserTest {
     void propertyAlias() {
         assertThat((Boolean) parser.parse("${os.name} == 'windows'")).isTrue();
         assertThat((Boolean) parser.parse("${os.name} == 'linux'")).isFalse();
-        assertThat((Boolean) parser.parse("${os.arch} == 'amd64' && ${os.name} == 'windows'")).isTrue();
+        assertThat((Boolean) parser.parse("${os.arch} == 'amd64' && ${os.name} == 'windows'"))
+                .isTrue();
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> parser.parse("${unclosed"));
     }
 

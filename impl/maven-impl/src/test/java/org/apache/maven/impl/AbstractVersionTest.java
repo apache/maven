@@ -39,13 +39,21 @@ abstract class AbstractVersionTest {
         Version v2 = newVersion(version2);
 
         if (expected > 0) {
-            assertThat(Integer.signum(v1.compareTo(v2))).as("expected " + v1 + " > " + v2).isEqualTo(1);
-            assertThat(Integer.signum(v2.compareTo(v1))).as("expected " + v2 + " < " + v1).isEqualTo(-1);
+            assertThat(Integer.signum(v1.compareTo(v2)))
+                    .as("expected " + v1 + " > " + v2)
+                    .isEqualTo(1);
+            assertThat(Integer.signum(v2.compareTo(v1)))
+                    .as("expected " + v2 + " < " + v1)
+                    .isEqualTo(-1);
             assertThat(v2).as("expected " + v1 + " != " + v2).isNotEqualTo(v1);
             assertThat(v1).as("expected " + v2 + " != " + v1).isNotEqualTo(v2);
         } else if (expected < 0) {
-            assertThat(Integer.signum(v1.compareTo(v2))).as("expected " + v1 + " < " + v2).isEqualTo(-1);
-            assertThat(Integer.signum(v2.compareTo(v1))).as("expected " + v2 + " > " + v1).isEqualTo(1);
+            assertThat(Integer.signum(v1.compareTo(v2)))
+                    .as("expected " + v1 + " < " + v2)
+                    .isEqualTo(-1);
+            assertThat(Integer.signum(v2.compareTo(v1)))
+                    .as("expected " + v2 + " > " + v1)
+                    .isEqualTo(1);
             assertThat(v2).as("expected " + v1 + " != " + v2).isNotEqualTo(v1);
             assertThat(v1).as("expected " + v2 + " != " + v1).isNotEqualTo(v2);
         } else {
@@ -53,7 +61,9 @@ abstract class AbstractVersionTest {
             assertThat(v2.compareTo(v1)).as("expected " + v2 + " == " + v1).isEqualTo(0);
             assertThat(v2).as("expected " + v1 + " == " + v2).isEqualTo(v1);
             assertThat(v1).as("expected " + v2 + " == " + v1).isEqualTo(v2);
-            assertThat(v2.hashCode()).as("expected #(" + v1 + ") == #(" + v1 + ")").isEqualTo(v1.hashCode());
+            assertThat(v2.hashCode())
+                    .as("expected #(" + v1 + ") == #(" + v1 + ")")
+                    .isEqualTo(v1.hashCode());
         }
     }
 

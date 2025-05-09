@@ -72,7 +72,9 @@ class ModelVersionParserTest {
 
     private void assertContains(String msg, VersionConstraint c, boolean b, String... versions) {
         for (String v : versions) {
-            assertThat(c.contains(versionParser.parseVersion(v))).as(String.format(msg, v)).isEqualTo(b);
+            assertThat(c.contains(versionParser.parseVersion(v)))
+                    .as(String.format(msg, v))
+                    .isEqualTo(b);
         }
     }
 

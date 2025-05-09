@@ -54,11 +54,15 @@ class VersionRangeTest {
     }
 
     private void assertContains(VersionRange range, String version) {
-        assertThat(range.contains(newVersion(version))).as(range + " should contain " + version).isTrue();
+        assertThat(range.contains(newVersion(version)))
+                .as(range + " should contain " + version)
+                .isTrue();
     }
 
     private void assertNotContains(VersionRange range, String version) {
-        assertThat(range.contains(newVersion(version))).as(range + " should not contain " + version).isFalse();
+        assertThat(range.contains(newVersion(version)))
+                .as(range + " should not contain " + version)
+                .isFalse();
     }
 
     @Test

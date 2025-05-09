@@ -63,7 +63,9 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     void rootDirectoryWithNull() {
         context.setModel(Model.newInstance());
 
-        NullPointerException e = assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> assertActivation(false, newExistsProfile("${project.rootDirectory}"), context)).actual();
+        NullPointerException e = assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> assertActivation(false, newExistsProfile("${project.rootDirectory}"), context))
+                .actual();
         assertThat(e.getMessage()).isEqualTo(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
     }
 

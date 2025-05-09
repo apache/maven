@@ -60,8 +60,10 @@ class ComplexActivationTest {
         ModelBuilderResult result = builder.newSession().build(request);
         assertThat(result).isNotNull();
         assertThat(result.getEffectiveModel()).isNotNull();
-        assertThat(result.getEffectiveModel().getProperties().get("profile.file")).isEqualTo("activated-1");
-        assertThat(result.getEffectiveModel().getProperties().get("profile.miss")).isNull();
+        assertThat(result.getEffectiveModel().getProperties().get("profile.file"))
+                .isEqualTo("activated-1");
+        assertThat(result.getEffectiveModel().getProperties().get("profile.miss"))
+                .isNull();
     }
 
     @Test
@@ -74,9 +76,10 @@ class ComplexActivationTest {
         ModelBuilderResult result = builder.newSession().build(request);
         assertThat(result).isNotNull();
         assertThat(result.getProblemCollector()
-                .problems()
-                .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.WARNING
-                        && p.getMessage().contains("The 'missing' assertion will be ignored."))).isTrue();
+                        .problems()
+                        .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.WARNING
+                                && p.getMessage().contains("The 'missing' assertion will be ignored.")))
+                .isTrue();
     }
 
     private Path getPom(String name) {

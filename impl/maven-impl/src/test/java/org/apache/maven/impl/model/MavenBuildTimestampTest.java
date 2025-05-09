@@ -33,6 +33,8 @@ class MavenBuildTimestampTest {
         interpolationProperties.put("maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'");
         MavenBuildTimestamp timestamp = new MavenBuildTimestamp(MonotonicClock.now(), interpolationProperties);
         String formattedTimestamp = timestamp.formattedTimestamp();
-        assertThat(formattedTimestamp.endsWith("Z")).as("We expect the UTC marker at the end of the timestamp.").isTrue();
+        assertThat(formattedTimestamp.endsWith("Z"))
+                .as("We expect the UTC marker at the end of the timestamp.")
+                .isTrue();
     }
 }

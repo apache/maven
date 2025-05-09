@@ -54,7 +54,8 @@ class DefaultNodeTest {
         node.setData(DependencyManagerUtils.NODE_DATA_PREMANAGED_SCOPE, "runtime");
         node.setManagedBits(DependencyNode.MANAGED_VERSION | DependencyNode.MANAGED_SCOPE);
         defaultNode = new DefaultNode(session, node, true);
-        assertThat(defaultNode.asString()).isEqualTo("org.example:myapp:jar:1.0:compile (version managed from 0.9; scope managed from runtime)");
+        assertThat(defaultNode.asString())
+                .isEqualTo("org.example:myapp:jar:1.0:compile (version managed from 0.9; scope managed from runtime)");
 
         // Test verbose mode with conflict resolution
         DefaultDependencyNode winner =
@@ -62,6 +63,7 @@ class DefaultNodeTest {
         node.setData(ConflictResolver.NODE_DATA_WINNER, winner);
         node.setManagedBits(0);
         defaultNode = new DefaultNode(session, node, true);
-        assertThat(defaultNode.asString()).isEqualTo("(org.example:myapp:jar:1.0:compile - omitted for conflict with 2.0)");
+        assertThat(defaultNode.asString())
+                .isEqualTo("(org.example:myapp:jar:1.0:compile - omitted for conflict with 2.0)");
     }
 }

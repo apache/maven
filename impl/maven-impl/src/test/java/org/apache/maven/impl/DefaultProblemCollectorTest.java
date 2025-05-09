@@ -90,17 +90,21 @@ class DefaultProblemCollectorTest {
 
         // collector is "full" of warnings
         assertThat(collector.reportProblem(
-                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.WARNING))).isFalse();
+                        new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.WARNING)))
+                .isFalse();
 
         // but collector will drop warning for more severe issues
         assertThat(collector.reportProblem(
-                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.ERROR))).isTrue();
+                        new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.ERROR)))
+                .isTrue();
         assertThat(collector.reportProblem(
-                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.FATAL))).isTrue();
+                        new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.FATAL)))
+                .isTrue();
 
         // collector is full of warnings, errors and fatal (mixed)
         assertThat(collector.reportProblem(
-                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.WARNING))).isFalse();
+                        new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.WARNING)))
+                .isFalse();
 
         // fill it up with fatal ones
         IntStream.range(0, 5)
@@ -109,14 +113,18 @@ class DefaultProblemCollectorTest {
 
         // from now on, only counters work, problems are lost
         assertThat(collector.reportProblem(
-                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.WARNING))).isFalse();
+                        new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.WARNING)))
+                .isFalse();
         assertThat(collector.reportProblem(
-                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.ERROR))).isFalse();
+                        new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.ERROR)))
+                .isFalse();
         assertThat(collector.reportProblem(
-                new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.FATAL))).isFalse();
+                        new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.FATAL)))
+                .isFalse();
 
         assertThat(collector.totalProblemsReported()).isEqualTo(17);
-        assertThat(collector.problemsReportedFor(BuilderProblem.Severity.WARNING)).isEqualTo(8);
+        assertThat(collector.problemsReportedFor(BuilderProblem.Severity.WARNING))
+                .isEqualTo(8);
         assertThat(collector.problemsReportedFor(BuilderProblem.Severity.ERROR)).isEqualTo(2);
         assertThat(collector.problemsReportedFor(BuilderProblem.Severity.FATAL)).isEqualTo(7);
 
@@ -149,7 +157,8 @@ class DefaultProblemCollectorTest {
         assertThat(collector.totalProblemsReported()).isEqualTo(14);
         assertThat(collector.problems().count()).isEqualTo(5);
 
-        assertThat(collector.problemsReportedFor(BuilderProblem.Severity.WARNING)).isEqualTo(5);
+        assertThat(collector.problemsReportedFor(BuilderProblem.Severity.WARNING))
+                .isEqualTo(5);
         assertThat(collector.problemsReportedFor(BuilderProblem.Severity.ERROR)).isEqualTo(5);
         assertThat(collector.problemsReportedFor(BuilderProblem.Severity.FATAL)).isEqualTo(4);
 
