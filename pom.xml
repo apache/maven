@@ -99,7 +99,7 @@ under the License.
   </contributors>
 
   <modules>
-    <module>api</module>
+    <module>maven-api</module>
     <module>maven-impl-modules</module>
     <module>maven-compat-modules</module>
     <module>apache-maven</module>
