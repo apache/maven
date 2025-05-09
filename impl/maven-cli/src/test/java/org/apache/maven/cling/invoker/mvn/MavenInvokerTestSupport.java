@@ -109,14 +109,20 @@ public abstract class MavenInvokerTestSupport {
                 ByteArrayOutputStream stderr = new ByteArrayOutputStream();
                 List<String> mvnArgs = new ArrayList<>(args);
                 mvnArgs.add(goal);
-                int exitCode = invoker.invoke(
-                        parser.parseInvocation(ParserRequest.mvn(mvnArgs, new JLineMessageBuilderFactory())
-                                .cwd(cwd)
-                                .userHome(userHome)
-                                .stdOut(stdout)
-                                .stdErr(stderr)
-                                .embedded(true)
-                                .build()));
+                int exitCode = -1;
+                Exception exception = null;
+                try {
+                    exitCode = invoker.invoke(
+                            parser.parseInvocation(ParserRequest.mvn(mvnArgs, new JLineMessageBuilderFactory())
+                                    .cwd(cwd)
+                                    .userHome(userHome)
+                                    .stdOut(stdout)
+                                    .stdErr(stderr)
+                                    .embedded(true)
+                                    .build()));
+                } catch (Exception e) {
+                    exception = e;
+                }
 
                 // dump things out
                 System.out.println("===================================================");
@@ -132,7 +138,11 @@ public abstract class MavenInvokerTestSupport {
                 System.err.println("===================================================");
 
                 logs.put(goal, stdout.toString());
-                assertEquals(0, exitCode, "OUT:" + stdout + "\nERR:" + stderr);
+                if (exception != null) {
+                    throw exception;
+                } else {
+                    assertEquals(0, exitCode, "OUT:" + stdout + "\nERR:" + stderr);
+                }
             }
         }
         return logs;
