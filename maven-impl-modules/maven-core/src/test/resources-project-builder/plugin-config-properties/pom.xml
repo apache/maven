@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>a</groupId>
+    <artifactId>b</artifactId>
+    <version>1.0</version>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <version>2.4</version>
+                  <configuration>
+                    <systemProperties>
+                      <property>
+                        <name>my.property</name>
+                        <value>my.value</value>
+                      </property>
+                    </systemProperties>
+                  </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

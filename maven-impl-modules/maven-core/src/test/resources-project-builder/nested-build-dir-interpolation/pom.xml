@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng3904</groupId>
+  <artifactId>test</artifactId>
+  <version>0.1</version>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: MNG-3904</name>
+  <description>
+    Test that properties which refer to build directories which in turn refer to other build directories are
+    properly interpolated.
+  </description>
+
+  <properties>
+    <!-- These are the properties of interest -->
+    <dir0>${project.build.outputDirectory}/dir0</dir0>
+    <dir1>${project.build.testSourceDirectory}/dir1</dir1>
+    <dir2>${project.reporting.outputDirectory}/dir2</dir2>
+  </properties>
+
+  <build>
+    <!-- Test properties which finally refer to ${project.basedir} -->
+    <directory>${project.basedir}/target</directory>
+    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+    <!-- Test properties which finally refer to ${basedir} -->
+    <sourceDirectory>${basedir}/src</sourceDirectory>
+    <testSourceDirectory>${project.build.sourceDirectory}/test</testSourceDirectory>
+  </build>
+
+  <reporting>
+    <outputDirectory>${project.build.directory}/site</outputDirectory>
+  </reporting>
+</project>

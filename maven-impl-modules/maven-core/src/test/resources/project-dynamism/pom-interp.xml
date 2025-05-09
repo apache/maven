@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.test</groupId>
+  <artifactId>test-build-dynamism</artifactId>
+  <version>1</version>
+
+  <build>
+    <sourceDirectory>/${project.groupId}/src/main/java</sourceDirectory>
+    <testSourceDirectory>/${pom.groupId}/src/test/java</testSourceDirectory>
+    <scriptSourceDirectory>/${groupId}/src/main/scripts</scriptSourceDirectory>
+
+    <plugins>
+      <plugin>
+        <artifactId>my-plugin</artifactId>
+        <configuration>
+          <testOne>${project.groupId}</testOne>
+          <testTwo>${pom.groupId}</testTwo>
+          <testThree>${groupId}</testThree>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

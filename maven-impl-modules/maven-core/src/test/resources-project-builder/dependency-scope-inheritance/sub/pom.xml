@@ -1,0 +1,19 @@
+<project>
+  <parent>
+    <artifactId>p0</artifactId>
+    <groupId>maven</groupId>
+    <version>1.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven</groupId>
+  <artifactId>p1</artifactId>
+  <version>1.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>maven-test</groupId>
+      <version>1.0</version>
+      <artifactId>a</artifactId>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plexus>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.LifeCyclePluginAnalyzer</role>
+      <implementation>org.apache.maven.lifecycle.EmptyLifecyclePluginAnalyzer</implementation>
+    </component>
+    <component>
+      <role>org.apache.maven.project.ProjectBuildingHelper</role>
+      <implementation>org.apache.maven.project.EmptyProjectBuildingHelper</implementation>
+    </component>
+  </components>
+</plexus>

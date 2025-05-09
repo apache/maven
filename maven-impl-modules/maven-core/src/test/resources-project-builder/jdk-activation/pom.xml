@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng1957</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>Maven Integration Test :: MNG-1957</name>
+  <description>
+    Test that JDK profile activation allows version ranges.
+  </description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <configuration>
+              <outputFile>target/jdk.properties</outputFile>
+              <expressions>
+                <expression>project/properties</expression>
+              </expressions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>test-1</id>
+      <activation>
+        <jdk>[1.4,)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty1>PASSED</jdkProperty1>
+      </properties>
+    </profile>
+    <profile>
+      <id>test-2</id>
+      <activation>
+        <jdk>(,100)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty2>PASSED</jdkProperty2>
+      </properties>
+    </profile>
+    <profile>
+      <id>test-3</id>
+      <activation>
+        <jdk>(1.3,100)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty3>PASSED</jdkProperty3>
+      </properties>
+    </profile>
+    <profile>
+      <id>test-4</id>
+      <activation>
+        <jdk>(100,)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty4>FAILED</jdkProperty4>
+      </properties>
+    </profile>
+    <profile>
+      <id>test-5</id>
+      <activation>
+        <jdk>(,1.4)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty5>FAILED</jdkProperty5>
+      </properties>
+    </profile>
+  </profiles>
+</project>

@@ -1,0 +1,48 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>tests.project</groupId>
+    <artifactId>duplicate-plugin-defs-merged</artifactId>
+    <version>1</version>
+
+    <build>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <dependencies>
+            <dependency>
+              <groupId>group</groupId>
+              <artifactId>first</artifactId>
+              <version>1</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>first</id>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <dependencies>
+            <dependency>
+              <groupId>group</groupId>
+              <artifactId>second</artifactId>
+              <version>1</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>second</id>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
+
+</project>

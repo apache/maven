@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng3899</groupId>
+    <artifactId>parent</artifactId>
+    <version>0.1</version>
+  </parent>
+
+  <artifactId>child</artifactId>
+
+  <name>Maven Integration Test :: MNG-3899</name>
+  <description>
+    Test that build extensions are properly merged during inheritance.
+  </description>
+
+  <build>
+    <!-- project extensions should precede inherited extensions -->
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its.mng3899</groupId>
+        <artifactId>b</artifactId>
+        <version>0.1</version>
+      </extension>
+      <extension>
+        <!-- project extensions should override inherited extension with equal gid:aid -->
+        <groupId>org.apache.maven.its.mng3899</groupId>
+        <artifactId>a</artifactId>
+        <version>0.2</version>
+      </extension>
+    </extensions>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <configuration>
+              <outputFile>target/extension.properties</outputFile>
+              <expressions>
+                <expression>project/build/extensions</expression>
+              </expressions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

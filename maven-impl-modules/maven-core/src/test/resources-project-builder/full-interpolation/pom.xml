@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng3833</groupId>
+  <artifactId>coreit</artifactId>
+  <version>0.1</version>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: MNG-3833</name>
+  <description>
+    Test that POM interpolation fully interpolates all properties in data flow chain, i.e. where property
+    A depends on property B, and property B depends on property C and so on.
+  </description>
+
+  <properties>
+    <!--
+    NOTE: Both the ordering (i.e. neither ascending nor descending) and the number of properties is crucial to
+    exhibit the bug.
+    -->
+    <property23>${property22}</property23>
+    <property21>${property20}</property21>
+    <property19>${property18}</property19>
+    <property17>${property16}</property17>
+    <property15>${property14}</property15>
+    <property13>${property12}</property13>
+    <property11>${property10}</property11>
+    <property09>${property08}</property09>
+    <property07>${property06}</property07>
+    <property05>${property04}</property05>
+    <property03>${property02}</property03>
+    <property01>${property00}</property01>
+    <property00>PASSED</property00>
+    <property02>${property01}</property02>
+    <property04>${property03}</property04>
+    <property06>${property05}</property06>
+    <property10>${property09}</property10>
+    <property12>${property11}</property12>
+    <property08>${property07}</property08>
+    <property14>${property13}</property14>
+    <property16>${property15}</property16>
+    <property18>${property17}</property18>
+    <property20>${property19}</property20>
+    <property22>${property21}</property22>
+  </properties>
+</project>

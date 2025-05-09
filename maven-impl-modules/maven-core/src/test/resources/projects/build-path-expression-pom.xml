@@ -1,0 +1,14 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.project.tests</groupId>
+  <artifactId>build-path-expression</artifactId>
+  <version>1</version>
+  <build>
+    <sourceDirectory>sources</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>${project.build.sourceDirectory}</directory>
+      </resource>
+    </resources>
+  </build>
+</project>

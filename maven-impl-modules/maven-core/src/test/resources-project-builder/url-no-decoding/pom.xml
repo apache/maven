@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4116</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: MNG-4116</name>
+  <description>
+    Test that the project builder does not decode URLs (which must be done by the transport layer instead).
+  </description>
+
+  <!-- some URLs using percent-encoded characters -->
+  <url>https://maven.apache.org/spacy%20path</url>
+  <scm>
+    <connection>scm:svn:svn+ssh://svn.apache.org/spacy%20path</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.apache.org/spacy%20path</developerConnection>
+    <url>https://svn.apache.org/viewvc/spacy%20path</url>
+  </scm>
+  <issueManagement>
+    <system>none</system>
+    <url>https://issues.apache.org/spacy%20path</url>
+  </issueManagement>
+  <ciManagement>
+    <system>none</system>
+    <url>https://ci.apache.org/spacy%20path</url>
+  </ciManagement>
+  <distributionManagement>
+    <repository>
+      <id>dist</id>
+      <url>scm:svn:svn+ssh://dist.apache.org/spacy%20path</url>
+    </repository>
+    <snapshotRepository>
+      <id>snap</id>
+      <url>scm:svn:svn+ssh://snap.apache.org/spacy%20path</url>
+    </snapshotRepository>
+    <site>
+      <id>site</id>
+      <url>scm:svn:svn+ssh://site.apache.org/spacy%20path</url>
+    </site>
+  </distributionManagement>
+</project>

@@ -1,0 +1,14 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>parent-version-range-local</groupId>
+    <artifactId>parent</artifactId>
+    <version>[1,10]</version>
+  </parent>
+  <artifactId>child</artifactId>
+  <version>${revision}</version>
+  <packaging>pom</packaging>
+  <properties>
+    <revision>1.0-SNAPSHOT</revision>
+  </properties>
+</project>

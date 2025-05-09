@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+  xml.namespace="http://maven.apache.org/PARAMDOC/${version}"
+  xml.schemaLocation="http://maven.apache.org/xsd/paramdoc-${version}.xsd">
+  <id>paramdoc</id>
+  <name>Paramdoc</name>
+  <description><![CDATA[Documentation on parameter expressions supported by Maven for use in plugins.]]></description>
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.usability.plugin</value>
+    </default>
+  </defaults>
+  <classes>
+    <class rootElement="true" xml.tagName="paramdoc">
+      <version>1.0.0</version>
+      <name>ExpressionDocumentation</name>
+      <description>The root of a parameter plugin expression document.</description>
+      <fields>
+        <field>
+          <version>1.0.0</version>
+          <name>expressions</name>
+          <description>The list of plugin parameter expressions described by this
+            document.</description>
+          <association>
+            <type>Expression</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[    private java.util.Map expressionsBySyntax;
+
+    public java.util.Map getExpressionsBySyntax()
+    {
+        if ( expressionsBySyntax == null )
+        {
+            expressionsBySyntax = new java.util.HashMap();
+
+            java.util.List expressions = getExpressions();
+
+            if ( expressions != null && !expressions.isEmpty() )
+            {
+                for ( java.util.Iterator it = expressions.iterator(); it.hasNext(); )
+                {
+                    Expression expr = (Expression) it.next();
+
+                    expressionsBySyntax.put( expr.getSyntax(), expr );
+                }
+            }
+        }
+
+        return expressionsBySyntax;
+    }
+
+    public void flushExpressionsBySyntax()
+    {
+        expressionsBySyntax = null;
+    }
+]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    <class>
+      <version>1.0.0</version>
+      <name>Expression</name>
+      <description>A plugin parameter expression supported by Maven</description>
+      <fields>
+        <field>
+          <version>1.0.0</version>
+          <name>syntax</name>
+          <description>The syntax of the expression</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>description</name>
+          <description>The description of what this expression references, and what it's generally used for.</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>configuration</name>
+          <description>The place and syntax used to change the value of this expression.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>cliOptions</name>
+          <description>The command-line switches used to change the value of this expression.</description>
+          <type>Properties</type>
+          <association xml.mapStyle="explode">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>apiMethods</name>
+          <description>The programmatic methods used to change the value of this expression.</description>
+          <type>Properties</type>
+          <association xml.mapStyle="explode">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>deprecation</name>
+          <description>A preferred alternative to this expression, in the case where it's deprecated.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>ban</name>
+          <description>A preferred alternative to this expression, in the case where it's banned from use.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <version>1.0.0</version>
+          <name>editable</name>
+          <description>Whether the value of this expression can be changed.</description>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>

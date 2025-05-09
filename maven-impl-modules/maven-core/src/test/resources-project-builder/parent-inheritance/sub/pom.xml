@@ -1,0 +1,9 @@
+<project>
+  <parent>
+    <groupId>gid</groupId>
+    <artifactId>child-2</artifactId>
+    <version>1.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>child-1</artifactId>
+</project>

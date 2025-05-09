@@ -1,0 +1,20 @@
+<project>
+  <parent>
+    <groupId>gid</groupId>
+    <artifactId>aid</artifactId>
+    <version>1.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonatype.nexus</groupId>
+  <artifactId>nexus</artifactId>
+  <version>1.3.0-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin2</artifactId>
+        <version>1.0-alpha-21</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng</groupId>
+    <artifactId>parent</artifactId>
+    <version>0.1</version>
+  </parent>
+
+  <groupId>org.apache.maven.its.mng</groupId>
+  <artifactId>test</artifactId>
+  <version>0.2</version>
+  <packaging>pom</packaging>
+
+  <name>project-name</name>
+  <description>project-description</description>
+  <url>https://project.url/</url>
+  <inceptionYear>2009</inceptionYear>
+  <organization>
+    <name>project-org</name>
+    <url>https://project-org.url/</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>project-license</name>
+      <url>https://project.url/license</url>
+      <distribution>repo</distribution>
+      <comments>free</comments>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>dev</id>
+      <name>project-developer</name>
+      <email>developer@</email>
+      <url>https://developer</url>
+      <organization>developer</organization>
+      <organizationUrl>https://devel.org</organizationUrl>
+      <roles>
+        <role>devel</role>
+      </roles>
+      <timezone>-1</timezone>
+      <properties>
+        <developer>yes</developer>
+      </properties>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>project-contributor</name>
+      <email>contributor@</email>
+      <url>https://contributor</url>
+      <organization>contributor</organization>
+      <organizationUrl>https://contrib.org</organizationUrl>
+      <roles>
+        <role>contrib</role>
+      </roles>
+      <timezone>+1</timezone>
+      <properties>
+        <contributor>yes</contributor>
+      </properties>
+    </contributor>
+  </contributors>
+
+  <mailingLists>
+    <mailingList>
+      <name>project-mailing-list</name>
+      <subscribe>subscribe@</subscribe>
+      <unsubscribe>unsubscribe@</unsubscribe>
+      <post>post@</post>
+      <archive>mail-archive</archive>
+      <otherArchives>
+        <otherArchive>other-archive</otherArchive>
+      </otherArchives>
+    </mailingList>
+  </mailingLists>
+
+  <prerequisites>
+    <maven>2.0.1</maven>
+  </prerequisites>
+
+  <scm>
+    <url>https://project.url/trunk</url>
+    <connection>https://project.url/scm</connection>
+    <developerConnection>https://project.url/scm</developerConnection>
+    <tag>TAG</tag>
+  </scm>
+  <issueManagement>
+    <system>issues</system>
+    <url>https://project.url/issues</url>
+  </issueManagement>
+  <ciManagement>
+    <system>ci</system>
+    <url>https://project.url/ci</url>
+    <notifiers>
+      <notifier>
+        <type>irc</type>
+        <address>ci@</address>
+        <sendOnError>true</sendOnError>
+        <sendOnFailure>false</sendOnFailure>
+        <sendOnSuccess>false</sendOnSuccess>
+        <sendOnWarning>false</sendOnWarning>
+        <configuration>
+          <ciProp>ci</ciProp>
+        </configuration>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+  <distributionManagement>
+    <repository>
+      <url>https://project.url/dist</url>
+      <id>project.distros</id>
+      <name>distros</name>
+    </repository>
+    <snapshotRepository>
+      <url>https://project.url/snaps</url>
+      <id>project.snaps</id>
+      <name>snaps</name>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
+    <site>
+      <url>https://project.url/site</url>
+      <id>project.site</id>
+      <name>docs</name>
+    </site>
+    <downloadUrl>https://project.url/download</downloadUrl>
+    <relocation>
+      <groupId>reloc-gid</groupId>
+      <artifactId>reloc-aid</artifactId>
+      <version>reloc-version</version>
+      <message>project-reloc-msg</message>
+    </relocation>
+  </distributionManagement>
+
+  <modules>
+    <module>sub</module>
+  </modules>
+
+  <properties>
+    <itProperty>project-property</itProperty>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven.its</groupId>
+        <artifactId>managed-dep</artifactId>
+        <version>0.1</version>
+        <type>war</type>
+        <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.maven.its</groupId>
+            <artifactId>excluded-managed-dep</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>dep</artifactId>
+      <version>0.2</version>
+      <type>ejb</type>
+      <scope>test</scope>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.maven.its</groupId>
+          <artifactId>excluded-dep</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>project-remote-repo</id>
+      <url>https://project.url/remote</url>
+      <name>repo</name>
+    </repository>
+  </repositories>
+
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its.ext</groupId>
+        <artifactId>ext</artifactId>
+        <version>3.0</version>
+      </extension>
+    </extensions>
+
+    <defaultGoal>test</defaultGoal>
+    <directory>build</directory>
+    <sourceDirectory>sources/main</sourceDirectory>
+    <scriptSourceDirectory>sources/scripts</scriptSourceDirectory>
+    <testSourceDirectory>sources/test</testSourceDirectory>
+    <outputDirectory>build/main</outputDirectory>
+    <testOutputDirectory>build/test</testOutputDirectory>
+    <finalName>coreit</finalName>
+    <resources>
+      <resource>
+        <directory>res/main</directory>
+        <filtering>true</filtering>
+        <targetPath>main</targetPath>
+        <includes>
+          <include>main.included</include>
+        </includes>
+        <excludes>
+          <exclude>main.excluded</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>res/test</directory>
+        <filtering>true</filtering>
+        <targetPath>test</targetPath>
+        <includes>
+          <include>test.included</include>
+        </includes>
+        <excludes>
+          <exclude>test.excluded</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
+    <filters>
+      <filter>src/main/filter/it.properties</filter>
+    </filters>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-build</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <outputFile>test.properties</outputFile>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <configuration>
+              <outputFile>pom.properties</outputFile>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.its</groupId>
+            <artifactId>build-plugin-dep</artifactId>
+            <version>0.3</version>
+            <type>zip</type>
+            <exclusions>
+              <exclusion>
+                <groupId>org.apache.maven.its</groupId>
+                <artifactId>excluded-build-plugin-dep</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <excludeDefaults>true</excludeDefaults>
+    <outputDirectory>docs</outputDirectory>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-reporting</artifactId>
+        <version>2.0-SNAPSHOT</version>
+        <configuration>
+          <outputFile>test.html</outputFile>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <id>it</id>
+            <reports>
+              <report>run</report>
+            </reports>
+            <configuration>
+              <outputFile>index.html</outputFile>
+            </configuration>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>

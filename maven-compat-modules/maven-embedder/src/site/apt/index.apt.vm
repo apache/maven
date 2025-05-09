@@ -1,0 +1,52 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one
+~~ or more contributor license agreements.  See the NOTICE file
+~~ distributed with this work for additional information
+~~ regarding copyright ownership.  The ASF licenses this file
+~~ to you under the Apache License, Version 2.0 (the
+~~ "License"); you may not use this file except in compliance
+~~ with the License.  You may obtain a copy of the License at
+~~
+~~ http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing,
+~~ software distributed under the License is distributed on an
+~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~~ KIND, either express or implied.  See the License for the
+~~ specific language governing permissions and limitations
+~~ under the License.
+
+ -----
+ ${project.name}
+ -----
+ Hervé Boutemy
+ -----
+ 2016-11-14
+ -----
+
+${project.name}
+
+ ${project.description}
+
+* Useful entry points
+
+ * {{{./apidocs/org/apache/maven/cli/MavenCli.html}MavenCli.doMain(CliRequest)}} is the main method preparing runtime environment before running {{{../maven-core/}Maven.execute()}}
+
+* References
+
+ * {{{./cli.html}CLI options}},
+
+ * {{{./logging.html}logging API}}.
+
+ * since 3.3.1 (see {{{/docs/3.3.1/release-notes.html#Core_Extensions}3.3.1 release notes}} for more details),
+   per project settings can be defined by files in <<<.mvn/>>> directory:
+
+   * <<<.mvn/jvm.config>>> containing jvm options,
+
+   * <<<.mvn/maven.config>>> containing Maven command-line parameter,
+
+   * <<<.mvn/extensions.xml>>> containing {{{./core-extensions.html}a list of extensions}},
+
+ * since 3.5.0, output is colorized by default, with color disabled in batch mode: see
+   {{{/shared/maven-shared-utils/apidocs/org/apache/maven/shared/utils/logging/package-summary.html}styled message API}}
+   for more details on adding color to a plugin output or customizing colors.
+

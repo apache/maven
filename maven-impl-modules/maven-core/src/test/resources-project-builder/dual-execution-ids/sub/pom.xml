@@ -1,0 +1,43 @@
+<project>
+
+<parent>
+  <artifactId>mercury-parent</artifactId>
+  <groupId>org.apache.maven.mercury</groupId>
+  <version>1.0.0-alpha-3-SNAPSHOT</version>
+</parent>
+
+<modelVersion>4.0.0</modelVersion>
+<groupId>org.apache.maven.mercury</groupId>
+<artifactId>mercury-util</artifactId>
+<name>Mercury Shared Utilities</name>
+<version>1.0.0-alpha-3-SNAPSHOT</version>
+ <build>
+  <pluginManagement>
+    <plugins>
+      <plugin>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <version>1.0</version>
+      </plugin>
+      </plugins>
+  </pluginManagement>
+  <plugins>
+    <plugin>
+      <artifactId>maven-remote-resources-plugin</artifactId>
+      <version>1.0</version>
+      <executions>
+        <execution>
+          <id>default</id>
+          <goals>
+            <goal>process</goal>
+          </goals>
+          <configuration>
+            <resourceBundles>
+              <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+            </resourceBundles>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+     </plugins>
+</build>
+  </project>

@@ -1,0 +1,26 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>maven</groupId>
+  <artifactId>p0</artifactId>
+  <packaging>pom</packaging>
+  <name>p0</name>
+  <version>1.0</version>
+  <organization>
+    <name>Codehaus</name>
+  </organization>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>maven-test</groupId>
+        <artifactId>maven-test-a</artifactId>
+        <version>1.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <modules>
+    <module>p1</module>
+    <module>p2</module>
+    <module>p3</module>
+    <module>p4</module>
+  </modules>
+</project>

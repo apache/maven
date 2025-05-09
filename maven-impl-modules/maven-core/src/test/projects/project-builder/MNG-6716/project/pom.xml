@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.tests</groupId>
+  <artifactId>MNG-6716</artifactId>
+  <packaging>jar</packaging>
+  <version>0.1-SNAPSHOT</version>
+
+  <mailingLists>
+    <mailingList>
+      <name>blah</name>
+    </mailingList>
+  </mailingLists>
+
+  <build>
+      <testSourceDirectory>../sibling/src-test</testSourceDirectory>
+      <sourceDirectory>../sibling/src-main</sourceDirectory>
+      <resources>
+        <resource><directory>blah</directory></resource>
+      </resources>
+  </build>
+</project>

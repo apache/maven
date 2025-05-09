@@ -1,0 +1,44 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng3586</groupId>
+  <artifactId>test2</artifactId>
+  <version>1.0</version>
+
+  <name>Maven Integration Test :: MNG-3586</name>
+  <description>
+    Test that plugin dependencies with scope system are part of the plugin class realm.
+  </description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin</artifactId>
+        <version>0.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.its.mng3586</groupId>
+            <artifactId>tools</artifactId>
+            <version>1.5.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/tools.jar</systemPath>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>load</id>
+            <phase>validate</phase>
+            <configuration>
+              <resourcePaths>maven-core-it.properties</resourcePaths>
+              <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
+            </configuration>
+            <goals>
+              <goal>load</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

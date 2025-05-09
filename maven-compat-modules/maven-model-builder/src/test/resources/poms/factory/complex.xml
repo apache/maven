@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>test</groupId>
+    <artifactId>test</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <my.filter.value>hello</my.filter.value>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>two-conditions</id>
+            <activation>
+                <file>
+                    <exists>simple.xml</exists>
+                </file>
+                <property>
+                    <name>myproperty</name>
+                    <value>test</value>
+                </property>
+            </activation>
+            <properties>
+                <profile.file>activated-1</profile.file>
+            </properties>
+        </profile>
+        <profile>
+            <id>another-two-conditions</id>
+            <activation>
+                <property>
+                    <name>myproperty</name>
+                    <value>test</value>
+                </property>
+                <file>
+                    <missing>simple.xml</missing>
+                </file>
+            </activation>
+            <properties>
+                <profile.miss>activated-2</profile.miss>
+            </properties>
+        </profile>
+    </profiles>
+</project>
