@@ -69,7 +69,7 @@ under the License.
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
           <version>2.0.0</version>
-          <basedir>${project.basedir}/../../api/maven-api-settings</basedir>
+          <basedir>${project.basedir}/../../maven-api/maven-api-settings</basedir>
           <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
           <models>
             <model>src/main/mdo/settings.mdo</model>

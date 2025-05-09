@@ -257,7 +257,7 @@ under the License.
         <configuration>
           <version>1.2.0</version>
           <models>
-            <model>../../api/maven-api-cli/src/main/mdo/core-extensions.mdo</model>
+            <model>../../maven-api/maven-api-cli/src/main/mdo/core-extensions.mdo</model>
           </models>
           <templates>
             <template>reader-stax.vm</template>

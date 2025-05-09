@@ -28,7 +28,7 @@
 Maven Model
 
  This is strictly the model for Maven POM (Project Object Model) in <<<org.apache.maven.model>>> package,
- delegating content to {{{../api/maven-api-model/index.html}Maven 4 API immutable model}}. All the effective model
+ delegating content to {{{../maven-api/maven-api-model/index.html}Maven 4 API immutable model}}. All the effective model
  building logic from multiple POMs and building context is done in {{{../maven-model-builder/}Maven Model Builder}}.
 
  The following are generated from this model:

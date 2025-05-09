@@ -69,7 +69,7 @@ under the License.
         <configuration>
           <version>1.2.0</version>
           <models>
-            <model>../../api/maven-api-metadata/src/main/mdo/metadata.mdo</model>
+            <model>../../maven-api/maven-api-metadata/src/main/mdo/metadata.mdo</model>
           </models>
           <params>
             <param>forcedIOModelVersion=1.1.0</param>
@@ -88,7 +88,7 @@ under the License.
             <configuration>
               <version>1.1.0</version>
               <models>
-                <model>../../api/maven-api-metadata/src/main/mdo/metadata.mdo</model>
+                <model>../../maven-api/maven-api-metadata/src/main/mdo/metadata.mdo</model>
               </models>
               <templates>
                 <template>model-v3.vm</template>
