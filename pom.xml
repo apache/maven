@@ -800,6 +800,31 @@ under the License.</licenseText>
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>org.openrewrite.maven</groupId>
+        <artifactId>rewrite-maven-plugin</artifactId>
+        <version>6.7.0</version>
+        <configuration>
+          <activeRecipes>
+            <recipe>org.openrewrite.staticanalysis.CodeCleanup</recipe>
+          </activeRecipes>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.openrewrite.recipe</groupId>
+            <artifactId>rewrite-static-analysis</artifactId>
+            <version>2.8.0</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.6.0</version>
+        <configuration>
+          <configLocation>http://svn.apache.org/repos/asf/maven/plugins/trunk/maven-checkstyle-plugin/src/main/resources/config/maven_checks.xml</configLocation>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
         <version>1.0.2</version>
