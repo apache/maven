@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import com.ctc.wstx.exc.WstxEOFException;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
@@ -229,7 +230,7 @@ class DefaultPluginXmlFactoryReadWriteTest {
                         .inputStream(new ByteArrayInputStream("<plugin><name>Broken Plugin".getBytes()))
                         .build()));
         assertTrue(exception.getMessage().contains("Unable to read plugin"));
-        assertInstanceOf(Exception.class, exception.getCause());
+        assertInstanceOf(WstxEOFException.class, exception.getCause());
     }
 
     @Test
