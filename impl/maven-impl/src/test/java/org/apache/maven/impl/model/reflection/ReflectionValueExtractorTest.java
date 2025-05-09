@@ -539,16 +539,7 @@ class ReflectionValueExtractorTest {
         }
     }
 
-    public static class ValueHolder {
-        private final Object value;
-
-        public ValueHolder(Object value) {
-            this.value = value;
-        }
-
-        public Object getValue() {
-            return value;
-        }
+    public record ValueHolder(Object value) {
     }
 
     /**
