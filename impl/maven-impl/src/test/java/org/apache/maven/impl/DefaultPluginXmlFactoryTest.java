@@ -39,6 +39,7 @@ import org.apache.maven.impl.model.DefaultModelProcessor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -229,7 +230,7 @@ class DefaultPluginXmlFactoryReadWriteTest {
                 () -> defaultPluginXmlFactory.read(XmlReaderRequest.builder()
                         .inputStream(new ByteArrayInputStream("<plugin><name>Broken Plugin".getBytes()))
                         .build()));
-        assertTrue(exception.getMessage().contains("Unable to read plugin"));
+        assertThat(exception.getMessage()).contains("Unable to read plugin");
         assertInstanceOf(WstxEOFException.class, exception.getCause());
     }
 
