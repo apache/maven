@@ -137,6 +137,7 @@ class SourcesTest {
     void nullHandling() {
         assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Sources.fromPath(null));
         assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Sources.buildSource(null));
-        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Sources.resolvedSource(null, "location"));
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> Sources.resolvedSource(null, "location"));
     }
 }

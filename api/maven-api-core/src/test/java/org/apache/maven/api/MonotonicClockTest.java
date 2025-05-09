@@ -38,7 +38,9 @@ class MonotonicClockTest {
         MonotonicClock clock1 = MonotonicClock.get();
         MonotonicClock clock2 = MonotonicClock.get();
 
-        assertThat(clock2).as("Multiple calls to get() should return the same instance").isSameAs(clock1);
+        assertThat(clock2)
+                .as("Multiple calls to get() should return the same instance")
+                .isSameAs(clock1);
     }
 
     @Test
@@ -50,7 +52,9 @@ class MonotonicClockTest {
 
         // Verify that attempting to change timezone returns the same instance
         Clock newClock = clock.withZone(ZoneId.systemDefault());
-        assertThat(newClock).as("withZone() should return the same clock instance").isSameAs(clock);
+        assertThat(newClock)
+                .as("withZone() should return the same clock instance")
+                .isSameAs(clock);
     }
 
     @Test
@@ -62,8 +66,12 @@ class MonotonicClockTest {
         Thread.sleep(10); // Small delay
         Instant third = MonotonicClock.now();
 
-        assertThat(first.isBefore(second)).as("Time should progress forward between measurements").isTrue();
-        assertThat(second.isBefore(third)).as("Time should progress forward between measurements").isTrue();
+        assertThat(first.isBefore(second))
+                .as("Time should progress forward between measurements")
+                .isTrue();
+        assertThat(second.isBefore(third))
+                .as("Time should progress forward between measurements")
+                .isTrue();
     }
 
     @Test
@@ -73,8 +81,12 @@ class MonotonicClockTest {
         Thread.sleep(50); // Longer delay for more reliable measurement
         Duration later = MonotonicClock.elapsed();
 
-        assertThat(later.compareTo(initial) > 0).as("Elapsed time should increase").isTrue();
-        assertThat(later.minus(initial).toMillis() >= 45).as("Elapsed time difference should be at least 45ms (accounting for some timing variance)").isTrue();
+        assertThat(later.compareTo(initial) > 0)
+                .as("Elapsed time should increase")
+                .isTrue();
+        assertThat(later.minus(initial).toMillis() >= 45)
+                .as("Elapsed time difference should be at least 45ms (accounting for some timing variance)")
+                .isTrue();
     }
 
     @Test
@@ -98,7 +110,9 @@ class MonotonicClockTest {
             Instant now = MonotonicClock.now();
             Instant start = MonotonicClock.start();
 
-            assertThat(now.isAfter(start)).as("Current time should be after start time").isTrue();
+            assertThat(now.isAfter(start))
+                    .as("Current time should be after start time")
+                    .isTrue();
         }
 
         @Test
@@ -110,7 +124,9 @@ class MonotonicClockTest {
             Duration calculated = Duration.between(clock.startInstant(), now);
 
             // Allow for small timing differences (1ms) due to execution time between measurements
-            assertThat(Math.abs(elapsed.toMillis() - calculated.toMillis()) <= 1).as("Elapsed time should match calculated duration between start and now").isTrue();
+            assertThat(Math.abs(elapsed.toMillis() - calculated.toMillis()) <= 1)
+                    .as("Elapsed time should match calculated duration between start and now")
+                    .isTrue();
         }
     }
 
@@ -124,7 +140,9 @@ class MonotonicClockTest {
 
         // Verify monotonic behavior across all measurements
         for (int i = 1; i < instants.length; i++) {
-            assertThat(instants[i].compareTo(instants[i - 1]) >= 0).as("Time should never go backwards even with rapid successive calls").isTrue();
+            assertThat(instants[i].compareTo(instants[i - 1]) >= 0)
+                    .as("Time should never go backwards even with rapid successive calls")
+                    .isTrue();
         }
     }
 
@@ -136,6 +154,8 @@ class MonotonicClockTest {
 
         // The difference should be relatively small (allow for 1 second max)
         Duration difference = Duration.between(monotonic, system).abs();
-        assertThat(difference.getSeconds() <= 1).as("Monotonic time should be reasonably aligned with system time").isTrue();
+        assertThat(difference.getSeconds() <= 1)
+                .as("Monotonic time should be reasonably aligned with system time")
+                .isTrue();
     }
 }
