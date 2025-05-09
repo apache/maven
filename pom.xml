@@ -100,8 +100,8 @@ under the License.
 
   <modules>
     <module>api</module>
-    <module>impl</module>
-    <module>compat</module>
+    <module>maven-impl-modules</module>
+    <module>maven-compat-modules</module>
     <module>apache-maven</module>
   </modules>
 
