@@ -25,6 +25,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
@@ -62,12 +63,8 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
                 return xml.read(inputStream, request.isStrict());
             } else if (reader != null) {
                 return xml.read(reader, request.isStrict());
-            } else if (path != null) {
-                try (InputStream is = Files.newInputStream(path)) {
-                    return xml.read(is, request.isStrict());
-                }
             }
-            try (InputStream is = url.openStream()) {
+            try (InputStream is = Files.newInputStream(Objects.requireNonNull(path))) {
                 return xml.read(is, request.isStrict());
             }
         } catch (Exception e) {

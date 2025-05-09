@@ -18,14 +18,23 @@
  */
 package org.apache.maven.impl;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.api.services.xml.*;
+import org.apache.maven.api.services.xml.ModelXmlFactory;
+import org.apache.maven.api.services.xml.XmlReaderException;
+import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.services.xml.XmlWriterException;
+import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.impl.model.DefaultModelProcessor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -51,6 +60,9 @@ class DefaultPluginXmlFactoryReadWriteTest {
 
     private final DefaultPluginXmlFactory sut = new DefaultPluginXmlFactory();
 
+
+    @TempDir
+    Path tempDir;
     @Test
     void readFromInputStreamParsesPluginDescriptorCorrectly() {
         PluginDescriptor descriptor = sut.read(XmlReaderRequest.builder()
@@ -219,9 +231,6 @@ class DefaultPluginXmlFactoryReadWriteTest {
         assertTrue(exception.getMessage().contains("Unable to read plugin"));
         assertInstanceOf(Exception.class, exception.getCause());
     }
-
-    @TempDir
-    Path tempDir;
     @Test
     void locateExistingPomWithFilePathShouldReturnSameFileIfRegularFile() throws IOException {
         Path pomFile = Files.createTempFile(tempDir, "pom", ".xml");
