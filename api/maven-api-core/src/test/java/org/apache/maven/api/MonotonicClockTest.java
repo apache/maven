@@ -28,69 +28,64 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MonotonicClockTest {
 
     @Test
     @DisplayName("MonotonicClock singleton instance should always return the same instance")
-    void testSingletonInstance() {
+    void singletonInstance() {
         MonotonicClock clock1 = MonotonicClock.get();
         MonotonicClock clock2 = MonotonicClock.get();
 
-        assertSame(clock1, clock2, "Multiple calls to get() should return the same instance");
+        assertThat(clock2).as("Multiple calls to get() should return the same instance").isSameAs(clock1);
     }
 
     @Test
     @DisplayName("MonotonicClock should always use UTC timezone")
-    void testClockTimezone() {
+    void clockTimezone() {
         MonotonicClock clock = MonotonicClock.get();
 
-        assertEquals(ZoneOffset.UTC, clock.getZone(), "Clock should use UTC timezone");
+        assertThat(clock.getZone()).as("Clock should use UTC timezone").isEqualTo(ZoneOffset.UTC);
 
         // Verify that attempting to change timezone returns the same instance
         Clock newClock = clock.withZone(ZoneId.systemDefault());
-        assertSame(clock, newClock, "withZone() should return the same clock instance");
+        assertThat(newClock).as("withZone() should return the same clock instance").isSameAs(clock);
     }
 
     @Test
     @DisplayName("MonotonicClock should maintain monotonic time progression")
-    void testMonotonicBehavior() throws InterruptedException {
+    void monotonicBehavior() throws InterruptedException {
         Instant first = MonotonicClock.now();
         Thread.sleep(10); // Small delay
         Instant second = MonotonicClock.now();
         Thread.sleep(10); // Small delay
         Instant third = MonotonicClock.now();
 
-        assertTrue(first.isBefore(second), "Time should progress forward between measurements");
-        assertTrue(second.isBefore(third), "Time should progress forward between measurements");
+        assertThat(first.isBefore(second)).as("Time should progress forward between measurements").isTrue();
+        assertThat(second.isBefore(third)).as("Time should progress forward between measurements").isTrue();
     }
 
     @Test
     @DisplayName("MonotonicClock elapsed time should increase")
-    void testElapsedTime() throws InterruptedException {
+    void elapsedTime() throws InterruptedException {
         Duration initial = MonotonicClock.elapsed();
         Thread.sleep(50); // Longer delay for more reliable measurement
         Duration later = MonotonicClock.elapsed();
 
-        assertTrue(later.compareTo(initial) > 0, "Elapsed time should increase");
-        assertTrue(
-                later.minus(initial).toMillis() >= 45,
-                "Elapsed time difference should be at least 45ms (accounting for some timing variance)");
+        assertThat(later.compareTo(initial) > 0).as("Elapsed time should increase").isTrue();
+        assertThat(later.minus(initial).toMillis() >= 45).as("Elapsed time difference should be at least 45ms (accounting for some timing variance)").isTrue();
     }
 
     @Test
     @DisplayName("MonotonicClock start time should remain constant")
-    void testStartTime() throws InterruptedException {
+    void startTime() throws InterruptedException {
         Instant start1 = MonotonicClock.start();
         Thread.sleep(10);
         Instant start2 = MonotonicClock.start();
 
-        assertEquals(start1, start2, "Start time should remain constant");
-        assertNotNull(start1, "Start time should not be null");
+        assertThat(start2).as("Start time should remain constant").isEqualTo(start1);
+        assertThat(start1).as("Start time should not be null").isNotNull();
     }
 
     @Nested
@@ -99,31 +94,29 @@ class MonotonicClockTest {
 
         @Test
         @DisplayName("Current time should be after start time")
-        void testCurrentTimeAfterStart() {
+        void currentTimeAfterStart() {
             Instant now = MonotonicClock.now();
             Instant start = MonotonicClock.start();
 
-            assertTrue(now.isAfter(start), "Current time should be after start time");
+            assertThat(now.isAfter(start)).as("Current time should be after start time").isTrue();
         }
 
         @Test
         @DisplayName("Elapsed time should match time difference")
-        void testElapsedTimeConsistency() {
+        void elapsedTimeConsistency() {
             MonotonicClock clock = MonotonicClock.get();
             Instant now = clock.instant();
             Duration elapsed = clock.elapsedTime();
             Duration calculated = Duration.between(clock.startInstant(), now);
 
             // Allow for small timing differences (1ms) due to execution time between measurements
-            assertTrue(
-                    Math.abs(elapsed.toMillis() - calculated.toMillis()) <= 1,
-                    "Elapsed time should match calculated duration between start and now");
+            assertThat(Math.abs(elapsed.toMillis() - calculated.toMillis()) <= 1).as("Elapsed time should match calculated duration between start and now").isTrue();
         }
     }
 
     @Test
     @DisplayName("MonotonicClock should handle rapid successive calls")
-    void testRapidCalls() {
+    void rapidCalls() {
         Instant[] instants = new Instant[1000];
         for (int i = 0; i < instants.length; i++) {
             instants[i] = MonotonicClock.now();
@@ -131,20 +124,18 @@ class MonotonicClockTest {
 
         // Verify monotonic behavior across all measurements
         for (int i = 1; i < instants.length; i++) {
-            assertTrue(
-                    instants[i].compareTo(instants[i - 1]) >= 0,
-                    "Time should never go backwards even with rapid successive calls");
+            assertThat(instants[i].compareTo(instants[i - 1]) >= 0).as("Time should never go backwards even with rapid successive calls").isTrue();
         }
     }
 
     @Test
     @DisplayName("MonotonicClock should maintain reasonable alignment with system time")
-    void testSystemTimeAlignment() {
+    void systemTimeAlignment() {
         Instant monotonic = MonotonicClock.now();
         Instant system = Instant.now();
 
         // The difference should be relatively small (allow for 1 second max)
         Duration difference = Duration.between(monotonic, system).abs();
-        assertTrue(difference.getSeconds() <= 1, "Monotonic time should be reasonably aligned with system time");
+        assertThat(difference.getSeconds() <= 1).as("Monotonic time should be reasonably aligned with system time").isTrue();
     }
 }

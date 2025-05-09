@@ -20,22 +20,21 @@ package org.apache.maven.api.settings;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class SettingsTest {
 
     @Test
-    void testSetLocalRepository() {
+    void setLocalRepository() {
         Settings s = Settings.newInstance();
 
         s = s.withLocalRepository("xxx");
-        assertEquals("xxx", s.getLocalRepository());
+        assertThat(s.getLocalRepository()).isEqualTo("xxx");
 
         s = s.withLocalRepository("yyy");
-        assertEquals("yyy", s.getLocalRepository());
+        assertThat(s.getLocalRepository()).isEqualTo("yyy");
 
         s = s.withLocalRepository(null);
-        assertNull(s.getLocalRepository());
+        assertThat(s.getLocalRepository()).isNull();
     }
 }

@@ -27,11 +27,8 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -43,53 +40,53 @@ class SourcesTest {
     Path tempDir;
 
     @Test
-    void testFromPath() {
+    void fromPath() {
         Path path = Paths.get("/tmp");
         Source source = Sources.fromPath(path);
 
-        assertNotNull(source);
-        assertInstanceOf(Sources.PathSource.class, source);
-        assertEquals(path.normalize(), source.getPath());
+        assertThat(source).isNotNull();
+        assertThat(source).isInstanceOf(Sources.PathSource.class);
+        assertThat(source.getPath()).isEqualTo(path.normalize());
     }
 
     @Test
-    void testBuildSource() {
+    void buildSource() {
         Path path = Paths.get("/tmp");
         ModelSource source = Sources.buildSource(path);
 
-        assertNotNull(source);
-        assertInstanceOf(Sources.BuildPathSource.class, source);
-        assertEquals(path.normalize(), source.getPath());
+        assertThat(source).isNotNull();
+        assertThat(source).isInstanceOf(Sources.BuildPathSource.class);
+        assertThat(source.getPath()).isEqualTo(path.normalize());
     }
 
     @Test
-    void testResolvedSource() {
+    void resolvedSource() {
         Path path = Paths.get("/tmp");
         String location = "custom-location";
         ModelSource source = Sources.resolvedSource(path, location);
 
-        assertNotNull(source);
-        assertInstanceOf(Sources.ResolvedPathSource.class, source);
-        assertNull(source.getPath());
-        assertEquals(location, source.getLocation());
+        assertThat(source).isNotNull();
+        assertThat(source).isInstanceOf(Sources.ResolvedPathSource.class);
+        assertThat(source.getPath()).isNull();
+        assertThat(source.getLocation()).isEqualTo(location);
     }
 
     @Test
-    void testPathSourceFunctionality() {
+    void pathSourceFunctionality() {
         // Test basic source functionality
         Path path = Paths.get("/tmp");
         Sources.PathSource source = (Sources.PathSource) Sources.fromPath(path);
 
-        assertEquals(path.normalize(), source.getPath());
-        assertEquals(path.toString(), source.getLocation());
+        assertThat(source.getPath()).isEqualTo(path.normalize());
+        assertThat(source.getLocation()).isEqualTo(path.toString());
 
         Source resolved = source.resolve("subdir");
-        assertNotNull(resolved);
-        assertEquals(path.resolve("subdir").normalize(), resolved.getPath());
+        assertThat(resolved).isNotNull();
+        assertThat(resolved.getPath()).isEqualTo(path.resolve("subdir").normalize());
     }
 
     @Test
-    void testBuildPathSourceFunctionality() {
+    void buildPathSourceFunctionality() {
         // Test build source functionality
         Path basePath = Paths.get("/tmp");
         ModelSource.ModelLocator locator = mock(ModelSource.ModelLocator.class);
@@ -99,31 +96,31 @@ class SourcesTest {
         Sources.BuildPathSource source = (Sources.BuildPathSource) Sources.buildSource(basePath);
         ModelSource resolved = source.resolve(locator, "subproject");
 
-        assertNotNull(resolved);
-        assertInstanceOf(Sources.BuildPathSource.class, resolved);
-        assertEquals(resolvedPath, resolved.getPath());
+        assertThat(resolved).isNotNull();
+        assertThat(resolved).isInstanceOf(Sources.BuildPathSource.class);
+        assertThat(resolved.getPath()).isEqualTo(resolvedPath);
 
         verify(locator).locateExistingPom(any(Path.class));
     }
 
     @Test
-    void testResolvedPathSourceFunctionality() {
+    void resolvedPathSourceFunctionality() {
         // Test resolved source functionality
         Path path = Paths.get("/tmp");
         String location = "custom-location";
         Sources.ResolvedPathSource source = (Sources.ResolvedPathSource) Sources.resolvedSource(path, location);
 
-        assertNull(source.getPath());
-        assertEquals(location, source.getLocation());
-        assertNull(source.resolve("subdir"));
+        assertThat(source.getPath()).isNull();
+        assertThat(source.getLocation()).isEqualTo(location);
+        assertThat(source.resolve("subdir")).isNull();
 
         ModelSource.ModelLocator locator = mock(ModelSource.ModelLocator.class);
-        assertNull(source.resolve(locator, "subproject"));
+        assertThat(source.resolve(locator, "subproject")).isNull();
         verify(locator, never()).locateExistingPom(any(Path.class));
     }
 
     @Test
-    void testStreamReading() throws IOException {
+    void streamReading() throws IOException {
         // Test stream reading functionality
         Path testFile = tempDir.resolve("test.txt");
         String content = "test content";
@@ -132,14 +129,14 @@ class SourcesTest {
         Source source = Sources.fromPath(testFile);
         try (InputStream inputStream = source.openStream()) {
             String readContent = new String(inputStream.readAllBytes());
-            assertEquals(content, readContent);
+            assertThat(readContent).isEqualTo(content);
         }
     }
 
     @Test
-    void testNullHandling() {
-        assertThrows(NullPointerException.class, () -> Sources.fromPath(null));
-        assertThrows(NullPointerException.class, () -> Sources.buildSource(null));
-        assertThrows(NullPointerException.class, () -> Sources.resolvedSource(null, "location"));
+    void nullHandling() {
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Sources.fromPath(null));
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Sources.buildSource(null));
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> Sources.resolvedSource(null, "location"));
     }
 }

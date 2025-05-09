@@ -20,68 +20,66 @@ package org.apache.maven.api.services;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RequestTraceTest {
 
     @Test
-    void testRequestTraceCreation() {
+    void requestTraceCreation() {
         RequestTrace parentTrace = new RequestTrace("parent-context", null, "parent-data");
         RequestTrace childTrace = new RequestTrace("child-context", parentTrace, "child-data");
 
-        assertEquals("parent-context", parentTrace.context());
-        assertNull(parentTrace.parent());
-        assertEquals("parent-data", parentTrace.data());
+        assertThat(parentTrace.context()).isEqualTo("parent-context");
+        assertThat(parentTrace.parent()).isNull();
+        assertThat(parentTrace.data()).isEqualTo("parent-data");
 
-        assertEquals("child-context", childTrace.context());
-        assertSame(parentTrace, childTrace.parent());
-        assertEquals("child-data", childTrace.data());
+        assertThat(childTrace.context()).isEqualTo("child-context");
+        assertThat(childTrace.parent()).isSameAs(parentTrace);
+        assertThat(childTrace.data()).isEqualTo("child-data");
     }
 
     @Test
-    void testRequestTraceWithParentContextInheritance() {
+    void requestTraceWithParentContextInheritance() {
         RequestTrace parentTrace = new RequestTrace("parent-context", null, "parent-data");
         RequestTrace childTrace = new RequestTrace(parentTrace, "child-data");
 
-        assertEquals("parent-context", parentTrace.context());
-        assertEquals("parent-context", childTrace.context());
-        assertEquals("child-data", childTrace.data());
+        assertThat(parentTrace.context()).isEqualTo("parent-context");
+        assertThat(childTrace.context()).isEqualTo("parent-context");
+        assertThat(childTrace.data()).isEqualTo("child-data");
     }
 
     @Test
-    void testPredefinedContexts() {
-        assertEquals("plugin", RequestTrace.CONTEXT_PLUGIN);
-        assertEquals("project", RequestTrace.CONTEXT_PROJECT);
-        assertEquals("bootstrap", RequestTrace.CONTEXT_BOOTSTRAP);
+    void predefinedContexts() {
+        assertThat(RequestTrace.CONTEXT_PLUGIN).isEqualTo("plugin");
+        assertThat(RequestTrace.CONTEXT_PROJECT).isEqualTo("project");
+        assertThat(RequestTrace.CONTEXT_BOOTSTRAP).isEqualTo("bootstrap");
     }
 
     @Test
-    void testNullValues() {
+    void nullValues() {
         RequestTrace trace = new RequestTrace(null, null, null);
-        assertNull(trace.context());
-        assertNull(trace.parent());
-        assertNull(trace.data());
+        assertThat(trace.context()).isNull();
+        assertThat(trace.parent()).isNull();
+        assertThat(trace.data()).isNull();
     }
 
     @Test
-    void testChainedTraces() {
+    void chainedTraces() {
         RequestTrace root = new RequestTrace("root", null, "root-data");
         RequestTrace level1 = new RequestTrace("level1", root, "level1-data");
         RequestTrace level2 = new RequestTrace("level2", level1, "level2-data");
         RequestTrace level3 = new RequestTrace(level2, "level3-data");
 
         // Verify the chain
-        assertNull(root.parent());
-        assertEquals(root, level1.parent());
-        assertEquals(level1, level2.parent());
-        assertEquals(level2, level3.parent());
+        assertThat(root.parent()).isNull();
+        assertThat(level1.parent()).isEqualTo(root);
+        assertThat(level2.parent()).isEqualTo(level1);
+        assertThat(level3.parent()).isEqualTo(level2);
 
         // Verify context inheritance
-        assertEquals("root", root.context());
-        assertEquals("level1", level1.context());
-        assertEquals("level2", level2.context());
-        assertEquals("level2", level3.context()); // Inherited from parent
+        assertThat(root.context()).isEqualTo("root");
+        assertThat(level1.context()).isEqualTo("level1");
+        assertThat(level2.context()).isEqualTo("level2");
+        assertThat(level3.context()).isEqualTo("level2"); // Inherited from parent
     }
 }

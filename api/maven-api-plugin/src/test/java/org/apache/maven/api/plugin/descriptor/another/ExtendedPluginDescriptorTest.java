@@ -21,7 +21,7 @@ package org.apache.maven.api.plugin.descriptor.another;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies that subclasses from generated model classes are possible.
@@ -63,7 +63,7 @@ class ExtendedPluginDescriptorTest {
     }
 
     @Test
-    void testExtendedPluginDescriptor() {
+    void extendedPluginDescriptor() {
         ExtendedPluginDescriptor.Builder builder = new ExtendedPluginDescriptor.Builder();
         // make sure to call the subclasses' builder methods first, otherwise fluent API would not work
         builder.additionalField("additional")
@@ -71,7 +71,7 @@ class ExtendedPluginDescriptorTest {
                 .artifactId("maven-plugin-api")
                 .version("1.0.0");
         ExtendedPluginDescriptor descriptor = builder.build();
-        assertEquals("additional", descriptor.getAdditionalField());
-        assertEquals("org.apache.maven", descriptor.getGroupId());
+        assertThat(descriptor.getAdditionalField()).isEqualTo("additional");
+        assertThat(descriptor.getGroupId()).isEqualTo("org.apache.maven");
     }
 }

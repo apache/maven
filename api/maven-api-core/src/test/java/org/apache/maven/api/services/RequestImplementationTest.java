@@ -27,15 +27,13 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 class RequestImplementationTest {
 
     @Test
-    void testArtifactResolverRequestEquality() {
+    void artifactResolverRequestEquality() {
         Session session = mock(Session.class);
         ArtifactCoordinates coords1 = mock(ArtifactCoordinates.class);
         ArtifactCoordinates coords2 = mock(ArtifactCoordinates.class);
@@ -63,30 +61,30 @@ class RequestImplementationTest {
                 .build();
 
         // Test equals and hashCode
-        assertEquals(request1, request2);
-        assertEquals(request1.hashCode(), request2.hashCode());
-        assertNotEquals(request1, request3);
+        assertThat(request2).isEqualTo(request1);
+        assertThat(request2.hashCode()).isEqualTo(request1.hashCode());
+        assertThat(request3).isNotEqualTo(request1);
 
         // Test toString
         String toString = request1.toString();
-        assertTrue(toString.contains("coordinates="));
-        assertTrue(toString.contains("repositories="));
+        assertThat(toString.contains("coordinates=")).isTrue();
+        assertThat(toString.contains("repositories=")).isTrue();
     }
 
     @Test
-    void testRequestTraceIntegration() {
+    void requestTraceIntegration() {
         Session session = mock(Session.class);
         RequestTrace trace = new RequestTrace("test-context", null, "test-data");
 
         ArtifactInstallerRequest request =
                 ArtifactInstallerRequest.builder().session(session).trace(trace).build();
 
-        assertEquals(trace, request.getTrace());
-        assertEquals(session, request.getSession());
+        assertThat(request.getTrace()).isEqualTo(trace);
+        assertThat(request.getSession()).isEqualTo(session);
     }
 
     @Test
-    void testDependencyResolverRequestEquality() {
+    void dependencyResolverRequestEquality() {
         Session session = mock(Session.class);
 
         DependencyResolverRequest.DependencyResolverRequestBuilder builder = DependencyResolverRequest.builder();
@@ -105,12 +103,12 @@ class RequestImplementationTest {
                 .pathScope(PathScope.MAIN_COMPILE)
                 .build();
 
-        assertEquals(request1, request2);
-        assertEquals(request1.hashCode(), request2.hashCode());
-        assertNotEquals(request1, request3);
+        assertThat(request2).isEqualTo(request1);
+        assertThat(request2.hashCode()).isEqualTo(request1.hashCode());
+        assertThat(request3).isNotEqualTo(request1);
 
         String toString = request1.toString();
-        assertTrue(toString.contains("requestType="));
-        assertTrue(toString.contains("pathScope="));
+        assertThat(toString.contains("requestType=")).isTrue();
+        assertThat(toString.contains("pathScope=")).isTrue();
     }
 }
