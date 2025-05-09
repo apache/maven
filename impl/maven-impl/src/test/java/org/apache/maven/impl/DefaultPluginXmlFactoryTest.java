@@ -31,7 +31,6 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -40,9 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class DefaultPluginXmlFactoryTest {
+class DefaultPluginXmlFactoryReadWriteTest {
 
-    private DefaultPluginXmlFactory sut;
     private static final String SAMPLE_PLUGIN_XML =
             """
             <?xml version="1.0" encoding="UTF-8"?>
@@ -54,13 +52,10 @@ class DefaultPluginXmlFactoryTest {
             </plugin>
             """;
 
-    @BeforeEach
-    void setUp() {
-        sut = new DefaultPluginXmlFactory();
-    }
+    private final DefaultPluginXmlFactory sut = new DefaultPluginXmlFactory();
 
     @Test
-    void shouldReadFromInputStream() {
+    void readFromInputStreamParsesPluginDescriptorCorrectly() {
         PluginDescriptor descriptor = sut.read(XmlReaderRequest.builder()
                 .inputStream(new ByteArrayInputStream(SAMPLE_PLUGIN_XML.getBytes()))
                 .build());
@@ -71,7 +66,7 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldReadFromReader() {
+    void readFromReaderParsesPluginDescriptorCorrectly() {
         assertEquals(
                 "Sample Plugin",
                 sut.read(XmlReaderRequest.builder()
@@ -81,7 +76,7 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldReadFromPath(@TempDir Path tempDir) throws Exception {
+    void readFromPathParsesPluginDescriptorCorrectly(@TempDir Path tempDir) throws Exception {
         Path xmlFile = tempDir.resolve("plugin.xml");
         Files.write(xmlFile, SAMPLE_PLUGIN_XML.getBytes());
         assertEquals(
@@ -90,14 +85,14 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldThrowExceptionOnInvalidInput() {
+    void readWithNoInputThrowsIllegalArgumentException() {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> sut.read(XmlReaderRequest.builder().build()));
     }
 
     @Test
-    void shouldWriteToWriter() {
+    void writeToWriterGeneratesValidXml() {
         StringWriter writer = new StringWriter();
         sut.write(XmlWriterRequest.<PluginDescriptor>builder()
                 .writer(writer)
@@ -114,7 +109,7 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldWriteToOutputStream() {
+    void writeToOutputStreamGeneratesValidXml() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         sut.write(XmlWriterRequest.<PluginDescriptor>builder()
                 .outputStream(outputStream)
@@ -124,7 +119,7 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldWriteToPath(@TempDir Path tempDir) throws Exception {
+    void writeToPathGeneratesValidXmlFile(@TempDir Path tempDir) throws Exception {
         Path xmlFile = tempDir.resolve("output-plugin.xml");
         sut.write(XmlWriterRequest.<PluginDescriptor>builder()
                 .path(xmlFile)
@@ -134,7 +129,7 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldParseValidXmlString() {
+    void fromXmlStringParsesValidXml() {
         PluginDescriptor descriptor = sut.fromXmlString(SAMPLE_PLUGIN_XML);
         assertEquals("Sample Plugin", descriptor.getName());
         assertEquals("org.example", descriptor.getGroupId());
@@ -143,7 +138,7 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldGenerateValidXmlString() {
+    void toXmlStringGeneratesValidXml() {
         String xml = sut.toXmlString(PluginDescriptor.newBuilder()
                 .name("Sample Plugin")
                 .groupId("org.example")
@@ -157,7 +152,7 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldParseXmlUsingStaticMethod() {
+    void staticFromXmlParsesValidXml() {
         PluginDescriptor descriptor = DefaultPluginXmlFactory.fromXml(SAMPLE_PLUGIN_XML);
         assertEquals("Sample Plugin", descriptor.getName());
         assertEquals("org.example", descriptor.getGroupId());
@@ -166,14 +161,13 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldGenerateXmlUsingStaticMethod() {
-        PluginDescriptor descriptor = PluginDescriptor.newBuilder()
+    void staticToXmlGeneratesValidXml() {
+        String xml = DefaultPluginXmlFactory.toXml(PluginDescriptor.newBuilder()
                 .name("Sample Plugin")
                 .groupId("org.example")
                 .artifactId("sample-plugin")
                 .version("1.0.0")
-                .build();
-        String xml = DefaultPluginXmlFactory.toXml(descriptor);
+                .build());
         assertTrue(xml.contains("<name>Sample Plugin</name>"));
         assertTrue(xml.contains("<groupId>org.example</groupId>"));
         assertTrue(xml.contains("<artifactId>sample-plugin</artifactId>"));
@@ -181,7 +175,7 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldThrowXmlWriterExceptionWhenWriteFails() {
+    void writeWithFailingWriterThrowsXmlWriterException() {
         XmlWriterException exception = assertThrows(
                 XmlWriterException.class,
                 () -> sut.write(XmlWriterRequest.<PluginDescriptor>builder()
@@ -206,20 +200,20 @@ class DefaultPluginXmlFactoryTest {
     }
 
     @Test
-    void shouldThrowIllegalArgumentExceptionWhenNoWriteTargetProvided() {
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> sut.write(XmlWriterRequest.<PluginDescriptor>builder()
-                        .content(PluginDescriptor.newBuilder()
-                                .name("No Output Plugin")
+    void writeWithNoTargetThrowsIllegalArgumentException() {
+        assertEquals("writer, outputStream or path must be non null",
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> sut.write(XmlWriterRequest.<PluginDescriptor>builder()
+                                .content(PluginDescriptor.newBuilder()
+                                        .name("No Output Plugin")
+                                        .build())
                                 .build())
-                        .build()));
-
-        assertEquals("writer, outputStream or path must be non null", exception.getMessage());
+                ).getMessage());
     }
 
     @Test
-    void shouldThrowXmlReaderExceptionOnMalformedXml() {
+    void readMalformedXmlThrowsXmlReaderException() {
         XmlReaderException exception = assertThrows(
                 XmlReaderException.class,
                 () -> sut.read(XmlReaderRequest.builder()
