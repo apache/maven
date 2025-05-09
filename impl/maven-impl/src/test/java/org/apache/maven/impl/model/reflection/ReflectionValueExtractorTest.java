@@ -350,7 +350,7 @@ class ReflectionValueExtractorTest {
 
         private String classifier;
 
-        public Artifact(String groupId, String artifactId, String version, String extension, String classifier) {
+        Artifact(String groupId, String artifactId, String version, String extension, String classifier) {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.version = version;
