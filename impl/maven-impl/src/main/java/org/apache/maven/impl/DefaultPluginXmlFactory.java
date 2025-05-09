@@ -66,10 +66,9 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
                 try (InputStream is = Files.newInputStream(path)) {
                     return xml.read(is, request.isStrict());
                 }
-            } else {
-                try (InputStream is = url.openStream()) {
-                    return xml.read(is, request.isStrict());
-                }
+            }
+            try (InputStream is = url.openStream()) {
+                return xml.read(is, request.isStrict());
             }
         } catch (Exception e) {
             throw new XmlReaderException("Unable to read plugin: " + getMessage(e), getLocation(e), e);

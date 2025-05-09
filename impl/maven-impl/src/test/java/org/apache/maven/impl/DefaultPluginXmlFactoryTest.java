@@ -18,19 +18,15 @@
  */
 package org.apache.maven.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.api.services.xml.XmlReaderException;
-import org.apache.maven.api.services.xml.XmlReaderRequest;
-import org.apache.maven.api.services.xml.XmlWriterException;
-import org.apache.maven.api.services.xml.XmlWriterRequest;
+import org.apache.maven.api.services.xml.*;
+import org.apache.maven.impl.model.DefaultModelProcessor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -38,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class DefaultPluginXmlFactoryReadWriteTest {
 
@@ -222,4 +219,36 @@ class DefaultPluginXmlFactoryReadWriteTest {
         assertTrue(exception.getMessage().contains("Unable to read plugin"));
         assertInstanceOf(Exception.class, exception.getCause());
     }
+
+    @TempDir
+    Path tempDir;
+    @Test
+    void locateExistingPomWithFilePathShouldReturnSameFileIfRegularFile() throws IOException {
+        Path pomFile = Files.createTempFile(tempDir, "pom", ".xml");
+        DefaultModelProcessor processor = new DefaultModelProcessor(mock(ModelXmlFactory.class), List.of());
+        assertEquals(pomFile, processor.locateExistingPom(pomFile));
+    }
+
+
+    @Test
+    void readFromUrlParsesPluginDescriptorCorrectly(@TempDir Path tempDir) throws Exception {
+        Path xmlFile = tempDir.resolve("plugin.xml");
+        Files.write(xmlFile, SAMPLE_PLUGIN_XML.getBytes());
+        URL url = xmlFile.toUri().toURL();
+
+        // Create request with URL using reflection since builder doesn't have url() method
+        XmlReaderRequest request = XmlReaderRequest.builder()
+                .inputStream(url.openStream())
+                .build();
+
+        PluginDescriptor descriptor = sut.read(request);
+
+        assertEquals("Sample Plugin", descriptor.getName());
+        assertEquals("org.example", descriptor.getGroupId());
+        assertEquals("sample-plugin", descriptor.getArtifactId());
+        assertEquals("1.0.0", descriptor.getVersion());
+    }
+
+
+
 }
