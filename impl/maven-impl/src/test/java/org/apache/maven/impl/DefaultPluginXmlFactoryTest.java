@@ -60,9 +60,9 @@ class DefaultPluginXmlFactoryReadWriteTest {
 
     private final DefaultPluginXmlFactory sut = new DefaultPluginXmlFactory();
 
-
     @TempDir
     Path tempDir;
+
     @Test
     void readFromInputStreamParsesPluginDescriptorCorrectly() {
         PluginDescriptor descriptor = sut.read(XmlReaderRequest.builder()
@@ -210,15 +210,16 @@ class DefaultPluginXmlFactoryReadWriteTest {
 
     @Test
     void writeWithNoTargetThrowsIllegalArgumentException() {
-        assertEquals("writer, outputStream or path must be non null",
+        assertEquals(
+                "writer, outputStream or path must be non null",
                 assertThrows(
-                        IllegalArgumentException.class,
-                        () -> sut.write(XmlWriterRequest.<PluginDescriptor>builder()
-                                .content(PluginDescriptor.newBuilder()
-                                        .name("No Output Plugin")
-                                        .build())
-                                .build())
-                ).getMessage());
+                                IllegalArgumentException.class,
+                                () -> sut.write(XmlWriterRequest.<PluginDescriptor>builder()
+                                        .content(PluginDescriptor.newBuilder()
+                                                .name("No Output Plugin")
+                                                .build())
+                                        .build()))
+                        .getMessage());
     }
 
     @Test
@@ -231,13 +232,13 @@ class DefaultPluginXmlFactoryReadWriteTest {
         assertTrue(exception.getMessage().contains("Unable to read plugin"));
         assertInstanceOf(Exception.class, exception.getCause());
     }
+
     @Test
     void locateExistingPomWithFilePathShouldReturnSameFileIfRegularFile() throws IOException {
         Path pomFile = Files.createTempFile(tempDir, "pom", ".xml");
         DefaultModelProcessor processor = new DefaultModelProcessor(mock(ModelXmlFactory.class), List.of());
         assertEquals(pomFile, processor.locateExistingPom(pomFile));
     }
-
 
     @Test
     void readFromUrlParsesPluginDescriptorCorrectly(@TempDir Path tempDir) throws Exception {
@@ -246,9 +247,8 @@ class DefaultPluginXmlFactoryReadWriteTest {
         URL url = xmlFile.toUri().toURL();
 
         // Create request with URL using reflection since builder doesn't have url() method
-        XmlReaderRequest request = XmlReaderRequest.builder()
-                .inputStream(url.openStream())
-                .build();
+        XmlReaderRequest request =
+                XmlReaderRequest.builder().inputStream(url.openStream()).build();
 
         PluginDescriptor descriptor = sut.read(request);
 
@@ -257,7 +257,4 @@ class DefaultPluginXmlFactoryReadWriteTest {
         assertEquals("sample-plugin", descriptor.getArtifactId());
         assertEquals("1.0.0", descriptor.getVersion());
     }
-
-
-
 }
