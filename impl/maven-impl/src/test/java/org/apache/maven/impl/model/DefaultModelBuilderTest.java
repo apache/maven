@@ -20,7 +20,6 @@ package org.apache.maven.impl.model;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -107,14 +106,14 @@ class DefaultModelBuilderTest {
         // after merge
         repositories = (List<RemoteRepository>) repositoriesField.get(state);
         assertEquals(3, repositories.size());
-        assertEquals("first", repositories.get(0).getId());
-        assertEquals("https://some.repo", repositories.get(0).getUrl()); // interpolated
+        assertEquals("first", repositories.getFirst().getId());
+        assertEquals("https://some.repo", repositories.getFirst().getUrl()); // interpolated
         assertEquals("second", repositories.get(1).getId());
         assertEquals("${secondParentRepo}", repositories.get(1).getUrl()); // un-interpolated (no source)
         assertEquals("central", repositories.get(2).getId()); // default
     }
 
     private Path getPom(String name) {
-        return Paths.get("src/test/resources/poms/factory/" + name + ".xml").toAbsolutePath();
+        return Path.of("src/test/resources/poms/factory/" + name + ".xml").toAbsolutePath();
     }
 }

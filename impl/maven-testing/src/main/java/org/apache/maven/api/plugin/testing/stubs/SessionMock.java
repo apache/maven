@@ -20,7 +20,6 @@ package org.apache.maven.api.plugin.testing.stubs;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -132,7 +131,7 @@ public class SessionMock {
     public static InternalSession getMockSession(String localRepo) {
         LocalRepository localRepository = mock(LocalRepository.class);
         when(localRepository.getId()).thenReturn("local");
-        when(localRepository.getPath()).thenReturn(Paths.get(localRepo));
+        when(localRepository.getPath()).thenReturn(Path.of(localRepo));
         return getMockSession(localRepository);
     }
 

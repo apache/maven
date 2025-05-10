@@ -281,7 +281,7 @@ public class MavenProperties extends AbstractMap<String, String> {
             valueLines.add(escapedKey + "=");
             sb.append(escapedKey).append("=");
         } else {
-            String val0 = valueLines.get(0);
+            String val0 = valueLines.getFirst();
             String rv0 = typed ? val0 : escapeJava(val0);
             if (!val0.trim().startsWith(escapedKey)) {
                 valueLines.set(0, escapedKey + " = " + rv0 /*+ (0 < lastLine? "\\": "")*/);

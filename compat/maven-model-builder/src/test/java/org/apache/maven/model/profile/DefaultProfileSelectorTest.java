@@ -68,6 +68,6 @@ public class DefaultProfileSelectorTest {
         assertEquals(1, problems.getErrors().size());
         assertEquals(
                 "Failed to determine activation for profile one: BOOM",
-                problems.getErrors().get(0));
+                problems.getErrors().getFirst());
     }
 }

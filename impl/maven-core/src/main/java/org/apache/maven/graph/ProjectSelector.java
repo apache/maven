@@ -96,7 +96,7 @@ public final class ProjectSelector {
         for (String selector : projectSelectors) {
             Optional<MavenProject> optSelectedProject =
                     findOptionalProjectBySelector(projects, baseDirectory, selector);
-            if (!optSelectedProject.isPresent()) {
+            if (optSelectedProject.isEmpty()) {
                 String message = "Could not find the selected project in the reactor: " + selector;
                 throw new MavenExecutionException(message, request.getPom());
             }

@@ -57,7 +57,7 @@ public class DefaultResolutionErrorHandler implements ResolutionErrorHandler {
         // Transfer Error
 
         if (result.hasErrorArtifactExceptions()) {
-            throw result.getErrorArtifactExceptions().get(0);
+            throw result.getErrorArtifactExceptions().getFirst();
         }
 
         if (result.hasMissingArtifacts()) {

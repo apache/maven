@@ -82,7 +82,7 @@ class DefaultModelBuildingResult implements ModelBuildingResult {
 
     @Override
     public Model getRawModel() {
-        return rawModels.get(modelIds.get(0));
+        return rawModels.get(modelIds.getFirst());
     }
 
     @Override

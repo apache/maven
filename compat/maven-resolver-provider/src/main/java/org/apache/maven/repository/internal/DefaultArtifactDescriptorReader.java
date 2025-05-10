@@ -240,17 +240,19 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     if (logger.isDebugEnabled()) {
                         String problem = (problems.size() == 1) ? "problem" : "problems";
                         String problemPredicate = problem + ((problems.size() == 1) ? " was" : " were");
-                        StringBuilder message = new StringBuilder(String.format(
-                                "%s %s encountered while building the effective model for %s during %s\n",
-                                problems.size(),
-                                problemPredicate,
-                                request.getArtifact(),
-                                RequestTraceHelper.interpretTrace(true, request.getTrace())));
+                        StringBuilder message = new StringBuilder(
+                                "%s %s encountered while building the effective model for %s during %s\n"
+                                        .formatted(
+                                                problems.size(),
+                                                problemPredicate,
+                                                request.getArtifact(),
+                                                RequestTraceHelper.interpretTrace(true, request.getTrace())));
                         message.append(StringUtils.capitalizeFirstLetter(problem));
                         for (ModelProblem modelProblem : problems) {
-                            message.append(String.format(
-                                    "\n* %s @ %s",
-                                    modelProblem.getMessage(), ModelProblemUtils.formatLocation(modelProblem, null)));
+                            message.append("\n* %s @ %s"
+                                    .formatted(
+                                            modelProblem.getMessage(),
+                                            ModelProblemUtils.formatLocation(modelProblem, null)));
                         }
                         logger.warn(message.toString());
                     } else {

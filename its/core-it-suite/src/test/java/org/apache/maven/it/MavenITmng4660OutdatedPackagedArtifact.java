@@ -24,7 +24,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import org.junit.jupiter.api.Test;
@@ -78,7 +77,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         // 2. Create a properties file with some content and compile only that module (module A).
         final Verifier verifier2 = newVerifier(testDir.getAbsolutePath());
         final Path resourcesDirectory =
-                Files.createDirectories(Paths.get(testDir.toString(), "module-a", "src", "main", "resources"));
+                Files.createDirectories(Path.of(testDir.toString(), "module-a", "src", "main", "resources"));
         final Path fileToWrite = resourcesDirectory.resolve("example.properties");
         Files.writeString(fileToWrite, "x=42");
 
@@ -115,7 +114,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         try {
             verifier3.verifyTextInLog(
                     "File '"
-                            + Paths.get("module-a", "target", "classes", "example.properties")
+                            + Path.of("module-a", "target", "classes", "example.properties")
                             + "' is more recent than the packaged artifact for 'module-a', please run a full `mvn package` build");
         } catch (VerificationException e) {
             final StringBuilder message = new StringBuilder(e.getMessage());
@@ -129,7 +128,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
 
             message.append(System.lineSeparator());
 
-            Path outputDirectory = Paths.get(testDir.toString(), "module-a", "target", "classes");
+            Path outputDirectory = Path.of(testDir.toString(), "module-a", "target", "classes");
 
             Files.walkFileTree(outputDirectory, new FileVisitor<Path>() {
                 @Override

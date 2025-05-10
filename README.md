@@ -66,7 +66,7 @@ Do you like Apache Maven? Then [donate back to the ASF](https://www.apache.org/f
 Quick Build
 -------
 If you want to bootstrap Maven, you'll need:
-- Java 17+
+- Java 21+
 - Maven 3.6.3 or later
 - Run Maven, specifying a location into which the completed Maven distro should be installed:
     ```

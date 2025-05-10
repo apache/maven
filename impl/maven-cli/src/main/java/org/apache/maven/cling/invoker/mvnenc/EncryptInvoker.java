@@ -89,7 +89,7 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
                 return badGoalsErrorMessage("No goal or multiple goals specified, specify only one goal.", context);
             }
 
-            String goalName = options.goals().get().get(0);
+            String goalName = options.goals().get().getFirst();
             Goal goal = context.goals.get(goalName);
 
             if (goal == null) {

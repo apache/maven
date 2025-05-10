@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -115,7 +114,7 @@ public class ForkedMavenExecutor implements Executor {
         cmdAndArguments.addAll(executorRequest.arguments());
 
         ArrayList<String> jvmArgs = new ArrayList<>();
-        if (!executorRequest.userHomeDirectory().equals(getCanonicalPath(Paths.get(System.getProperty("user.home"))))) {
+        if (!executorRequest.userHomeDirectory().equals(getCanonicalPath(Path.of(System.getProperty("user.home"))))) {
             jvmArgs.add("-Duser.home=" + executorRequest.userHomeDirectory().toString());
         }
         if (executorRequest.jvmArguments().isPresent()) {

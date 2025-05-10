@@ -123,7 +123,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
         } catch (BatchRequestException e) {
             String message;
             if (e.getResults().size() == 1) {
-                message = e.getResults().iterator().next().error().getMessage();
+                message = e.getResults().getFirst().error().getMessage();
             } else {
                 message = "Unable to resolve artifacts: " + e.getMessage();
             }

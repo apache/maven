@@ -203,7 +203,7 @@ public class BootstrapCoreExtensionManager {
         }
         return CoreExtensionEntry.discoverFrom(
                 realm,
-                Collections.singleton(artifacts.get(0).getPath().toFile()),
+                Collections.singleton(artifacts.getFirst().getPath().toFile()),
                 extension.getGroupId() + ":" + extension.getArtifactId(),
                 extension.getConfiguration());
     }

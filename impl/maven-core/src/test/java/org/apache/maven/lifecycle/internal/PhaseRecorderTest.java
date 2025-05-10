@@ -38,7 +38,7 @@ class PhaseRecorderTest {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
         final List<MojoExecution> executions = plan.getMojoExecutions();
 
-        final MojoExecution mojoExecution1 = executions.get(0);
+        final MojoExecution mojoExecution1 = executions.getFirst();
         final MojoExecution mojoExecution2 = executions.get(1);
         phaseRecorder.observeExecution(mojoExecution1);
 

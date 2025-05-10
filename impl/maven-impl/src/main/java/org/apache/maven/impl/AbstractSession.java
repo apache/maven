@@ -837,7 +837,7 @@ public abstract class AbstractSession implements InternalSession {
         Node root = getService(DependencyResolver.class)
                 .collect(this, dependency, scope)
                 .getRoot();
-        return root.getChildren().iterator().next();
+        return root.getChildren().getFirst();
     }
 
     @Nonnull

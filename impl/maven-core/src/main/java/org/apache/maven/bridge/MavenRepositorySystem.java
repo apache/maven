@@ -391,7 +391,7 @@ public class MavenRepositorySystem {
             throws InvalidRepositoryException {
         if (layout == null) {
             throw new InvalidRepositoryException(
-                    String.format("Cannot find ArtifactRepositoryLayout instance for: %s %s", layoutId, repositoryId),
+                    "Cannot find ArtifactRepositoryLayout instance for: %s %s".formatted(layoutId, repositoryId),
                     repositoryId);
         }
     }
@@ -637,7 +637,7 @@ public class MavenRepositorySystem {
 
             ArtifactRepositoryPolicy snapshotPolicy = getEffectivePolicy(snapshotPolicies);
 
-            ArtifactRepository aliasedRepo = aliasedRepos.get(0);
+            ArtifactRepository aliasedRepo = aliasedRepos.getFirst();
 
             ArtifactRepository effectiveRepository = createArtifactRepository(
                     aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(), snapshotPolicy, releasePolicy);

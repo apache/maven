@@ -64,8 +64,8 @@ class DependencyManagementTest {
         dm.addDependency(d1);
         assertNotNull(dm.getDependencies());
         assertEquals(1, dm.getDependencies().size());
-        dm.getDependencies().get(0).setArtifactId("myArtifactId");
-        assertEquals("myArtifactId", dm.getDependencies().get(0).getArtifactId());
+        dm.getDependencies().getFirst().setArtifactId("myArtifactId");
+        assertEquals("myArtifactId", dm.getDependencies().getFirst().getArtifactId());
         dm.setDependencies(null);
         assertNotNull(dm.getDependencies());
         assertEquals(0, dm.getDependencies().size());

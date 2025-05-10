@@ -20,7 +20,6 @@ package org.apache.maven.plugin;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,7 +83,7 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
         }
 
         if (basedir == null) {
-            basedir = Paths.get(System.getProperty("user.dir"));
+            basedir = Path.of(System.getProperty("user.dir"));
         }
 
         this.basedir = basedir;

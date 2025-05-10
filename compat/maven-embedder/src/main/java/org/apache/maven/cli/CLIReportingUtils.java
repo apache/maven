@@ -199,6 +199,6 @@ public final class CLIReportingUtils {
             format = "%4$d.%5$03d s";
         }
 
-        return String.format(format, d, h, m, s, ms);
+        return format.formatted(d, h, m, s, ms);
     }
 }

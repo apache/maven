@@ -172,13 +172,13 @@ public final class CLIReportingUtils {
         long millis = duration.toMillisPart();
 
         if (days > 0) {
-            return String.format("%d d %02d:%02d h", days, hours, minutes);
+            return "%d d %02d:%02d h".formatted(days, hours, minutes);
         } else if (hours > 0) {
-            return String.format("%02d:%02d h", hours, minutes);
+            return "%02d:%02d h".formatted(hours, minutes);
         } else if (minutes > 0) {
-            return String.format("%02d:%02d min", minutes, seconds);
+            return "%02d:%02d min".formatted(minutes, seconds);
         } else {
-            return String.format("%d.%03d s", seconds, millis);
+            return "%d.%03d s".formatted(seconds, millis);
         }
     }
 }

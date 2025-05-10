@@ -20,7 +20,7 @@ package org.apache.maven.model.building;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +43,7 @@ public class GraphTest {
     public void testPerf() throws IOException {
         List<String[]> data = new ArrayList<>();
         String k = null;
-        for (String line : Files.readAllLines(Paths.get("src/test/resources/dag.txt"))) {
+        for (String line : Files.readAllLines(Path.of("src/test/resources/dag.txt"))) {
             if (line.startsWith("\t")) {
                 data.add(new String[] {k, line.trim()});
             } else {

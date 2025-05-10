@@ -98,21 +98,21 @@ class DefaultGraphConflictResolverTest {
                 "wrong # of v2 incident edges in the resulting graph after resolver");
         assertEquals(
                 "1.2",
-                res.getIncidentEdges(v2).get(0).getVersion(),
+                res.getIncidentEdges(v2).getFirst().getVersion(),
                 "wrong edge v1-v2 in the resulting graph after resolver");
 
         assertEquals(
                 1, res.getIncidentEdges(v3).size(), "wrong # of edges v1-v3 in the resulting graph after resolver");
         assertEquals(
                 "1.1",
-                res.getIncidentEdges(v3).get(0).getVersion(),
+                res.getIncidentEdges(v3).getFirst().getVersion(),
                 "wrong edge v1-v3 in the resulting graph after resolver");
 
         assertEquals(
                 1, res.getIncidentEdges(v4).size(), "wrong # of edges v3-v4 in the resulting graph after resolver");
         assertEquals(
                 "1.2",
-                res.getIncidentEdges(v4).get(0).getVersion(),
+                res.getIncidentEdges(v4).getFirst().getVersion(),
                 "wrong edge v3-v4 in the resulting graph after resolver");
     }
 
@@ -139,21 +139,21 @@ class DefaultGraphConflictResolverTest {
                 "wrong # of v2 incident edges in the resulting graph after resolver");
         assertEquals(
                 "1.2",
-                res.getIncidentEdges(v2).get(0).getVersion(),
+                res.getIncidentEdges(v2).getFirst().getVersion(),
                 "wrong edge v1-v2 in the resulting graph after resolver");
 
         assertEquals(
                 1, res.getIncidentEdges(v3).size(), "wrong # of edges v1-v3 in the resulting graph after resolver");
         assertEquals(
                 "1.1",
-                res.getIncidentEdges(v3).get(0).getVersion(),
+                res.getIncidentEdges(v3).getFirst().getVersion(),
                 "wrong edge v1-v3 in the resulting graph after resolver");
 
         assertEquals(
                 1, res.getIncidentEdges(v4).size(), "wrong # of edges v3-v4 in the resulting graph after resolver");
         assertEquals(
                 "1.1",
-                res.getIncidentEdges(v4).get(0).getVersion(),
+                res.getIncidentEdges(v4).getFirst().getVersion(),
                 "wrong edge v3-v4 in the resulting graph after resolver");
     }
 
@@ -180,21 +180,21 @@ class DefaultGraphConflictResolverTest {
                 "wrong # of v2 incident edges in the resulting graph after resolver");
         assertEquals(
                 "1.2",
-                res.getIncidentEdges(v2).get(0).getVersion(),
+                res.getIncidentEdges(v2).getFirst().getVersion(),
                 "wrong edge v1-v2 in the resulting graph after resolver");
 
         assertEquals(
                 1, res.getIncidentEdges(v3).size(), "wrong # of edges v1-v3 in the resulting graph after resolver");
         assertEquals(
                 "1.1",
-                res.getIncidentEdges(v3).get(0).getVersion(),
+                res.getIncidentEdges(v3).getFirst().getVersion(),
                 "wrong edge v1-v3 in the resulting graph after resolver");
 
         assertEquals(
                 1, res.getIncidentEdges(v4).size(), "wrong # of edges v3-v4 in the resulting graph after resolver");
         assertEquals(
                 "1.2",
-                res.getIncidentEdges(v4).get(0).getVersion(),
+                res.getIncidentEdges(v4).getFirst().getVersion(),
                 "wrong edge v3-v4 in the resulting graph after resolver");
     }
     // ------------------------------------------------------------------------------------------

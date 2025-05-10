@@ -86,9 +86,9 @@ class CanonicalProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         List<PluginExecution> executions = plugin.getExecutions();
 
-        PluginExecution execution = executions.get(0);
+        PluginExecution execution = executions.getFirst();
 
-        String g0 = execution.getGoals().get(0);
+        String g0 = execution.getGoals().getFirst();
 
         assertEquals("plexus:runtime", g0);
 

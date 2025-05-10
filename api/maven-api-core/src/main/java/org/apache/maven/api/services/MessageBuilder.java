@@ -245,7 +245,7 @@ public interface MessageBuilder extends Appendable {
 
     /**
      * Append formatted content to the buffer.
-     * @see String#format(String, Object...)
+     * @see String#formatted(Object...)
      *
      * @param pattern a <a href="../util/Formatter.html#syntax">format string</a>
      * @param args arguments referenced by the format specifiers in the format string
@@ -253,7 +253,7 @@ public interface MessageBuilder extends Appendable {
      */
     @Nonnull
     default MessageBuilder format(String pattern, Object... args) {
-        return append(String.format(pattern, args));
+        return append(pattern.formatted(args));
     }
 
     /**

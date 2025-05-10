@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
@@ -55,7 +54,7 @@ class MavenITmng8645ConsumerPomDependencyManagementTest extends AbstractMavenInt
         verifier.verifyErrorFreeLog();
 
         // validate consumer pom
-        Path consumerPom = basedir.resolve(Paths.get(
+        Path consumerPom = basedir.resolve(Path.of(
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.mng8645",

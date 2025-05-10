@@ -53,7 +53,7 @@ class MavenITmng7737ProfileActivationTest extends AbstractMavenIntegrationTestCa
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // Example output on my Linux Box w/ Java 17
+        // Example output on my Linux Box w/ Java 21
         // The following profiles are active:
         //
         // - settings-active-default (source: external)
@@ -61,6 +61,7 @@ class MavenITmng7737ProfileActivationTest extends AbstractMavenIntegrationTestCa
         // - settings-jdk-8 (source: external)
         // - settings-jdk-11 (source: external)
         // - settings-jdk-17 (source: external)
+        // - settings-jdk-21 (source: external)
         // - settings-os-unix (source: external)
         // - settings-property (source: external)
         // - settings-file-exists-present (source: external)
@@ -69,6 +70,7 @@ class MavenITmng7737ProfileActivationTest extends AbstractMavenIntegrationTestCa
         // - pom-jdk-8 (source: org.apache.maven.its.mng7737:test:0.1)
         // - pom-jdk-11 (source: org.apache.maven.its.mng7737:test:0.1)
         // - pom-jdk-17 (source: org.apache.maven.its.mng7737:test:0.1)
+        // - pom-jdk-21 (source: org.apache.maven.its.mng7737:test:0.1)
         // - pom-os-unix (source: org.apache.maven.its.mng7737:test:0.1)
         // - pom-property (source: org.apache.maven.its.mng7737:test:0.1)
         // - pom-file-exists-present (source: org.apache.maven.its.mng7737:test:0.1)

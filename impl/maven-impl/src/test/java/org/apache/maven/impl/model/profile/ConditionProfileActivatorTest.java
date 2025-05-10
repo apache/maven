@@ -213,7 +213,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         assertEquals(0, problems.getErrors().size(), problems.getErrors().toString());
         assertEquals(1, problems.getWarnings().size(), problems.getWarnings().toString());
         assertTrue(
-                problems.getWarnings().get(0).contains(warningContains),
+                problems.getWarnings().getFirst().contains(warningContains),
                 problems.getWarnings().toString());
     }
 

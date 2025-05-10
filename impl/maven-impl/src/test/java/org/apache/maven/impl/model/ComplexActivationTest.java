@@ -19,7 +19,6 @@
 package org.apache.maven.impl.model;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.maven.api.Session;
@@ -83,6 +82,6 @@ class ComplexActivationTest {
     }
 
     private Path getPom(String name) {
-        return Paths.get("src/test/resources/poms/factory/" + name + ".xml").toAbsolutePath();
+        return Path.of("src/test/resources/poms/factory/" + name + ".xml").toAbsolutePath();
     }
 }

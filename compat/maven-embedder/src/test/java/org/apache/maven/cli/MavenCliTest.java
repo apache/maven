@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -441,7 +440,7 @@ class MavenCliTest {
     void resumeFromSelectorIsSuggestedWithoutGroupId() {
         List<MavenProject> allProjects =
                 asList(createMavenProject("group", "module-a"), createMavenProject("group", "module-b"));
-        MavenProject failedProject = allProjects.get(0);
+        MavenProject failedProject = allProjects.getFirst();
 
         String selector = cli.getResumeFromSelector(allProjects, failedProject);
 
@@ -452,7 +451,7 @@ class MavenCliTest {
     void resumeFromSelectorContainsGroupIdWhenArtifactIdIsNotUnique() {
         List<MavenProject> allProjects =
                 asList(createMavenProject("group-a", "module"), createMavenProject("group-b", "module"));
-        MavenProject failedProject = allProjects.get(0);
+        MavenProject failedProject = allProjects.getFirst();
 
         String selector = cli.getResumeFromSelector(allProjects, failedProject);
 
@@ -580,7 +579,7 @@ class MavenCliTest {
 
     @Test
     public void findRootProjectWithAttribute() {
-        Path test = Paths.get("src/test/projects/root-attribute");
+        Path test = Path.of("src/test/projects/root-attribute");
         assertEquals(test, new DefaultRootLocator().findRoot(test.resolve("child")));
     }
 
@@ -600,7 +599,11 @@ class MavenCliTest {
         Files.createDirectories(mvn);
         Files.writeString(
                 mvn.resolve("maven.properties"),
-                "${includes} = env-${envName}.properties\nfro = ${bar}z\n" + "bar = chti${java.version}\n");
+                """
+                ${includes} = env-${envName}.properties
+                fro = ${bar}z
+                bar = chti${java.version}
+                """);
         Files.writeString(mvn.resolve("env-test.properties"), "\n");
 
         // Arrange

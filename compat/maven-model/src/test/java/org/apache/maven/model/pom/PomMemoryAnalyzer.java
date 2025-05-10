@@ -22,7 +22,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,7 +71,7 @@ public class PomMemoryAnalyzer {
             System.exit(1);
         }
 
-        Path rootDir = Paths.get(args[0]);
+        Path rootDir = Path.of(args[0]);
         PomMemoryAnalyzer analyzer = new PomMemoryAnalyzer();
         MavenStaxReader reader = new MavenStaxReader();
 

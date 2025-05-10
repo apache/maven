@@ -265,7 +265,7 @@ class ConditionParserTest {
     @Test
     void testNestedPropertyAlias() {
         functions.put("property", args -> {
-            if (args.get(0).equals("project.rootDirectory")) {
+            if (args.getFirst().equals("project.rootDirectory")) {
                 return "/home/user/project";
             }
             return null;

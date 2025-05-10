@@ -195,6 +195,6 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
 
         assertEquals(0, problems.getErrors().size());
         assertEquals(1, problems.getWarnings().size());
-        assertTrue(problems.getWarnings().get(0).contains(warningContains));
+        assertTrue(problems.getWarnings().getFirst().contains(warningContains));
     }
 }

@@ -19,7 +19,6 @@
 package org.apache.maven.impl.standalone;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
@@ -376,11 +375,11 @@ public class ApiRunner {
         // TODO: remove that when this go more public
         properties.put("user.home", "target");
 
-        Path userHome = Paths.get(properties.get("user.home"));
+        Path userHome = Path.of(properties.get("user.home"));
         Path mavenUserHome = userHome.resolve(".m2");
         Path mavenSystemHome = properties.containsKey("maven.home")
-                ? Paths.get(properties.get("maven.home"))
-                : properties.containsKey("env.MAVEN_HOME") ? Paths.get(properties.get("env.MAVEN_HOME")) : null;
+                ? Path.of(properties.get("maven.home"))
+                : properties.containsKey("env.MAVEN_HOME") ? Path.of(properties.get("env.MAVEN_HOME")) : null;
 
         DefaultRepositorySystemSession rsession = new DefaultRepositorySystemSession(h -> false);
         rsession.setScopeManager(new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE));

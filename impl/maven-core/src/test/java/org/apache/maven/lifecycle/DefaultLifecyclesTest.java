@@ -93,7 +93,7 @@ class DefaultLifecyclesTest {
                         List.of(new DefaultLifecycleRegistry.LifecycleWrapperProvider(mockedPlexusContainer))),
                 new DefaultLookup(mockedPlexusContainer));
 
-        assertThat(dl.getLifeCycles().get(0).getId(), is("clean"));
+        assertThat(dl.getLifeCycles().getFirst().getId(), is("clean"));
         assertThat(dl.getLifeCycles().get(1).getId(), is("default"));
         assertThat(dl.getLifeCycles().get(2).getId(), is("site"));
         assertThat(dl.getLifeCycles().get(3).getId(), is("etl"));

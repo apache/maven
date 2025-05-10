@@ -543,7 +543,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     if (i == size() - 1 || get(i + 1).getType() == STRING_ITEM) {
                         remove(i);
                     } else if (get(i + 1).getType() == LIST_ITEM) {
-                        Item item = ((ListItem) get(i + 1)).get(0);
+                        Item item = ((ListItem) get(i + 1)).getFirst();
                         if (item.getType() == COMBINATION_ITEM || item.getType() == STRING_ITEM) {
                             remove(i);
                         }

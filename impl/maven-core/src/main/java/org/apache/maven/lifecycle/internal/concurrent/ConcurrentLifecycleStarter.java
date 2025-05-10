@@ -99,9 +99,8 @@ public class ConcurrentLifecycleStarter implements LifecycleStarter {
             int degreeOfConcurrency = session.getRequest().getDegreeOfConcurrency();
             if (degreeOfConcurrency > 1) {
                 logger.info("");
-                logger.info(String.format(
-                        "Using the %s implementation with a thread count of %d",
-                        executor.getClass().getSimpleName(), degreeOfConcurrency));
+                logger.info("Using the %s implementation with a thread count of %d"
+                        .formatted(executor.getClass().getSimpleName(), degreeOfConcurrency));
             }
 
             ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();

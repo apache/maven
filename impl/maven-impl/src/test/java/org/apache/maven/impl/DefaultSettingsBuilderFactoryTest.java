@@ -19,7 +19,6 @@
 package org.apache.maven.impl;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.maven.api.Session;
@@ -70,6 +69,6 @@ class DefaultSettingsBuilderFactoryTest {
     }
 
     private Path getSettings(String name) {
-        return Paths.get("src/test/resources/" + name + ".xml").toAbsolutePath();
+        return Path.of("src/test/resources/" + name + ".xml").toAbsolutePath();
     }
 }

@@ -135,7 +135,7 @@ public class ResolutionNode {
                     }
                 }
 
-                ids.add(0, artifact);
+                ids.addFirst(artifact);
                 node = node.parent;
             }
             trail = ids;

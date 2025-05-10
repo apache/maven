@@ -48,8 +48,7 @@ class ConcurrencyDependencyGraphTest {
         List<MavenProject> rootSchedulableBuilds = graph.getRootSchedulableBuilds();
         // only Project.A has no dependencies
         assertEquals(1, rootSchedulableBuilds.size());
-        assertEquals(
-                ProjectDependencyGraphStub.A, rootSchedulableBuilds.iterator().next());
+        assertEquals(ProjectDependencyGraphStub.A, rootSchedulableBuilds.getFirst());
         // double check A deps
         List<MavenProject> dependenciesA = graph.getDependencies(ProjectDependencyGraphStub.A);
         assertEquals(0, dependenciesA.size());
@@ -68,7 +67,7 @@ class ConcurrencyDependencyGraphTest {
         Set<MavenProject> unfinishedProjects = graph.getUnfinishedProjects();
         assertEquals(5, unfinishedProjects.size());
 
-        graph.markAsFinished(schedulableNewProcesses.get(0));
+        graph.markAsFinished(schedulableNewProcesses.getFirst());
         assertEquals(2, graph.getFinishedProjects().size());
         assertEquals(4, graph.getUnfinishedProjects().size());
 

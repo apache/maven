@@ -99,7 +99,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         // Value taken from p2
         // ----------------------------------------------------------------------
 
-        assertEquals("mailing-list", project4.getMailingLists().get(0).getName());
+        assertEquals("mailing-list", project4.getMailingLists().getFirst().getName());
 
         // ----------------------------------------------------------------------
         // Value taken from p1

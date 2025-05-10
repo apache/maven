@@ -46,8 +46,8 @@ class TransformationManagerTest {
         assertEquals(3, tms.size());
 
         assertTrue(
-                tms.get(0) instanceof ReleaseArtifactTransformation,
-                "We expected the release transformation and got " + tms.get(0));
+                tms.getFirst() instanceof ReleaseArtifactTransformation,
+                "We expected the release transformation and got " + tms.getFirst());
 
         assertTrue(
                 tms.get(1) instanceof LatestArtifactTransformation,

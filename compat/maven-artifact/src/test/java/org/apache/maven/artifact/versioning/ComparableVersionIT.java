@@ -23,7 +23,6 @@ import java.io.InterruptedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
@@ -36,7 +35,7 @@ class ComparableVersionIT {
 
     @Test
     void test() throws Exception {
-        Files.walkFileTree(Paths.get("target"), new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(Path.of("target"), new SimpleFileVisitor<Path>() {
             Pattern mavenArtifactJar = Pattern.compile("maven-artifact-[\\d.]+(-SNAPSHOT)?\\.jar");
 
             @Override
@@ -44,7 +43,7 @@ class ComparableVersionIT {
                 String filename = file.getFileName().toString();
                 if (mavenArtifactJar.matcher(filename).matches()) {
                     Process p = Runtime.getRuntime().exec(new String[] {
-                        Paths.get(System.getProperty("java.home"), "bin/java").toString(),
+                        Path.of(System.getProperty("java.home"), "bin/java").toString(),
                         "-jar",
                         file.toAbsolutePath().toString(),
                         "5.32",
@@ -64,7 +63,7 @@ class ComparableVersionIT {
 
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                if (Paths.get("target").equals(dir)) {
+                if (Path.of("target").equals(dir)) {
                     return FileVisitResult.CONTINUE;
                 } else {
                     return FileVisitResult.SKIP_SUBTREE;

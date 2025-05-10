@@ -160,7 +160,7 @@ public class FileSizeFormat {
 
         ScaleUnit unit = ScaleUnit.getScaleUnit(Math.round(rate));
         double scaledRate = rate / unit.bytes();
-        builder.append(String.format("%.1f", scaledRate));
+        builder.append("%.1f".formatted(scaledRate));
         builder.append(" ").append(unit.symbol()).append("/s");
     }
 

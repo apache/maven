@@ -54,7 +54,7 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
     }
 
     private String formatLocation(int columnNumber, int lineNumber) {
-        return String.format("line %d, column %d", lineNumber, columnNumber);
+        return "line %d, column %d".formatted(lineNumber, columnNumber);
     }
 
     @Override

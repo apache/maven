@@ -20,7 +20,6 @@ package org.apache.maven.impl;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -81,7 +80,7 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
             throw new ToolchainFactoryException(
                     "Java toolchain without the " + KEY_JAVAHOME + " configuration element.");
         }
-        Path normal = Paths.get(javahome.value()).normalize();
+        Path normal = Path.of(javahome.value()).normalize();
         if (!Files.exists(normal)) {
             throw new ToolchainFactoryException("Non-existing JDK home configuration at " + normal.toAbsolutePath());
         }
@@ -125,7 +124,7 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
 
         @Override
         public String findTool(String toolName) {
-            Path toRet = findTool(toolName, Paths.get(getJavaHome()).normalize());
+            Path toRet = findTool(toolName, Path.of(getJavaHome()).normalize());
             if (toRet != null) {
                 return toRet.toAbsolutePath().toString();
             }

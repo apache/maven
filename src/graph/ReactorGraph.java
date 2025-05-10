@@ -30,7 +30,7 @@ import guru.nidi.graphviz.parse.Parser;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -140,7 +140,7 @@ public class ReactorGraph {
 
             // Write intermediary graph to DOT file
             String dotContent = Graphviz.fromGraph(clusteredGraph).render(Format.DOT).toString();
-            Files.write(Paths.get("target/graph/intermediary_graph.dot"), dotContent.getBytes());
+            Files.write(Path.of("target/graph/intermediary_graph.dot"), dotContent.getBytes());
             System.out.println("Intermediary graph written to intermediary_graph.dot");
 
             // Render graph to SVF
@@ -154,7 +154,7 @@ public class ReactorGraph {
 
             // Write high-level graph to DOT file
             String highLevelDotContent = Graphviz.fromGraph(highLevelGraph).render(Format.DOT).toString();
-            Files.write(Paths.get("target/graph/high_level_graph.dot"), highLevelDotContent.getBytes());
+            Files.write(Path.of("target/graph/high_level_graph.dot"), highLevelDotContent.getBytes());
             System.out.println("High-level graph written to high_level_graph.dot");
 
             // Render high-level graph to SVG

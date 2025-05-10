@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -131,7 +130,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
         String localRepository = effective.getLocalRepository();
         if (localRepository != null && !localRepository.isEmpty()) {
-            Path file = Paths.get(localRepository);
+            Path file = Path.of(localRepository);
             if (!file.isAbsolute() && file.toString().startsWith(File.separator)) {
                 effective = effective.withLocalRepository(file.toAbsolutePath().toString());
             }
@@ -303,13 +302,13 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         Map<String, String> properties = session.getUserProperties();
         String settingsSecurity = properties.get(Constants.MAVEN_SETTINGS_SECURITY);
         if (settingsSecurity != null) {
-            return Paths.get(settingsSecurity);
+            return Path.of(settingsSecurity);
         }
         String mavenUserConf = properties.get(Constants.MAVEN_USER_CONF);
         if (mavenUserConf != null) {
-            return Paths.get(mavenUserConf, Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
+            return Path.of(mavenUserConf, Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
         }
-        return Paths.get(properties.get("user.home"), ".m2", Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
+        return Path.of(properties.get("user.home"), ".m2", Constants.MAVEN_SETTINGS_SECURITY_FILE_NAME);
     }
 
     @Override

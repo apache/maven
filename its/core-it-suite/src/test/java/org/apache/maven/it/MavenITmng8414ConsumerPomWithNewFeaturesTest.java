@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
@@ -55,7 +54,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
         verifier.verifyTextInLog(
                 "The consumer POM for org.apache.maven.its:mng-8414:jar:1.0.0-SNAPSHOT cannot be downgraded to 4.0.0.");
 
-        Path consumerPom = basedir.resolve(Paths.get(
+        Path consumerPom = basedir.resolve(Path.of(
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its",
@@ -86,7 +85,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
 
         verifier.verifyTextNotInLog("cannot be downgraded to 4.0.0.");
 
-        Path consumerPom = basedir.resolve(Paths.get(
+        Path consumerPom = basedir.resolve(Path.of(
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its",

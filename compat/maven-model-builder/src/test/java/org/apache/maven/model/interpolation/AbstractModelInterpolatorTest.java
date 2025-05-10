@@ -220,7 +220,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model out = interpolator.interpolateModel(model, new File("."), createModelBuildingRequest(context), collector);
         assertCollectorState(0, 0, 0, collector);
 
-        assertEquals("3.8.1", (out.getDependencies().get(0)).getVersion());
+        assertEquals("3.8.1", (out.getDependencies().getFirst()).getVersion());
     }
 
     @Test
@@ -238,7 +238,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model out = interpolator.interpolateModel(model, new File("."), createModelBuildingRequest(context), collector);
         assertProblemFree(collector);
 
-        assertEquals("${something}", (out.getDependencies().get(0)).getVersion());
+        assertEquals("${something}", (out.getDependencies().getFirst()).getVersion());
     }
 
     @Test
@@ -257,7 +257,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model out = interpolator.interpolateModel(model, new File("."), createModelBuildingRequest(context), collector);
         assertCollectorState(0, 0, 0, collector);
 
-        assertEquals("foo-3.8.1", (out.getDependencies().get(0)).getVersion());
+        assertEquals("foo-3.8.1", (out.getDependencies().getFirst()).getVersion());
     }
 
     @Test
@@ -277,7 +277,7 @@ public abstract class AbstractModelInterpolatorTest {
         assertProblemFree(collector);
 
         assertEquals(
-                "file://localhost/myBasedir/temp-repo", (out.getRepositories().get(0)).getUrl());
+                "file://localhost/myBasedir/temp-repo", (out.getRepositories().getFirst()).getUrl());
     }
 
     @Test
@@ -296,7 +296,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
         assertProblemFree(collector);
 
-        assertEquals("myBaseUri/temp-repo", (out.getRepositories().get(0)).getUrl());
+        assertEquals("myBaseUri/temp-repo", (out.getRepositories().getFirst()).getUrl());
     }
 
     @Test
@@ -399,7 +399,7 @@ public abstract class AbstractModelInterpolatorTest {
         assertEquals(1, rDeps.size());
         assertEquals(
                 new File(basedir, "artifact.jar").getAbsolutePath(),
-                new File(rDeps.get(0).getSystemPath()).getAbsolutePath());
+                new File(rDeps.getFirst().getSystemPath()).getAbsolutePath());
     }
 
     @Test
@@ -417,7 +417,7 @@ public abstract class AbstractModelInterpolatorTest {
         interpolator.interpolateModel(model, null, request, collector);
 
         assertCollectorState(0, 2, 0, collector);
-        assertTrue(collector.getErrors().get(0).contains("Detected the following recursive expression cycle"));
+        assertTrue(collector.getErrors().getFirst().contains("Detected the following recursive expression cycle"));
     }
 
     @Test
@@ -436,7 +436,7 @@ public abstract class AbstractModelInterpolatorTest {
         assertCollectorState(0, 1, 0, collector);
         assertEquals(
                 "Resolving expression: '${basedir}': Detected the following recursive expression cycle in 'basedir': [basedir]",
-                collector.getErrors().get(0));
+                collector.getErrors().getFirst());
     }
 
     protected abstract ModelInterpolator createInterpolator() throws Exception;

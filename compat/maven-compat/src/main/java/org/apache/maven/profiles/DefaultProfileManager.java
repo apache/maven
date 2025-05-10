@@ -171,7 +171,7 @@ public class DefaultProfileManager implements ProfileManager {
         });
 
         if (!errors.isEmpty()) {
-            throw errors.get(0);
+            throw errors.getFirst();
         }
 
         return profiles;

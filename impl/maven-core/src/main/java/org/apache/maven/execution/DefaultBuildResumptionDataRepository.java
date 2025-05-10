@@ -26,7 +26,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.stream.Stream;
 
@@ -51,7 +50,7 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
             throws BuildResumptionPersistenceException {
         Properties properties = convertToProperties(buildResumptionData);
 
-        Path resumeProperties = Paths.get(rootProject.getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME);
+        Path resumeProperties = Path.of(rootProject.getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME);
         try {
             Files.createDirectories(resumeProperties.getParent());
             try (Writer writer = Files.newBufferedWriter(resumeProperties)) {
@@ -75,13 +74,13 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     @Override
     public void applyResumptionData(MavenExecutionRequest request, MavenProject rootProject) {
         Properties properties =
-                loadResumptionFile(Paths.get(rootProject.getBuild().getDirectory()));
+                loadResumptionFile(Path.of(rootProject.getBuild().getDirectory()));
         applyResumptionProperties(request, properties);
     }
 
     @Override
     public void removeResumptionData(MavenProject rootProject) {
-        Path resumeProperties = Paths.get(rootProject.getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME);
+        Path resumeProperties = Path.of(rootProject.getBuild().getDirectory(), RESUME_PROPERTIES_FILENAME);
         try {
             Files.deleteIfExists(resumeProperties);
         } catch (IOException e) {

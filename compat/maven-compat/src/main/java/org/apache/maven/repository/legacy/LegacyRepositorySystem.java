@@ -137,8 +137,8 @@ public class LegacyRepositorySystem implements RepositorySystem {
         } catch (InvalidVersionSpecificationException e) {
             // MNG-5368: Log a message instead of returning 'null' silently.
             this.logger.error(
-                    String.format(
-                            "Invalid version specification '%s' creating dependency artifact '%s'.", d.getVersion(), d),
+                    "Invalid version specification '%s' creating dependency artifact '%s'."
+                            .formatted(d.getVersion(), d),
                     e);
             return null;
         }
@@ -176,9 +176,8 @@ public class LegacyRepositorySystem implements RepositorySystem {
         } catch (InvalidVersionSpecificationException e) {
             // MNG-5368: Log a message instead of returning 'null' silently.
             this.logger.error(
-                    String.format(
-                            "Invalid version specification '%s' creating extension artifact '%s:%s:%s'.",
-                            version, groupId, artifactId, version),
+                    "Invalid version specification '%s' creating extension artifact '%s:%s:%s'."
+                            .formatted(version, groupId, artifactId, version),
                     e);
 
             return null;
@@ -203,8 +202,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         } catch (InvalidVersionSpecificationException e) {
             // MNG-5368: Log a message instead of returning 'null' silently.
             this.logger.error(
-                    String.format("Invalid version specification '%s' creating plugin artifact '%s'.", version, plugin),
-                    e);
+                    "Invalid version specification '%s' creating plugin artifact '%s'.".formatted(version, plugin), e);
 
             return null;
         }
@@ -368,7 +366,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
 
             ArtifactRepositoryPolicy snapshotPolicy = getEffectivePolicy(snapshotPolicies);
 
-            ArtifactRepository aliasedRepo = aliasedRepos.get(0);
+            ArtifactRepository aliasedRepo = aliasedRepos.getFirst();
 
             ArtifactRepository effectiveRepository = createArtifactRepository(
                     aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(), snapshotPolicy, releasePolicy);

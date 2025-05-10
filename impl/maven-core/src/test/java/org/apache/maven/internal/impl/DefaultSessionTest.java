@@ -18,7 +18,7 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -54,10 +54,10 @@ public class DefaultSessionTest {
         RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         MavenSession ms = new MavenSession(null, rss, mer, null);
-        ms.getRequest().setRootDirectory(Paths.get("myRootDirectory"));
+        ms.getRequest().setRootDirectory(Path.of("myRootDirectory"));
         DefaultSession session =
                 new DefaultSession(ms, mock(RepositorySystem.class), Collections.emptyList(), null, null, null);
 
-        assertEquals(Paths.get("myRootDirectory"), session.getRootDirectory());
+        assertEquals(Path.of("myRootDirectory"), session.getRootDirectory());
     }
 }

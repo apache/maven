@@ -18,11 +18,14 @@
  */
 package org.apache.maven.repository.metadata;
 
+import java.io.Serial;
+
 /**
  */
 @Deprecated
 public class MetadataGraphTransformationException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = -4029897098314019152L;
 
     public MetadataGraphTransformationException() {}

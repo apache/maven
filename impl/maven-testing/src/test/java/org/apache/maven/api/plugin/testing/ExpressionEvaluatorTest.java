@@ -19,7 +19,6 @@
 package org.apache.maven.api.plugin.testing;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.maven.api.Project;
@@ -126,14 +125,14 @@ public class ExpressionEvaluatorTest {
         Session session = SessionMock.getMockSession(LOCAL_REPO);
         doReturn(new Properties()).when(session).getSystemProperties();
         doReturn(new Properties()).when(session).getUserProperties();
-        doAnswer(iom -> Paths.get(MojoExtension.getBasedir())).when(session).getRootDirectory();
+        doAnswer(iom -> Path.of(MojoExtension.getBasedir())).when(session).getRootDirectory();
         return session;
     }
 
     @Provides
     Project project() {
         ProjectStub project = new ProjectStub();
-        project.setBasedir(Paths.get(MojoExtension.getBasedir()));
+        project.setBasedir(Path.of(MojoExtension.getBasedir()));
         return project;
     }
 }

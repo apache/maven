@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
@@ -541,7 +541,7 @@ public class DefaultWagonManager implements WagonManager {
                 temp.deleteOnExit();
                 byte[] bytes = sums.get(extension).getBytes(StandardCharsets.UTF_8);
                 Files.write(
-                        Paths.get(temp.getAbsolutePath()), bytes, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+                        Path.of(temp.getAbsolutePath()), bytes, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
 
                 temporaryFiles.add(temp);
                 wagon.put(temp, remotePath + "." + extension);

@@ -195,7 +195,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
 
             if (!plugin.isExtensions()
                     && artifacts.size() == 1
-                    && artifacts.get(0).getFile() != null) {
+                    && artifacts.getFirst().getFile() != null) {
                 /*
                  * This is purely for backward-compat with 2.x where <extensions> consisting of a single artifact where
                  * loaded into the core and hence available to plugins, in contrast to bigger extensions that were

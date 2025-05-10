@@ -39,7 +39,7 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
         if (o.isEmpty()) {
             throw new IllegalArgumentException("No options specified (or all were null)");
         } else if (o.size() == 1) {
-            return o.get(0);
+            return o.getFirst();
         } else {
             return new LayeredMavenOptions<>(o);
         }

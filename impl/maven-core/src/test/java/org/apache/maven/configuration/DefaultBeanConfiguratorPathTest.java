@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.StringReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.configuration.internal.DefaultBeanConfigurator;
@@ -69,7 +68,7 @@ class DefaultBeanConfiguratorPathTest {
 
         configurator.configureBean(request);
 
-        assertEquals(Paths.get("test"), bean.file);
+        assertEquals(Path.of("test"), bean.file);
     }
 
     @Test
@@ -93,7 +92,7 @@ class DefaultBeanConfiguratorPathTest {
 
         configurator.configureBean(request);
 
-        assertEquals(Paths.get("base/test").toAbsolutePath(), bean.file);
+        assertEquals(Path.of("base/test").toAbsolutePath(), bean.file);
     }
 
     @Test
@@ -107,7 +106,7 @@ class DefaultBeanConfiguratorPathTest {
 
         configurator.configureBean(request);
 
-        assertEquals(Paths.get("test"), bean.file);
+        assertEquals(Path.of("test"), bean.file);
     }
 
     static class SomeBean {

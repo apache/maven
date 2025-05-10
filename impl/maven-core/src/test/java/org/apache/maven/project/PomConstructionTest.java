@@ -1601,7 +1601,7 @@ class PomConstructionTest {
         List<PluginExecution> executions = (List<PluginExecution>) pom.getValue(
                 "build/pluginsAsMap[@name='org.apache.maven.its.plugins:maven-it-plugin-log-file']/executions");
         assertEquals(1, executions.size());
-        assertEquals("inherited-execution", executions.get(0).getId());
+        assertEquals("inherited-execution", executions.getFirst().getId());
     }
 
     @Test
@@ -1611,7 +1611,7 @@ class PomConstructionTest {
         List<PluginExecution> executions = (List<PluginExecution>) pom.getValue(
                 "build/pluginsAsMap[@name='org.apache.maven.its.plugins:maven-it-plugin-log-file']/executions");
         assertEquals(1, executions.size());
-        assertEquals("inherited-execution", executions.get(0).getId());
+        assertEquals("inherited-execution", executions.getFirst().getId());
     }
 
     /* MNG-4193 */
@@ -1736,7 +1736,7 @@ class PomConstructionTest {
                 (List<PluginExecution>) pom.getValue("build/plugins[@artifactId='maven-resources-plugin']/executions");
         assertNotNull(executions);
         assertEquals(4, executions.size());
-        assertEquals("default-resources", executions.get(0).getId());
+        assertEquals("default-resources", executions.getFirst().getId());
         assertEquals("default-testResources", executions.get(1).getId());
         assertEquals("test-1", executions.get(2).getId());
         assertEquals("test-2", executions.get(3).getId());

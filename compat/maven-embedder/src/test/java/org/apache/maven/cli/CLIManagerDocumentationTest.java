@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -114,7 +113,7 @@ class CLIManagerDocumentationTest {
 
     @Test
     void testOptionsAsHtml() throws IOException {
-        Path options = Paths.get("target/test-classes/options.html");
+        Path options = Path.of("target/test-classes/options.html");
         Files.writeString(options, getOptionsAsHtml(), StandardCharsets.UTF_8);
     }
 }

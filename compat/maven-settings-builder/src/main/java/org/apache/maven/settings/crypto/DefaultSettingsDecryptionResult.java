@@ -47,7 +47,7 @@ class DefaultSettingsDecryptionResult implements SettingsDecryptionResult {
 
     @Override
     public Server getServer() {
-        return servers.isEmpty() ? null : servers.get(0);
+        return servers.isEmpty() ? null : servers.getFirst();
     }
 
     @Override
@@ -57,7 +57,7 @@ class DefaultSettingsDecryptionResult implements SettingsDecryptionResult {
 
     @Override
     public Proxy getProxy() {
-        return proxies.isEmpty() ? null : proxies.get(0);
+        return proxies.isEmpty() ? null : proxies.getFirst();
     }
 
     @Override

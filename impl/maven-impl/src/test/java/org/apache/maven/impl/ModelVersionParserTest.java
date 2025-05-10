@@ -70,17 +70,17 @@ public class ModelVersionParserTest {
     }
 
     private void assertNotContains(VersionConstraint c, String... versions) {
-        assertContains(String.format("%s: %%s should not be contained\n", c.toString()), c, false, versions);
+        assertContains("%s: %%s should not be contained\n".formatted(c.toString()), c, false, versions);
     }
 
     private void assertContains(String msg, VersionConstraint c, boolean b, String... versions) {
         for (String v : versions) {
-            assertEquals(b, c.contains(versionParser.parseVersion(v)), String.format(msg, v));
+            assertEquals(b, c.contains(versionParser.parseVersion(v)), msg.formatted(v));
         }
     }
 
     private void assertContains(VersionConstraint c, String... versions) {
-        assertContains(String.format("%s: %%s should be contained\n", c.toString()), c, true, versions);
+        assertContains("%s: %%s should be contained\n".formatted(c.toString()), c, true, versions);
     }
 
     @Test

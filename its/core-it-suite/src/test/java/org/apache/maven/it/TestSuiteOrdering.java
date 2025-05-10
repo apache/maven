@@ -20,7 +20,7 @@ package org.apache.maven.it;
 
 import java.io.PrintStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -75,7 +75,7 @@ public class TestSuiteOrdering implements ClassOrderer {
 
             String basedir = System.getProperty("basedir", ".");
 
-            try (PrintStream info = new PrintStream(Files.newOutputStream(Paths.get(basedir, "target/info.txt")))) {
+            try (PrintStream info = new PrintStream(Files.newOutputStream(Path.of(basedir, "target/info.txt")))) {
                 infoProperty(info, "maven.version");
                 infoProperty(info, "java.version");
                 infoProperty(info, "os.name");

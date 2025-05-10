@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -78,7 +77,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
         }
         if (Features.consumerPom(session.getUserProperties(), true)) {
             Path buildDir =
-                    project.getBuild() != null ? Paths.get(project.getBuild().getDirectory()) : null;
+                    project.getBuild() != null ? Path.of(project.getBuild().getDirectory()) : null;
             if (buildDir != null) {
                 Files.createDirectories(buildDir);
             }
@@ -193,8 +192,8 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
         Files.createDirectories(dest.getParent());
         try (Writer w = Files.newBufferedWriter(dest)) {
             MavenStaxWriter writer = new MavenStaxWriter();
-            writer.setNamespace(String.format(NAMESPACE_FORMAT, version));
-            writer.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
+            writer.setNamespace(NAMESPACE_FORMAT.formatted(version));
+            writer.setSchemaLocation(SCHEMA_LOCATION_FORMAT.formatted(version));
             writer.setAddLocationInformation(false);
             writer.write(w, model);
         }

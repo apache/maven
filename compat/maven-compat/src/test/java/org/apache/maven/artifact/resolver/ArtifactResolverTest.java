@@ -181,7 +181,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
         ResolutionGroup group = source.retrieve(artifact, localRepository(), new ArrayList<>());
         List<ArtifactRepository> repositories = group.getResolutionRepositories();
         assertEquals(1, repositories.size(), "There should be one repository!");
-        ArtifactRepository repository = repositories.get(0);
+        ArtifactRepository repository = repositories.getFirst();
         assertEquals(TestMavenWorkspaceReader.REPO_ID, repository.getId());
         assertEquals(TestMavenWorkspaceReader.REPO_URL, repository.getUrl());
     }

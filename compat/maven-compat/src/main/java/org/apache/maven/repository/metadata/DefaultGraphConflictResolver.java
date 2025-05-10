@@ -181,7 +181,7 @@ public class DefaultGraphConflictResolver implements GraphConflictResolver {
         }
 
         if (edges.size() == 1) {
-            MetadataGraphEdge e = edges.get(0);
+            MetadataGraphEdge e = edges.getFirst();
             if (scope.encloses(e.getScope())) {
                 return e;
             }

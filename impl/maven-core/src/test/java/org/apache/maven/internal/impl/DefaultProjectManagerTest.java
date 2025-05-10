@@ -19,7 +19,6 @@
 package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
@@ -43,7 +42,7 @@ class DefaultProjectManagerTest {
         MavenProject mavenProject = new MavenProject();
         Project project = new DefaultProject(session, mavenProject);
         ProducedArtifact artifact = Mockito.mock(ProducedArtifact.class);
-        Path path = Paths.get("");
+        Path path = Path.of("");
         DefaultVersionParser versionParser =
                 new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()));
         DefaultProjectManager projectManager = new DefaultProjectManager(session, artifactManager);

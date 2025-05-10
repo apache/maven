@@ -21,7 +21,6 @@ package org.apache.maven.impl.model;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +124,7 @@ public class DefaultModelProcessor implements ModelProcessor {
 
     private Path doLocateExistingPom(Path project) {
         if (project == null) {
-            project = Paths.get(System.getProperty("user.dir"));
+            project = Path.of(System.getProperty("user.dir"));
         }
         if (Files.isDirectory(project)) {
             Path pom = project.resolve("pom.xml");

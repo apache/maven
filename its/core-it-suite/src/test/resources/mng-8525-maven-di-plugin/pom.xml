@@ -30,7 +30,7 @@ under the License.
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <javaVersion>17</javaVersion>
+    <javaVersion>21</javaVersion>
     <guiceVersion>6.0.0</guiceVersion>
     <mavenVersion>4.0.0-beta-5</mavenVersion>
     <mavenPluginPluginVersion>4.0.0-beta-1</mavenPluginPluginVersion>

@@ -87,7 +87,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         assertEquals("1.0", session.getCurrentProject().getVersion());
         List<MojoExecution> executionPlan = getExecutions(calculateExecutionPlan(session, "resources:resources"));
         assertEquals(1, executionPlan.size());
-        MojoExecution mojoExecution = executionPlan.get(0);
+        MojoExecution mojoExecution = executionPlan.getFirst();
         assertNotNull(mojoExecution);
         assertEquals(
                 "org.apache.maven.plugins",
@@ -109,7 +109,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         assertEquals("1.0", session.getCurrentProject().getVersion());
         List<MojoExecution> executionPlan = getExecutions(calculateExecutionPlan(session, "clean"));
         assertEquals(1, executionPlan.size());
-        MojoExecution mojoExecution = executionPlan.get(0);
+        MojoExecution mojoExecution = executionPlan.getFirst();
         assertNotNull(mojoExecution);
         assertEquals(
                 "org.apache.maven.plugins",
@@ -131,7 +131,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         assertEquals("1.0", session.getCurrentProject().getVersion());
         List<MojoExecution> executionPlan = getExecutions(calculateExecutionPlan(session, "clean:clean"));
         assertEquals(1, executionPlan.size());
-        MojoExecution mojoExecution = executionPlan.get(0);
+        MojoExecution mojoExecution = executionPlan.getFirst();
         assertNotNull(mojoExecution);
         assertEquals(
                 "org.apache.maven.plugins",
@@ -362,7 +362,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         MavenExecutionPlan executionPlan = lifeCycleExecutionPlanCalculator.calculateExecutionPlan(
                 session, session.getCurrentProject(), Arrays.asList(task), false);
 
-        MojoExecution execution = executionPlan.getMojoExecutions().get(0);
+        MojoExecution execution = executionPlan.getMojoExecutions().getFirst();
         assertEquals("maven-it-plugin", execution.getArtifactId(), execution.toString());
         assertNull(execution.getConfiguration());
 

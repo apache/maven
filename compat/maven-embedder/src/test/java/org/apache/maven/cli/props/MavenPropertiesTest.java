@@ -72,34 +72,38 @@ public class MavenPropertiesTest {
 
     @Test
     public void testSpaces() throws Exception {
-        String config = "\n" + "\n"
-                + "    \n"
-                + "                \n"
-                + "   \\ \\r \\n \\t \\f\n"
-                + "   \n"
-                + "                                                \n"
-                + "! dshfjklahfjkldashgjl;as\n"
-                + "     #jdfagdfjagkdjfghksdajfd\n"
-                + "     \n"
-                + "!!properties\n"
-                + "\n"
-                + "a=a\n"
-                + "b bb as,dn   \n"
-                + "c\\r\\ \\t\\nu =:: cu\n"
-                + "bu= b\\\n"
-                + "                u\n"
-                + "d=d\\r\\ne=e\n"
-                + "f   :f\\\n"
-                + "f\\\n"
-                + "                        f\n"
-                + "g               g\n"
-                + "h\\u0020h\n"
-                + "\\   i=i\n"
-                + "j=\\   j\n"
-                + "space=\\   c\n"
-                + "\n"
-                + "dblbackslash=\\\\\n"
-                + "                        \n";
+        String config =
+                """
+
+
+                   \s
+                               \s
+                   \\ \\r \\n \\t \\f
+                  \s
+                                                               \s
+                ! dshfjklahfjkldashgjl;as
+                     #jdfagdfjagkdjfghksdajfd
+                    \s
+                !!properties
+
+                a=a
+                b bb as,dn  \s
+                c\\r\\ \\t\\nu =:: cu
+                bu= b\\
+                                u
+                d=d\\r\\ne=e
+                f   :f\\
+                f\\
+                                        f
+                g               g
+                h\\u0020h
+                \\   i=i
+                j=\\   j
+                space=\\   c
+
+                dblbackslash=\\\\
+                                       \s
+                """;
 
         java.util.Properties props1 = new java.util.Properties();
         props1.load(new StringReader(config));
@@ -289,7 +293,7 @@ public class MavenPropertiesTest {
         assertTrue(sw.toString().endsWith(RESULT3), msg);
         List<String> rawValue = properties.getRaw(KEY1);
         assertEquals(2, (Object) rawValue.size());
-        assertEquals(KEY1A + " = " + VALUE1, rawValue.get(0));
+        assertEquals(KEY1A + " = " + VALUE1, rawValue.getFirst());
         assertEquals(VALUE1, rawValue.get(1));
     }
 
@@ -339,7 +343,7 @@ public class MavenPropertiesTest {
         List<String> raw = props.getRaw("fruits");
         assertNotNull(raw);
         assertEquals(3, (Object) raw.size());
-        assertEquals("fruits                           apple, banana, pear, ", raw.get(0));
+        assertEquals("fruits                           apple, banana, pear, ", raw.getFirst());
 
         props = new MavenProperties();
         props.put(
@@ -354,7 +358,7 @@ public class MavenPropertiesTest {
         raw = props.getRaw("fruits");
         assertNotNull(raw);
         assertEquals(3, (Object) raw.size());
-        assertEquals("fruits                           apple, banana, pear, ", raw.get(0));
+        assertEquals("fruits                           apple, banana, pear, ", raw.getFirst());
 
         sw = new StringWriter();
         props.save(sw);
@@ -365,7 +369,7 @@ public class MavenPropertiesTest {
         raw = props.getRaw("fruits");
         assertNotNull(raw);
         assertEquals(3, (Object) raw.size());
-        assertEquals("fruits                           apple, banana, pear, ", raw.get(0));
+        assertEquals("fruits                           apple, banana, pear, ", raw.getFirst());
 
         props = new MavenProperties();
         props.put(
@@ -380,7 +384,7 @@ public class MavenPropertiesTest {
         raw = props.getRaw("fruits");
         assertNotNull(raw);
         assertEquals(3, (Object) raw.size());
-        assertEquals("fruits =                            apple, banana, pear, ", raw.get(0));
+        assertEquals("fruits =                            apple, banana, pear, ", raw.getFirst());
     }
 
     @Test

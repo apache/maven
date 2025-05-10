@@ -65,7 +65,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
 
         List<Dependency> deps = result.getDependencies();
         assertEquals(2, deps.size());
-        checkUtSimpleArtifactDependencies(deps.get(0), deps.get(1));
+        checkUtSimpleArtifactDependencies(deps.getFirst(), deps.get(1));
     }
 
     /**
@@ -126,7 +126,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
         List<DependencyNode> nodes = collectResult.getRoot().getChildren();
         assertEquals(2, nodes.size());
         checkUtSimpleArtifactDependencies(
-                nodes.get(0).getDependency(), nodes.get(1).getDependency());
+                nodes.getFirst().getDependency(), nodes.get(1).getDependency());
     }
 
     @Test
@@ -178,7 +178,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
         List<ArtifactResult> results = system.resolveArtifacts(session, requests);
 
         assertEquals(3, results.size());
-        checkArtifactResult(results.get(0), "artifact-1.0.jar");
+        checkArtifactResult(results.getFirst(), "artifact-1.0.jar");
         checkArtifactResult(results.get(1), "artifact-1.0.zip");
         checkArtifactResult(results.get(2), "artifact-1.0-classifier.zip");
     }

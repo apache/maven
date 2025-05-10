@@ -61,7 +61,7 @@ class LifecyclePhaseTest {
         assertNotNull(mojos);
         assertEquals(2, mojos.size());
 
-        LifecycleMojo mojo1 = mojos.get(0);
+        LifecycleMojo mojo1 = mojos.getFirst();
         assertNotNull(mojo1);
         assertEquals("jar:jar", mojo1.getGoal());
 

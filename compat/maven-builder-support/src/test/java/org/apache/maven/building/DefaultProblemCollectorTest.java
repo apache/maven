@@ -40,7 +40,7 @@ class DefaultProblemCollectorTest {
 
         assertEquals(2, collector.getProblems().size());
 
-        Problem p1 = collector.getProblems().get(0);
+        Problem p1 = collector.getProblems().getFirst();
         assertEquals(Severity.ERROR, p1.getSeverity());
         assertEquals("MESSAGE1", p1.getMessage());
         assertEquals(-1, p1.getLineNumber());
@@ -67,7 +67,7 @@ class DefaultProblemCollectorTest {
         collector.setSource("SOURCE_PROBLEM3");
         collector.add(null, "PROBLEM3", -1, -1, null);
 
-        assertEquals("", collector.getProblems().get(0).getSource());
+        assertEquals("", collector.getProblems().getFirst().getSource());
         assertEquals("SOURCE_PROBLEM2", collector.getProblems().get(1).getSource());
         assertEquals("SOURCE_PROBLEM3", collector.getProblems().get(2).getSource());
     }

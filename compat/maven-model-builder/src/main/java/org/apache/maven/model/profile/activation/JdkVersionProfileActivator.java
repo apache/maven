@@ -107,7 +107,7 @@ public class JdkVersionProfileActivator implements ProfileActivator {
     }
 
     private static boolean isInRange(String value, List<RangeValue> range) {
-        int leftRelation = getRelationOrder(value, range.get(0), true);
+        int leftRelation = getRelationOrder(value, range.getFirst(), true);
 
         if (leftRelation == 0) {
             return true;

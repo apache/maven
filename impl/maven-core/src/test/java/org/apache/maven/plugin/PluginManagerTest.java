@@ -181,6 +181,6 @@ class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
                 plugin, session.getCurrentProject().getRemotePluginRepositories(), session.getRepositorySession());
         ClassRealm pluginRealm = pluginManager.getPluginRealm(session, pluginDescriptor);
 
-        assertEquals(pluginRealm, pluginDescriptor.getComponents().get(0).getRealm());
+        assertEquals(pluginRealm, pluginDescriptor.getComponents().getFirst().getRealm());
     }
 }

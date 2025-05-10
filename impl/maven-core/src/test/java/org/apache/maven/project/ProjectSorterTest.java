@@ -156,7 +156,7 @@ class ProjectSorterTest {
 
         projects = new ProjectSorter(projects).getSortedProjects();
 
-        assertEquals(project2, projects.get(0));
+        assertEquals(project2, projects.getFirst());
         assertEquals(project1, projects.get(1));
     }
 
@@ -171,7 +171,7 @@ class ProjectSorterTest {
 
         projects = new ProjectSorter(projects).getSortedProjects();
 
-        assertEquals(project2, projects.get(0));
+        assertEquals(project2, projects.getFirst());
         assertEquals(project1, projects.get(1));
     }
 
@@ -198,7 +198,7 @@ class ProjectSorterTest {
         projects.add(project2);
 
         projects = new ProjectSorter(projects).getSortedProjects();
-        assertEquals(project1, projects.get(0));
+        assertEquals(project1, projects.getFirst());
         assertEquals(project2, projects.get(1));
     }
 
@@ -236,7 +236,7 @@ class ProjectSorterTest {
 
         projects = new ProjectSorter(projects).getSortedProjects();
 
-        assertEquals(parentProject, projects.get(0));
+        assertEquals(parentProject, projects.getFirst());
 
         // the order of these two is non-deterministic, based on when they're added to the reactor.
         assertThat(projects, hasItem(pluginProject));
@@ -273,7 +273,7 @@ class ProjectSorterTest {
 
         projects = new ProjectSorter(projects).getSortedProjects();
 
-        assertEquals(parentProject, projects.get(0));
+        assertEquals(parentProject, projects.getFirst());
 
         // the order of these two is non-deterministic, based on when they're added to the reactor.
         assertThat(projects, hasItem(pluginProject));
@@ -311,7 +311,7 @@ class ProjectSorterTest {
 
         projects = new ProjectSorter(projects).getSortedProjects();
 
-        assertEquals(pluginProject, projects.get(0));
+        assertEquals(pluginProject, projects.getFirst());
         assertEquals(usingProject, projects.get(1));
     }
 
@@ -328,7 +328,7 @@ class ProjectSorterTest {
 
         projects = new ProjectSorter(projects).getSortedProjects();
 
-        assertEquals(pluginProject, projects.get(0));
+        assertEquals(pluginProject, projects.getFirst());
         assertEquals(usingProject, projects.get(1));
     }
 }

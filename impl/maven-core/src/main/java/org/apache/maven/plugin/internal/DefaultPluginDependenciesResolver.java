@@ -123,7 +123,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                         pluginArtifact instanceof RelocatedArtifact relocated ? ": " + relocated.getMessage() : "";
                 logger.warn(
                         "The artifact {} has been relocated to {}{}",
-                        result.getRelocations().get(0),
+                        result.getRelocations().getFirst(),
                         pluginArtifact,
                         message);
             }

@@ -37,8 +37,7 @@ public final class CIDetectorHelper {
         ArrayList<CIInfo> result = ServiceLoader.load(CIDetector.class).stream()
                 .map(ServiceLoader.Provider::get)
                 .map(CIDetector::detectCI)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(Optional::stream)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         if (result.size() > 1) {

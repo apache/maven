@@ -544,7 +544,7 @@ public class ConditionParser {
         if (value instanceof Double || value instanceof Float) {
             double doubleValue = ((Number) value).doubleValue();
             if (doubleValue == Math.floor(doubleValue) && !Double.isInfinite(doubleValue)) {
-                return String.format("%.0f", doubleValue);
+                return "%.0f".formatted(doubleValue);
             }
         }
         return String.valueOf(value);

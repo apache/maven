@@ -172,15 +172,14 @@ public final class ReflectionUtils {
             if (!injectFactoryMethods.isEmpty()) {
                 throw failedImplicitBinding(key, "both inject constructor and inject factory method are present");
             }
-            return bindingFromConstructor(
-                    key, (Constructor<T>) injectConstructors.iterator().next());
+            return bindingFromConstructor(key, (Constructor<T>) injectConstructors.getFirst());
         }
 
         if (!injectFactoryMethods.isEmpty()) {
             if (injectFactoryMethods.size() > 1) {
                 throw failedImplicitBinding(key, "more than one inject factory method");
             }
-            return bindingFromMethod(injectFactoryMethods.iterator().next());
+            return bindingFromMethod(injectFactoryMethods.getFirst());
         }
 
         if (constructors.isEmpty()) {
@@ -189,8 +188,7 @@ public final class ReflectionUtils {
         if (constructors.size() > 1) {
             throw failedImplicitBinding(key, "inject annotation on class with multiple constructors");
         }
-        Constructor<T> declaredConstructor =
-                (Constructor<T>) constructors.iterator().next();
+        Constructor<T> declaredConstructor = (Constructor<T>) constructors.getFirst();
 
         Class<?> enclosingClass = cls.getEnclosingClass();
         if (enclosingClass != null

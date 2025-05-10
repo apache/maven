@@ -82,9 +82,9 @@ class DefaultWagonManagerTest {
                 "repo2", "string://url2", new ArtifactRepositoryLayoutStub(), null, null));
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon("string");
-        wagon.addExpectedContent(repos.get(0).getLayout().pathOf(artifact), "expected");
+        wagon.addExpectedContent(repos.getFirst().getLayout().pathOf(artifact), "expected");
         wagon.addExpectedContent(
-                repos.get(0).getLayout().pathOf(artifact) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac");
+                repos.getFirst().getLayout().pathOf(artifact) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac");
         wagon.addExpectedContent(repos.get(1).getLayout().pathOf(artifact), "expected");
         wagon.addExpectedContent(
                 repos.get(1).getLayout().pathOf(artifact) + ".md5", "cd26d9e10ce691cc69aa2b90dcebbdac");

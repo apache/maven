@@ -22,7 +22,6 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,7 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
 
         Path linkedMavenHome = tempDir.resolve("linked-maven-home");
 
-        Path oldMavenHome = Paths.get(System.getProperty("maven.home"));
+        Path oldMavenHome = Path.of(System.getProperty("maven.home"));
         Files.deleteIfExists(linkedMavenHome);
         Files.createSymbolicLink(linkedMavenHome, oldMavenHome);
         System.setProperty("maven.home", linkedMavenHome.toString());
@@ -65,9 +64,9 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
         Properties props = new Properties();
         props.load(new ByteArrayInputStream(dump.getBytes(StandardCharsets.UTF_8)));
 
-        Path installationSettingsXml = Paths.get(props.getProperty("maven.settings"));
-        Path installationToolchainsXml = Paths.get(props.getProperty("maven.toolchains"));
-        Path mavenHome = Paths.get(props.getProperty("maven.home"));
+        Path installationSettingsXml = Path.of(props.getProperty("maven.settings"));
+        Path installationToolchainsXml = Path.of(props.getProperty("maven.toolchains"));
+        Path mavenHome = Path.of(props.getProperty("maven.home"));
 
         assertEquals(mavenHome, installationSettingsXml.getParent().getParent()); // remove conf
         assertEquals(mavenHome, installationToolchainsXml.getParent().getParent()); // remove conf

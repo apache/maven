@@ -18,6 +18,8 @@
  */
 package org.apache.maven.repository.legacy.resolver.conflict;
 
+import java.io.Serial;
+
 /**
  * Indicates that a specified conflict resolver implementation could not be found.
  *
@@ -28,6 +30,7 @@ public class ConflictResolverNotFoundException extends Exception {
     // constants --------------------------------------------------------------
 
     /** The serial version ID. */
+    @Serial
     private static final long serialVersionUID = 3372412184339653914L;
 
     // constructors -----------------------------------------------------------

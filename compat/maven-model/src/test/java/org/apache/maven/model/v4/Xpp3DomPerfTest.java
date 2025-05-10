@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -59,7 +58,7 @@ public class Xpp3DomPerfTest {
 
         @Setup(Level.Iteration)
         public void setUp() throws IOException {
-            Path userHome = Paths.get(System.getProperty("user.home"));
+            Path userHome = Path.of(System.getProperty("user.home"));
             poms = Files.walk(userHome.resolve(".m2/repository/org/apache/maven"))
                     .filter(p -> p.getFileName().toString().endsWith(".pom"))
                     .collect(Collectors.toList());

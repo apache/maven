@@ -59,7 +59,7 @@ class PluginDescriptorBuilderTest {
         assertEquals(2, pd.getMojos().size());
         assertEquals(1, pd.getDependencies().size());
 
-        MojoDescriptor md = pd.getMojos().get(0);
+        MojoDescriptor md = pd.getMojos().getFirst();
 
         assertEquals("jar", md.getGoal());
         assertEquals("mojo-description", md.getDescription());
@@ -93,7 +93,7 @@ class PluginDescriptorBuilderTest {
         assertEquals("${project.build.finalName}", pc.getAttribute("default-value"));
         assertEquals("java.lang.String", pc.getAttribute("implementation"));
 
-        Parameter mp = md.getParameters().get(0);
+        Parameter mp = md.getParameters().getFirst();
 
         assertEquals("finalName", mp.getName());
         assertEquals("jarName", mp.getAlias());
@@ -107,13 +107,13 @@ class PluginDescriptorBuilderTest {
         assertEquals("${project.build.finalName}", mp.getDefaultValue());
         assertEquals("3.0.0", mp.getSince());
 
-        ComponentRequirement cr = md.getRequirements().get(0);
+        ComponentRequirement cr = md.getRequirements().getFirst();
 
         assertEquals("org.codehaus.plexus.archiver.Archiver", cr.getRole());
         assertEquals("jar", cr.getRoleHint());
         assertEquals("jarArchiver", cr.getFieldName());
 
-        ComponentDependency cd = pd.getDependencies().get(0);
+        ComponentDependency cd = pd.getDependencies().getFirst();
 
         assertEquals("org.apache.maven", cd.getGroupId());
         assertEquals("maven-plugin-api", cd.getArtifactId());
