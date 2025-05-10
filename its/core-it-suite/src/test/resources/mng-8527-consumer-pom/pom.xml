@@ -37,7 +37,7 @@ under the License.
 
   <properties>
     <mavenVersion>4.0.0-rc-2</mavenVersion>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.target>21</maven.compiler.target>
   </properties>
 
   <dependencies>
