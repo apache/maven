@@ -37,11 +37,23 @@ public interface SourceRoot {
      * The path is relative to the <abbr>POM</abbr> file.
      *
      * <h4>Default implementation</h4>
-     * The default value is <code>src/{@linkplain #scope() scope}/{@linkplain #language() language}</code>
-     * as a relative path. Implementation classes may override this default with an absolute path instead.
+     * The default value depends on whether a {@linkplain #module() module name} is specified in this source root:
+     * <ul>
+     *   <li>
+     *     If no module name, then the default directory is
+     *     <code>src/{@linkplain #scope() scope}/{@linkplain #language() language}</code>.
+     *   </li><li>
+     *     If a module name is present, then the default directory is
+     *     <code>src/{@linkplain #language() language}/{@linkplain #module() module}/{@linkplain #scope() scope}</code>.
+     *   </li>
+     * </ul>
+     *
+     * These default values are relative directories.
+     * Implementation classes may override this default with absolute paths instead.
      */
     default Path directory() {
-        return Path.of("src", scope().id(), language().id());
+        return module().map((module) -> Path.of("src", language().id(), module, scope().id()))
+                .orElseGet(() -> Path.of("src", scope().id(), language().id()));
     }
 
     /**
