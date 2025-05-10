@@ -18,6 +18,9 @@
  */
 package org.apache.maven.impl;
 
+import javax.xml.stream.XMLStreamException;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -45,6 +48,7 @@ import static org.apache.maven.impl.StaxLocation.getMessage;
 @Named
 @Singleton
 public class DefaultPluginXmlFactory implements PluginXmlFactory {
+
     @Override
     public PluginDescriptor read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
         nonNull(request, "request");
@@ -52,40 +56,52 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
         URL url = request.getURL();
         Reader reader = request.getReader();
         InputStream inputStream = request.getInputStream();
-        if (path == null && url == null && reader == null && inputStream == null) {
+        if (inputStream == null && reader == null && path == null && url == null) {
             throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
         }
+        return read(request.isAddDefaultEntities(), request.isStrict(), inputStream, reader, path, url);
+    }
+
+    private static PluginDescriptor read(
+            boolean addDefaultEntities, boolean strict, InputStream inputStream, Reader reader, Path path, URL url) {
         try {
             PluginDescriptorStaxReader xml = new PluginDescriptorStaxReader();
-            xml.setAddDefaultEntities(request.isAddDefaultEntities());
+            xml.setAddDefaultEntities(addDefaultEntities);
             if (inputStream != null) {
-                return xml.read(inputStream, request.isStrict());
+                return read(xml, inputStream, strict);
             } else if (reader != null) {
-                return xml.read(reader, request.isStrict());
+                return xml.read(reader, strict);
             } else if (path != null) {
                 try (InputStream is = Files.newInputStream(path)) {
-                    return xml.read(is, request.isStrict());
-                }
-            } else {
-                try (InputStream is = url.openStream()) {
-                    return xml.read(is, request.isStrict());
+                    return read(xml, is, strict);
                 }
             }
-        } catch (Exception e) {
+            try (InputStream is = url.openStream()) {
+                return read(xml, is, strict);
+            }
+        } catch (IOException | XMLStreamException e) {
             throw new XmlReaderException("Unable to read plugin: " + getMessage(e), getLocation(e), e);
         }
+    }
+
+    private static PluginDescriptor read(PluginDescriptorStaxReader xml, InputStream is, boolean strict)
+            throws XMLStreamException {
+        return xml.read(is, strict);
     }
 
     @Override
     public void write(XmlWriterRequest<PluginDescriptor> request) throws XmlWriterException {
         nonNull(request, "request");
-        PluginDescriptor content = nonNull(request.getContent(), "content");
         Path path = request.getPath();
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
         if (writer == null && outputStream == null && path == null) {
-            throw new IllegalArgumentException("writer, outputStream or path must be non null");
+            throw new IllegalArgumentException("writer, output stream, or path must be non null");
         }
+        write(writer, request.getContent(), outputStream, path);
+    }
+
+    private static void write(Writer writer, PluginDescriptor content, OutputStream outputStream, Path path) {
         try {
             if (writer != null) {
                 new PluginDescriptorStaxWriter().write(writer, content);
@@ -93,10 +109,10 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
                 new PluginDescriptorStaxWriter().write(outputStream, content);
             } else {
                 try (OutputStream os = Files.newOutputStream(path)) {
-                    new PluginDescriptorStaxWriter().write(outputStream, content);
+                    new PluginDescriptorStaxWriter().write(os, content);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | XMLStreamException e) {
             throw new XmlWriterException("Unable to write plugin: " + getMessage(e), getLocation(e), e);
         }
     }
