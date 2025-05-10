@@ -32,7 +32,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -174,27 +173,6 @@ class DefaultWagonManagerTest {
     private ArtifactRepository createStringRepo() {
         return artifactRepositoryFactory.createArtifactRepository(
                 "id", "string://url", new ArtifactRepositoryLayoutStub(), null, null);
-    }
-
-    /**
-     * Build an ArtifactRepository object.
-     *
-     * @param id
-     * @param url
-     * @return
-     */
-    private ArtifactRepository getRepo(String id, String url) {
-        return artifactRepositoryFactory.createArtifactRepository(id, url, new DefaultRepositoryLayout(), null, null);
-    }
-
-    /**
-     * Build an ArtifactRepository object.
-     *
-     * @param id
-     * @return
-     */
-    private ArtifactRepository getRepo(String id) {
-        return getRepo(id, "http://something");
     }
 
     @Test

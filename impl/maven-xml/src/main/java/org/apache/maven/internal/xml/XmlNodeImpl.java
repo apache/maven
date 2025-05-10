@@ -332,8 +332,4 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         }
         return w;
     }
-
-    private static boolean isEmpty(String str) {
-        return str == null || str.isEmpty();
-    }
 }
