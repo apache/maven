@@ -19,6 +19,8 @@
 package org.apache.maven.api;
 
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,29 +47,46 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return the list of pattern matchers for the files to include}.
+     * {@return the list of patterns for the files to include}.
      * The path separator is {@code /} on all platforms, including Windows.
-     * The patterns are used to match paths relative to the {@code directory}.
-     * The prefix before the {@code :} character, if present, is the syntax.
-     * If no syntax is specified, the default is a Maven-specific variation
-     * of the {@code "glob"} pattern.
+     * The prefix before the {@code :} character, if present and longer than 1 character, is the syntax.
+     * If no syntax is specified, or if its length is 1 character (interpreted as a Windows drive),
+     * the default is a Maven-specific variation of the {@code "glob"} pattern.
      *
      * <p>
      * The default implementation returns an empty list, which means to apply a language-dependent pattern.
      * For example, for the Java language, the pattern includes all files with the {@code .java} suffix.
+     *
+     * @see java.nio.file.FileSystem#getPathMatcher(String)
      */
     default List<String> includes() {
         return List.of();
     }
 
     /**
-     * {@return the list of pattern matchers for the files to exclude}.
+     * {@return the list of patterns for the files to exclude}.
      * The exclusions are applied after the inclusions.
      * The default implementation returns an empty list.
      */
     default List<String> excludes() {
         return List.of();
     }
+
+    /**
+     * {@return a matcher combining the include and exclude patterns}.
+     * If the user did not specify any includes, the given {@code defaultIncludes} are used.
+     * These defaults depend on the plugin.
+     * For example, the default include of the Java compiler plugin is <code>"**&sol;*.java"</code>.
+     *
+     * <p>If the user did not specify any excludes, the default is often files generated
+     * by Source Code Management (<abbr>SCM</abbr>) software or by the operating system.
+     * Examples: <code>"**&sol;.gitignore"</code>, <code>"**&sol;.DS_Store"</code>.</p>
+     *
+     * @param defaultIncludes the default includes if unspecified by the user
+     * @param useDefaultExcludes whether to add the default set of patterns to exclude,
+     *        mostly Source Code Management (<abbr>SCM</abbr>) files
+     */
+    PathMatcher matcher(Collection<String> defaultIncludes, boolean useDefaultExcludes);
 
     /**
      * {@return in which context the source files will be used}.
