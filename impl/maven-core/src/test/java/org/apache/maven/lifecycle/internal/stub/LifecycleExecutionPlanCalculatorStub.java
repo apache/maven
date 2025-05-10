@@ -190,10 +190,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
         return createExecutionPlan(ProjectDependencyGraphStub.B.getExecutionProject(), me);
     }
 
-    private static MavenExecutionPlan createExecutionPlan(MavenProject project, List<MojoExecution> mojoExecutions)
-            throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
-                    NoPluginFoundForPrefixException, MojoNotFoundException, PluginNotFoundException,
-                    PluginResolutionException, LifecyclePhaseNotFoundException, LifecycleNotFoundException {
+    private static MavenExecutionPlan createExecutionPlan(MavenProject project, List<MojoExecution> mojoExecutions) {
         final List<ExecutionPlanItem> planItemList =
                 ExecutionPlanItem.createExecutionPlanItems(project, mojoExecutions);
         return new MavenExecutionPlan(planItemList, getDefaultLifecycles());

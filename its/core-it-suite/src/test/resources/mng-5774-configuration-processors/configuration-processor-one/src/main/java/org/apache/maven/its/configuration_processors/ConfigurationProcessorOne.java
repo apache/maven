@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class ConfigurationProcessorOne implements ConfigurationProcessor {
     private Logger logger = LoggerFactory.getLogger(ConfigurationProcessorOne.class);
 
-    public void process(CliRequest request) throws Exception {
+    public void process(CliRequest request) {
         logger.info("ConfigurationProcessorOne.process()");
         request.getUserProperties().put("answer", "yes");
     }

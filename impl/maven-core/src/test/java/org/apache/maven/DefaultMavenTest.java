@@ -48,7 +48,7 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
         private final AtomicReference<Class<?>> wsrClassRef = new AtomicReference<>(null);
 
         @Override
-        public void afterProjectsRead(MavenSession session) throws MavenExecutionException {
+        public void afterProjectsRead(MavenSession session) {
             wsrClassRef.set(session.getRepositorySession().getWorkspaceReader().getClass());
         }
     }

@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;
@@ -82,8 +81,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
         Handler repoHandler = new AbstractHandler() {
             @Override
             public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
                 System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
                 if (request.getRequestURI().endsWith("/b-0.1.jar")) {

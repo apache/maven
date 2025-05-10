@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
@@ -167,8 +166,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
             this.connector = connector;
         }
 
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
             System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
             PrintWriter writer = response.getWriter();

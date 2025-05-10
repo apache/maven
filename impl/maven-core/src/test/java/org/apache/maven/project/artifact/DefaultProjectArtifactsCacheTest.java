@@ -34,7 +34,7 @@ class DefaultProjectArtifactsCacheTest {
     private ProjectArtifactsCache cache;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         cache = new DefaultProjectArtifactsCache();
     }
 

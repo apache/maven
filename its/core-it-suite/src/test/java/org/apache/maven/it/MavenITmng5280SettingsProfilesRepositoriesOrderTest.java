@@ -60,7 +60,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();
@@ -140,8 +140,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
         private volatile boolean artifactRequestedFromRepo2;
 
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
             String uri = request.getRequestURI();
 
             if (uri.startsWith("/repo1/org/apache/maven/its/mng5280/fake-artifact/1.0/")) {

@@ -75,7 +75,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testNullSafe() throws Exception {
+    void testNullSafe() {
         Profile p = Profile.newInstance();
 
         assertActivation(false, p, newContext(null, null));
@@ -86,7 +86,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkPrefix() throws Exception {
+    void testJdkPrefix() {
         Profile profile = newProfile("inrange(${java.version}, '[1.4,1.5)')");
 
         assertActivation(true, profile, newContext(null, newJdkProperties("1.4")));
@@ -100,7 +100,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkPrefixNegated() throws Exception {
+    void testJdkPrefixNegated() {
         Profile profile = newProfile("not(inrange(${java.version}, '[1.4,1.5)'))");
 
         assertActivation(false, profile, newContext(null, newJdkProperties("1.4")));
@@ -114,7 +114,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkVersionRangeInclusiveBounds() throws Exception {
+    void testJdkVersionRangeInclusiveBounds() {
         Profile profile = newProfile("inrange(${java.version}, '[1.5,1.6.1]')");
 
         assertActivation(false, profile, newContext(null, newJdkProperties("1.4")));
@@ -135,7 +135,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkVersionRangeExclusiveBounds() throws Exception {
+    void testJdkVersionRangeExclusiveBounds() {
         Profile profile = newProfile("inrange(${java.version}, '[1.3.1,1.6)')");
 
         assertActivation(false, profile, newContext(null, newJdkProperties("1.3")));
@@ -157,7 +157,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkVersionRangeInclusiveLowerBound() throws Exception {
+    void testJdkVersionRangeInclusiveLowerBound() {
         Profile profile = newProfile("inrange(${java.version}, '[1.5,)')");
 
         assertActivation(false, profile, newContext(null, newJdkProperties("1.4")));
@@ -178,7 +178,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testJdkVersionRangeExclusiveUpperBound() throws Exception {
+    void testJdkVersionRangeExclusiveUpperBound() {
         Profile profile = newProfile("inrange(${java.version}, '(,1.6)')");
 
         assertActivation(true, profile, newContext(null, newJdkProperties("1.5")));
@@ -222,7 +222,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testOsVersionStringComparison() throws Exception {
+    void testOsVersionStringComparison() {
         Profile profile = newProfile("inrange(${os.version}, '[6.5.0-1014-aws,6.6)')");
 
         assertActivation(true, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -232,7 +232,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testOsVersionRegexMatching() throws Exception {
+    void testOsVersionRegexMatching() {
         Profile profile = newProfile("matches(${os.version}, '.*aws')");
 
         assertActivation(true, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
@@ -299,7 +299,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNameOnlyUserProperty() throws Exception {
+    void testPropWithNameOnlyUserProperty() {
         Profile profile = newProfile("${prop}");
 
         assertActivation(true, profile, newContext(newPropProperties("prop", "value"), null));
@@ -308,7 +308,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNameOnlySystemProperty() throws Exception {
+    void testPropWithNameOnlySystemProperty() {
         Profile profile = newProfile("${prop}");
 
         assertActivation(true, profile, newContext(null, newPropProperties("prop", "value")));
@@ -317,7 +317,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedNameOnlyUserProperty() throws Exception {
+    void testPropWithNegatedNameOnlyUserProperty() {
         Profile profile = newProfile("not(${prop})");
 
         assertActivation(false, profile, newContext(newPropProperties("prop", "value"), null));
@@ -326,7 +326,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedNameOnlySystemProperty() throws Exception {
+    void testPropWithNegatedNameOnlySystemProperty() {
         Profile profile = newProfile("not(${prop})");
 
         assertActivation(false, profile, newContext(null, newPropProperties("prop", "value")));
@@ -335,7 +335,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithValueUserProperty() throws Exception {
+    void testPropWithValueUserProperty() {
         Profile profile = newProfile("${prop} == 'value'");
 
         assertActivation(true, profile, newContext(newPropProperties("prop", "value"), null));
@@ -344,7 +344,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithValueSystemProperty() throws Exception {
+    void testPropWithValueSystemProperty() {
         Profile profile = newProfile("${prop} == 'value'");
 
         assertActivation(true, profile, newContext(null, newPropProperties("prop", "value")));
@@ -353,7 +353,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedValueUserProperty() throws Exception {
+    void testPropWithNegatedValueUserProperty() {
         Profile profile = newProfile("${prop} != 'value'");
 
         assertActivation(false, profile, newContext(newPropProperties("prop", "value"), null));
@@ -362,7 +362,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithNegatedValueSystemProperty() throws Exception {
+    void testPropWithNegatedValueSystemProperty() {
         Profile profile = newProfile("${prop} != 'value'");
 
         assertActivation(false, profile, newContext(null, newPropProperties("prop", "value")));
@@ -371,7 +371,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
-    void testPropWithValueUserPropertyDominantOverSystemProperty() throws Exception {
+    void testPropWithValueUserPropertyDominantOverSystemProperty() {
         Profile profile = newProfile("${prop} == 'value'");
 
         Map<String, String> props1 = newPropProperties("prop", "value");

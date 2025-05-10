@@ -305,7 +305,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
      * so we need to actually read the class file with ASM to find the annotation and
      * the goal.
      */
-    private static String getGoalFromMojoImplementationClass(Class<?> cl) throws IOException {
+    private static String getGoalFromMojoImplementationClass(Class<?> cl) {
         return cl.getAnnotation(Named.class).value();
     }
 

@@ -113,7 +113,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

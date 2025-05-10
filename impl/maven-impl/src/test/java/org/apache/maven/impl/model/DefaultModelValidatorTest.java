@@ -88,12 +88,12 @@ class DefaultModelValidatorTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         validator = new DefaultModelValidator();
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() {
         this.validator = null;
     }
 

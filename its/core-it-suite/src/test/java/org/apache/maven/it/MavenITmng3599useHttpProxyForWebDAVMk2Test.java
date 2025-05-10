@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -64,11 +63,10 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
     }
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    protected void setUp() {
         Handler handler = new AbstractHandler() {
             public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
                 System.out.println("Got request for URL: '" + request.getRequestURL() + "'");
                 System.out.flush();
 
@@ -123,7 +121,7 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

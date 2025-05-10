@@ -99,7 +99,7 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

@@ -178,7 +178,7 @@ public class DefaultBeanConfigurator implements BeanConfigurator {
         }
 
         @Override
-        protected Object fromString(String value) throws ComponentConfigurationException {
+        protected Object fromString(String value) {
             return Paths.get(value.replace('/' == File.separatorChar ? '\\' : '/', File.separatorChar));
         }
 

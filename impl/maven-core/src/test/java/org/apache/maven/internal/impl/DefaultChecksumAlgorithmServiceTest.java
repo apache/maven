@@ -68,7 +68,7 @@ public class DefaultChecksumAlgorithmServiceTest {
     }
 
     @Test
-    void calculateByte() throws IOException {
+    void calculateByte() {
         Map<ChecksumAlgorithmService.ChecksumAlgorithm, String> checksums = service.calculate(
                 "test".getBytes(StandardCharsets.UTF_8), service.select(Arrays.asList("SHA-1", "MD5")));
         assertNotNull(checksums);
@@ -78,7 +78,7 @@ public class DefaultChecksumAlgorithmServiceTest {
     }
 
     @Test
-    void calculateByteBuffer() throws IOException {
+    void calculateByteBuffer() {
         Map<ChecksumAlgorithmService.ChecksumAlgorithm, String> checksums = service.calculate(
                 ByteBuffer.wrap("test".getBytes(StandardCharsets.UTF_8)),
                 service.select(Arrays.asList("SHA-1", "MD5")));

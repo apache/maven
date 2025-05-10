@@ -107,10 +107,7 @@ public class ProjectDependencyGraphStub implements ProjectDependencyGraph {
     }
 
     private static ProjectSegment createProjectBuild(
-            MavenProject project, MavenSession session, TaskSegment taskSegment)
-            throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
-                    NoPluginFoundForPrefixException, MojoNotFoundException, PluginNotFoundException,
-                    PluginResolutionException, LifecyclePhaseNotFoundException, LifecycleNotFoundException {
+            MavenProject project, MavenSession session, TaskSegment taskSegment) {
         final MavenSession session1 = session.clone();
         return new ProjectSegment(project, taskSegment, session1);
     }

@@ -100,7 +100,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         return doExecute(context, request);
     }
 
-    protected MavenExecutionRequest prepareMavenExecutionRequest() throws Exception {
+    protected MavenExecutionRequest prepareMavenExecutionRequest() {
         // explicitly fill in "defaults"?
         DefaultMavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         mavenExecutionRequest.setRepositoryCache(new DefaultRepositoryCache());
@@ -453,7 +453,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         }
     }
 
-    protected int doExecute(MavenContext context, MavenExecutionRequest request) throws Exception {
+    protected int doExecute(MavenContext context, MavenExecutionRequest request) {
         context.eventSpyDispatcher.onEvent(request);
 
         MavenExecutionResult result;

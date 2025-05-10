@@ -333,7 +333,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      * @param artifact the artifact identifier to search
      * @return path to the desired artifact, or {@code null} if not found
      */
-    private Path findArtifactPath(String group, String artifact) throws IOException {
+    private Path findArtifactPath(String group, String artifact) {
         for (Map.Entry<Dependency, Path> entry : dependencies.entrySet()) {
             Dependency dep = entry.getKey();
             if (group.equals(dep.getGroupId()) && artifact.equals(dep.getArtifactId())) {

@@ -164,7 +164,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testShouldNotThrowExceptionOnReferenceToNonExistentValue() throws Exception {
+    public void testShouldNotThrowExceptionOnReferenceToNonExistentValue() {
         Scm scm = Scm.newBuilder().connection("${test}/somepath").build();
         Model model = Model.newBuilder().scm(scm).build();
 
@@ -177,7 +177,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testShouldThrowExceptionOnRecursiveScmConnectionReference() throws Exception {
+    public void testShouldThrowExceptionOnRecursiveScmConnectionReference() {
         Scm scm = Scm.newBuilder()
                 .connection("${project.scm.connection}/somepath")
                 .build();
@@ -190,7 +190,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() throws Exception {
+    public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() {
         Scm scm = Scm.newBuilder().connection("${test}/somepath").build();
         Map<String, String> props = new HashMap<>();
         props.put("test", "test");
@@ -206,7 +206,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    void shouldInterpolateOrganizationNameCorrectly() throws Exception {
+    void shouldInterpolateOrganizationNameCorrectly() {
         String orgName = "MyCo";
 
         Model model = Model.newBuilder()
@@ -221,7 +221,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void shouldInterpolateDependencyVersionToSetSameAsProjectVersion() throws Exception {
+    public void shouldInterpolateDependencyVersionToSetSameAsProjectVersion() {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .dependencies(Collections.singletonList(
@@ -237,7 +237,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testShouldNotInterpolateDependencyVersionWithInvalidReference() throws Exception {
+    public void testShouldNotInterpolateDependencyVersionWithInvalidReference() {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .dependencies(Collections.singletonList(
@@ -253,7 +253,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testTwoReferences() throws Exception {
+    public void testTwoReferences() {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
@@ -271,7 +271,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testProperty() throws Exception {
+    public void testProperty() {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
@@ -294,7 +294,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testBasedirUnx() throws Exception {
+    public void testBasedirUnx() {
         FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
         Path projectBasedir = fs.getPath("projectBasedir");
 
@@ -316,7 +316,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testBasedirWin() throws Exception {
+    public void testBasedirWin() {
         FileSystem fs = Jimfs.newFileSystem(Configuration.windows());
         Path projectBasedir = fs.getPath("projectBasedir");
 
@@ -338,7 +338,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testBaseUri() throws Exception {
+    public void testBaseUri() {
         Path projectBasedir = Paths.get("projectBasedir");
 
         Model model = Model.newBuilder()
@@ -360,7 +360,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    void testRootDirectory() throws Exception {
+    void testRootDirectory() {
         Path rootDirectory = Paths.get("myRootDirectory");
 
         Model model = Model.newBuilder()
@@ -380,7 +380,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    void testRootDirectoryWithUri() throws Exception {
+    void testRootDirectoryWithUri() {
         Path rootDirectory = Paths.get("myRootDirectory");
 
         Model model = Model.newBuilder()
@@ -402,7 +402,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    void testRootDirectoryWithNull() throws Exception {
+    void testRootDirectoryWithNull() {
         Path projectDirectory = Paths.get("myProjectDirectory");
         this.rootDirectory = new AtomicReference<>(null);
 
@@ -427,7 +427,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testEnvars() throws Exception {
+    public void testEnvars() {
         context.put("env.HOME", "/path/to/home");
 
         Map<String, String> modelProperties = new HashMap<>();
@@ -444,7 +444,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void envarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
+    public void envarExpressionThatEvaluatesToNullReturnsTheLiteralString() {
 
         Map<String, String> modelProperties = new HashMap<>();
         modelProperties.put("outputDirectory", "${env.DOES_NOT_EXIST}");
@@ -460,7 +460,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void expressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
+    public void expressionThatEvaluatesToNullReturnsTheLiteralString() {
         Map<String, String> modelProperties = new HashMap<>();
         modelProperties.put("outputDirectory", "${DOES_NOT_EXIST}");
 
@@ -475,7 +475,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void shouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly() throws Exception {
+    public void shouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly() {
         Model model = Model.newBuilder()
                 .build(Build.newBuilder()
                         .sourceDirectory("correct")
@@ -497,7 +497,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void shouldInterpolateUnprefixedBasedirExpression() throws Exception {
+    public void shouldInterpolateUnprefixedBasedirExpression() {
         Path basedir = Paths.get("/test/path");
         Model model = Model.newBuilder()
                 .dependencies(Collections.singletonList(Dependency.newBuilder()
@@ -519,7 +519,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testRecursiveExpressionCycleNPE() throws Exception {
+    public void testRecursiveExpressionCycleNPE() {
         Map<String, String> props = new HashMap<>();
         props.put("aa", "${bb}");
         props.put("bb", "${aa}");
@@ -537,7 +537,7 @@ class DefaultModelInterpolatorTest {
 
     @Disabled("per def cannot be recursive: ${basedir} is immediately going for project.basedir")
     @Test
-    public void testRecursiveExpressionCycleBaseDir() throws Exception {
+    public void testRecursiveExpressionCycleBaseDir() {
         Map<String, String> props = new HashMap<>();
         props.put("basedir", "${basedir}");
         ModelBuilderRequest request = createModelBuildingRequest(Map.of()).build();
@@ -554,7 +554,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    void shouldIgnorePropertiesWithPomPrefix() throws Exception {
+    void shouldIgnorePropertiesWithPomPrefix() {
         final String orgName = "MyCo";
         final String uninterpolatedName = "${pom.organization.name} Tools";
 

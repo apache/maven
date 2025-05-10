@@ -27,10 +27,10 @@ import org.codehaus.plexus.component.annotations.Component;
 public class EventLoggerSpy extends AbstractEventSpy {
 
     @Override
-    public void init(Context context) throws Exception {}
+    public void init(Context context) {}
 
     @Override
-    public void onEvent(Object event) throws Exception {
+    public void onEvent(Object event) {
         if (event instanceof ExecutionEvent) {
 
             ExecutionEvent executionEvent = (ExecutionEvent) event;

@@ -21,7 +21,7 @@ package mng0624;
 import junit.framework.TestCase;
 
 public class HelloTest extends TestCase {
-    public void testHello() throws Exception {
+    public void testHello() {
         Hello hello = new Hello();
         hello.helloWorld();
     }

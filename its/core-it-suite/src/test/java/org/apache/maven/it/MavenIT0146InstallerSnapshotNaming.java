@@ -46,7 +46,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
     }
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    protected void setUp() {
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
         HandlerList handlers = new HandlerList();
@@ -63,7 +63,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

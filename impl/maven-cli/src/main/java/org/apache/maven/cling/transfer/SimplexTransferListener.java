@@ -215,7 +215,7 @@ public final class SimplexTransferListener extends AbstractTransferListener impl
             consumer.accept(event);
         }
 
-        public void waitForProcessed() throws InterruptedException {
+        public void waitForProcessed() {
             // nothing, is async
         }
     }

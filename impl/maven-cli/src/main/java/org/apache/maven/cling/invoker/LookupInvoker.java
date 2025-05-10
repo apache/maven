@@ -222,7 +222,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 .warnAboutDeprecatedOptions(context.invokerRequest.parserRequest(), context.logger::warn);
     }
 
-    protected void pushCoreProperties(C context) throws Exception {
+    protected void pushCoreProperties(C context) {
         System.setProperty(
                 Constants.MAVEN_HOME,
                 context.invokerRequest.installationDirectory().toString());
@@ -235,7 +235,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
      * {@link PropertyContributor} SPI invocation, and "refreshes" already pushed user properties by re-writing them
      * as SPI may have modified them.
      */
-    protected void pushUserProperties(C context) throws Exception {
+    protected void pushUserProperties(C context) {
         ProtoSession protoSession = context.protoSession;
         HashSet<String> sys = new HashSet<>(protoSession.getSystemProperties().keySet());
         if (context.pushedUserProperties == null) {
@@ -493,7 +493,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         return terminal.getClass().getSimpleName() + " (" + String.join(", ", subs) + ")";
     }
 
-    protected void preCommands(C context) throws Exception {
+    protected void preCommands(C context) {
         boolean verbose = context.invokerRequest.effectiveVerbose();
         boolean version = context.invokerRequest.options().showVersion().orElse(false);
         if (verbose || version) {
@@ -520,7 +520,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         return new PlexusContainerCapsuleFactory<>();
     }
 
-    protected void postContainer(C context) throws Exception {
+    protected void postContainer(C context) {
         ProtoSession protoSession = context.protoSession;
         for (PropertyContributor propertyContributor : context.lookup
                 .lookup(PropertyContributorsHolder.class)
@@ -533,13 +533,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.protoSession = protoSession;
     }
 
-    protected void lookup(C context) throws Exception {
+    protected void lookup(C context) {
         if (context.eventSpyDispatcher == null) {
             context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
         }
     }
 
-    protected void init(C context) throws Exception {
+    protected void init(C context) {
         Map<String, Object> data = new HashMap<>();
         data.put("plexus", context.lookup.lookup(PlexusContainer.class));
         data.put("workingDirectory", context.cwd.get().toString());
@@ -549,7 +549,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.eventSpyDispatcher.init(() -> data);
     }
 
-    protected void postCommands(C context) throws Exception {
+    protected void postCommands(C context) {
         InvokerRequest invokerRequest = context.invokerRequest;
         Logger logger = context.logger;
         if (invokerRequest.options().showErrors().orElse(false)) {
@@ -716,10 +716,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         };
     }
 
-    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest)
-            throws Exception {}
+    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) {}
 
-    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception {}
+    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) {}
 
     protected boolean mayDisableInteractiveMode(C context, boolean proposedInteractive) {
         if (!context.invokerRequest.options().forceInteractive().orElse(false)) {

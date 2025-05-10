@@ -170,7 +170,7 @@ public class Verifier {
         this.executable = requireNonNull(executable);
     }
 
-    public void execute() throws VerificationException {
+    public void execute() {
         List<String> args = new ArrayList<>(defaultCliArguments);
         for (String cliArgument : cliArguments) {
             args.add(cliArgument.replace("${basedir}", getBasedir()));
@@ -257,7 +257,7 @@ public class Verifier {
         }
     }
 
-    public String getMavenVersion() throws VerificationException {
+    public String getMavenVersion() {
         return executorHelper.mavenVersion();
     }
 
@@ -809,7 +809,7 @@ public class Verifier {
         return getArtifactMetadataPath(gid, aid, null);
     }
 
-    public void deleteArtifact(String org, String name, String version, String ext) throws IOException {
+    public void deleteArtifact(String org, String name, String version, String ext) {
         List<String> files = getArtifactFileNameList(org, name, version, ext);
         for (String fileName : files) {
             FileUtils.forceDelete(new File(fileName));

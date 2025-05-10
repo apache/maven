@@ -57,7 +57,6 @@ public class MavenITmngXXXXDescriptionOfProblemTest
 
     @Test
     public void testitMNGxxxx ()
-        throws Exception
     {
 
         // The testdir is computed from the location of this

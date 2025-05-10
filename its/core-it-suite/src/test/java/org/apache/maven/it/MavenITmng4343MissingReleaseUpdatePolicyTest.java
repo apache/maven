@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Deque;
 import java.util.Map;
@@ -59,12 +58,11 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
     }
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    protected void setUp() {
         Handler repoHandler = new AbstractHandler() {
             @Override
             public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
+                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
                 System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
 
                 if (request.getRequestURI().startsWith("/org/apache/maven/its/mng4343")) {
@@ -109,7 +107,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
     }
 
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         if (server != null) {
             server.stop();
             server.join();

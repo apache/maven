@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -186,8 +185,7 @@ public class BuildPlanExecutor {
         this.lifecycles = lifecycles;
     }
 
-    public void execute(MavenSession session, ReactorContext reactorContext, List<TaskSegment> taskSegments)
-            throws ExecutionException, InterruptedException {
+    public void execute(MavenSession session, ReactorContext reactorContext, List<TaskSegment> taskSegments) {
         try (BuildContext ctx = new BuildContext(session, reactorContext, taskSegments)) {
             ctx.execute();
         }

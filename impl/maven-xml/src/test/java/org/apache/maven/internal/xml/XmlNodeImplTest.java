@@ -281,7 +281,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testPreserveDominantBlankValue() throws XMLStreamException, IOException {
+    void testPreserveDominantBlankValue() throws XMLStreamException {
         String lhs = "<parameter xml:space=\"preserve\"> </parameter>";
 
         String rhs = "<parameter>recessive</parameter>";
@@ -294,7 +294,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testPreserveDominantEmptyNode() throws XMLStreamException, IOException {
+    void testPreserveDominantEmptyNode() throws XMLStreamException {
         String lhs = "<parameter></parameter>";
 
         String rhs = "<parameter>recessive</parameter>";
@@ -307,7 +307,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testPreserveDominantEmptyNode2() throws XMLStreamException, IOException {
+    void testPreserveDominantEmptyNode2() throws XMLStreamException {
         String lhs = "<parameter/>";
 
         String rhs = "<parameter>recessive</parameter>";
@@ -690,7 +690,7 @@ class XmlNodeImplTest {
     }
 
     private static XmlNode toXmlNode(Reader reader, XmlService.InputLocationBuilder locationBuilder)
-            throws XMLStreamException, IOException {
+            throws XMLStreamException {
         return XmlService.read(reader, locationBuilder);
     }
 

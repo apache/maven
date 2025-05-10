@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
@@ -137,8 +136,7 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
     }
 
     static class RepoHandler extends AbstractHandler {
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
             PrintWriter writer = response.getWriter();
 
             String uri = request.getRequestURI();

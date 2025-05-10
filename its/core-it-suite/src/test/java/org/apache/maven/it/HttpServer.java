@@ -80,7 +80,7 @@ public class HttpServer {
         this.server = server(port);
     }
 
-    public void start() throws Exception {
+    public void start() {
         server.start();
         // server.join();
     }
@@ -89,11 +89,11 @@ public class HttpServer {
         return server.isFailed();
     }
 
-    public void stop() throws Exception {
+    public void stop() {
         server.stop();
     }
 
-    public void join() throws Exception {
+    public void join() {
         server.join();
     }
 

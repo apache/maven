@@ -142,7 +142,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testScmInheritance() throws Exception {
+    void testScmInheritance() {
         Model model = Model.newBuilder()
                 .scm(Scm.newBuilder()
                         .connection("scm:git:https://github.com/apache/maven-project.git")
