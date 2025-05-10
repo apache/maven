@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -44,7 +43,7 @@ class SourcesTest {
 
     @Test
     void testFromPath() {
-        Path path = Paths.get("/tmp");
+        Path path = Path.of("/tmp");
         Source source = Sources.fromPath(path);
 
         assertNotNull(source);
@@ -54,7 +53,7 @@ class SourcesTest {
 
     @Test
     void testBuildSource() {
-        Path path = Paths.get("/tmp");
+        Path path = Path.of("/tmp");
         ModelSource source = Sources.buildSource(path);
 
         assertNotNull(source);
@@ -64,7 +63,7 @@ class SourcesTest {
 
     @Test
     void testResolvedSource() {
-        Path path = Paths.get("/tmp");
+        Path path = Path.of("/tmp");
         String location = "custom-location";
         ModelSource source = Sources.resolvedSource(path, location);
 
@@ -77,7 +76,7 @@ class SourcesTest {
     @Test
     void testPathSourceFunctionality() {
         // Test basic source functionality
-        Path path = Paths.get("/tmp");
+        Path path = Path.of("/tmp");
         Sources.PathSource source = (Sources.PathSource) Sources.fromPath(path);
 
         assertEquals(path.normalize(), source.getPath());
@@ -91,9 +90,9 @@ class SourcesTest {
     @Test
     void testBuildPathSourceFunctionality() {
         // Test build source functionality
-        Path basePath = Paths.get("/tmp");
+        Path basePath = Path.of("/tmp");
         ModelSource.ModelLocator locator = mock(ModelSource.ModelLocator.class);
-        Path resolvedPath = Paths.get("/tmp/subproject/pom.xml");
+        Path resolvedPath = Path.of("/tmp/subproject/pom.xml");
         when(locator.locateExistingPom(any(Path.class))).thenReturn(resolvedPath);
 
         Sources.BuildPathSource source = (Sources.BuildPathSource) Sources.buildSource(basePath);
@@ -109,7 +108,7 @@ class SourcesTest {
     @Test
     void testResolvedPathSourceFunctionality() {
         // Test resolved source functionality
-        Path path = Paths.get("/tmp");
+        Path path = Path.of("/tmp");
         String location = "custom-location";
         Sources.ResolvedPathSource source = (Sources.ResolvedPathSource) Sources.resolvedSource(path, location);
 

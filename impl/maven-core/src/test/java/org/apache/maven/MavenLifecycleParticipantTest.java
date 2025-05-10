@@ -45,7 +45,7 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
 
         @Override
         public void afterProjectsRead(MavenSession session) {
-            MavenProject project = session.getProjects().get(0);
+            MavenProject project = session.getProjects().getFirst();
 
             Dependency dependency = new Dependency();
             dependency.setArtifactId(INJECTED_ARTIFACT_ID);
@@ -118,7 +118,7 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
         ArrayList<Artifact> artifacts = new ArrayList<>(project.getArtifacts());
 
         assertEquals(1, artifacts.size());
-        assertEquals(INJECTED_ARTIFACT_ID, artifacts.get(0).getArtifactId());
+        assertEquals(INJECTED_ARTIFACT_ID, artifacts.getFirst().getArtifactId());
     }
 
     @Test

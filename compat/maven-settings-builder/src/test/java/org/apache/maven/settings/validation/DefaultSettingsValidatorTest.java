@@ -98,7 +98,7 @@ class DefaultSettingsValidatorTest {
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
         assertEquals(4, problems.messages.size());
-        assertContains(problems.messages.get(0), "'mirrors.mirror.id' must not be 'local'");
+        assertContains(problems.messages.getFirst(), "'mirrors.mirror.id' must not be 'local'");
         assertContains(problems.messages.get(1), "'mirrors.mirror.url' for local is missing");
         assertContains(problems.messages.get(2), "'mirrors.mirror.mirrorOf' for local is missing");
         assertContains(problems.messages.get(3), "'mirrors.mirror.id' must not contain any of these characters");
@@ -121,7 +121,8 @@ class DefaultSettingsValidatorTest {
         validator.validate(settings, problems);
         assertEquals(3, problems.messages.size());
         assertContains(
-                problems.messages.get(0), "'profiles.profile[default].repositories.repository.id' must not be 'local'");
+                problems.messages.getFirst(),
+                "'profiles.profile[default].repositories.repository.id' must not be 'local'");
         assertContains(
                 problems.messages.get(1),
                 "'profiles.profile[default].repositories.repository.url' for local is missing");
@@ -144,7 +145,8 @@ class DefaultSettingsValidatorTest {
         validator.validate(settings, problems);
         assertEquals(1, problems.messages.size());
         assertContains(
-                problems.messages.get(0), "'servers.server.id' must be unique but found duplicate server with id test");
+                problems.messages.getFirst(),
+                "'servers.server.id' must be unique but found duplicate server with id test");
     }
 
     @Test
@@ -161,7 +163,7 @@ class DefaultSettingsValidatorTest {
         validator.validate(settings, problems);
         assertEquals(1, problems.messages.size());
         assertContains(
-                problems.messages.get(0),
+                problems.messages.getFirst(),
                 "'profiles.profile.id' must be unique but found duplicate profile with id test");
     }
 
@@ -184,7 +186,7 @@ class DefaultSettingsValidatorTest {
         validator.validate(settings, problems);
         assertEquals(1, problems.messages.size());
         assertContains(
-                problems.messages.get(0),
+                problems.messages.getFirst(),
                 "'profiles.profile[pro].repositories.repository.id' must be unique"
                         + " but found duplicate repository with id test");
     }
@@ -203,7 +205,7 @@ class DefaultSettingsValidatorTest {
         validator.validate(settings, problems);
         assertEquals(1, problems.messages.size());
         assertContains(
-                problems.messages.get(0),
+                problems.messages.getFirst(),
                 "'proxies.proxy.id' must be unique" + " but found duplicate proxy with id " + id);
     }
 
@@ -216,7 +218,7 @@ class DefaultSettingsValidatorTest {
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
         assertEquals(1, problems.messages.size());
-        assertContains(problems.messages.get(0), "'proxies.proxy.host' for default is missing");
+        assertContains(problems.messages.getFirst(), "'proxies.proxy.host' for default is missing");
     }
 
     private static class SimpleProblemCollector implements SettingsProblemCollector {

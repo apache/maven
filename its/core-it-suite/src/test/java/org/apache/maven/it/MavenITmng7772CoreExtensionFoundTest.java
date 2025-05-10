@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +43,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
         String installedToLocalRepo = verifier.getLocalRepository();
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setUserHomeDirectory(Paths.get(testDir.toPath().toString(), "home-extensions-xml"));
+        verifier.setUserHomeDirectory(Path.of(testDir.toPath().toString(), "home-extensions-xml"));
         verifier.addCliArgument("-Dmaven.repo.local=" + installedToLocalRepo);
 
         verifier.addCliArgument("validate");
@@ -69,7 +68,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
         assertTrue("Jar output path was not built", Files.isRegularFile(jarPath));
 
         verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setUserHomeDirectory(Paths.get(testDir.toPath().toString(), "home-lib-ext"));
+        verifier.setUserHomeDirectory(Path.of(testDir.toPath().toString(), "home-lib-ext"));
         verifier.addCliArgument("-Dmaven.ext.class.path=" + jarPath);
         verifier.addCliArgument("validate");
         verifier.execute();

@@ -100,12 +100,13 @@ class DefaultToolchainsBuilderTest {
         assertNotNull(result.getEffectiveToolchains());
         assertEquals(1, result.getEffectiveToolchains().getToolchains().size());
         assertEquals(
-                "TYPE", result.getEffectiveToolchains().getToolchains().get(0).getType());
+                "TYPE",
+                result.getEffectiveToolchains().getToolchains().getFirst().getType());
         assertEquals(
                 "user_value",
                 result.getEffectiveToolchains()
                         .getToolchains()
-                        .get(0)
+                        .getFirst()
                         .getProvides()
                         .get("key"));
         assertNotNull(result.getProblems());
@@ -130,12 +131,13 @@ class DefaultToolchainsBuilderTest {
         assertNotNull(result.getEffectiveToolchains());
         assertEquals(1, result.getEffectiveToolchains().getToolchains().size());
         assertEquals(
-                "TYPE", result.getEffectiveToolchains().getToolchains().get(0).getType());
+                "TYPE",
+                result.getEffectiveToolchains().getToolchains().getFirst().getType());
         assertEquals(
                 "global_value",
                 result.getEffectiveToolchains()
                         .getToolchains()
-                        .get(0)
+                        .getFirst()
                         .getProvides()
                         .get("key"));
         assertNotNull(result.getProblems());
@@ -170,12 +172,13 @@ class DefaultToolchainsBuilderTest {
         assertNotNull(result.getEffectiveToolchains());
         assertEquals(2, result.getEffectiveToolchains().getToolchains().size());
         assertEquals(
-                "TYPE", result.getEffectiveToolchains().getToolchains().get(0).getType());
+                "TYPE",
+                result.getEffectiveToolchains().getToolchains().getFirst().getType());
         assertEquals(
                 "user_value",
                 result.getEffectiveToolchains()
                         .getToolchains()
-                        .get(0)
+                        .getFirst()
                         .getProvides()
                         .get("key"));
         assertEquals(
@@ -253,11 +256,11 @@ class DefaultToolchainsBuilderTest {
                 interpolatedValue,
                 result.getEffectiveToolchains()
                         .getToolchains()
-                        .get(0)
+                        .getFirst()
                         .getProvides()
                         .get("key"));
         org.codehaus.plexus.util.xml.Xpp3Dom toolchainConfiguration = (org.codehaus.plexus.util.xml.Xpp3Dom)
-                result.getEffectiveToolchains().getToolchains().get(0).getConfiguration();
+                result.getEffectiveToolchains().getToolchains().getFirst().getConfiguration();
         assertEquals(
                 interpolatedValue, toolchainConfiguration.getChild("jdkHome").getValue());
         assertNotNull(result.getProblems());
@@ -283,7 +286,7 @@ class DefaultToolchainsBuilderTest {
                 "${env.testNonExistingKey}",
                 result.getEffectiveToolchains()
                         .getToolchains()
-                        .get(0)
+                        .getFirst()
                         .getProvides()
                         .get("key"));
         assertNotNull(result.getProblems());
@@ -310,7 +313,7 @@ class DefaultToolchainsBuilderTest {
                 interpolatedValue,
                 result.getEffectiveToolchains()
                         .getToolchains()
-                        .get(0)
+                        .getFirst()
                         .getProvides()
                         .get("key"));
         assertNotNull(result.getProblems());

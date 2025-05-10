@@ -84,7 +84,8 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
 
         MavenExecutionResult result = maven.execute(request);
 
-        assertEquals(ProjectCycleException.class, result.getExceptions().get(0).getClass());
+        assertEquals(
+                ProjectCycleException.class, result.getExceptions().getFirst().getClass());
     }
 
     @Test

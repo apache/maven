@@ -118,7 +118,7 @@ class BuildPlanCreatorTest {
     private void assertIsSuccessor(BuildStep predecessor, BuildStep successor) {
         assertTrue(
                 successor.isSuccessorOf(predecessor),
-                String.format("Expected '%s' to be a successor of '%s'", successor.toString(), predecessor.toString()));
+                "Expected '%s' to be a successor of '%s'".formatted(successor.toString(), predecessor.toString()));
     }
 
     @SuppressWarnings("checkstyle:UnusedLocalVariable")

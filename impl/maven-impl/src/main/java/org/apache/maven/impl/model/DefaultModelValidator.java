@@ -2248,16 +2248,18 @@ public class DefaultModelValidator implements ModelValidator {
             String hint;
             if (dependency.getClassifier() == null
                     || dependency.getClassifier().trim().isEmpty()) {
-                hint = String.format(
-                        "groupId=%s, artifactId=%s, type=%s",
-                        nvl(dependency.getGroupId()), nvl(dependency.getArtifactId()), nvl(dependency.getType()));
+                hint = "groupId=%s, artifactId=%s, type=%s"
+                        .formatted(
+                                nvl(dependency.getGroupId()),
+                                nvl(dependency.getArtifactId()),
+                                nvl(dependency.getType()));
             } else {
-                hint = String.format(
-                        "groupId=%s, artifactId=%s, classifier=%s, type=%s",
-                        nvl(dependency.getGroupId()),
-                        nvl(dependency.getArtifactId()),
-                        nvl(dependency.getClassifier()),
-                        nvl(dependency.getType()));
+                hint = "groupId=%s, artifactId=%s, classifier=%s, type=%s"
+                        .formatted(
+                                nvl(dependency.getGroupId()),
+                                nvl(dependency.getArtifactId()),
+                                nvl(dependency.getClassifier()),
+                                nvl(dependency.getType()));
             }
             return new SourceHint(hint, null); // DMK
         }

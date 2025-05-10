@@ -44,7 +44,7 @@ class RemoteSnapshotMetadataTest {
     @BeforeEach
     void setLocaleToUseBuddhistCalendar() {
         defaultLocale = Locale.getDefault();
-        Locale.setDefault(new Locale("th", "TH"));
+        Locale.setDefault(Locale.of("th", "TH"));
     }
 
     @AfterEach

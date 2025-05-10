@@ -30,7 +30,6 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -239,7 +238,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                         Model localModel = new MavenStaxReader().read(r);
                         model = new MavenMerger().merge(localModel, model, false, null);
                         model = new DefaultModelPathTranslator(new DefaultPathTranslator())
-                                .alignToBaseDirectory(model, Paths.get(getBasedir()), null);
+                                .alignToBaseDirectory(model, Path.of(getBasedir()), null);
                     }
                 }
                 goal = parameterInjectMojo.goal();
@@ -362,7 +361,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
         */
 
-        Path basedirPath = Paths.get(getBasedir());
+        Path basedirPath = Path.of(getBasedir());
 
         InjectMojo mojo = AnnotationSupport.findAnnotation(context.getElement().get(), InjectMojo.class)
                 .orElse(null);
@@ -418,7 +417,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             model = new MavenMerger().merge(tmodel, defaultModel, false, null);
         }
         tmodel = new DefaultModelPathTranslator(new DefaultPathTranslator())
-                .alignToBaseDirectory(tmodel, Paths.get(getBasedir()), null);
+                .alignToBaseDirectory(tmodel, Path.of(getBasedir()), null);
         context.getStore(ExtensionContext.Namespace.GLOBAL).put(Model.class, tmodel);
 
         // mojo execution
@@ -458,7 +457,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                     stub.setMainArtifact(artifact);
                 }
                 stub.setModel(model);
-                stub.setBasedir(Paths.get(MojoExtension.getBasedir()));
+                stub.setBasedir(Path.of(MojoExtension.getBasedir()));
                 stub.setPomPath(modelPath[0]);
                 s.getService(ArtifactManager.class).setPath(stub.getPomArtifact(), modelPath[0]);
                 return stub;
@@ -584,7 +583,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
     private Reader openPomUrl(Class<?> holder, String pom, Path[] modelPath) throws IOException {
         if (pom.startsWith("file:")) {
-            Path path = Paths.get(getBasedir()).resolve(pom.substring("file:".length()));
+            Path path = Path.of(getBasedir()).resolve(pom.substring("file:".length()));
             modelPath[0] = path;
             return Files.newBufferedReader(path);
         } else if (pom.startsWith("classpath:")) {
@@ -596,7 +595,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         } else if (pom.contains("<project>")) {
             return new StringReader(pom);
         } else {
-            Path path = Paths.get(getBasedir()).resolve(pom);
+            Path path = Path.of(getBasedir()).resolve(pom);
             modelPath[0] = path;
             return Files.newBufferedReader(path);
         }
@@ -610,7 +609,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         if (goal.matches(".*:.*:.*:.*")) {
             return goal.split(":");
         } else {
-            Path pluginPom = Paths.get(getPluginBasedir(), "pom.xml");
+            Path pluginPom = Path.of(getPluginBasedir(), "pom.xml");
             Xpp3Dom pluginPomDom = Xpp3DomBuilder.build(Files.newBufferedReader(pluginPom));
             String artifactId = pluginPomDom.getChild("artifactId").getValue();
             String groupId = resolveFromRootThenParent(pluginPomDom, "groupId");

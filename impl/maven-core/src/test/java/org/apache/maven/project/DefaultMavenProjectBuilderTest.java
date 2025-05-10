@@ -95,10 +95,11 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         File f1 = getTestFile("src/test/resources/projects/duplicate-plugins-merged-pom.xml");
 
         MavenProject project = getProject(f1);
-        assertEquals(2, project.getBuildPlugins().get(0).getDependencies().size());
-        assertEquals(2, project.getBuildPlugins().get(0).getExecutions().size());
+        assertEquals(2, project.getBuildPlugins().getFirst().getDependencies().size());
+        assertEquals(2, project.getBuildPlugins().getFirst().getExecutions().size());
         assertEquals(
-                "first", project.getBuildPlugins().get(0).getExecutions().get(0).getId());
+                "first",
+                project.getBuildPlugins().getFirst().getExecutions().getFirst().getId());
     }
 
     @Test
@@ -163,7 +164,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         List<ProjectBuildingResult> results = e.getResults();
         assertNotNull(results);
         assertEquals(1, results.size());
-        ProjectBuildingResult result = results.get(0);
+        ProjectBuildingResult result = results.getFirst();
         assertNotNull(result);
         assertNotNull(result.getProject());
         assertEquals(1, result.getProblems().size());
@@ -364,7 +365,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         List<org.apache.maven.api.model.Profile> activeProfiles =
                 new DefaultProject(session, project).getDeclaredActiveProfiles();
         assertEquals(1, activeProfiles.size());
-        org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
+        org.apache.maven.api.model.Profile profile = activeProfiles.getFirst();
         assertEquals("active-by-default", profile.getId());
         InputLocation location = profile.getLocation("");
         assertNotNull(location);
@@ -402,7 +403,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         List<org.apache.maven.api.model.Profile> activeProfiles =
                 new DefaultProject(session, project).getDeclaredActiveProfiles();
         assertEquals(2, activeProfiles.size());
-        org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
+        org.apache.maven.api.model.Profile profile = activeProfiles.getFirst();
         assertEquals("active-by-default", profile.getId());
         InputLocation location = profile.getLocation("");
         assertNotNull(location);
@@ -540,7 +541,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
         assertEquals(2, results.size());
-        MavenProject p1 = results.get(0).getProject();
+        MavenProject p1 = results.getFirst().getProject();
         MavenProject p2 = results.get(1).getProject();
         MavenProject parent = p1.getArtifactId().equals("parent") ? p1 : p2;
         assertEquals(List.of("child"), parent.getModel().getDelegate().getSubprojects());

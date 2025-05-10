@@ -58,7 +58,7 @@ class DefaultProjectDependencyGraphTest {
                 new DefaultProjectDependencyGraph(Arrays.asList(aProject, bProject, cProject)),
                 Arrays.asList(aProject, cProject));
         final List<MavenProject> sortedProjects = graph.getSortedProjects();
-        assertEquals(aProject, sortedProjects.get(0));
+        assertEquals(aProject, sortedProjects.getFirst());
         assertEquals(cProject, sortedProjects.get(1));
 
         assertTrue(graph.getDownstreamProjects(aProject, false).contains(cProject));
@@ -68,7 +68,7 @@ class DefaultProjectDependencyGraphTest {
     void testGetSortedProjects() throws DuplicateProjectException, CycleDetectedException {
         ProjectDependencyGraph graph = new DefaultProjectDependencyGraph(Arrays.asList(depender1, aProject));
         final List<MavenProject> sortedProjects = graph.getSortedProjects();
-        assertEquals(aProject, sortedProjects.get(0));
+        assertEquals(aProject, sortedProjects.getFirst());
         assertEquals(depender1, sortedProjects.get(1));
     }
 
@@ -77,7 +77,7 @@ class DefaultProjectDependencyGraphTest {
         // This test verifies the baseline structure used in subsequent tests. If this fails, the rest will fail.
         ProjectDependencyGraph graph = threeProjectsDependingOnASingle();
         final List<MavenProject> sortedProjects = graph.getSortedProjects();
-        assertEquals(aProject, sortedProjects.get(0));
+        assertEquals(aProject, sortedProjects.getFirst());
         assertEquals(depender1, sortedProjects.get(1));
         assertEquals(depender2, sortedProjects.get(2));
         assertEquals(depender3, sortedProjects.get(3));
@@ -87,7 +87,7 @@ class DefaultProjectDependencyGraphTest {
     void testVerifyThatDownstreamProjectsComeInSortedOrder() throws CycleDetectedException, DuplicateProjectException {
         final List<MavenProject> downstreamProjects =
                 threeProjectsDependingOnASingle().getDownstreamProjects(aProject, true);
-        assertEquals(depender1, downstreamProjects.get(0));
+        assertEquals(depender1, downstreamProjects.getFirst());
         assertEquals(depender2, downstreamProjects.get(1));
         assertEquals(depender3, downstreamProjects.get(2));
     }
@@ -98,7 +98,7 @@ class DefaultProjectDependencyGraphTest {
                 new DefaultProjectDependencyGraph(Arrays.asList(depender1, depender4, depender2, depender3, aProject));
 
         final List<MavenProject> downstreamProjects = graph.getDownstreamProjects(aProject, true);
-        assertEquals(depender1, downstreamProjects.get(0));
+        assertEquals(depender1, downstreamProjects.getFirst());
         assertEquals(depender3, downstreamProjects.get(1));
         assertEquals(depender4, downstreamProjects.get(2));
         assertEquals(depender2, downstreamProjects.get(3));
@@ -110,7 +110,7 @@ class DefaultProjectDependencyGraphTest {
                 new DefaultProjectDependencyGraph(Arrays.asList(depender1, depender4, depender2, depender3, aProject));
 
         final List<MavenProject> downstreamProjects = graph.getDownstreamProjects(aProject, false);
-        assertEquals(depender1, downstreamProjects.get(0));
+        assertEquals(depender1, downstreamProjects.getFirst());
         assertEquals(depender3, downstreamProjects.get(1));
         assertEquals(depender4, downstreamProjects.get(2));
         assertEquals(depender2, downstreamProjects.get(3));
@@ -122,7 +122,7 @@ class DefaultProjectDependencyGraphTest {
                 Arrays.asList(depender1, transitiveOnly, depender2, depender3, aProject));
 
         final List<MavenProject> downstreamProjects = graph.getDownstreamProjects(aProject, true);
-        assertEquals(depender1, downstreamProjects.get(0));
+        assertEquals(depender1, downstreamProjects.getFirst());
         assertEquals(depender3, downstreamProjects.get(1));
         assertEquals(transitiveOnly, downstreamProjects.get(2));
         assertEquals(depender2, downstreamProjects.get(3));
@@ -134,7 +134,7 @@ class DefaultProjectDependencyGraphTest {
                 Arrays.asList(depender1, transitiveOnly, depender2, depender3, aProject));
 
         final List<MavenProject> downstreamProjects = graph.getDownstreamProjects(aProject, false);
-        assertEquals(depender1, downstreamProjects.get(0));
+        assertEquals(depender1, downstreamProjects.getFirst());
         assertEquals(depender3, downstreamProjects.get(1));
         assertEquals(depender2, downstreamProjects.get(2));
     }
@@ -143,7 +143,7 @@ class DefaultProjectDependencyGraphTest {
     void testGetUpstreamProjects() throws CycleDetectedException, DuplicateProjectException {
         ProjectDependencyGraph graph = threeProjectsDependingOnASingle();
         final List<MavenProject> downstreamProjects = graph.getUpstreamProjects(depender1, true);
-        assertEquals(aProject, downstreamProjects.get(0));
+        assertEquals(aProject, downstreamProjects.getFirst());
     }
 
     private ProjectDependencyGraph threeProjectsDependingOnASingle()

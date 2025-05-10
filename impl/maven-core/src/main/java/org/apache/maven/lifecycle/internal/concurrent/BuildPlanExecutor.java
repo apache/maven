@@ -525,8 +525,8 @@ public class BuildPlanExecutor {
                         // Handle the stored exception
                         Throwable failure;
                         if (failures.size() == 1) {
-                            failure = failures.get(
-                                    0); // Single exception, no need to wrap it in a LifecycleExecutionException
+                            failure = failures.getFirst(); // Single exception, no need to wrap it in a
+                            // LifecycleExecutionException
                         } else {
                             failure = new LifecycleExecutionException("Error building project");
                             failures.forEach(failure::addSuppressed);

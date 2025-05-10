@@ -77,7 +77,7 @@ class DefaultProfileManagerTest {
 
         assertNotNull(active);
         assertEquals(1, active.size());
-        assertEquals("defaultActivated", ((Profile) active.get(0)).getId());
+        assertEquals("defaultActivated", ((Profile) active.getFirst()).getId());
     }
 
     @Test
@@ -114,7 +114,7 @@ class DefaultProfileManagerTest {
 
         assertNotNull(active);
         assertEquals(1, active.size());
-        assertEquals("syspropActivated", ((Profile) active.get(0)).getId());
+        assertEquals("syspropActivated", ((Profile) active.getFirst()).getId());
     }
 
     @Test
@@ -169,7 +169,7 @@ class DefaultProfileManagerTest {
 
         assertNotNull(active);
         assertEquals(1, active.size());
-        assertEquals("syspropActivated", ((Profile) active.get(0)).getId());
+        assertEquals("syspropActivated", ((Profile) active.getFirst()).getId());
     }
 
     @Test

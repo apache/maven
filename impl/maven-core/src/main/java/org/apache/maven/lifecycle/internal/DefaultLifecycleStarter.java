@@ -116,9 +116,8 @@ public class DefaultLifecycleStarter implements LifecycleStarter {
             int degreeOfConcurrency = session.getRequest().getDegreeOfConcurrency();
             if (degreeOfConcurrency > 1) {
                 logger.info("");
-                logger.info(String.format(
-                        "Using the %s implementation with a thread count of %d",
-                        builder.getClass().getSimpleName(), degreeOfConcurrency));
+                logger.info("Using the %s implementation with a thread count of %d"
+                        .formatted(builder.getClass().getSimpleName(), degreeOfConcurrency));
             }
             builder.build(session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus);
 

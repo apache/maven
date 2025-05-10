@@ -23,7 +23,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.maven.api.Constants;
@@ -50,9 +49,9 @@ public class MavenSecDispatcher extends DefaultSecDispatcher {
     private static Path configurationFile() {
         String mavenUserConf = System.getProperty(Constants.MAVEN_USER_CONF);
         if (mavenUserConf != null) {
-            return Paths.get(mavenUserConf, FILE_NAME);
+            return Path.of(mavenUserConf, FILE_NAME);
         }
         // this means we are in UT or alike
-        return Paths.get(System.getProperty("user.home"), ".m2", FILE_NAME);
+        return Path.of(System.getProperty("user.home"), ".m2", FILE_NAME);
     }
 }

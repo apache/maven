@@ -225,7 +225,7 @@ public class EmbeddedMavenExecutor implements Executor {
         if (useMavenArgsEnv && mavenArgsEnv != null && !mavenArgsEnv.isEmpty()) {
             Arrays.stream(mavenArgsEnv.split(" "))
                     .filter(s -> !s.trim().isEmpty())
-                    .forEach(s -> mavenArgs.add(0, s));
+                    .forEach(s -> mavenArgs.addFirst(s));
         }
 
         Properties properties = prepareProperties(executorRequest);

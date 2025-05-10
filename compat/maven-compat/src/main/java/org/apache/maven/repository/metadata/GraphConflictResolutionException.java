@@ -18,12 +18,15 @@
  */
 package org.apache.maven.repository.metadata;
 
+import java.io.Serial;
+
 /**
  *
  *
  */
 @Deprecated
 public class GraphConflictResolutionException extends Exception {
+    @Serial
     private static final long serialVersionUID = 2677613140287940255L;
 
     public GraphConflictResolutionException() {}

@@ -56,7 +56,7 @@ class SettingsUtilsTest {
 
         assertNotNull(pluginGroups);
         assertEquals(3, pluginGroups.size());
-        assertEquals("org.apache.maven.plugins", pluginGroups.get(0));
+        assertEquals("org.apache.maven.plugins", pluginGroups.getFirst());
         assertEquals("org.codehaus.modello", pluginGroups.get(1));
         assertEquals("org.codehaus.plexus", pluginGroups.get(2));
     }

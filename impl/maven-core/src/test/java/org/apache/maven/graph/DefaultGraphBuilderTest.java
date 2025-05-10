@@ -19,7 +19,7 @@
 package org.apache.maven.graph;
 
 import java.io.File;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -300,7 +300,7 @@ class DefaultGraphBuilderTest {
         parameterInactiveRequiredProjects.forEach(projectActivation::deactivateRequiredProject);
         parameterInactiveOptionalProjects.forEach(projectActivation::deactivateOptionalProject);
 
-        when(mavenExecutionRequest.getRootDirectory()).thenReturn(Paths.get("."));
+        when(mavenExecutionRequest.getRootDirectory()).thenReturn(Path.of("."));
         when(mavenExecutionRequest.getProjectActivation()).thenReturn(projectActivation);
         when(mavenExecutionRequest.getMakeBehavior()).thenReturn(parameterMakeBehavior);
         when(mavenExecutionRequest.getPom()).thenReturn(parameterRequestedPom);

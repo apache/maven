@@ -95,7 +95,7 @@ class MavenToolchainMergerTest {
 
             merger.merge(jdks, jdksExtend, TrackableBase.USER_LEVEL);
             assertEquals(2, jdks.getToolchains().size());
-            Xpp3Dom config0 = (Xpp3Dom) jdks.getToolchains().get(0).getConfiguration();
+            Xpp3Dom config0 = (Xpp3Dom) jdks.getToolchains().getFirst().getConfiguration();
             assertEquals("lib/tools.jar", config0.getChild("toolsJar").getValue());
             assertEquals(2, config0.getChildCount());
             Xpp3Dom config1 = (Xpp3Dom) jdks.getToolchains().get(1).getConfiguration();
@@ -113,7 +113,7 @@ class MavenToolchainMergerTest {
             // switch dominant with recessive
             merger.merge(jdksExtend, jdks, TrackableBase.USER_LEVEL);
             assertEquals(2, jdksExtend.getToolchains().size());
-            Xpp3Dom config0 = (Xpp3Dom) jdksExtend.getToolchains().get(0).getConfiguration();
+            Xpp3Dom config0 = (Xpp3Dom) jdksExtend.getToolchains().getFirst().getConfiguration();
             assertEquals("lib/tools.jar", config0.getChild("toolsJar").getValue());
             assertEquals(2, config0.getChildCount());
             Xpp3Dom config1 = (Xpp3Dom) jdksExtend.getToolchains().get(1).getConfiguration();

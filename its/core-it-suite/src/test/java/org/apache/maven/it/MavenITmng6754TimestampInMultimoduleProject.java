@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -48,8 +47,8 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
     public void testArtifactsHaveSameTimestamp() throws Exception {
         final File testDir = extractResources(RESOURCE_PATH);
         final Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        final Path localRepoDir = Paths.get(verifier.getLocalRepository());
-        final Path remoteRepoDir = Paths.get(verifier.getBasedir(), "repo");
+        final Path localRepoDir = Path.of(verifier.getLocalRepository());
+        final Path remoteRepoDir = Path.of(verifier.getBasedir(), "repo");
 
         verifier.deleteDirectory("repo");
         verifier.deleteArtifacts("org.apache.maven.its.mng6754");
@@ -343,7 +342,7 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
     }
 
     private Path getRepoFile(final Path repoDir, final String moduleName, String version, String fileName) {
-        final Path mng6754Path = Paths.get("org", "apache", "maven", "its", "mng6754");
+        final Path mng6754Path = Path.of("org", "apache", "maven", "its", "mng6754");
         Path modulePath = repoDir.resolve(mng6754Path.resolve(moduleName));
         if (version != null) {
             modulePath = modulePath.resolve(version);

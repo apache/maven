@@ -59,8 +59,8 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
             failIfNotTypeCompatible(result, type, configuration);
             return result;
         } catch (final ExpressionEvaluationException e) {
-            final String reason = String.format(
-                    "Cannot evaluate expression '%s' for configuration entry '%s'", value, configuration.getName());
+            final String reason = "Cannot evaluate expression '%s' for configuration entry '%s'"
+                    .formatted(value, configuration.getName());
 
             throw new ComponentConfigurationException(configuration, reason, e);
         }

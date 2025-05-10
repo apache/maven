@@ -313,7 +313,7 @@ public class DefaultMaven implements Maven {
             validateOptionalProfiles(session, request.getProfileActivation());
 
             if (session.getResult().hasExceptions()) {
-                addExceptionToResult(result, session.getResult().getExceptions().get(0));
+                addExceptionToResult(result, session.getResult().getExceptions().getFirst());
                 persistResumptionData(result, session);
                 return result;
             } else {

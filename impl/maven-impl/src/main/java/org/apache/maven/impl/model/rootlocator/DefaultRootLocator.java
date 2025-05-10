@@ -21,7 +21,6 @@ package org.apache.maven.impl.model.rootlocator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -91,7 +90,7 @@ public class DefaultRootLocator implements RootLocator {
     protected Optional<Path> getRootDirectoryFallback() {
         String mmpd = System.getProperty("maven.multiModuleProjectDirectory");
         if (mmpd != null) {
-            return Optional.of(getCanonicalPath(Paths.get(mmpd)));
+            return Optional.of(getCanonicalPath(Path.of(mmpd)));
         }
         return Optional.empty();
     }

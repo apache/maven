@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -179,7 +178,7 @@ public class DefaultBeanConfigurator implements BeanConfigurator {
 
         @Override
         protected Object fromString(String value) throws ComponentConfigurationException {
-            return Paths.get(value.replace('/' == File.separatorChar ? '\\' : '/', File.separatorChar));
+            return Path.of(value.replace('/' == File.separatorChar ? '\\' : '/', File.separatorChar));
         }
 
         @Override

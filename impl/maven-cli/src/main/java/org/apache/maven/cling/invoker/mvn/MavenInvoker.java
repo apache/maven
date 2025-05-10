@@ -207,9 +207,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         if (toolchainsResult.getProblems().hasWarningProblems()) {
             int totalProblems = toolchainsResult.getProblems().totalProblemsReported();
             context.logger.info("");
-            context.logger.info(String.format(
-                    "%s %s encountered while building the effective toolchains (use -e to see details)",
-                    totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
+            context.logger.info("%s %s encountered while building the effective toolchains (use -e to see details)"
+                    .formatted(totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
 
             if (context.invokerRequest.options().showErrors().orElse(false)) {
                 for (BuilderProblem problem :
@@ -507,8 +506,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                 // Sort the failedProjects list in the topologically sorted order.
                 failedProjects.sort(comparing(sortedProjects::indexOf));
 
-                MavenProject firstFailedProject = failedProjects.get(0);
-                if (!firstFailedProject.equals(sortedProjects.get(0))) {
+                MavenProject firstFailedProject = failedProjects.getFirst();
+                if (!firstFailedProject.equals(sortedProjects.getFirst())) {
                     String resumeFromSelector = getResumeFromSelector(sortedProjects, firstFailedProject);
                     logBuildResumeHint(context, "mvn [args] -rf " + resumeFromSelector);
                 }

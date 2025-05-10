@@ -81,6 +81,6 @@ class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase
         @SuppressWarnings("deprecation")
         List<Artifact> artifacts = project.getCompileArtifacts();
         assertEquals(1, artifacts.size());
-        assertThat(artifacts.get(0).getFile().getName(), endsWith("tools.jar"));
+        assertThat(artifacts.getFirst().getFile().getName(), endsWith("tools.jar"));
     }
 }

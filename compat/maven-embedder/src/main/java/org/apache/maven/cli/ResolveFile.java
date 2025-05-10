@@ -19,7 +19,7 @@
 package org.apache.maven.cli;
 
 import java.io.File;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 /**
  * Resolve relative file path against the given base directory
@@ -35,7 +35,7 @@ public class ResolveFile {
             // drive-relative Windows path
             return file.getAbsoluteFile();
         } else {
-            return Paths.get(baseDirectory, file.getPath()).normalize().toFile();
+            return Path.of(baseDirectory, file.getPath()).normalize().toFile();
         }
     }
 }

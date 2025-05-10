@@ -81,7 +81,7 @@ class DefaultToolchainManagerTest {
         List<Toolchain> result = manager.getToolchains(session, "jdk", Map.of("version", "11"));
 
         assertEquals(1, result.size());
-        assertEquals(mockToolchain, result.get(0));
+        assertEquals(mockToolchain, result.getFirst());
     }
 
     @Test

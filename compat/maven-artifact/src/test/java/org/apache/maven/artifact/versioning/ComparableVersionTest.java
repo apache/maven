@@ -437,7 +437,7 @@ class ComparableVersionTest {
     @Test
     void testLocaleIndependent() {
         Locale orig = Locale.getDefault();
-        Locale[] locales = {Locale.ENGLISH, new Locale("tr"), Locale.getDefault()};
+        Locale[] locales = {Locale.ENGLISH, Locale.of("tr"), Locale.getDefault()};
         try {
             for (Locale locale : locales) {
                 Locale.setDefault(locale);

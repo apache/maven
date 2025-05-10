@@ -34,9 +34,11 @@ class MavenStaxReaderTest {
 
     @Test
     void testNamespaceReporting() throws Exception {
-        String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
-                + "  <modelVersion>4.0.0</modelVersion>\n"
-                + "</project>";
+        String xml =
+                """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                </project>""";
 
         Model model = fromXml(xml);
         assertEquals("http://maven.apache.org/POM/4.0.0", model.getNamespaceUri());
@@ -52,15 +54,17 @@ class MavenStaxReaderTest {
 
     @Test
     void testNamespaceConsistency() throws XMLStreamException {
-        String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
-                + "  <build xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
-                + "    <plugins>\n"
-                + "      <plugin>\n"
-                + "        <artifactId>maven-test-plugin</artifactId>\n"
-                + "      </plugin>\n"
-                + "    </plugins>\n"
-                + "  </build>\n"
-                + "</project>";
+        String xml =
+                """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <build xmlns="http://maven.apache.org/POM/4.0.0">
+                    <plugins>
+                      <plugin>
+                        <artifactId>maven-test-plugin</artifactId>
+                      </plugin>
+                    </plugins>
+                  </build>
+                </project>""";
 
         Model model = fromXml(xml);
         assertEquals("http://maven.apache.org/POM/4.0.0", model.getNamespaceUri());
@@ -68,15 +72,17 @@ class MavenStaxReaderTest {
 
     @Test
     void testNamespaceInconsistencyThrows() {
-        String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
-                + "  <build xmlns=\"http://maven.apache.org/POM/4.1.0\">\n"
-                + "    <plugins>\n"
-                + "      <plugin>\n"
-                + "        <artifactId>maven-test-plugin</artifactId>\n"
-                + "      </plugin>\n"
-                + "    </plugins>\n"
-                + "  </build>\n"
-                + "</project>";
+        String xml =
+                """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <build xmlns="http://maven.apache.org/POM/4.1.0">
+                    <plugins>
+                      <plugin>
+                        <artifactId>maven-test-plugin</artifactId>
+                      </plugin>
+                    </plugins>
+                  </build>
+                </project>""";
 
         XMLStreamException ex = assertThrows(XMLStreamException.class, () -> fromXml(xml));
         assertTrue(ex.getMessage().contains("Unexpected namespace for element 'build'"));
@@ -86,15 +92,17 @@ class MavenStaxReaderTest {
 
     @Test
     void testEmptyNamespaceConsistency() throws XMLStreamException {
-        String xml = "<project>\n"
-                + "  <build>\n"
-                + "    <plugins>\n"
-                + "      <plugin>\n"
-                + "        <artifactId>maven-test-plugin</artifactId>\n"
-                + "      </plugin>\n"
-                + "    </plugins>\n"
-                + "  </build>\n"
-                + "</project>";
+        String xml =
+                """
+                <project>
+                  <build>
+                    <plugins>
+                      <plugin>
+                        <artifactId>maven-test-plugin</artifactId>
+                      </plugin>
+                    </plugins>
+                  </build>
+                </project>""";
 
         Model model = fromXml(xml);
         assertEquals("", model.getNamespaceUri());
@@ -102,15 +110,17 @@ class MavenStaxReaderTest {
 
     @Test
     void testEmptyNamespaceInconsistencyThrows() {
-        String xml = "<project>\n"
-                + "  <build xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
-                + "    <plugins>\n"
-                + "      <plugin>\n"
-                + "        <artifactId>maven-test-plugin</artifactId>\n"
-                + "      </plugin>\n"
-                + "    </plugins>\n"
-                + "  </build>\n"
-                + "</project>";
+        String xml =
+                """
+                <project>
+                  <build xmlns="http://maven.apache.org/POM/4.0.0">
+                    <plugins>
+                      <plugin>
+                        <artifactId>maven-test-plugin</artifactId>
+                      </plugin>
+                    </plugins>
+                  </build>
+                </project>""";
 
         XMLStreamException ex = assertThrows(XMLStreamException.class, () -> fromXml(xml));
         assertTrue(ex.getMessage().contains("Unexpected namespace for element 'build'"));
@@ -120,20 +130,22 @@ class MavenStaxReaderTest {
 
     @Test
     void testPluginConfigurationAllowsOtherNamespaces() throws XMLStreamException {
-        String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
-                + "  <build>\n"
-                + "    <plugins>\n"
-                + "      <plugin>\n"
-                + "        <artifactId>maven-test-plugin</artifactId>\n"
-                + "        <configuration>\n"
-                + "          <customConfig xmlns:custom=\"http://custom.namespace.org\">\n"
-                + "            <custom:element>value</custom:element>\n"
-                + "          </customConfig>\n"
-                + "        </configuration>\n"
-                + "      </plugin>\n"
-                + "    </plugins>\n"
-                + "  </build>\n"
-                + "</project>";
+        String xml =
+                """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <build>
+                    <plugins>
+                      <plugin>
+                        <artifactId>maven-test-plugin</artifactId>
+                        <configuration>
+                          <customConfig xmlns:custom="http://custom.namespace.org">
+                            <custom:element>value</custom:element>
+                          </customConfig>
+                        </configuration>
+                      </plugin>
+                    </plugins>
+                  </build>
+                </project>""";
 
         Model model = fromXml(xml);
         assertNotNull(model);

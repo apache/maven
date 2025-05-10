@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -172,11 +171,11 @@ public interface ExecutorRequest {
         return new Builder(
                 MVN,
                 null,
-                getCanonicalPath(Paths.get(System.getProperty("user.dir"))),
+                getCanonicalPath(Path.of(System.getProperty("user.dir"))),
                 installationDirectory != null
                         ? getCanonicalPath(installationDirectory)
                         : discoverInstallationDirectory(),
-                getCanonicalPath(Paths.get(System.getProperty("user.home"))),
+                getCanonicalPath(Path.of(System.getProperty("user.home"))),
                 null,
                 null,
                 null,
@@ -467,7 +466,7 @@ public interface ExecutorRequest {
         if (mavenHome == null) {
             throw new ExecutorException("requires maven.home Java System Property set");
         }
-        return getCanonicalPath(Paths.get(mavenHome));
+        return getCanonicalPath(Path.of(mavenHome));
     }
 
     @Nonnull
@@ -476,7 +475,7 @@ public interface ExecutorRequest {
         if (userHome == null) {
             throw new ExecutorException("requires user.home Java System Property set");
         }
-        return getCanonicalPath(Paths.get(userHome));
+        return getCanonicalPath(Path.of(userHome));
     }
 
     @Nonnull

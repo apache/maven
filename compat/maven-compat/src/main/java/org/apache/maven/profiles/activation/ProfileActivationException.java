@@ -18,12 +18,15 @@
  */
 package org.apache.maven.profiles.activation;
 
+import java.io.Serial;
+
 /**
  * ProfileActivationException
  */
 @Deprecated
 public class ProfileActivationException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = -90820222109103638L;
 
     public ProfileActivationException(String message, Throwable cause) {
