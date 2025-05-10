@@ -28,10 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MavenITmng6401ProxyPortInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    private Proxy proxy;
-
-    private int port;
-
     protected MavenITmng6401ProxyPortInterpolationTest() {
         super("(4.0.0-alpha-7,)");
     }

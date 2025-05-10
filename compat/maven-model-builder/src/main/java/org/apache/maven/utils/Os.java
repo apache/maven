@@ -128,11 +128,6 @@ public class Os {
      */
     private static final String DARWIN = "darwin";
 
-    /**
-     * The path separator.
-     */
-    private static final String PATH_SEP = System.getProperty("path.separator");
-
     static {
         // Those two public constants are initialized here, as they need all the private constants
         // above to be initialized first, but the code style imposes the public constants to be
