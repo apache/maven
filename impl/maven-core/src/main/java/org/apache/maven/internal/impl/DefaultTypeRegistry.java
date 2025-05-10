@@ -22,16 +22,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.LanguageRegistry;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.spi.TypeProvider;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -41,12 +40,11 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.impl.resolver.type.DefaultType;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.function.Function.identity;
 
 @Named
 @Singleton
 public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistry {
-    private final Map<String, Type> types;
+    private final Lookup lookup;
 
     private final LanguageRegistry languageRegistry;
 
@@ -55,11 +53,8 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     private final LegacyArtifactHandlerManager manager;
 
     @Inject
-    public DefaultTypeRegistry(
-            List<TypeProvider> providers, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
-        this.types = requireNonNull(providers, "providers cannot be null").stream()
-                .flatMap(p -> p.provides().stream())
-                .collect(Collectors.toMap(Type::id, identity()));
+    public DefaultTypeRegistry(Lookup lookup, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
+        this.lookup = lookup;
         this.languageRegistry = requireNonNull(languageRegistry, "languageRegistry cannot be null");
         this.usedTypes = new ConcurrentHashMap<>();
         this.manager = requireNonNull(manager, "artifactHandlerManager cannot be null");
@@ -84,7 +79,11 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     public Type require(String id) {
         requireNonNull(id, "id cannot be null");
         return usedTypes.computeIfAbsent(id, i -> {
-            Type type = types.get(id);
+            Type type = lookup.lookupList(TypeProvider.class).stream()
+                    .flatMap(p -> p.provides().stream())
+                    .filter(t -> Objects.equals(id, t.id()))
+                    .findFirst()
+                    .orElse(null);
             if (type == null) {
                 // Copy data as the ArtifactHandler is not immutable, but Type should be.
                 ArtifactHandler handler = manager.getArtifactHandler(id);
