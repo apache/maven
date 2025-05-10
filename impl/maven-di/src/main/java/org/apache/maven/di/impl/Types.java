@@ -25,7 +25,6 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,7 +115,7 @@ public class Types {
     public static Map<TypeVariable<?>, Type> getTypeBindings(Type type) {
         Type[] typeArguments = getActualTypeArguments(type);
         if (typeArguments.length == 0) {
-            return Collections.emptyMap();
+            return Map.of();
         }
         TypeVariable<?>[] typeVariables = getRawType(type).getTypeParameters();
         Map<TypeVariable<?>, Type> map = new HashMap<>();

@@ -22,7 +22,6 @@ import javax.inject.Inject;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.SimpleLookup;
@@ -88,8 +87,8 @@ public class ModelBuilderTest {
                 null);
         InternalSession.associate(rsession, session);
 
-        List<ProjectBuildingResult> results = projectBuilder.build(
-                Collections.singletonList(new File("src/test/resources/projects/tree/pom.xml")), true, request);
+        List<ProjectBuildingResult> results =
+                projectBuilder.build(List.of(new File("src/test/resources/projects/tree/pom.xml")), true, request);
 
         assertEquals(3, results.size());
     }

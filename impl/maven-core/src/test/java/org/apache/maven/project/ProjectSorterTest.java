@@ -19,7 +19,6 @@
 package org.apache.maven.project;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.model.Build;
@@ -108,7 +107,7 @@ class ProjectSorterTest {
 
         build.addPlugin(plugin);
 
-        new ProjectSorter(Collections.singletonList(project));
+        new ProjectSorter(List.of(project));
     }
 
     @Test
@@ -129,7 +128,7 @@ class ProjectSorterTest {
 
         build.setPluginManagement(pMgmt);
 
-        new ProjectSorter(Collections.singletonList(project));
+        new ProjectSorter(List.of(project));
     }
 
     @Test
@@ -142,7 +141,7 @@ class ProjectSorterTest {
 
         build.addExtension(extension);
 
-        new ProjectSorter(Collections.singletonList(project));
+        new ProjectSorter(List.of(project));
     }
 
     @Test

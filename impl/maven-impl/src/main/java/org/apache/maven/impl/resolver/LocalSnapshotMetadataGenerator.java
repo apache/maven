@@ -20,8 +20,8 @@ package org.apache.maven.impl.resolver;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.Constants;
@@ -64,7 +64,7 @@ class LocalSnapshotMetadataGenerator implements MetadataGenerator {
             }
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

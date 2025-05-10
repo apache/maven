@@ -21,6 +21,8 @@ package org.apache.maven.api;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
@@ -69,6 +71,7 @@ public interface Toolchain {
      *
      * @return the toolchain type
      */
+    @Nonnull
     String getType();
 
     /**
@@ -76,6 +79,7 @@ public interface Toolchain {
      *
      * @return the toolchain model
      */
+    @Nonnull
     ToolchainModel getModel();
 
     /**
@@ -84,7 +88,8 @@ public interface Toolchain {
      * @param toolName the tool platform independent tool name
      * @return file representing the tool executable, or null if the tool cannot be found
      */
-    String findTool(String toolName);
+    @Nullable
+    String findTool(@Nonnull String toolName);
 
     /**
      * Let the toolchain decide if it matches requirements defined
@@ -93,5 +98,5 @@ public interface Toolchain {
      * @param requirements key value pair, may not be {@code null}
      * @return {@code true} if the requirements match, otherwise {@code false}
      */
-    boolean matchesRequirements(Map<String, String> requirements);
+    boolean matchesRequirements(@Nonnull Map<String, String> requirements);
 }

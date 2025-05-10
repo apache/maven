@@ -209,11 +209,11 @@ public class ${class.name}
         }
       #elseif ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
         if (${field.name} == null) {
-            ${field.name} = Collections.emptyList();
+            ${field.name} = List.of();
         }
         if (!Objects.equals(${field.name}, ${pfx}${cap}())) {
             update(getDelegate().with${cap}(
-                ${field.name}.stream().map(c -> c.getDelegate()).collect(Collectors.toList())));
+                ${field.name}.stream().map(c -> c.getDelegate()).toList()));
             ${field.name}.forEach(e -> e.childrenTracking = this::replace);
         }
       #elseif ( $field.to && $field.to != "String" )
@@ -239,11 +239,11 @@ public class ${class.name}
         #if ( $field.to == "String" )
         update(getDelegate().with${cap}(
                Stream.concat(getDelegate().get${cap}().stream(), Stream.of(${v}))
-                        .collect(Collectors.toList())));
+                        .toList()));
         #else
         update(getDelegate().with${cap}(
                Stream.concat(getDelegate().get${cap}().stream(), Stream.of(${v}.getDelegate()))
-                        .collect(Collectors.toList())));
+                        .toList()));
         ${v}.childrenTracking = this::replace;
         #end
     }
@@ -253,12 +253,12 @@ public class ${class.name}
         update(getDelegate().with${cap}(
                getDelegate().get${cap}().stream()
                         .filter(e -> !Objects.equals(e, ${v}))
-                        .collect(Collectors.toList())));
+                        .toList()));
         #else
         update(getDelegate().with${cap}(
                getDelegate().get${cap}().stream()
                         .filter(e -> !Objects.equals(e, ${v}))
-                        .collect(Collectors.toList())));
+                        .toList()));
         ${v}.childrenTracking = null;
         #end
     }

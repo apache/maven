@@ -124,8 +124,8 @@ class ReactorReader implements MavenWorkspaceReader {
 
     public List<String> findVersions(Artifact artifact) {
         List<String> versions = getProjects()
-                .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
-                .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
+                .getOrDefault(artifact.getGroupId(), Map.of())
+                .getOrDefault(artifact.getArtifactId(), Map.of())
                 .values()
                 .stream()
                 .map(MavenProject::getVersion)
@@ -134,8 +134,8 @@ class ReactorReader implements MavenWorkspaceReader {
             return versions;
         }
         return getAllProjects()
-                .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
-                .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
+                .getOrDefault(artifact.getGroupId(), Map.of())
+                .getOrDefault(artifact.getArtifactId(), Map.of())
                 .values()
                 .stream()
                 .filter(p -> Objects.nonNull(findArtifact(p, artifact, false)))
@@ -484,8 +484,8 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private MavenProject getProject(Artifact artifact, Map<String, Map<String, Map<String, MavenProject>>> projects) {
-        return projects.getOrDefault(artifact.getGroupId(), Collections.emptyMap())
-                .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
+        return projects.getOrDefault(artifact.getGroupId(), Map.of())
+                .getOrDefault(artifact.getArtifactId(), Map.of())
                 .getOrDefault(artifact.getBaseVersion(), null);
     }
 
@@ -501,7 +501,7 @@ class ReactorReader implements MavenWorkspaceReader {
                         .put(project.getVersion(), project));
                 this.allProjects = map;
             } else {
-                return Collections.emptyMap();
+                return Map.of();
             }
         }
         return allProjects;
@@ -518,7 +518,7 @@ class ReactorReader implements MavenWorkspaceReader {
                         .put(project.getVersion(), project));
                 this.projects = map;
             } else {
-                return Collections.emptyMap();
+                return Map.of();
             }
         }
         return projects;

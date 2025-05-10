@@ -20,7 +20,7 @@ package org.apache.maven.api.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.maven.api.ArtifactCoordinates;
@@ -117,7 +117,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
         private String coordinateString;
         private String scope;
         private boolean optional;
-        private Collection<Exclusion> exclusions = Collections.emptyList();
+        private Collection<Exclusion> exclusions = List.of();
 
         DependencyCoordinatesFactoryRequestBuilder() {}
 

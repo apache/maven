@@ -23,12 +23,15 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.annotations.Nonnull;
 
 public interface LifecycleRegistry extends ExtensibleEnumRegistry<Lifecycle>, Iterable<Lifecycle> {
 
+    @Nonnull
     default Stream<Lifecycle> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
 
-    List<String> computePhases(Lifecycle lifecycle);
+    @Nonnull
+    List<String> computePhases(@Nonnull Lifecycle lifecycle);
 }

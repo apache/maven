@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl;
 
+import java.util.Objects;
+
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
@@ -26,8 +28,6 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.model.ModelVersionParser;
-
-import static org.apache.maven.impl.ImplUtils.nonNull;
 
 /**
  * A wrapper class around a resolver version that works as model version parser as well.
@@ -39,7 +39,7 @@ public class DefaultVersionParser implements VersionParser {
 
     @Inject
     public DefaultVersionParser(ModelVersionParser modelVersionParser) {
-        this.modelVersionParser = nonNull(modelVersionParser, "modelVersionParser");
+        this.modelVersionParser = Objects.requireNonNull(modelVersionParser, "modelVersionParser cannot be null");
     }
 
     @Override

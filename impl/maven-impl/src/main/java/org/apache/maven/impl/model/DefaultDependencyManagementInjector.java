@@ -19,7 +19,6 @@
 package org.apache.maven.impl.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +58,7 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             if (dependencyManagement != null) {
                 Map<Object, Dependency> dependencies = new HashMap<>();
-                Map<Object, Object> context = Collections.emptyMap();
+                Map<Object, Object> context = Map.of();
 
                 for (Dependency dependency : model.getDependencies()) {
                     Object key = getDependencyKey().apply(dependency);

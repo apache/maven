@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -228,7 +227,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     public ClassRealm createExtensionRealm(Plugin plugin, List<Artifact> artifacts) {
         Objects.requireNonNull(plugin, "plugin cannot be null");
 
-        Map<String, ClassLoader> foreignImports = Collections.singletonMap("", getMavenApiRealm());
+        Map<String, ClassLoader> foreignImports = Map.of("", getMavenApiRealm());
 
         return createRealm(
                 getKey(plugin, true), RealmType.Extension, PARENT_CLASSLOADER, null, foreignImports, artifacts);

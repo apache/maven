@@ -33,7 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
@@ -104,7 +103,6 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.transfer.TransferResource;
 
 import static org.apache.maven.impl.ImplUtils.map;
-import static org.apache.maven.impl.ImplUtils.nonNull;
 
 public abstract class AbstractSession implements InternalSession {
 
@@ -134,7 +132,7 @@ public abstract class AbstractSession implements InternalSession {
             List<RemoteRepository> repositories,
             List<org.eclipse.aether.repository.RemoteRepository> resolverRepositories,
             Lookup lookup) {
-        this.session = nonNull(session, "session");
+        this.session = Objects.requireNonNull(session, "session cannot be null");
         this.repositorySystem = repositorySystem;
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
@@ -337,7 +335,7 @@ public abstract class AbstractSession implements InternalSession {
     @Nonnull
     @Override
     public Session withLocalRepository(@Nonnull LocalRepository localRepository) {
-        nonNull(localRepository, "localRepository");
+        Objects.requireNonNull(localRepository, "localRepository cannot be null");
         if (session.getLocalRepository() != null
                 && Objects.equals(session.getLocalRepository().getBasePath(), localRepository.getPath())) {
             return this;
@@ -461,12 +459,12 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public void registerListener(@Nonnull Listener listener) {
-        listeners.add(nonNull(listener));
+        listeners.add(Objects.requireNonNull(listener));
     }
 
     @Override
     public void unregisterListener(@Nonnull Listener listener) {
-        listeners.remove(nonNull(listener));
+        listeners.remove(Objects.requireNonNull(listener));
     }
 
     @Nonnull
@@ -616,7 +614,7 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates) {
         return getService(ArtifactResolver.class)
-                .resolve(this, Collections.singletonList(coordinates))
+                .resolve(this, List.of(coordinates))
                 .getResults()
                 .values()
                 .iterator()
@@ -633,7 +631,7 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates, List<RemoteRepository> repositories) {
         return getService(ArtifactResolver.class)
-                .resolve(this, Collections.singletonList(coordinates), repositories)
+                .resolve(this, List.of(coordinates), repositories)
                 .getResults()
                 .values()
                 .iterator()
@@ -707,7 +705,7 @@ public abstract class AbstractSession implements InternalSession {
     public Collection<DownloadedArtifact> resolveArtifacts(Artifact... artifacts) {
         ArtifactCoordinatesFactory acf = getService(ArtifactCoordinatesFactory.class);
         List<ArtifactCoordinates> coords =
-                Arrays.stream(artifacts).map(a -> acf.create(this, a)).collect(Collectors.toList());
+                Arrays.stream(artifacts).map(a -> acf.create(this, a)).toList();
         return resolveArtifacts(coords);
     }
 
@@ -967,7 +965,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public DependencyScope requireDependencyScope(String id) {
-        DependencyScope scope = DependencyScope.forId(nonNull(id, "id"));
+        DependencyScope scope = DependencyScope.forId(Objects.requireNonNull(id, "id cannot be null"));
         if (scope == null) {
             throw new IllegalArgumentException("Invalid dependency scope: " + id);
         }

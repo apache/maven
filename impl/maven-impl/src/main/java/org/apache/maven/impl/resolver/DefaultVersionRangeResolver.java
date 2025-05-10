@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -198,7 +199,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
         try {
             if (metadata != null) {
                 try (SyncContext syncContext = syncContextFactory.newInstance(session, true)) {
-                    syncContext.acquire(null, Collections.singleton(metadata));
+                    syncContext.acquire(null, Set.of(metadata));
 
                     if (metadata.getPath() != null && Files.exists(metadata.getPath())) {
                         try (InputStream in = Files.newInputStream(metadata.getPath())) {

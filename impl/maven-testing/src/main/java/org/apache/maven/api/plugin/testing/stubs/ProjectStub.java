@@ -88,6 +88,7 @@ public class ProjectStub implements Project {
     public Packaging getPackaging() {
         return new Packaging() {
             @Override
+            @Nonnull
             public String id() {
                 return model.getPackaging();
             }
@@ -128,6 +129,7 @@ public class ProjectStub implements Project {
             }
 
             @Override
+            @Nonnull
             public Map<String, PluginContainer> plugins() {
                 return Map.of();
             }
@@ -135,6 +137,7 @@ public class ProjectStub implements Project {
     }
 
     @Override
+    @Nonnull
     public List<ProducedArtifact> getArtifacts() {
         ProducedArtifact pomArtifact = new ProducedArtifactStub(getGroupId(), getArtifactId(), "", getVersion(), "pom");
         return mainArtifact != null ? Arrays.asList(pomArtifact, mainArtifact) : Arrays.asList(pomArtifact);

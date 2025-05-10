@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl;
 
+import java.util.Objects;
+
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.annotations.Nonnull;
@@ -28,7 +30,6 @@ import org.apache.maven.api.services.DependencyCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.impl.ImplUtils.map;
-import static org.apache.maven.impl.ImplUtils.nonNull;
 
 @Named
 @Singleton
@@ -37,7 +38,7 @@ public class DefaultDependencyCoordinatesFactory implements DependencyCoordinate
     @Nonnull
     @Override
     public DependencyCoordinates create(@Nonnull DependencyCoordinatesFactoryRequest request) {
-        nonNull(request, "request");
+        Objects.requireNonNull(request, "request cannot be null");
         InternalSession session = InternalSession.from(request.getSession());
 
         ArtifactType type = null;

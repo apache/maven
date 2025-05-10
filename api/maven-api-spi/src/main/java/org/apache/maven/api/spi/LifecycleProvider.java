@@ -37,7 +37,7 @@ import org.apache.maven.api.di.Named;
  * <pre>
  * public class CustomLifecycleProvider implements LifecycleProvider {
  *     public Collection&lt;Lifecycle&gt; provides() {
- *         return Collections.singleton(
+ *         return Set.of(
  *             lifecycle("deploy-docker", Arrays.asList(
  *                 "build-image",
  *                 "tag-image",

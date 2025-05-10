@@ -35,7 +35,7 @@ import org.apache.maven.api.di.Named;
  * <pre>
  * public class CustomLanguageProvider implements LanguageProvider {
  *     public Collection&lt;Language&gt; provides() {
- *         return Collections.singleton(language("kotlin"));
+ *         return Set.of(language("kotlin"));
  *     }
  * }
  * </pre>

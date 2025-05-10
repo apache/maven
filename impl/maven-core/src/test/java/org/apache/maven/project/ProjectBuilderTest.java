@@ -122,7 +122,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // multi projects build entry point
         List<ProjectBuildingResult> results = getContainer()
                 .lookup(org.apache.maven.project.ProjectBuilder.class)
-                .build(Collections.singletonList(pomFile), false, configuration);
+                .build(List.of(pomFile), false, configuration);
         assertEquals(1, results.size());
         MavenProject mavenProject = results.get(0).getProject();
         assertEquals(1, mavenProject.getArtifacts().size());
@@ -156,7 +156,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // multi projects build entry point
         List<ProjectBuildingResult> results = getContainer()
                 .lookup(org.apache.maven.project.ProjectBuilder.class)
-                .build(Collections.singletonList(pomFile), false, configuration);
+                .build(List.of(pomFile), false, configuration);
         assertEquals(1, results.size());
         MavenProject mavenProject = results.get(0).getProject();
         assertEquals(0, mavenProject.getArtifacts().size());
@@ -213,8 +213,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // multi projects build entry point
         ProjectBuildingException ex2 = assertThrows(
-                ProjectBuildingException.class,
-                () -> projectBuilder.build(Collections.singletonList(pomFile), true, configuration));
+                ProjectBuildingException.class, () -> projectBuilder.build(List.of(pomFile), true, configuration));
 
         assertEquals(1, ex2.getResults().size());
         MavenProject project2 = ex2.getResults().get(0).getProject();
@@ -239,8 +238,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // multi projects build entry point
         ProjectBuildingException pex = assertThrows(
-                ProjectBuildingException.class,
-                () -> projectBuilder.build(Collections.singletonList(pomFile), false, configuration));
+                ProjectBuildingException.class, () -> projectBuilder.build(List.of(pomFile), false, configuration));
         assertEquals(1, pex.getResults().size());
         assertNotNull(pex.getResults().get(0).getPomFile());
         assertThat(pex.getResults().get(0).getProblems().size(), greaterThan(0));
@@ -266,8 +264,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // read poms separately
         boolean parentFileWasFoundOnChild = false;
         for (File file : toRead) {
-            List<ProjectBuildingResult> results =
-                    projectBuilder.build(Collections.singletonList(file), false, configuration);
+            List<ProjectBuildingResult> results = projectBuilder.build(List.of(file), false, configuration);
             assertResultShowNoError(results);
             MavenProject project = findChildProject(results);
             if (project != null) {
@@ -310,8 +307,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
         configuration.setResolveDependencies(true);
-        List<ProjectBuildingResult> result =
-                projectBuilder.build(Collections.singletonList(file), false, configuration);
+        List<ProjectBuildingResult> result = projectBuilder.build(List.of(file), false, configuration);
         MavenProject project = result.get(0).getProject();
         // verify a few typical parameters are not duplicated
         assertEquals(1, project.getTestCompileSourceRoots().size());

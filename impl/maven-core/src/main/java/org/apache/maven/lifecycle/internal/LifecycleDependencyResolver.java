@@ -30,7 +30,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -96,9 +95,9 @@ public class LifecycleDependencyResolver {
             projectAndSubmodules.add(project);
             return session.getProjects().stream() // sorted all
                     .filter(projectAndSubmodules::contains)
-                    .collect(Collectors.toList()); // sorted and filtered to what we need
+                    .toList(); // sorted and filtered to what we need
         } else {
-            return Collections.singletonList(project);
+            return List.of(project);
         }
     }
 
@@ -288,7 +287,7 @@ public class LifecycleDependencyResolver {
             RepositoryUtils.toArtifacts(
                     artifacts,
                     result.getDependencyGraph().getChildren(),
-                    Collections.singletonList(project.getArtifact().getId()),
+                    List.of(project.getArtifact().getId()),
                     collectionFilter);
         }
         return new SetWithResolutionResult(result, artifacts);

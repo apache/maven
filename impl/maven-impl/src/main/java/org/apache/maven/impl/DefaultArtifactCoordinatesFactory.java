@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl;
 
+import java.util.Objects;
+
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
@@ -26,14 +28,12 @@ import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.ArtifactCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
-
 @Named
 @Singleton
 public class DefaultArtifactCoordinatesFactory implements ArtifactCoordinatesFactory {
     @Override
     public ArtifactCoordinates create(@Nonnull ArtifactCoordinatesFactoryRequest request) {
-        nonNull(request, "request");
+        Objects.requireNonNull(request, "request cannot be null");
         InternalSession session = InternalSession.from(request.getSession());
         if (request.getCoordinatesString() != null) {
             return new DefaultArtifactCoordinates(

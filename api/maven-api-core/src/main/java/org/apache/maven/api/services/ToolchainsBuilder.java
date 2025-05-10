@@ -38,7 +38,8 @@ public interface ToolchainsBuilder extends Service {
      * @return the result of the toolchains building, never {@code null}
      * @throws ToolchainsBuilderException if the effective toolchains could not be built
      */
-    ToolchainsBuilderResult build(ToolchainsBuilderRequest request);
+    @Nonnull
+    ToolchainsBuilderResult build(@Nonnull ToolchainsBuilderRequest request);
 
     /**
      * Builds the effective toolchains for the specified toolchains sources.

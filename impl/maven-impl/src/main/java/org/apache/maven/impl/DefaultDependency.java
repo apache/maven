@@ -26,8 +26,16 @@ import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * Default implementation of the Dependency interface.
+ * Extends AetherDependencyWrapper to provide dependency-specific functionality.
+ */
 public class DefaultDependency extends AetherDependencyWrapper implements Dependency {
 
+    /**
+     * The unique key for this dependency.
+     */
+    @Nonnull
     private final String key;
 
     public DefaultDependency(

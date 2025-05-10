@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -133,7 +133,7 @@ public class HttpServer {
             mapping.setPathSpec("/*");
             mapping.setConstraint(constraint);
 
-            security.setConstraintMappings(Collections.singletonList(mapping));
+            security.setConstraintMappings(List.of(mapping));
             security.setAuthenticator(new BasicAuthenticator());
             security.setLoginService(loginService);
             security.setHandler(handler);

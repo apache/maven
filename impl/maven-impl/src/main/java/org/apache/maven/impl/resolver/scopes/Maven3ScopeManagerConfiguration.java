@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.aether.artifact.ArtifactProperties;
@@ -83,7 +84,7 @@ public final class Maven3ScopeManagerConfiguration implements ScopeManagerConfig
     @Override
     public BuildScopeSource getBuildScopeSource() {
         return new BuildScopeMatrixSource(
-                Collections.singletonList(CommonBuilds.PROJECT_PATH_MAIN),
+                List.of(CommonBuilds.PROJECT_PATH_MAIN),
                 Arrays.asList(CommonBuilds.BUILD_PATH_COMPILE, CommonBuilds.BUILD_PATH_RUNTIME),
                 CommonBuilds.MAVEN_TEST_BUILD_SCOPE);
     }
@@ -126,13 +127,13 @@ public final class Maven3ScopeManagerConfiguration implements ScopeManagerConfig
                 RS_MAIN_COMPILE,
                 InternalScopeManager.Mode.ELIMINATE,
                 singleton(CommonBuilds.PROJECT_PATH_MAIN, CommonBuilds.BUILD_PATH_COMPILE),
-                Collections.singletonList(system),
+                List.of(system),
                 nonTransitiveDependencyScopes));
         result.add(internalScopeManager.createResolutionScope(
                 RS_MAIN_COMPILE_PLUS_RUNTIME,
                 InternalScopeManager.Mode.ELIMINATE,
                 byProjectPath(CommonBuilds.PROJECT_PATH_MAIN),
-                Collections.singletonList(system),
+                List.of(system),
                 nonTransitiveDependencyScopes));
         result.add(internalScopeManager.createResolutionScope(
                 RS_MAIN_RUNTIME,
@@ -144,19 +145,19 @@ public final class Maven3ScopeManagerConfiguration implements ScopeManagerConfig
                 RS_MAIN_RUNTIME_PLUS_SYSTEM,
                 InternalScopeManager.Mode.ELIMINATE,
                 singleton(CommonBuilds.PROJECT_PATH_MAIN, CommonBuilds.BUILD_PATH_RUNTIME),
-                Collections.singletonList(system),
+                List.of(system),
                 nonTransitiveDependencyScopes));
         result.add(internalScopeManager.createResolutionScope(
                 RS_TEST_COMPILE,
                 InternalScopeManager.Mode.ELIMINATE,
                 select(CommonBuilds.PROJECT_PATH_TEST, CommonBuilds.BUILD_PATH_COMPILE),
-                Collections.singletonList(system),
+                List.of(system),
                 nonTransitiveDependencyScopes));
         result.add(internalScopeManager.createResolutionScope(
                 RS_TEST_RUNTIME,
                 InternalScopeManager.Mode.ELIMINATE,
                 select(CommonBuilds.PROJECT_PATH_TEST, CommonBuilds.BUILD_PATH_RUNTIME),
-                Collections.singletonList(system),
+                List.of(system),
                 nonTransitiveDependencyScopes));
         return result;
     }

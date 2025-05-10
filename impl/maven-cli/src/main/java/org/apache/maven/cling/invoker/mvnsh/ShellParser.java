@@ -18,7 +18,6 @@
  */
 package org.apache.maven.cling.invoker.mvnsh;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
@@ -55,7 +54,7 @@ public class ShellParser extends BaseParser {
 
     @Override
     protected List<Options> parseCliOptions(LocalContext context) {
-        return Collections.singletonList(parseShellCliOptions(context.parserRequest.args()));
+        return List.of(parseShellCliOptions(context.parserRequest.args()));
     }
 
     protected CommonsCliShellOptions parseShellCliOptions(List<String> args) {

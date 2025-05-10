@@ -25,7 +25,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -296,7 +296,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
             throws CycleDetectedException, DuplicateProjectException, NoLocalRepositoryManagerException {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setSystemProperties(properties)
-                .setGoals(Collections.emptyList())
+                .setGoals(List.of())
                 .setBaseDirectory(new File(""))
                 .setLocalRepository(repo);
 
@@ -306,7 +306,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
                 .newInstance(repositorySession, new LocalRepository(repo.getUrl())));
         MavenSession session =
                 new MavenSession(container, repositorySession, request, new DefaultMavenExecutionResult());
-        session.setProjects(Collections.emptyList());
+        session.setProjects(List.of());
         return session;
     }
 
@@ -405,7 +405,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
                 new DefaultArtifactHandler("maven-plugin"));
         pd.setPluginArtifact(artifact);
 
-        pd.setArtifacts(Collections.singletonList(artifact));
+        pd.setArtifacts(List.of(artifact));
         DefaultDependencyNode node = new DefaultDependencyNode(
                 new org.eclipse.aether.graph.Dependency(RepositoryUtils.toArtifact(artifact), "compile"));
         pd.setDependencyNode(node);

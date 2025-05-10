@@ -96,7 +96,7 @@ class PathModularization {
      */
     private PathModularization() {
         filename = "(none)";
-        descriptors = Collections.emptyMap();
+        descriptors = Map.of();
         isModuleHierarchy = false;
     }
 
@@ -151,7 +151,7 @@ class PathModularization {
                         descriptor = ModuleDescriptor.read(in);
                     }
                 }
-                descriptors = Collections.singletonMap(file, descriptor);
+                descriptors = Map.of(file, descriptor);
                 isModuleHierarchy = false;
                 return;
             }
@@ -201,7 +201,7 @@ class PathModularization {
                             descriptor = ModuleDescriptor.read(in);
                         }
                     }
-                    descriptors = Collections.singletonMap(path, descriptor);
+                    descriptors = Map.of(path, descriptor);
                     isModuleHierarchy = false;
                     return;
                 }
@@ -210,14 +210,14 @@ class PathModularization {
                 if (mf != null) {
                     Object name = mf.getMainAttributes().get(AUTO_MODULE_NAME);
                     if (name instanceof String) {
-                        descriptors = Collections.singletonMap(path, name);
+                        descriptors = Map.of(path, name);
                         isModuleHierarchy = false;
                         return;
                     }
                 }
             }
         }
-        descriptors = Collections.emptyMap();
+        descriptors = Map.of();
         isModuleHierarchy = false;
     }
 

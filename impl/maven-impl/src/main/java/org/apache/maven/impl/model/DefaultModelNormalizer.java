@@ -19,7 +19,6 @@
 package org.apache.maven.impl.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +95,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     protected static class DuplicateMerger extends MavenModelMerger {
 
         public Plugin mergePlugin(Plugin target, Plugin source) {
-            return super.mergePlugin(target, source, false, Collections.emptyMap());
+            return super.mergePlugin(target, source, false, Map.of());
         }
     }
 

@@ -96,11 +96,11 @@ public class DefaultProfileInjector implements ProfileInjector {
     protected static class ProfileModelMerger extends MavenModelMerger {
 
         public void mergeModelBase(ModelBase.Builder builder, ModelBase target, ModelBase source) {
-            mergeModelBase(builder, target, source, true, Collections.emptyMap());
+            mergeModelBase(builder, target, source, true, Map.of());
         }
 
         public void mergeBuildBase(BuildBase.Builder builder, BuildBase target, BuildBase source) {
-            mergeBuildBase(builder, target, source, true, Collections.emptyMap());
+            mergeBuildBase(builder, target, source, true, Map.of());
         }
 
         @Override

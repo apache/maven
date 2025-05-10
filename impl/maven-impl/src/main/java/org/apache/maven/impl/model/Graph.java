@@ -19,7 +19,6 @@
 package org.apache.maven.impl.model;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -34,7 +33,7 @@ class Graph {
 
     synchronized void addEdge(String from, String to) throws CycleDetectedException {
         if (graph.computeIfAbsent(from, l -> new HashSet<>()).add(to)) {
-            List<String> cycle = visitCycle(graph, Collections.singleton(to), new HashMap<>(), new LinkedList<>());
+            List<String> cycle = visitCycle(graph, Set.of(to), new HashMap<>(), new LinkedList<>());
             if (cycle != null) {
                 // remove edge which introduced cycle
                 throw new CycleDetectedException(

@@ -1672,7 +1672,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 List<Dependency> dependencies = importMgmt.getDependencies().stream()
                         .filter(candidate -> exclusions.stream().noneMatch(exclusion -> match(exclusion, candidate)))
                         .map(candidate -> addExclusions(candidate, exclusions))
-                        .collect(Collectors.toList());
+                        .toList();
                 importMgmt = importMgmt.withDependencies(dependencies);
             }
 

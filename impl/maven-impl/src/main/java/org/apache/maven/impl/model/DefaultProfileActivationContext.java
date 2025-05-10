@@ -142,10 +142,10 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     private final RootLocator rootLocator;
     private final Interpolator interpolator;
 
-    private List<String> activeProfileIds = Collections.emptyList();
-    private List<String> inactiveProfileIds = Collections.emptyList();
-    private Map<String, String> systemProperties = Collections.emptyMap();
-    private Map<String, String> userProperties = Collections.emptyMap();
+    private List<String> activeProfileIds = List.of();
+    private List<String> inactiveProfileIds = List.of();
+    private Map<String, String> systemProperties = Map.of();
+    private Map<String, String> userProperties = Map.of();
     private Model model;
 
     private final ThreadLocal<Record> records = new ThreadLocal<>();
@@ -419,10 +419,10 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     private static List<String> unmodifiable(List<String> list) {
-        return list != null ? Collections.unmodifiableList(list) : Collections.emptyList();
+        return list != null ? Collections.unmodifiableList(list) : List.of();
     }
 
     private static Map<String, String> unmodifiable(Map<String, String> map) {
-        return map != null ? Collections.unmodifiableMap(map) : Collections.emptyMap();
+        return map != null ? Collections.unmodifiableMap(map) : Map.of();
     }
 }

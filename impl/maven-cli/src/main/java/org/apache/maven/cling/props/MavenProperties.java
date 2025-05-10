@@ -311,7 +311,7 @@ public class MavenProperties extends AbstractMap<String, String> {
     }
 
     public String put(String key, String comment, String value) {
-        return put(key, Collections.singletonList(comment), value);
+        return put(key, List.of(comment), value);
     }
 
     public boolean update(Map<String, String> props) {

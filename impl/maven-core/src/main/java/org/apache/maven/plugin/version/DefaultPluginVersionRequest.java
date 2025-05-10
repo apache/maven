@@ -41,7 +41,7 @@ public class DefaultPluginVersionRequest implements PluginVersionRequest {
 
     private Model pom;
 
-    private List<RemoteRepository> repositories = Collections.emptyList();
+    private List<RemoteRepository> repositories = List.of();
 
     private RepositorySystemSession session;
 
@@ -124,7 +124,7 @@ public class DefaultPluginVersionRequest implements PluginVersionRequest {
         if (repositories != null) {
             this.repositories = Collections.unmodifiableList(repositories);
         } else {
-            this.repositories = Collections.emptyList();
+            this.repositories = List.of();
         }
 
         return this;
