@@ -39,7 +39,7 @@ class LifecycleTaskSegmentCalculatorImplTest {
         List<TaskSegment> taskSegments = lifecycleTaskSegmentCalculator.calculateTaskSegments(session);
 
         final ProjectBuildList buildList = buildListCalculator.calculateProjectBuilds(session, taskSegments);
-        final ProjectBuildList segments = buildList.getByTaskSegment(taskSegments.get(0));
+        final ProjectBuildList segments = buildList.getByTaskSegment(taskSegments.getFirst());
         assertEquals(3, taskSegments.size(), "Stub data contains 3 segments");
         assertEquals(6, segments.size(), "Stub data contains 6 items");
         final ProjectSegment build = segments.get(0);

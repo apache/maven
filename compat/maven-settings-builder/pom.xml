@@ -38,6 +38,10 @@ under the License.
   </contributors>
 
   <dependencies>
+  <dependency>
+   <groupId>jakarta.inject</groupId>
+   <artifactId>jakarta.inject-api</artifactId>
+  </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>

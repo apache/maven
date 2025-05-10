@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -395,8 +394,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (sources != null) {
                 return sources.stream()
                         .reduce((a, b) -> {
-                            throw new IllegalStateException(String.format(
-                                    "No unique Source for %s:%s: %s and %s",
+                            throw new IllegalStateException("No unique Source for %s:%s: %s and %s".formatted(
                                     groupId, artifactId, a.getLocation(), b.getLocation()));
                         })
                         .orElse(null);
@@ -642,7 +640,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // Check for errors again after execution
             if (exceptions.size() == 1) {
-                throw exceptions.get(0);
+                throw exceptions.getFirst();
             } else if (exceptions.size() > 1) {
                 MavenException fatalException = new MavenException("Multiple fatal exceptions occurred");
                 exceptions.forEach(fatalException::addSuppressed);
@@ -1324,7 +1322,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     if ((groupId == null || artifactId == null || version == null)
                             && (path == null || !path.isEmpty())) {
                         Path pomFile = model.getPomFile();
-                        Path relativePath = Paths.get(path != null ? path : "..");
+                        Path relativePath = Path.of(path != null ? path : "..");
                         Path pomPath = pomFile.resolveSibling(relativePath).normalize();
                         if (Files.isDirectory(pomPath)) {
                             pomPath = modelProcessor.locateExistingPom(pomPath);

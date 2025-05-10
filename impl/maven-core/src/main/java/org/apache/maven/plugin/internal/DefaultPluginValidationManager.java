@@ -22,7 +22,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -313,7 +312,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
                     stringBuilder.append(" (").append(location).append(")");
                 } else {
                     Path topDirectory = mavenSession.getTopDirectory();
-                    Path locationPath = Paths.get(location).toAbsolutePath().normalize();
+                    Path locationPath = Path.of(location).toAbsolutePath().normalize();
                     if (locationPath.startsWith(topDirectory)) {
                         locationPath = topDirectory.relativize(locationPath);
                     }

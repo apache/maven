@@ -61,20 +61,20 @@ class ConcurrencyDependencyGraphTest {
 
         final List<MavenProject> projectBuilds = graph.getRootSchedulableBuilds();
         assertEquals(1, projectBuilds.size());
-        assertEquals(A, projectBuilds.iterator().next());
+        assertEquals(A, projectBuilds.getFirst());
 
         final List<MavenProject> subsequent = graph.markAsFinished(A);
         assertEquals(2, subsequent.size());
-        assertEquals(ProjectDependencyGraphStub.B, subsequent.get(0));
+        assertEquals(ProjectDependencyGraphStub.B, subsequent.getFirst());
         assertEquals(C, subsequent.get(1));
 
         final List<MavenProject> bDescendants = graph.markAsFinished(B);
         assertEquals(1, bDescendants.size());
-        assertEquals(Y, bDescendants.get(0));
+        assertEquals(Y, bDescendants.getFirst());
 
         final List<MavenProject> cDescendants = graph.markAsFinished(C);
         assertEquals(2, cDescendants.size());
-        assertEquals(X, cDescendants.get(0));
+        assertEquals(X, cDescendants.getFirst());
         assertEquals(Z, cDescendants.get(1));
     }
 
@@ -91,11 +91,11 @@ class ConcurrencyDependencyGraphTest {
         graph.markAsFinished(A);
         final List<MavenProject> cDescendants = graph.markAsFinished(C);
         assertEquals(1, cDescendants.size());
-        assertEquals(Z, cDescendants.get(0));
+        assertEquals(Z, cDescendants.getFirst());
 
         final List<MavenProject> bDescendants = graph.markAsFinished(B);
         assertEquals(2, bDescendants.size());
-        assertEquals(X, bDescendants.get(0));
+        assertEquals(X, bDescendants.getFirst());
         assertEquals(Y, bDescendants.get(1));
     }
 }

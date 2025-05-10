@@ -187,7 +187,7 @@ public class SisuDiBridgeModule extends AbstractModule {
             if (!list.isEmpty()) {
                 list.sort(getBindingComparator());
                 //noinspection unchecked
-                return () -> (Q) getInstance(list.iterator().next());
+                return () -> (Q) getInstance(list.getFirst());
             } else if (dep.optional()) {
                 return () -> null;
             } else {

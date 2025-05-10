@@ -19,7 +19,7 @@
 package org.apache.maven.impl.standalone;
 
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.DownloadedArtifact;
@@ -54,7 +54,7 @@ class TestApiStandalone {
         ModelBuilderResult result = builder.newSession()
                 .build(ModelBuilderRequest.builder()
                         .session(session)
-                        .source(Sources.buildSource(Paths.get("pom.xml").toAbsolutePath()))
+                        .source(Sources.buildSource(Path.of("pom.xml").toAbsolutePath()))
                         .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .recursive(true)
                         .build());

@@ -191,8 +191,7 @@ public class ProjectModelResolver implements ModelResolver {
 
             if (versionRangeResult.getHighestVersion() == null) {
                 throw new UnresolvableModelException(
-                        String.format(
-                                "No versions matched the requested parent version range '%s'", parent.getVersion()),
+                        "No versions matched the requested parent version range '%s'".formatted(parent.getVersion()),
                         parent.getGroupId(),
                         parent.getArtifactId(),
                         parent.getVersion());
@@ -203,8 +202,7 @@ public class ProjectModelResolver implements ModelResolver {
                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null) {
                 // Message below is checked for in the MNG-2199 core IT.
                 throw new UnresolvableModelException(
-                        String.format(
-                                "The requested parent version range '%s' does not specify an upper bound",
+                        "The requested parent version range '%s' does not specify an upper bound".formatted(
                                 parent.getVersion()),
                         parent.getGroupId(),
                         parent.getArtifactId(),
@@ -233,8 +231,7 @@ public class ProjectModelResolver implements ModelResolver {
 
             if (versionRangeResult.getHighestVersion() == null) {
                 throw new UnresolvableModelException(
-                        String.format(
-                                "No versions matched the requested dependency version range '%s'",
+                        "No versions matched the requested dependency version range '%s'".formatted(
                                 dependency.getVersion()),
                         dependency.getGroupId(),
                         dependency.getArtifactId(),
@@ -246,8 +243,7 @@ public class ProjectModelResolver implements ModelResolver {
                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null) {
                 // Message below is checked for in the MNG-4463 core IT.
                 throw new UnresolvableModelException(
-                        String.format(
-                                "The requested dependency version range '%s' does not specify an upper bound",
+                        "The requested dependency version range '%s' does not specify an upper bound".formatted(
                                 dependency.getVersion()),
                         dependency.getGroupId(),
                         dependency.getArtifactId(),

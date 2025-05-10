@@ -108,7 +108,7 @@ public class ModelBuildingException extends Exception {
         if (result == null || result.getModelIds().isEmpty()) {
             return "";
         }
-        return result.getModelIds().get(0);
+        return result.getModelIds().getFirst();
     }
 
     /**
@@ -125,7 +125,7 @@ public class ModelBuildingException extends Exception {
 
     private static String toMessage(ModelBuildingResult result) {
         if (result != null && !result.getModelIds().isEmpty()) {
-            return toMessage(result.getModelIds().get(0), result.getProblems());
+            return toMessage(result.getModelIds().getFirst(), result.getProblems());
         }
         return null;
     }

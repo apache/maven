@@ -121,7 +121,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'modelVersion' is missing.", result.getErrors().get(0));
+        assertEquals("'modelVersion' is missing.", result.getErrors().getFirst());
     }
 
     @Test
@@ -131,7 +131,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 1, 0, 0);
 
-        assertTrue(result.getFatals().get(0).contains("modelVersion"));
+        assertTrue(result.getFatals().getFirst().contains("modelVersion"));
     }
 
     @Test
@@ -141,7 +141,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("'modelVersion' must be one of"));
+        assertTrue(result.getErrors().getFirst().contains("'modelVersion' must be one of"));
     }
 
     @Test
@@ -150,7 +150,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'artifactId' is missing.", result.getErrors().get(0));
+        assertEquals("'artifactId' is missing.", result.getErrors().getFirst());
     }
 
     @Test
@@ -159,7 +159,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'groupId' is missing.", result.getErrors().get(0));
+        assertEquals("'groupId' is missing.", result.getErrors().getFirst());
     }
 
     @Test
@@ -170,7 +170,7 @@ class DefaultModelValidatorTest {
 
         assertEquals(
                 "'groupId' with value 'o/a/m' does not match a valid id pattern.",
-                result.getErrors().get(0));
+                result.getErrors().getFirst());
 
         assertEquals(
                 "'artifactId' with value 'm$-do$' does not match a valid id pattern.",
@@ -183,7 +183,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'packaging' is missing.", result.getErrors().get(0));
+        assertEquals("'packaging' is missing.", result.getErrors().getFirst());
     }
 
     @Test
@@ -192,7 +192,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertEquals("'version' is missing.", result.getErrors().get(0));
+        assertEquals("'version' is missing.", result.getErrors().getFirst());
     }
 
     @Test
@@ -201,7 +201,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("Aggregator projects require 'pom' as packaging."));
+        assertTrue(result.getErrors().getFirst().contains("Aggregator projects require 'pom' as packaging."));
     }
 
     @Test
@@ -211,7 +211,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors()
-                .get(0)
+                .getFirst()
                 .contains("'dependencies.dependency.artifactId' for groupId:null:jar is missing"));
     }
 
@@ -222,7 +222,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors()
-                .get(0)
+                .getFirst()
                 .contains("'dependencies.dependency.groupId' for null:artifactId:jar is missing"));
     }
 
@@ -233,7 +233,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors()
-                .get(0)
+                .getFirst()
                 .contains("'dependencies.dependency.version' for groupId:artifactId:jar is missing"));
     }
 
@@ -244,7 +244,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors()
-                .get(0)
+                .getFirst()
                 .contains("'dependencyManagement.dependencies.dependency.artifactId' for groupId:null:jar is missing"));
     }
 
@@ -255,7 +255,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors()
-                .get(0)
+                .getFirst()
                 .contains("'dependencyManagement.dependencies.dependency.groupId' for null:artifactId:jar is missing"));
     }
 
@@ -282,7 +282,7 @@ class DefaultModelValidatorTest {
 
         assertEquals(
                 "'build.plugins.plugin.artifactId' is missing.",
-                result.getErrors().get(0));
+                result.getErrors().getFirst());
     }
 
     @Test
@@ -294,7 +294,7 @@ class DefaultModelValidatorTest {
         assertEquals(
                 "'build.plugins.plugin.version' for org.apache.maven.plugins:maven-it-plugin"
                         + " must be a valid version but is ''.",
-                result.getErrors().get(0));
+                result.getErrors().getFirst());
     }
 
     @Test
@@ -305,7 +305,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 4, 0);
 
         assertEquals(
-                "'repositories.repository.id' is missing.", result.getErrors().get(0));
+                "'repositories.repository.id' is missing.", result.getErrors().getFirst());
 
         assertEquals(
                 "'repositories.repository.[null].url' is missing.",
@@ -328,7 +328,7 @@ class DefaultModelValidatorTest {
 
         assertEquals(
                 "'build.resources.resource.directory' is missing.",
-                result.getErrors().get(0));
+                result.getErrors().getFirst());
 
         assertEquals(
                 "'build.testResources.testResource.directory' is missing.",
@@ -341,7 +341,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 3, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:d"));
+        assertTrue(result.getErrors().getFirst().contains("test:d"));
 
         assertTrue(result.getErrors().get(1).contains("test:e"));
 
@@ -354,7 +354,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 2);
 
-        assertTrue(result.getWarnings().get(0).contains("test:f"));
+        assertTrue(result.getWarnings().getFirst().contains("test:f"));
 
         assertTrue(result.getWarnings().get(1).contains("test:g"));
     }
@@ -365,7 +365,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 1);
 
-        assertContains(result.getWarnings().get(0), "test:g");
+        assertContains(result.getWarnings().getFirst(), "test:g");
     }
 
     @Test
@@ -375,7 +375,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 2, 0);
 
         assertContains(
-                result.getErrors().get(0), "'dependencies.dependency.version' for test:b:jar must be a valid version");
+                result.getErrors().getFirst(), "'dependencies.dependency.version' for test:b:jar must be a valid version");
         assertContains(
                 result.getErrors().get(1),
                 "'dependencies.dependency.version' for test:c:jar must not contain any of these characters");
@@ -387,7 +387,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("child"));
+        assertTrue(result.getErrors().getFirst().contains("child"));
     }
 
     @Test
@@ -396,7 +396,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("non-unique-id"));
+        assertTrue(result.getErrors().getFirst().contains("non-unique-id"));
     }
 
     @Test
@@ -406,7 +406,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 4, 0);
 
         assertContains(
-                result.getErrors().get(0), "'build.plugins.plugin.version' for test:mip must be a valid version");
+                result.getErrors().getFirst(), "'build.plugins.plugin.version' for test:mip must be a valid version");
         assertContains(
                 result.getErrors().get(1), "'build.plugins.plugin.version' for test:rmv must be a valid version");
         assertContains(
@@ -422,7 +422,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("distributionManagement.status"));
+        assertTrue(result.getErrors().getFirst().contains("distributionManagement.status"));
     }
 
     @Test
@@ -430,7 +430,7 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateRaw("incomplete-parent.xml");
 
         assertViolations(result, 3, 0, 0);
-        assertTrue(result.getFatals().get(0).contains("parent.groupId"));
+        assertTrue(result.getFatals().getFirst().contains("parent.groupId"));
         assertTrue(result.getFatals().get(1).contains("parent.artifactId"));
         assertTrue(result.getFatals().get(2).contains("parent.version"));
     }
@@ -444,7 +444,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 1);
 
         assertContains(
-                result.getWarnings().get(0),
+                result.getWarnings().getFirst(),
                 "'dependencies.dependency.systemPath' for test:a:jar should use a variable instead of a hard-coded path");
 
         SimpleProblemCollector result31 =
@@ -453,7 +453,7 @@ class DefaultModelValidatorTest {
         assertViolations(result31, 0, 0, 3);
 
         assertContains(
-                result31.getWarnings().get(0),
+                result31.getWarnings().getFirst(),
                 "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope");
         assertContains(
                 result31.getWarnings().get(1),
@@ -469,7 +469,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("'modules.module[0]' has been specified without a path"));
+        assertTrue(result.getErrors().getFirst().contains("'modules.module[0]' has been specified without a path"));
     }
 
     @Test
@@ -478,7 +478,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 4);
 
-        assertTrue(result.getWarnings().get(0).contains("duplicate declaration of plugin test:duplicate"));
+        assertTrue(result.getWarnings().getFirst().contains("duplicate declaration of plugin test:duplicate"));
         assertTrue(result.getWarnings().get(1).contains("duplicate declaration of plugin test:managed-duplicate"));
         assertTrue(result.getWarnings().get(2).contains("duplicate declaration of plugin profile:duplicate"));
         assertTrue(result.getWarnings().get(3).contains("duplicate declaration of plugin profile:managed-duplicate"));
@@ -490,7 +490,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 4, 0);
 
-        assertContains(result.getErrors().get(0), "duplicate execution with id a");
+        assertContains(result.getErrors().getFirst(), "duplicate execution with id a");
         assertContains(result.getErrors().get(1), "duplicate execution with id default");
         assertContains(result.getErrors().get(2), "duplicate execution with id c");
         assertContains(result.getErrors().get(3), "duplicate execution with id b");
@@ -502,7 +502,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 4);
 
-        assertContains(result.getWarnings().get(0), "'repositories.repository.id'" + " must not be 'local'");
+        assertContains(result.getWarnings().getFirst(), "'repositories.repository.id'" + " must not be 'local'");
         assertContains(result.getWarnings().get(1), "'pluginRepositories.pluginRepository.id' must not be 'local'");
         assertContains(result.getWarnings().get(2), "'distributionManagement.repository.id' must not be 'local'");
         assertContains(
@@ -515,7 +515,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains(":a:"));
+        assertTrue(result.getErrors().getFirst().contains(":a:"));
     }
 
     @Test
@@ -524,7 +524,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:"));
+        assertTrue(result.getErrors().getFirst().contains("test:"));
     }
 
     @Test
@@ -533,7 +533,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:a"));
+        assertTrue(result.getErrors().getFirst().contains("test:a"));
     }
 
     @Test
@@ -542,7 +542,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 1, 0);
 
-        assertTrue(result.getErrors().get(0).contains("test:b"));
+        assertTrue(result.getErrors().getFirst().contains("test:b"));
     }
 
     @Test
@@ -551,7 +551,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 1);
 
-        assertContains(result.getWarnings().get(0), "'version' must not contain any of these characters");
+        assertContains(result.getWarnings().getFirst(), "'version' must not contain any of these characters");
     }
 
     @Test
@@ -560,7 +560,7 @@ class DefaultModelValidatorTest {
 
         assertViolations(result, 0, 0, 1);
 
-        assertContains(result.getWarnings().get(0), "'version' uses an unsupported snapshot version format");
+        assertContains(result.getWarnings().getFirst(), "'version' uses an unsupported snapshot version format");
     }
 
     @Test
@@ -570,7 +570,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 4);
 
         assertContains(
-                result.getWarnings().get(0), "'repositories.repository.id' must not contain any of these characters");
+                result.getWarnings().getFirst(), "'repositories.repository.id' must not contain any of these characters");
         assertContains(
                 result.getWarnings().get(1),
                 "'pluginRepositories.pluginRepository.id' must not contain any of these characters");
@@ -590,7 +590,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 2);
 
         assertContains(
-                result.getWarnings().get(0), "'dependencies.dependency.exclusions.exclusion.groupId' for gid:aid:jar");
+                result.getWarnings().getFirst(), "'dependencies.dependency.exclusions.exclusion.groupId' for gid:aid:jar");
         assertContains(
                 result.getWarnings().get(1),
                 "'dependencies.dependency.exclusions.exclusion.artifactId' for gid:aid:jar");
@@ -609,7 +609,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 2);
 
         assertContains(
-                result.getWarnings().get(0),
+                result.getWarnings().getFirst(),
                 "'dependencies.dependency.exclusions.exclusion.groupId' for gid:aid:jar is missing");
         assertContains(
                 result.getWarnings().get(1),
@@ -623,7 +623,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 1);
 
         assertContains(
-                result.getWarnings().get(0),
+                result.getWarnings().getFirst(),
                 "'dependencyManagement.dependencies.dependency.type' for test:a:jar must be 'pom'");
     }
 
@@ -634,7 +634,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertContains(
-                result.getErrors().get(0),
+                result.getErrors().getFirst(),
                 "'dependencyManagement.dependencies.dependency.classifier' for test:a:pom:cls must be empty");
     }
 
@@ -645,7 +645,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 2);
 
         assertContains(
-                result.getWarnings().get(0),
+                result.getWarnings().getFirst(),
                 "'dependencies.dependency.systemPath' for test:a:jar should not point at files within the project directory");
         assertContains(
                 result.getWarnings().get(1),
@@ -657,7 +657,7 @@ class DefaultModelValidatorTest {
         assertViolations(result31, 0, 0, 4);
 
         assertContains(
-                result31.getWarnings().get(0),
+                result31.getWarnings().getFirst(),
                 "'dependencies.dependency.scope' for test:a:jar declares usage of deprecated 'system' scope");
         assertContains(
                 result31.getWarnings().get(1),
@@ -678,7 +678,7 @@ class DefaultModelValidatorTest {
 
         assertEquals(
                 "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' version of a plugin must be defined. ",
-                result.getFatals().get(0));
+                result.getFatals().getFirst());
     }
 
     @Test
@@ -689,7 +689,7 @@ class DefaultModelValidatorTest {
 
         assertEquals(
                 "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' groupId of a plugin must be defined. ",
-                result.getFatals().get(0));
+                result.getFatals().getFirst());
     }
 
     @Test
@@ -700,7 +700,7 @@ class DefaultModelValidatorTest {
 
         assertEquals(
                 "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' artifactId of a plugin must be defined. ",
-                result.getFatals().get(0));
+                result.getFatals().getFirst());
     }
 
     @Test
@@ -711,7 +711,7 @@ class DefaultModelValidatorTest {
 
         assertEquals(
                 "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' groupId of a plugin must be defined. ",
-                result.getFatals().get(0));
+                result.getFatals().getFirst());
 
         assertEquals(
                 "'build.pluginManagement.plugins.plugin.(groupId:artifactId)' artifactId of a plugin must be defined. ",
@@ -732,7 +732,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 2);
 
         assertContains(
-                result.getWarnings().get(0),
+                result.getWarnings().getFirst(),
                 "'dependencies.dependency.version' for test:a:jar is either LATEST or RELEASE (both of them are being deprecated)");
         assertContains(
                 result.getWarnings().get(1),
@@ -747,7 +747,7 @@ class DefaultModelValidatorTest {
 
         assertEquals(
                 "'dependencies.dependency[com.example.group:testinvalidpom:0.0.1-SNAPSHOT]' for com.example.group:testinvalidpom:0.0.1-SNAPSHOT is referencing itself.",
-                result.getFatals().get(0));
+                result.getFatals().getFirst());
     }
 
     @Test
@@ -787,7 +787,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 1);
         assertEquals(
                 "'version' contains an expression but should be a constant.",
-                result.getWarnings().get(0));
+                result.getWarnings().getFirst());
     }
 
     @Test
@@ -796,7 +796,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 1);
         assertEquals(
                 "'version' contains an expression but should be a constant.",
-                result.getWarnings().get(0));
+                result.getWarnings().getFirst());
     }
 
     @Test
@@ -805,7 +805,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 1);
         assertEquals(
                 "'version' contains an expression but should be a constant.",
-                result.getWarnings().get(0));
+                result.getWarnings().getFirst());
     }
 
     @Test
@@ -814,7 +814,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 1);
         assertEquals(
                 "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)",
-                result.getWarnings().get(0));
+                result.getWarnings().getFirst());
     }
 
     @Test
@@ -823,7 +823,7 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 1);
         assertEquals(
                 "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)",
-                result.getWarnings().get(0));
+                result.getWarnings().getFirst());
     }
 
     @Test
@@ -863,7 +863,7 @@ class DefaultModelValidatorTest {
                 "'profiles.profile[exists-project-version].activation.file.exists' "
                         + "Failed to interpolate profile activation property ${project.version}/test.txt: "
                         + "${project.version} expressions are not supported during profile activation.",
-                result.getWarnings().get(0));
+                result.getWarnings().getFirst());
 
         assertEquals(
                 "'profiles.profile[missing-project-version].activation.file.missing' "
@@ -882,7 +882,7 @@ class DefaultModelValidatorTest {
                 "'profiles.profile[property-name-project-version].activation.property.name' "
                         + "Failed to interpolate profile activation property ${project.version}: "
                         + "${project.version} expressions are not supported during profile activation.",
-                result.getWarnings().get(0));
+                result.getWarnings().getFirst());
 
         assertEquals(
                 "'profiles.profile[property-value-project-version].activation.property.value' "

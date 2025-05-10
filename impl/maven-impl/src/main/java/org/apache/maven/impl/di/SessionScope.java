@@ -61,21 +61,21 @@ public class SessionScope implements Scope {
     protected final List<ScopeState> values = new CopyOnWriteArrayList<>();
 
     public void enter() {
-        values.add(0, new ScopeState());
+        values.addFirst(new ScopeState());
     }
 
     protected ScopeState getScopeState() {
         if (values.isEmpty()) {
             throw new OutOfScopeException("Cannot access session scope outside of a scoping block");
         }
-        return values.get(0);
+        return values.getFirst();
     }
 
     public void exit() {
         if (values.isEmpty()) {
             throw new IllegalStateException();
         }
-        values.remove(0);
+        values.removeFirst();
     }
 
     public <T> void seed(Class<T> clazz, Supplier<T> value) {

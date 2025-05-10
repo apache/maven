@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -51,7 +50,7 @@ class MavenITmng8523ModelPropertiesTest extends AbstractMavenIntegrationTestCase
         verifier.verifyErrorFreeLog();
 
         Path consumerPomPath =
-                Paths.get(verifier.getArtifactPath("org.apache.maven.its.mng-8523", "jar", "1.0.0-SNAPSHOT", "pom"));
+                Path.of(verifier.getArtifactPath("org.apache.maven.its.mng-8523", "jar", "1.0.0-SNAPSHOT", "pom"));
         assertTrue(Files.exists(consumerPomPath), "consumer pom not found at " + consumerPomPath);
 
         List<String> consumerPomLines;

@@ -32,6 +32,10 @@ under the License.
   <description>Deprecated Maven2 classes maintained as compatibility layer.</description>
 
   <dependencies>
+  <dependency>
+   <groupId>jakarta.inject</groupId>
+   <artifactId>jakarta.inject-api</artifactId>
+  </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-annotations</artifactId>

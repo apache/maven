@@ -124,7 +124,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 .lookup(org.apache.maven.project.ProjectBuilder.class)
                 .build(Collections.singletonList(pomFile), false, configuration);
         assertEquals(1, results.size());
-        MavenProject mavenProject = results.get(0).getProject();
+        MavenProject mavenProject = results.getFirst().getProject();
         assertEquals(1, mavenProject.getArtifacts().size());
 
         final MavenProject project = mavenProject;
@@ -158,7 +158,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 .lookup(org.apache.maven.project.ProjectBuilder.class)
                 .build(Collections.singletonList(pomFile), false, configuration);
         assertEquals(1, results.size());
-        MavenProject mavenProject = results.get(0).getProject();
+        MavenProject mavenProject = results.getFirst().getProject();
         assertEquals(0, mavenProject.getArtifacts().size());
     }
 
@@ -206,7 +206,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 assertThrows(ProjectBuildingException.class, () -> projectBuilder.build(pomFile, configuration));
 
         assertEquals(1, ex1.getResults().size());
-        MavenProject project1 = ex1.getResults().get(0).getProject();
+        MavenProject project1 = ex1.getResults().getFirst().getProject();
         assertNotNull(project1);
         assertEquals("testArtifactMissingVersion", project1.getArtifactId());
         assertEquals(pomFile, project1.getFile());
@@ -217,7 +217,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 () -> projectBuilder.build(Collections.singletonList(pomFile), true, configuration));
 
         assertEquals(1, ex2.getResults().size());
-        MavenProject project2 = ex2.getResults().get(0).getProject();
+        MavenProject project2 = ex2.getResults().getFirst().getProject();
         assertNotNull(project2);
         assertEquals("testArtifactMissingVersion", project2.getArtifactId());
         assertEquals(pomFile, project2.getFile());
@@ -242,8 +242,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 ProjectBuildingException.class,
                 () -> projectBuilder.build(Collections.singletonList(pomFile), false, configuration));
         assertEquals(1, pex.getResults().size());
-        assertNotNull(pex.getResults().get(0).getPomFile());
-        assertThat(pex.getResults().get(0).getProblems().size(), greaterThan(0));
+        assertNotNull(pex.getResults().getFirst().getPomFile());
+        assertThat(pex.getResults().getFirst().getProblems().size(), greaterThan(0));
         assertThat(
                 pex.getResults(),
                 contains(projectBuildingResultWithProblemMessage(
@@ -312,7 +312,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         configuration.setResolveDependencies(true);
         List<ProjectBuildingResult> result =
                 projectBuilder.build(Collections.singletonList(file), false, configuration);
-        MavenProject project = result.get(0).getProject();
+        MavenProject project = result.getFirst().getProject();
         // verify a few typical parameters are not duplicated
         assertEquals(1, project.getTestCompileSourceRoots().size());
         assertEquals(1, project.getCompileSourceRoots().size());

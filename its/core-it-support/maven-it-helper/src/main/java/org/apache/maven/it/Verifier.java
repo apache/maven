@@ -32,7 +32,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -138,14 +137,14 @@ public class Verifier {
     public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
         requireNonNull(basedir);
         try {
-            this.basedir = Paths.get(basedir).toAbsolutePath();
+            this.basedir = Path.of(basedir).toAbsolutePath();
             this.tempBasedir = Files.createTempDirectory("verifier");
-            this.userHomeDirectory = Paths.get(System.getProperty("maven.test.user.home", "user.home"));
+            this.userHomeDirectory = Path.of(System.getProperty("maven.test.user.home", "user.home"));
             Files.createDirectories(this.userHomeDirectory);
-            this.outerLocalRepository = Paths.get(System.getProperty("maven.test.repo.local", ".m2/repository"));
+            this.outerLocalRepository = Path.of(System.getProperty("maven.test.repo.local", ".m2/repository"));
             this.executorHelper = new HelperImpl(
                     VERIFIER_FORK_MODE,
-                    Paths.get(System.getProperty("maven.home")),
+                    Path.of(System.getProperty("maven.home")),
                     this.userHomeDirectory,
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
@@ -825,7 +824,7 @@ public class Verifier {
      */
     public void deleteArtifacts(String gid) throws IOException {
         String mdPath = executorTool.metadataPath(executorHelper.executorRequest(), gid, null);
-        Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
+        Path dir = Path.of(getLocalRepository()).resolve(mdPath).getParent();
         FileUtils.deleteDirectory(dir.toFile());
     }
 
@@ -845,7 +844,7 @@ public class Verifier {
 
         String mdPath =
                 executorTool.metadataPath(executorHelper.executorRequest(), gid + ":" + aid + ":" + version, null);
-        Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
+        Path dir = Path.of(getLocalRepository()).resolve(mdPath).getParent();
         FileUtils.deleteDirectory(dir.toFile());
     }
 
@@ -932,7 +931,7 @@ public class Verifier {
     public Map<String, String> newDefaultFilterMap() {
         Map<String, String> filterMap = new HashMap<>();
 
-        Path basedir = Paths.get(getBasedir()).toAbsolutePath();
+        Path basedir = Path.of(getBasedir()).toAbsolutePath();
         filterMap.put("@basedir@", basedir.toString());
         filterMap.put("@baseurl@", basedir.toUri().toASCIIString());
 
@@ -997,7 +996,7 @@ public class Verifier {
 
     private void verifyFilePresence(String filePath, boolean wanted) throws VerificationException {
         if (filePath.contains("!/")) {
-            Path basedir = Paths.get(getBasedir()).toAbsolutePath();
+            Path basedir = Path.of(getBasedir()).toAbsolutePath();
             String urlString = "jar:" + basedir.toUri().toASCIIString() + "/" + filePath;
 
             InputStream is = null;

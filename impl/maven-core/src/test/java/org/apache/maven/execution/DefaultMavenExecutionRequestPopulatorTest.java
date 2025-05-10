@@ -56,7 +56,7 @@ class DefaultMavenExecutionRequestPopulatorTest {
 
         List<ArtifactRepository> repositories = request.getPluginArtifactRepositories();
         assertEquals(1, repositories.size());
-        assertEquals(r.getId(), repositories.get(0).getId());
-        assertEquals(r.getUrl(), repositories.get(0).getUrl());
+        assertEquals(r.getId(), repositories.getFirst().getId());
+        assertEquals(r.getUrl(), repositories.getFirst().getUrl());
     }
 }

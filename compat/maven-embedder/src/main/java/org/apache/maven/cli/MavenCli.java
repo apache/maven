@@ -1025,8 +1025,8 @@ public class MavenCli {
                 // Sort the failedProjects list in the topologically sorted order.
                 failedProjects.sort(comparing(sortedProjects::indexOf));
 
-                MavenProject firstFailedProject = failedProjects.get(0);
-                if (!firstFailedProject.equals(sortedProjects.get(0))) {
+                MavenProject firstFailedProject = failedProjects.getFirst();
+                if (!firstFailedProject.equals(sortedProjects.getFirst())) {
                     String resumeFromSelector = getResumeFromSelector(sortedProjects, firstFailedProject);
                     logBuildResumeHint("mvn [args] -rf " + resumeFromSelector);
                 }
@@ -1179,15 +1179,13 @@ public class MavenCli {
             //
             // There are too many ConfigurationProcessors so we don't know which one to run so report the error.
             //
-            StringBuilder sb = new StringBuilder(String.format(
-                    "%nThere can only be one user supplied ConfigurationProcessor, there are %s:%n%n",
+            StringBuilder sb = new StringBuilder("%nThere can only be one user supplied ConfigurationProcessor, there are %s:%n%n".formatted(
                     userSuppliedConfigurationProcessorCount));
             for (Entry<String, ConfigurationProcessor> entry : configurationProcessors.entrySet()) {
                 String hint = entry.getKey();
                 if (!hint.equals(SettingsXmlConfigurationProcessor.HINT)) {
                     ConfigurationProcessor configurationProcessor = entry.getValue();
-                    sb.append(String.format(
-                            "%s%n", configurationProcessor.getClass().getName()));
+                    sb.append("%s%n".formatted(configurationProcessor.getClass().getName()));
                 }
             }
             throw new Exception(sb.toString());

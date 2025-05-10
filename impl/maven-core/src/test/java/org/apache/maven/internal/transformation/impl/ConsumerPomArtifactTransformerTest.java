@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
@@ -45,9 +44,9 @@ class ConsumerPomArtifactTransformerTest {
         when(systemSessionMock.getData()).thenReturn(sessionDataMock);
 
         Path beforePomFile =
-                Paths.get("src/test/resources/projects/transform/before.pom").toAbsolutePath();
+                Path.of("src/test/resources/projects/transform/before.pom").toAbsolutePath();
         Path afterPomFile =
-                Paths.get("src/test/resources/projects/transform/after.pom").toAbsolutePath();
+                Path.of("src/test/resources/projects/transform/after.pom").toAbsolutePath();
         Path tempFile = Files.createTempFile("", ".pom");
         Files.delete(tempFile);
         try (InputStream expected = Files.newInputStream(beforePomFile)) {
@@ -71,10 +70,10 @@ class ConsumerPomArtifactTransformerTest {
         SessionData sessionDataMock = Mockito.mock(SessionData.class);
         when(systemSessionMock.getData()).thenReturn(sessionDataMock);
 
-        Path beforePomFile = Paths.get("src/test/resources/projects/transform/jar/before.pom")
+        Path beforePomFile = Path.of("src/test/resources/projects/transform/jar/before.pom")
                 .toAbsolutePath();
         Path afterPomFile =
-                Paths.get("src/test/resources/projects/transform/jar/after.pom").toAbsolutePath();
+                Path.of("src/test/resources/projects/transform/jar/after.pom").toAbsolutePath();
         Path tempFile = Files.createTempFile("", ".pom");
         Files.delete(tempFile);
         try (InputStream expected = Files.newInputStream(beforePomFile)) {

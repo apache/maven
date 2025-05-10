@@ -290,7 +290,7 @@ public class TestRepositorySystem implements RepositorySystem {
                 throw new IOException(localFile + " does not exist and no remote repositories are configured");
             }
 
-            ArtifactRepository remoteRepo = request.getRemoteRepositories().get(0);
+            ArtifactRepository remoteRepo = request.getRemoteRepositories().getFirst();
 
             File remoteFile = new File(remoteRepo.getBasedir(), remoteRepo.pathOf(artifact));
 

@@ -186,7 +186,7 @@ class TestApi {
 
         assertNotNull(paths);
         assertEquals(10, paths.size());
-        assertEquals("test-extension-1.jar", paths.get(0).getFileName().toString());
+        assertEquals("test-extension-1.jar", paths.getFirst().getFileName().toString());
 
         // JUnit has an "Automatic-Module-Name", so it appears on the module path.
         Map<PathType, List<Path>> dispatched = session.resolveDependencies(
@@ -198,9 +198,9 @@ class TestApi {
         assertEquals(1, unresolved.size());
         assertEquals(8, classes.size()); // "plexus.pom" and "junit.jar" are excluded.
         assertEquals(1, modules.size());
-        assertEquals("plexus-1.0.11.pom", unresolved.get(0).getFileName().toString());
-        assertEquals("test-extension-1.jar", classes.get(0).getFileName().toString());
-        assertEquals("junit-4.13.1.jar", modules.get(0).getFileName().toString());
+        assertEquals("plexus-1.0.11.pom", unresolved.getFirst().getFileName().toString());
+        assertEquals("test-extension-1.jar", classes.getFirst().getFileName().toString());
+        assertEquals("junit-4.13.1.jar", modules.getFirst().getFileName().toString());
         assertTrue(paths.containsAll(classes));
         assertTrue(paths.containsAll(modules));
 
@@ -214,7 +214,7 @@ class TestApi {
         assertEquals(9, classes.size());
         assertNull(modules);
         assertTrue(paths.containsAll(classes));
-        assertEquals("plexus-1.0.11.pom", unresolved.get(0).getFileName().toString());
+        assertEquals("plexus-1.0.11.pom", unresolved.getFirst().getFileName().toString());
     }
 
     @Test

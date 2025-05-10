@@ -1027,8 +1027,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         ModelResolver modelResolver = request.getModelResolver();
         Objects.requireNonNull(
                 modelResolver,
-                String.format(
-                        "request.modelResolver cannot be null (parent POM %s and POM %s)",
+                "request.modelResolver cannot be null (parent POM %s and POM %s)".formatted(
                         ModelProblemUtils.toId(groupId, artifactId, version),
                         ModelProblemUtils.toSourceHint(childModel)));
 

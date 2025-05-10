@@ -19,7 +19,6 @@
 package org.apache.maven.impl.resolver;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -54,7 +53,7 @@ class DefaultModelResolverTest {
 
     @BeforeEach
     void setup() {
-        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path basedir = Path.of(System.getProperty("basedir", ""));
         Path localRepoPath = basedir.resolve("target/local-repo");
         Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
         Session s = ApiRunner.createSession(

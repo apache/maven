@@ -274,7 +274,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
                     List<P> problems = getProblems(s);
                     while (!problems.isEmpty()) {
                         try {
-                            return problems.remove(0) != null;
+                            return problems.removeFirst() != null;
                         } catch (IndexOutOfBoundsException e) {
                             // empty, continue
                         }

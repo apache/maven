@@ -22,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 
@@ -324,11 +323,11 @@ public abstract class MavenExecutorTestSupport {
     }
 
     public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
-        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")));
+        return ExecutorRequest.mavenBuilder(Path.of(System.getProperty("maven3home")));
     }
 
     public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
-        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")));
+        return ExecutorRequest.mavenBuilder(Path.of(System.getProperty("maven4home")));
     }
 
     protected void layDownFiles(Path cwd) throws IOException {

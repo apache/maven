@@ -70,6 +70,6 @@ public class EncryptParser extends BaseParser {
     @Override
     protected Options assembleOptions(List<Options> parsedOptions) {
         // nothing to assemble, we deal with CLI only
-        return parsedOptions.get(0);
+        return parsedOptions.getFirst();
     }
 }

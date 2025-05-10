@@ -214,7 +214,7 @@ public class InjectorImpl implements Injector {
             List<Binding<Q>> bindingList = new ArrayList<>(res);
             Comparator<Binding<Q>> comparing = Comparator.comparing(Binding::getPriority);
             bindingList.sort(comparing.reversed());
-            Binding<Q> binding = bindingList.get(0);
+            Binding<Q> binding = bindingList.getFirst();
             return compile(binding);
         }
         if (key.getRawType() == List.class) {

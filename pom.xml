@@ -128,7 +128,7 @@ under the License.
   </distributionManagement>
 
   <properties>
-    <javaVersion>17</javaVersion>
+    <javaVersion>21</javaVersion>
     <maven.compiler.source>${javaVersion}</maven.compiler.source>
     <maven.compiler.target>${javaVersion}</maven.compiler.target>
     <maven.compiler.release>${javaVersion}</maven.compiler.release>
@@ -402,20 +402,9 @@ under the License.
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>javax.annotation-api</artifactId>
-        <version>${javaxAnnotationApiVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>${sisuVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>${sisuVersion}</version>
-        <classifier>no_asm</classifier>
+        <groupId>jakarta.annotation</groupId>
+        <artifactId>jakarta.annotation-api</artifactId>
+        <version>1.3.5</version>
       </dependency>
       <dependency>
         <groupId>jakarta.inject</groupId>
@@ -703,7 +692,6 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.5.2</version>
           <configuration>
             <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>

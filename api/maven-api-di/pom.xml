@@ -33,4 +33,11 @@
   <properties>
     <maven.compiler.proc>none</maven.compiler.proc>
   </properties>
+ <dependencies>
+  <dependency>
+   <groupId>jakarta.annotation</groupId>
+   <artifactId>jakarta.annotation-api</artifactId>
+   <version>1.3.5</version>
+  </dependency>
+ </dependencies>
 </project>

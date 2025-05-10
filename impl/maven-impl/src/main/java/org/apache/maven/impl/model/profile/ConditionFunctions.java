@@ -59,7 +59,7 @@ public class ConditionFunctions {
         if (args.size() != 1) {
             throw new IllegalArgumentException("length function requires exactly one argument");
         }
-        String s = ConditionParser.toString(args.get(0));
+        String s = ConditionParser.toString(args.getFirst());
         return s.length();
     }
 
@@ -74,7 +74,7 @@ public class ConditionFunctions {
         if (args.size() != 1) {
             throw new IllegalArgumentException("upper function requires exactly one argument");
         }
-        String s = ConditionParser.toString(args.get(0));
+        String s = ConditionParser.toString(args.getFirst());
         return s.toUpperCase();
     }
 
@@ -89,7 +89,7 @@ public class ConditionFunctions {
         if (args.size() != 1) {
             throw new IllegalArgumentException("lower function requires exactly one argument");
         }
-        String s = ConditionParser.toString(args.get(0));
+        String s = ConditionParser.toString(args.getFirst());
         return s.toLowerCase();
     }
 
@@ -104,7 +104,7 @@ public class ConditionFunctions {
         if (args.size() < 2 || args.size() > 3) {
             throw new IllegalArgumentException("substring function requires 2 or 3 arguments");
         }
-        String s = ConditionParser.toString(args.get(0));
+        String s = ConditionParser.toString(args.getFirst());
         int start = toInt(args.get(1));
         int end = args.size() == 3 ? toInt(args.get(2)) : s.length();
         return s.substring(start, end);
@@ -121,7 +121,7 @@ public class ConditionFunctions {
         if (args.size() != 2) {
             throw new IllegalArgumentException("indexOf function requires exactly two arguments");
         }
-        String s = ConditionParser.toString(args.get(0));
+        String s = ConditionParser.toString(args.getFirst());
         String substring = ConditionParser.toString(args.get(1));
         return s.indexOf(substring);
     }
@@ -137,7 +137,7 @@ public class ConditionFunctions {
         if (args.size() != 2) {
             throw new IllegalArgumentException("contains function requires exactly two arguments");
         }
-        String s = ConditionParser.toString(args.get(0));
+        String s = ConditionParser.toString(args.getFirst());
         String substring = ConditionParser.toString(args.get(1));
         return s.contains(substring);
     }
@@ -153,7 +153,7 @@ public class ConditionFunctions {
         if (args.size() != 2) {
             throw new IllegalArgumentException("matches function requires exactly two arguments");
         }
-        String s = ConditionParser.toString(args.get(0));
+        String s = ConditionParser.toString(args.getFirst());
         String regex = ConditionParser.toString(args.get(1));
         return s.matches(regex);
     }
@@ -169,7 +169,7 @@ public class ConditionFunctions {
         if (args.size() != 1) {
             throw new IllegalArgumentException("not function requires exactly one argument");
         }
-        return !ConditionParser.toBoolean(args.get(0));
+        return !ConditionParser.toBoolean(args.getFirst());
     }
 
     /**
@@ -184,7 +184,7 @@ public class ConditionFunctions {
         if (args.size() != 3) {
             throw new IllegalArgumentException("if function requires exactly three arguments");
         }
-        boolean condition = ConditionParser.toBoolean(args.get(0));
+        boolean condition = ConditionParser.toBoolean(args.getFirst());
         return condition ? args.get(1) : args.get(2);
     }
 
@@ -201,7 +201,7 @@ public class ConditionFunctions {
         if (args.size() != 1) {
             throw new IllegalArgumentException("exists function requires exactly one argument");
         }
-        String path = ConditionParser.toString(args.get(0));
+        String path = ConditionParser.toString(args.getFirst());
         return context.exists(path, true);
     }
 
@@ -218,7 +218,7 @@ public class ConditionFunctions {
         if (args.size() != 1) {
             throw new IllegalArgumentException("missing function requires exactly one argument");
         }
-        String path = ConditionParser.toString(args.get(0));
+        String path = ConditionParser.toString(args.getFirst());
         return !context.exists(path, true);
     }
 
@@ -233,7 +233,7 @@ public class ConditionFunctions {
         if (args.size() != 2) {
             throw new IllegalArgumentException("inrange function requires exactly two arguments");
         }
-        String version = ConditionParser.toString(args.get(0));
+        String version = ConditionParser.toString(args.getFirst());
         String range = ConditionParser.toString(args.get(1));
         return versionParser.parseVersionRange(range).contains(versionParser.parseVersion(version));
     }

@@ -65,7 +65,7 @@ public interface VersionRangeResolverResult extends Result<VersionRangeResolverR
     default Optional<Version> getLowestVersion() {
         return getVersions().isEmpty()
                 ? Optional.empty()
-                : Optional.of(getVersions().get(0));
+                : Optional.of(getVersions().getFirst());
     }
 
     /**

@@ -124,10 +124,10 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
                 indent.append("  ");
             }
         } else if (collectStepTrace != null) {
-            if (collectStepTrace.getPath().get(0).getArtifact() == null) {
+            if (collectStepTrace.getPath().getFirst().getArtifact() == null) {
                 return;
             }
-            baseName = ArtifactIdUtils.toId(collectStepTrace.getPath().get(0).getArtifact())
+            baseName = ArtifactIdUtils.toId(collectStepTrace.getPath().getFirst().getArtifact())
                     .replace(":", "_");
             trackingFile = trackingDir.resolve(baseName + ext);
             if (Files.exists(trackingFile)) {

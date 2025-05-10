@@ -21,7 +21,7 @@ package org.apache.maven.model;
 import javax.inject.Inject;
 
 import java.io.File;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
@@ -68,7 +68,7 @@ public class ModelBuilderTest {
     void testModelBuilder() throws Exception {
         MavenExecutionRequest mavenRequest = new DefaultMavenExecutionRequest();
         mavenRequest.setLocalRepository(mavenRepositorySystem.createLocalRepository(new File("target/test-repo/")));
-        mavenRequest.setRootDirectory(Paths.get("src/test/resources/projects/tree"));
+        mavenRequest.setRootDirectory(Path.of("src/test/resources/projects/tree"));
 
         DefaultProjectBuildingRequest request = new DefaultProjectBuildingRequest();
         RepositorySystemSession.CloseableSession rsession = repositorySessionFactory

@@ -19,7 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ public class MavenITmng7772CoreExtensionsNotFoundTest extends AbstractMavenInteg
         File testDir = extractResources("/mng-7772-core-extensions-not-found");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setUserHomeDirectory(Paths.get(testDir.toPath().toString(), "home"));
+        verifier.setUserHomeDirectory(Path.of(testDir.toPath().toString(), "home"));
 
         try {
             verifier.addCliArgument("validate");

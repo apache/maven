@@ -61,8 +61,7 @@ public class PrecedenceCoreExtensionSelector<C extends LookupContext> implements
                 String key = coreExtension.getGroupId() + ":" + coreExtension.getArtifactId();
                 CoreExtension conflict = selectedExtensions.putIfAbsent(key, coreExtension);
                 if (conflict != null) {
-                    conflicts.add(String.format(
-                            "Conflicting extension %s: %s vs %s",
+                    conflicts.add("Conflicting extension %s: %s vs %s".formatted(
                             key,
                             formatLocation(conflict.getLocation("")),
                             formatLocation(coreExtension.getLocation(""))));

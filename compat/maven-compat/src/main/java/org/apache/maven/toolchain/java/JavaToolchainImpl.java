@@ -20,7 +20,6 @@ package org.apache.maven.toolchain.java;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
@@ -56,7 +55,7 @@ public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain
     }
 
     public String findTool(String toolName) {
-        Path toRet = findTool(toolName, Paths.get(getJavaHome()).normalize());
+        Path toRet = findTool(toolName, Path.of(getJavaHome()).normalize());
         if (toRet != null) {
             return toRet.toAbsolutePath().toString();
         }

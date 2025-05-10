@@ -56,29 +56,30 @@ class ModelXmlTest {
 
     @Test
     void testNamespaceInXmlNode() throws XMLStreamException {
-        String xml = "<project xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-                + "         xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
-                + "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/POM/4.0.0\">\n"
-                + "  <build>\n"
-                + "    <plugins>\n"
-                + "      <plugin>\n"
-                + "         <m:configuration xmlns:m=\"http://maven.apache.org/POM/4.0.0\" xmlns=\"http://fabric8.io/fabric8-maven-plugin\">\n"
-                + "             <myConfig>foo</myConfig>\n"
-                + "         </m:configuration>\n"
-                + "      </plugin>\n"
-                + "    </plugins>\n"
-                + "  </build>\n"
-                + "</project>";
+        String xml = """
+                <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xmlns="http://maven.apache.org/POM/4.0.0"
+                         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/POM/4.0.0">
+                  <build>
+                    <plugins>
+                      <plugin>
+                         <m:configuration xmlns:m="http://maven.apache.org/POM/4.0.0" xmlns="http://fabric8.io/fabric8-maven-plugin">
+                             <myConfig>foo</myConfig>
+                         </m:configuration>
+                      </plugin>
+                    </plugins>
+                  </build>
+                </project>""";
 
         Model model = fromXml(xml);
-        Plugin plugin = model.getBuild().getPlugins().get(0);
+        Plugin plugin = model.getBuild().getPlugins().getFirst();
         XmlNode node = plugin.getConfiguration();
         assertNotNull(node);
         assertEquals("http://maven.apache.org/POM/4.0.0", node.namespaceUri());
         assertEquals("m", node.prefix());
         assertEquals("configuration", node.name());
         assertEquals(1, node.children().size());
-        XmlNode myConfig = node.children().get(0);
+        XmlNode myConfig = node.children().getFirst();
         assertEquals("http://fabric8.io/fabric8-maven-plugin", myConfig.namespaceUri());
         assertEquals("", myConfig.prefix());
         assertEquals("myConfig", myConfig.name());

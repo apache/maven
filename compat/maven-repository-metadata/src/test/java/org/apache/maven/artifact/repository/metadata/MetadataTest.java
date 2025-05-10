@@ -100,11 +100,11 @@ class MetadataTest {
 
         assertEquals(1, target.getVersioning().getSnapshotVersions().size());
         assertEquals(
-                "sources", target.getVersioning().getSnapshotVersions().get(0).getClassifier());
-        assertEquals("jar", target.getVersioning().getSnapshotVersions().get(0).getExtension());
+                "sources", target.getVersioning().getSnapshotVersions().getFirst().getClassifier());
+        assertEquals("jar", target.getVersioning().getSnapshotVersions().getFirst().getExtension());
         assertEquals(
                 "20200710072412",
-                target.getVersioning().getSnapshotVersions().get(0).getUpdated());
+                target.getVersioning().getSnapshotVersions().getFirst().getUpdated());
     }
 
     @Test
@@ -120,7 +120,7 @@ class MetadataTest {
         assertTrue(target.merge(source));
         Versioning actualVersioning = target.getVersioning();
         assertEquals(2, actualVersioning.getSnapshotVersions().size());
-        assertEquals(sv2, actualVersioning.getSnapshotVersions().get(0));
+        assertEquals(sv2, actualVersioning.getSnapshotVersions().getFirst());
         assertEquals(sv3, actualVersioning.getSnapshotVersions().get(1));
         assertEquals(formatDate(after, false), actualVersioning.getLastUpdated());
         assertEquals(formatDate(after, true), actualVersioning.getSnapshot().getTimestamp());
@@ -137,7 +137,7 @@ class MetadataTest {
         // nothing should be updated, as the target was already updated at a later date than source
         assertFalse(target.merge(source));
         assertEquals(1, target.getVersioning().getSnapshotVersions().size());
-        assertEquals(sv1, target.getVersioning().getSnapshotVersions().get(0));
+        assertEquals(sv1, target.getVersioning().getSnapshotVersions().getFirst());
         assertEquals(formatDate(after, false), target.getVersioning().getLastUpdated());
         assertEquals(
                 formatDate(after, true), target.getVersioning().getSnapshot().getTimestamp());
@@ -153,7 +153,7 @@ class MetadataTest {
         // TODO: improve merge here?
         assertTrue(target.merge(source));
         assertEquals(1, target.getVersioning().getSnapshotVersions().size());
-        assertEquals(sv1, target.getVersioning().getSnapshotVersions().get(0));
+        assertEquals(sv1, target.getVersioning().getSnapshotVersions().getFirst());
         assertEquals(formatDate(date, false), target.getVersioning().getLastUpdated());
         assertEquals(
                 formatDate(date, true), target.getVersioning().getSnapshot().getTimestamp());

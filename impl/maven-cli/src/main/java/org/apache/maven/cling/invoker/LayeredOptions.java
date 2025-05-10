@@ -48,8 +48,7 @@ public abstract class LayeredOptions<O extends Options> implements Options {
 
     @Override
     public String source() {
-        return String.format(
-                "layered(%s)", options.stream().map(Options::source).toList());
+        return "layered(%s)".formatted(options.stream().map(Options::source).toList());
     }
 
     @Override
@@ -147,7 +146,7 @@ public abstract class LayeredOptions<O extends Options> implements Options {
 
     @Override
     public void displayHelp(ParserRequest request, Consumer<String> printWriter) {
-        options.get(0).displayHelp(request, printWriter);
+        options.getFirst().displayHelp(request, printWriter);
     }
 
     protected <T> Optional<T> returnFirstPresentOrEmpty(Function<O, Optional<T>> getter) {

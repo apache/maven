@@ -116,8 +116,9 @@ under the License.
       <artifactId>javax.inject</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+   <version>1.3.5</version>
     </dependency>
 
     <!-- DI Runtime -->

@@ -218,7 +218,7 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private boolean isPackagedArtifactUpToDate(MavenProject project, File packagedArtifactFile) {
-        Path outputDirectory = Paths.get(project.getBuild().getOutputDirectory());
+        Path outputDirectory = Path.of(project.getBuild().getOutputDirectory());
         if (!outputDirectory.toFile().exists()) {
             return true;
         }

@@ -21,7 +21,6 @@ package org.apache.maven.internal.transformation.impl;
 import javax.inject.Inject;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,9 +92,9 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         InternalMavenSession.from(InternalSession.from(session))
                 .getMavenSession()
                 .getRequest()
-                .setRootDirectory(Paths.get("src/test/resources/consumer/trivial"));
+                .setRootDirectory(Path.of("src/test/resources/consumer/trivial"));
 
-        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+        Path file = Path.of("src/test/resources/consumer/trivial/child/pom.xml");
 
         ModelBuilder.ModelBuilderSession mbs = modelBuilder.newSession();
         InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
@@ -118,10 +117,10 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         MavenExecutionRequest request = InternalMavenSession.from(InternalSession.from(session))
                 .getMavenSession()
                 .getRequest();
-        request.setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
+        request.setRootDirectory(Path.of("src/test/resources/consumer/simple"));
         request.getUserProperties().setProperty("changelist", "MNG6957");
 
-        Path file = Paths.get("src/test/resources/consumer/simple/simple-parent/simple-weather/pom.xml");
+        Path file = Path.of("src/test/resources/consumer/simple/simple-parent/simple-weather/pom.xml");
 
         ModelBuilder.ModelBuilderSession mbs = modelBuilder.newSession();
         InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
@@ -134,7 +133,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         MavenProject project = new MavenProject(orgModel);
         project.setOriginalModel(new org.apache.maven.model.Model(orgModel));
-        request.setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
+        request.setRootDirectory(Path.of("src/test/resources/consumer/simple"));
         Model model = builder.build(session, project, file);
 
         assertNotNull(model);

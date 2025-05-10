@@ -90,7 +90,7 @@ public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
 
                 return parse(parser, role);
             } catch (final Exception e) {
-                throw new IllegalArgumentException(String.format(CONVERSION_ERROR, value, role), e);
+                throw new IllegalArgumentException(CONVERSION_ERROR.formatted(value, role), e);
             }
         }
 
@@ -327,7 +327,7 @@ public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
      */
     private static <T> T newImplementation(final Class<T> clazz) {
         try {
-            return clazz.newInstance();
+            return clazz.getDeclaredConstructor().newInstance();
         } catch (final Exception e) {
             throw new IllegalArgumentException("Cannot create instance of: " + clazz, e);
         } catch (final LinkageError e) {
@@ -347,9 +347,9 @@ public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
             return clazz.getConstructor(String.class).newInstance(value);
         } catch (final Exception e) {
             final Throwable cause = e instanceof InvocationTargetException ? e.getCause() : e;
-            throw new IllegalArgumentException(String.format(CONVERSION_ERROR, value, clazz), cause);
+            throw new IllegalArgumentException(CONVERSION_ERROR.formatted(value, clazz), cause);
         } catch (final LinkageError e) {
-            throw new IllegalArgumentException(String.format(CONVERSION_ERROR, value, clazz), e);
+            throw new IllegalArgumentException(CONVERSION_ERROR.formatted(value, clazz), e);
         }
     }
 

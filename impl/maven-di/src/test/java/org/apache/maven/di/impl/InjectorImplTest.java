@@ -195,11 +195,11 @@ public class InjectorImplTest {
         assertNotNull(services);
         assertEquals(2, services.size());
 
-        assertNotNull(services.get(0));
-        assertInstanceOf(InjectList.MyService.class, services.get(0));
+        assertNotNull(services.getFirst());
+        assertInstanceOf(InjectList.MyService.class, services.getFirst());
         assertNotNull(services.get(1));
         assertInstanceOf(InjectList.MyService.class, services.get(1));
-        assertNotSame(services.get(0).getClass(), services.get(1).getClass());
+        assertNotSame(services.getFirst().getClass(), services.get(1).getClass());
     }
 
     static class InjectList {
@@ -222,15 +222,15 @@ public class InjectorImplTest {
         assertEquals(2, services.size());
 
         List<Map.Entry<String, InjectMap.MyService>> entries = new ArrayList<>(services.entrySet());
-        assertNotNull(entries.get(0));
-        assertInstanceOf(InjectMap.MyService.class, entries.get(0).getValue());
-        assertInstanceOf(String.class, entries.get(0).getKey());
+        assertNotNull(entries.getFirst());
+        assertInstanceOf(InjectMap.MyService.class, entries.getFirst().getValue());
+        assertInstanceOf(String.class, entries.getFirst().getKey());
         assertNotNull(entries.get(1));
         assertInstanceOf(String.class, entries.get(1).getKey());
         assertInstanceOf(InjectMap.MyService.class, entries.get(1).getValue());
-        assertNotEquals(entries.get(0).getKey(), entries.get(1).getKey());
+        assertNotEquals(entries.getFirst().getKey(), entries.get(1).getKey());
         assertNotSame(
-                entries.get(0).getValue().getClass(), entries.get(1).getValue().getClass());
+                entries.getFirst().getValue().getClass(), entries.get(1).getValue().getClass());
 
         InjectMap.MyMojo mojo = injector.getInstance(InjectMap.MyMojo.class);
         assertNotNull(mojo);

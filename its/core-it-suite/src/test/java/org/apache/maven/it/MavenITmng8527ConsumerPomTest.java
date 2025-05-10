@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -52,8 +51,8 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
         verifier.verifyErrorFreeLog();
 
         Path consumerPomPath =
-                Paths.get(verifier.getArtifactPath("org.apache.maven.its.mng-8527", "child", "1.0.0-SNAPSHOT", "pom"));
-        Path buildPomPath = Paths.get(
+                Path.of(verifier.getArtifactPath("org.apache.maven.its.mng-8527", "child", "1.0.0-SNAPSHOT", "pom"));
+        Path buildPomPath = Path.of(
                 verifier.getArtifactPath("org.apache.maven.its.mng-8527", "child", "1.0.0-SNAPSHOT", "pom", "build"));
 
         assertTrue(Files.exists(consumerPomPath), "consumer pom not found at " + consumerPomPath);

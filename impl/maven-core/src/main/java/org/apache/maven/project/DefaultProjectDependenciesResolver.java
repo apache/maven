@@ -172,7 +172,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                     org.eclipse.aether.artifact.Artifact artifact =
                             child.getDependency().getArtifact();
                     String message = artifact instanceof RelocatedArtifact relocated ? relocated.getMessage() : null;
-                    logger.warn("The artifact " + child.getRelocations().get(0) + " has been relocated to " + artifact
+                    logger.warn("The artifact " + child.getRelocations().getFirst() + " has been relocated to " + artifact
                             + (message != null ? ": " + message : ""));
                 }
             }

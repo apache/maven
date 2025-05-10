@@ -135,7 +135,7 @@ class TransformedArtifact extends DefaultArtifact {
         }
         StringBuilder result = new StringBuilder();
         for (byte b : md.digest()) {
-            result.append(String.format("%02x", b));
+            result.append("%02x".formatted(b));
         }
         return result.toString();
     }

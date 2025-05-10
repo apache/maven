@@ -694,8 +694,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (emitSettingsWarnings && settingsResult.getProblems().hasWarningProblems()) {
             int totalProblems = settingsResult.getProblems().totalProblemsReported();
             context.logger.info("");
-            context.logger.info(String.format(
-                    "%s %s encountered while building the effective settings (use -e to see details)",
+            context.logger.info("%s %s encountered while building the effective settings (use -e to see details)".formatted(
                     totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
 
             if (context.invokerRequest.options().showErrors().orElse(false)) {

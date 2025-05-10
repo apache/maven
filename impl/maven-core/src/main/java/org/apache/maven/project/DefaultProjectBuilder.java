@@ -578,9 +578,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             ArrayList<org.apache.maven.model.building.ModelProblem> problems = new ArrayList<>();
             problemCollector.problems().map(BuildSession::convert).forEach(problems::add);
             if (problemCollector.problemsOverflow()) {
-                problems.add(
-                        0,
-                        new DefaultModelProblem(
+                problems.addFirst(new DefaultModelProblem(
                                 "Too many model problems reported (listed problems are just a subset of reported problems)",
                                 org.apache.maven.model.building.ModelProblem.Severity.WARNING,
                                 null,

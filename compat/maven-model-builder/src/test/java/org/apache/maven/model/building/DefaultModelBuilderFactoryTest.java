@@ -21,7 +21,7 @@ package org.apache.maven.model.building;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
@@ -38,10 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DefaultModelBuilderFactoryTest {
 
     private static final String BASE_DIR =
-            Paths.get("src", "test", "resources", "poms", "factory").toString();
+            Path.of("src", "test", "resources", "poms", "factory").toString();
 
     private File getPom(String name) {
-        return new File(Paths.get(BASE_DIR, name + ".xml").toString()).getAbsoluteFile();
+        return new File(Path.of(BASE_DIR, name + ".xml").toString()).getAbsoluteFile();
     }
 
     @Test
@@ -58,7 +58,7 @@ class DefaultModelBuilderFactoryTest {
         assertNotNull(result.getEffectiveModel());
         assertEquals("activated", result.getEffectiveModel().getProperties().get("profile.file"));
         Xpp3Dom conf = (Xpp3Dom)
-                result.getEffectiveModel().getBuild().getPlugins().get(0).getConfiguration();
+                result.getEffectiveModel().getBuild().getPlugins().getFirst().getConfiguration();
         assertNotNull(conf);
         assertEquals("1.5", conf.getChild("source").getValue());
         assertEquals("  1.5  ", conf.getChild("target").getValue());

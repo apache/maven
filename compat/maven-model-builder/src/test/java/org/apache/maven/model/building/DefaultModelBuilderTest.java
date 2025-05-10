@@ -37,44 +37,50 @@ public class DefaultModelBuilderTest {
     private static final String BASE1_ID = "thegroup:base1:pom";
     private static final String BASE1_ID2 = "thegroup:base1:1";
 
-    private static final String BASE1 = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
-            + "  <groupId>thegroup</groupId>\n"
-            + "  <artifactId>base1</artifactId>\n"
-            + "  <version>1</version>\n"
-            + "  <packaging>pom</packaging>\n"
-            + "  <dependencyManagement>\n"
-            + "    <dependencies>\n"
-            + "      <dependency>\n"
-            + "        <groupId>thegroup</groupId>\n"
-            + "        <artifactId>base2</artifactId>\n"
-            + "        <version>1</version>\n"
-            + "        <type>pom</type>\n"
-            + "        <scope>import</scope>\n"
-            + "      </dependency>\n"
-            + "    </dependencies>\n"
-            + "  </dependencyManagement>\n"
-            + "</project>\n";
+    private static final String BASE1 = """
+            <project>
+              <modelVersion>4.0.0</modelVersion>
+              <groupId>thegroup</groupId>
+              <artifactId>base1</artifactId>
+              <version>1</version>
+              <packaging>pom</packaging>
+              <dependencyManagement>
+                <dependencies>
+                  <dependency>
+                    <groupId>thegroup</groupId>
+                    <artifactId>base2</artifactId>
+                    <version>1</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                  </dependency>
+                </dependencies>
+              </dependencyManagement>
+            </project>
+            """;
 
     private static final String BASE2_ID = "thegroup:base2:pom";
     private static final String BASE2_ID2 = "thegroup:base2:1";
 
-    private static final String BASE2 = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
-            + "  <groupId>thegroup</groupId>\n"
-            + "  <artifactId>base2</artifactId>\n"
-            + "  <version>1</version>\n"
-            + "  <packaging>pom</packaging>\n"
-            + "  <dependencyManagement>\n"
-            + "    <dependencies>\n"
-            + "      <dependency>\n"
-            + "        <groupId>thegroup</groupId>\n"
-            + "        <artifactId>base1</artifactId>\n"
-            + "        <version>1</version>\n"
-            + "        <type>pom</type>\n"
-            + "        <scope>import</scope>\n"
-            + "      </dependency>\n"
-            + "    </dependencies>\n"
-            + "  </dependencyManagement>\n"
-            + "</project>\n";
+    private static final String BASE2 = """
+            <project>
+              <modelVersion>4.0.0</modelVersion>
+              <groupId>thegroup</groupId>
+              <artifactId>base2</artifactId>
+              <version>1</version>
+              <packaging>pom</packaging>
+              <dependencyManagement>
+                <dependencies>
+                  <dependency>
+                    <groupId>thegroup</groupId>
+                    <artifactId>base1</artifactId>
+                    <version>1</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                  </dependency>
+                </dependencies>
+              </dependencyManagement>
+            </project>
+            """;
 
     @Test
     public void testCycleInImports() throws Exception {
