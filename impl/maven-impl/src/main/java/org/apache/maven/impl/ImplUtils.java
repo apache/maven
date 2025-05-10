@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 class ImplUtils {
     public static <T> T nonNull(T t) {
@@ -50,6 +49,6 @@ class ImplUtils {
     }
 
     public static <U, V> List<V> map(Collection<U> list, Function<U, V> mapper) {
-        return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
+        return list.stream().map(mapper).filter(Objects::nonNull).toList();
     }
 }

@@ -21,7 +21,6 @@ package org.apache.maven.impl;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Node;
 import org.apache.maven.api.NodeVisitor;
@@ -45,7 +44,7 @@ public abstract class AbstractNode implements Node {
     @Override
     public Node filter(Predicate<Node> filter) {
         List<Node> children =
-                getChildren().stream().filter(filter).map(n -> n.filter(filter)).collect(Collectors.toList());
+                getChildren().stream().filter(filter).map(n -> n.filter(filter)).toList();
         return new WrapperNode(this, Collections.unmodifiableList(children));
     }
 

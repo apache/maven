@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
@@ -56,7 +55,7 @@ public class DefaultBuildResumptionAnalyzer implements BuildResumptionAnalyzer {
                 .filter(project -> result.getBuildSummary(project) == null
                         || result.getBuildSummary(project) instanceof BuildFailure)
                 .map(project -> project.getGroupId() + ":" + project.getArtifactId())
-                .collect(Collectors.toList());
+                .toList();
 
         if (remainingProjects.isEmpty()) {
             LOGGER.info("No remaining projects found, resuming the build would not make sense.");

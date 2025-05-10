@@ -33,7 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
@@ -707,7 +706,7 @@ public abstract class AbstractSession implements InternalSession {
     public Collection<DownloadedArtifact> resolveArtifacts(Artifact... artifacts) {
         ArtifactCoordinatesFactory acf = getService(ArtifactCoordinatesFactory.class);
         List<ArtifactCoordinates> coords =
-                Arrays.stream(artifacts).map(a -> acf.create(this, a)).collect(Collectors.toList());
+                Arrays.stream(artifacts).map(a -> acf.create(this, a)).toList();
         return resolveArtifacts(coords);
     }
 
