@@ -35,17 +35,6 @@ import org.slf4j.Logger;
  *
  */
 public final class CLIReportingUtils {
-    // CHECKSTYLE_OFF: MagicNumber
-    public static final long MB = 1024 * 1024;
-
-    private static final long ONE_SECOND = 1000L;
-
-    private static final long ONE_MINUTE = 60 * ONE_SECOND;
-
-    private static final long ONE_HOUR = 60 * ONE_MINUTE;
-
-    private static final long ONE_DAY = 24 * ONE_HOUR;
-    // CHECKSTYLE_ON: MagicNumber
 
     public static final String BUILD_VERSION_PROPERTY = "version";
 
