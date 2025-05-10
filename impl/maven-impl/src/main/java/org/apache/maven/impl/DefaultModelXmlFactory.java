@@ -121,7 +121,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         Writer writer = request.getWriter();
         Function<Object, String> inputLocationFormatter = request.getInputLocationFormatter();
         if (writer == null && outputStream == null && path == null) {
-            throw new IllegalArgumentException("writer, outputStream or path must be non null");
+            throw new IllegalArgumentException("writer, output stream, or path must be non-null");
         }
         try {
             MavenStaxWriter w = new MavenStaxWriter();

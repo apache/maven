@@ -84,7 +84,7 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
         if (writer == null && outputStream == null && path == null) {
-            throw new IllegalArgumentException("writer, outputStream or path must be non null");
+            throw new IllegalArgumentException("writer, output stream, or path must be non-null");
         }
         try {
             if (writer != null) {
