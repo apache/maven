@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Verifies scope inheritance of direct and transitive dependencies.
- *
+ * <p>
  * Should show three behaviors:
  *
  * 1. dependencyManagement should override the scope of transitive dependencies.

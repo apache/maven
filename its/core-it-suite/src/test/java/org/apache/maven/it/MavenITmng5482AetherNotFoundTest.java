@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5482">MNG-5482</a>.
- *
+ * <p>
  * It checks that plugins and reports causing errors because of Aether change from Sonatype to Eclipse
  * get a dedicated message to explain solution to end-users
  *

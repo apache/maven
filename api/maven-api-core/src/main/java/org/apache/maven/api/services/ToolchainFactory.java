@@ -28,7 +28,6 @@ import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
  * Factory interface for creating toolchain instances from configuration models.
- *
  * <p>This factory is responsible for instantiating concrete toolchain implementations
  * based on toolchain model configurations or default settings.</p>
  *

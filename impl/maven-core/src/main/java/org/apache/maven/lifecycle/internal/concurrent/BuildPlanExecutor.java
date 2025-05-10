@@ -108,7 +108,7 @@ import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.TEARDOWN;
  * Executes the Maven build plan in a concurrent manner, handling the lifecycle phases and plugin executions.
  * This executor implements a weave-mode build strategy, where builds are executed phase-by-phase rather than
  * project-by-project.
- *
+ * <p>
  * <h2>Key Features:</h2>
  * <ul>
  *   <li>Concurrent execution of compatible build steps across projects</li>
@@ -132,7 +132,7 @@ import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.TEARDOWN;
  * min(degreeOfConcurrency, numberOfProjects)
  * </pre>
  * where degreeOfConcurrency is set via the -T command-line option.
- *
+ * <p>
  * <h2>Build Step States:</h2>
  * <ul>
  *   <li>CREATED: Initial state of a build step</li>
@@ -141,7 +141,6 @@ import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.TEARDOWN;
  *   <li>EXECUTED: Step has completed successfully</li>
  *   <li>FAILED: Step execution failed</li>
  * </ul>
- *
  * <p><strong>NOTE:</strong> This class is not part of any public API and can be changed or deleted without prior notice.</p>
  *
  * @since 3.0

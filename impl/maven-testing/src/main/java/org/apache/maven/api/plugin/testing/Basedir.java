@@ -28,9 +28,7 @@ import java.lang.annotation.Target;
  * Specifies the base directory for test resources in Maven plugin tests.
  * This annotation can be applied to test classes or methods to define where test resources
  * (such as POM files, source files, and other test artifacts) are located.
- *
  * <p>If not specified, the plugin's base directory will be used as the default.</p>
- *
  * <p>Example usage on class level:</p>
  * <pre>
  * {@code
@@ -46,7 +44,6 @@ import java.lang.annotation.Target;
  * }
  * }
  * </pre>
- *
  * <p>Example usage on method level:</p>
  * <pre>
  * {@code
@@ -62,7 +59,6 @@ import java.lang.annotation.Target;
  * }
  * }
  * </pre>
- *
  * <p>When applied at both class and method level, the method-level annotation takes precedence.</p>
  *
  * @see MojoTest

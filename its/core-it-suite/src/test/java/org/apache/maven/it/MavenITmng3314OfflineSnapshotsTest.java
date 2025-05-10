@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3314">MNG-3314</a>.
- *
+ * <p>
  * Verifies that offline mode functions correctly for snapshot dependencies.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>

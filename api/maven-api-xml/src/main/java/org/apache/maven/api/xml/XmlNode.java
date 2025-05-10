@@ -37,7 +37,6 @@ import org.apache.maven.api.annotations.ThreadSafe;
  * An immutable XML node representation that provides a clean API for working with XML data structures.
  * This interface represents a single node in an XML document tree, containing information about
  * the node's name, value, attributes, and child nodes.
- *
  * <p>Example usage:</p>
  * <pre>
  * XmlNode node = XmlNode.newBuilder()

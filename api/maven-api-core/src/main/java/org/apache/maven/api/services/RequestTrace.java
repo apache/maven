@@ -30,11 +30,9 @@ import org.apache.maven.api.annotations.Nullable;
  *   <li>Carries contextual data describing the current request or operation</li>
  *   <li>Supports both internal session operations and client-provided trace information</li>
  * </ul>
- *
  * <p>For internal session operations, the trace typically contains {@code *Request} objects
  * that represent the current processing state. Client code can also create traces with
  * application-specific data to provide context when invoking session methods.</p>
- *
  * <p>This trace information is particularly useful for:</p>
  * <ul>
  *   <li>Debugging and troubleshooting request flows</li>

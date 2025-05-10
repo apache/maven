@@ -21,7 +21,6 @@
  * Provides early-stage logging capabilities for Maven CLI operations.
  * These logging facilities are used during Maven startup before the full logging
  * system is initialized.
- *
  * <p>This package includes:</p>
  * <ul>
  *   <li>Basic logging interfaces and implementations</li>

@@ -81,7 +81,6 @@ import static org.mockito.Mockito.withSettings;
  * This class provides a comprehensive mock session that simulates the behavior
  * of a real Maven session, including repository management, artifact handling,
  * and project building capabilities.
- *
  * <p>The mock session includes pre-configured behaviors for:</p>
  * <ul>
  *   <li>Repository management (local and remote repositories)</li>
@@ -91,7 +90,6 @@ import static org.mockito.Mockito.withSettings;
  *   <li>Model XML processing</li>
  *   <li>Session data storage</li>
  * </ul>
- *
  * <p>Example usage in a test:</p>
  * <pre>
  * {@code
@@ -107,7 +105,6 @@ import static org.mockito.Mockito.withSettings;
  * }
  * }
  * </pre>
- *
  * <p>The mock session maintains internal state for:</p>
  * <ul>
  *   <li>Attached artifacts (via {@link ProjectManager})</li>
@@ -115,7 +112,6 @@ import static org.mockito.Mockito.withSettings;
  *   <li>System and user properties</li>
  *   <li>Session-scoped data (via {@link TestSessionData})</li>
  * </ul>
- *
  * <p>Most service implementations are mocked using Mockito, with pre-configured
  * behaviors that simulate typical Maven operations. Some services, like
  * {@link ModelXmlFactory} and {@link VersionParser}, use real implementations

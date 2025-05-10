@@ -23,7 +23,7 @@ import java.io.File;
 /**
  * An integration test which proves that the bug of MNG-7310 is fixed.
  * The bug is about loading an extension in a sibling submodule, which ends up failing the build.
- *
+ * <p>
  * <a href="https://issues.apache.org/jira/browse/MNG-7310">MNG-7310</a>.
  *
  */

@@ -32,10 +32,8 @@ import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
  * A stub implementation of {@link Plugin} for testing Maven plugins.
  * Provides a lightweight plugin context that can be configured with models,
  * descriptors, lifecycles, and dependencies needed for testing.
- *
  * <p>This stub is commonly used in conjunction with {@link MojoExecutionStub}
  * to create a complete testing environment for plugin executions.</p>
- *
  * <p>Example usage:</p>
  * <pre>
  * PluginStub plugin = new PluginStub();

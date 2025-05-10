@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5663">MNG-5663</a>:
  *
  * The test POM references an import scope POM, which also has a dependency on an import scope POM.
- *
+ * <p>
  * The 2nd import scope POM is found in a repository that is only defined in the test POM. The test confirms
  * that dependencies are successfully resolved for this setup.
  *

@@ -33,29 +33,24 @@ import org.apache.maven.api.annotations.Nullable;
 /**
  * Comprehensive service interface for XML operations including node creation,
  * merging, reading, and writing.
- *
  * <p>This class provides XML merging functionality for Maven's XML handling
  * and specifies the combination modes that control how XML elements are merged.</p>
- *
  * <p>The merger supports two main types of combinations:</p>
  * <ul>
  *   <li>Children combination: Controls how child elements are combined</li>
  *   <li>Self combination: Controls how the element itself is combined</li>
  * </ul>
- *
  * <p>Children combination modes (specified by {@code combine.children} attribute):</p>
  * <ul>
  *   <li>{@code merge} (default): Merges elements with matching names</li>
  *   <li>{@code append}: Adds elements as siblings</li>
  * </ul>
- *
  * <p>Self combination modes (specified by {@code combine.self} attribute):</p>
  * <ul>
  *   <li>{@code merge} (default): Merges attributes and values</li>
  *   <li>{@code override}: Completely replaces the element</li>
  *   <li>{@code remove}: Removes the element</li>
  * </ul>
- *
  * <p>For complex XML structures, combining can also be done based on:</p>
  * <ul>
  *   <li>ID: Using the {@code combine.id} attribute</li>

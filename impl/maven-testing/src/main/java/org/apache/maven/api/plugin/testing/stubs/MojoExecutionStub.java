@@ -30,7 +30,6 @@ import org.apache.maven.api.xml.XmlNode;
  * A stub implementation of {@link MojoExecution} for testing Maven plugins.
  * This class provides a simplified representation of a Mojo execution context,
  * allowing tests to simulate plugin executions without a full Maven environment.
- *
  * <p>Example usage:</p>
  * <pre>
  * MojoExecutionStub execution = new MojoExecutionStub("myExecution", "myGoal");

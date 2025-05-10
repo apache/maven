@@ -114,7 +114,6 @@ import static java.util.Objects.requireNonNull;
  * JUnit Jupiter extension that provides support for testing Maven plugins (Mojos).
  * This extension handles the lifecycle of Mojo instances in tests, including instantiation,
  * configuration, and dependency injection.
- *
  * <p>The extension is automatically registered when using the {@link MojoTest} annotation
  * on a test class. It provides the following features:</p>
  * <ul>
@@ -125,7 +124,6 @@ import static java.util.Objects.requireNonNull;
  *   <li>Maven session and build context setup</li>
  *   <li>Component dependency injection</li>
  * </ul>
- *
  * <p>Example usage in a test class:</p>
  * <pre>
  * {@code
@@ -141,16 +139,13 @@ import static java.util.Objects.requireNonNull;
  * }
  * }
  * </pre>
- *
  * <p>The extension supports two main injection scenarios:</p>
  * <ol>
  *   <li>Method parameter injection: Mojo instances can be injected as test method parameters</li>
  *   <li>Field injection: Components can be injected into test class fields using {@code @Inject}</li>
  * </ol>
- *
  * <p>For custom POM configurations, you can specify a POM file using the {@link InjectMojo#pom()}
  * attribute. The extension will merge this configuration with default test project settings.</p>
- *
  * <p>Base directory handling:</p>
  * <ul>
  *   <li>Plugin basedir: The directory containing the plugin project</li>

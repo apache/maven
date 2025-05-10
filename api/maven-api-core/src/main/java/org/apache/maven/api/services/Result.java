@@ -25,7 +25,6 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Base interface for service operation results in Maven. This interface defines the common contract
  * for operation results, providing access to the original request that generated this result.
- *
  * <p>Each result is linked to its originating {@link Request}, allowing for:
  * <ul>
  *   <li>Traceability between requests and their outcomes</li>

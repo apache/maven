@@ -31,7 +31,6 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Service interface for managing Maven toolchains, which provide abstraction for different
  * build tools and environments.
- *
  * <p>A toolchain represents a specific build tool configuration (e.g., JDK, compiler) that can be
  * used during the Maven build process. This service allows for retrieving, storing, and managing
  * these toolchains.</p>

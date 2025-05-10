@@ -20,7 +20,7 @@
 /**
  * This package contain support (mostly abstract) classes, that implement "base" of CLIng.
  * In packages below you find actual implementations.
- *
+ * <p>
  * Hierarchy:
  * <ul>
  * <li>{@link org.apache.maven.cling.invoker.LookupInvoker} is the "basis", the common ground of all Maven Tools</li>

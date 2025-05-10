@@ -40,7 +40,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
  * Describes a version transformation during artifact resolution.
- *
+ * <p>
  * TODO try and refactor to remove abstract methods - not particular happy about current design
  */
 @Deprecated

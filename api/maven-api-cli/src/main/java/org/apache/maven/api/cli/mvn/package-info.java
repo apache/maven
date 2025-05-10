@@ -19,10 +19,8 @@
 
 /**
  * Provides the API for the Maven build tool ({@code mvn}).
- *
  * <p>This package contains interfaces and classes specific to the main Maven build
  * tool, which is responsible for project build lifecycle execution and dependency management.</p>
- *
  * <p>Key features include:</p>
  * <ul>
  *   <li>Build lifecycle execution control</li>

@@ -28,11 +28,9 @@ import java.lang.annotation.Target;
  * Container annotation for multiple {@link MojoParameter} annotations.
  * This annotation is automatically used by Java when multiple {@code @MojoParameter}
  * annotations are applied to the same element.
- *
  * <p>While this annotation can be used directly, it's generally more convenient
  * to use multiple {@code @MojoParameter} annotations, which Java will automatically
  * wrap in this container annotation.</p>
- *
  * <p>Example of direct usage:</p>
  * <pre>
  * {@code
@@ -48,7 +46,6 @@ import java.lang.annotation.Target;
  * }
  * }
  * </pre>
- *
  * <p>Equivalent usage with repeatable annotation:</p>
  * <pre>
  * {@code

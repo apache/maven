@@ -26,7 +26,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * A Maven artifact is a file, typically a JAR, that is produced and used by Maven projects.
  * It is identified by a unique combination of a group ID, artifact ID, version, classifier,
  * and extension, and it is stored in a repository for dependency management and build purposes.
- *
  * <p>Each {@code Artifact} instance is basically an exact pointer to a file in a Maven repository.
  * {@code Artifact} instances are created when <dfn>resolving</dfn> {@link ArtifactCoordinates} instances.
  * Resolving is the process that selects a {@linkplain #getVersion() particular version}

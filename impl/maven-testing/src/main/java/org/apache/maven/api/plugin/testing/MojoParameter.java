@@ -29,12 +29,10 @@ import java.lang.annotation.Target;
  * Specifies a parameter value for a Mojo in a Maven plugin test.
  * This annotation can be used to configure individual Mojo parameters
  * without requiring a full POM file.
- *
  * <p>The annotation is repeatable, allowing multiple parameters to be set
  * on a single test method or parameter. For multiple parameters, you can
  * either use multiple {@code @MojoParameter} annotations or a single
  * {@link MojoParameters} annotation.</p>
- *
  * <p>Example usage with a single parameter:</p>
  * <pre>
  * {@code
@@ -46,7 +44,6 @@ import java.lang.annotation.Target;
  * }
  * }
  * </pre>
- *
  * <p>Example usage with multiple parameters:</p>
  * <pre>
  * {@code

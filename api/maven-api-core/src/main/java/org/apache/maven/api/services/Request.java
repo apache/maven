@@ -28,7 +28,6 @@ import org.apache.maven.api.annotations.Nullable;
  * Base interface for service requests in Maven. This interface defines the common contract
  * for all request types within the Maven service layer, providing access to session context
  * and request tracing capabilities.
- *
  * <p>Each request is associated with a {@link ProtoSession} that contains the configuration
  * and context necessary for request processing, including:
  * <ul>
@@ -36,14 +35,12 @@ import org.apache.maven.api.annotations.Nullable;
  *   <li>Session start time information</li>
  *   <li>Project directory structures</li>
  * </ul>
- *
  * <p>Requests can optionally carry trace information through {@link RequestTrace} to support:
  * <ul>
  *   <li>Debugging and troubleshooting of request flows</li>
  *   <li>Audit logging of operations</li>
  *   <li>Performance monitoring of nested operations</li>
  * </ul>
- *
  * <p>This interface is designed to be extended by specific request types that handle
  * different Maven operations. All implementations must be immutable to ensure thread safety
  * and predictable behavior in concurrent environments.

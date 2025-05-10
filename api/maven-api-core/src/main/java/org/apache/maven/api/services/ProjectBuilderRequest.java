@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Request used to build a {@link org.apache.maven.api.Project} using
  * the {@link ProjectBuilder} service.
- *
+ * <p>
  * TODO: add validationLevel, activeProfileIds, inactiveProfileIds, resolveDependencies
  *
  * @since 4.0.0

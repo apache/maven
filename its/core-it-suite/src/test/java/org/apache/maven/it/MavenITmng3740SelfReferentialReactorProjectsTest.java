@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3740">MNG-3740</a>.
- *
+ * <p>
  * Check that when a plugin project build uses an earlier version of itself, it
  * doesn't result in a StackOverflowError as a result of trying to calculate
  * a concrete state for its project references, which includes itself because of

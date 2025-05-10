@@ -31,7 +31,6 @@ import org.eclipse.aether.graph.Dependency;
  * an Eclipse Aether object. This class implements the methods that are common to {@code Dependency} and
  * {@code DependencyCoordinates}, even if this class does not implement directly any of those interfaces.
  * Having matching method signatures is sufficient, even if there is no {@code @Override} annotations.
- *
  * <p>The fact that this class is wrapping an Eclipse Aether object is an implementation details that may
  * change in any future Maven version. For now, one purpose of this class is to have a single type to check
  * for unwrapping the Eclipse Aether object.</p>

@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * An integration test to check that concurrently running projects are finished
  * in --fail-fast mode, while downstream projects are skipped.
- *
+ * <p>
  * <a href="https://issues.apache.org/jira/browse/MNG-6720">MNG-6720</a>.
  *
  */

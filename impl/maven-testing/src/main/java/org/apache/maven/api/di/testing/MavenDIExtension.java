@@ -31,10 +31,8 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * JUnit Jupiter extension that provides dependency injection support for Maven tests.
  * This extension manages the lifecycle of a DI container for each test method execution,
  * automatically performing injection into test instances and cleanup.
- *
  * <p>This is a modernized version of the original Plexus test support, adapted for
  * Maven's new DI framework and JUnit Jupiter.</p>
- *
  * <p>Usage example:</p>
  * <pre>
  * {@code

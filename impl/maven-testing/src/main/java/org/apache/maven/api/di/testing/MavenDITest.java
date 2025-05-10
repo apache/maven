@@ -29,11 +29,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * Annotation that enables Maven's dependency injection support in JUnit tests.
  * When applied to a test class, it automatically sets up the DI container and
  * performs injection into test instances.
- *
  * <p>This annotation is a convenient way to use {@link MavenDIExtension} without
  * explicitly using {@code @ExtendWith}. It provides the same functionality as the
  * legacy Plexus test support but uses Maven's new DI framework.</p>
- *
  * <p>Example usage:</p>
  * <pre>
  * {@code
@@ -51,7 +49,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * }
  * }
  * </pre>
- *
  * <p>The annotation supports:</p>
  * <ul>
  *   <li>Constructor injection</li>

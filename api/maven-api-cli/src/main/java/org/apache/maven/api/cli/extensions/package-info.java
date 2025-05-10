@@ -19,7 +19,6 @@
 
 /**
  * Provides support for Maven core extensions configuration and management.
- *
  * <p>This package contains classes for:</p>
  * <ul>
  *   <li>Extension configuration model</li>

@@ -28,11 +28,9 @@ import java.lang.annotation.Target;
  * Annotation used in Maven plugin tests to inject and configure a Mojo instance.
  * This annotation can be applied to either test methods or parameters to specify
  * which Mojo should be instantiated and how it should be configured.
- *
  * <p>The annotation requires a {@code goal} attribute to specify which Mojo goal
  * should be instantiated. Optionally, a custom {@code pom} file can be specified
  * to provide specific configuration for the test.</p>
- *
  * <p>Example usage on a test method:</p>
  * <pre>
  * {@code
@@ -44,7 +42,6 @@ import java.lang.annotation.Target;
  * }
  * }
  * </pre>
- *
  * <p>Example usage with a custom POM:</p>
  * <pre>
  * {@code
@@ -59,7 +56,6 @@ import java.lang.annotation.Target;
  * }
  * }
  * </pre>
- *
  * <p>The annotation can be used in conjunction with {@link MojoParameter} to provide
  * specific parameter values for the Mojo:</p>
  * <pre>

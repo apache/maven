@@ -33,14 +33,12 @@ import org.apache.maven.api.annotations.Nonnull;
  * The local repository serves as a cache for downloaded remote artifacts and storage
  * for locally installed artifacts. This manager provides services to determine the
  * appropriate paths for artifacts within the local repository structure.
- *
  * <p>The LocalRepositoryManager is responsible for:
  * <ul>
  *   <li>Determining the storage path for locally installed artifacts</li>
  *   <li>Managing the layout and organization of cached remote artifacts</li>
  *   <li>Maintaining consistency in artifact storage patterns</li>
  * </ul>
- *
  * <p>This interface is part of Maven's repository management system and works in
  * conjunction with {@link RemoteRepository} and {@link LocalRepository} to provide
  * a complete artifact resolution and storage solution.

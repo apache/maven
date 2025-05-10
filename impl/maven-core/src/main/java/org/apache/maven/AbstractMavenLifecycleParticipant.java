@@ -22,7 +22,7 @@ import org.apache.maven.execution.MavenSession;
 
 /**
  * Allows core extensions to participate in Maven build session lifecycle.
- *
+ * <p>
  * All callback methods (will) follow beforeXXX/afterXXX naming pattern to
  * indicate at what lifecycle point it is being called.
  *

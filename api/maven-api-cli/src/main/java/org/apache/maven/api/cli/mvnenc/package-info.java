@@ -19,10 +19,8 @@
 
 /**
  * Provides the API for the Maven Password Encryption tool ({@code mvnenc}).
- *
  * <p>This package contains interfaces and classes for the password encryption tool,
  * which helps secure sensitive information in Maven settings and configuration files.</p>
- *
  * <p>Key features include:</p>
  * <ul>
  *   <li>Password encryption and decryption</li>

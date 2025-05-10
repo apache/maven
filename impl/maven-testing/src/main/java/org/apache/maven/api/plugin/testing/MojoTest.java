@@ -29,11 +29,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * Annotation that enables Maven plugin (Mojo) testing support in JUnit tests.
  * When applied to a test class, it automatically sets up the testing environment
  * for Maven plugins, including dependency injection and parameter resolution.
- *
  * <p>This annotation works in conjunction with {@link InjectMojo} and {@link MojoParameter}
  * to provide a comprehensive testing framework for Maven plugins. It automatically registers
  * the {@link MojoExtension} which handles the plugin lifecycle and dependency injection.</p>
- *
  * <p>Example usage:</p>
  * <pre>
  * {@code
@@ -60,7 +58,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * }
  * }
  * </pre>
- *
  * <p>The annotation supports:</p>
  * <ul>
  *   <li>Automatic Mojo instantiation and configuration</li>
@@ -70,7 +67,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  *   <li>Custom POM configuration via {@link InjectMojo#pom()}</li>
  *   <li>Base directory configuration for test resources</li>
  * </ul>
- *
  * <p>This annotation replaces the legacy maven-plugin-testing-harness functionality
  * with a modern, annotation-based approach that integrates with JUnit Jupiter and
  * Maven's new dependency injection framework.</p>

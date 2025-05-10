@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3203">MNG-3203</a>.
- *
+ * <p>
  * todo Fill in a better description of what this test verifies!
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>

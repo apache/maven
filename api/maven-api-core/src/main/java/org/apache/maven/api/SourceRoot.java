@@ -25,7 +25,7 @@ import java.util.Optional;
 /**
  * A root directory of source files.
  * The sources may be Java main classes, test classes, resources or anything else identified by the scope.
- *
+ * <p>
  * <h2>Default values</h2>
  * The properties in this interface are defined in the {@code <Source>} element of the
  * {@linkplain org.apache.maven.api.model.Model Maven project descriptor}.

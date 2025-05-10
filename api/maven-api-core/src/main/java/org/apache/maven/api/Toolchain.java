@@ -25,31 +25,26 @@ import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
  * Represents a toolchain in the Maven build system.
- *
  * <p>A toolchain is a set of tools that can be used to build a project.
  * This interface allows users to define and configure various toolchains
  * that can be utilized by Maven during the build process. Toolchains can
  * include compilers, interpreters, and other tools that are necessary
  * for building a project in a specific environment.</p>
- *
  * <p>Toolchains are defined in the Maven toolchains.xml file and can be
  * referenced in the project's POM file. This allows for greater flexibility
  * and control over the build environment, enabling developers to specify
  * the exact versions of tools they wish to use.</p>
- *
  * <p>
  * Toolchains can be obtained through the {@link org.apache.maven.api.services.ToolchainManager ToolchainManager}
  * service. This service provides methods to retrieve and manage toolchains defined
  * in the Maven configuration.
  * </p>
- *
  * <p>
  * The following are key functionalities provided by the Toolchain interface:</p><ul>
  *   <li>Access to the type of the toolchain (e.g., JDK, compiler).</li>
  *   <li>Retrieval of the specific version of the toolchain.</li>
  *   <li>Configuration of toolchain properties to match the project's requirements.</li>
  * </ul>
- *
  * <p>Example usage:</p>
  * <pre>
  * Toolchain toolchain = ...; // Obtain a Toolchain instance
