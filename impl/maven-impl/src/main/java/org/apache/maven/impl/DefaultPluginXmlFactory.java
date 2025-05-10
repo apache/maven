@@ -38,7 +38,7 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.StaxLocation.getLocation;
 import static org.apache.maven.impl.StaxLocation.getMessage;
 
@@ -47,7 +47,7 @@ import static org.apache.maven.impl.StaxLocation.getMessage;
 public class DefaultPluginXmlFactory implements PluginXmlFactory {
     @Override
     public PluginDescriptor read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
-        nonNull(request, "request");
+        requireNonNull(request, "request");
         Path path = request.getPath();
         URL url = request.getURL();
         Reader reader = request.getReader();
@@ -78,8 +78,8 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
 
     @Override
     public void write(XmlWriterRequest<PluginDescriptor> request) throws XmlWriterException {
-        nonNull(request, "request");
-        PluginDescriptor content = nonNull(request.getContent(), "content");
+        requireNonNull(request, "request");
+        PluginDescriptor content = requireNonNull(request.getContent(), "content");
         Path path = request.getPath();
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();

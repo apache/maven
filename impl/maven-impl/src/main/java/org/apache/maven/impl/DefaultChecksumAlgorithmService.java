@@ -41,7 +41,7 @@ import org.apache.maven.api.services.ChecksumAlgorithmServiceException;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactory;
 import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactorySelector;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 @Named
 @Singleton
@@ -51,7 +51,7 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
     @Inject
     public DefaultChecksumAlgorithmService(ChecksumAlgorithmFactorySelector checksumAlgorithmFactorySelector) {
         this.checksumAlgorithmFactorySelector =
-                nonNull(checksumAlgorithmFactorySelector, "checksumAlgorithmFactorySelector");
+                requireNonNull(checksumAlgorithmFactorySelector, "checksumAlgorithmFactorySelector");
     }
 
     @Override
@@ -63,7 +63,7 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
 
     @Override
     public ChecksumAlgorithm select(String algorithmName) {
-        nonNull(algorithmName, "algorithmName");
+        requireNonNull(algorithmName, "algorithmName");
         try {
             return new DefaultChecksumAlgorithm(checksumAlgorithmFactorySelector.select(algorithmName));
         } catch (IllegalArgumentException e) {
@@ -73,7 +73,7 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
 
     @Override
     public Collection<ChecksumAlgorithm> select(Collection<String> algorithmNames) {
-        nonNull(algorithmNames, "algorithmNames");
+        requireNonNull(algorithmNames, "algorithmNames");
         try {
             return checksumAlgorithmFactorySelector.selectList(new ArrayList<>(algorithmNames)).stream()
                     .map(DefaultChecksumAlgorithm::new)
@@ -85,8 +85,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
 
     @Override
     public Map<ChecksumAlgorithm, String> calculate(byte[] data, Collection<ChecksumAlgorithm> algorithms) {
-        nonNull(data, "data");
-        nonNull(algorithms, "algorithms");
+        requireNonNull(data, "data");
+        requireNonNull(algorithms, "algorithms");
         try {
             return calculate(new ByteArrayInputStream(data), algorithms);
         } catch (IOException e) {
@@ -96,8 +96,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
 
     @Override
     public Map<ChecksumAlgorithm, String> calculate(ByteBuffer data, Collection<ChecksumAlgorithm> algorithms) {
-        nonNull(data, "data");
-        nonNull(algorithms, "algorithms");
+        requireNonNull(data, "data");
+        requireNonNull(algorithms, "algorithms");
         LinkedHashMap<ChecksumAlgorithm, ChecksumCalculator> algMap = new LinkedHashMap<>();
         algorithms.forEach(f -> algMap.put(f, f.getCalculator()));
         data.mark();
@@ -113,8 +113,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
     @Override
     public Map<ChecksumAlgorithm, String> calculate(Path file, Collection<ChecksumAlgorithm> algorithms)
             throws IOException {
-        nonNull(file, "file");
-        nonNull(algorithms, "algorithms");
+        requireNonNull(file, "file");
+        requireNonNull(algorithms, "algorithms");
         try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(file))) {
             return calculate(inputStream, algorithms);
         }
@@ -123,8 +123,8 @@ public class DefaultChecksumAlgorithmService implements ChecksumAlgorithmService
     @Override
     public Map<ChecksumAlgorithm, String> calculate(InputStream stream, Collection<ChecksumAlgorithm> algorithms)
             throws IOException {
-        nonNull(stream, "stream");
-        nonNull(algorithms, "algorithms");
+        requireNonNull(stream, "stream");
+        requireNonNull(algorithms, "algorithms");
         LinkedHashMap<ChecksumAlgorithm, ChecksumCalculator> algMap = new LinkedHashMap<>();
         algorithms.forEach(f -> algMap.put(f, f.getCalculator()));
         final byte[] buffer = new byte[1024 * 32];

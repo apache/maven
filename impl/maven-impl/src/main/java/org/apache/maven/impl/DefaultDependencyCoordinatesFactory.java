@@ -27,8 +27,8 @@ import org.apache.maven.api.services.DependencyCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.ImplUtils.map;
-import static org.apache.maven.impl.ImplUtils.nonNull;
 
 @Named
 @Singleton
@@ -37,7 +37,7 @@ public class DefaultDependencyCoordinatesFactory implements DependencyCoordinate
     @Nonnull
     @Override
     public DependencyCoordinates create(@Nonnull DependencyCoordinatesFactoryRequest request) {
-        nonNull(request, "request");
+        requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
 
         ArtifactType type = null;
