@@ -2107,7 +2107,7 @@
 
             <p>If a target version, different from the base version, is specified for resources or script files,
             then this value modifies the directory where the files will be copied.
-            For example, if {@code targetVersion} is 17, then the {@code foo/bar.properties}
+            For example, if {@code targetVersion} is 21, then the {@code foo/bar.properties}
             resource file will be copied as {@code META-INF/versions/17/foo/bar.properties}.</p>
 
             <p>This element can be combined with the {@code module} element for specifying sources,

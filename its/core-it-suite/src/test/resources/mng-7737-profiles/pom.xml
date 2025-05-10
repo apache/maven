@@ -59,6 +59,12 @@ under the License.
       </activation>
     </profile>
     <profile>
+      <id>pom-jdk-21</id>
+      <activation>
+        <jdk>[21,)</jdk>
+      </activation>
+    </profile>
+    <profile>
       <id>pom-os-unix</id>
       <activation>
         <os>

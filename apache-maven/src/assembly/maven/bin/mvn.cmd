@@ -70,10 +70,10 @@ if not exist "%JAVACMD%" (
   goto error
 )
 
-@REM Check Java version by testing the Java 17+ flag
+@REM Check Java version by testing the Java 21+ flag
 "%JAVACMD%" --enable-native-access=ALL-UNNAMED -version >nul 2>&1
 if ERRORLEVEL 1 (
-    echo Error: Apache Maven 4.x requires Java 17 or newer to run. >&2
+    echo Error: Apache Maven 4.x requires Java 21 or newer to run. >&2
     "%JAVACMD%" -version >&2
     echo Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK. >&2
     goto error
