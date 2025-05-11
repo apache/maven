@@ -26,14 +26,14 @@ import org.apache.maven.di.impl.Types;
 import org.apache.maven.impl.ExtensibleEnumRegistries;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DiTest {
 
     @Test
-    void testGenerics() {
+    void generics() {
         Set<Type> types = Types.getAllSuperTypes(ExtensibleEnumRegistries.DefaultPathScopeRegistry.class);
-        assertNotNull(types);
+        assertThat(types).isNotNull();
 
         Injector injector = Injector.create();
         injector.bindImplicit(ExtensibleEnumRegistries.DefaultPathScopeRegistry.class);

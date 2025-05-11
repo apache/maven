@@ -56,10 +56,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 /**
  */
@@ -71,30 +69,29 @@ class DefaultModelInterpolatorTest {
     AtomicReference<Path> rootDirectory; // used in TestRootLocator below
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         context = new HashMap<>();
         context.put("basedir", "myBasedir");
         context.put("anotherdir", "anotherBasedir");
         context.put("project.baseUri", "myBaseUri");
 
-        session = ApiRunner.createSession(injector -> {
-            injector.bindInstance(DefaultModelInterpolatorTest.class, this);
-        });
+        session = ApiRunner.createSession(injector ->
+            injector.bindInstance(DefaultModelInterpolatorTest.class, this));
         interpolator = session.getService(Lookup.class).lookup(DefaultModelInterpolator.class);
     }
 
     protected void assertProblemFree(SimpleProblemCollector collector) {
-        assertEquals(0, collector.getErrors().size(), "Expected no errors");
-        assertEquals(0, collector.getWarnings().size(), "Expected no warnings");
-        assertEquals(0, collector.getFatals().size(), "Expected no fatals");
+        assertThat(collector.getErrors().size()).as("Expected no errors").isEqualTo(0);
+        assertThat(collector.getWarnings().size()).as("Expected no warnings").isEqualTo(0);
+        assertThat(collector.getFatals().size()).as("Expected no fatals").isEqualTo(0);
     }
 
     @SuppressWarnings("SameParameterValue")
     protected void assertCollectorState(
             int numFatals, int numErrors, int numWarnings, SimpleProblemCollector collector) {
-        assertEquals(numErrors, collector.getErrors().size(), "Errors");
-        assertEquals(numWarnings, collector.getWarnings().size(), "Warnings");
-        assertEquals(numFatals, collector.getFatals().size(), "Fatals");
+        assertThat(collector.getErrors().size()).as("Errors").isEqualTo(numErrors);
+        assertThat(collector.getWarnings().size()).as("Warnings").isEqualTo(numWarnings);
+        assertThat(collector.getFatals().size()).as("Fatals").isEqualTo(numFatals);
     }
 
     private ModelBuilderRequest.ModelBuilderRequestBuilder createModelBuildingRequest(Map<String, String> p) {
@@ -108,7 +105,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testDefaultBuildTimestampFormatShouldFormatTimeIn24HourFormat() {
+    void defaultBuildTimestampFormatShouldFormatTimeIn24HourFormat() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
         cal.set(Calendar.HOUR, 12);
@@ -135,12 +132,12 @@ class DefaultModelInterpolatorTest {
         DateTimeFormatter format = DateTimeFormatter.ofPattern(MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT)
                 .withZone(ZoneId.of("UTC"));
 
-        assertEquals("1976-11-11T00:16:00Z", format.format(firstTestDate));
-        assertEquals("1976-11-11T23:16:00Z", format.format(secondTestDate));
+        assertThat(format.format(firstTestDate)).isEqualTo("1976-11-11T00:16:00Z");
+        assertThat(format.format(secondTestDate)).isEqualTo("1976-11-11T23:16:00Z");
     }
 
     @Test
-    public void testDefaultBuildTimestampFormatWithLocalTimeZoneMidnightRollover() {
+    void defaultBuildTimestampFormatWithLocalTimeZoneMidnightRollover() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 
@@ -159,12 +156,12 @@ class DefaultModelInterpolatorTest {
 
         DateTimeFormatter format = DateTimeFormatter.ofPattern(MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT)
                 .withZone(ZoneId.of("UTC"));
-        assertEquals("2014-06-15T23:16:00Z", format.format(firstTestDate));
-        assertEquals("2014-11-16T00:16:00Z", format.format(secondTestDate));
+        assertThat(format.format(firstTestDate)).isEqualTo("2014-06-15T23:16:00Z");
+        assertThat(format.format(secondTestDate)).isEqualTo("2014-11-16T00:16:00Z");
     }
 
     @Test
-    public void testShouldNotThrowExceptionOnReferenceToNonExistentValue() throws Exception {
+    void shouldNotThrowExceptionOnReferenceToNonExistentValue() throws Exception {
         Scm scm = Scm.newBuilder().connection("${test}/somepath").build();
         Model model = Model.newBuilder().scm(scm).build();
 
@@ -173,11 +170,11 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
 
         assertProblemFree(collector);
-        assertEquals("${test}/somepath", out.getScm().getConnection());
+        assertThat(out.getScm().getConnection()).isEqualTo("${test}/somepath");
     }
 
     @Test
-    public void testShouldThrowExceptionOnRecursiveScmConnectionReference() throws Exception {
+    void shouldThrowExceptionOnRecursiveScmConnectionReference() throws Exception {
         Scm scm = Scm.newBuilder()
                 .connection("${project.scm.connection}/somepath")
                 .build();
@@ -190,7 +187,7 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
-    public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() throws Exception {
+    void shouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() throws Exception {
         Scm scm = Scm.newBuilder().connection("${test}/somepath").build();
         Map<String, String> props = new HashMap<>();
         props.put("test", "test");
@@ -202,7 +199,7 @@ class DefaultModelInterpolatorTest {
 
         assertProblemFree(collector);
 
-        assertEquals("test/somepath", out.getScm().getConnection());
+        assertThat(out.getScm().getConnection()).isEqualTo("test/somepath");
     }
 
     @Test
@@ -217,11 +214,11 @@ class DefaultModelInterpolatorTest {
         Model out = interpolator.interpolateModel(
                 model, Paths.get("."), createModelBuildingRequest(context).build(), new SimpleProblemCollector());
 
-        assertEquals(orgName + " Tools", out.getName());
+        assertThat(out.getName()).isEqualTo(orgName + " Tools");
     }
 
     @Test
-    public void shouldInterpolateDependencyVersionToSetSameAsProjectVersion() throws Exception {
+    void shouldInterpolateDependencyVersionToSetSameAsProjectVersion() throws Exception {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .dependencies(Collections.singletonList(
@@ -233,11 +230,11 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertCollectorState(0, 0, 0, collector);
 
-        assertEquals("3.8.1", (out.getDependencies().get(0)).getVersion());
+        assertThat((out.getDependencies().get(0)).getVersion()).isEqualTo("3.8.1");
     }
 
     @Test
-    public void testShouldNotInterpolateDependencyVersionWithInvalidReference() throws Exception {
+    void shouldNotInterpolateDependencyVersionWithInvalidReference() throws Exception {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .dependencies(Collections.singletonList(
@@ -249,11 +246,11 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals("${something}", (out.getDependencies().get(0)).getVersion());
+        assertThat((out.getDependencies().get(0)).getVersion()).isEqualTo("${something}");
     }
 
     @Test
-    public void testTwoReferences() throws Exception {
+    void twoReferences() throws Exception {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
@@ -267,11 +264,11 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertCollectorState(0, 0, 0, collector);
 
-        assertEquals("foo-3.8.1", (out.getDependencies().get(0)).getVersion());
+        assertThat((out.getDependencies().get(0)).getVersion()).isEqualTo("foo-3.8.1");
     }
 
     @Test
-    public void testProperty() throws Exception {
+    void property() throws Exception {
         Model model = Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
@@ -288,13 +285,11 @@ class DefaultModelInterpolatorTest {
                 collector);
         assertProblemFree(collector);
 
-        assertEquals(
-                "file://localhost/anotherBasedir/temp-repo",
-                (out.getRepositories().get(0)).getUrl());
+        assertThat((out.getRepositories().get(0)).getUrl()).isEqualTo("file://localhost/anotherBasedir/temp-repo");
     }
 
     @Test
-    public void testBasedirUnx() throws Exception {
+    void basedirUnx() throws Exception {
         FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
         Path projectBasedir = fs.getPath("projectBasedir");
 
@@ -310,13 +305,11 @@ class DefaultModelInterpolatorTest {
                 model, projectBasedir, createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals(
-                projectBasedir.toAbsolutePath() + "/temp-repo",
-                (out.getRepositories().get(0)).getUrl());
+        assertThat((out.getRepositories().get(0)).getUrl()).isEqualTo(projectBasedir.toAbsolutePath() + "/temp-repo");
     }
 
     @Test
-    public void testBasedirWin() throws Exception {
+    void basedirWin() throws Exception {
         FileSystem fs = Jimfs.newFileSystem(Configuration.windows());
         Path projectBasedir = fs.getPath("projectBasedir");
 
@@ -332,13 +325,11 @@ class DefaultModelInterpolatorTest {
                 model, projectBasedir, createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals(
-                projectBasedir.toAbsolutePath() + "/temp-repo",
-                (out.getRepositories().get(0)).getUrl());
+        assertThat((out.getRepositories().get(0)).getUrl()).isEqualTo(projectBasedir.toAbsolutePath() + "/temp-repo");
     }
 
     @Test
-    public void testBaseUri() throws Exception {
+    void baseUri() throws Exception {
         Path projectBasedir = Paths.get("projectBasedir");
 
         Model model = Model.newBuilder()
@@ -354,13 +345,11 @@ class DefaultModelInterpolatorTest {
                 model, projectBasedir, createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals(
-                projectBasedir.resolve("temp-repo").toUri().toString(),
-                (out.getRepositories().get(0)).getUrl());
+        assertThat((out.getRepositories().get(0)).getUrl()).isEqualTo(projectBasedir.resolve("temp-repo").toUri().toString());
     }
 
     @Test
-    void testRootDirectory() throws Exception {
+    void rootDirectory() throws Exception {
         Path rootDirectory = Paths.get("myRootDirectory");
 
         Model model = Model.newBuilder()
@@ -376,11 +365,11 @@ class DefaultModelInterpolatorTest {
                 model, rootDirectory, createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals("file:myRootDirectory/temp-repo", (out.getRepositories().get(0)).getUrl());
+        assertThat((out.getRepositories().get(0)).getUrl()).isEqualTo("file:myRootDirectory/temp-repo");
     }
 
     @Test
-    void testRootDirectoryWithUri() throws Exception {
+    void rootDirectoryWithUri() throws Exception {
         Path rootDirectory = Paths.get("myRootDirectory");
 
         Model model = Model.newBuilder()
@@ -396,13 +385,11 @@ class DefaultModelInterpolatorTest {
                 model, rootDirectory, createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals(
-                rootDirectory.resolve("temp-repo").toUri().toString(),
-                (out.getRepositories().get(0)).getUrl());
+        assertThat((out.getRepositories().get(0)).getUrl()).isEqualTo(rootDirectory.resolve("temp-repo").toUri().toString());
     }
 
     @Test
-    void testRootDirectoryWithNull() throws Exception {
+    void rootDirectoryWithNull() throws Exception {
         Path projectDirectory = Paths.get("myProjectDirectory");
         this.rootDirectory = new AtomicReference<>(null);
 
@@ -415,19 +402,17 @@ class DefaultModelInterpolatorTest {
                 .build();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        IllegalStateException e = assertThrows(
-                IllegalStateException.class,
-                () -> interpolator.interpolateModel(
-                        model,
-                        projectDirectory,
-                        createModelBuildingRequest(context).build(),
-                        collector));
+        IllegalStateException e = assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> interpolator.interpolateModel(
+                model,
+                projectDirectory,
+                createModelBuildingRequest(context).build(),
+                collector)).actual();
 
-        assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
+        assertThat(e.getMessage()).isEqualTo(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
     }
 
     @Test
-    public void testEnvars() throws Exception {
+    void envars() throws Exception {
         context.put("env.HOME", "/path/to/home");
 
         Map<String, String> modelProperties = new HashMap<>();
@@ -440,11 +425,11 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals("/path/to/home", out.getProperties().get("outputDirectory"));
+        assertThat(out.getProperties().get("outputDirectory")).isEqualTo("/path/to/home");
     }
 
     @Test
-    public void envarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
+    void envarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
 
         Map<String, String> modelProperties = new HashMap<>();
         modelProperties.put("outputDirectory", "${env.DOES_NOT_EXIST}");
@@ -456,11 +441,11 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals("${env.DOES_NOT_EXIST}", out.getProperties().get("outputDirectory"));
+        assertThat(out.getProperties().get("outputDirectory")).isEqualTo("${env.DOES_NOT_EXIST}");
     }
 
     @Test
-    public void expressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
+    void expressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
         Map<String, String> modelProperties = new HashMap<>();
         modelProperties.put("outputDirectory", "${DOES_NOT_EXIST}");
 
@@ -471,11 +456,11 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals("${DOES_NOT_EXIST}", out.getProperties().get("outputDirectory"));
+        assertThat(out.getProperties().get("outputDirectory")).isEqualTo("${DOES_NOT_EXIST}");
     }
 
     @Test
-    public void shouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly() throws Exception {
+    void shouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly() throws Exception {
         Model model = Model.newBuilder()
                 .build(Build.newBuilder()
                         .sourceDirectory("correct")
@@ -493,11 +478,11 @@ class DefaultModelInterpolatorTest {
         List<Resource> outResources = out.getBuild().getResources();
         Iterator<Resource> resIt = outResources.iterator();
 
-        assertEquals(model.getBuild().getSourceDirectory(), resIt.next().getDirectory());
+        assertThat(resIt.next().getDirectory()).isEqualTo(model.getBuild().getSourceDirectory());
     }
 
     @Test
-    public void shouldInterpolateUnprefixedBasedirExpression() throws Exception {
+    void shouldInterpolateUnprefixedBasedirExpression() throws Exception {
         Path basedir = Paths.get("/test/path");
         Model model = Model.newBuilder()
                 .dependencies(Collections.singletonList(Dependency.newBuilder()
@@ -511,15 +496,13 @@ class DefaultModelInterpolatorTest {
         assertProblemFree(collector);
 
         List<Dependency> rDeps = result.getDependencies();
-        assertNotNull(rDeps);
-        assertEquals(1, rDeps.size());
-        assertEquals(
-                basedir.resolve("artifact.jar").toAbsolutePath(),
-                Paths.get(rDeps.get(0).getSystemPath()).toAbsolutePath());
+        assertThat(rDeps).isNotNull();
+        assertThat(rDeps.size()).isEqualTo(1);
+        assertThat(Paths.get(rDeps.get(0).getSystemPath()).toAbsolutePath()).isEqualTo(basedir.resolve("artifact.jar").toAbsolutePath());
     }
 
     @Test
-    public void testRecursiveExpressionCycleNPE() throws Exception {
+    void recursiveExpressionCycleNPE() throws Exception {
         Map<String, String> props = new HashMap<>();
         props.put("aa", "${bb}");
         props.put("bb", "${aa}");
@@ -532,12 +515,12 @@ class DefaultModelInterpolatorTest {
         interpolator.interpolateModel(model, null, request, collector);
 
         assertCollectorState(0, 2, 0, collector);
-        assertTrue(collector.getErrors().get(0).contains("recursive variable reference"));
+        assertThat(collector.getErrors().get(0).contains("recursive variable reference")).isTrue();
     }
 
     @Disabled("per def cannot be recursive: ${basedir} is immediately going for project.basedir")
     @Test
-    public void testRecursiveExpressionCycleBaseDir() throws Exception {
+    void recursiveExpressionCycleBaseDir() throws Exception {
         Map<String, String> props = new HashMap<>();
         props.put("basedir", "${basedir}");
         ModelBuilderRequest request = createModelBuildingRequest(Map.of()).build();
@@ -549,8 +532,7 @@ class DefaultModelInterpolatorTest {
         interpolator.interpolateModel(model, null, request, collector);
 
         assertCollectorState(0, 1, 0, collector);
-        assertEquals(
-                "recursive variable reference: basedir", collector.getErrors().get(0));
+        assertThat(collector.getErrors().get(0)).isEqualTo("recursive variable reference: basedir");
     }
 
     @Test
@@ -572,7 +554,7 @@ class DefaultModelInterpolatorTest {
                 collector);
 
         assertCollectorState(0, 0, 0, collector);
-        assertEquals(uninterpolatedName, out.getName());
+        assertThat(out.getName()).isEqualTo(uninterpolatedName);
     }
 
     @Provides

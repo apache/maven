@@ -38,14 +38,12 @@ import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TestApiStandalone {
 
     @Test
-    void testStandalone() {
+    void standalone() {
         Session session = ApiRunner.createSession(injector -> {
             injector.bindInstance(TestApiStandalone.class, this);
         });
@@ -58,18 +56,18 @@ class TestApiStandalone {
                         .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .recursive(true)
                         .build());
-        assertNotNull(result.getEffectiveModel());
+        assertThat(result.getEffectiveModel()).isNotNull();
 
         ArtifactCoordinates coords =
                 session.createArtifactCoordinates("org.apache.maven:maven-api-core:4.0.0-alpha-13");
         DownloadedArtifact res = session.resolveArtifact(coords);
-        assertNotNull(res);
-        assertNotNull(res.getPath());
-        assertTrue(Files.exists(res.getPath()));
+        assertThat(res).isNotNull();
+        assertThat(res.getPath()).isNotNull();
+        assertThat(Files.exists(res.getPath())).isTrue();
 
         Node node = session.collectDependencies(session.createDependencyCoordinates(coords), PathScope.MAIN_RUNTIME);
-        assertNotNull(node);
-        assertEquals(6, node.getChildren().size());
+        assertThat(node).isNotNull();
+        assertThat(node.getChildren().size()).isEqualTo(6);
     }
 
     @Provides

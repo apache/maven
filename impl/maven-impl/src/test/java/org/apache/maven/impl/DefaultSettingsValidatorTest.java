@@ -31,7 +31,7 @@ import org.apache.maven.impl.model.DefaultInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultSettingsValidatorTest {
 
@@ -43,31 +43,31 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidate() {
+    void validate() {
         Profile prof = Profile.newBuilder().id("xxx").build();
         Settings model = Settings.newBuilder().profiles(List.of(prof)).build();
         ProblemCollector<BuilderProblem> problems = validator.validate(model);
-        assertEquals(0, problems.totalProblemsReported());
+        assertThat(problems.totalProblemsReported()).isEqualTo(0);
 
         Repository repo = org.apache.maven.api.settings.Repository.newInstance(false);
         Settings model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();
         problems = validator.validate(model2);
-        assertEquals(2, problems.totalProblemsReported());
+        assertThat(problems.totalProblemsReported()).isEqualTo(2);
 
         repo = repo.withUrl("http://xxx.xxx.com");
         model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();
         problems = validator.validate(model2);
-        assertEquals(1, problems.totalProblemsReported());
+        assertThat(problems.totalProblemsReported()).isEqualTo(1);
 
         repo = repo.withId("xxx");
         model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();
         problems = validator.validate(model2);
-        assertEquals(0, problems.totalProblemsReported());
+        assertThat(problems.totalProblemsReported()).isEqualTo(0);
     }
 }

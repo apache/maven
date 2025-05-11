@@ -26,9 +26,7 @@ import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests {@link JdkVersionProfileActivator}.
@@ -55,7 +53,7 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
     }
 
     @Test
-    void testNullSafe() throws Exception {
+    void nullSafe() throws Exception {
         Profile p = Profile.newInstance();
 
         assertActivation(false, p, newContext(null, null));
@@ -66,7 +64,7 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
     }
 
     @Test
-    void testPrefix() throws Exception {
+    void prefix() throws Exception {
         Profile profile = newProfile("1.4");
 
         assertActivation(true, profile, newContext(null, newProperties("1.4")));
@@ -80,7 +78,7 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
     }
 
     @Test
-    void testPrefixNegated() throws Exception {
+    void prefixNegated() throws Exception {
         Profile profile = newProfile("!1.4");
 
         assertActivation(false, profile, newContext(null, newProperties("1.4")));
@@ -94,7 +92,7 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
     }
 
     @Test
-    void testVersionRangeInclusiveBounds() throws Exception {
+    void versionRangeInclusiveBounds() throws Exception {
         Profile profile = newProfile("[1.5,1.6]");
 
         assertActivation(false, profile, newContext(null, newProperties("1.4")));
@@ -115,7 +113,7 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
     }
 
     @Test
-    void testVersionRangeExclusiveBounds() throws Exception {
+    void versionRangeExclusiveBounds() throws Exception {
         Profile profile = newProfile("(1.3,1.6)");
 
         assertActivation(false, profile, newContext(null, newProperties("1.3")));
@@ -137,7 +135,7 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
     }
 
     @Test
-    void testVersionRangeInclusiveLowerBound() throws Exception {
+    void versionRangeInclusiveLowerBound() throws Exception {
         Profile profile = newProfile("[1.5,)");
 
         assertActivation(false, profile, newContext(null, newProperties("1.4")));
@@ -158,7 +156,7 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
     }
 
     @Test
-    void testVersionRangeExclusiveUpperBound() throws Exception {
+    void versionRangeExclusiveUpperBound() throws Exception {
         Profile profile = newProfile("(,1.6)");
 
         assertActivation(true, profile, newContext(null, newProperties("1.5")));
@@ -174,7 +172,7 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
     }
 
     @Test
-    void testRubbishJavaVersion() {
+    void rubbishJavaVersion() {
         Profile profile = newProfile("[1.8,)");
 
         assertActivationWithProblems(profile, newContext(null, newProperties("Pūteketeke")), "invalid JDK version");
@@ -187,10 +185,10 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
             Profile profile, ProfileActivationContext context, String warningContains) {
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        assertFalse(activator.isActive(profile, context, problems));
+        assertThat(activator.isActive(profile, context, problems)).isFalse();
 
-        assertEquals(0, problems.getErrors().size());
-        assertEquals(1, problems.getWarnings().size());
-        assertTrue(problems.getWarnings().get(0).contains(warningContains));
+        assertThat(problems.getErrors().size()).isEqualTo(0);
+        assertThat(problems.getWarnings().size()).isEqualTo(1);
+        assertThat(problems.getWarnings().get(0).contains(warningContains)).isTrue();
     }
 }

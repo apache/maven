@@ -23,10 +23,7 @@ import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,7 +31,7 @@ import static org.mockito.Mockito.when;
 class RequestTraceHelperTest {
 
     @Test
-    void testEnterWithRequestData() {
+    void enterWithRequestData() {
         InternalSession session = mock(InternalSession.class);
         Request<?> request = mock(Request.class);
         org.apache.maven.api.services.RequestTrace existingTrace =
@@ -44,33 +41,33 @@ class RequestTraceHelperTest {
 
         RequestTraceHelper.ResolverTrace result = RequestTraceHelper.enter(session, request);
 
-        assertNotNull(result);
-        assertEquals(existingTrace, result.mvnTrace());
+        assertThat(result).isNotNull();
+        assertThat(result.mvnTrace()).isEqualTo(existingTrace);
         verify(session).setCurrentTrace(existingTrace);
     }
 
     @Test
-    void testInterpretTraceWithArtifactRequest() {
+    void interpretTraceWithArtifactRequest() {
         ArtifactRequest artifactRequest = mock(ArtifactRequest.class);
         RequestTrace trace = RequestTrace.newChild(null, artifactRequest);
 
         String result = RequestTraceHelper.interpretTrace(false, trace);
 
-        assertTrue(result.startsWith("artifact request for "));
+        assertThat(result.startsWith("artifact request for ")).isTrue();
     }
 
     @Test
-    void testToMavenWithNullTrace() {
-        assertNull(RequestTraceHelper.toMaven("test", null));
+    void toMavenWithNullTrace() {
+        assertThat(RequestTraceHelper.toMaven("test", null)).isNull();
     }
 
     @Test
-    void testToResolverWithNullTrace() {
-        assertNull(RequestTraceHelper.toResolver(null));
+    void toResolverWithNullTrace() {
+        assertThat(RequestTraceHelper.toResolver(null)).isNull();
     }
 
     @Test
-    void testExitResetsParentTrace() {
+    void exitResetsParentTrace() {
         InternalSession session = mock(InternalSession.class);
         org.apache.maven.api.services.RequestTrace parentTrace =
                 new org.apache.maven.api.services.RequestTrace(null, "parent");

@@ -37,8 +37,7 @@ import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -52,23 +51,23 @@ class DefaultModelBuilderTest {
     void setup() {
         session = ApiRunner.createSession();
         builder = session.getService(ModelBuilder.class);
-        assertNotNull(builder);
+        assertThat(builder).isNotNull();
     }
 
     @Test
-    public void testPropertiesAndProfiles() {
+    void propertiesAndProfiles() {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                 .source(Sources.buildSource(getPom("props-and-profiles")))
                 .build();
         ModelBuilderResult result = builder.newSession().build(request);
-        assertNotNull(result);
-        assertEquals("21", result.getEffectiveModel().getProperties().get("maven.compiler.release"));
+        assertThat(result).isNotNull();
+        assertThat(result.getEffectiveModel().getProperties().get("maven.compiler.release")).isEqualTo("21");
     }
 
     @Test
-    public void testMergeRepositories() throws Exception {
+    void mergeRepositories() throws Exception {
         // this is here only to trigger mainSession creation; unrelated
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
@@ -89,7 +88,7 @@ class DefaultModelBuilderTest {
         List<RemoteRepository> repositories;
         // before merge
         repositories = (List<RemoteRepository>) repositoriesField.get(state);
-        assertEquals(1, repositories.size()); // central
+        assertThat(repositories.size()).isEqualTo(1); // central
 
         Model model = Model.newBuilder()
                 .repositories(Arrays.asList(
@@ -106,12 +105,12 @@ class DefaultModelBuilderTest {
 
         // after merge
         repositories = (List<RemoteRepository>) repositoriesField.get(state);
-        assertEquals(3, repositories.size());
-        assertEquals("first", repositories.get(0).getId());
-        assertEquals("https://some.repo", repositories.get(0).getUrl()); // interpolated
-        assertEquals("second", repositories.get(1).getId());
-        assertEquals("${secondParentRepo}", repositories.get(1).getUrl()); // un-interpolated (no source)
-        assertEquals("central", repositories.get(2).getId()); // default
+        assertThat(repositories.size()).isEqualTo(3);
+        assertThat(repositories.get(0).getId()).isEqualTo("first");
+        assertThat(repositories.get(0).getUrl()).isEqualTo("https://some.repo"); // interpolated
+        assertThat(repositories.get(1).getId()).isEqualTo("second");
+        assertThat(repositories.get(1).getUrl()).isEqualTo("${secondParentRepo}"); // un-interpolated (no source)
+        assertThat(repositories.get(2).getId()).isEqualTo("central"); // default
     }
 
     private Path getPom(String name) {

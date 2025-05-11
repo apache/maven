@@ -24,15 +24,15 @@ import java.util.Map;
 import org.apache.maven.api.MonotonicClock;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MavenBuildTimestampTest {
     @Test
-    void testMavenBuildTimestampUsesUTC() {
+    void mavenBuildTimestampUsesUTC() {
         Map<String, String> interpolationProperties = new HashMap<>();
         interpolationProperties.put("maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'");
         MavenBuildTimestamp timestamp = new MavenBuildTimestamp(MonotonicClock.now(), interpolationProperties);
         String formattedTimestamp = timestamp.formattedTimestamp();
-        assertTrue(formattedTimestamp.endsWith("Z"), "We expect the UTC marker at the end of the timestamp.");
+        assertThat(formattedTimestamp.endsWith("Z")).as("We expect the UTC marker at the end of the timestamp.").isTrue();
     }
 }

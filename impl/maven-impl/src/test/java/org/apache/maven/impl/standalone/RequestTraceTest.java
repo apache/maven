@@ -48,14 +48,12 @@ import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RequestTraceTest {
 
     @Test
-    void testTraces() {
+    void traces() {
         Session session = ApiRunner.createSession(injector -> {
             injector.bindInstance(RequestTraceTest.class, this);
         });
@@ -68,7 +66,7 @@ class RequestTraceTest {
                         .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                         .recursive(true)
                         .build());
-        assertNotNull(result.getEffectiveModel());
+        assertThat(result.getEffectiveModel()).isNotNull();
 
         List<RepositoryEvent> events = new CopyOnWriteArrayList<>();
         ((DefaultRepositorySystemSession) InternalSession.from(session).getSession())
@@ -82,9 +80,9 @@ class RequestTraceTest {
         ArtifactCoordinates coords =
                 session.createArtifactCoordinates("org.apache.maven:maven-api-core:4.0.0-alpha-13");
         DownloadedArtifact res = session.resolveArtifact(coords);
-        assertNotNull(res);
-        assertNotNull(res.getPath());
-        assertTrue(Files.exists(res.getPath()));
+        assertThat(res).isNotNull();
+        assertThat(res.getPath()).isNotNull();
+        assertThat(Files.exists(res.getPath())).isTrue();
 
         Node node = session.getService(DependencyResolver.class)
                 .collect(DependencyResolverRequest.builder()
@@ -101,15 +99,15 @@ class RequestTraceTest {
 
         for (RepositoryEvent event : events) {
             org.eclipse.aether.RequestTrace trace = event.getTrace();
-            assertNotNull(trace);
+            assertThat(trace).isNotNull();
 
             RequestTrace rTrace = RequestTraceHelper.toMaven("collect", trace);
-            assertNotNull(rTrace);
-            assertNotNull(rTrace.parent());
+            assertThat(rTrace).isNotNull();
+            assertThat(rTrace.parent()).isNotNull();
         }
 
-        assertNotNull(node);
-        assertEquals(6, node.getChildren().size());
+        assertThat(node).isNotNull();
+        assertThat(node.getChildren().size()).isEqualTo(6);
     }
 
     @Provides
