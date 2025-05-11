@@ -800,6 +800,25 @@ under the License.</licenseText>
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>org.ec4j.maven</groupId>
+        <artifactId>editorconfig-maven-plugin</artifactId>
+        <version>0.1.3</version>
+        <configuration>
+          <excludes>
+            <exclude>.github/**</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>editorconfig-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
         <version>1.0.2</version>
