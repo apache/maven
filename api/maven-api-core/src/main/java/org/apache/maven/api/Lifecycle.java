@@ -101,7 +101,7 @@ public interface Lifecycle extends ExtensibleEnum {
 
     /**
      * A phase in the lifecycle.
-     *
+     * <p>
      * A phase is identified by its name. It also contains a list of plugins bound to that phase,
      * a list of {@link Link links}, and a list of sub-phases.  This forms a tree of phases.
      */

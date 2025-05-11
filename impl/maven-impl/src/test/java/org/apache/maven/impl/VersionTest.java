@@ -349,7 +349,7 @@ public class VersionTest extends AbstractVersionTest {
 
     /**
      * UT for <a href="https://issues.apache.org/jira/browse/MRESOLVER-314">MRESOLVER-314</a>.
-     *
+     * <p>
      * Generates random UUID string based versions and tries to sort them. While this test is not as reliable
      * as {@link #testCompareUuidVersionStringStream()}, it covers broader range and in case it fails it records
      * the failed array, so we can investigate more.
@@ -374,7 +374,7 @@ public class VersionTest extends AbstractVersionTest {
 
     /**
      * UT for <a href="https://issues.apache.org/jira/browse/MRESOLVER-314">MRESOLVER-314</a>.
-     *
+     * <p>
      * Works on known set that failed before fix, provided by {@link #uuidVersionStringStream()}.
      */
     @Test

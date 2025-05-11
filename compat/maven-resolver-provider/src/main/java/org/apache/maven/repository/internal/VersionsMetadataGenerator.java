@@ -35,7 +35,7 @@ import org.eclipse.aether.util.ConfigUtils;
 
 /**
  * Maven GA level metadata generator.
- *
+ * <p>
  * Version metadata contains list of existing baseVersions within this GA.
  *
  * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead

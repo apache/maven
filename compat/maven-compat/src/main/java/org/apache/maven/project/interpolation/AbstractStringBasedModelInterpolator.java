@@ -56,7 +56,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
- *
+ * <p>
  * TODO Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
  */
 @Deprecated

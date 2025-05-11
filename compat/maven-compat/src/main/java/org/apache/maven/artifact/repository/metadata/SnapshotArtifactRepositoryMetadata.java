@@ -23,7 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Metadata for the artifact version directory of the repository.
- *
+ * <p>
  * TODO split instantiation (versioning, plugin mappings) from definition
  */
 @Deprecated

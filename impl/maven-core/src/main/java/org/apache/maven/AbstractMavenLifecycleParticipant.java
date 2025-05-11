@@ -22,7 +22,7 @@ import org.apache.maven.execution.MavenSession;
 
 /**
  * Allows core extensions to participate in Maven build session lifecycle.
- *
+ * <p>
  * All callback methods (will) follow beforeXXX/afterXXX naming pattern to
  * indicate at what lifecycle point it is being called.
  *
@@ -34,7 +34,7 @@ public abstract class AbstractMavenLifecycleParticipant {
 
     /**
      * Invoked after all MavenProject instances have been created.
-     *
+     * <p>
      * This callback is intended to allow extensions to manipulate MavenProjects
      * before they are sorted and actual build execution starts.
      *
@@ -47,7 +47,7 @@ public abstract class AbstractMavenLifecycleParticipant {
 
     /**
      * Invoked after MavenSession instance has been created.
-     *
+     * <p>
      * This callback is intended to allow extensions to inject execution properties,
      * activate profiles and perform similar tasks that affect MavenProject
      * instance construction.
@@ -62,7 +62,7 @@ public abstract class AbstractMavenLifecycleParticipant {
 
     /**
      * Invoked after all projects were built.
-     *
+     * <p>
      * This callback is intended to allow extensions to perform cleanup of any
      * allocated external resources after the build. It is invoked on best-effort
      * basis and may be missed due to an Error or RuntimeException in Maven core

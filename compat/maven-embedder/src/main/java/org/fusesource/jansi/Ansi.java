@@ -23,7 +23,7 @@ import java.util.ArrayList;
 /**
  * Provides a fluent API for generating
  * <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences">ANSI escape sequences</a>.
- *
+ * <p>
  * This class comes from Jansi and is provided for backward compatibility
  * with maven-shared-utils, while Maven has migrated to JLine (into which Jansi has been merged
  * since JLine 3.25.0).

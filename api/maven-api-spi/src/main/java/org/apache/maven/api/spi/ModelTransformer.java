@@ -58,7 +58,7 @@ public interface ModelTransformer extends SpiService {
 
     /**
      * Apply a transformation on the file model.
-     *
+     * <p>
      * This method will be called on each file model being loaded,
      * just before validation.
      *
@@ -73,7 +73,7 @@ public interface ModelTransformer extends SpiService {
 
     /**
      * Apply a transformation on the raw models.
-     *
+     * <p>
      * This method will be called on each raw model being loaded,
      * just before validation.
      *
@@ -88,7 +88,7 @@ public interface ModelTransformer extends SpiService {
 
     /**
      * Apply a transformation on the effective models.
-     *
+     * <p>
      * This method will be called on each effective model being loaded,
      * just before validation.
      *

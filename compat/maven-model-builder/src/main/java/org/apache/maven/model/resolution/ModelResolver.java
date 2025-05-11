@@ -98,7 +98,7 @@ public interface ModelResolver {
      * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters,
      * repositories that were added first should also be searched first. When multiple repositories with the same
      * identifier are added, then the value of the replace argument determines the behaviour.
-     *
+     * <p>
      * If replace is false, then any existing repository with the same ID will remain in use. If replace
      * is true, the new repository replaces the original.
      *

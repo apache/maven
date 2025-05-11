@@ -149,7 +149,7 @@ public class ConditionProfileActivator implements ProfileActivator {
     /**
      * Retrieves the value of a property from the project context.
      * Special function used to support the <code>${property}</code> syntax.
-     *
+     * <p>
      * The profile activation is done twice: once on the file model (so the model
      * which has just been read from the file) and once while computing the effective
      * model (so the model which will be used to build the project). We do need

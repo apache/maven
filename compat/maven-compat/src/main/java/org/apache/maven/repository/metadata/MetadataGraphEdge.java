@@ -38,7 +38,7 @@ public class MetadataGraphEdge {
     /**
      * capturing where this link came from
      * and where it is linked to.
-     *
+     * <p>
      *   In the first implementation only source used for explanatory function
      */
     MetadataGraphVertex source;

@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.di.Inject;
@@ -106,18 +104,6 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
             Plugin merged = cur.withExecutions(execs.values());
             plugins.put(merged, merged);
         }
-    }
-
-    private static String getExecutionId(Plugin plugin, String goal) {
-        Set<String> existingIds = plugin != null
-                ? plugin.getExecutions().stream().map(PluginExecution::getId).collect(Collectors.toSet())
-                : Set.of();
-        String base = "default-" + goal;
-        String id = base;
-        for (int index = 1; existingIds.contains(id); index++) {
-            id = base + '-' + index;
-        }
-        return id;
     }
 
     /**
