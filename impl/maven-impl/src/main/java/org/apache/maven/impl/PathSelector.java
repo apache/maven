@@ -453,10 +453,8 @@ public class PathSelector implements PathMatcher {
                     end++; // Ommit the leading slash if there is nothing before it.
                 }
             }
-            if (start > 0) {
-                if (pattern.charAt(--start) != '/') {
-                    continue;
-                }
+            if (start > 0 && pattern.charAt(--start) != '/') {
+                continue;
             }
             String reduced = pattern.substring(0, start) + pattern.substring(end);
             patterns.add(DEFAULT_SYNTAX + reduced);
