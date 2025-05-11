@@ -14,6 +14,8 @@ github:
     rebase: true
   autolink_jira:
     - MNG
+  pull_requests:
+    del_branch_on_merge: true
 notifications:
   commits: commits@maven.apache.org
   issues: issues@maven.apache.org
