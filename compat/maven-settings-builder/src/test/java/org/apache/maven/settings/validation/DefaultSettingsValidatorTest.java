@@ -57,7 +57,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidate() {
+    void validate() {
         Settings model = new Settings();
         Profile prof = new Profile();
         prof.setId("xxx");
@@ -84,7 +84,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateMirror() throws Exception {
+    void validateMirror() throws Exception {
         Settings settings = new Settings();
         Mirror mirror = new Mirror();
         mirror.setId("local");
@@ -105,7 +105,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateRepository() throws Exception {
+    void validateRepository() throws Exception {
         Profile profile = new Profile();
         Repository repo = new Repository();
         repo.setId("local");
@@ -131,7 +131,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateUniqueServerId() throws Exception {
+    void validateUniqueServerId() throws Exception {
         Settings settings = new Settings();
         Server server1 = new Server();
         server1.setId("test");
@@ -148,7 +148,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateUniqueProfileId() throws Exception {
+    void validateUniqueProfileId() throws Exception {
         Settings settings = new Settings();
         Profile profile1 = new Profile();
         profile1.setId("test");
@@ -166,7 +166,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateUniqueRepositoryId() throws Exception {
+    void validateUniqueRepositoryId() throws Exception {
         Settings settings = new Settings();
         Profile profile = new Profile();
         profile.setId("pro");
@@ -190,7 +190,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateUniqueProxyId() throws Exception {
+    void validateUniqueProxyId() throws Exception {
         Settings settings = new Settings();
         Proxy proxy = new Proxy();
         String id = "foo";
@@ -208,7 +208,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidateProxy() throws Exception {
+    void validateProxy() throws Exception {
         Settings settings = new Settings();
         Proxy proxy1 = new Proxy();
         settings.addProxy(proxy1);

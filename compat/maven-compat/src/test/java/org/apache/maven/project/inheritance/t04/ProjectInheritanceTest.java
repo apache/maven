@@ -55,7 +55,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
+    void dependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
         File pom0Basedir = pom0.getParentFile();
@@ -69,14 +69,13 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         Set set = project1.getArtifacts();
         assertNotNull(set, "No artifacts");
         assertTrue(set.size() > 0, "No Artifacts");
-        assertTrue(set.size() == 3, "Set size should be 3, is " + set.size());
+        assertEquals(3, set.size(), "Set size should be 3, is " + set.size());
 
         for (Object aSet : set) {
             Artifact artifact = (Artifact) aSet;
             System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
                     + " Optional=" + (artifact.isOptional() ? "true" : "false"));
-            assertTrue(
-                    artifact.getVersion().equals("1.0"), "Incorrect version for " + artifact.getDependencyConflictId());
+            assertEquals("1.0", artifact.getVersion(), "Incorrect version for " + artifact.getDependencyConflictId());
         }
     }
 }

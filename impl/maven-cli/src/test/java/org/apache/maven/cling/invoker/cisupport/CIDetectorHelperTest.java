@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CIDetectorHelperTest {
+class CIDetectorHelperTest {
     private static final Set<String> ALL =
             Set.of("CIRCLECI", "CI", "WORKSPACE", "GITHUB_ACTIONS", "TEAMCITY_VERSION", "TRAVIS");
 

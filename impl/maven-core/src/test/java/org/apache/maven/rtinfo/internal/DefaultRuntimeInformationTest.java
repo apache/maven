@@ -35,14 +35,14 @@ class DefaultRuntimeInformationTest {
     RuntimeInformation rtInfo;
 
     @Test
-    void testGetMavenVersion() {
+    void getMavenVersion() {
         String mavenVersion = rtInfo.getMavenVersion();
         assertNotNull(mavenVersion);
-        assertTrue(!mavenVersion.isEmpty());
+        assertFalse(mavenVersion.isEmpty());
     }
 
     @Test
-    void testIsMavenVersion() {
+    void isMavenVersion() {
         assertTrue(rtInfo.isMavenVersion("2.0"));
         assertFalse(rtInfo.isMavenVersion("9.9"));
 

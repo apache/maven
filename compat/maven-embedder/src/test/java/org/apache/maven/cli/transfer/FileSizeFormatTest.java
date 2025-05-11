@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FileSizeFormatTest {
 
     @Test
-    void testNegativeSize() {
+    void negativeSize() {
         FileSizeFormat format = new FileSizeFormat();
 
         long negativeSize = -100L;
@@ -36,7 +36,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testSize() {
+    void size() {
         FileSizeFormat format = new FileSizeFormat();
 
         assertEquals("0 B", format.format(0L));
@@ -62,7 +62,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testSizeWithSelectedScaleUnit() {
+    void sizeWithSelectedScaleUnit() {
         FileSizeFormat format = new FileSizeFormat();
 
         assertEquals("0 B", format.format(0L));
@@ -151,7 +151,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testNegativeProgressedSize() {
+    void negativeProgressedSize() {
         FileSizeFormat format = new FileSizeFormat();
 
         long negativeProgressedSize = -100L;
@@ -159,14 +159,14 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testNegativeProgressedSizeBiggerThanSize() {
+    void negativeProgressedSizeBiggerThanSize() {
         FileSizeFormat format = new FileSizeFormat();
 
         assertThrows(IllegalArgumentException.class, () -> format.formatProgress(100L, 10L));
     }
 
     @Test
-    void testProgressedSizeWithoutSize() {
+    void progressedSizeWithoutSize() {
         FileSizeFormat format = new FileSizeFormat();
 
         assertEquals("0 B", format.formatProgress(0L, -1L));
@@ -176,14 +176,14 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testProgressedBothZero() {
+    void progressedBothZero() {
         FileSizeFormat format = new FileSizeFormat();
 
         assertEquals("0 B", format.formatProgress(0L, 0L));
     }
 
     @Test
-    void testProgressedSizeWithSize() {
+    void progressedSizeWithSize() {
         FileSizeFormat format = new FileSizeFormat();
 
         assertEquals("0/800 B", format.formatProgress(0L, 800L));

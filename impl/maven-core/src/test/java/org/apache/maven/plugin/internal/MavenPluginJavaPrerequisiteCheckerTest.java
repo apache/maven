@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MavenPluginJavaPrerequisiteCheckerTest {
 
     @Test
-    void testMatchesVersion() {
+    void matchesVersion() {
         MavenPluginJavaPrerequisiteChecker checker = new MavenPluginJavaPrerequisiteChecker(new GenericVersionScheme());
         assertTrue(checker.matchesVersion("1.0", "1.8"));
         assertTrue(checker.matchesVersion("1.8", "9.0.1+11"));

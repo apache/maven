@@ -61,7 +61,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testArtifact() throws Exception {
+    void artifact() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -89,7 +89,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testMissingArtifact() throws Exception {
+    void missingArtifact() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -114,7 +114,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testPom() throws Exception {
+    void pom() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -142,7 +142,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testMissingPom() throws Exception {
+    void missingPom() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -167,7 +167,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testMetadata() throws Exception {
+    void metadata() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -195,7 +195,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testMissingMetadata() throws Exception {
+    void missingMetadata() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
@@ -221,7 +221,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testArtifactTouchFileName() throws Exception {
+    void artifactTouchFileName() throws Exception {
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = artifactFactory.createArtifactWithClassifier("groupId", "a", "0.0.1-SNAPSHOT", "jar", null);

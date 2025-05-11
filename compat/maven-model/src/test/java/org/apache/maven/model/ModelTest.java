@@ -32,12 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class ModelTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Model().hashCode();
     }
 
     @Test
-    void testBuild() {
+    void build() {
         Model model = new Model();
         Build build = new Build();
         build.setOutputDirectory("myOutputDirectory");
@@ -50,20 +50,20 @@ class ModelTest {
     }
 
     @Test
-    void testEqualsNullSafe() {
+    void equalsNullSafe() {
         assertNotEquals(null, new Model());
 
         new Model().equals(new Model());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Model thing = new Model();
         assertEquals(thing, thing);
     }
 
     @Test
-    void testToStringNullSafe() {
+    void toStringNullSafe() {
         assertNotNull(new Model().toString());
     }
 }

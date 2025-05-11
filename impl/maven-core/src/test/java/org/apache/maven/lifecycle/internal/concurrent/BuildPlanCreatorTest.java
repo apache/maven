@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BuildPlanCreatorTest {
 
     @Test
-    void testMulti() {
+    void multi() {
         MavenProject project = new MavenProject();
         project.setCollectedProjects(List.of());
         Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
@@ -47,7 +47,7 @@ class BuildPlanCreatorTest {
     }
 
     @Test
-    void testCondense() {
+    void condense() {
         MavenProject p1 = new MavenProject();
         p1.setCollectedProjects(List.of());
         p1.setArtifactId("p1");
@@ -83,7 +83,7 @@ class BuildPlanCreatorTest {
     }
 
     @Test
-    void testAlias() {
+    void alias() {
         MavenProject p1 = new MavenProject();
         p1.setArtifactId("p1");
         p1.setCollectedProjects(List.of());
@@ -94,7 +94,7 @@ class BuildPlanCreatorTest {
     }
 
     @Test
-    void testAllPhase() {
+    void allPhase() {
         MavenProject c1 = new MavenProject();
         c1.setArtifactId("c1");
         c1.setCollectedProjects(List.of());

@@ -58,9 +58,8 @@ class DefaultModelResolverTest {
         Path localRepoPath = basedir.resolve("target/local-repo");
         Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
         Session s = ApiRunner.createSession(
-                injector -> {
-                    injector.bindInstance(DefaultModelResolverTest.class, this);
-                },
+                injector ->
+                    injector.bindInstance(DefaultModelResolverTest.class, this),
                 localRepoPath);
         RemoteRepository remoteRepository = s.createRemoteRepository(
                 RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
@@ -68,7 +67,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveParentThrowsModelResolverExceptionWhenNotFound() throws Exception {
+    void resolveParentThrowsModelResolverExceptionWhenNotFound() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")
@@ -84,7 +83,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveParentThrowsModelResolverExceptionWhenNoMatchingVersionFound() throws Exception {
+    void resolveParentThrowsModelResolverExceptionWhenNoMatchingVersionFound() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")
@@ -99,7 +98,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveParentThrowsModelResolverExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void resolveParentThrowsModelResolverExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")
@@ -114,7 +113,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
+    void resolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")
@@ -126,7 +125,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
+    void resolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
         final Parent parent = Parent.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")
@@ -139,7 +138,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveDependencyThrowsModelResolverExceptionWhenNotFound() throws Exception {
+    void resolveDependencyThrowsModelResolverExceptionWhenNotFound() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")
@@ -155,7 +154,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveDependencyThrowsModelResolverExceptionWhenNoMatchingVersionFound() throws Exception {
+    void resolveDependencyThrowsModelResolverExceptionWhenNoMatchingVersionFound() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")
@@ -170,7 +169,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveDependencyThrowsModelResolverExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void resolveDependencyThrowsModelResolverExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")
@@ -185,7 +184,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
+    void resolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")
@@ -197,7 +196,7 @@ class DefaultModelResolverTest {
     }
 
     @Test
-    void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
+    void resolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
         final Dependency dependency = Dependency.newBuilder()
                 .groupId("org.apache")
                 .artifactId("apache")

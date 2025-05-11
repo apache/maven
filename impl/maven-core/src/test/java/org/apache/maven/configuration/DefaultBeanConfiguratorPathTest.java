@@ -59,7 +59,7 @@ class DefaultBeanConfiguratorPathTest {
     }
 
     @Test
-    void testMinimal() throws BeanConfigurationException {
+    void minimal() throws BeanConfigurationException {
         SomeBean bean = new SomeBean();
 
         Xpp3Dom config = toConfig("<file>test</file>");
@@ -73,7 +73,7 @@ class DefaultBeanConfiguratorPathTest {
     }
 
     @Test
-    void testPreAndPostProcessing() throws BeanConfigurationException {
+    void preAndPostProcessing() throws BeanConfigurationException {
         SomeBean bean = new SomeBean();
 
         Xpp3Dom config = toConfig("<file>${test}</file>");
@@ -97,7 +97,7 @@ class DefaultBeanConfiguratorPathTest {
     }
 
     @Test
-    void testChildConfigurationElement() throws BeanConfigurationException {
+    void childConfigurationElement() throws BeanConfigurationException {
         SomeBean bean = new SomeBean();
 
         Xpp3Dom config = toConfig("<wrapper><file>test</file></wrapper>");

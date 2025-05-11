@@ -34,27 +34,27 @@ class ProjectDependencyGraphStubTest {
     ProjectDependencyGraphStub stub = new ProjectDependencyGraphStub();
 
     @Test
-    void testADependencies() {
+    void aDependencies() {
         final List<MavenProject> mavenProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.A, false);
         assertEquals(0, mavenProjects.size());
     }
 
     @Test
-    void testBDependencies() {
+    void bDependencies() {
         final List<MavenProject> bProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.B, false);
         assertEquals(1, bProjects.size());
         assertTrue(bProjects.contains(ProjectDependencyGraphStub.A));
     }
 
     @Test
-    void testCDependencies() {
+    void cDependencies() {
         final List<MavenProject> cProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.C, false);
         assertEquals(1, cProjects.size());
         assertTrue(cProjects.contains(ProjectDependencyGraphStub.A));
     }
 
     @Test
-    void testXDependencies() {
+    void xDependencies() {
         final List<MavenProject> cProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.X, false);
         assertEquals(2, cProjects.size());
         assertTrue(cProjects.contains(ProjectDependencyGraphStub.C));

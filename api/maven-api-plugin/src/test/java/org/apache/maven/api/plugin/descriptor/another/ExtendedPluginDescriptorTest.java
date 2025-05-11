@@ -63,7 +63,7 @@ class ExtendedPluginDescriptorTest {
     }
 
     @Test
-    void testExtendedPluginDescriptor() {
+    void extendedPluginDescriptor() {
         ExtendedPluginDescriptor.Builder builder = new ExtendedPluginDescriptor.Builder();
         // make sure to call the subclasses' builder methods first, otherwise fluent API would not work
         builder.additionalField("additional")

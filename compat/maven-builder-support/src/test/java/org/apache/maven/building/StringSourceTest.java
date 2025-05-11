@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StringSourceTest {
     @Test
-    void testGetInputStream() throws Exception {
+    void getInputStream() throws Exception {
         StringSource source = new StringSource("Hello World!");
 
         try (InputStream is = source.getInputStream();
@@ -37,7 +37,7 @@ class StringSourceTest {
     }
 
     @Test
-    void testGetLocation() {
+    void getLocation() {
         StringSource source = new StringSource("Hello World!");
         assertEquals("(memory)", source.getLocation());
 
@@ -46,7 +46,7 @@ class StringSourceTest {
     }
 
     @Test
-    void testGetContent() {
+    void getContent() {
         StringSource source = new StringSource(null);
         assertEquals("", source.getContent());
 

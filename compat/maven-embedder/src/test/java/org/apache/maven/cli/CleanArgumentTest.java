@@ -45,7 +45,7 @@ class CleanArgumentTest {
     }
 
     @Test
-    void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes() {
+    void cleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingDoubleQuotes() {
         String information = "-Dinformation=\"The Information is important.\"";
         String[] args = {information};
         String[] cleanArgs = CleanArgument.cleanArgs(args);
@@ -54,7 +54,7 @@ class CleanArgumentTest {
     }
 
     @Test
-    void testCleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingSingleQuotes() {
+    void cleanArgsShouldNotTouchCorrectlyQuotedArgumentsUsingSingleQuotes() {
         String information = "-Dinformation='The Information is important.'";
         String[] args = {information};
         String[] cleanArgs = CleanArgument.cleanArgs(args);

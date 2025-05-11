@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 class BuildListCalculatorTest {
 
     @Test
-    void testCalculateProjectBuilds() throws Exception {
+    void calculateProjectBuilds() throws Exception {
         LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator = getTaskSegmentCalculator();
         BuildListCalculator buildListCalculator = new BuildListCalculator();
         final MavenSession session = ProjectDependencyGraphStub.getMavenSession();

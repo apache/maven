@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@code Scm}.
@@ -31,30 +28,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ScmTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Scm().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new Scm().equals(null));
+    void equalsNullSafe() {
+        assertNotEquals(null, new Scm());
 
         new Scm().equals(new Scm());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Scm thing = new Scm();
-        assertTrue(thing.equals(thing));
+        assertEquals(thing, thing);
     }
 
     @Test
-    void testToStringNullSafe() {
+    void toStringNullSafe() {
         assertNotNull(new Scm().toString());
     }
 
     @Test
-    public void testToStringNotNonsense() {
+    void toStringNotNonsense() {
         Scm scm = new Scm();
         scm.setConnection("scm:git:git://git.localdomain/model");
 

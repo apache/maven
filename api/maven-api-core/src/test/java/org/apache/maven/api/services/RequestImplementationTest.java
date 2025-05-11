@@ -35,7 +35,7 @@ import static org.mockito.Mockito.mock;
 class RequestImplementationTest {
 
     @Test
-    void testArtifactResolverRequestEquality() {
+    void artifactResolverRequestEquality() {
         Session session = mock(Session.class);
         ArtifactCoordinates coords1 = mock(ArtifactCoordinates.class);
         ArtifactCoordinates coords2 = mock(ArtifactCoordinates.class);
@@ -74,7 +74,7 @@ class RequestImplementationTest {
     }
 
     @Test
-    void testRequestTraceIntegration() {
+    void requestTraceIntegration() {
         Session session = mock(Session.class);
         RequestTrace trace = new RequestTrace("test-context", null, "test-data");
 
@@ -86,7 +86,7 @@ class RequestImplementationTest {
     }
 
     @Test
-    void testDependencyResolverRequestEquality() {
+    void dependencyResolverRequestEquality() {
         Session session = mock(Session.class);
 
         DependencyResolverRequest.DependencyResolverRequestBuilder builder = DependencyResolverRequest.builder();

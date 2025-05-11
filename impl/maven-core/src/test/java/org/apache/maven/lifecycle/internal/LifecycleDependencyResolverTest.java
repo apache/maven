@@ -46,7 +46,7 @@ class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase
     }
 
     @Test
-    void testCachedReactorProjectDependencies() throws Exception {
+    void cachedReactorProjectDependencies() throws Exception {
         MavenSession session = createMavenSession(
                 new File("src/test/projects/lifecycle-dependency-resolver/pom.xml"), new Properties(), true);
         Collection<String> scopesToCollect = null;

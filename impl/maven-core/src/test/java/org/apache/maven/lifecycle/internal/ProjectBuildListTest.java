@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ProjectBuildListTest {
     @Test
-    void testGetByTaskSegment() throws Exception {
+    void getByTaskSegment() throws Exception {
         final MavenSession session = ProjectDependencyGraphStub.getMavenSession();
         ProjectBuildList projectBuildList = ProjectDependencyGraphStub.getProjectBuildList(session);
         TaskSegment taskSegment = projectBuildList.get(0).getTaskSegment();

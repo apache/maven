@@ -6,7 +6,6 @@ import org.apache.maven.plugin.testing.WithoutMojo;
 
 import org.junit.Rule;
 import static org.junit.Assert.*;
-import org.junit.Test;
 import java.io.File;
 
 public class MyMojoTest

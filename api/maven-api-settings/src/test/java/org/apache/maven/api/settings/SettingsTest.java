@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class SettingsTest {
 
     @Test
-    void testSetLocalRepository() {
+    void setLocalRepository() {
         Settings s = Settings.newInstance();
 
         s = s.withLocalRepository("xxx");

@@ -49,7 +49,7 @@ class LifecycleModuleBuilderTest {
     PlexusContainer container;
 
     @Test
-    void testCurrentProject() throws Exception {
+    void currentProject() throws Exception {
         List<MavenProject> currentProjects = new ArrayList<>();
         MojoExecutorStub mojoExecutor = new MojoExecutorStub() {
             @Override

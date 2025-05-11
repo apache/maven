@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SoftIdentityMapTest {
     private SoftIdentityMap<Object, String> map;
@@ -144,7 +143,7 @@ class SoftIdentityMapTest {
         String key1 = new String("key");
         String key2 = new String("key");
 
-        assertTrue(key1.equals(key2), "Sanity check: keys should be equal");
+        assertEquals(key1, key2, "Sanity check: keys should be equal");
         assertNotSame(key1, key2, "Sanity check: keys should be distinct objects");
 
         AtomicInteger computeCount = new AtomicInteger(0);

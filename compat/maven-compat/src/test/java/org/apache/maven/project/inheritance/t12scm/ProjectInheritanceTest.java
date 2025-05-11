@@ -43,7 +43,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testScmInfoCalculatedCorrectlyOnParentAndChildRead() throws Exception {
+    void scmInfoCalculatedCorrectlyOnParentAndChildRead() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -61,7 +61,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     }
 
     @Test
-    void testScmInfoCalculatedCorrectlyOnChildOnlyRead() throws Exception {
+    void scmInfoCalculatedCorrectlyOnChildOnlyRead() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom1 = new File(localRepo, "p0/modules/p1/pom.xml");

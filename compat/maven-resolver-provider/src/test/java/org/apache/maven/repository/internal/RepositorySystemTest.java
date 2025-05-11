@@ -41,20 +41,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RepositorySystemTest extends AbstractRepositoryTestCase {
     @Test
-    void testResolveVersionRange() throws Exception {
+    void resolveVersionRange() throws Exception {
         // VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
         //                throws VersionRangeResolutionException;
 
     }
 
     @Test
-    void testResolveVersion() throws Exception {
+    void resolveVersion() throws Exception {
         // VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
         //                throws VersionResolutionException;
     }
 
     @Test
-    void testReadArtifactDescriptor() throws Exception {
+    void readArtifactDescriptor() throws Exception {
         Artifact artifact = new DefaultArtifact("ut.simple:artifact:extension:classifier:1.0");
 
         ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
@@ -113,7 +113,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testCollectDependencies() throws Exception {
+    void collectDependencies() throws Exception {
         Artifact artifact = new DefaultArtifact("ut.simple:artifact:extension:classifier:1.0");
         // notice: extension and classifier not really used in this test...
 
@@ -130,7 +130,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveArtifact() throws Exception {
+    void resolveArtifact() throws Exception {
         Artifact artifact = new DefaultArtifact("ut.simple:artifact:1.0");
 
         ArtifactRequest artifactRequest = new ArtifactRequest();
@@ -160,7 +160,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveArtifacts() throws Exception {
+    void resolveArtifacts() throws Exception {
         ArtifactRequest req1 = new ArtifactRequest();
         req1.setArtifact(new DefaultArtifact("ut.simple:artifact:1.0"));
         req1.addRepository(newTestRepository());
@@ -184,31 +184,31 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveMetadata() throws Exception {
+    void resolveMetadata() throws Exception {
         // List<MetadataResult> resolveMetadata( RepositorySystemSession session,
         //                                      Collection<? extends MetadataRequest> requests );
     }
 
     @Test
-    void testInstall() throws Exception {
+    void install() throws Exception {
         // InstallResult install( RepositorySystemSession session, InstallRequest request )
         //                throws InstallationException;
         // release, snapshot unique ou non unique, attachment
     }
 
     @Test
-    void testDeploy() throws Exception {
+    void deploy() throws Exception {
         // DeployResult deploy( RepositorySystemSession session, DeployRequest request )
         //                throws DeploymentException;
     }
 
     @Test
-    void testNewLocalRepositoryManager() throws Exception {
+    void newLocalRepositoryManager() throws Exception {
         // LocalRepositoryManager newLocalRepositoryManager( LocalRepository localRepository );
     }
 
     @Test
-    void testNewSyncContext() throws Exception {
+    void newSyncContext() throws Exception {
         // SyncContext newSyncContext( RepositorySystemSession session, boolean shared );
     }
 }

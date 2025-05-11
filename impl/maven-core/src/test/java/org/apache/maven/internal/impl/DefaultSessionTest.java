@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-public class DefaultSessionTest {
+class DefaultSessionTest {
 
     @Test
-    void testRootDirectoryWithNull() {
+    void rootDirectoryWithNull() {
         RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         MavenSession ms = new MavenSession(null, rss, mer, null);
@@ -50,7 +50,7 @@ public class DefaultSessionTest {
     }
 
     @Test
-    void testRootDirectory() {
+    void rootDirectory() {
         RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         MavenSession ms = new MavenSession(null, rss, mer, null);

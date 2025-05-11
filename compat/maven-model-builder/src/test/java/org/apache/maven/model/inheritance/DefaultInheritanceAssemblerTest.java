@@ -60,7 +60,7 @@ class DefaultInheritanceAssemblerTest {
     }
 
     @Test
-    void testPluginConfiguration() throws Exception {
+    void pluginConfiguration() throws Exception {
         testInheritance("plugin-configuration");
     }
 
@@ -70,7 +70,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws IOException Model read problem
      */
     @Test
-    void testUrls() throws Exception {
+    void urls() throws Exception {
         testInheritance("urls");
     }
 
@@ -79,7 +79,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws IOException Model read problem
      */
     @Test
-    void testFlatUrls() throws IOException {
+    void flatUrls() throws IOException {
         testInheritance("flat-urls");
     }
 
@@ -88,7 +88,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws Exception
      */
     @Test
-    void testNoAppendUrls() throws Exception {
+    void noAppendUrls() throws Exception {
         testInheritance("no-append-urls");
     }
 
@@ -97,7 +97,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws Exception
      */
     @Test
-    void testNoAppendUrls2() throws Exception {
+    void noAppendUrls2() throws Exception {
         testInheritance("no-append-urls2");
     }
 
@@ -106,7 +106,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws Exception
      */
     @Test
-    void testNoAppendUrls3() throws Exception {
+    void noAppendUrls3() throws Exception {
         testInheritance("no-append-urls3");
     }
 
@@ -117,7 +117,7 @@ class DefaultInheritanceAssemblerTest {
      * @throws IOException Model read problem
      */
     @Test
-    void testFlatTrickyUrls() throws IOException {
+    void flatTrickyUrls() throws IOException {
         // parent references child with artifactId (which is not directory name)
         // then relative path calculation will fail during build from disk but success when calculated from repo
         try {
@@ -154,7 +154,7 @@ class DefaultInheritanceAssemblerTest {
     }
 
     @Test
-    void testWithEmptyUrl() throws IOException {
+    void withEmptyUrl() throws IOException {
         testInheritance("empty-urls", false);
     }
 
@@ -195,7 +195,7 @@ class DefaultInheritanceAssemblerTest {
     }
 
     @Test
-    void testModulePathNotArtifactId() throws IOException {
+    void modulePathNotArtifactId() throws IOException {
         Model parent = getModel("module-path-not-artifactId-parent");
 
         Model child = getModel("module-path-not-artifactId-child");

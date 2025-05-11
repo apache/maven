@@ -37,7 +37,7 @@ class ComplexActivationTest {
     }
 
     @Test
-    void testAndConditionInActivation() throws Exception {
+    void andConditionInActivation() throws Exception {
         Properties sysProperties = new Properties();
         sysProperties.setProperty("myproperty", "test");
 

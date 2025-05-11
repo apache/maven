@@ -46,7 +46,7 @@ class ArtifactInstallerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testArtifactInstallation() throws Exception {
+    void artifactInstallation() throws Exception {
         sessionScope.enter();
         try {
             sessionScope.seed(MavenSession.class, mock(MavenSession.class));

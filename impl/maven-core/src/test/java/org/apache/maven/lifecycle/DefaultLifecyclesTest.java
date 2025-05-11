@@ -49,35 +49,35 @@ class DefaultLifecyclesTest {
     private DefaultLifecycles defaultLifeCycles;
 
     @Test
-    void testDefaultLifecycles() {
+    void defaultLifecycles() {
         final List<Lifecycle> lifecycles = defaultLifeCycles.getLifeCycles();
         assertThat(lifecycles, hasSize(3));
         assertThat(DefaultLifecycles.STANDARD_LIFECYCLES, arrayWithSize(3));
     }
 
     @Test
-    void testDefaultLifecycle() {
+    void defaultLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("default");
         assertThat(lifecycle.getId(), is("default"));
         assertThat(lifecycle.getPhases(), hasSize(54));
     }
 
     @Test
-    void testCleanLifecycle() {
+    void cleanLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("clean");
         assertThat(lifecycle.getId(), is("clean"));
         assertThat(lifecycle.getPhases(), hasSize(3));
     }
 
     @Test
-    void testSiteLifecycle() {
+    void siteLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("site");
         assertThat(lifecycle.getId(), is("site"));
         assertThat(lifecycle.getPhases(), hasSize(6));
     }
 
     @Test
-    void testCustomLifecycle() throws ComponentLookupException {
+    void customLifecycle() throws ComponentLookupException {
         List<Lifecycle> myLifecycles = new ArrayList<>();
         Lifecycle myLifecycle =
                 new Lifecycle("etl", Arrays.asList("extract", "transform", "load"), Collections.emptyMap());

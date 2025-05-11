@@ -37,7 +37,7 @@ class MonotonicClockTest {
 
     @Test
     @DisplayName("MonotonicClock singleton instance should always return the same instance")
-    void testSingletonInstance() {
+    void singletonInstance() {
         MonotonicClock clock1 = MonotonicClock.get();
         MonotonicClock clock2 = MonotonicClock.get();
 
@@ -46,7 +46,7 @@ class MonotonicClockTest {
 
     @Test
     @DisplayName("MonotonicClock should always use UTC timezone")
-    void testClockTimezone() {
+    void clockTimezone() {
         MonotonicClock clock = MonotonicClock.get();
 
         assertEquals(ZoneOffset.UTC, clock.getZone(), "Clock should use UTC timezone");
@@ -58,7 +58,7 @@ class MonotonicClockTest {
 
     @Test
     @DisplayName("MonotonicClock should maintain monotonic time progression")
-    void testMonotonicBehavior() throws InterruptedException {
+    void monotonicBehavior() throws InterruptedException {
         Instant first = MonotonicClock.now();
         Thread.sleep(10); // Small delay
         Instant second = MonotonicClock.now();
@@ -71,7 +71,7 @@ class MonotonicClockTest {
 
     @Test
     @DisplayName("MonotonicClock elapsed time should increase")
-    void testElapsedTime() throws InterruptedException {
+    void elapsedTime() throws InterruptedException {
         Duration initial = MonotonicClock.elapsed();
         Thread.sleep(50); // Longer delay for more reliable measurement
         Duration later = MonotonicClock.elapsed();
@@ -84,7 +84,7 @@ class MonotonicClockTest {
 
     @Test
     @DisplayName("MonotonicClock start time should remain constant")
-    void testStartTime() throws InterruptedException {
+    void startTime() throws InterruptedException {
         Instant start1 = MonotonicClock.start();
         Thread.sleep(10);
         Instant start2 = MonotonicClock.start();
@@ -99,7 +99,7 @@ class MonotonicClockTest {
 
         @Test
         @DisplayName("Current time should be after start time")
-        void testCurrentTimeAfterStart() {
+        void currentTimeAfterStart() {
             Instant now = MonotonicClock.now();
             Instant start = MonotonicClock.start();
 
@@ -108,7 +108,7 @@ class MonotonicClockTest {
 
         @Test
         @DisplayName("Elapsed time should match time difference")
-        void testElapsedTimeConsistency() {
+        void elapsedTimeConsistency() {
             MonotonicClock clock = MonotonicClock.get();
             Instant now = clock.instant();
             Duration elapsed = clock.elapsedTime();
@@ -123,7 +123,7 @@ class MonotonicClockTest {
 
     @Test
     @DisplayName("MonotonicClock should handle rapid successive calls")
-    void testRapidCalls() {
+    void rapidCalls() {
         Instant[] instants = new Instant[1000];
         for (int i = 0; i < instants.length; i++) {
             instants[i] = MonotonicClock.now();
@@ -139,7 +139,7 @@ class MonotonicClockTest {
 
     @Test
     @DisplayName("MonotonicClock should maintain reasonable alignment with system time")
-    void testSystemTimeAlignment() {
+    void systemTimeAlignment() {
         Instant monotonic = MonotonicClock.now();
         Instant system = Instant.now();
 

@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PropertiesAsMapTest {
 
     @Test
-    void testPropertiesAsMap() {
+    void propertiesAsMap() {
         Properties props = new Properties();
         props.setProperty("foo1", "bar1");
         props.setProperty("foo2", "bar2");

@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class VersionRangeTest {
+class VersionRangeTest {
 
     private ModelVersionParser versionParser = new DefaultModelVersionParser(new GenericVersionScheme());
 
@@ -64,7 +64,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    void testLowerBoundInclusiveUpperBoundInclusive() {
+    void lowerBoundInclusiveUpperBoundInclusive() {
         VersionRange range = parseValid("[1,2]");
         assertContains(range, "1");
         assertContains(range, "1.1-SNAPSHOT");
@@ -73,7 +73,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    void testLowerBoundInclusiveUpperBoundExclusive() {
+    void lowerBoundInclusiveUpperBoundExclusive() {
         VersionRange range = parseValid("[1.2.3.4.5,1.2.3.4.6)");
         assertContains(range, "1.2.3.4.5");
         assertNotContains(range, "1.2.3.4.6");
@@ -81,7 +81,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    void testLowerBoundExclusiveUpperBoundInclusive() {
+    void lowerBoundExclusiveUpperBoundInclusive() {
         VersionRange range = parseValid("(1a,1b]");
         assertNotContains(range, "1a");
         assertContains(range, "1b");
@@ -89,7 +89,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    void testLowerBoundExclusiveUpperBoundExclusive() {
+    void lowerBoundExclusiveUpperBoundExclusive() {
         VersionRange range = parseValid("(1,3)");
         assertNotContains(range, "1");
         assertContains(range, "2-SNAPSHOT");
@@ -98,7 +98,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    void testSingleVersion() {
+    void singleVersion() {
         VersionRange range = parseValid("[1]");
         assertContains(range, "1");
         assertEquals(range, parseValid(range.toString()));
@@ -109,7 +109,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    void testSingleWildcardVersion() {
+    void singleWildcardVersion() {
         VersionRange range = parseValid("[1.2.*]");
         assertContains(range, "1.2-alpha-1");
         assertContains(range, "1.2-SNAPSHOT");
@@ -120,24 +120,24 @@ public class VersionRangeTest {
     }
 
     @Test
-    void testMissingOpenCloseDelimiter() {
+    void missingOpenCloseDelimiter() {
         parseInvalid("1.0");
     }
 
     @Test
-    void testMissingOpenDelimiter() {
+    void missingOpenDelimiter() {
         parseInvalid("1.0]");
         parseInvalid("1.0)");
     }
 
     @Test
-    void testMissingCloseDelimiter() {
+    void missingCloseDelimiter() {
         parseInvalid("[1.0");
         parseInvalid("(1.0");
     }
 
     @Test
-    void testTooManyVersions() {
+    void tooManyVersions() {
         parseInvalid("[1,2,3]");
         parseInvalid("(1,2,3)");
         parseInvalid("[1,2,3)");

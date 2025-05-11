@@ -30,7 +30,7 @@ import static org.apache.maven.api.di.testing.MavenDIExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @MavenDITest
-public class SimpleDITest {
+class SimpleDITest {
 
     private static final String LOCAL_REPO = getBasedir() + File.separator + "target" + File.separator + "local-repo";
 
@@ -38,7 +38,7 @@ public class SimpleDITest {
     Session session;
 
     @Test
-    void testSession() {
+    void session() {
         assertNotNull(session);
         assertNotNull(session.getLocalRepository());
     }

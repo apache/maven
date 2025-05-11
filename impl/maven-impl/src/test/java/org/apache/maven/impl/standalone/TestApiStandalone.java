@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestApiStandalone {
 
     @Test
-    void testStandalone() {
+    void standalone() {
         Session session = ApiRunner.createSession(injector -> {
             injector.bindInstance(TestApiStandalone.class, this);
         });

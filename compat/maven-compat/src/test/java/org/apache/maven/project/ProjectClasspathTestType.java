@@ -52,7 +52,7 @@ class ProjectClasspathTestType extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    void testProjectClasspath() throws Exception {
+    void projectClasspath() throws Exception {
         File f = getFileForClasspathResource(DIR + "project-with-scoped-dependencies.xml");
 
         MavenProject project = getProjectWithDependencies(f);

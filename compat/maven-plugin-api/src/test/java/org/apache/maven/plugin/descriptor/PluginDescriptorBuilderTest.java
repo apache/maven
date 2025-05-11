@@ -46,7 +46,7 @@ class PluginDescriptorBuilderTest {
     }
 
     @Test
-    void testBuildReader() throws Exception {
+    void buildReader() throws Exception {
         PluginDescriptor pd = build("/plugin.xml");
 
         assertEquals("org.apache.maven.plugins", pd.getGroupId());

@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Unit tests on <code>MavenProperties</code>.
  */
 @Deprecated
-public class MavenPropertiesTest {
+class MavenPropertiesTest {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final String COMMENT = "# comment";
@@ -65,13 +65,13 @@ public class MavenPropertiesTest {
      * @see junit.framework.TestCase#setUp()
      */
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         properties = new MavenProperties();
         properties.load(new StringReader(TEST_PROPERTIES));
     }
 
     @Test
-    public void testSpaces() throws Exception {
+    void spaces() throws Exception {
         String config = "\n" + "\n"
                 + "    \n"
                 + "                \n"
@@ -164,7 +164,7 @@ public class MavenPropertiesTest {
     }
 
     @Test
-    public void testConfigInterpolation() throws IOException {
+    void configInterpolation() throws IOException {
         String config = "a=$\\\\\\\\{var}\n" + "ab=${a}b\n" + "abc=${ab}c";
         Map<String, String> expected = Map.of("a", "$\\{var}", "ab", "$\\{var}b", "abc", "$\\{var}bc");
 
@@ -186,13 +186,13 @@ public class MavenPropertiesTest {
      * @throws Exception
      */
     @Test
-    public void testGettingProperty() throws Exception {
+    void gettingProperty() throws Exception {
         Object o2 = properties.get("test");
         assertEquals("test", o2);
     }
 
     @Test
-    public void testLoadSave() throws IOException {
+    void loadSave() throws IOException {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         pw.println("# ");
@@ -225,7 +225,7 @@ public class MavenPropertiesTest {
     }
 
     @Test
-    public void testJavaUtilPropertiesCompatibility() throws Exception {
+    void javaUtilPropertiesCompatibility() throws Exception {
         MavenProperties properties = new MavenProperties();
         properties.load(new StringReader(TEST_PROPERTIES));
 
@@ -246,7 +246,7 @@ public class MavenPropertiesTest {
     private static final String RESULT1 = COMMENT + LINE_SEPARATOR + KEY1A + " = " + VALUE1 + LINE_SEPARATOR;
 
     @Test
-    public void testSaveComment1() throws Exception {
+    void saveComment1() throws Exception {
         properties.put(KEY1, COMMENT, VALUE1);
         StringWriter sw = new StringWriter();
         properties.save(sw);
@@ -257,7 +257,7 @@ public class MavenPropertiesTest {
     private static final String RESULT1A = COMMENT + LINE_SEPARATOR + KEY2A + " = " + VALUE1 + LINE_SEPARATOR;
 
     @Test
-    public void testSaveComment1a() throws Exception {
+    void saveComment1a() throws Exception {
         properties.put(KEY2, COMMENT, VALUE1);
         StringWriter sw = new StringWriter();
         properties.save(sw);
@@ -269,7 +269,7 @@ public class MavenPropertiesTest {
             COMMENT + LINE_SEPARATOR + COMMENT + LINE_SEPARATOR + KEY1A + " = " + VALUE1 + LINE_SEPARATOR;
 
     @Test
-    public void testSaveComment2() throws Exception {
+    void saveComment2() throws Exception {
         properties.put(KEY1, List.of(new String[] {COMMENT, COMMENT}), VALUE1);
         StringWriter sw = new StringWriter();
         properties.save(sw);
@@ -281,7 +281,7 @@ public class MavenPropertiesTest {
             + "\\" + LINE_SEPARATOR + VALUE1 + LINE_SEPARATOR;
 
     @Test
-    public void testSaveComment3() throws Exception {
+    void saveComment3() throws Exception {
         properties.put(KEY1, List.of(new String[] {COMMENT, COMMENT}), List.of(new String[] {VALUE1, VALUE1}));
         StringWriter sw = new StringWriter();
         properties.save(sw);
@@ -294,7 +294,7 @@ public class MavenPropertiesTest {
     }
 
     @Test
-    public void testEntrySetValue() throws Exception {
+    void entrySetValue() throws Exception {
         properties.put(KEY1, VALUE1);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -320,7 +320,7 @@ public class MavenPropertiesTest {
     }
 
     @Test
-    public void testMultiValueEscaping() throws IOException {
+    void multiValueEscaping() throws IOException {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         pw.println("fruits                           apple, banana, pear, \\");
@@ -384,7 +384,7 @@ public class MavenPropertiesTest {
     }
 
     @Test
-    public void testUpdate() throws Exception {
+    void update() throws Exception {
         MavenProperties p1 = new MavenProperties();
         p1.put(
                 "fruits",
@@ -416,7 +416,7 @@ public class MavenPropertiesTest {
     }
 
     @Test
-    public void testSubstitution() throws IOException {
+    void substitution() throws IOException {
         String str = "port = 4141" + LINE_SEPARATOR + "host = localhost"
                 + LINE_SEPARATOR + "url = https://${host}:${port}/service"
                 + LINE_SEPARATOR;

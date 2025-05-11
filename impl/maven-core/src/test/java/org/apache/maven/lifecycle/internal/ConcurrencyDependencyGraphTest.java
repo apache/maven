@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ConcurrencyDependencyGraphTest {
     @Test
-    void testConcurrencyGraphPrimaryVersion()
+    void concurrencyGraphPrimaryVersion()
             throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
                     NoPluginFoundForPrefixException, MojoNotFoundException, PluginNotFoundException,
                     PluginResolutionException, LifecyclePhaseNotFoundException, LifecycleNotFoundException {
@@ -79,7 +79,7 @@ class ConcurrencyDependencyGraphTest {
     }
 
     @Test
-    void testConcurrencyGraphDifferentCompletionOrder()
+    void concurrencyGraphDifferentCompletionOrder()
             throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
                     NoPluginFoundForPrefixException, MojoNotFoundException, PluginNotFoundException,
                     PluginResolutionException, LifecyclePhaseNotFoundException, LifecycleNotFoundException {

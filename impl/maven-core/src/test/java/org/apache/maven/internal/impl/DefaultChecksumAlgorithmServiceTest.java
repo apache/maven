@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class DefaultChecksumAlgorithmServiceTest {
+class DefaultChecksumAlgorithmServiceTest {
     private static Map<String, ChecksumAlgorithmFactory> getChecksumAlgorithmFactories() {
         HashMap<String, ChecksumAlgorithmFactory> result = new HashMap<>();
         result.put(Sha512ChecksumAlgorithmFactory.NAME, new Sha512ChecksumAlgorithmFactory());

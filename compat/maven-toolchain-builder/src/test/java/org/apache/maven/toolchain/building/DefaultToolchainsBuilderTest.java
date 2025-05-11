@@ -74,7 +74,7 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testBuildEmptyRequest() throws Exception {
+    void buildEmptyRequest() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         ToolchainsBuildingResult result = toolchainBuilder.build(request);
         assertNotNull(result.getEffectiveToolchains());
@@ -83,7 +83,7 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testBuildRequestWithUserToolchains() throws Exception {
+    void buildRequestWithUserToolchains() throws Exception {
         Properties props = new Properties();
         props.put("key", "user_value");
         ToolchainModel toolchain = new ToolchainModel();
@@ -113,7 +113,7 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testBuildRequestWithGlobalToolchains() throws Exception {
+    void buildRequestWithGlobalToolchains() throws Exception {
         Properties props = new Properties();
         props.put("key", "global_value");
         ToolchainModel toolchain = new ToolchainModel();
@@ -143,7 +143,7 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testBuildRequestWithBothToolchains() throws Exception {
+    void buildRequestWithBothToolchains() throws Exception {
         Properties props = new Properties();
         props.put("key", "user_value");
         ToolchainModel toolchain = new ToolchainModel();
@@ -192,7 +192,7 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testStrictToolchainsParseException() throws Exception {
+    void strictToolchainsParseException() throws Exception {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(new StringSource(""));
         ToolchainsParseException parseException = new ToolchainsParseException("MESSAGE", 4, 2);
@@ -209,7 +209,7 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testIOException() throws Exception {
+    void iOException() throws Exception {
         Source src = mock(Source.class);
         IOException ioException = new IOException("MESSAGE");
         doThrow(ioException).when(src).getInputStream();
@@ -229,7 +229,7 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testEnvironmentVariablesAreInterpolated() throws Exception {
+    void environmentVariablesAreInterpolated() throws Exception {
         Properties props = new Properties();
         props.put("key", "${env.testKey}");
         Xpp3Dom configurationChild = new Xpp3Dom("jdkHome");
@@ -265,7 +265,7 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testNonExistingEnvironmentVariablesAreNotInterpolated() throws Exception {
+    void nonExistingEnvironmentVariablesAreNotInterpolated() throws Exception {
         Properties props = new Properties();
         props.put("key", "${env.testNonExistingKey}");
         ToolchainModel toolchain = new ToolchainModel();
@@ -291,7 +291,7 @@ class DefaultToolchainsBuilderTest {
     }
 
     @Test
-    void testEnvironmentVariablesWithSpecialCharactersAreInterpolated() throws Exception {
+    void environmentVariablesWithSpecialCharactersAreInterpolated() throws Exception {
         Properties props = new Properties();
         props.put("key", "${env.testSpecialCharactersKey}");
         ToolchainModel toolchain = new ToolchainModel();

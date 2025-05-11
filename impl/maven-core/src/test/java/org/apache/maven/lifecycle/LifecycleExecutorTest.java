@@ -78,7 +78,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     // -----------------------------------------------------------------------------------------------
 
     @Test
-    void testCalculationOfBuildPlanWithIndividualTaskWherePluginIsSpecifiedInThePom() throws Exception {
+    void calculationOfBuildPlanWithIndividualTaskWherePluginIsSpecifiedInThePom() throws Exception {
         // We are doing something like "mvn resources:resources" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
         File pom = getProject("project-basic");
@@ -100,7 +100,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanLifecycle() throws Exception {
+    void calculationOfBuildPlanWithIndividualTaskOfTheCleanLifecycle() throws Exception {
         // We are doing something like "mvn clean:clean" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
         File pom = getProject("project-basic");
@@ -122,7 +122,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal() throws Exception {
+    void calculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal() throws Exception {
         // We are doing something like "mvn clean:clean" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
         File pom = getProject("project-basic");
@@ -153,7 +153,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
 
     // We need to take in multiple lifecycles
     @Test
-    public void testCalculationOfBuildPlanTasksOfTheCleanLifecycleAndTheInstallLifecycle() throws Exception {
+    void calculationOfBuildPlanTasksOfTheCleanLifecycleAndTheInstallLifecycle() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
         assertEquals(
@@ -192,7 +192,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
 
     // We need to take in multiple lifecycles
     @Test
-    public void testCalculationOfBuildPlanWithMultipleExecutionsOfModello() throws Exception {
+    void calculationOfBuildPlanWithMultipleExecutionsOfModello() throws Exception {
         File pom = getProject("project-with-multiple-executions");
         MavenSession session = createMavenSession(pom);
         assertEquals(
@@ -251,7 +251,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testLifecycleQueryingUsingADefaultLifecyclePhase() throws Exception {
+    void lifecycleQueryingUsingADefaultLifecyclePhase() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
         assertEquals(
@@ -285,14 +285,14 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testLifecyclePluginsRetrievalForDefaultLifecycle() throws Exception {
+    void lifecyclePluginsRetrievalForDefaultLifecycle() throws Exception {
         List<Plugin> plugins = new ArrayList<>(lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles("jar"));
 
         assertThat(plugins.toString(), plugins, hasSize(8));
     }
 
     @Test
-    void testPluginConfigurationCreation() throws Exception {
+    void pluginConfigurationCreation() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
         MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor(
@@ -316,7 +316,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testInvalidGoalName() throws Exception {
+    void invalidGoalName() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
         MojoNotFoundException e = assertThrows(
@@ -334,7 +334,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testPluginPrefixRetrieval() throws Exception {
+    void pluginPrefixRetrieval() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
         Plugin plugin = mojoDescriptorCreator.findPluginForPrefix("resources", session);
@@ -345,7 +345,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     // Prefixes
 
     @Test
-    void testFindingPluginPrefixForCleanClean() throws Exception {
+    void findingPluginPrefixForCleanClean() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
         Plugin plugin = mojoDescriptorCreator.findPluginForPrefix("clean", session);
@@ -353,7 +353,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testSetupMojoExecution() throws Exception {
+    void setupMojoExecution() throws Exception {
         File pom = getProject("mojo-configuration");
 
         MavenSession session = createMavenSession(pom);
@@ -373,7 +373,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testExecutionListeners() throws Exception {
+    void executionListeners() throws Exception {
         final File pom = getProject("project-basic");
         final MavenSession session = createMavenSession(pom);
         session.setProjectDependencyGraph(new ProjectDependencyGraph() {

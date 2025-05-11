@@ -48,7 +48,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testProjectInheritance() throws Exception {
+    void projectInheritance() throws Exception {
         // ----------------------------------------------------------------------
         // Check p0 value for org name
         // ----------------------------------------------------------------------

@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@code Relocation}.
@@ -31,25 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RelocationTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Relocation().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new Relocation().equals(null));
+    void equalsNullSafe() {
+        assertNotEquals(null, new Relocation());
 
         new Relocation().equals(new Relocation());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Relocation thing = new Relocation();
-        assertTrue(thing.equals(thing));
+        assertEquals(thing, thing);
     }
 
     @Test
-    void testToStringNullSafe() {
+    void toStringNullSafe() {
         assertNotNull(new Relocation().toString());
     }
 }

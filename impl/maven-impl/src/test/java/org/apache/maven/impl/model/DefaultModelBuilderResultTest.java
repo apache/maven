@@ -57,7 +57,7 @@ class DefaultModelBuilderResultTest {
     }
 
     @Test
-    void testModelLifecycle() {
+    void modelLifecycle() {
         // Test initial state
         assertNull(result.getSource());
         assertNull(result.getFileModel());
@@ -83,7 +83,7 @@ class DefaultModelBuilderResultTest {
     }
 
     @Test
-    void testProblemCollection() {
+    void problemCollection() {
         ModelProblem problem = mock(ModelProblem.class);
         Mockito.when(problem.getSeverity()).thenReturn(BuilderProblem.Severity.ERROR);
         problemCollector.reportProblem(problem);
@@ -93,7 +93,7 @@ class DefaultModelBuilderResultTest {
     }
 
     @Test
-    void testChildrenManagement() {
+    void childrenManagement() {
         DefaultModelBuilderResult child1 = new DefaultModelBuilderResult(request, problemCollector);
         DefaultModelBuilderResult child2 = new DefaultModelBuilderResult(request, problemCollector);
 
@@ -106,7 +106,7 @@ class DefaultModelBuilderResultTest {
     }
 
     @Test
-    void testRequestAssociation() {
+    void requestAssociation() {
         assertSame(request, result.getRequest());
     }
 }

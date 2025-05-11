@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class SerializationTest {
 
     @Test
-    void testModelSerialization() throws Exception {
+    void modelSerialization() throws Exception {
         Model model;
         try (InputStream is = getClass().getResourceAsStream("/xml/pom.xml")) {
             model = new MavenXpp3Reader().read(is);
@@ -56,7 +56,7 @@ class SerializationTest {
     }
 
     @Test
-    void testModelPropertiesAndListSerialization() throws Exception {
+    void modelPropertiesAndListSerialization() throws Exception {
         Model model;
         try (InputStream is = getClass().getResourceAsStream("/xml/pom.xml")) {
             model = new MavenXpp3Reader().read(is);

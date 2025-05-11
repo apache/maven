@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ConcurrencyDependencyGraphTest {
 
     @Test
-    void testGraph() throws Exception {
+    void graph() throws Exception {
 
         ProjectBuildList projectBuildList =
                 ProjectDependencyGraphStub.getProjectBuildList(ProjectDependencyGraphStub.getMavenSession());

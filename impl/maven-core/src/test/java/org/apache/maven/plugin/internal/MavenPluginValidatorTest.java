@@ -44,7 +44,7 @@ class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testValidate() {
+    void validate() {
         Artifact plugin = new DefaultArtifact(
                 "org.apache.maven.its.plugins",
                 "maven-it-plugin",
@@ -63,7 +63,7 @@ class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testInvalidGroupId() {
+    void invalidGroupId() {
         Artifact plugin = new DefaultArtifact(
                 "org.apache.maven.its.plugins",
                 "maven-it-plugin",
@@ -82,7 +82,7 @@ class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testInvalidArtifactId() {
+    void invalidArtifactId() {
         Artifact plugin = new DefaultArtifact(
                 "org.apache.maven.its.plugins",
                 "maven-it-plugin",
@@ -101,7 +101,7 @@ class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testInvalidVersion() {
+    void invalidVersion() {
         Artifact plugin = new DefaultArtifact(
                 "org.apache.maven.its.plugins",
                 "maven-it-plugin",

@@ -47,7 +47,7 @@ class DefaultExceptionHandlerTest {
      * </p>
      */
     @Test
-    void testJdk7ipv6() {
+    void jdk7ipv6() {
         ConnectException connEx = new ConnectException("Connection refused: connect");
         IOException ioEx = new IOException("Unable to establish loopback connection", connEx);
         MojoExecutionException mojoEx =
@@ -61,7 +61,7 @@ class DefaultExceptionHandlerTest {
     }
 
     @Test
-    void testHandleExceptionAetherClassNotFound() {
+    void handleExceptionAetherClassNotFound() {
         Throwable cause2 = new NoClassDefFoundError("org/sonatype/aether/RepositorySystem");
         Plugin plugin = new Plugin();
         Exception cause = new PluginContainerException(plugin, null, null, cause2);
@@ -79,7 +79,7 @@ class DefaultExceptionHandlerTest {
     }
 
     @Test
-    void testHandleExceptionNoClassDefFoundErrorNull() {
+    void handleExceptionNoClassDefFoundErrorNull() {
         Throwable cause2 = new NoClassDefFoundError();
         Plugin plugin = new Plugin();
         Exception cause = new PluginContainerException(plugin, null, null, cause2);
@@ -97,7 +97,7 @@ class DefaultExceptionHandlerTest {
     }
 
     @Test
-    void testHandleExceptionLoopInCause() {
+    void handleExceptionLoopInCause() {
         // Some broken exception that does return "this" as getCause
         AtomicReference<Throwable> causeRef = new AtomicReference<>(null);
         Exception cause2 = new RuntimeException("loop") {
@@ -125,7 +125,7 @@ class DefaultExceptionHandlerTest {
     }
 
     @Test
-    void testHandleExceptionSelfReferencing() {
+    void handleExceptionSelfReferencing() {
         RuntimeException boom3 = new RuntimeException("BOOM3");
         RuntimeException boom2 = new RuntimeException("BOOM2", boom3);
         RuntimeException boom1 = new RuntimeException("BOOM1", boom2);

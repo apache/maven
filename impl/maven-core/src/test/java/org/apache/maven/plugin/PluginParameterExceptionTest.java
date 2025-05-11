@@ -37,7 +37,7 @@ class PluginParameterExceptionTest {
     private static final String LS = System.lineSeparator();
 
     @Test
-    void testMissingRequiredStringArrayTypeParameter() {
+    void missingRequiredStringArrayTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
@@ -69,7 +69,7 @@ class PluginParameterExceptionTest {
     }
 
     @Test
-    void testMissingRequiredCollectionTypeParameter() {
+    void missingRequiredCollectionTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
@@ -101,7 +101,7 @@ class PluginParameterExceptionTest {
     }
 
     @Test
-    void testMissingRequiredMapTypeParameter() {
+    void missingRequiredMapTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
@@ -133,7 +133,7 @@ class PluginParameterExceptionTest {
     }
 
     @Test
-    void testMissingRequiredPropertiesTypeParameter() {
+    void missingRequiredPropertiesTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
         PluginDescriptor pluginDescriptor = new PluginDescriptor();

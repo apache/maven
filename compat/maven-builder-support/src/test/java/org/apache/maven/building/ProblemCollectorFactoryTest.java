@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 class ProblemCollectorFactoryTest {
 
     @Test
-    void testNewInstance() {
+    void newInstance() {
         ProblemCollector collector1 = ProblemCollectorFactory.newInstance(null);
 
         Problem problem = new DefaultProblem("MESSAGE1", null, null, -1, -1, null);

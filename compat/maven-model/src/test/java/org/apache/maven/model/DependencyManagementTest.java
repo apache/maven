@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@code DependencyManagement}.
@@ -32,30 +29,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DependencyManagementTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new DependencyManagement().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new DependencyManagement().equals(null));
+    void equalsNullSafe() {
+        assertNotEquals(null, new DependencyManagement());
 
         new DependencyManagement().equals(new DependencyManagement());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         DependencyManagement thing = new DependencyManagement();
-        assertTrue(thing.equals(thing));
+        assertEquals(thing, thing);
     }
 
     @Test
-    void testToStringNullSafe() {
+    void toStringNullSafe() {
         assertNotNull(new DependencyManagement().toString());
     }
 
     @Test
-    void testDependencies() {
+    void dependencies() {
         DependencyManagement dm = new DependencyManagement();
         Dependency d1 = new Dependency();
         d1.setGroupId("myGroupId");

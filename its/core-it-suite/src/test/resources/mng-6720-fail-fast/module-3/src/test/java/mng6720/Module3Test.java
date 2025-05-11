@@ -18,8 +18,6 @@
  */
 package mng6720;
 
-import org.junit.Test;
-
 public class Module3Test {
     @Test
     public void test() {

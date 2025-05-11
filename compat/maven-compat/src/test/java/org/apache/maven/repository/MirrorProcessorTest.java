@@ -45,7 +45,7 @@ class MirrorProcessorTest {
     private ArtifactRepositoryFactory repositorySystem;
 
     @Test
-    void testExternalURL() {
+    void externalURL() {
         assertTrue(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://somehost")));
         assertTrue(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "http://somehost:9090/somepath")));
         assertTrue(DefaultMirrorSelector.isExternalRepo(getRepo("foo", "ftp://somehost")));
@@ -67,7 +67,7 @@ class MirrorProcessorTest {
     }
 
     @Test
-    void testMirrorLookup() {
+    void mirrorLookup() {
         Mirror mirrorA = newMirror("a", "a", "http://a");
         Mirror mirrorB = newMirror("b", "b", "http://b");
 
@@ -81,7 +81,7 @@ class MirrorProcessorTest {
     }
 
     @Test
-    void testMirrorWildcardLookup() {
+    void mirrorWildcardLookup() {
         Mirror mirrorA = newMirror("a", "a", "http://a");
         Mirror mirrorB = newMirror("b", "b", "http://b");
         Mirror mirrorC = newMirror("c", "*", "http://wildcard");
@@ -96,7 +96,7 @@ class MirrorProcessorTest {
     }
 
     @Test
-    void testMirrorStopOnFirstMatch() {
+    void mirrorStopOnFirstMatch() {
         // exact matches win first
         Mirror mirrorA2 = newMirror("a2", "a,b", "http://a2");
         Mirror mirrorA = newMirror("a", "a", "http://a");
@@ -124,7 +124,7 @@ class MirrorProcessorTest {
     }
 
     @Test
-    void testPatterns() {
+    void patterns() {
         assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "*"));
         assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), "*,"));
         assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a"), ",*,"));
@@ -160,7 +160,7 @@ class MirrorProcessorTest {
     }
 
     @Test
-    void testPatternsWithExternal() {
+    void patternsWithExternal() {
         assertTrue(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "*"));
         assertFalse(DefaultMirrorSelector.matchPattern(getRepo("a", "http://localhost"), "external:*"));
 
@@ -174,7 +174,7 @@ class MirrorProcessorTest {
     }
 
     @Test
-    void testLayoutPattern() {
+    void layoutPattern() {
         assertTrue(DefaultMirrorSelector.matchesLayout("default", null));
         assertTrue(DefaultMirrorSelector.matchesLayout("default", ""));
         assertTrue(DefaultMirrorSelector.matchesLayout("default", "*"));
@@ -193,7 +193,7 @@ class MirrorProcessorTest {
     }
 
     @Test
-    void testMirrorLayoutConsideredForMatching() {
+    void mirrorLayoutConsideredForMatching() {
         ArtifactRepository repo = getRepo("a");
 
         Mirror mirrorA = newMirror("a", "a", null, "http://a");

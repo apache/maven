@@ -43,7 +43,7 @@ class SourcesTest {
     Path tempDir;
 
     @Test
-    void testFromPath() {
+    void fromPath() {
         Path path = Paths.get("/tmp");
         Source source = Sources.fromPath(path);
 
@@ -53,7 +53,7 @@ class SourcesTest {
     }
 
     @Test
-    void testBuildSource() {
+    void buildSource() {
         Path path = Paths.get("/tmp");
         ModelSource source = Sources.buildSource(path);
 
@@ -63,7 +63,7 @@ class SourcesTest {
     }
 
     @Test
-    void testResolvedSource() {
+    void resolvedSource() {
         Path path = Paths.get("/tmp");
         String location = "custom-location";
         ModelSource source = Sources.resolvedSource(path, location);
@@ -75,7 +75,7 @@ class SourcesTest {
     }
 
     @Test
-    void testPathSourceFunctionality() {
+    void pathSourceFunctionality() {
         // Test basic source functionality
         Path path = Paths.get("/tmp");
         Sources.PathSource source = (Sources.PathSource) Sources.fromPath(path);
@@ -89,7 +89,7 @@ class SourcesTest {
     }
 
     @Test
-    void testBuildPathSourceFunctionality() {
+    void buildPathSourceFunctionality() {
         // Test build source functionality
         Path basePath = Paths.get("/tmp");
         ModelSource.ModelLocator locator = mock(ModelSource.ModelLocator.class);
@@ -107,7 +107,7 @@ class SourcesTest {
     }
 
     @Test
-    void testResolvedPathSourceFunctionality() {
+    void resolvedPathSourceFunctionality() {
         // Test resolved source functionality
         Path path = Paths.get("/tmp");
         String location = "custom-location";
@@ -123,7 +123,7 @@ class SourcesTest {
     }
 
     @Test
-    void testStreamReading() throws IOException {
+    void streamReading() throws IOException {
         // Test stream reading functionality
         Path testFile = tempDir.resolve("test.txt");
         String content = "test content";
@@ -137,7 +137,7 @@ class SourcesTest {
     }
 
     @Test
-    void testNullHandling() {
+    void nullHandling() {
         assertThrows(NullPointerException.class, () -> Sources.fromPath(null));
         assertThrows(NullPointerException.class, () -> Sources.buildSource(null));
         assertThrows(NullPointerException.class, () -> Sources.resolvedSource(null, "location"));

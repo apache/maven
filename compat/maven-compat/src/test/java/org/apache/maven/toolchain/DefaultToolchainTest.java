@@ -23,6 +23,7 @@ import java.util.Collections;
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -35,11 +36,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 class DefaultToolchainTest {
+    private AutoCloseable mocks;
     private final Logger logger = mock(Logger.class);
 
     @BeforeEach
     void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
     }
 
     private DefaultToolchain newDefaultToolchain(ToolchainModel model) {
@@ -61,14 +63,14 @@ class DefaultToolchainTest {
     }
 
     @Test
-    void testGetModel() {
+    void getModel() {
         ToolchainModel model = new ToolchainModel();
         DefaultToolchain toolchain = newDefaultToolchain(model);
         assertEquals(model, toolchain.getModel());
     }
 
     @Test
-    void testGetType() {
+    void getType() {
         ToolchainModel model = new ToolchainModel();
         DefaultToolchain toolchain = newDefaultToolchain(model, "TYPE");
         assertEquals("TYPE", toolchain.getType());
@@ -79,14 +81,14 @@ class DefaultToolchainTest {
     }
 
     @Test
-    void testGetLogger() {
+    void getLogger() {
         ToolchainModel model = new ToolchainModel();
         DefaultToolchain toolchain = newDefaultToolchain(model);
         assertEquals(logger, toolchain.getLog());
     }
 
     @Test
-    void testMissingRequirementProperty() {
+    void missingRequirementProperty() {
         ToolchainModel model = new ToolchainModel();
         model.setType("TYPE");
         DefaultToolchain toolchain = newDefaultToolchain(model);
@@ -96,7 +98,7 @@ class DefaultToolchainTest {
     }
 
     @Test
-    void testNonMatchingRequirementProperty() {
+    void nonMatchingRequirementProperty() {
         ToolchainModel model = new ToolchainModel();
         model.setType("TYPE");
         DefaultToolchain toolchain = newDefaultToolchain(model);
@@ -107,7 +109,7 @@ class DefaultToolchainTest {
     }
 
     @Test
-    void testEquals() {
+    void equals() {
         ToolchainModel tm1 = new ToolchainModel();
         tm1.setType("jdk");
         tm1.addProvide("version", "1.5");
@@ -135,5 +137,10 @@ class DefaultToolchainTest {
         assertNotEquals(tc1, tc2);
         assertNotEquals(tc2, tc1);
         assertEquals(tc2, tc2);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        mocks.close();
     }
 }

@@ -49,7 +49,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testNegativeSize() {
+    void negativeSize() {
         FileSizeFormat format = new FileSizeFormat();
         assertThrows(IllegalArgumentException.class, () -> format.format(-100L));
     }
@@ -80,7 +80,7 @@ class FileSizeFormatTest {
 
     @ParameterizedTest
     @MethodSource("sizeTestData")
-    void testSize(long input, String expected) {
+    void size(long input, String expected) {
         FileSizeFormat format = new FileSizeFormat();
         assertEquals(expected, format.format(input));
     }
@@ -177,7 +177,7 @@ class FileSizeFormatTest {
 
     @ParameterizedTest
     @MethodSource("sizeWithScaleUnitTestData")
-    void testSizeWithSelectedScaleUnit(long input, ScaleUnit unit, String expected) {
+    void sizeWithSelectedScaleUnit(long input, ScaleUnit unit, String expected) {
         FileSizeFormat format = new FileSizeFormat();
         if (unit == null) {
             assertEquals(expected, format.format(input));
@@ -187,7 +187,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testNegativeProgressedSize() {
+    void negativeProgressedSize() {
         FileSizeFormat format = new FileSizeFormat();
 
         long negativeProgressedSize = -100L;
@@ -195,7 +195,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testNegativeProgressedSizeBiggerThanSize() {
+    void negativeProgressedSizeBiggerThanSize() {
         FileSizeFormat format = new FileSizeFormat();
 
         assertThrows(IllegalArgumentException.class, () -> format.formatProgress(100L, 10L));
@@ -211,7 +211,7 @@ class FileSizeFormatTest {
 
     @ParameterizedTest
     @MethodSource("progressedSizeWithoutSizeTestData")
-    void testProgressedSizeWithoutSize(long progressedSize, String expected) {
+    void progressedSizeWithoutSize(long progressedSize, String expected) {
         FileSizeFormat format = new FileSizeFormat();
         assertEquals(expected, format.formatProgress(progressedSize, -1L));
     }
@@ -253,13 +253,13 @@ class FileSizeFormatTest {
 
     @ParameterizedTest
     @MethodSource("progressedSizeWithSizeTestData")
-    void testProgressedSizeWithSize(long progressedSize, long totalSize, String expected) {
+    void progressedSizeWithSize(long progressedSize, long totalSize, String expected) {
         FileSizeFormat format = new FileSizeFormat();
         assertEquals(expected, format.formatProgress(progressedSize, totalSize));
     }
 
     @Test
-    void testFormatRate() {
+    void formatRate() {
         FileSizeFormat format = new FileSizeFormat();
 
         // Test bytes per second
@@ -284,7 +284,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testFormatRateThresholds() {
+    void formatRateThresholds() {
         FileSizeFormat format = new FileSizeFormat();
 
         // Test value less than 0.05
@@ -318,7 +318,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testFormatRateEdgeCases() {
+    void formatRateEdgeCases() {
         FileSizeFormat format = new FileSizeFormat();
 
         // Test zero rate
@@ -338,7 +338,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testFormatRateLargeValues() {
+    void formatRateLargeValues() {
         FileSizeFormat format = new FileSizeFormat();
 
         // Test large but valid rates
@@ -353,7 +353,7 @@ class FileSizeFormatTest {
     }
 
     @Test
-    void testFormatRateInvalidValues() {
+    void formatRateInvalidValues() {
         FileSizeFormat format = new FileSizeFormat();
 
         // Test negative rate

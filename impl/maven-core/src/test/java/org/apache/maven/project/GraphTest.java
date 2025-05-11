@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GraphTest {
+class GraphTest {
 
     @Test
-    public void testGraph() throws CycleDetectedException {
+    void graph() throws CycleDetectedException {
         Graph graph = new Graph();
         graph.addVertex("a");
         assertEquals(1, graph.getVertices().size());
@@ -93,7 +93,7 @@ public class GraphTest {
     }
 
     @Test
-    public void testCycleDetection() throws Exception {
+    void cycleDetection() throws Exception {
         Graph graph1 = new Graph();
         addEdge(graph1, "a", "b");
         addEdge(graph1, "b", "c");
@@ -143,7 +143,7 @@ public class GraphTest {
     }
 
     @Test
-    public void testDfs() throws CycleDetectedException {
+    void dfs() throws CycleDetectedException {
         Graph graph1 = new Graph();
         addEdge(graph1, "a", "b");
         addEdge(graph1, "b", "c");

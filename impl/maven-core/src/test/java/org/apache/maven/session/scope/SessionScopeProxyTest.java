@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
 @ExtendWith(MockitoExtension.class)
-public class SessionScopeProxyTest {
+class SessionScopeProxyTest {
 
     @Mock
     Session session;
@@ -55,7 +55,7 @@ public class SessionScopeProxyTest {
     PlexusContainer container;
 
     @Test
-    void testProxiedSessionScopedBean() throws ComponentLookupException {
+    void proxiedSessionScopedBean() throws ComponentLookupException {
         ComponentLookupException e =
                 assertThrows(ComponentLookupException.class, () -> container.lookup(MySingletonBean2.class));
         assertTrue(e.getMessage().matches("[\\s\\S]*: Can not set .* field .* to [\\s\\S]*"));

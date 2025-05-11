@@ -51,7 +51,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testProjectInheritance() throws Exception {
+    void projectInheritance() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
 

@@ -76,7 +76,7 @@ class DefaultClasspathTransformationTestType {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testCompileClasspathTransform() throws Exception {
+    void compileClasspathTransform() throws Exception {
         ClasspathContainer res;
 
         res = transform.transform(graph, ArtifactScopeEnum.compile, false);
@@ -88,7 +88,7 @@ class DefaultClasspathTransformationTestType {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testRuntimeClasspathTransform() throws Exception {
+    void runtimeClasspathTransform() throws Exception {
         ClasspathContainer res;
 
         res = transform.transform(graph, ArtifactScopeEnum.runtime, false);
@@ -103,7 +103,7 @@ class DefaultClasspathTransformationTestType {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testTestClasspathTransform() throws Exception {
+    void testClasspathTransform() throws Exception {
         ClasspathContainer res;
 
         res = transform.transform(graph, ArtifactScopeEnum.test, false);

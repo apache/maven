@@ -33,7 +33,7 @@ class DefaultSettingsBuilderFactoryTest {
     }
 
     @Test
-    void testCompleteWiring() throws Exception {
+    void completeWiring() throws Exception {
         SettingsBuilder builder = new DefaultSettingsBuilderFactory().newInstance();
         assertNotNull(builder);
 

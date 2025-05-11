@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class LifecycleExecutionPlanCalculatorTest extends AbstractCoreMavenComponentTestCase {
 
     @Test
-    void testCalculateExecutionPlanWithGoalTasks() throws Exception {
+    void calculateExecutionPlanWithGoalTasks() throws Exception {
         MojoDescriptorCreator mojoDescriptorCreator = createMojoDescriptorCreator();
         LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator =
                 createExecutionPlaceCalculator(mojoDescriptorCreator);

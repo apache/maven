@@ -33,7 +33,7 @@ class RequirementMatcherFactoryTest {
      * Test of createExactMatcher method, of class RequirementMatcherFactory.
      */
     @Test
-    void testCreateExactMatcher() {
+    void createExactMatcher() {
         RequirementMatcher matcher;
         matcher = RequirementMatcherFactory.createExactMatcher("foo");
         assertFalse(matcher.matches("bar"));
@@ -46,7 +46,7 @@ class RequirementMatcherFactoryTest {
      * Test of createVersionMatcher method, of class RequirementMatcherFactory.
      */
     @Test
-    void testCreateVersionMatcher() {
+    void createVersionMatcher() {
         RequirementMatcher matcher;
         matcher = RequirementMatcherFactory.createVersionMatcher("1.5.2");
         assertFalse(matcher.matches("1.5"));

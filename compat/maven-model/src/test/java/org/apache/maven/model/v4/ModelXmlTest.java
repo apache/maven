@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ModelXmlTest {
 
     @Test
-    void testXmlRoundtripWithProperties() throws Exception {
+    void xmlRoundtripWithProperties() throws Exception {
         Map<String, String> props = new LinkedHashMap<>();
         props.put("javax.version", "3.1.0");
         props.put("mockito.version", "1.10.19");
@@ -55,7 +55,7 @@ class ModelXmlTest {
     }
 
     @Test
-    void testNamespaceInXmlNode() throws XMLStreamException {
+    void namespaceInXmlNode() throws XMLStreamException {
         String xml = "<project xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
                 + "         xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
                 + "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/POM/4.0.0\">\n"

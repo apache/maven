@@ -82,7 +82,7 @@ import static org.mockito.Mockito.mock;
 
 /**
  */
-public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenComponentTestCase {
+class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenComponentTestCase {
     private static final String FS = File.separator;
 
     @Inject
@@ -91,7 +91,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     private Path rootDirectory;
 
     @Test
-    public void testPluginDescriptorExpressionReference() throws Exception {
+    void pluginDescriptorExpressionReference() throws Exception {
         Session session = newSession();
         MojoExecution exec = newMojoExecution(session);
 
@@ -107,7 +107,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testPluginArtifactsExpressionReference() throws Exception {
+    void pluginArtifactsExpressionReference() throws Exception {
         Session session = newSession();
         MojoExecution exec = newMojoExecution(session);
 
@@ -126,7 +126,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testPluginArtifactMapExpressionReference() throws Exception {
+    void pluginArtifactMapExpressionReference() throws Exception {
         Session session = newSession();
 
         MojoExecution exec = newMojoExecution(session);
@@ -148,7 +148,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testPluginArtifactIdExpressionReference() throws Exception {
+    void pluginArtifactIdExpressionReference() throws Exception {
         Session session = newSession();
 
         MojoExecution exec = newMojoExecution(session);
@@ -165,7 +165,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testValueExtractionWithAPomValueContainingAPath() throws Exception {
+    void valueExtractionWithAPomValueContainingAPath() throws Exception {
         String expected = getTestFile("target/test-classes/target/classes").getCanonicalPath();
 
         Build build = new Build();
@@ -186,7 +186,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testEscapedVariablePassthrough() throws Exception {
+    void escapedVariablePassthrough() throws Exception {
         String var = "${var}";
 
         MavenProject project = createDefaultProject();
@@ -200,7 +200,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testEscapedVariablePassthroughInLargerExpression() throws Exception {
+    void escapedVariablePassthroughInLargerExpression() throws Exception {
         String var = "${var}";
         String key = var + " with version: ${project.version}";
 
@@ -215,7 +215,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testMultipleSubExpressionsInLargerExpression() throws Exception {
+    void multipleSubExpressionsInLargerExpression() throws Exception {
         String key = "${project.artifactId} with version: ${project.version}";
 
         MavenProject project = createDefaultProject();
@@ -230,7 +230,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testMissingPOMPropertyRefInLargerExpression() throws Exception {
+    void missingPOMPropertyRefInLargerExpression() throws Exception {
         String expr = "/path/to/someproject-${baseVersion}";
 
         MavenProject project = createDefaultProject();
@@ -243,7 +243,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testPOMPropertyExtractionWithMissingProjectWithDotNotation() throws Exception {
+    void pomPropertyExtractionWithMissingProjectWithDotNotation() throws Exception {
         String key = "m2.name";
         String checkValue = "value";
 
@@ -258,7 +258,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testValueExtractionFromSystemPropertiesWithMissingProject() throws Exception {
+    void valueExtractionFromSystemPropertiesWithMissingProject() throws Exception {
         String sysprop = "PPEET_sysprop1";
 
         Properties executionProperties = new Properties();
@@ -275,7 +275,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testValueExtractionFromSystemPropertiesWithMissingProjectWithDotNotation() throws Exception {
+    void valueExtractionFromSystemPropertiesWithMissingProjectWithDotNotation() throws Exception {
         String sysprop = "PPEET.sysprop2";
 
         Properties executionProperties = new Properties();
@@ -311,7 +311,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testTwoExpressions() throws Exception {
+    void twoExpressions() throws Exception {
         MavenProject project = createDefaultProject();
         Build build = project.getBuild();
         build.setDirectory("expected-directory");
@@ -325,7 +325,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testShouldExtractPluginArtifacts() throws Exception {
+    void shouldExtractPluginArtifacts() throws Exception {
         ExpressionEvaluator ee = createExpressionEvaluator(createDefaultProject(), new Properties());
 
         Object value = ee.evaluate("${mojo.plugin.dependencies}");
@@ -343,13 +343,13 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    void testRootDirectoryNotPrefixed() throws Exception {
+    void rootDirectoryNotPrefixed() throws Exception {
         ExpressionEvaluator ee = createExpressionEvaluator(createDefaultProject(), new Properties());
         assertNull(ee.evaluate("${rootDirectory}"));
     }
 
     @Test
-    void testRootDirectoryWithNull() throws Exception {
+    void rootDirectoryWithNull() throws Exception {
         ExpressionEvaluator ee = createExpressionEvaluator(createDefaultProject(), new Properties());
         Exception e = assertThrows(Exception.class, () -> ee.evaluate("${session.rootDirectory}"));
         e = assertInstanceOf(IntrospectionException.class, e.getCause());
@@ -358,7 +358,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    void testRootDirectory() throws Exception {
+    void rootDirectory() throws Exception {
         this.rootDirectory = Paths.get("myRootDirectory");
         ExpressionEvaluator ee = createExpressionEvaluator(createDefaultProject(), new Properties());
         assertInstanceOf(Path.class, ee.evaluate("${session.rootDirectory}"));
@@ -431,7 +431,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testUri() throws Exception {
+    void uri() throws Exception {
         Path path = Paths.get("").toAbsolutePath();
 
         MavenSession mavenSession = createMavenSession(null);
@@ -444,7 +444,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testPath() throws Exception {
+    void path() throws Exception {
         Path path = Paths.get("").toAbsolutePath();
 
         MavenSession mavenSession = createMavenSession(null);
@@ -457,7 +457,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     @Test
-    public void testPluginInjection() throws Exception {
+    void pluginInjection() throws Exception {
         Path path = Paths.get("rép➜α").toAbsolutePath();
 
         MavenSession mavenSession = createMavenSession(null);

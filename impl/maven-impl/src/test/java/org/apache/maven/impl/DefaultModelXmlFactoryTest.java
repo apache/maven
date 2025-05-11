@@ -40,7 +40,7 @@ class DefaultModelXmlFactoryTest {
     }
 
     @Test
-    void testValidNamespaceWithModelVersion400() throws Exception {
+    void validNamespaceWithModelVersion400() throws Exception {
         String xml =
                 """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -56,7 +56,7 @@ class DefaultModelXmlFactoryTest {
     }
 
     @Test
-    void testValidNamespaceWithModelVersion410() throws Exception {
+    void validNamespaceWithModelVersion410() throws Exception {
         String xml =
                 """
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
@@ -72,7 +72,7 @@ class DefaultModelXmlFactoryTest {
     }
 
     @Test
-    void testInvalidNamespaceWithModelVersion410() {
+    void invalidNamespaceWithModelVersion410() {
         String xml =
                 """
                 <project xmlns="http://invalid.namespace/4.1.0">
@@ -88,7 +88,7 @@ class DefaultModelXmlFactoryTest {
     }
 
     @Test
-    void testNoNamespaceWithModelVersion400() throws Exception {
+    void noNamespaceWithModelVersion400() throws Exception {
         String xml =
                 """
                 <project>
@@ -104,12 +104,12 @@ class DefaultModelXmlFactoryTest {
     }
 
     @Test
-    void testNullRequest() {
+    void nullRequest() {
         assertThrows(IllegalArgumentException.class, () -> factory.read((XmlReaderRequest) null));
     }
 
     @Test
-    void testMalformedModelVersion() throws Exception {
+    void malformedModelVersion() throws Exception {
         String xml =
                 """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">

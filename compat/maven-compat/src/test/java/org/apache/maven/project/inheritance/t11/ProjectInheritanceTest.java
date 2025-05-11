@@ -47,7 +47,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagementDoesNotOverrideScopeOfCurrentArtifact() throws Exception {
+    void dependencyManagementDoesNotOverrideScopeOfCurrentArtifact() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");

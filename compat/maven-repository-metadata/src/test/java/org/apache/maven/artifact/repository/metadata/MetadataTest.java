@@ -215,7 +215,7 @@ class MetadataTest {
     /*-- END test "groupId/artifactId/version" metadata ---*/
 
     @Test
-    void testRoundtrip() throws Exception {
+    void roundtrip() throws Exception {
         Metadata source = new Metadata(org.apache.maven.api.metadata.Metadata.newBuilder(
                         createMetadataFromArtifact(artifact).getDelegate(), true)
                 .modelEncoding("UTF-16")

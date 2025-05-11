@@ -95,7 +95,7 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testDependencyInjection() throws Exception {
+    void dependencyInjection() throws Exception {
         PlexusContainer container = getContainer();
 
         ComponentDescriptor<? extends AbstractMavenLifecycleParticipant> cd =
@@ -122,7 +122,7 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testReactorDependencyInjection() throws Exception {
+    void reactorDependencyInjection() throws Exception {
         List<String> reactorOrder =
                 getReactorOrder("lifecycle-participant-reactor-dependency-injection", InjectReactorDependency.class);
         assertEquals(Arrays.asList("parent", "module-b", "module-a"), reactorOrder);

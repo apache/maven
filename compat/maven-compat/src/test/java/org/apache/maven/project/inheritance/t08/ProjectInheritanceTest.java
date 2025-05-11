@@ -50,7 +50,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagement() throws Exception {
+    void dependencyManagement() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
 
@@ -68,14 +68,13 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         assertNotNull(set, "No artifacts");
         assertTrue(set.size() > 0, "No Artifacts");
         Iterator iter = set.iterator();
-        assertTrue(set.size() == 4, "Set size should be 4, is " + set.size());
+        assertEquals(4, set.size(), "Set size should be 4, is " + set.size());
 
         while (iter.hasNext()) {
             Artifact artifact = (Artifact) iter.next();
             System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
                     + " Optional=" + (artifact.isOptional() ? "true" : "false"));
-            assertTrue(
-                    artifact.getVersion().equals("1.0"), "Incorrect version for " + artifact.getDependencyConflictId());
+            assertEquals("1.0", artifact.getVersion(), "Incorrect version for " + artifact.getDependencyConflictId());
         }
     }
 }

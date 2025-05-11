@@ -56,7 +56,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
+    void dependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -72,7 +72,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         Map map = project1.getArtifactMap();
         assertNotNull(map, "No artifacts");
         assertTrue(map.size() > 0, "No Artifacts");
-        assertTrue(map.size() == 3, "Set size should be 3, is " + map.size());
+        assertEquals(3, map.size(), "Set size should be 3, is " + map.size());
 
         Artifact a = (Artifact) map.get("maven-test:t10-a");
         Artifact b = (Artifact) map.get("maven-test:t10-b");
@@ -84,12 +84,12 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
         // inherited from depMgmt
         System.out.println(a.getScope());
-        assertTrue(a.getScope().equals("test"), "Incorrect scope for " + a.getDependencyConflictId());
+        assertEquals("test", a.getScope(), "Incorrect scope for " + a.getDependencyConflictId());
 
         // transitive dep, overridden b depMgmt
-        assertTrue(b.getScope().equals("runtime"), "Incorrect scope for " + b.getDependencyConflictId());
+        assertEquals("runtime", b.getScope(), "Incorrect scope for " + b.getDependencyConflictId());
 
         // direct dep, overrides depMgmt
-        assertTrue(c.getScope().equals("runtime"), "Incorrect scope for " + c.getDependencyConflictId());
+        assertEquals("runtime", c.getScope(), "Incorrect scope for " + c.getDependencyConflictId());
     }
 }

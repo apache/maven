@@ -72,7 +72,7 @@ class PomConstructionWithSettingsTest {
     }
 
     @Test
-    void testSettingsNoPom() throws Exception {
+    void settingsNoPom() throws Exception {
         PomTestWrapper pom = buildPom("settings-no-pom");
         assertEquals("local-profile-prop-value", pom.getValue("properties/local-profile-prop"));
     }
@@ -81,7 +81,7 @@ class PomConstructionWithSettingsTest {
      * MNG-4107
      */
     @Test
-    void testPomAndSettingsInterpolation() throws Exception {
+    void pomAndSettingsInterpolation() throws Exception {
         PomTestWrapper pom = buildPom("test-pom-and-settings-interpolation");
         assertEquals("applied", pom.getValue("properties/settingsProfile"));
         assertEquals("applied", pom.getValue("properties/pomProfile"));
@@ -93,7 +93,7 @@ class PomConstructionWithSettingsTest {
      * MNG-4107
      */
     @Test
-    void testRepositories() throws Exception {
+    void repositories() throws Exception {
         PomTestWrapper pom = buildPom("repositories");
         assertEquals("maven-core-it-0", pom.getValue("repositories[1]/id"));
     }

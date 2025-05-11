@@ -56,7 +56,7 @@ class DefaultModelBuilderTest {
     }
 
     @Test
-    public void testPropertiesAndProfiles() {
+    void propertiesAndProfiles() {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
@@ -68,7 +68,7 @@ class DefaultModelBuilderTest {
     }
 
     @Test
-    public void testMergeRepositories() throws Exception {
+    void mergeRepositories() throws Exception {
         // this is here only to trigger mainSession creation; unrelated
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)

@@ -42,7 +42,7 @@ import static org.mockito.Mockito.doReturn;
  * @author Edwin Punzalan
  */
 @MojoTest
-public class ExpressionEvaluatorTest {
+class ExpressionEvaluatorTest {
 
     private static final String LOCAL_REPO = "target/local-repo/";
     private static final String GROUP_ID = "test";
@@ -65,7 +65,7 @@ public class ExpressionEvaluatorTest {
 
     @Test
     @InjectMojo(goal = COORDINATES, pom = CONFIG)
-    public void testInjection(ExpressionEvaluatorMojo mojo) {
+    void injection(ExpressionEvaluatorMojo mojo) {
         assertNotNull(mojo.basedir);
         assertNotNull(mojo.workdir);
         assertDoesNotThrow(mojo::execute);
@@ -75,7 +75,7 @@ public class ExpressionEvaluatorTest {
     @InjectMojo(goal = COORDINATES, pom = CONFIG)
     @Basedir("${basedir}/target/test-classes")
     @MojoParameter(name = "param", value = "paramValue")
-    public void testParam(ExpressionEvaluatorMojo mojo) {
+    void param(ExpressionEvaluatorMojo mojo) {
         assertNotNull(mojo.basedir);
         assertNotNull(mojo.workdir);
         assertEquals("paramValue", mojo.param);
@@ -86,7 +86,7 @@ public class ExpressionEvaluatorTest {
     @InjectMojo(goal = COORDINATES, pom = CONFIG)
     @MojoParameter(name = "param", value = "paramValue")
     @MojoParameter(name = "param2", value = "param2Value")
-    public void testParams(ExpressionEvaluatorMojo mojo) {
+    void params(ExpressionEvaluatorMojo mojo) {
         assertNotNull(mojo.basedir);
         assertNotNull(mojo.workdir);
         assertEquals("paramValue", mojo.param);

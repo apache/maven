@@ -53,7 +53,7 @@ class ComplexActivationTest {
     }
 
     @Test
-    void testAndConditionInActivation() throws Exception {
+    void andConditionInActivation() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
@@ -68,7 +68,7 @@ class ComplexActivationTest {
     }
 
     @Test
-    public void testConditionExistingAndMissingInActivation() throws Exception {
+    void conditionExistingAndMissingInActivation() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)

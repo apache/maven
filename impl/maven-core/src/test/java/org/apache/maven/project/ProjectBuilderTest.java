@@ -60,7 +60,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testSystemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
+    void systemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
         File pom = getProject("it0063");
 
         Properties eps = new Properties();
@@ -76,7 +76,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testBuildFromModelSource() throws Exception {
+    void buildFromModelSource() throws Exception {
         File pomFile = new File("src/test/resources/projects/modelsource/module01/pom.xml");
         MavenSession mavenSession = createMavenSession(pomFile);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -89,7 +89,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testVersionlessManagedDependency() throws Exception {
+    void versionlessManagedDependency() throws Exception {
         File pomFile = new File("src/test/resources/projects/versionless-managed-dependency.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -107,7 +107,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testResolveDependencies() throws Exception {
+    void resolveDependencies() throws Exception {
         File pomFile = new File("src/test/resources/projects/basic-resolveDependencies.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -141,7 +141,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testDontResolveDependencies() throws Exception {
+    void dontResolveDependencies() throws Exception {
         File pomFile = new File("src/test/resources/projects/basic-resolveDependencies.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -163,7 +163,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testReadModifiedPoms(@TempDir Path tempDir) throws Exception {
+    void readModifiedPoms(@TempDir Path tempDir) throws Exception {
         // TODO a similar test should be created to test the dependency management (basically all usages
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
 
@@ -191,7 +191,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testReadErroneousMavenProjectContainsReference() throws Exception {
+    void readErroneousMavenProjectContainsReference() throws Exception {
         File pomFile = new File("src/test/resources/projects/artifactMissingVersion/pom.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
         mavenSession.getRequest().setRootDirectory(pomFile.getParentFile().toPath());
@@ -224,7 +224,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testReadInvalidPom() throws Exception {
+    void readInvalidPom() throws Exception {
         File pomFile = new File("src/test/resources/projects/badPom.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -251,7 +251,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testReadParentAndChildWithRegularVersionSetParentFile() throws Exception {
+    void readParentAndChildWithRegularVersionSetParentFile() throws Exception {
         List<File> toRead = new ArrayList<>(2);
         File parentPom = getProject("MNG-6723");
         toRead.add(parentPom);
@@ -304,7 +304,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testBuildProperties() throws Exception {
+    void buildProperties() throws Exception {
         File file = new File(getProject("MNG-6716").getParentFile(), "project/pom.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -321,7 +321,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testPropertyInPluginManagementGroupId() throws Exception {
+    void propertyInPluginManagementGroupId() throws Exception {
         File pom = getProject("MNG-6983");
 
         MavenSession session = createMavenSession(pom);
@@ -333,7 +333,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testBuildFromModelSourceResolvesBasedir() throws Exception {
+    void buildFromModelSourceResolvesBasedir() throws Exception {
         File pomFile = new File("src/test/resources/projects/modelsourcebasedir/pom.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -355,7 +355,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testLocationTrackingResolution() throws Exception {
+    void locationTrackingResolution() throws Exception {
         File pom = getProject("MNG-7648");
 
         MavenSession session = createMavenSession(pom);

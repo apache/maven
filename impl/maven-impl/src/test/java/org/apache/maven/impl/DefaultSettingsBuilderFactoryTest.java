@@ -54,7 +54,7 @@ class DefaultSettingsBuilderFactoryTest {
     }
 
     @Test
-    void testCompleteWiring() {
+    void completeWiring() {
         SettingsBuilder builder =
                 new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
         assertNotNull(builder);

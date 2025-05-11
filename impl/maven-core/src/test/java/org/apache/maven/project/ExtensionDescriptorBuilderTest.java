@@ -56,7 +56,7 @@ class ExtensionDescriptorBuilderTest {
     }
 
     @Test
-    void testEmptyDescriptor() throws Exception {
+    void emptyDescriptor() throws Exception {
         String xml = "<extension></extension>";
 
         ExtensionDescriptor ed = builder.build(toStream(xml));
@@ -69,7 +69,7 @@ class ExtensionDescriptorBuilderTest {
     }
 
     @Test
-    void testCompleteDescriptor() throws Exception {
+    void completeDescriptor() throws Exception {
         String xml = "<?xml version='1.0' encoding='UTF-8'?>" + "<extension>" + "<exportedPackages>"
                 + "<exportedPackage>a</exportedPackage>" + "<exportedPackage>b</exportedPackage>"
                 + "<exportedPackage>c</exportedPackage>" + "</exportedPackages>" + "<exportedArtifacts>"

@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
+class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
     @Inject
     ConsumerPomBuilder builder;
@@ -89,7 +89,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testTrivialConsumer() throws Exception {
+    void trivialConsumer() throws Exception {
         InternalMavenSession.from(InternalSession.from(session))
                 .getMavenSession()
                 .getRequest()
@@ -114,7 +114,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testSimpleConsumer() throws Exception {
+    void simpleConsumer() throws Exception {
         MavenExecutionRequest request = InternalMavenSession.from(InternalSession.from(session))
                 .getMavenSession()
                 .getRequest();
@@ -142,7 +142,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testScmInheritance() throws Exception {
+    void scmInheritance() throws Exception {
         Model model = Model.newBuilder()
                 .scm(Scm.newBuilder()
                         .connection("scm:git:https://github.com/apache/maven-project.git")

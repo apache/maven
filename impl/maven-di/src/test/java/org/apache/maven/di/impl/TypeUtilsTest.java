@@ -32,12 +32,12 @@ import static org.apache.maven.di.impl.Types.simplifyType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TypeUtilsTest {
+class TypeUtilsTest {
 
     TreeSet<String> aField;
 
     @Test
-    void testGetSuperTypes() {
+    void getSuperTypes() {
         Type type = new Key<TreeSet<String>>() {}.getType();
         Set<Type> types = Types.getAllSuperTypes(type);
         assertNotNull(types);
@@ -62,7 +62,7 @@ public class TypeUtilsTest {
 
     @Test
     @SuppressWarnings("checkstyle:AvoidNestedBlocks")
-    public void testSimplifyType() {
+    void testSimplifyType() {
         {
             Type type = Integer.class;
             assertEquals(type, simplifyType(type));

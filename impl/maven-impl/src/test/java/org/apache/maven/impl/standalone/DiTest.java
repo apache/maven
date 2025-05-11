@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class DiTest {
 
     @Test
-    void testGenerics() {
+    void generics() {
         Set<Type> types = Types.getAllSuperTypes(ExtensibleEnumRegistries.DefaultPathScopeRegistry.class);
         assertNotNull(types);
 

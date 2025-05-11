@@ -123,17 +123,17 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testVersionsQualifier() {
+    void versionsQualifier() {
         checkVersionsOrder(VERSIONS_QUALIFIER);
     }
 
     @Test
-    void testVersionsNumber() {
+    void versionsNumber() {
         checkVersionsOrder(VERSIONS_NUMBER);
     }
 
     @Test
-    void testVersionsEqual() {
+    void versionsEqual() {
         newComparable("1.0-alpha");
         checkVersionsEqual("1", "1");
         checkVersionsEqual("1", "1.0");
@@ -173,7 +173,7 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testVersionsHaveSameOrderButAreNotEqual() {
+    void versionsHaveSameOrderButAreNotEqual() {
         checkVersionsHaveSameOrder("1ga", "1");
         checkVersionsHaveSameOrder("1release", "1");
         checkVersionsHaveSameOrder("1final", "1");
@@ -188,7 +188,7 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testVersionComparing() {
+    void versionComparing() {
         checkVersionsOrder("1", "2");
         checkVersionsOrder("1.5", "2");
         checkVersionsOrder("1", "2.5");
@@ -219,13 +219,13 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testLeadingZeroes() {
+    void leadingZeroes() {
         checkVersionsOrder("0.7", "2");
         checkVersionsOrder("0.2", "1.0.7");
     }
 
     @Test
-    void testDigitGreaterThanNonAscii() {
+    void digitGreaterThanNonAscii() {
         ComparableVersion c1 = new ComparableVersion("1");
         ComparableVersion c2 = new ComparableVersion("é");
         assertTrue(c1.compareTo(c2) > 0, "expected " + "1" + " > " + "\uD835\uDFE4");
@@ -233,7 +233,7 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testDigitGreaterThanNonBmpCharacters() {
+    void digitGreaterThanNonBmpCharacters() {
         ComparableVersion c1 = new ComparableVersion("1");
         // MATHEMATICAL SANS-SERIF DIGIT TWO
         ComparableVersion c2 = new ComparableVersion("\uD835\uDFE4");
@@ -242,7 +242,7 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testGetCanonical() {
+    void getCanonical() {
         // MNG-7700
         newComparable("0.x");
         newComparable("0-x");
@@ -256,35 +256,35 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testLexicographicASCIISortOrder() { // Required by Semver 1.0
+    void lexicographicASCIISortOrder() { // Required by Semver 1.0
         ComparableVersion lower = new ComparableVersion("1.0.0-alpha1");
         ComparableVersion upper = new ComparableVersion("1.0.0-ALPHA1");
         // Lower case is equal to upper case. This is *NOT* what Semver 1.0
         // specifies. Here we are explicitly deviating from Semver 1.0.
-        assertTrue(upper.compareTo(lower) == 0, "expected 1.0.0-ALPHA1 == 1.0.0-alpha1");
-        assertTrue(lower.compareTo(upper) == 0, "expected 1.0.0-alpha1 == 1.0.0-ALPHA1");
+        assertEquals(0, upper.compareTo(lower), "expected 1.0.0-ALPHA1 == 1.0.0-alpha1");
+        assertEquals(0, lower.compareTo(upper), "expected 1.0.0-alpha1 == 1.0.0-ALPHA1");
     }
 
     @Test
-    void testCompareLowerCaseToUpperCaseASCII() {
+    void compareLowerCaseToUpperCaseASCII() {
         ComparableVersion lower = new ComparableVersion("1.a");
         ComparableVersion upper = new ComparableVersion("1.A");
         // Lower case is equal to upper case
-        assertTrue(upper.compareTo(lower) == 0, "expected 1.A == 1.a");
-        assertTrue(lower.compareTo(upper) == 0, "expected 1.a == 1.A");
+        assertEquals(0, upper.compareTo(lower), "expected 1.A == 1.a");
+        assertEquals(0, lower.compareTo(upper), "expected 1.a == 1.A");
     }
 
     @Test
-    void testCompareLowerCaseToUpperCaseNonASCII() {
+    void compareLowerCaseToUpperCaseNonASCII() {
         ComparableVersion lower = new ComparableVersion("1.é");
         ComparableVersion upper = new ComparableVersion("1.É");
         // Lower case is equal to upper case
-        assertTrue(upper.compareTo(lower) == 0, "expected 1.É < 1.é");
-        assertTrue(lower.compareTo(upper) == 0, "expected 1.é > 1.É");
+        assertEquals(0, upper.compareTo(lower), "expected 1.É < 1.é");
+        assertEquals(0, lower.compareTo(upper), "expected 1.é > 1.É");
     }
 
     @Test
-    void testCompareDigitToLetter() {
+    void compareDigitToLetter() {
         ComparableVersion seven = new ComparableVersion("7");
         ComparableVersion capitalJ = new ComparableVersion("J");
         ComparableVersion lowerCaseC = new ComparableVersion("c");
@@ -296,7 +296,7 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testNonAsciiDigits() { // These should not be treated as digits.
+    void nonAsciiDigits() { // These should not be treated as digits.
         ComparableVersion asciiOne = new ComparableVersion("1");
         ComparableVersion arabicEight = new ComparableVersion("\u0668");
         ComparableVersion asciiNine = new ComparableVersion("9");
@@ -307,7 +307,7 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testLexicographicOrder() {
+    void lexicographicOrder() {
         ComparableVersion aardvark = new ComparableVersion("aardvark");
         ComparableVersion zebra = new ComparableVersion("zebra");
         assertTrue(zebra.compareTo(aardvark) > 0);
@@ -327,7 +327,7 @@ class ComparableVersionTest {
      * <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=226100">226100</a>
      */
     @Test
-    void testMng5568() {
+    void mng5568() {
         String a = "6.1.0";
         String b = "6.1.0rc3";
         String c = "6.1H.5-beta"; // this is the unusual version string, with 'H' in the middle
@@ -341,7 +341,7 @@ class ComparableVersionTest {
      * Test <a href="https://jira.apache.org/jira/browse/MNG-6572">MNG-6572</a> optimization.
      */
     @Test
-    void testMng6572() {
+    void mng6572() {
         String a = "20190126.230843"; // resembles a SNAPSHOT
         String b = "1234567890.12345"; // 10 digit number
         String c = "123456789012345.1H.5-beta"; // 15 digit number
@@ -360,7 +360,7 @@ class ComparableVersionTest {
      * (related to MNG-6572 optimization)
      */
     @Test
-    void testVersionEqualWithLeadingZeroes() {
+    void versionEqualWithLeadingZeroes() {
         // versions with string lengths from 1 to 19
         String[] arr = new String[] {
             "0000000000000000001",
@@ -392,7 +392,7 @@ class ComparableVersionTest {
      * (related to MNG-6572 optimization)
      */
     @Test
-    void testVersionZeroEqualWithLeadingZeroes() {
+    void versionZeroEqualWithLeadingZeroes() {
         // versions with string lengths from 1 to 19
         String[] arr = new String[] {
             "0000000000000000000",
@@ -424,7 +424,7 @@ class ComparableVersionTest {
      * for qualifiers that start with "-0.", which was showing A == C and B == C but A &lt; B.
      */
     @Test
-    void testMng6964() {
+    void mng6964() {
         String a = "1-0.alpha";
         String b = "1-0.beta";
         String c = "1";
@@ -435,7 +435,7 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testLocaleIndependent() {
+    void localeIndependent() {
         Locale orig = Locale.getDefault();
         Locale[] locales = {Locale.ENGLISH, new Locale("tr"), Locale.getDefault()};
         try {
@@ -449,7 +449,7 @@ class ComparableVersionTest {
     }
 
     @Test
-    void testReuse() {
+    void reuse() {
         ComparableVersion c1 = new ComparableVersion("1");
         c1.parseVersion("2");
 
@@ -464,7 +464,7 @@ class ComparableVersionTest {
      * 1.0.0.X1 &lt; 1.0.0-X2 for any string X
      */
     @Test
-    void testMng7644() {
+    void mng7644() {
         for (String x : new String[] {"abc", "alpha", "a", "beta", "b", "def", "milestone", "m", "RC"}) {
             // 1.0.0.X1 < 1.0.0-X2 for any string x
             checkVersionsOrder("1.0.0." + x + "1", "1.0.0-" + x + "2");
@@ -476,7 +476,7 @@ class ComparableVersionTest {
     }
 
     @Test
-    public void testMng7714() {
+    void mng7714() {
         ComparableVersion f = new ComparableVersion("1.0.final-redhat");
         ComparableVersion sp1 = new ComparableVersion("1.0-sp1-redhat");
         ComparableVersion sp2 = new ComparableVersion("1.0-sp-1-redhat");

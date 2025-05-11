@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class ModelVersionParserTest {
+class ModelVersionParserTest {
 
     private final DefaultModelVersionParser versionParser = new DefaultModelVersionParser(new GenericVersionScheme());
 
@@ -43,7 +43,7 @@ public class ModelVersionParserTest {
     }
 
     @Test
-    void testEnumeratedVersions() throws VersionParserException {
+    void enumeratedVersions() throws VersionParserException {
         VersionConstraint c = versionParser.parseVersionConstraint("1.0");
         assertEquals("1.0", c.getRecommendedVersion().toString());
         assertTrue(c.contains(versionParser.parseVersion("1.0")));
@@ -84,14 +84,14 @@ public class ModelVersionParserTest {
     }
 
     @Test
-    void testInvalid() {
+    void invalid() {
         parseInvalid("[1,");
         parseInvalid("[1,2],(3,");
         parseInvalid("[1,2],3");
     }
 
     @Test
-    void testSameUpperAndLowerBound() throws VersionParserException {
+    void sameUpperAndLowerBound() throws VersionParserException {
         VersionConstraint c = versionParser.parseVersionConstraint("[1.0]");
         assertEquals("[1.0,1.0]", c.toString());
         VersionConstraint c2 = versionParser.parseVersionConstraint(c.toString());

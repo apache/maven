@@ -43,7 +43,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testValidate() {
+    void validate() {
         Profile prof = Profile.newBuilder().id("xxx").build();
         Settings model = Settings.newBuilder().profiles(List.of(prof)).build();
         ProblemCollector<BuilderProblem> problems = validator.validate(model);

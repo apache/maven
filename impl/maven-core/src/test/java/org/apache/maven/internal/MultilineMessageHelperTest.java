@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MultilineMessageHelperTest {
 
     @Test
-    void testBuilderCommon() {
+    void builderCommon() {
         List<String> msgs = new ArrayList<>();
         msgs.add("*****************************************************************");
         msgs.add("* Your build is requesting parallel execution, but project      *");
@@ -51,7 +51,7 @@ class MultilineMessageHelperTest {
     }
 
     @Test
-    void testMojoExecutor() {
+    void mojoExecutor() {
         List<String> msgs = new ArrayList<>();
         msgs.add("*****************************************************************");
         msgs.add("* An aggregator Mojo is already executing in parallel build,    *");
