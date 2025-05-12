@@ -14,7 +14,6 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-root = true
 
 [*]
 charset = utf-8
@@ -23,11 +22,5 @@ indent_style = space
 insert_final_newline = true
 
 [*.java]
-ij_continuation_indent_size = 4
 ij_java_class_count_to_use_import_on_demand = 999
 ij_java_names_count_to_use_import_on_demand = 999
-indent_size = 4
-max_line_length = 120
-
-[*.xml]
-max_line_length = 160
