@@ -226,6 +226,11 @@ public class FastTerminal implements TerminalExt {
     }
 
     @Override
+    public MouseTracking getCurrentMouseTracking() {
+        return getTerminal().getCurrentMouseTracking();
+    }
+
+    @Override
     public boolean trackMouse(MouseTracking mouseTracking) {
         return getTerminal().trackMouse(mouseTracking);
     }
@@ -238,6 +243,16 @@ public class FastTerminal implements TerminalExt {
     @Override
     public MouseEvent readMouseEvent(IntSupplier intSupplier) {
         return getTerminal().readMouseEvent(intSupplier);
+    }
+
+    @Override
+    public MouseEvent readMouseEvent(String prefix) {
+        return getTerminal().readMouseEvent(prefix);
+    }
+
+    @Override
+    public MouseEvent readMouseEvent(IntSupplier reader, String prefix) {
+        return getTerminal().readMouseEvent(reader, prefix);
     }
 
     @Override
