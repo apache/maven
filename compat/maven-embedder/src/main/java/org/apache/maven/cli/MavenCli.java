@@ -1587,13 +1587,6 @@ public class MavenCli {
         enableOnPresentOption(commandLine, String.valueOf(option), setting);
     }
 
-    private void enableOnAbsentOption(
-            final CommandLine commandLine, final char option, final Consumer<Boolean> setting) {
-        if (!commandLine.hasOption(option)) {
-            setting.accept(true);
-        }
-    }
-
     int calculateDegreeOfConcurrency(String threadConfiguration) {
         try {
             if (threadConfiguration.endsWith("C")) {
