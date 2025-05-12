@@ -19,6 +19,8 @@
 package org.apache.maven.impl;
 
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -140,9 +142,9 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param scope scope of source code (main or test)
      * @param language language of the source code
      * @param directory directory of the source code
-     * @param includes list of patterns for the files to include, or {@code null} if unspecified
-     * @param excludes list of patterns for the files to exclude, or {@code null} if unspecified
-     * */
+     * @param includes patterns for the files to include, or {@code null} or empty if unspecified
+     * @param excludes patterns for the files to exclude, or {@code null} or empty if nothing to exclude
+     */
     public DefaultSourceRoot(
             final ProjectScope scope,
             final Language language,
@@ -183,7 +185,7 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return the list of pattern matchers for the files to include}.
+     * {@return the patterns for the files to include}.
      */
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable
@@ -192,12 +194,28 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return the list of pattern matchers for the files to exclude}.
+     * {@return the patterns for the files to exclude}.
      */
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable
     public List<String> excludes() {
         return excludes;
+    }
+
+    /**
+     * {@return a matcher combining the include and exclude patterns}.
+     *
+     * @param defaultIncludes the default includes if unspecified by the user
+     * @param useDefaultExcludes whether to add the default set of patterns to exclude,
+     *        mostly Source Code Management (<abbr>SCM</abbr>) files
+     */
+    @Override
+    public PathMatcher matcher(Collection<String> defaultIncludes, boolean useDefaultExcludes) {
+        Collection<String> actual = includes();
+        if (actual == null || actual.isEmpty()) {
+            actual = defaultIncludes;
+        }
+        return new PathSelector(directory(), actual, excludes(), useDefaultExcludes).simplify();
     }
 
     /**
