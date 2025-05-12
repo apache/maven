@@ -56,11 +56,11 @@ public class ToolboxTool implements ExecutorTool {
                 .argument("-DasProperties")
                 .stdOut(stdout)
                 .stdErr(stderr);
-        ExecutorRequest request = doExecute(builder);
+        doExecute(builder);
         try {
             Properties properties = new Properties();
             properties.load(new ByteArrayInputStream(
-                    validateOutput(request, false, stdout, stderr).getBytes()));
+                    validateOutput(false, stdout, stderr).getBytes()));
             return properties.entrySet().stream()
                     .collect(Collectors.toMap(
                             e -> String.valueOf(e.getKey()),
@@ -79,8 +79,8 @@ public class ToolboxTool implements ExecutorTool {
         ExecutorRequest.Builder builder = mojo(executorRequest, "gav-local-repository-path")
                 .stdOut(stdout)
                 .stdErr(stderr);
-        ExecutorRequest request = doExecute(builder);
-        return validateOutput(request, true, stdout, stderr);
+        doExecute(builder);
+        return validateOutput(true, stdout, stderr);
     }
 
     @Override
@@ -95,8 +95,8 @@ public class ToolboxTool implements ExecutorTool {
         if (repositoryId != null) {
             builder.argument("-Drepository=" + repositoryId + "::unimportant");
         }
-        ExecutorRequest request = doExecute(builder);
-        return validateOutput(request, true, stdout, stderr);
+        doExecute(builder);
+        return validateOutput(true, stdout, stderr);
     }
 
     @Override
@@ -111,8 +111,8 @@ public class ToolboxTool implements ExecutorTool {
         if (repositoryId != null) {
             builder.argument("-Drepository=" + repositoryId + "::unimportant");
         }
-        ExecutorRequest request = doExecute(builder);
-        return validateOutput(request, true, stdout, stderr);
+        doExecute(builder);
+        return validateOutput(true, stdout, stderr);
     }
 
     private ExecutorRequest.Builder mojo(ExecutorRequest.Builder builder, String mojo) {
@@ -122,7 +122,7 @@ public class ToolboxTool implements ExecutorTool {
         return builder.argument(TOOLBOX + mojo).argument("--quiet").argument("-DforceStdout");
     }
 
-    private ExecutorRequest doExecute(ExecutorRequest.Builder builder) {
+    private void doExecute(ExecutorRequest.Builder builder) {
         ExecutorRequest request = builder.build();
         int ec = helper.execute(request);
         if (ec != 0) {
@@ -130,14 +130,12 @@ public class ToolboxTool implements ExecutorTool {
                     + request.stdOut().orElse(null) + "; stderr="
                     + request.stdErr().orElse(null));
         }
-        return request;
     }
 
     /**
      * Performs "sanity check" for output, making sure no insane values like empty strings are returned.
      */
-    private String validateOutput(
-            ExecutorRequest request, boolean shave, ByteArrayOutputStream stdout, ByteArrayOutputStream stderr) {
+    private String validateOutput(boolean shave, ByteArrayOutputStream stdout, ByteArrayOutputStream stderr) {
         String result = stdout.toString();
         if (shave) {
             result = result.replace("\n", "").replace("\r", "");
