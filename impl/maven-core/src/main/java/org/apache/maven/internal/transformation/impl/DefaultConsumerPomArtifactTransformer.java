@@ -46,7 +46,6 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.installation.InstallRequest;
-import org.eclipse.sisu.PreDestroy;
 
 /**
  * Consumer POM transformer.
@@ -115,17 +114,6 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
 
     private void deferDeleteFile(Path generatedFile) {
         toDelete.add(generatedFile.toAbsolutePath());
-    }
-
-    @PreDestroy
-    private void doDeleteFiles() {
-        for (Path file : toDelete) {
-            try {
-                Files.delete(file);
-            } catch (IOException e) {
-                // ignore, we did our best...
-            }
-        }
     }
 
     public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
