@@ -53,5 +53,5 @@ This integration test demonstrates how to create a Maven plugin with `extensions
 
 4. Verify that the custom type handler is used:
    ```
-   [INFO] Using custom type handler for type: custom-type
+   [INFO] [MNG-8572] Registering custom type handler for type: custom-type
    ```

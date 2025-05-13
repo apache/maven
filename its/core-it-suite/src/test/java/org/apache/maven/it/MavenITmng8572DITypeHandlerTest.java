@@ -49,11 +49,22 @@ public class MavenITmng8572DITypeHandlerTest extends AbstractMavenIntegrationTes
         verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.addCliArguments(
+                "install:install-file",
+                "-Dfile=src/main/java/org/apache/maven/its/mng8572/test/DummyClass.java",
+                "-DpomFile=dummy-artifact-pom.xml",
+                "-Dpackaging=custom",
+                "-DcreateChecksum=true");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
+        verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Verify that our custom type handler was used
-        verifier.verifyTextInLog("[INFO] Using custom type handler for type: custom-type");
+        verifier.verifyTextInLog("[INFO] [MNG-8572] Registering custom type handler for type: custom-type");
     }
 }

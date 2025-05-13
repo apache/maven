@@ -39,7 +39,6 @@ public class CustomTypeProvider implements TypeProvider {
 
     @Override
     public Collection<Type> provides() {
-        System.out.println("[MNG-8572] Registering custom type handler for type: custom-type");
         LOGGER.info("[MNG-8572] Registering custom type handler for type: custom-type");
 
         // Create a custom type that will be used for dependencies with type="custom-type"

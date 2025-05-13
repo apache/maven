@@ -17,7 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.1.0">
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
   <modelVersion>4.1.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng8572</groupId>
