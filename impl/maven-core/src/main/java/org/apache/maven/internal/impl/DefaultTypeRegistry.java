@@ -54,7 +54,7 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
 
     @Inject
     public DefaultTypeRegistry(Lookup lookup, LanguageRegistry languageRegistry, LegacyArtifactHandlerManager manager) {
-        this.lookup = lookup;
+        this.lookup = requireNonNull(lookup, "lookup cannot be null");
         this.languageRegistry = requireNonNull(languageRegistry, "languageRegistry cannot be null");
         this.usedTypes = new ConcurrentHashMap<>();
         this.manager = requireNonNull(manager, "artifactHandlerManager cannot be null");
