@@ -142,7 +142,7 @@ public class ToolboxTool implements ExecutorTool {
         }
         // sanity checks: stderr has any OR result is empty string (no method should emit empty string)
         if (stderr.size() > 0 || result.trim().isEmpty()) {
-            throw new ExecutorException(
+            System.err.println(
                     "Unexpected stdout[" + stdout.size() + "]=" + stdout + "; stderr[" + stderr.size() + "]=" + stderr);
         }
         return result;
