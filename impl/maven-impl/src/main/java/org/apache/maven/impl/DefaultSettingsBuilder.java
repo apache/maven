@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -62,7 +64,6 @@ import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatche
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
- *
  */
 @Named
 public class DefaultSettingsBuilder implements SettingsBuilder {
@@ -203,6 +204,12 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         settings = interpolate(settings, request, problems);
         settings = decrypt(settingsSource, settings, request, problems);
 
+        if (!isProjectSettings) {
+            settings = Settings.newBuilder(settings, false)
+                    .servers(serversByIds(settings.getServers()))
+                    .build();
+        }
+
         settingsValidator.validate(settings, isProjectSettings, problems);
 
         if (isProjectSettings) {
@@ -226,6 +233,22 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         return settings;
+    }
+
+    private List<Server> serversByIds(List<Server> servers) {
+
+        if (servers.stream().allMatch(server -> server.getIds().isEmpty())) {
+            return servers;
+        }
+
+        ArrayList<Server> result = new ArrayList<>(servers);
+
+        servers.stream().filter(server -> !server.getIds().isEmpty()).forEach(server -> server.getIds()
+                .forEach(id -> result.add(Server.newBuilder(server)
+                        .id(id)
+                        .ids(Collections.emptyList())
+                        .build())));
+        return result;
     }
 
     private Settings interpolate(
