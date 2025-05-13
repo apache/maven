@@ -181,6 +181,7 @@
         </field>
         <field xdoc.separator="blank">
           <name>repositories</name>
+          <!-- 2.0.0+ ? -->
           <version>1.3.0+</version>
           <description>
             The lists of the remote repositories.
@@ -192,6 +193,7 @@
         </field>
         <field>
           <name>pluginRepositories</name>
+          <!-- 2.0.0+ ? -->
           <version>1.3.0+</version>
           <description>
             The lists of the remote repositories for discovering plugins.
@@ -528,6 +530,17 @@
           <description>
             Extra configuration for the transport layer.
           </description>
+        </field>
+        <field>
+          <name>ids</name>
+          <version>1.3.0+</version>
+          <description>
+            List of additional ids for server.
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
     </class>
