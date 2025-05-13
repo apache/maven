@@ -65,7 +65,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
     @Test
     @DisabledOnOs(OS.WINDOWS) // need to investigate why it fails on windows
-    void testProjectInheritance() throws Exception {
+    void projectInheritance() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         System.out.println("Local repository is at: " + localRepo.getAbsolutePath());

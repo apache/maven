@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 class DefaultArtifactDescriptorReaderTest extends AbstractRepositoryTestCase {
 
     @Test
-    void testMng5459() throws Exception {
+    void mng5459() throws Exception {
         // prepare
         DefaultArtifactDescriptorReader reader =
                 (DefaultArtifactDescriptorReader) getContainer().lookup(ArtifactDescriptorReader.class);

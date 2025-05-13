@@ -41,7 +41,7 @@ import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn4Execu
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ToolboxToolTest {
+class ToolboxToolTest {
     @TempDir
     private static Path userHome;
 

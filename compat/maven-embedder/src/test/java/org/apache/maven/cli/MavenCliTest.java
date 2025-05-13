@@ -134,7 +134,7 @@ class MavenCliTest {
     }
 
     @Test
-    void testDetermineProjectActivation() throws ParseException {
+    void determineProjectActivation() throws ParseException {
         final CommandLineParser parser = new DefaultParser();
 
         final Options options = new Options();
@@ -161,7 +161,7 @@ class MavenCliTest {
     }
 
     @Test
-    void testCalculateDegreeOfConcurrency() {
+    void calculateDegreeOfConcurrency() {
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("-1"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0x4"));
@@ -183,7 +183,7 @@ class MavenCliTest {
     }
 
     @Test
-    void testMavenConfig() throws Exception {
+    void mavenConfig() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File("src/test/projects/config").getCanonicalPath());
         CliRequest request = new CliRequest(new String[0], null);
@@ -201,7 +201,7 @@ class MavenCliTest {
     }
 
     @Test
-    void testMavenConfigInvalid() throws Exception {
+    void mavenConfigInvalid() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/config-illegal").getCanonicalPath());
@@ -225,7 +225,7 @@ class MavenCliTest {
      * @throws Exception in case of failure.
      */
     @Test
-    void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
+    void mvnConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -252,7 +252,7 @@ class MavenCliTest {
      * @throws Exception
      */
     @Test
-    void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
+    void mvnConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -281,7 +281,7 @@ class MavenCliTest {
      * @throws Exception
      */
     @Test
-    void testMVNConfigurationCLIRepeatedPropertiesLastWins() throws Exception {
+    void mvnConfigurationCLIRepeatedPropertiesLastWins() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -310,7 +310,7 @@ class MavenCliTest {
      * @throws Exception
      */
     @Test
-    void testMVNConfigurationFunkyArguments() throws Exception {
+    void mvnConfigurationFunkyArguments() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -338,7 +338,7 @@ class MavenCliTest {
     }
 
     @Test
-    void testStyleColors() throws Exception {
+    void styleColors() throws Exception {
         assumeTrue(MessageUtils.isColorEnabled(), "ANSI not supported");
         CliRequest request;
 
@@ -407,7 +407,7 @@ class MavenCliTest {
      * Verifies MNG-6558
      */
     @Test
-    void testToolchainsBuildingEvents() throws Exception {
+    void toolchainsBuildingEvents() throws Exception {
         final EventSpyDispatcher eventSpyDispatcherMock = mock(EventSpyDispatcher.class);
         MavenCli customizedMavenCli = new MavenCli() {
             @Override
@@ -489,7 +489,7 @@ class MavenCliTest {
      * @throws Exception cli invocation.
      */
     @Test
-    void testVersionStringWithoutAnsi() throws Exception {
+    void versionStringWithoutAnsi() throws Exception {
         // given
         // - request with version and batch mode
         CliRequest cliRequest = new CliRequest(new String[] {"--version", "--batch-mode"}, null);
@@ -579,13 +579,13 @@ class MavenCliTest {
     }
 
     @Test
-    public void findRootProjectWithAttribute() {
+    void findRootProjectWithAttribute() {
         Path test = Paths.get("src/test/projects/root-attribute");
         assertEquals(test, new DefaultRootLocator().findRoot(test.resolve("child")));
     }
 
     @Test
-    public void testPropertiesInterpolation() throws Exception {
+    void propertiesInterpolation() throws Exception {
         FileSystem fs = Jimfs.newFileSystem(Configuration.windows());
 
         Path mavenHome = fs.getPath("C:\\maven");
@@ -643,14 +643,14 @@ class MavenCliTest {
     }
 
     @Test
-    public void testEmptyProfile() throws Exception {
+    void emptyProfile() throws Exception {
         CliRequest request = new CliRequest(new String[] {"-P", ""}, null);
         cli.cli(request);
         cli.populateRequest(request);
     }
 
     @Test
-    public void testEmptyProject() throws Exception {
+    void emptyProject() throws Exception {
         CliRequest request = new CliRequest(new String[] {"-pl", ""}, null);
         cli.cli(request);
         cli.populateRequest(request);
@@ -658,7 +658,7 @@ class MavenCliTest {
 
     @ParameterizedTest
     @MethodSource("activateBatchModeArguments")
-    public void activateBatchMode(boolean ciEnv, String[] cliArgs, boolean isBatchMode) throws Exception {
+    void activateBatchMode(boolean ciEnv, String[] cliArgs, boolean isBatchMode) throws Exception {
         CliRequest request = new CliRequest(cliArgs, null);
         if (ciEnv) {
             request.getSystemProperties().put("env.CI", "true");
@@ -685,7 +685,7 @@ class MavenCliTest {
 
     @ParameterizedTest
     @MethodSource("calculateTransferListenerArguments")
-    public void calculateTransferListener(boolean ciEnv, String[] cliArgs, Class<TransferListener> expectedSubClass)
+    void calculateTransferListener(boolean ciEnv, String[] cliArgs, Class<TransferListener> expectedSubClass)
             throws Exception {
         CliRequest request = new CliRequest(cliArgs, null);
         if (ciEnv) {

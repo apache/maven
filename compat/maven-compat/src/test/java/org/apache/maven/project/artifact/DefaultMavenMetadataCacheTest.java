@@ -45,7 +45,7 @@ class DefaultMavenMetadataCacheTest {
     }
 
     @Test
-    void testCacheKey() throws Exception {
+    void cacheKey() throws Exception {
         Artifact a1 = repositorySystem.createArtifact("testGroup", "testArtifact", "1.2.3", "jar");
         @SuppressWarnings("deprecation")
         ArtifactRepository lr1 = new DelegatingLocalArtifactRepository(repositorySystem.createDefaultLocalRepository());

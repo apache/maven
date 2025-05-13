@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
  */
 class DefaultMavenExecutionTest {
     @Test
-    void testCopyDefault() {
+    void copyDefault() {
         MavenExecutionRequest original = new DefaultMavenExecutionRequest();
         MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy(original);
         assertNotNull(copy);
@@ -41,7 +41,7 @@ class DefaultMavenExecutionTest {
     }
 
     @Test
-    void testResultWithNullTopologicallySortedProjectsIsEmptyList() {
+    void resultWithNullTopologicallySortedProjectsIsEmptyList() {
         MavenExecutionResult result = new DefaultMavenExecutionResult();
         result.setTopologicallySortedProjects(null);
         List<MavenProject> projects = result.getTopologicallySortedProjects();

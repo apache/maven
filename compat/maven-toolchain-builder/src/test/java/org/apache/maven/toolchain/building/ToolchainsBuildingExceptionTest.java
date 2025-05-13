@@ -31,13 +31,13 @@ class ToolchainsBuildingExceptionTest {
     private static final String LS = System.lineSeparator();
 
     @Test
-    void testNoProblems() {
+    void noProblems() {
         ToolchainsBuildingException e = new ToolchainsBuildingException(Collections.emptyList());
         assertEquals("0 problems were encountered while building the effective toolchains" + LS, e.getMessage());
     }
 
     @Test
-    void testOneProblem() {
+    void oneProblem() {
         ProblemCollector problemCollector = ProblemCollectorFactory.newInstance(null);
         problemCollector.add(Problem.Severity.ERROR, "MESSAGE", 3, 5, new Exception());
         ToolchainsBuildingException e = new ToolchainsBuildingException(problemCollector.getProblems());
@@ -48,7 +48,7 @@ class ToolchainsBuildingExceptionTest {
     }
 
     @Test
-    void testUnknownPositionAndSource() {
+    void unknownPositionAndSource() {
         ProblemCollector problemCollector = ProblemCollectorFactory.newInstance(null);
         problemCollector.add(Problem.Severity.ERROR, "MESSAGE", -1, -1, new Exception());
         ToolchainsBuildingException e = new ToolchainsBuildingException(problemCollector.getProblems());
@@ -58,7 +58,7 @@ class ToolchainsBuildingExceptionTest {
     }
 
     @Test
-    void testUnknownPosition() {
+    void unknownPosition() {
         ProblemCollector problemCollector = ProblemCollectorFactory.newInstance(null);
         problemCollector.setSource("SOURCE");
         problemCollector.add(Problem.Severity.ERROR, "MESSAGE", -1, -1, new Exception());

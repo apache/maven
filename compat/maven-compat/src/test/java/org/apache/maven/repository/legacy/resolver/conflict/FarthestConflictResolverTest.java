@@ -44,7 +44,7 @@ class FarthestConflictResolverTest extends AbstractConflictResolverTest {
      * </pre>
      */
     @Test
-    void testDepth() {
+    void depth() {
         ResolutionNode a1n = createResolutionNode(a1);
         ResolutionNode b1n = createResolutionNode(b1);
         ResolutionNode a2n = createResolutionNode(a2, b1n);
@@ -60,7 +60,7 @@ class FarthestConflictResolverTest extends AbstractConflictResolverTest {
      * </pre>
      */
     @Test
-    void testDepthReversed() {
+    void depthReversed() {
         ResolutionNode b1n = createResolutionNode(b1);
         ResolutionNode a2n = createResolutionNode(a2, b1n);
         ResolutionNode a1n = createResolutionNode(a1);
@@ -76,7 +76,7 @@ class FarthestConflictResolverTest extends AbstractConflictResolverTest {
      * </pre>
      */
     @Test
-    void testEqual() {
+    void equal() {
         ResolutionNode a1n = createResolutionNode(a1);
         ResolutionNode a2n = createResolutionNode(a2);
 
@@ -91,7 +91,7 @@ class FarthestConflictResolverTest extends AbstractConflictResolverTest {
      * </pre>
      */
     @Test
-    void testEqualReversed() {
+    void equalReversed() {
         ResolutionNode a2n = createResolutionNode(a2);
         ResolutionNode a1n = createResolutionNode(a1);
 

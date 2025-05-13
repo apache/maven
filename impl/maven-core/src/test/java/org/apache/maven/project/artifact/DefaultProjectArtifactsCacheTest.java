@@ -39,7 +39,7 @@ class DefaultProjectArtifactsCacheTest {
     }
 
     @Test
-    void testProjectDependencyOrder() throws Exception {
+    void projectDependencyOrder() throws Exception {
         ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key() {};
 
         Set<Artifact> artifacts = new LinkedHashSet<>(4);

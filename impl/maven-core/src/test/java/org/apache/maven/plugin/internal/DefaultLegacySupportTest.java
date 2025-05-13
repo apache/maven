@@ -34,7 +34,7 @@ class DefaultLegacySupportTest {
     final DefaultLegacySupport defaultLegacySupport = new DefaultLegacySupport();
 
     @Test
-    void testSetSession() throws Exception {
+    void setSession() throws Exception {
 
         MavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         MavenSession m1 = new MavenSession(null, null, mavenExecutionRequest, null);

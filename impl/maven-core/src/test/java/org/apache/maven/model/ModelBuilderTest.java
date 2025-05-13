@@ -50,7 +50,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest
-public class ModelBuilderTest {
+class ModelBuilderTest {
 
     @Inject
     ProjectBuilder projectBuilder;
@@ -65,7 +65,7 @@ public class ModelBuilderTest {
     RepositorySystem repositorySystem;
 
     @Test
-    void testModelBuilder() throws Exception {
+    void modelBuilder() throws Exception {
         MavenExecutionRequest mavenRequest = new DefaultMavenExecutionRequest();
         mavenRequest.setLocalRepository(mavenRepositorySystem.createLocalRepository(new File("target/test-repo/")));
         mavenRequest.setRootDirectory(Paths.get("src/test/resources/projects/tree"));

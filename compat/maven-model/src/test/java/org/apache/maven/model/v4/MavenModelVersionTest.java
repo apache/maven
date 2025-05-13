@@ -42,30 +42,30 @@ class MavenModelVersionTest {
     }
 
     @Test
-    void testV4Model() {
+    void v4Model() {
         assertEquals("4.0.0", new MavenModelVersion().getModelVersion(model));
     }
 
     @Test
-    void testV4ModelVersion() {
+    void v4ModelVersion() {
         Model m = model.withModelVersion("4.1.0");
         assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m));
     }
 
     @Test
-    void testV4ModelRoot() {
+    void v4ModelRoot() {
         Model m = model.withRoot(true);
         assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
     }
 
     @Test
-    void testV4ModelPreserveModelVersion() {
+    void v4ModelPreserveModelVersion() {
         Model m = model.withPreserveModelVersion(true);
         assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
     }
 
     @Test
-    void testV4ModelPriority() {
+    void v4ModelPriority() {
         Model m = model.withBuild(Build.newInstance()
                 .withPlugins(Collections.singleton(Plugin.newInstance()
                         .withExecutions(Collections.singleton(

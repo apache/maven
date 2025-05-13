@@ -36,7 +36,7 @@ class ScopeArtifactFilterTest {
     }
 
     @Test
-    void testIncludeCompile() {
+    void includeCompile() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -47,7 +47,7 @@ class ScopeArtifactFilterTest {
     }
 
     @Test
-    void testIncludeCompilePlusRuntime() {
+    void includeCompilePlusRuntime() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE_PLUS_RUNTIME);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -58,7 +58,7 @@ class ScopeArtifactFilterTest {
     }
 
     @Test
-    void testIncludeRuntime() {
+    void includeRuntime() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -69,7 +69,7 @@ class ScopeArtifactFilterTest {
     }
 
     @Test
-    void testIncludeRuntimePlusSystem() {
+    void includeRuntimePlusSystem() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME_PLUS_SYSTEM);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -80,7 +80,7 @@ class ScopeArtifactFilterTest {
     }
 
     @Test
-    void testIncludeTest() {
+    void includeTest() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_TEST);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));

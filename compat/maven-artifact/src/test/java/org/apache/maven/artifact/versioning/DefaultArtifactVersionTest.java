@@ -20,9 +20,7 @@ package org.apache.maven.artifact.versioning;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test DefaultArtifactVersion.
@@ -48,7 +46,7 @@ class DefaultArtifactVersionTest {
     }
 
     @Test
-    void testVersionParsing() {
+    void versionParsing() {
         checkVersionParsing("1", 1, 0, 0, 0, null);
         checkVersionParsing("1.2", 1, 2, 0, 0, null);
         checkVersionParsing("1.2.3", 1, 2, 3, 0, null);
@@ -85,7 +83,7 @@ class DefaultArtifactVersionTest {
     }
 
     @Test
-    void testVersionComparing() {
+    void versionComparing() {
         assertVersionEqual("1", "1");
         assertVersionOlder("1", "2");
         assertVersionOlder("1.5", "2");
@@ -132,7 +130,7 @@ class DefaultArtifactVersionTest {
     }
 
     @Test
-    void testVersionSnapshotComparing() {
+    void versionSnapshotComparing() {
         assertVersionEqual("1-SNAPSHOT", "1-SNAPSHOT");
         assertVersionOlder("1-SNAPSHOT", "2-SNAPSHOT");
         assertVersionOlder("1.5-SNAPSHOT", "2-SNAPSHOT");
@@ -166,7 +164,7 @@ class DefaultArtifactVersionTest {
     }
 
     @Test
-    void testSnapshotVsReleases() {
+    void snapshotVsReleases() {
         assertVersionOlder("1.0-RC1", "1.0-SNAPSHOT");
         assertVersionOlder("1.0-rc1", "1.0-SNAPSHOT");
         assertVersionOlder("1.0-rc-1", "1.0-SNAPSHOT");
@@ -176,18 +174,18 @@ class DefaultArtifactVersionTest {
     void testHashCode() {
         ArtifactVersion v1 = newArtifactVersion("1");
         ArtifactVersion v2 = newArtifactVersion("1.0");
-        assertTrue(v1.equals(v2));
+        assertEquals(v1, v2);
         assertEquals(v1.hashCode(), v2.hashCode());
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(newArtifactVersion("1").equals(null));
+    void equalsNullSafe() {
+        assertNotEquals(null, newArtifactVersion("1"));
     }
 
     @Test
-    void testEqualsTypeSafe() {
-        assertFalse(newArtifactVersion("1").equals("non-an-artifact-version-instance"));
+    void equalsTypeSafe() {
+        assertNotEquals("non-an-artifact-version-instance", newArtifactVersion("1"));
     }
 
     private void assertVersionOlder(String left, String right) {
@@ -200,11 +198,7 @@ class DefaultArtifactVersionTest {
     }
 
     private void assertVersionEqual(String left, String right) {
-        assertTrue(
-                newArtifactVersion(left).compareTo(newArtifactVersion(right)) == 0,
-                left + " should be equal to " + right);
-        assertTrue(
-                newArtifactVersion(right).compareTo(newArtifactVersion(left)) == 0,
-                right + " should be equal to " + left);
+        assertEquals(0, newArtifactVersion(left).compareTo(newArtifactVersion(right)), left + " should be equal to " + right);
+        assertEquals(0, newArtifactVersion(right).compareTo(newArtifactVersion(left)), right + " should be equal to " + left);
     }
 }

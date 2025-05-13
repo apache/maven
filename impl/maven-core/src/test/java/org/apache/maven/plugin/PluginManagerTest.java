@@ -48,7 +48,7 @@ class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testPluginLoading() throws Exception {
+    void pluginLoading() throws Exception {
         MavenSession session = createMavenSession(null);
         Plugin plugin = new Plugin();
         plugin.setGroupId("org.apache.maven.its.plugins");
@@ -60,7 +60,7 @@ class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testMojoDescriptorRetrieval() throws Exception {
+    void mojoDescriptorRetrieval() throws Exception {
         MavenSession session = createMavenSession(null);
         String goal = "it";
         Plugin plugin = new Plugin();
@@ -88,7 +88,7 @@ class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     // test a build where projects use different versions of the same plugin
 
     @Test
-    void testThatPluginDependencyThatHasSystemScopeIsResolved() throws Exception {
+    void thatPluginDependencyThatHasSystemScopeIsResolved() throws Exception {
         MavenSession session = createMavenSession(getProject("project-contributing-system-scope-plugin-dep"));
         MavenProject project = session.getCurrentProject();
         Plugin plugin = project.getPlugin("org.apache.maven.its.plugins:maven-it-plugin");
@@ -128,7 +128,7 @@ class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testPluginRealmCache() throws Exception {
+    void pluginRealmCache() throws Exception {
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setLocalRepository(getLocalRepository());
         repositoryRequest.setRemoteRepositories(getPluginArtifactRepositories());
@@ -167,7 +167,7 @@ class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testBuildExtensionsPluginLoading() throws Exception {
+    void buildExtensionsPluginLoading() throws Exception {
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setLocalRepository(getLocalRepository());
         repositoryRequest.setRemoteRepositories(getPluginArtifactRepositories());

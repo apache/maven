@@ -60,7 +60,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testRootDirectoryWithNull() {
+    void rootDirectoryWithNull() {
         context.setModel(Model.newInstance());
 
         NullPointerException e = assertThrows(
@@ -70,7 +70,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testRootDirectory() {
+    void rootDirectory() {
         assertActivation(false, newExistsProfile("${project.rootDirectory}/someFile.txt"), context);
         assertActivation(true, newMissingProfile("${project.rootDirectory}/someFile.txt"), context);
         assertActivation(true, newExistsProfile("${project.rootDirectory}"), context);
@@ -80,7 +80,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testIsActiveNoFileWithShortBasedir() {
+    void isActiveNoFileWithShortBasedir() {
         assertActivation(false, newExistsProfile(null), context);
         assertActivation(false, newExistsProfile("someFile.txt"), context);
         assertActivation(false, newExistsProfile("${basedir}/someFile.txt"), context);
@@ -91,7 +91,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testIsActiveNoFile() {
+    void isActiveNoFile() {
         assertActivation(false, newExistsProfile(null), context);
         assertActivation(false, newExistsProfile("someFile.txt"), context);
         assertActivation(false, newExistsProfile("${project.basedir}/someFile.txt"), context);
@@ -102,7 +102,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testIsActiveExistsFileExists() {
+    void isActiveExistsFileExists() {
         assertActivation(true, newExistsProfile("file.txt"), context);
         assertActivation(true, newExistsProfile("${project.basedir}"), context);
         assertActivation(true, newExistsProfile("${project.basedir}/" + "file.txt"), context);
@@ -113,7 +113,7 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     }
 
     @Test
-    void testIsActiveExistsLeavesFileUnchanged() {
+    void isActiveExistsLeavesFileUnchanged() {
         Profile profile = newExistsProfile("file.txt");
         assertEquals("file.txt", profile.getActivation().getFile().getExists());
 

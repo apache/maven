@@ -37,7 +37,7 @@ class DefaultMavenExecutionRequestPopulatorTest {
     MavenExecutionRequestPopulator testee;
 
     @Test
-    void testPluginRepositoryInjection() throws Exception {
+    void pluginRepositoryInjection() throws Exception {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
         Repository r = new Repository();

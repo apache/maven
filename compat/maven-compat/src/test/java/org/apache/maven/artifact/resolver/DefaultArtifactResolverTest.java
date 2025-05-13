@@ -50,7 +50,7 @@ class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testMNG4738() throws Exception {
+    void mng4738() throws Exception {
         Artifact g = createLocalArtifact("g", "1.0");
         createLocalArtifact("h", "1.0");
         artifactResolver.resolveTransitively(
@@ -89,7 +89,7 @@ class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testLookup() throws Exception {
+    void lookup() throws Exception {
         ArtifactResolver resolver = getContainer().lookup(ArtifactResolver.class, "default");
         assertNotNull(resolver);
     }

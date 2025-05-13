@@ -20,9 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@code Parent}.
@@ -31,25 +29,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ParentTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Parent().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new Parent().equals(null));
+    void equalsNullSafe() {
+        assertNotEquals(null, new Parent());
 
         new Parent().equals(new Parent());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Parent thing = new Parent();
-        assertTrue(thing.equals(thing));
+        assertEquals(thing, thing);
     }
 
     @Test
-    void testToStringNullSafe() {
+    void toStringNullSafe() {
         assertNotNull(new Parent().toString());
     }
 }

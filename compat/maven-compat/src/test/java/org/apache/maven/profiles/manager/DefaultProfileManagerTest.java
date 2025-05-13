@@ -47,7 +47,7 @@ class DefaultProfileManagerTest {
     }
 
     @Test
-    void testShouldActivateDefaultProfile() throws Exception {
+    void shouldActivateDefaultProfile() throws Exception {
         Profile notActivated = new Profile();
         notActivated.setId("notActivated");
 
@@ -81,7 +81,7 @@ class DefaultProfileManagerTest {
     }
 
     @Test
-    void testShouldNotActivateDefaultProfile() throws Exception {
+    void shouldNotActivateDefaultProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -118,7 +118,7 @@ class DefaultProfileManagerTest {
     }
 
     @Test
-    void testShouldNotActivateReversalOfPresentSystemProperty() throws Exception {
+    void shouldNotActivateReversalOfPresentSystemProperty() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -144,7 +144,7 @@ class DefaultProfileManagerTest {
     }
 
     @Test
-    void testShouldOverrideAndActivateInactiveProfile() throws Exception {
+    void shouldOverrideAndActivateInactiveProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -173,7 +173,7 @@ class DefaultProfileManagerTest {
     }
 
     @Test
-    void testShouldOverrideAndDeactivateActiveProfile() throws Exception {
+    void shouldOverrideAndDeactivateActiveProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 

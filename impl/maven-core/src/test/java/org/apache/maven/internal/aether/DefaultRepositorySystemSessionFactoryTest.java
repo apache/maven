@@ -61,7 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
  * UT for {@link DefaultRepositorySystemSessionFactory}.
  */
 @PlexusTest
-public class DefaultRepositorySystemSessionFactoryTest {
+class DefaultRepositorySystemSessionFactoryTest {
     @Inject
     protected MavenRepositorySystem mavenRepositorySystem;
 

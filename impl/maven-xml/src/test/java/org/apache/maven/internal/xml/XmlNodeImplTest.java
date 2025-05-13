@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class XmlNodeImplTest {
 
     @Test
-    void testCombineChildrenAppend() throws Exception {
+    void combineChildrenAppend() throws Exception {
         String lhs = "<configuration>\n"
                 + "    <plugins>\n"
                 + "        <plugin>\n"
@@ -152,7 +152,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testAppend() throws Exception {
+    void append() throws Exception {
         String lhs =
                 """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -194,7 +194,7 @@ class XmlNodeImplTest {
      * @throws java.lang.Exception if any.
      */
     @Test
-    void testCombineId() throws Exception {
+    void combineId() throws Exception {
         String lhs = "<props>" + "<property combine.id='LHS-ONLY'><name>LHS-ONLY</name><value>LHS</value></property>"
                 + "<property combine.id='TOOVERWRITE'><name>TOOVERWRITE</name><value>LHS</value></property>"
                 + "</props>";
@@ -240,7 +240,7 @@ class XmlNodeImplTest {
      * @throws java.lang.Exception if any.
      */
     @Test
-    void testCombineKeys() throws Exception {
+    void combineKeys() throws Exception {
         String lhs = "<props combine.keys='key'>"
                 + "<property key=\"LHS-ONLY\"><name>LHS-ONLY</name><value>LHS</value></property>"
                 + "<property combine.keys='name'><name>TOOVERWRITE</name><value>LHS</value></property>" + "</props>";
@@ -281,7 +281,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testPreserveDominantBlankValue() throws XMLStreamException, IOException {
+    void preserveDominantBlankValue() throws XMLStreamException, IOException {
         String lhs = "<parameter xml:space=\"preserve\"> </parameter>";
 
         String rhs = "<parameter>recessive</parameter>";
@@ -294,7 +294,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testPreserveDominantEmptyNode() throws XMLStreamException, IOException {
+    void preserveDominantEmptyNode() throws XMLStreamException, IOException {
         String lhs = "<parameter></parameter>";
 
         String rhs = "<parameter>recessive</parameter>";
@@ -307,7 +307,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testPreserveDominantEmptyNode2() throws XMLStreamException, IOException {
+    void preserveDominantEmptyNode2() throws XMLStreamException, IOException {
         String lhs = "<parameter/>";
 
         String rhs = "<parameter>recessive</parameter>";
@@ -323,7 +323,7 @@ class XmlNodeImplTest {
      * <p>testShouldPerformAppendAtFirstSubElementLevel.</p>
      */
     @Test
-    void testShouldPerformAppendAtFirstSubElementLevel() throws XMLStreamException {
+    void shouldPerformAppendAtFirstSubElementLevel() throws XMLStreamException {
         String lhs =
                 """
                 <top combine.children="append">
@@ -359,7 +359,7 @@ class XmlNodeImplTest {
      * <p>testShouldOverrideAppendAndDeepMerge.</p>
      */
     @Test
-    void testShouldOverrideAppendAndDeepMerge() {
+    void shouldOverrideAppendAndDeepMerge() {
         // create the dominant DOM
         Xpp3Dom t1 = new Xpp3Dom("top");
         t1.setAttribute(Xpp3Dom.CHILDREN_COMBINATION_MODE_ATTRIBUTE, Xpp3Dom.CHILDREN_COMBINATION_APPEND);
@@ -395,7 +395,7 @@ class XmlNodeImplTest {
      * <p>testShouldPerformSelfOverrideAtTopLevel.</p>
      */
     @Test
-    void testShouldPerformSelfOverrideAtTopLevel() {
+    void shouldPerformSelfOverrideAtTopLevel() {
         // create the dominant DOM
         Xpp3Dom t1 = new Xpp3Dom("top");
         t1.setAttribute("attr", "value");
@@ -421,7 +421,7 @@ class XmlNodeImplTest {
      * <p>testShouldMergeValuesAtTopLevelByDefault.</p>
      */
     @Test
-    void testShouldNotMergeValuesAtTopLevelByDefault() {
+    void shouldNotMergeValuesAtTopLevelByDefault() {
         // create the dominant DOM
         Xpp3Dom t1 = new Xpp3Dom("top");
         t1.setAttribute("attr", "value");
@@ -447,7 +447,7 @@ class XmlNodeImplTest {
      * <p>testShouldMergeValuesAtTopLevel.</p>
      */
     @Test
-    void testShouldNotMergeValuesAtTopLevel() {
+    void shouldNotMergeValuesAtTopLevel() {
         // create the dominant DOM
         Xpp3Dom t1 = new Xpp3Dom("top");
         t1.setAttribute("attr", "value");
@@ -470,11 +470,11 @@ class XmlNodeImplTest {
      * <p>testEquals.</p>
      */
     @Test
-    void testEquals() {
+    void equals() {
         XmlNode dom = XmlNode.newInstance("top");
 
         assertEquals(dom, dom);
-        assertNotEquals(dom, null);
+        assertNotEquals(null, dom);
         assertNotEquals(dom, XmlNode.newInstance(""));
     }
 
@@ -482,7 +482,7 @@ class XmlNodeImplTest {
      * <p>testEqualsIsNullSafe.</p>
      */
     @Test
-    void testEqualsIsNullSafe() throws XMLStreamException, IOException {
+    void equalsIsNullSafe() throws XMLStreamException, IOException {
         String testDom = "<configuration><items thing='blah'><item>one</item><item>two</item></items></configuration>";
         XmlNode dom = toXmlNode(testDom);
 
@@ -501,7 +501,7 @@ class XmlNodeImplTest {
      * <p>testShouldOverwritePluginConfigurationSubItemsByDefault.</p>
      */
     @Test
-    void testShouldOverwritePluginConfigurationSubItemsByDefault() throws XMLStreamException, IOException {
+    void shouldOverwritePluginConfigurationSubItemsByDefault() throws XMLStreamException, IOException {
         String parentConfigStr = "<configuration><items><item>one</item><item>two</item></items></configuration>";
         XmlNode parentConfig = toXmlNode(parentConfigStr, new FixedInputLocationBuilder("parent"));
 
@@ -522,7 +522,7 @@ class XmlNodeImplTest {
      * <p>testShouldMergePluginConfigurationSubItemsWithMergeAttributeSet.</p>
      */
     @Test
-    void testShouldMergePluginConfigurationSubItemsWithMergeAttributeSet() throws XMLStreamException, IOException {
+    void shouldMergePluginConfigurationSubItemsWithMergeAttributeSet() throws XMLStreamException, IOException {
         String parentConfigStr = "<configuration><items><item>one</item><item>two</item></items></configuration>";
         XmlNode parentConfig = toXmlNode(parentConfigStr, new FixedInputLocationBuilder("parent"));
 
@@ -551,7 +551,7 @@ class XmlNodeImplTest {
      * @throws java.lang.Exception if any.
      */
     @Test
-    void testShouldNotChangeUponMergeWithItselfWhenFirstOrLastSubItemIsEmpty() throws Exception {
+    void shouldNotChangeUponMergeWithItselfWhenFirstOrLastSubItemIsEmpty() throws Exception {
         String configStr = "<configuration><items><item/><item>test</item><item/></items></configuration>";
         XmlNode dominantConfig = toXmlNode(configStr);
         XmlNode recessiveConfig = toXmlNode(configStr);
@@ -572,7 +572,7 @@ class XmlNodeImplTest {
      * @throws java.lang.Exception if any.
      */
     @Test
-    void testShouldCopyRecessiveChildrenNotPresentInTarget() throws Exception {
+    void shouldCopyRecessiveChildrenNotPresentInTarget() throws Exception {
         String dominantStr = "<configuration><foo>x</foo></configuration>";
         String recessiveStr = "<configuration><bar>y</bar></configuration>";
         Xpp3Dom dominantConfig = build(new StringReader(dominantStr));
@@ -591,7 +591,7 @@ class XmlNodeImplTest {
      * <p>testDupeChildren.</p>
      */
     @Test
-    void testDupeChildren() throws IOException, XMLStreamException {
+    void dupeChildren() throws IOException, XMLStreamException {
         String dupes = "<configuration><foo>x</foo><foo>y</foo></configuration>";
         XmlNode dom = toXmlNode(new StringReader(dupes));
         assertNotNull(dom);
@@ -604,7 +604,7 @@ class XmlNodeImplTest {
      * @throws java.lang.Exception if any.
      */
     @Test
-    void testShouldRemoveEntireElementWithAttributesAndChildren() throws Exception {
+    void shouldRemoveEntireElementWithAttributesAndChildren() throws Exception {
         String dominantStr = "<config><service combine.self=\"remove\"/></config>";
         String recessiveStr = "<config><service><parameter>parameter</parameter></service></config>";
         Xpp3Dom dominantConfig = build(new StringReader(dominantStr));
@@ -622,7 +622,7 @@ class XmlNodeImplTest {
      * @throws java.lang.Exception if any.
      */
     @Test
-    void testShouldRemoveDoNotRemoveTagWhenSwappedInputDOMs() throws Exception {
+    void shouldRemoveDoNotRemoveTagWhenSwappedInputDOMs() throws Exception {
         String dominantStr = "<config><service combine.self=\"remove\"/></config>";
         String recessiveStr = "<config><service><parameter>parameter</parameter></service></config>";
         Xpp3Dom dominantConfig = build(new StringReader(dominantStr));
@@ -635,7 +635,7 @@ class XmlNodeImplTest {
     }
 
     @Test
-    void testMergeCombineChildrenAppendOnRecessive() throws XMLStreamException, IOException {
+    void mergeCombineChildrenAppendOnRecessive() throws XMLStreamException, IOException {
         String dominant = "<relocations>\n" + "  <relocation>\n"
                 + "    <pattern>org.apache.shiro.crypto.CipherService</pattern>\n"
                 + "    <shadedPattern>org.apache.shiro.crypto.cipher.CipherService</shadedPattern>\n"

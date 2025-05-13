@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("unused")
-public class InjectorImplTest {
+class InjectorImplTest {
 
     @Test
     void markerQualifierTest() {
@@ -157,7 +157,7 @@ public class InjectorImplTest {
     }
 
     @Test
-    public void bindInterfacesTest() {
+    void bindInterfacesTest() {
         Injector injector = Injector.create().bindImplicit(BindInterfaces.class);
         BindInterfaces.TestInterface<String> inst =
                 injector.getInstance(new Key<BindInterfaces.TestInterface<String>>() {});
@@ -256,7 +256,7 @@ public class InjectorImplTest {
     }
 
     @Test
-    void testSingleton() {
+    void singleton() {
         Injector injector = Injector.create()
                 .bindImplicit(SingletonContainer.Bean1.class)
                 .bindImplicit(SingletonContainer.Bean2.class);
@@ -291,7 +291,7 @@ public class InjectorImplTest {
     }
 
     @Test
-    void testProvides() {
+    void provides() {
         Injector injector = Injector.create().bindImplicit(ProvidesContainer.class);
 
         assertNotNull(injector.getInstance(String.class));
@@ -311,7 +311,7 @@ public class InjectorImplTest {
     }
 
     @Test
-    void testInjectConstructor() {
+    void injectConstructor() {
         Injector injector = Injector.create().bindImplicit(InjectConstructorContainer.class);
 
         assertNotNull(injector.getInstance(InjectConstructorContainer.Bean.class));
@@ -334,7 +334,7 @@ public class InjectorImplTest {
     }
 
     @Test
-    void testNullableOnField() {
+    void nullableOnField() {
         Injector injector = Injector.create().bindImplicit(NullableOnField.class);
         NullableOnField.MyMojo mojo = injector.getInstance(NullableOnField.MyMojo.class);
         assertNotNull(mojo);
@@ -355,7 +355,7 @@ public class InjectorImplTest {
     }
 
     @Test
-    void testNullableOnConstructor() {
+    void nullableOnConstructor() {
         Injector injector = Injector.create().bindImplicit(NullableOnConstructor.class);
         NullableOnConstructor.MyMojo mojo = injector.getInstance(NullableOnConstructor.MyMojo.class);
         assertNotNull(mojo);
@@ -379,12 +379,11 @@ public class InjectorImplTest {
     }
 
     @Test
-    void testCircularPriorityDependency() {
+    void circularPriorityDependency() {
         Injector injector = Injector.create().bindImplicit(CircularPriorityTest.class);
 
-        DIException exception = assertThrows(DIException.class, () -> {
-            injector.getInstance(CircularPriorityTest.MyService.class);
-        });
+        DIException exception =
+                assertThrows(DIException.class, () -> injector.getInstance(CircularPriorityTest.MyService.class));
         assertThat(exception).isInstanceOf(DIException.class).hasMessageContaining("HighPriorityServiceImpl");
         assertThat(exception.getCause())
                 .isInstanceOf(DIException.class)

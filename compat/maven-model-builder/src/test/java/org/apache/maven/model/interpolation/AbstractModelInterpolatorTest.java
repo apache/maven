@@ -79,7 +79,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testDefaultBuildTimestampFormatShouldFormatTimeIn24HourFormat() {
+    public void defaultBuildTimestampFormatShouldFormatTimeIn24HourFormat() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE);
         cal.set(Calendar.HOUR, 12);
@@ -110,7 +110,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testDefaultBuildTimestampFormatWithLocalTimeZoneMidnightRollover() {
+    public void defaultBuildTimestampFormatWithLocalTimeZoneMidnightRollover() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 
@@ -134,7 +134,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testShouldNotThrowExceptionOnReferenceToNonExistentValue() throws Exception {
+    public void shouldNotThrowExceptionOnReferenceToNonExistentValue() throws Exception {
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .scm(org.apache.maven.api.model.Scm.newBuilder()
                         .connection("${test}/somepath")
@@ -151,7 +151,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testShouldThrowExceptionOnRecursiveScmConnectionReference() throws Exception {
+    public void shouldThrowExceptionOnRecursiveScmConnectionReference() throws Exception {
         var model = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .scm(org.apache.maven.api.model.Scm.newBuilder()
                         .connection("${project.scm.connection}/somepath")
@@ -166,7 +166,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() throws Exception {
+    public void shouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() throws Exception {
         Map<String, String> props = new HashMap<>();
         props.put("test", "test");
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
@@ -224,7 +224,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testShouldNotInterpolateDependencyVersionWithInvalidReference() throws Exception {
+    public void shouldNotInterpolateDependencyVersionWithInvalidReference() throws Exception {
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .version("3.8.1")
                 .dependencies(Collections.singletonList(org.apache.maven.api.model.Dependency.newBuilder()
@@ -242,7 +242,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testTwoReferences() throws Exception {
+    public void twoReferences() throws Exception {
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
@@ -261,7 +261,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testBasedir() throws Exception {
+    public void basedir() throws Exception {
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
@@ -281,7 +281,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testBaseUri() throws Exception {
+    public void baseUri() throws Exception {
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
@@ -300,7 +300,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testEnvars() throws Exception {
+    public void envars() throws Exception {
         context.put("env.HOME", "/path/to/home");
 
         Map<String, String> modelProperties = new HashMap<>();
@@ -403,7 +403,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testRecursiveExpressionCycleNPE() throws Exception {
+    public void recursiveExpressionCycleNPE() throws Exception {
         Map<String, String> props = new HashMap<>();
         props.put("aa", "${bb}");
         props.put("bb", "${aa}");
@@ -421,7 +421,7 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
-    public void testRecursiveExpressionCycleBaseDir() throws Exception {
+    public void recursiveExpressionCycleBaseDir() throws Exception {
         Map<String, String> props = new HashMap<>();
         props.put("basedir", "${basedir}");
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();

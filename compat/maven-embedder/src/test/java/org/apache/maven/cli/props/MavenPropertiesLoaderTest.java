@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class MavenPropertiesLoaderTest {
 
     @Test
-    void testIncludes() throws Exception {
+    void includes() throws Exception {
         FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
 
         Path mavenHome = fs.getPath("/maven");
@@ -62,7 +62,7 @@ class MavenPropertiesLoaderTest {
     }
 
     @Test
-    void testIncludes3() throws Exception {
+    void includes3() throws Exception {
         FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
 
         Path mavenHome = fs.getPath("/maven");

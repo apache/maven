@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 class RequestTraceHelperTest {
 
     @Test
-    void testEnterWithRequestData() {
+    void enterWithRequestData() {
         InternalSession session = mock(InternalSession.class);
         Request<?> request = mock(Request.class);
         org.apache.maven.api.services.RequestTrace existingTrace =
@@ -50,7 +50,7 @@ class RequestTraceHelperTest {
     }
 
     @Test
-    void testInterpretTraceWithArtifactRequest() {
+    void interpretTraceWithArtifactRequest() {
         ArtifactRequest artifactRequest = mock(ArtifactRequest.class);
         RequestTrace trace = RequestTrace.newChild(null, artifactRequest);
 
@@ -60,17 +60,17 @@ class RequestTraceHelperTest {
     }
 
     @Test
-    void testToMavenWithNullTrace() {
+    void toMavenWithNullTrace() {
         assertNull(RequestTraceHelper.toMaven("test", null));
     }
 
     @Test
-    void testToResolverWithNullTrace() {
+    void toResolverWithNullTrace() {
         assertNull(RequestTraceHelper.toResolver(null));
     }
 
     @Test
-    void testExitResetsParentTrace() {
+    void exitResetsParentTrace() {
         InternalSession session = mock(InternalSession.class);
         org.apache.maven.api.services.RequestTrace parentTrace =
                 new org.apache.maven.api.services.RequestTrace(null, "parent");

@@ -40,7 +40,7 @@ class BuilderCommonTest {
     private Logger logger = mock(Logger.class);
 
     @Test
-    void testResolveBuildPlan() throws Exception {
+    void resolveBuildPlan() throws Exception {
         MavenSession original = ProjectDependencyGraphStub.getMavenSession();
 
         final TaskSegment taskSegment1 = new TaskSegment(false);
@@ -55,7 +55,7 @@ class BuilderCommonTest {
     }
 
     @Test
-    void testDefaultBindingPluginsWarning() throws Exception {
+    void defaultBindingPluginsWarning() throws Exception {
         MavenSession original = ProjectDependencyGraphStub.getMavenSession();
 
         final TaskSegment taskSegment1 = new TaskSegment(false);
@@ -79,13 +79,13 @@ class BuilderCommonTest {
     }
 
     @Test
-    void testHandleBuildError() throws Exception {}
+    void handleBuildError() throws Exception {}
 
     @Test
-    void testAttachToThread() throws Exception {}
+    void attachToThread() throws Exception {}
 
     @Test
-    void testGetKey() throws Exception {}
+    void getKey() throws Exception {}
 
     public BuilderCommon getBuilderCommon(Logger logger) {
         final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger();

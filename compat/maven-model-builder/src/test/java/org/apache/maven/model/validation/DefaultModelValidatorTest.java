@@ -116,7 +116,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingModelVersion() throws Exception {
+    void missingModelVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-modelVersion-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -125,7 +125,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadModelVersion() throws Exception {
+    void badModelVersion() throws Exception {
         SimpleProblemCollector result =
                 validateRaw("bad-modelVersion.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
 
@@ -135,7 +135,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testModelVersionMessage() throws Exception {
+    void modelVersionMessage() throws Exception {
         SimpleProblemCollector result =
                 validateRaw("modelVersion-4_0.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
 
@@ -145,7 +145,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingArtifactId() throws Exception {
+    void missingArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-artifactId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -154,7 +154,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingGroupId() throws Exception {
+    void missingGroupId() throws Exception {
         SimpleProblemCollector result = validate("missing-groupId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -163,7 +163,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testInvalidCoordinateIds() throws Exception {
+    void invalidCoordinateIds() throws Exception {
         SimpleProblemCollector result = validate("invalid-coordinate-ids-pom.xml");
 
         assertViolations(result, 0, 2, 0);
@@ -178,7 +178,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingType() throws Exception {
+    void missingType() throws Exception {
         SimpleProblemCollector result = validate("missing-type-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -187,7 +187,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingVersion() throws Exception {
+    void missingVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-version-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -196,7 +196,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testInvalidAggregatorPackaging() throws Exception {
+    void invalidAggregatorPackaging() throws Exception {
         SimpleProblemCollector result = validate("invalid-aggregator-packaging-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -205,7 +205,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingDependencyArtifactId() throws Exception {
+    void missingDependencyArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-artifactId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -216,7 +216,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingDependencyGroupId() throws Exception {
+    void missingDependencyGroupId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-groupId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -227,7 +227,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingDependencyVersion() throws Exception {
+    void missingDependencyVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-version-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -238,7 +238,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingDependencyManagementArtifactId() throws Exception {
+    void missingDependencyManagementArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-mgmt-artifactId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -249,7 +249,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingDependencyManagementGroupId() throws Exception {
+    void missingDependencyManagementGroupId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-mgmt-groupId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -260,7 +260,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingAll() throws Exception {
+    void missingAll() throws Exception {
         SimpleProblemCollector result = validate("missing-1-pom.xml");
 
         assertViolations(result, 0, 4, 0);
@@ -275,7 +275,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingPluginArtifactId() throws Exception {
+    void missingPluginArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-plugin-artifactId-pom.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -286,7 +286,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testEmptyPluginVersion() throws Exception {
+    void emptyPluginVersion() throws Exception {
         SimpleProblemCollector result = validate("empty-plugin-version.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -298,7 +298,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingRepositoryId() throws Exception {
+    void missingRepositoryId() throws Exception {
         SimpleProblemCollector result =
                 validateRaw("missing-repository-id-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
 
@@ -321,7 +321,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingResourceDirectory() throws Exception {
+    void missingResourceDirectory() throws Exception {
         SimpleProblemCollector result = validate("missing-resource-directory-pom.xml");
 
         assertViolations(result, 0, 2, 0);
@@ -336,7 +336,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadPluginDependencyScope() throws Exception {
+    void badPluginDependencyScope() throws Exception {
         SimpleProblemCollector result = validate("bad-plugin-dependency-scope.xml");
 
         assertViolations(result, 0, 3, 0);
@@ -349,7 +349,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadDependencyScope() throws Exception {
+    void badDependencyScope() throws Exception {
         SimpleProblemCollector result = validate("bad-dependency-scope.xml");
 
         assertViolations(result, 0, 0, 2);
@@ -360,7 +360,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadDependencyManagementScope() throws Exception {
+    void badDependencyManagementScope() throws Exception {
         SimpleProblemCollector result = validate("bad-dependency-management-scope.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -369,7 +369,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadDependencyVersion() throws Exception {
+    void badDependencyVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-dependency-version.xml");
 
         assertViolations(result, 0, 2, 0);
@@ -382,7 +382,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testDuplicateModule() throws Exception {
+    void duplicateModule() throws Exception {
         SimpleProblemCollector result = validate("duplicate-module.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -391,7 +391,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testDuplicateProfileId() throws Exception {
+    void duplicateProfileId() throws Exception {
         SimpleProblemCollector result = validateRaw("duplicate-profile-id.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -400,7 +400,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadPluginVersion() throws Exception {
+    void badPluginVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-plugin-version.xml");
 
         assertViolations(result, 0, 4, 0);
@@ -417,7 +417,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testDistributionManagementStatus() throws Exception {
+    void distributionManagementStatus() throws Exception {
         SimpleProblemCollector result = validate("distribution-management-status.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -426,7 +426,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testIncompleteParent() throws Exception {
+    void incompleteParent() throws Exception {
         SimpleProblemCollector result = validateRaw("incomplete-parent.xml");
 
         assertViolations(result, 3, 0, 0);
@@ -436,7 +436,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testHardCodedSystemPath() throws Exception {
+    void hardCodedSystemPath() throws Exception {
         SimpleProblemCollector result = validateRaw("hard-coded-system-path.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -464,7 +464,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testEmptyModule() throws Exception {
+    void emptyModule() throws Exception {
         SimpleProblemCollector result = validate("empty-module.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -473,7 +473,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testDuplicatePlugin() throws Exception {
+    void duplicatePlugin() throws Exception {
         SimpleProblemCollector result = validateRaw("duplicate-plugin.xml");
 
         assertViolations(result, 0, 0, 4);
@@ -485,7 +485,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testDuplicatePluginExecution() throws Exception {
+    void duplicatePluginExecution() throws Exception {
         SimpleProblemCollector result = validateRaw("duplicate-plugin-execution.xml");
 
         assertViolations(result, 0, 4, 0);
@@ -497,7 +497,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testReservedRepositoryId() throws Exception {
+    void reservedRepositoryId() throws Exception {
         SimpleProblemCollector result = validate("reserved-repository-id.xml");
 
         assertViolations(result, 0, 0, 4);
@@ -510,7 +510,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingPluginDependencyGroupId() throws Exception {
+    void missingPluginDependencyGroupId() throws Exception {
         SimpleProblemCollector result = validate("missing-plugin-dependency-groupId.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -519,7 +519,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingPluginDependencyArtifactId() throws Exception {
+    void missingPluginDependencyArtifactId() throws Exception {
         SimpleProblemCollector result = validate("missing-plugin-dependency-artifactId.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -528,7 +528,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingPluginDependencyVersion() throws Exception {
+    void missingPluginDependencyVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-plugin-dependency-version.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -537,7 +537,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadPluginDependencyVersion() throws Exception {
+    void badPluginDependencyVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-plugin-dependency-version.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -546,7 +546,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadVersion() throws Exception {
+    void badVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-version.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -555,7 +555,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadSnapshotVersion() throws Exception {
+    void badSnapshotVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-snapshot-version.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -564,7 +564,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadRepositoryId() throws Exception {
+    void badRepositoryId() throws Exception {
         SimpleProblemCollector result = validate("bad-repository-id.xml");
 
         assertViolations(result, 0, 0, 4);
@@ -583,7 +583,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadDependencyExclusionId() throws Exception {
+    void badDependencyExclusionId() throws Exception {
         SimpleProblemCollector result =
                 validateEffective("bad-dependency-exclusion-id.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0);
 
@@ -603,7 +603,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingDependencyExclusionId() throws Exception {
+    void missingDependencyExclusionId() throws Exception {
         SimpleProblemCollector result = validate("missing-dependency-exclusion-id.xml");
 
         assertViolations(result, 0, 0, 2);
@@ -617,7 +617,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadImportScopeType() throws Exception {
+    void badImportScopeType() throws Exception {
         SimpleProblemCollector result = validateRaw("bad-import-scope-type.xml");
 
         assertViolations(result, 0, 0, 1);
@@ -628,7 +628,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testBadImportScopeClassifier() throws Exception {
+    void badImportScopeClassifier() throws Exception {
         SimpleProblemCollector result = validateRaw("bad-import-scope-classifier.xml");
 
         assertViolations(result, 0, 1, 0);
@@ -639,7 +639,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testSystemPathRefersToProjectBasedir() throws Exception {
+    void systemPathRefersToProjectBasedir() throws Exception {
         SimpleProblemCollector result = validateRaw("basedir-system-path.xml");
 
         assertViolations(result, 0, 0, 2);
@@ -671,7 +671,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testInvalidVersionInPluginManagement() throws Exception {
+    void invalidVersionInPluginManagement() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/missing-plugin-version-pluginManagement.xml");
 
         assertViolations(result, 1, 0, 0);
@@ -682,7 +682,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testInvalidGroupIdInPluginManagement() throws Exception {
+    void invalidGroupIdInPluginManagement() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/missing-groupId-pluginManagement.xml");
 
         assertViolations(result, 1, 0, 0);
@@ -693,7 +693,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testInvalidArtifactIdInPluginManagement() throws Exception {
+    void invalidArtifactIdInPluginManagement() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/missing-artifactId-pluginManagement.xml");
 
         assertViolations(result, 1, 0, 0);
@@ -704,7 +704,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testInvalidGroupAndArtifactIdInPluginManagement() throws Exception {
+    void invalidGroupAndArtifactIdInPluginManagement() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/missing-ga-pluginManagement.xml");
 
         assertViolations(result, 2, 0, 0);
@@ -719,14 +719,14 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testMissingReportPluginVersion() throws Exception {
+    void missingReportPluginVersion() throws Exception {
         SimpleProblemCollector result = validate("missing-report-version-pom.xml");
 
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testDeprecatedDependencyMetaversionsLatestAndRelease() throws Exception {
+    void deprecatedDependencyMetaversionsLatestAndRelease() throws Exception {
         SimpleProblemCollector result = validateRaw("deprecated-dependency-metaversions-latest-and-release.xml");
 
         assertViolations(result, 0, 0, 2);
@@ -740,7 +740,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testSelfReferencingDependencyInRawModel() throws Exception {
+    void selfReferencingDependencyInRawModel() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/self-referencing.xml");
 
         assertViolations(result, 1, 0, 0);
@@ -751,38 +751,38 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testSelfReferencingDependencyWithClassifierInRawModel() throws Exception {
+    void selfReferencingDependencyWithClassifierInRawModel() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/self-referencing-classifier.xml");
 
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlySha1() throws Exception {
+    void ciFriendlySha1() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/ok-ci-friendly-sha1.xml");
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlyRevision() throws Exception {
+    void ciFriendlyRevision() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/ok-ci-friendly-revision.xml");
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlyChangeList() throws Exception {
+    void ciFriendlyChangeList() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/ok-ci-friendly-changelist.xml");
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlyAllExpressions() throws Exception {
+    void ciFriendlyAllExpressions() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/ok-ci-friendly-all-expressions.xml");
         assertViolations(result, 0, 0, 0);
     }
 
     @Test
-    void testCiFriendlyBad() throws Exception {
+    void ciFriendlyBad() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-ci-friendly.xml");
         assertViolations(result, 0, 0, 1);
         assertEquals(
@@ -791,7 +791,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testCiFriendlyBadSha1Plus() throws Exception {
+    void ciFriendlyBadSha1Plus() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-ci-friendly-sha1plus.xml");
         assertViolations(result, 0, 0, 1);
         assertEquals(
@@ -800,7 +800,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testCiFriendlyBadSha1Plus2() throws Exception {
+    void ciFriendlyBadSha1Plus2() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-ci-friendly-sha1plus2.xml");
         assertViolations(result, 0, 0, 1);
         assertEquals(
@@ -809,7 +809,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testParentVersionLATEST() throws Exception {
+    void parentVersionLATEST() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-parent-version-latest.xml");
         assertViolations(result, 0, 0, 1);
         assertEquals(
@@ -818,7 +818,7 @@ class DefaultModelValidatorTest {
     }
 
     @Test
-    void testParentVersionRELEASE() throws Exception {
+    void parentVersionRELEASE() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/bad-parent-version-release.xml");
         assertViolations(result, 0, 0, 1);
         assertEquals(

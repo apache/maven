@@ -66,7 +66,7 @@ class DefaultArtifactTest {
     }
 
     @Test
-    void testGetVersionReturnsResolvedVersionOnSnapshot() {
+    void getVersionReturnsResolvedVersionOnSnapshot() {
         assertEquals(snapshotResolvedVersion, snapshotArtifact.getVersion());
 
         // this is FOUL!
@@ -76,24 +76,24 @@ class DefaultArtifactTest {
     }
 
     @Test
-    void testGetDependencyConflictId() {
+    void getDependencyConflictId() {
         assertEquals(groupId + ":" + artifactId + ":" + type + ":" + classifier, artifact.getDependencyConflictId());
     }
 
     @Test
-    void testGetDependencyConflictIdNullGroupId() {
+    void getDependencyConflictIdNullGroupId() {
         artifact.setGroupId(null);
         assertEquals(null + ":" + artifactId + ":" + type + ":" + classifier, artifact.getDependencyConflictId());
     }
 
     @Test
-    void testGetDependencyConflictIdNullClassifier() {
+    void getDependencyConflictIdNullClassifier() {
         artifact = new DefaultArtifact(groupId, artifactId, versionRange, scope, type, null, artifactHandler);
         assertEquals(groupId + ":" + artifactId + ":" + type, artifact.getDependencyConflictId());
     }
 
     @Test
-    void testGetDependencyConflictIdNullScope() {
+    void getDependencyConflictIdNullScope() {
         artifact.setScope(null);
         assertEquals(groupId + ":" + artifactId + ":" + type + ":" + classifier, artifact.getDependencyConflictId());
     }
@@ -106,25 +106,25 @@ class DefaultArtifactTest {
     }
 
     @Test
-    void testToStringNullGroupId() {
+    void toStringNullGroupId() {
         artifact.setGroupId(null);
         assertEquals(artifactId + ":" + type + ":" + classifier + ":" + version + ":" + scope, artifact.toString());
     }
 
     @Test
-    void testToStringNullClassifier() {
+    void toStringNullClassifier() {
         artifact = new DefaultArtifact(groupId, artifactId, versionRange, scope, type, null, artifactHandler);
         assertEquals(groupId + ":" + artifactId + ":" + type + ":" + version + ":" + scope, artifact.toString());
     }
 
     @Test
-    void testToStringNullScope() {
+    void toStringNullScope() {
         artifact.setScope(null);
         assertEquals(groupId + ":" + artifactId + ":" + type + ":" + classifier + ":" + version, artifact.toString());
     }
 
     @Test
-    void testComparisonByVersion() {
+    void comparisonByVersion() {
         Artifact artifact1 = new DefaultArtifact(
                 groupId, artifactId, VersionRange.createFromVersion("5.0"), scope, type, classifier, artifactHandler);
         Artifact artifact2 = new DefaultArtifact(
@@ -135,12 +135,12 @@ class DefaultArtifactTest {
 
         Artifact artifact = new DefaultArtifact(
                 groupId, artifactId, VersionRange.createFromVersion("5.0"), scope, type, classifier, artifactHandler);
-        assertTrue(artifact.compareTo(artifact1) == 0);
-        assertTrue(artifact1.compareTo(artifact) == 0);
+        assertEquals(0, artifact.compareTo(artifact1));
+        assertEquals(0, artifact1.compareTo(artifact));
     }
 
     @Test
-    void testNonResolvedVersionRangeConsistentlyYieldsNullVersions() throws Exception {
+    void nonResolvedVersionRangeConsistentlyYieldsNullVersions() throws Exception {
         VersionRange vr = VersionRange.createFromVersionSpec("[1.0,2.0)");
         artifact = new DefaultArtifact(groupId, artifactId, vr, scope, type, null, artifactHandler);
         assertNull(artifact.getVersion());
@@ -148,7 +148,7 @@ class DefaultArtifactTest {
     }
 
     @Test
-    void testMNG7780() throws Exception {
+    void mng7780() throws Exception {
         VersionRange vr = VersionRange.createFromVersionSpec("[1.0,2.0)");
         artifact = new DefaultArtifact(groupId, artifactId, vr, scope, type, null, artifactHandler);
         assertNull(artifact.getVersion());
@@ -161,7 +161,7 @@ class DefaultArtifactTest {
 
     @ParameterizedTest
     @MethodSource("invalidMavenCoordinates")
-    void testIllegalCoordinatesInConstructor(String groupId, String artifactId, String version) {
+    void illegalCoordinatesInConstructor(String groupId, String artifactId, String version) {
         assertThrows(
                 InvalidArtifactRTException.class,
                 () -> new DefaultArtifact(

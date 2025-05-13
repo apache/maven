@@ -49,7 +49,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagement() throws Exception {
+    void dependencyManagement() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
 
@@ -70,8 +70,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
             Artifact artifact = (Artifact) aSet;
             System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
                     + " Scope: " + artifact.getScope());
-            assertTrue(
-                    artifact.getVersion().equals("1.0"), "Incorrect version for " + artifact.getDependencyConflictId());
+            assertEquals("1.0", artifact.getVersion(), "Incorrect version for " + artifact.getDependencyConflictId());
         }
     }
 }

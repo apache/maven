@@ -26,10 +26,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * A test which demonstrates maven's dependency management
@@ -50,7 +47,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testDependencyManagement() throws Exception {
+    void dependencyManagement() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
 
@@ -66,15 +63,14 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         Set set = project1.getArtifacts();
         assertNotNull(set, "No artifacts");
         assertTrue(set.size() > 0, "No Artifacts");
-        assertTrue(set.size() == 3, "Set size should be 3, is " + set.size());
+        assertEquals(3, set.size(), "Set size should be 3, is " + set.size());
 
         for (Object aSet : set) {
             Artifact artifact = (Artifact) aSet;
-            assertFalse(artifact.getArtifactId().equals("t07-d"));
+            assertNotEquals("t07-d", artifact.getArtifactId());
             System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
                     + " Optional=" + (artifact.isOptional() ? "true" : "false"));
-            assertTrue(
-                    artifact.getVersion().equals("1.0"), "Incorrect version for " + artifact.getDependencyConflictId());
+            assertEquals("1.0", artifact.getVersion(), "Incorrect version for " + artifact.getDependencyConflictId());
         }
     }
 }

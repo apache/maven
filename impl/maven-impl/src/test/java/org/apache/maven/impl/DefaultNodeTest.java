@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DefaultNodeTest {
 
     @Test
-    void testAsString() {
+    void asString() {
         InternalSession session = Mockito.mock(InternalSession.class);
 
         // Create a basic dependency node

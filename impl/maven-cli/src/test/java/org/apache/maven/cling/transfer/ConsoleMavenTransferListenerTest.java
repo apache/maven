@@ -42,7 +42,7 @@ class ConsoleMavenTransferListenerTest {
     private CountDownLatch endLatch;
 
     @Test
-    void testTransferProgressedWithPrintResourceNames() throws Exception {
+    void transferProgressedWithPrintResourceNames() throws Exception {
         int size = 1000;
         ExecutorService service = Executors.newFixedThreadPool(size * 2);
         try {

@@ -51,7 +51,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    void testProjectInheritance() throws Exception {
+    void projectInheritance() throws Exception {
         MavenProject p4 = getProject(projectFile("p4"));
 
         assertEquals("p4", p4.getName());

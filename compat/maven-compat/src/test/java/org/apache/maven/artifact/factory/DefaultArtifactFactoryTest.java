@@ -35,7 +35,7 @@ class DefaultArtifactFactoryTest {
     ArtifactFactory factory;
 
     @Test
-    void testPropagationOfSystemScopeRegardlessOfInheritedScope() {
+    void propagationOfSystemScopeRegardlessOfInheritedScope() {
         Artifact artifact = factory.createDependencyArtifact(
                 "test-grp", "test-artifact", VersionRange.createFromVersion("1.0"), "type", null, "system", "provided");
         Artifact artifact2 = factory.createDependencyArtifact(

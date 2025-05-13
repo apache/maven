@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class XmlNodeBuilderTest {
 
     @Test
-    void testReadMultiDoc() throws Exception {
+    void readMultiDoc() throws Exception {
         String doc = "<?xml version='1.0'?><doc><child>foo</child></doc>";
         StringReader r = new StringReader(doc + doc) {
             @Override
@@ -47,7 +47,7 @@ class XmlNodeBuilderTest {
     }
 
     @Test
-    void testWithNamespace() throws Exception {
+    void withNamespace() throws Exception {
         String doc = "<?xml version='1.0'?><doc xmlns='foo:bar'/>";
         StringReader r = new StringReader(doc);
         XMLStreamReader xsr = XMLInputFactory.newFactory().createXMLStreamReader(r);

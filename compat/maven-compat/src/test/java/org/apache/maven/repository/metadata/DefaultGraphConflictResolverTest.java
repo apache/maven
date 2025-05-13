@@ -76,7 +76,7 @@ class DefaultGraphConflictResolverTest {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testCompileResolution() throws Exception {
+    void compileResolution() throws Exception {
         MetadataGraph res;
 
         res = resolver.resolveConflicts(graph, ArtifactScopeEnum.compile);
@@ -118,7 +118,7 @@ class DefaultGraphConflictResolverTest {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testRuntimeResolution() throws Exception {
+    void runtimeResolution() throws Exception {
         MetadataGraph res;
 
         res = resolver.resolveConflicts(graph, ArtifactScopeEnum.runtime);
@@ -159,7 +159,7 @@ class DefaultGraphConflictResolverTest {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testTestResolution() throws Exception {
+    void testResolution() throws Exception {
         MetadataGraph res;
 
         res = resolver.resolveConflicts(graph, ArtifactScopeEnum.test);

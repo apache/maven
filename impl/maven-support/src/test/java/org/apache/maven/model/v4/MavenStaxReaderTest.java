@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MavenStaxReaderTest {
 
     @Test
-    void testNamespaceReporting() throws Exception {
+    void namespaceReporting() throws Exception {
         String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
                 + "  <modelVersion>4.0.0</modelVersion>\n"
                 + "</project>";
@@ -43,7 +43,7 @@ class MavenStaxReaderTest {
     }
 
     @Test
-    void testEmptyNamespaceReporting() throws Exception {
+    void emptyNamespaceReporting() throws Exception {
         String xml = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n" + "</project>";
 
         Model model = fromXml(xml);
@@ -51,7 +51,7 @@ class MavenStaxReaderTest {
     }
 
     @Test
-    void testNamespaceConsistency() throws XMLStreamException {
+    void namespaceConsistency() throws XMLStreamException {
         String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
                 + "  <build xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
                 + "    <plugins>\n"
@@ -67,7 +67,7 @@ class MavenStaxReaderTest {
     }
 
     @Test
-    void testNamespaceInconsistencyThrows() {
+    void namespaceInconsistencyThrows() {
         String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
                 + "  <build xmlns=\"http://maven.apache.org/POM/4.1.0\">\n"
                 + "    <plugins>\n"
@@ -85,7 +85,7 @@ class MavenStaxReaderTest {
     }
 
     @Test
-    void testEmptyNamespaceConsistency() throws XMLStreamException {
+    void emptyNamespaceConsistency() throws XMLStreamException {
         String xml = "<project>\n"
                 + "  <build>\n"
                 + "    <plugins>\n"
@@ -101,7 +101,7 @@ class MavenStaxReaderTest {
     }
 
     @Test
-    void testEmptyNamespaceInconsistencyThrows() {
+    void emptyNamespaceInconsistencyThrows() {
         String xml = "<project>\n"
                 + "  <build xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
                 + "    <plugins>\n"
@@ -119,7 +119,7 @@ class MavenStaxReaderTest {
     }
 
     @Test
-    void testPluginConfigurationAllowsOtherNamespaces() throws XMLStreamException {
+    void pluginConfigurationAllowsOtherNamespaces() throws XMLStreamException {
         String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
                 + "  <build>\n"
                 + "    <plugins>\n"

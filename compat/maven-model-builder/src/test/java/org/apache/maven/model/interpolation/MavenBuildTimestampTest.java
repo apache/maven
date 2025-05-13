@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Deprecated
 class MavenBuildTimestampTest {
     @Test
-    void testMavenBuildTimestampUsesUTC() {
+    void mavenBuildTimestampUsesUTC() {
         Properties interpolationProperties = new Properties();
         interpolationProperties.put("maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'");
         MavenBuildTimestamp timestamp = new MavenBuildTimestamp(new Date(), interpolationProperties);

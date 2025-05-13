@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FileSourceTest {
 
     @Test
-    void testFileSource() {
+    void fileSource() {
         NullPointerException e = assertThrows(
                 NullPointerException.class,
                 () -> new FileSource((File) null),
@@ -39,7 +39,7 @@ class FileSourceTest {
     }
 
     @Test
-    void testGetInputStream() throws Exception {
+    void getInputStream() throws Exception {
         File txtFile = new File("target/test-classes/source.txt");
         FileSource source = new FileSource(txtFile);
 
@@ -51,14 +51,14 @@ class FileSourceTest {
     }
 
     @Test
-    void testGetLocation() {
+    void getLocation() {
         File txtFile = new File("target/test-classes/source.txt");
         FileSource source = new FileSource(txtFile);
         assertEquals(txtFile.getAbsolutePath(), source.getLocation());
     }
 
     @Test
-    void testGetFile() {
+    void getFile() {
         File txtFile = new File("target/test-classes/source.txt");
         FileSource source = new FileSource(txtFile);
         assertEquals(txtFile.getAbsoluteFile(), source.getFile());

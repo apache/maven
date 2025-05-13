@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * ReflectionValueExtractorTest class.
  */
 @Deprecated
-public class ReflectionValueExtractorTest {
+class ReflectionValueExtractorTest {
     private Project project;
 
     /**
@@ -87,7 +87,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    void testValueExtraction() throws Exception {
+    void valueExtraction() throws Exception {
         // ----------------------------------------------------------------------
         // Top level values
         // ----------------------------------------------------------------------
@@ -172,7 +172,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testValueExtractorWithAInvalidExpression() throws Exception {
+    void valueExtractorWithAInvalidExpression() throws Exception {
         assertNull(ReflectionValueExtractor.evaluate("project.foo", project));
         assertNull(ReflectionValueExtractor.evaluate("project.dependencies[10]", project));
         assertNull(ReflectionValueExtractor.evaluate("project.dependencies[0].foo", project));
@@ -184,7 +184,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testMappedDottedKey() throws Exception {
+    void mappedDottedKey() throws Exception {
         Map<String, String> map = new HashMap<String, String>();
         map.put("a.b", "a.b-value");
 
@@ -197,7 +197,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testIndexedMapped() throws Exception {
+    void indexedMapped() throws Exception {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("a", "a-value");
         List<Object> list = new ArrayList<Object>();
@@ -212,7 +212,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testMappedIndexed() throws Exception {
+    void mappedIndexed() throws Exception {
         List<Object> list = new ArrayList<Object>();
         list.add("a-value");
         Map<Object, Object> map = new HashMap<Object, Object>();
@@ -226,7 +226,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testMappedMissingDot() throws Exception {
+    void mappedMissingDot() throws Exception {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("a", new ValueHolder("a-value"));
         assertNull(ReflectionValueExtractor.evaluate("h.value(a)value", new ValueHolder(map)));
@@ -238,7 +238,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testIndexedMissingDot() throws Exception {
+    void indexedMissingDot() throws Exception {
         List<Object> list = new ArrayList<Object>();
         list.add(new ValueHolder("a-value"));
         assertNull(ReflectionValueExtractor.evaluate("h.value[0]value", new ValueHolder(list)));
@@ -250,7 +250,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testDotDot() throws Exception {
+    void dotDot() throws Exception {
         assertNull(ReflectionValueExtractor.evaluate("h..value", new ValueHolder("value")));
     }
 
@@ -260,7 +260,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testBadIndexedSyntax() throws Exception {
+    void badIndexedSyntax() throws Exception {
         List<Object> list = new ArrayList<Object>();
         list.add("a-value");
         Object value = new ValueHolder(list);
@@ -279,7 +279,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testBadMappedSyntax() throws Exception {
+    void badMappedSyntax() throws Exception {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("a", "a-value");
         Object value = new ValueHolder(map);
@@ -296,7 +296,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testIllegalIndexedType() throws Exception {
+    void illegalIndexedType() throws Exception {
         try {
             ReflectionValueExtractor.evaluate("h.value[1]", new ValueHolder("string"));
         } catch (Exception e) {
@@ -310,7 +310,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testIllegalMappedType() throws Exception {
+    void illegalMappedType() throws Exception {
         try {
             ReflectionValueExtractor.evaluate("h.value(key)", new ValueHolder("string"));
         } catch (Exception e) {
@@ -324,7 +324,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testTrimRootToken() throws Exception {
+    void trimRootToken() throws Exception {
         assertNull(ReflectionValueExtractor.evaluate("project", project, true));
     }
 
@@ -334,7 +334,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testArtifactMap() throws Exception {
+    void artifactMap() throws Exception {
         assertEquals(
                 "g0",
                 ((Artifact) ReflectionValueExtractor.evaluate("project.artifactMap(g0:a0:c0)", project)).getGroupId());
@@ -566,7 +566,7 @@ public class ReflectionValueExtractorTest {
      * @throws Exception if any.
      */
     @Test
-    public void testRootPropertyRegression() throws Exception {
+    void rootPropertyRegression() throws Exception {
         Project project = new Project();
         project.setDescription("c:\\\\org\\apache\\test");
         Object evalued = ReflectionValueExtractor.evaluate("description", project);

@@ -79,7 +79,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testResolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository() throws Exception {
+    void resolutionOfASingleArtifactWhereTheArtifactIsPresentInTheLocalRepository() throws Exception {
         Artifact a = createLocalArtifact("a", "1.0");
 
         artifactResolver.resolve(a, remoteRepositories(), localRepository());
@@ -88,7 +88,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepository()
+    void resolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepository()
             throws Exception {
         Artifact b = createRemoteArtifact("b", "1.0-SNAPSHOT");
         deleteLocalArtifact(b);
@@ -103,7 +103,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testTransitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository() throws Exception {
+    void transitiveResolutionWhereAllArtifactsArePresentInTheLocalRepository() throws Exception {
         Artifact g = createLocalArtifact("g", "1.0");
 
         Artifact h = createLocalArtifact("h", "1.0");
@@ -126,7 +126,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
 
     @Test
     void
-            testTransitiveResolutionWhereAllArtifactsAreNotPresentInTheLocalRepositoryAndMustBeRetrievedFromTheRemoteRepository()
+            transitiveResolutionWhereAllArtifactsAreNotPresentInTheLocalRepositoryAndMustBeRetrievedFromTheRemoteRepository()
                     throws Exception {
         Artifact i = createRemoteArtifact("i", "1.0-SNAPSHOT");
         deleteLocalArtifact(i);
@@ -151,7 +151,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testResolutionFailureWhenArtifactNotPresentInRemoteRepository() throws Exception {
+    void resolutionFailureWhenArtifactNotPresentInRemoteRepository() throws Exception {
         Artifact k = createArtifact("k", "1.0");
 
         assertThrows(
@@ -161,7 +161,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood() throws Exception {
+    void resolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood() throws Exception {
         Artifact l = createRemoteArtifact("l", "1.0-SNAPSHOT");
         deleteLocalArtifact(l);
 
@@ -175,7 +175,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void testReadRepoFromModel() throws Exception {
+    void readRepoFromModel() throws Exception {
         Artifact artifact = createArtifact(TestMavenWorkspaceReader.ARTIFACT_ID, TestMavenWorkspaceReader.VERSION);
         ArtifactMetadataSource source = getContainer().lookup(ArtifactMetadataSource.class, "maven");
         ResolutionGroup group = source.retrieve(artifact, localRepository(), new ArrayList<>());
@@ -187,7 +187,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    void testTransitiveResolutionOrder() throws Exception {
+    void transitiveResolutionOrder() throws Exception {
         Artifact m = createLocalArtifact("m", "1.0");
 
         Artifact n = createLocalArtifact("n", "1.0");

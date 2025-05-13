@@ -96,7 +96,7 @@ class PomConstructionTest {
      * @throws Exception in case of issue
      */
     @Test
-    void testEmptyUrl() throws Exception {
+    void emptyUrl() throws Exception {
         buildPom("empty-distMng-repo-url");
     }
 
@@ -107,7 +107,7 @@ class PomConstructionTest {
      */
     /* MNG-786*/
     @Test
-    void testProfileModules() throws Exception {
+    void profileModules() throws Exception {
         PomTestWrapper pom = buildPom("profile-module", "a");
         assertEquals("test-prop", pom.getValue("properties[1]/b")); // verifies profile applied
         assertEquals(4, ((List<?>) pom.getValue("modules")).size());
@@ -123,20 +123,20 @@ class PomConstructionTest {
      * @throws Exception in case of issue
      */
     @Test
-    void testParentInheritance() throws Exception {
+    void parentInheritance() throws Exception {
         buildPom("parent-inheritance/sub");
     }
 
     /*MNG-3995*/
     @Test
-    void testExecutionConfigurationJoin() throws Exception {
+    void executionConfigurationJoin() throws Exception {
         PomTestWrapper pom = buildPom("execution-configuration-join");
         assertEquals(2, ((List<?>) pom.getValue("build/plugins[1]/executions[1]/configuration[1]/fileset[1]")).size());
     }
 
     /*MNG-3803*/
     @Test
-    void testPluginConfigProperties() throws Exception {
+    void pluginConfigProperties() throws Exception {
         PomTestWrapper pom = buildPom("plugin-config-properties");
         assertEquals(
                 "my.property", pom.getValue("build/plugins[1]/configuration[1]/systemProperties[1]/property[1]/name"));
@@ -144,7 +144,7 @@ class PomConstructionTest {
 
     /*MNG-3900*/
     @Test
-    void testProfilePropertiesInterpolation() throws Exception {
+    void profilePropertiesInterpolation() throws Exception {
         PomTestWrapper pom = buildPom("profile-properties-interpolation", "interpolation-profile");
         assertEquals("PASSED", pom.getValue("properties[1]/test"));
         assertEquals("PASSED", pom.getValue("properties[1]/property"));
@@ -176,7 +176,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testBuildPluginInterpolation() throws Exception {
+    void buildPluginInterpolation() throws Exception {
         PomTestWrapper pom = buildPom("plugin-interpolation-build", "activeProfile");
         Model originalModel = pom.getMavenProject().getOriginalModel();
 
@@ -271,7 +271,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testReportingPluginInterpolation() throws Exception {
+    void reportingPluginInterpolation() throws Exception {
         PomTestWrapper pom = buildPom("plugin-interpolation-reporting", "activeProfile");
         Model originalModel = pom.getMavenProject().getOriginalModel();
 
@@ -353,21 +353,21 @@ class PomConstructionTest {
     // to validate the properties. We also need a way to navigate from the Tex specification documents to
     // the test in question and vice versa. A little Eclipse plugin would do the trick.
     @Test
-    public void testThatExecutionsWithoutIdsAreMergedAndTheChildWins() throws Exception {
+    void thatExecutionsWithoutIdsAreMergedAndTheChildWins() throws Exception {
         PomTestWrapper tester = buildPom("micromailer");
         assertModelEquals(tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]");
     }
 
     /*MNG-4010*/
     @Test
-    void testDuplicateExclusionsDependency() throws Exception {
+    void duplicateExclusionsDependency() throws Exception {
         PomTestWrapper pom = buildPom("duplicate-exclusions-dependency/sub");
         assertEquals(1, ((List<?>) pom.getValue("dependencies[1]/exclusions")).size());
     }
 
     /*MNG-4008*/
     @Test
-    void testMultipleFilters() throws Exception {
+    void multipleFilters() throws Exception {
         PomTestWrapper pom = buildPom("multiple-filters");
         assertEquals(4, ((List<?>) pom.getValue("build/filters")).size());
     }
@@ -434,7 +434,7 @@ class PomConstructionTest {
     */
 
     @Test
-    void testDuplicateDependenciesCauseLastDeclarationToBePickedInLenientMode() throws Exception {
+    void duplicateDependenciesCauseLastDeclarationToBePickedInLenientMode() throws Exception {
         PomTestWrapper pom = buildPom("unique-dependency-key/deps", true, null, null);
         assertEquals(1, ((List<?>) pom.getValue("dependencies")).size());
         assertEquals("0.2", pom.getValue("dependencies[1]/version"));
@@ -442,7 +442,7 @@ class PomConstructionTest {
 
     /* MNG-3567*/
     @Test
-    void testParentInterpolation() throws Exception {
+    void parentInterpolation() throws Exception {
         PomTestWrapper pom = buildPom("parent-interpolation/sub");
         pom = new PomTestWrapper(pom.getMavenProject().getParent());
         assertEquals("1.3.0-SNAPSHOT", pom.getValue("build/plugins[1]/version"));
@@ -450,14 +450,14 @@ class PomConstructionTest {
 
     /* MNG-3567*/
     @Test
-    void testPluginManagementInherited() throws Exception {
+    void pluginManagementInherited() throws Exception {
         PomTestWrapper pom = buildPom("pluginmanagement-inherited/sub");
         assertEquals("1.0-alpha-21", pom.getValue("build/plugins[1]/version"));
     }
 
     /* MNG-2174*/
     @Test
-    void testPluginManagementDependencies() throws Exception {
+    void pluginManagementDependencies() throws Exception {
         PomTestWrapper pom = buildPom("plugin-management-dependencies/sub", "test");
         assertEquals("1.0-alpha-21", pom.getValue("build/plugins[1]/version"));
         assertEquals("1.0", pom.getValue("build/plugins[1]/dependencies[1]/version"));
@@ -465,7 +465,7 @@ class PomConstructionTest {
 
     /* MNG-3877*/
     @Test
-    void testReportingInterpolation() throws Exception {
+    void reportingInterpolation() throws Exception {
         PomTestWrapper pom = buildPom("reporting-interpolation");
         assertEquals(
                 createPath(Arrays.asList(
@@ -480,14 +480,14 @@ class PomConstructionTest {
     }
 
     @Test
-    void testPluginOrder() throws Exception {
+    void pluginOrder() throws Exception {
         PomTestWrapper pom = buildPom("plugin-order");
         assertEquals("plexus-component-metadata", pom.getValue("build/plugins[1]/artifactId"));
         assertEquals("maven-surefire-plugin", pom.getValue("build/plugins[2]/artifactId"));
     }
 
     @Test
-    void testErroneousJoiningOfDifferentPluginsWithEqualDependencies() throws Exception {
+    void erroneousJoiningOfDifferentPluginsWithEqualDependencies() throws Exception {
         PomTestWrapper pom = buildPom("equal-plugin-deps");
         assertEquals("maven-it-plugin-a", pom.getValue("build/plugins[1]/artifactId"));
         assertEquals(1, ((List<?>) pom.getValue("build/plugins[1]/dependencies")).size());
@@ -497,7 +497,7 @@ class PomConstructionTest {
 
     /** MNG-3821 */
     @Test
-    void testErroneousJoiningOfDifferentPluginsWithEqualExecutionIds() throws Exception {
+    void erroneousJoiningOfDifferentPluginsWithEqualExecutionIds() throws Exception {
         PomTestWrapper pom = buildPom("equal-plugin-exec-ids");
         assertEquals("maven-it-plugin-a", pom.getValue("build/plugins[1]/artifactId"));
         assertEquals(1, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
@@ -511,7 +511,7 @@ class PomConstructionTest {
 
     /** MNG-3998 */
     @Test
-    void testExecutionConfiguration() throws Exception {
+    void executionConfiguration() throws Exception {
         PomTestWrapper pom = buildPom("execution-configuration");
         assertEquals(2, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals("src/main/mdo/nexus.xml", (pom.getValue("build/plugins[1]/executions[1]/configuration[1]/model")));
@@ -520,7 +520,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testSingleConfigurationInheritance() throws Exception {
+    void singleConfigurationInheritance() throws Exception {
         PomTestWrapper pom = buildPom("single-configuration-inheritance");
 
         assertEquals(2, ((List<?>) pom.getValue("build/plugins[1]/executions[1]/configuration[1]/rules")).size());
@@ -534,7 +534,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testConfigWithPluginManagement() throws Exception {
+    void configWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("config-with-plugin-mng");
         assertEquals(2, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals(
@@ -544,7 +544,7 @@ class PomConstructionTest {
 
     /** MNG-3965 */
     @Test
-    void testExecutionConfigurationSubcollections() throws Exception {
+    void executionConfigurationSubcollections() throws Exception {
         PomTestWrapper pom = buildPom("execution-configuration-subcollections");
         assertEquals(
                 2,
@@ -554,26 +554,26 @@ class PomConstructionTest {
 
     /** MNG-3985 */
     @Test
-    void testMultipleRepositories() throws Exception {
+    void multipleRepositories() throws Exception {
         PomTestWrapper pom = buildPom("multiple-repos/sub");
         assertEquals(2, ((List<?>) pom.getValue("repositories")).size());
     }
 
     /** MNG-3965 */
     @Test
-    void testMultipleExecutionIds() throws Exception {
+    void multipleExecutionIds() throws Exception {
         PomTestWrapper pom = buildPom("dual-execution-ids/sub");
         assertEquals(1, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
     }
 
     /** MNG-3997 */
     @Test
-    void testConsecutiveEmptyElements() throws Exception {
+    void consecutiveEmptyElements() throws Exception {
         buildPom("consecutive_empty_elements");
     }
 
     @Test
-    void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement() throws Exception {
+    void orderOfGoalsFromPluginExecutionWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-goals-order/wo-plugin-mgmt");
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/executions[1]/goals")).size());
         assertEquals("b", pom.getValue("build/plugins[1]/executions[1]/goals[1]"));
@@ -585,7 +585,7 @@ class PomConstructionTest {
 
     /* MNG-3886*/
     @Test
-    void testOrderOfGoalsFromPluginExecutionWithPluginManagement() throws Exception {
+    void orderOfGoalsFromPluginExecutionWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-goals-order/w-plugin-mgmt");
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/executions[1]/goals")).size());
         assertEquals("b", pom.getValue("build/plugins[1]/executions[1]/goals[1]"));
@@ -596,7 +596,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testOrderOfPluginExecutionsWithoutPluginManagement() throws Exception {
+    void orderOfPluginExecutionsWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-order/wo-plugin-mgmt");
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals("b", pom.getValue("build/plugins[1]/executions[1]/id"));
@@ -608,7 +608,7 @@ class PomConstructionTest {
 
     /* MNG-3887 */
     @Test
-    void testOrderOfPluginExecutionsWithPluginManagement() throws Exception {
+    void orderOfPluginExecutionsWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-order/w-plugin-mgmt");
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals("b", pom.getValue("build/plugins[1]/executions[1]/id"));
@@ -619,27 +619,27 @@ class PomConstructionTest {
     }
 
     @Test
-    void testMergeOfPluginExecutionsWhenChildInheritsPluginVersion() throws Exception {
+    void mergeOfPluginExecutionsWhenChildInheritsPluginVersion() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-merging-wo-version/sub");
         assertEquals(4, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
     }
 
     /* MNG-3943*/
     @Test
-    void testMergeOfPluginExecutionsWhenChildAndParentUseDifferentPluginVersions() throws Exception {
+    void mergeOfPluginExecutionsWhenChildAndParentUseDifferentPluginVersions() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-merging-version-insensitive/sub");
         assertEquals(4, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
     }
 
     @Test
-    void testInterpolationWithXmlMarkup() throws Exception {
+    void interpolationWithXmlMarkup() throws Exception {
         PomTestWrapper pom = buildPom("xml-markup-interpolation");
         assertEquals("<?xml version='1.0'?>Tom&Jerry", pom.getValue("properties/xmlTest"));
     }
 
     /* MNG-3925 */
     @Test
-    void testOrderOfMergedPluginExecutionsWithoutPluginManagement() throws Exception {
+    void orderOfMergedPluginExecutionsWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("merged-plugin-exec-order/wo-plugin-mgmt/sub");
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals("parent-1", pom.getValue("build/plugins[1]/executions[1]/goals[1]"));
@@ -650,7 +650,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testOrderOfMergedPluginExecutionsWithPluginManagement() throws Exception {
+    void orderOfMergedPluginExecutionsWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("merged-plugin-exec-order/w-plugin-mgmt/sub");
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals("parent-1", pom.getValue("build/plugins[1]/executions[1]/goals[1]"));
@@ -662,7 +662,7 @@ class PomConstructionTest {
 
     /* MNG-3984*/
     @Test
-    void testDifferentContainersWithSameId() throws Exception {
+    void differentContainersWithSameId() throws Exception {
         PomTestWrapper pom = buildPom("join-different-containers-same-id");
         assertEquals(1, ((List<?>) pom.getValue("build/plugins[1]/executions[1]/goals")).size());
         assertEquals(
@@ -674,7 +674,7 @@ class PomConstructionTest {
 
     /* MNG-3937*/
     @Test
-    void testOrderOfMergedPluginExecutionGoalsWithoutPluginManagement() throws Exception {
+    void orderOfMergedPluginExecutionGoalsWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("merged-plugin-exec-goals-order/wo-plugin-mgmt/sub");
 
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/executions[1]/goals")).size());
@@ -686,7 +686,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testOrderOfMergedPluginExecutionGoalsWithPluginManagement() throws Exception {
+    void orderOfMergedPluginExecutionGoalsWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("merged-plugin-exec-goals-order/w-plugin-mgmt/sub");
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/executions[1]/goals")).size());
         assertEquals("child-a", pom.getValue("build/plugins[1]/executions[1]/goals[1]"));
@@ -698,7 +698,7 @@ class PomConstructionTest {
 
     /*MNG-3938*/
     @Test
-    void testOverridingOfInheritedPluginExecutionsWithoutPluginManagement() throws Exception {
+    void overridingOfInheritedPluginExecutionsWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-merging/wo-plugin-mgmt/sub");
         assertEquals(2, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals("child-default", pom.getValue("build/plugins[1]/executions[@id='default']/phase"));
@@ -707,7 +707,7 @@ class PomConstructionTest {
 
     /* MNG-3938 */
     @Test
-    void testOverridingOfInheritedPluginExecutionsWithPluginManagement() throws Exception {
+    void overridingOfInheritedPluginExecutionsWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-merging/w-plugin-mgmt/sub");
         assertEquals(2, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals("child-default", pom.getValue("build/plugins[1]/executions[@id='default']/phase"));
@@ -716,7 +716,7 @@ class PomConstructionTest {
 
     /* MNG-3906*/
     @Test
-    void testOrderOfMergedPluginDependenciesWithoutPluginManagement() throws Exception {
+    void orderOfMergedPluginDependenciesWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("merged-plugin-class-path-order/wo-plugin-mgmt/sub");
 
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/dependencies")).size());
@@ -734,7 +734,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testOrderOfMergedPluginDependenciesWithPluginManagement() throws Exception {
+    void orderOfMergedPluginDependenciesWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("merged-plugin-class-path-order/w-plugin-mgmt/sub");
         assertEquals(5, ((List<?>) pom.getValue("build/plugins[1]/dependencies")).size());
         assertEquals("c", pom.getValue("build/plugins[1]/dependencies[1]/artifactId"));
@@ -750,7 +750,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testInterpolationOfNestedBuildDirectories() throws Exception {
+    void interpolationOfNestedBuildDirectories() throws Exception {
         PomTestWrapper pom = buildPom("nested-build-dir-interpolation");
         assertEquals(
                 new File(pom.getBasedir(), "target/classes/dir0"), new File((String) pom.getValue("properties/dir0")));
@@ -760,7 +760,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testAppendArtifactIdOfChildToInheritedUrls() throws Exception {
+    void appendArtifactIdOfChildToInheritedUrls() throws Exception {
         PomTestWrapper pom = buildPom("url-inheritance/sub");
         assertEquals("https://parent.url/child", pom.getValue("url"));
         assertEquals("https://parent.url/org", pom.getValue("organization/url"));
@@ -778,7 +778,7 @@ class PomConstructionTest {
 
     /* MNG-3846*/
     @Test
-    void testAppendArtifactIdOfParentAndChildToInheritedUrls() throws Exception {
+    void appendArtifactIdOfParentAndChildToInheritedUrls() throws Exception {
         PomTestWrapper pom = buildPom("url-inheritance/another-parent/sub");
         assertEquals("https://parent.url/ap/child", pom.getValue("url"));
         assertEquals("https://parent.url/org", pom.getValue("organization/url"));
@@ -795,7 +795,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testNonInheritedElementsInSubtreesOverriddenByChild() throws Exception {
+    void nonInheritedElementsInSubtreesOverriddenByChild() throws Exception {
         PomTestWrapper pom = buildPom("limited-inheritance/child");
         assertNull(pom.getValue("organization/url"));
         assertNull(pom.getValue("issueManagement/system"));
@@ -816,7 +816,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testXmlTextCoalescing() throws Exception {
+    void xmlTextCoalescing() throws Exception {
         PomTestWrapper pom = buildPom("xml-coalesce-text");
         assertEquals("A  Test  Project Property", pom.getValue("properties/prop0"));
         assertEquals("That's a test!", pom.getValue("properties/prop1"));
@@ -830,7 +830,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testFullInterpolationOfNestedExpressions() throws Exception {
+    void fullInterpolationOfNestedExpressions() throws Exception {
         PomTestWrapper pom = buildPom("full-interpolation");
         for (int i = 0; i < 24; i++) {
             String index = ((i < 10) ? "0" : "") + i;
@@ -839,7 +839,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testInterpolationWithBasedirAlignedDirectories() throws Exception {
+    void interpolationWithBasedirAlignedDirectories() throws Exception {
         PomTestWrapper pom = buildPom("basedir-aligned-interpolation");
         assertEquals(
                 new File(pom.getBasedir(), "src/main/java"),
@@ -866,7 +866,7 @@ class PomConstructionTest {
 
     /* MNG-3944*/
     @Test
-    void testInterpolationOfBasedirInPomWithUnusualName() throws Exception {
+    void interpolationOfBasedirInPomWithUnusualName() throws Exception {
         PomTestWrapper pom = buildPom("basedir-interpolation/pom-with-unusual-name.xml");
         assertEquals(pom.getBasedir(), new File(pom.getValue("properties/prop0").toString()));
         assertEquals(pom.getBasedir(), new File(pom.getValue("properties/prop1").toString()));
@@ -874,13 +874,13 @@ class PomConstructionTest {
 
     /* MNG-3979 */
     @Test
-    void testJoiningOfContainersWhenChildHasEmptyElements() throws Exception {
+    void joiningOfContainersWhenChildHasEmptyElements() throws Exception {
         PomTestWrapper pom = buildPom("id-container-joining-with-empty-elements/sub");
         assertNotNull(pom);
     }
 
     @Test
-    void testOrderOfPluginConfigurationElementsWithoutPluginManagement() throws Exception {
+    void orderOfPluginConfigurationElementsWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-config-order/wo-plugin-mgmt");
         assertEquals("one", pom.getValue("build/plugins[1]/configuration/stringParams/stringParam[1]"));
         assertEquals("two", pom.getValue("build/plugins[1]/configuration/stringParams/stringParam[2]"));
@@ -890,7 +890,7 @@ class PomConstructionTest {
 
     /* MNG-3827*/
     @Test
-    void testOrderOfPluginConfigurationElementsWithPluginManagement() throws Exception {
+    void orderOfPluginConfigurationElementsWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-config-order/w-plugin-mgmt");
         assertEquals("one", pom.getValue("build/plugins[1]/configuration/stringParams/stringParam[1]"));
         assertEquals("two", pom.getValue("build/plugins[1]/configuration/stringParams/stringParam[2]"));
@@ -899,7 +899,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testOrderOfPluginExecutionConfigurationElementsWithoutPluginManagement() throws Exception {
+    void orderOfPluginExecutionConfigurationElementsWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-config-order/wo-plugin-mgmt");
         String prefix = "build/plugins[1]/executions[1]/configuration/";
         assertEquals("one", pom.getValue(prefix + "stringParams/stringParam[1]"));
@@ -912,7 +912,7 @@ class PomConstructionTest {
 
     /* MNG-3864*/
     @Test
-    void testOrderOfPluginExecutionConfigurationElementsWithPluginManagement() throws Exception {
+    void orderOfPluginExecutionConfigurationElementsWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-config-order/w-plugin-mgmt");
         String prefix = "build/plugins[1]/executions[1]/configuration/";
         assertEquals("one", pom.getValue(prefix + "stringParams/stringParam[1]"));
@@ -925,7 +925,7 @@ class PomConstructionTest {
 
     /* MNG-3836*/
     @Test
-    void testMergeOfInheritedPluginConfiguration() throws Exception {
+    void mergeOfInheritedPluginConfiguration() throws Exception {
         PomTestWrapper pom = buildPom("plugin-config-merging/child");
 
         String prefix = "build/plugins[1]/configuration/";
@@ -943,13 +943,13 @@ class PomConstructionTest {
 
     /* MNG-2591 */
     @Test
-    void testAppendOfInheritedPluginConfigurationWithNoProfile() throws Exception {
+    void appendOfInheritedPluginConfigurationWithNoProfile() throws Exception {
         testAppendOfInheritedPluginConfiguration("no-profile");
     }
 
     /* MNG-2591*/
     @Test
-    void testAppendOfInheritedPluginConfigurationWithActiveProfile() throws Exception {
+    void appendOfInheritedPluginConfigurationWithActiveProfile() throws Exception {
         testAppendOfInheritedPluginConfiguration("with-profile");
     }
 
@@ -978,7 +978,7 @@ class PomConstructionTest {
 
     /* MNG-4000 */
     @Test
-    void testMultiplePluginExecutionsWithAndWithoutIdsWithoutPluginManagement() throws Exception {
+    void multiplePluginExecutionsWithAndWithoutIdsWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-w-and-wo-id/wo-plugin-mgmt");
         assertEquals(2, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals("log-string", pom.getValue("build/plugins[1]/executions[1]/goals[1]"));
@@ -986,7 +986,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testMultiplePluginExecutionsWithAndWithoutIdsWithPluginManagement() throws Exception {
+    void multiplePluginExecutionsWithAndWithoutIdsWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-w-and-wo-id/w-plugin-mgmt");
         assertEquals(2, ((List<?>) pom.getValue("build/plugins[1]/executions")).size());
         assertEquals("log-string", pom.getValue("build/plugins[1]/executions[1]/goals[1]"));
@@ -994,7 +994,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testDependencyOrderWithoutPluginManagement() throws Exception {
+    void dependencyOrderWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("dependency-order/wo-plugin-mgmt");
         assertEquals(4, ((List<?>) pom.getValue("dependencies")).size());
         assertEquals("a", pom.getValue("dependencies[1]/artifactId"));
@@ -1004,7 +1004,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testDependencyOrderWithPluginManagement() throws Exception {
+    void dependencyOrderWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("dependency-order/w-plugin-mgmt");
         assertEquals(4, ((List<?>) pom.getValue("dependencies")).size());
         assertEquals("a", pom.getValue("dependencies[1]/artifactId"));
@@ -1014,7 +1014,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testBuildDirectoriesUsePlatformSpecificFileSeparator() throws Exception {
+    void buildDirectoriesUsePlatformSpecificFileSeparator() throws Exception {
         PomTestWrapper pom = buildPom("platform-file-separator");
         assertPathWithNormalizedFileSeparators(pom.getValue("build/directory"));
         assertPathWithNormalizedFileSeparators(pom.getValue("build/outputDirectory"));
@@ -1029,7 +1029,7 @@ class PomConstructionTest {
 
     /* MNG-4008 */
     @Test
-    void testMergedFilterOrder() throws Exception {
+    void mergedFilterOrder() throws Exception {
         PomTestWrapper pom = buildPom("merged-filter-order/sub");
 
         assertEquals(7, ((List<?>) pom.getValue("build/filters")).size());
@@ -1044,7 +1044,7 @@ class PomConstructionTest {
 
     /** MNG-4027*/
     @Test
-    void testProfileInjectedDependencies() throws Exception {
+    void profileInjectedDependencies() throws Exception {
         PomTestWrapper pom = buildPom("profile-injected-dependencies");
         assertEquals(4, ((List<?>) pom.getValue("dependencies")).size());
         assertEquals("a", pom.getValue("dependencies[1]/artifactId"));
@@ -1055,13 +1055,13 @@ class PomConstructionTest {
 
     /** IT-0021*/
     @Test
-    void testProfileDependenciesMultipleProfiles() throws Exception {
+    void profileDependenciesMultipleProfiles() throws Exception {
         PomTestWrapper pom = buildPom("profile-dependencies-multiple-profiles", "profile-1", "profile-2");
         assertEquals(2, ((List<?>) pom.getValue("dependencies")).size());
     }
 
     @Test
-    void testDependencyInheritance() throws Exception {
+    void dependencyInheritance() throws Exception {
         PomTestWrapper pom = buildPom("dependency-inheritance/sub");
         assertEquals(1, ((List<?>) pom.getValue("dependencies")).size());
         assertEquals("4.13.1", pom.getValue("dependencies[1]/version"));
@@ -1069,7 +1069,7 @@ class PomConstructionTest {
 
     /** MNG-4034 */
     @Test
-    void testManagedProfileDependency() throws Exception {
+    void managedProfileDependency() throws Exception {
         PomTestWrapper pom = this.buildPom("managed-profile-dependency/sub", "maven-core-it");
         assertEquals(1, ((List<?>) pom.getValue("dependencies")).size());
         assertEquals("org.apache.maven.its", pom.getValue("dependencies[1]/groupId"));
@@ -1082,21 +1082,21 @@ class PomConstructionTest {
 
     /** MNG-4040 */
     @Test
-    void testProfileModuleInheritance() throws Exception {
+    void profileModuleInheritance() throws Exception {
         PomTestWrapper pom = this.buildPom("profile-module-inheritance/sub", "dist");
         assertEquals(0, ((List<?>) pom.getValue("modules")).size());
     }
 
     /** MNG-3621 */
     @Test
-    void testUncPath() throws Exception {
+    void uncPath() throws Exception {
         PomTestWrapper pom = this.buildPom("unc-path/sub");
         assertEquals("file:////host/site/test-child", pom.getValue("distributionManagement/site/url"));
     }
 
     /** MNG-2006 */
     @Test
-    void testUrlAppendWithChildPathAdjustment() throws Exception {
+    void urlAppendWithChildPathAdjustment() throws Exception {
         PomTestWrapper pom = this.buildPom("url-append/child");
         assertEquals("https://project.url/child", pom.getValue("url"));
         assertEquals("https://viewvc.project.url/child", pom.getValue("scm/url"));
@@ -1107,20 +1107,20 @@ class PomConstructionTest {
 
     /** MNG-0479 */
     @Test
-    void testRepoInheritance() throws Exception {
+    void repoInheritance() throws Exception {
         PomTestWrapper pom = this.buildPom("repo-inheritance");
         assertEquals(1, ((List<?>) pom.getValue("repositories")).size());
         assertEquals("it0043", pom.getValue("repositories[1]/name"));
     }
 
     @Test
-    void testEmptyScm() throws Exception {
+    void emptyScm() throws Exception {
         PomTestWrapper pom = this.buildPom("empty-scm");
         assertNull(pom.getValue("scm"));
     }
 
     @Test
-    void testPluginConfigurationUsingAttributesWithoutPluginManagement() throws Exception {
+    void pluginConfigurationUsingAttributesWithoutPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-config-attributes/wo-plugin-mgmt");
         assertEquals("src", pom.getValue("build/plugins[1]/configuration/domParam/copy/@todir"));
         assertEquals("true", pom.getValue("build/plugins[1]/configuration/domParam/copy/@overwrite"));
@@ -1131,7 +1131,7 @@ class PomConstructionTest {
 
     /** MNG-4053*/
     @Test
-    void testPluginConfigurationUsingAttributesWithPluginManagement() throws Exception {
+    void pluginConfigurationUsingAttributesWithPluginManagement() throws Exception {
         PomTestWrapper pom = buildPom("plugin-config-attributes/w-plugin-mgmt");
         assertEquals("src", pom.getValue("build/plugins[1]/configuration/domParam/copy/@todir"));
         assertEquals("true", pom.getValue("build/plugins[1]/configuration/domParam/copy/@overwrite"));
@@ -1141,7 +1141,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testPluginConfigurationUsingAttributesWithPluginManagementAndProfile() throws Exception {
+    void pluginConfigurationUsingAttributesWithPluginManagementAndProfile() throws Exception {
         PomTestWrapper pom = buildPom("plugin-config-attributes/w-profile", "maven-core-it");
         assertEquals("src", pom.getValue("build/plugins[1]/configuration/domParam/copy/@todir"));
         assertEquals("true", pom.getValue("build/plugins[1]/configuration/domParam/copy/@overwrite"));
@@ -1151,7 +1151,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testPomEncoding() throws Exception {
+    void pomEncoding() throws Exception {
         PomTestWrapper pom = buildPom("pom-encoding/utf-8");
         assertEquals("TEST-CHARS: \u00DF\u0131\u03A3\u042F\u05D0\u20AC", pom.getValue("description"));
         pom = buildPom("pom-encoding/latin-1");
@@ -1160,14 +1160,14 @@ class PomConstructionTest {
 
     /* MNG-4070 */
     @Test
-    void testXmlWhitespaceHandling() throws Exception {
+    void xmlWhitespaceHandling() throws Exception {
         PomTestWrapper pom = buildPom("xml-whitespace/sub");
         assertEquals("org.apache.maven.its.mng4070", pom.getValue("groupId"));
     }
 
     /* MNG-3760*/
     @Test
-    void testInterpolationOfBaseUri() throws Exception {
+    void interpolationOfBaseUri() throws Exception {
         PomTestWrapper pom = buildPom("baseuri-interpolation/pom.xml");
         assertNotEquals(
                 pom.getBasedir().toURI().toString(),
@@ -1176,7 +1176,7 @@ class PomConstructionTest {
 
     /* MNG-6386 */
     @Test
-    void testInterpolationOfRfc3986BaseUri() throws Exception {
+    void interpolationOfRfc3986BaseUri() throws Exception {
         PomTestWrapper pom = buildPom("baseuri-interpolation/pom.xml");
         String prop1 = pom.getValue("properties/prop1").toString();
         assertEquals(pom.getBasedir().toPath().toUri().toASCIIString(), prop1);
@@ -1185,7 +1185,7 @@ class PomConstructionTest {
 
     /* MNG-3811*/
     @Test
-    void testReportingPluginConfig() throws Exception {
+    void reportingPluginConfig() throws Exception {
         PomTestWrapper pom = buildPom("reporting-plugin-config/sub");
 
         assertEquals(3, ((List<?>) pom.getValue("reporting/plugins[1]/configuration/stringParams")).size());
@@ -1198,28 +1198,28 @@ class PomConstructionTest {
     }
 
     @Test
-    void testPropertiesNoDuplication() throws Exception {
+    void propertiesNoDuplication() throws Exception {
         PomTestWrapper pom = buildPom("properties-no-duplication/sub");
         assertEquals(4, ((Properties) pom.getValue("properties")).size());
         assertEquals("child", pom.getValue("properties/pomProfile"));
     }
 
     @Test
-    void testPomInheritance() throws Exception {
+    void pomInheritance() throws Exception {
         PomTestWrapper pom = buildPom("pom-inheritance/child-1");
         assertEquals("parent-description", pom.getValue("description"));
         assertEquals("jar", pom.getValue("packaging"));
     }
 
     @Test
-    void testCompleteModelWithoutParent() throws Exception {
+    void completeModelWithoutParent() throws Exception {
         PomTestWrapper pom = buildPom("complete-model/wo-parent");
 
         testCompleteModel(pom);
     }
 
     @Test
-    void testCompleteModelWithParent() throws Exception {
+    void completeModelWithParent() throws Exception {
         PomTestWrapper pom = buildPom("complete-model/w-parent/sub");
 
         testCompleteModel(pom);
@@ -1433,13 +1433,13 @@ class PomConstructionTest {
 
     /* MNG-2309*/
     @Test
-    void testProfileInjectionOrder() throws Exception {
+    void profileInjectionOrder() throws Exception {
         PomTestWrapper pom = buildPom("profile-injection-order", "pom-a", "pom-b", "pom-e", "pom-c", "pom-d");
         assertEquals("e", pom.getValue("properties[1]/pomProperty"));
     }
 
     @Test
-    void testPropertiesInheritance() throws Exception {
+    void propertiesInheritance() throws Exception {
         PomTestWrapper pom = buildPom("properties-inheritance/sub");
         assertEquals("parent-property", pom.getValue("properties/parentProperty"));
         assertEquals("child-property", pom.getValue("properties/childProperty"));
@@ -1448,7 +1448,7 @@ class PomConstructionTest {
 
     /* MNG-4102*/
     @Test
-    void testInheritedPropertiesInterpolatedWithValuesFromChildWithoutProfiles() throws Exception {
+    void inheritedPropertiesInterpolatedWithValuesFromChildWithoutProfiles() throws Exception {
         PomTestWrapper pom = buildPom("inherited-properties-interpolation/no-profile/sub");
 
         assertEquals("CHILD", pom.getValue("properties/overridden"));
@@ -1457,7 +1457,7 @@ class PomConstructionTest {
 
     /* MNG-4102 */
     @Test
-    void testInheritedPropertiesInterpolatedWithValuesFromChildWithActiveProfiles() throws Exception {
+    void inheritedPropertiesInterpolatedWithValuesFromChildWithActiveProfiles() throws Exception {
         PomTestWrapper pom = buildPom("inherited-properties-interpolation/active-profile/sub");
 
         assertEquals(1, pom.getMavenProject().getModel().getProfiles().size());
@@ -1469,7 +1469,7 @@ class PomConstructionTest {
 
     /* MNG-3545 */
     @Test
-    void testProfileDefaultActivation() throws Exception {
+    void profileDefaultActivation() throws Exception {
         PomTestWrapper pom = buildPom("profile-default-deactivation", "profile4");
         assertEquals(1, pom.getMavenProject().getActiveProfiles().size());
         assertEquals(1, ((List<?>) pom.getValue("build/plugins")).size());
@@ -1478,7 +1478,7 @@ class PomConstructionTest {
 
     /* MNG-1995 */
     @Test
-    void testBooleanInterpolation() throws Exception {
+    void booleanInterpolation() throws Exception {
         PomTestWrapper pom = buildPom("boolean-interpolation");
         assertEquals(true, pom.getValue("repositories[1]/releases/enabled"));
         assertEquals(true, pom.getValue("build/resources[1]/filtering"));
@@ -1486,7 +1486,7 @@ class PomConstructionTest {
 
     /* MNG-3899 */
     @Test
-    void testBuildExtensionInheritance() throws Exception {
+    void buildExtensionInheritance() throws Exception {
         PomTestWrapper pom = buildPom("build-extension-inheritance/sub");
         assertEquals(3, ((List<?>) pom.getValue("build/extensions")).size());
         assertEquals("b", pom.getValue("build/extensions[1]/artifactId"));
@@ -1497,7 +1497,7 @@ class PomConstructionTest {
 
     /*MNG-1957*/
     @Test
-    void testJdkActivation() throws Exception {
+    void jdkActivation() throws Exception {
         Properties props = new Properties();
         props.put("java.version", "1.5.0_15");
 
@@ -1510,14 +1510,14 @@ class PomConstructionTest {
 
     /* MNG-2174 */
     @Test
-    void testProfilePluginMngDependencies() throws Exception {
+    void profilePluginMngDependencies() throws Exception {
         PomTestWrapper pom = buildPom("profile-plugin-mng-dependencies/sub", "maven-core-it");
         assertEquals("a", pom.getValue("build/plugins[1]/dependencies[1]/artifactId"));
     }
 
     /** MNG-4116 */
     @Test
-    void testPercentEncodedUrlsMustNotBeDecoded() throws Exception {
+    void percentEncodedUrlsMustNotBeDecoded() throws Exception {
         PomTestWrapper pom = this.buildPom("url-no-decoding");
         assertEquals("https://maven.apache.org/spacy%20path", pom.getValue("url"));
         assertEquals("https://svn.apache.org/viewvc/spacy%20path", pom.getValue("scm/url"));
@@ -1535,7 +1535,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testPluginManagementInheritance() throws Exception {
+    void pluginManagementInheritance() throws Exception {
         PomTestWrapper pom = this.buildPom("plugin-management-inheritance");
         assertEquals(
                 "0.1-stub-SNAPSHOT",
@@ -1543,50 +1543,50 @@ class PomConstructionTest {
     }
 
     @Test
-    void testProfilePlugins() throws Exception {
+    void profilePlugins() throws Exception {
         PomTestWrapper pom = this.buildPom("profile-plugins", "standard");
         assertEquals(2, ((List<?>) pom.getValue("build/plugins")).size());
         assertEquals("maven-assembly2-plugin", pom.getValue("build/plugins[2]/artifactId"));
     }
 
     @Test
-    void testPluginInheritanceSimple() throws Exception {
+    void pluginInheritanceSimple() throws Exception {
         PomTestWrapper pom = this.buildPom("plugin-inheritance-simple/sub");
         assertEquals(2, ((List<?>) pom.getValue("build/plugins")).size());
     }
 
     @Test
-    void testPluginManagementDuplicate() throws Exception {
+    void pluginManagementDuplicate() throws Exception {
         PomTestWrapper pom = this.buildPom("plugin-management-duplicate/sub");
         assertEquals(7, ((List<?>) pom.getValue("build/pluginManagement/plugins")).size());
     }
 
     @Test
-    void testDistributionManagement() throws Exception {
+    void distributionManagement() throws Exception {
         PomTestWrapper pom = this.buildPom("distribution-management");
         assertEquals("legacy", pom.getValue("distributionManagement/repository/layout"));
     }
 
     @Test
-    void testDependencyScopeInheritance() throws Exception {
+    void dependencyScopeInheritance() throws Exception {
         PomTestWrapper pom = buildPom("dependency-scope-inheritance/sub");
         String scope = (String) pom.getValue("dependencies[1]/scope");
         assertEquals("compile", scope);
     }
 
     @Test
-    void testDependencyScope() throws Exception {
+    void dependencyScope() throws Exception {
         buildPom("dependency-scope/sub");
     }
 
     // This will fail on a validation error if incorrect
     @Test
-    public void testDependencyManagementWithInterpolation() throws Exception {
+    void dependencyManagementWithInterpolation() throws Exception {
         buildPom("dependency-management-with-interpolation/sub");
     }
 
     @Test
-    void testInterpolationWithSystemProperty() throws Exception {
+    void interpolationWithSystemProperty() throws Exception {
         Properties sysProps = new Properties();
         sysProps.setProperty("system.property", "PASSED");
         PomTestWrapper pom = buildPom("system-property-interpolation", sysProps, null);
@@ -1595,7 +1595,7 @@ class PomConstructionTest {
 
     /* MNG-4129 */
     @Test
-    void testPluginExecutionInheritanceWhenChildDoesNotDeclarePlugin() throws Exception {
+    void pluginExecutionInheritanceWhenChildDoesNotDeclarePlugin() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-inheritance/wo-merge");
         @SuppressWarnings("unchecked")
         List<PluginExecution> executions = (List<PluginExecution>) pom.getValue(
@@ -1605,7 +1605,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testPluginExecutionInheritanceWhenChildDoesDeclarePluginAsWell() throws Exception {
+    void pluginExecutionInheritanceWhenChildDoesDeclarePluginAsWell() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-inheritance/w-merge");
         @SuppressWarnings("unchecked")
         List<PluginExecution> executions = (List<PluginExecution>) pom.getValue(
@@ -1616,7 +1616,7 @@ class PomConstructionTest {
 
     /* MNG-4193 */
     @Test
-    void testValidationErrorUponNonUniqueArtifactRepositoryId() throws Exception {
+    void validationErrorUponNonUniqueArtifactRepositoryId() throws Exception {
         assertThrows(
                 ProjectBuildingException.class,
                 () -> buildPom("unique-repo-id/artifact-repo"),
@@ -1625,7 +1625,7 @@ class PomConstructionTest {
 
     /* MNG-4193 */
     @Test
-    void testValidationErrorUponNonUniquePluginRepositoryId() throws Exception {
+    void validationErrorUponNonUniquePluginRepositoryId() throws Exception {
         assertThrows(
                 ProjectBuildingException.class,
                 () -> buildPom("unique-repo-id/plugin-repo"),
@@ -1634,7 +1634,7 @@ class PomConstructionTest {
 
     /* MNG-4193 */
     @Test
-    void testValidationErrorUponNonUniqueArtifactRepositoryIdInProfile() throws Exception {
+    void validationErrorUponNonUniqueArtifactRepositoryIdInProfile() throws Exception {
         assertThrows(
                 ProjectBuildingException.class,
                 () -> buildPom("unique-repo-id/artifact-repo-in-profile"),
@@ -1643,7 +1643,7 @@ class PomConstructionTest {
 
     /* MNG-4193 */
     @Test
-    void testValidationErrorUponNonUniquePluginRepositoryIdInProfile() throws Exception {
+    void validationErrorUponNonUniquePluginRepositoryIdInProfile() throws Exception {
         assertThrows(
                 ProjectBuildingException.class,
                 () -> buildPom("unique-repo-id/plugin-repo-in-profile"),
@@ -1652,13 +1652,13 @@ class PomConstructionTest {
 
     /** MNG-3843 */
     @Test
-    void testPrerequisitesAreNotInherited() throws Exception {
+    void prerequisitesAreNotInherited() throws Exception {
         PomTestWrapper pom = buildPom("prerequisites-inheritance/child");
         assertSame(null, pom.getValue("prerequisites"));
     }
 
     @Test
-    void testLicensesAreInheritedButNotAggregated() throws Exception {
+    void licensesAreInheritedButNotAggregated() throws Exception {
         PomTestWrapper pom = buildPom("licenses-inheritance/child-2");
         assertEquals(1, ((List<?>) pom.getValue("licenses")).size());
         assertEquals("child-license", pom.getValue("licenses[1]/name"));
@@ -1666,28 +1666,28 @@ class PomConstructionTest {
     }
 
     @Test
-    void testDevelopersAreInheritedButNotAggregated() throws Exception {
+    void developersAreInheritedButNotAggregated() throws Exception {
         PomTestWrapper pom = buildPom("developers-inheritance/child-2");
         assertEquals(1, ((List<?>) pom.getValue("developers")).size());
         assertEquals("child-developer", pom.getValue("developers[1]/name"));
     }
 
     @Test
-    void testContributorsAreInheritedButNotAggregated() throws Exception {
+    void contributorsAreInheritedButNotAggregated() throws Exception {
         PomTestWrapper pom = buildPom("contributors-inheritance/child-2");
         assertEquals(1, ((List<?>) pom.getValue("contributors")).size());
         assertEquals("child-contributor", pom.getValue("contributors[1]/name"));
     }
 
     @Test
-    void testMailingListsAreInheritedButNotAggregated() throws Exception {
+    void mailingListsAreInheritedButNotAggregated() throws Exception {
         PomTestWrapper pom = buildPom("mailing-lists-inheritance/child-2");
         assertEquals(1, ((List<?>) pom.getValue("mailingLists")).size());
         assertEquals("child-mailing-list", pom.getValue("mailingLists[1]/name"));
     }
 
     @Test
-    void testPluginInheritanceOrder() throws Exception {
+    void pluginInheritanceOrder() throws Exception {
         PomTestWrapper pom = buildPom("plugin-inheritance-order/child");
 
         assertEquals("maven-it-plugin-log-file", pom.getValue("build/plugins[1]/artifactId"));
@@ -1700,7 +1700,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testCliPropsDominateProjectPropsDuringInterpolation() throws Exception {
+    void cliPropsDominateProjectPropsDuringInterpolation() throws Exception {
         Properties props = new Properties();
         props.setProperty("testProperty", "PASSED");
         PomTestWrapper pom = buildPom("interpolation-cli-wins", null, props);
@@ -1709,7 +1709,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testParentPomPackagingMustBePom() throws Exception {
+    void parentPomPackagingMustBePom() throws Exception {
         assertThrows(
                 ProjectBuildingException.class,
                 () -> buildPom("parent-pom-packaging/sub"),
@@ -1718,7 +1718,7 @@ class PomConstructionTest {
 
     /** MNG-522, MNG-3018 */
     @Test
-    void testManagedPluginConfigurationAppliesToImplicitPluginsIntroducedByPackaging() throws Exception {
+    void managedPluginConfigurationAppliesToImplicitPluginsIntroducedByPackaging() throws Exception {
         PomTestWrapper pom = buildPom("plugin-management-for-implicit-plugin/child");
         assertEquals(
                 "passed.txt",
@@ -1729,7 +1729,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testDefaultPluginsExecutionContributedByPackagingExecuteBeforeUserDefinedExecutions() throws Exception {
+    void defaultPluginsExecutionContributedByPackagingExecuteBeforeUserDefinedExecutions() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-order-and-default-exec");
         @SuppressWarnings("unchecked")
         List<PluginExecution> executions =
@@ -1743,7 +1743,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testPluginDeclarationsRetainPomOrderAfterInjectionOfDefaultPlugins() throws Exception {
+    void pluginDeclarationsRetainPomOrderAfterInjectionOfDefaultPlugins() throws Exception {
         PomTestWrapper pom = buildPom("plugin-exec-order-with-lifecycle");
         @SuppressWarnings("unchecked")
         List<Plugin> plugins = (List<Plugin>) pom.getValue("build/plugins");
@@ -1764,7 +1764,7 @@ class PomConstructionTest {
 
     /** MNG-4415 */
     @Test
-    void testPluginOrderAfterMergingWithInheritedPlugins() throws Exception {
+    void pluginOrderAfterMergingWithInheritedPlugins() throws Exception {
         PomTestWrapper pom = buildPom("plugin-inheritance-merge-order/sub");
 
         List<String> expected = new ArrayList<>();
@@ -1791,7 +1791,7 @@ class PomConstructionTest {
 
     /** MNG-4416 */
     @Test
-    void testPluginOrderAfterMergingWithInjectedPlugins() throws Exception {
+    void pluginOrderAfterMergingWithInjectedPlugins() throws Exception {
         PomTestWrapper pom = buildPom("plugin-injection-merge-order");
 
         List<String> expected = new ArrayList<>();
@@ -1817,7 +1817,7 @@ class PomConstructionTest {
     }
 
     @Test
-    void testProjectArtifactIdIsNotInheritedButMandatory() throws Exception {
+    void projectArtifactIdIsNotInheritedButMandatory() throws Exception {
         assertThrows(
                 ProjectBuildingException.class,
                 () -> buildPom("artifact-id-inheritance/child"),

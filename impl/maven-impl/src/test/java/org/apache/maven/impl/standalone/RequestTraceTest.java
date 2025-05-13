@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RequestTraceTest {
 
     @Test
-    void testTraces() {
+    void traces() {
         Session session = ApiRunner.createSession(injector -> {
             injector.bindInstance(RequestTraceTest.class, this);
         });

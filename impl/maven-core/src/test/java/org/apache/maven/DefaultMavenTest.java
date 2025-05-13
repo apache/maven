@@ -62,7 +62,7 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testEnsureResolverSessionHasMavenWorkspaceReader() throws Exception {
+    void ensureResolverSessionHasMavenWorkspaceReader() throws Exception {
         WsrClassCatcher wsrClassCatcher =
                 (WsrClassCatcher) getContainer().lookup(AbstractMavenLifecycleParticipant.class, "WsrClassCatcher");
         Maven maven = getContainer().lookup(Maven.class);
@@ -78,7 +78,7 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testThatErrorDuringProjectDependencyGraphCreationAreStored() throws Exception {
+    void thatErrorDuringProjectDependencyGraphCreationAreStored() throws Exception {
         MavenExecutionRequest request =
                 createMavenExecutionRequest(getProject("cyclic-reference")).setGoals(asList("validate"));
 
@@ -88,7 +88,7 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testMavenProjectNoDuplicateArtifacts() throws Exception {
+    void mavenProjectNoDuplicateArtifacts() throws Exception {
         MavenProjectHelper mavenProjectHelper = getContainer().lookup(MavenProjectHelper.class);
         MavenProject mavenProject = new MavenProject();
         mavenProject.setArtifact(new DefaultArtifact("g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null));

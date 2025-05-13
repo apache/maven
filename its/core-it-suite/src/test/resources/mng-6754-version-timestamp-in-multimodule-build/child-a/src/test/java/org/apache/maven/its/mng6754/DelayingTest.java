@@ -39,8 +39,6 @@ package org.apache.maven.its.mng6754;
 
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-
 public class DelayingTest {
     @Test
     public void generateSomeDelay() throws InterruptedException {

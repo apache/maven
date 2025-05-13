@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class DefaultProblemCollectorTest {
 
     @Test
-    void testGetProblems() {
+    void getProblems() {
         DefaultProblemCollector collector = new DefaultProblemCollector(null);
         assertNotNull(collector.getProblems());
         assertEquals(0, collector.getProblems().size());
@@ -56,7 +56,7 @@ class DefaultProblemCollectorTest {
     }
 
     @Test
-    void testSetSource() {
+    void setSource() {
         DefaultProblemCollector collector = new DefaultProblemCollector(null);
 
         collector.add(null, "PROBLEM1", -1, -1, null);

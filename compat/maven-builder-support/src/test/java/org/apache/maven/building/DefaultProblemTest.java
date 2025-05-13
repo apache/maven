@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 class DefaultProblemTest {
 
     @Test
-    void testGetSeverity() {
+    void getSeverity() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals(Severity.ERROR, problem.getSeverity());
 
@@ -43,7 +43,7 @@ class DefaultProblemTest {
     }
 
     @Test
-    void testGetLineNumber() {
+    void getLineNumber() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals(-1, problem.getLineNumber());
 
@@ -59,7 +59,7 @@ class DefaultProblemTest {
     }
 
     @Test
-    void testGetColumnNumber() {
+    void getColumnNumber() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals(-1, problem.getColumnNumber());
 
@@ -75,7 +75,7 @@ class DefaultProblemTest {
     }
 
     @Test
-    void testGetException() {
+    void getException() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertNull(problem.getException());
 
@@ -85,7 +85,7 @@ class DefaultProblemTest {
     }
 
     @Test
-    void testGetSource() {
+    void getSource() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals("", problem.getSource());
 
@@ -97,7 +97,7 @@ class DefaultProblemTest {
     }
 
     @Test
-    void testGetLocation() {
+    void getLocation() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals("", problem.getLocation());
 
@@ -115,7 +115,7 @@ class DefaultProblemTest {
     }
 
     @Test
-    void testGetMessage() {
+    void getMessage() {
         DefaultProblem problem = new DefaultProblem("MESSAGE", null, null, -1, -1, null);
         assertEquals("MESSAGE", problem.getMessage());
 

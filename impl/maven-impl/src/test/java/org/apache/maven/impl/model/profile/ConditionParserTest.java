@@ -71,31 +71,31 @@ class ConditionParserTest {
     }
 
     @Test
-    void testStringLiterals() {
+    void stringLiterals() {
         assertEquals("Hello, World!", parser.parse("'Hello, World!'"));
         assertEquals("Hello, World!", parser.parse("\"Hello, World!\""));
     }
 
     @Test
-    void testStringConcatenation() {
+    void stringConcatenation() {
         assertEquals("HelloWorld", parser.parse("'Hello' + 'World'"));
         assertEquals("Hello123", parser.parse("'Hello' + 123"));
     }
 
     @Test
-    void testLengthFunction() {
+    void lengthFunction() {
         assertEquals(13, parser.parse("length('Hello, World!')"));
         assertEquals(5, parser.parse("length(\"Hello\")"));
     }
 
     @Test
-    void testCaseConversionFunctions() {
+    void caseConversionFunctions() {
         assertEquals("HELLO", parser.parse("upper('hello')"));
         assertEquals("world", parser.parse("lower('WORLD')"));
     }
 
     @Test
-    void testConcatFunction() {
+    void concatFunction() {
         assertEquals("HelloWorld", parser.parse("'Hello' + 'World'"));
         assertEquals("The answer is 42", parser.parse("'The answer is ' + 42"));
         assertEquals("The answer is 42", parser.parse("'The answer is ' + 42.0"));
@@ -118,49 +118,49 @@ class ConditionParserTest {
     }
 
     @Test
-    void testSubstringFunction() {
+    void substringFunction() {
         assertEquals("World", parser.parse("substring('Hello, World!', 7, 12)"));
         assertEquals("World!", parser.parse("substring('Hello, World!', 7)"));
     }
 
     @Test
-    void testIndexOf() {
+    void indexOf() {
         assertEquals(7, parser.parse("indexOf('Hello, World!', 'World')"));
         assertEquals(-1, parser.parse("indexOf('Hello, World!', 'OpenAI')"));
     }
 
     @Test
-    void testInRange() {
+    void inRange() {
         assertTrue((Boolean) parser.parse("inrange('1.8.0_292', '[1.8,2.0)')"));
         assertFalse((Boolean) parser.parse("inrange('1.7.0', '[1.8,2.0)')"));
     }
 
     @Test
-    void testIfFunction() {
+    void ifFunction() {
         assertEquals("long", parser.parse("if(length('test') > 3, 'long', 'short')"));
         assertEquals("short", parser.parse("if(length('hi') > 3, 'long', 'short')"));
     }
 
     @Test
-    void testContainsFunction() {
+    void containsFunction() {
         assertTrue((Boolean) parser.parse("contains('Hello, World!', 'World')"));
         assertFalse((Boolean) parser.parse("contains('Hello, World!', 'OpenAI')"));
     }
 
     @Test
-    void testMatchesFunction() {
+    void matchesFunction() {
         assertTrue((Boolean) parser.parse("matches('test123', '\\w+')"));
         assertFalse((Boolean) parser.parse("matches('test123', '\\d+')"));
     }
 
     @Test
-    void testComplexExpression() {
+    void complexExpression() {
         String expression = "if(contains(lower('HELLO WORLD'), 'hello'), upper('success') + '!', 'failure')";
         assertEquals("SUCCESS!", parser.parse(expression));
     }
 
     @Test
-    void testStringComparison() {
+    void stringComparison() {
         assertTrue((Boolean) parser.parse("'abc' != 'cdf'"));
         assertFalse((Boolean) parser.parse("'abc' != 'abc'"));
         assertTrue((Boolean) parser.parse("'abc' == 'abc'"));
@@ -168,7 +168,7 @@ class ConditionParserTest {
     }
 
     @Test
-    void testParenthesesMismatch() {
+    void parenthesesMismatch() {
         functions.put("property", args -> "foo");
         functions.put("inrange", args -> false);
         assertThrows(
@@ -190,7 +190,7 @@ class ConditionParserTest {
     }
 
     @Test
-    void testBasicArithmetic() {
+    void basicArithmetic() {
         assertEquals(5.0, parser.parse("2 + 3"));
         assertEquals(10.0, parser.parse("15 - 5"));
         assertEquals(24.0, parser.parse("6 * 4"));
@@ -198,7 +198,7 @@ class ConditionParserTest {
     }
 
     @Test
-    void testArithmeticPrecedence() {
+    void arithmeticPrecedence() {
         assertEquals(14.0, parser.parse("2 + 3 * 4"));
         assertEquals(20.0, parser.parse("(2 + 3) * 4"));
         assertEquals(11.0, parser.parse("15 - 6 + 2"));
@@ -206,7 +206,7 @@ class ConditionParserTest {
     }
 
     @Test
-    void testFloatingPointArithmetic() {
+    void floatingPointArithmetic() {
         assertEquals(5.5, parser.parse("2.2 + 3.3"));
         assertEquals(0.1, (Double) parser.parse("3.3 - 3.2"), 1e-10);
         assertEquals(6.25, parser.parse("2.5 * 2.5"));
@@ -214,7 +214,7 @@ class ConditionParserTest {
     }
 
     @Test
-    void testArithmeticComparisons() {
+    void arithmeticComparisons() {
         assertTrue((Boolean) parser.parse("5 > 3"));
         assertTrue((Boolean) parser.parse("3 < 5"));
         assertTrue((Boolean) parser.parse("5 >= 5"));
@@ -227,7 +227,7 @@ class ConditionParserTest {
     }
 
     @Test
-    void testComplexArithmeticExpressions() {
+    void complexArithmeticExpressions() {
         assertFalse((Boolean) parser.parse("(2 + 3 * 4) > (10 + 5)"));
         assertTrue((Boolean) parser.parse("(2 + 3 * 4) < (10 + 5)"));
         assertTrue((Boolean) parser.parse("(10 / 2 + 3) == 8"));
@@ -235,7 +235,7 @@ class ConditionParserTest {
     }
 
     @Test
-    void testArithmeticFunctions() {
+    void arithmeticFunctions() {
         assertEquals(5.0, parser.parse("2 + 3"));
         assertEquals(2.0, parser.parse("5 - 3"));
         assertEquals(15.0, parser.parse("3 * 5"));
@@ -243,19 +243,19 @@ class ConditionParserTest {
     }
 
     @Test
-    void testCombinedArithmeticAndLogic() {
+    void combinedArithmeticAndLogic() {
         assertTrue((Boolean) parser.parse("(5 > 3) && (10 / 2 == 5)"));
         assertFalse((Boolean) parser.parse("(5 < 3) || (10 / 2 != 5)"));
         assertTrue((Boolean) parser.parse("2 + 3 == 1 * 5"));
     }
 
     @Test
-    void testDivisionByZero() {
+    void divisionByZero() {
         assertThrows(ArithmeticException.class, () -> parser.parse("5 / 0"));
     }
 
     @Test
-    void testPropertyAlias() {
+    void propertyAlias() {
         assertTrue((Boolean) parser.parse("${os.name} == 'windows'"));
         assertFalse((Boolean) parser.parse("${os.name} == 'linux'"));
         assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' && ${os.name} == 'windows'"));
@@ -263,7 +263,7 @@ class ConditionParserTest {
     }
 
     @Test
-    void testNestedPropertyAlias() {
+    void nestedPropertyAlias() {
         functions.put("property", args -> {
             if (args.get(0).equals("project.rootDirectory")) {
                 return "/home/user/project";
@@ -282,7 +282,7 @@ class ConditionParserTest {
     }
 
     @Test
-    void testToInt() {
+    void toInt() {
         assertEquals(123, ConditionParser.toInt(123));
         assertEquals(123, ConditionParser.toInt(123L));
         assertEquals(123, ConditionParser.toInt(123.0));

@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@code License}.
@@ -32,30 +29,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LicenseTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new License().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new License().equals(null));
+    void equalsNullSafe() {
+        assertNotEquals(null, new License());
 
         new License().equals(new License());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         License thing = new License();
-        assertTrue(thing.equals(thing));
+        assertEquals(thing, thing);
     }
 
     @Test
-    void testToStringNullSafe() {
+    void toStringNullSafe() {
         assertNotNull(new License().toString());
     }
 
     @Test
-    public void testToStringNotNonsense() {
+    void toStringNotNonsense() {
         License license = new License();
         license.setName("Unlicense");
         license.setUrl("http://lic.localdomain");

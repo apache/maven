@@ -51,7 +51,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void resolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
@@ -66,7 +66,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void resolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
@@ -81,7 +81,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void resolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
@@ -95,7 +95,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
+    void resolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
@@ -106,7 +106,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
+    void resolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
         parent.setArtifactId("artifact");
@@ -117,7 +117,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void resolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");
@@ -132,7 +132,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void resolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");
@@ -146,7 +146,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void resolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");
@@ -160,7 +160,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
+    void resolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");
@@ -171,7 +171,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
+    void resolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
         dependency.setArtifactId("artifact");

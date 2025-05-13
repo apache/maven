@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MojoExecutionScopeTest {
     @Test
-    void testNestedEnter() throws Exception {
+    void nestedEnter() throws Exception {
         MojoExecutionScope scope = new MojoExecutionScope();
 
         scope.enter();
@@ -55,7 +55,7 @@ class MojoExecutionScopeTest {
     }
 
     @Test
-    void testMultiKeyInstance() throws Exception {
+    void multiKeyInstance() throws Exception {
         MojoExecutionScope scope = new MojoExecutionScope();
         scope.enter();
 

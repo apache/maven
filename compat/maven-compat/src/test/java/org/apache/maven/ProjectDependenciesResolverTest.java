@@ -46,7 +46,7 @@ class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase
     }
 
     @Test
-    void testSystemScopeDependencies() throws Exception {
+    void systemScopeDependencies() throws Exception {
         MavenSession session = createMavenSession(null);
         MavenProject project = session.getCurrentProject();
 
@@ -64,7 +64,7 @@ class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase
     }
 
     @Test
-    void testSystemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
+    void systemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
         File pom = getProject("it0063");
 
         Properties eps = new Properties();

@@ -33,7 +33,7 @@ class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
     private DefaultVersionResolver versionResolver;
 
     @Test
-    void testResolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts() throws Exception {
+    void resolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts() throws Exception {
         VersionRequest requestB = new VersionRequest();
         requestB.addRepository(newTestRepository());
         Artifact artifactB =
@@ -55,7 +55,7 @@ class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testResolveSeparateInstalledClassifiedNonVersionedArtifacts() throws Exception {
+    void resolveSeparateInstalledClassifiedNonVersionedArtifacts() throws Exception {
         VersionRequest requestA = new VersionRequest();
         requestA.addRepository(newTestRepository());
         String versionA = "07.20.3-20120809.112124-88";

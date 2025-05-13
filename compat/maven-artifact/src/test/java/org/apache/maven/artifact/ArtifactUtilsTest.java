@@ -41,7 +41,7 @@ class ArtifactUtilsTest {
     }
 
     @Test
-    void testIsSnapshot() {
+    void isSnapshot() {
         assertFalse(ArtifactUtils.isSnapshot(null));
         assertFalse(ArtifactUtils.isSnapshot(""));
         assertFalse(ArtifactUtils.isSnapshot("1.2.3"));
@@ -52,7 +52,7 @@ class ArtifactUtilsTest {
     }
 
     @Test
-    void testToSnapshotVersion() {
+    void toSnapshotVersion() {
         assertEquals("1.2.3", ArtifactUtils.toSnapshotVersion("1.2.3"));
         assertEquals("1.2.3-SNAPSHOT", ArtifactUtils.toSnapshotVersion("1.2.3-SNAPSHOT"));
         assertEquals("1.2.3-SNAPSHOT", ArtifactUtils.toSnapshotVersion("1.2.3-20090413.094722-2"));
@@ -63,7 +63,7 @@ class ArtifactUtilsTest {
      * Tests that the ordering of the map resembles the ordering of the input collection of artifacts.
      */
     @Test
-    void testArtifactMapByVersionlessIdOrdering() throws Exception {
+    void artifactMapByVersionlessIdOrdering() throws Exception {
         List<Artifact> list = new ArrayList<>();
         list.add(newArtifact("b"));
         list.add(newArtifact("a"));

@@ -282,7 +282,7 @@ class DefaultGraphBuilderTest {
     @ParameterizedTest
     @MethodSource("parameters")
     @SuppressWarnings("checkstyle:ParameterNumber")
-    void testGetReactorProjects(
+    void getReactorProjects(
             String parameterDescription,
             List<String> parameterActiveRequiredProjects,
             List<String> parameterActiveOptionalProjects,
@@ -337,7 +337,7 @@ class DefaultGraphBuilderTest {
     }
 
     @Test
-    void testProcessPackagingAttribute() throws ProjectBuildingException {
+    void processPackagingAttribute() throws ProjectBuildingException {
         graphBuilder = new DefaultGraphBuilder(
                 mock(BuildResumptionDataRepository.class),
                 pomlessCollectionStrategy,

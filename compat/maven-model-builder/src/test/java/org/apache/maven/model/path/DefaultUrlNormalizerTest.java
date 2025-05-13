@@ -35,19 +35,19 @@ class DefaultUrlNormalizerTest {
     }
 
     @Test
-    void testNullSafe() {
+    void nullSafe() {
         assertNull(normalize(null));
     }
 
     @Test
-    void testTrailingSlash() {
+    void trailingSlash() {
         assertEquals("", normalize(""));
         assertEquals("http://server.org/dir", normalize("http://server.org/dir"));
         assertEquals("http://server.org/dir/", normalize("http://server.org/dir/"));
     }
 
     @Test
-    void testRemovalOfParentRefs() {
+    void removalOfParentRefs() {
         assertEquals("http://server.org/child", normalize("http://server.org/parent/../child"));
         assertEquals("http://server.org/child", normalize("http://server.org/grand/parent/../../child"));
 
@@ -56,7 +56,7 @@ class DefaultUrlNormalizerTest {
     }
 
     @Test
-    void testPreservationOfDoubleSlashes() {
+    void preservationOfDoubleSlashes() {
         assertEquals("scm:hg:ssh://localhost//home/user", normalize("scm:hg:ssh://localhost//home/user"));
         assertEquals("file:////UNC/server", normalize("file:////UNC/server"));
         assertEquals(

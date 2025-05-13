@@ -39,8 +39,6 @@ package com.mycompany.app;
 
 import java.net.URL;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 
 /**

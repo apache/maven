@@ -40,7 +40,7 @@ class TransformationManagerTest {
     ArtifactTransformationManager tm;
 
     @Test
-    void testTransformationManager() {
+    void transformationManager() {
         List<ArtifactTransformation> tms = tm.getArtifactTransformations();
 
         assertEquals(3, tms.size());

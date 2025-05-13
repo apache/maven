@@ -32,6 +32,7 @@ import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -50,6 +51,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DefaultToolchainManagerTest {
+    private AutoCloseable mocks;
     // Mocks to inject into toolchainManager
     @Mock
     private Logger logger;
@@ -67,7 +69,7 @@ class DefaultToolchainManagerTest {
 
     @BeforeEach
     void onSetup() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
 
         Map<String, ToolchainFactory> factories = new HashMap<>();
         factories.put("basic", toolchainFactoryBasicType);
@@ -81,7 +83,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testNoModels() {
+    void noModels() {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         when(session.getRequest()).thenReturn(executionRequest);
@@ -92,7 +94,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testModelNoFactory() {
+    void modelNoFactory() {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         List<ToolchainModel> toolchainModels = new ArrayList<>();
@@ -109,7 +111,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testModelAndFactory() {
+    void modelAndFactory() {
         MavenSession session = mock(MavenSession.class);
         List<ToolchainModel> toolchainModels = List.of(
                 ToolchainModel.newBuilder().type("basic").build(),
@@ -128,7 +130,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testModelsAndFactory() {
+    void modelsAndFactory() {
         MavenSession session = mock(MavenSession.class);
         Session sessionv4 = mock(Session.class);
         when(session.getSession()).thenReturn(sessionv4);
@@ -149,7 +151,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testRequirements() throws Exception {
+    void requirements() throws Exception {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         when(session.getRequest()).thenReturn(executionRequest);
@@ -174,7 +176,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testToolchainsForAvailableType() throws Exception {
+    void toolchainsForAvailableType() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -196,7 +198,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testToolchainsForUnknownType() throws Exception {
+    void toolchainsForUnknownType() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -216,7 +218,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testToolchainsForConfiguredType() throws Exception {
+    void toolchainsForConfiguredType() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -247,7 +249,7 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void testMisconfiguredToolchain() throws Exception {
+    void misconfiguredToolchain() throws Exception {
         // prepare
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
@@ -260,5 +262,10 @@ class DefaultToolchainManagerTest {
 
         // verify
         assertEquals(0, basics.length);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        mocks.close();
     }
 }

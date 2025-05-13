@@ -45,7 +45,7 @@ class DefaultModelBuilderFactoryTest {
     }
 
     @Test
-    void testCompleteWiring() throws Exception {
+    void completeWiring() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull(builder);
 
@@ -65,7 +65,7 @@ class DefaultModelBuilderFactoryTest {
     }
 
     @Test
-    void testPomChanges() throws Exception {
+    void pomChanges() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull(builder);
         File pom = getPom("simple");

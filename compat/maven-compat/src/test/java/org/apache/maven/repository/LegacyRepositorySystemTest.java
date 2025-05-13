@@ -116,7 +116,7 @@ class LegacyRepositorySystemTest {
     }
 
     @Test
-    void testThatASystemScopedDependencyIsNotResolvedFromRepositories() throws Exception {
+    void thatASystemScopedDependencyIsNotResolvedFromRepositories() throws Exception {
         //
         // We should get a whole slew of dependencies resolving this artifact transitively
         //
@@ -231,7 +231,7 @@ class LegacyRepositorySystemTest {
     }
 
     @Test
-    void testLocalRepositoryBasedir() throws Exception {
+    void localRepositoryBasedir() throws Exception {
         File localRepoDir = new File("").getAbsoluteFile();
 
         ArtifactRepository localRepo = repositorySystem.createLocalRepository(localRepoDir);

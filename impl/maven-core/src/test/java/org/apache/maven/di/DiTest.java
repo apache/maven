@@ -73,7 +73,7 @@ public class DiTest {
         }
 
         @Test
-        void testPlexus() throws Exception {
+        void plexus() throws Exception {
             List<ModelParser> parsers = container.lookupList(ModelParser.class);
             assertNotNull(parsers);
             assertEquals(1, parsers.size());
@@ -83,7 +83,7 @@ public class DiTest {
         }
 
         @Test
-        void testGuice() throws Exception {
+        void guice() throws Exception {
             List<Binding<ModelParser>> parsers =
                     container.lookup(Injector.class).findBindingsByType(TypeLiteral.get(ModelParser.class));
             assertNotNull(parsers);
@@ -91,7 +91,7 @@ public class DiTest {
         }
 
         @Test
-        void testDI() throws Exception {
+        void di() throws Exception {
             DiInjected diInjected = new DiInjected();
             container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
             assertNotNull(diInjected.parser);
@@ -144,7 +144,7 @@ public class DiTest {
         }
 
         @Test
-        void testPlexus() throws Exception {
+        void plexus() throws Exception {
             List<ModelParser> parsers = container.lookupList(ModelParser.class);
             assertNotNull(parsers);
             assertEquals(1, parsers.size());
@@ -154,7 +154,7 @@ public class DiTest {
         }
 
         @Test
-        void testGuice() throws Exception {
+        void guice() throws Exception {
             List<Binding<ModelParser>> parsers2 =
                     container.lookup(Injector.class).findBindingsByType(TypeLiteral.get(ModelParser.class));
             assertNotNull(parsers2);
@@ -163,7 +163,7 @@ public class DiTest {
 
         @Test
         @EnabledIf("org.apache.maven.di.DiTest#testShouldNotHaveDuplicates")
-        void testDI() throws Exception {
+        void di() throws Exception {
             DiInjected diInjected = new DiInjected();
             container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
             assertNotNull(diInjected.parser);
@@ -216,7 +216,7 @@ public class DiTest {
         }
 
         @Test
-        void testPlexus() throws Exception {
+        void plexus() throws Exception {
             List<ModelParser> parsers = container.lookupList(ModelParser.class);
             assertNotNull(parsers);
             assertEquals(1, parsers.size());
@@ -226,7 +226,7 @@ public class DiTest {
         }
 
         @Test
-        void testGuice() throws Exception {
+        void guice() throws Exception {
             List<Binding<ModelParser>> parsers =
                     container.lookup(Injector.class).findBindingsByType(TypeLiteral.get(ModelParser.class));
             assertNotNull(parsers);
@@ -235,7 +235,7 @@ public class DiTest {
 
         @Test
         @EnabledIf("org.apache.maven.di.DiTest#testShouldNotHaveDuplicates")
-        void testDI() throws Exception {
+        void di() throws Exception {
             DiInjected diInjected = new DiInjected();
             container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
             assertNotNull(diInjected.parser);
@@ -295,7 +295,7 @@ public class DiTest {
         }
 
         @Test
-        void testPlexus() throws Exception {
+        void plexus() throws Exception {
             List<ModelParser> parsers = container.lookupList(ModelParser.class);
             assertNotNull(parsers);
             assertEquals(1, parsers.size());
@@ -305,7 +305,7 @@ public class DiTest {
         }
 
         @Test
-        void testGuice() throws Exception {
+        void guice() throws Exception {
             List<Binding<ModelParser>> parsers =
                     container.lookup(Injector.class).findBindingsByType(TypeLiteral.get(ModelParser.class));
             assertNotNull(parsers);
@@ -313,7 +313,7 @@ public class DiTest {
         }
 
         @Test
-        void testDI() throws Exception {
+        void di() throws Exception {
             DiInjected diInjected = new DiInjected();
             container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
             assertNotNull(diInjected.parser);

@@ -40,7 +40,7 @@ import org.junit.jupiter.api.io.TempDir;
  * Resident UT.
  */
 @Order(100)
-public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
+class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
 
     @Override
     protected Invoker createInvoker(ClassWorld classWorld) {

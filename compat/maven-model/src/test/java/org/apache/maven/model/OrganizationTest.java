@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@code Organization}.
@@ -32,30 +29,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class OrganizationTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new Organization().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new Organization().equals(null));
+    void equalsNullSafe() {
+        assertNotEquals(null, new Organization());
 
         new Organization().equals(new Organization());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         Organization thing = new Organization();
-        assertTrue(thing.equals(thing));
+        assertEquals(thing, thing);
     }
 
     @Test
-    void testToStringNullSafe() {
+    void toStringNullSafe() {
         assertNotNull(new Organization().toString());
     }
 
     @Test
-    public void testToStringNotNonsense11() {
+    void toStringNotNonsense11() {
         Organization org = new Organization();
         org.setName("Testing Maven Unit");
         org.setUrl("https://maven.localdomain");
@@ -64,7 +61,7 @@ class OrganizationTest {
     }
 
     @Test
-    public void testToStringNotNonsense10() {
+    void toStringNotNonsense10() {
         Organization org = new Organization();
         org.setName("Testing Maven Unit");
 
@@ -72,7 +69,7 @@ class OrganizationTest {
     }
 
     @Test
-    public void testToStringNotNonsense01() {
+    void toStringNotNonsense01() {
         Organization org = new Organization();
         org.setUrl("https://maven.localdomain");
 
@@ -80,7 +77,7 @@ class OrganizationTest {
     }
 
     @Test
-    public void testToStringNotNonsense00() {
+    void toStringNotNonsense00() {
         Organization org = new Organization();
 
         assertEquals("Organization {name=null, url=null}", org.toString());

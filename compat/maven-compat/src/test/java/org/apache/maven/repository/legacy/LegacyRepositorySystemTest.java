@@ -43,14 +43,14 @@ class LegacyRepositorySystemTest {
     private LegacyRepositorySystem repositorySystem;
 
     @Test
-    void testThatLocalRepositoryWithSpacesIsProperlyHandled() throws Exception {
+    void thatLocalRepositoryWithSpacesIsProperlyHandled() throws Exception {
         File basedir = new File("target/spacy path").getAbsoluteFile();
         ArtifactRepository repo = repositorySystem.createLocalRepository(basedir);
         assertEquals(basedir, new File(repo.getBasedir()));
     }
 
     @Test
-    void testAuthenticationHandling() {
+    void authenticationHandling() {
         Server server = new Server();
         server.setId("repository");
         server.setUsername("jason");

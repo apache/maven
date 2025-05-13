@@ -47,7 +47,7 @@ class LifecyclePhaseTest {
     }
 
     @Test
-    void testSet() {
+    void set() {
         LifecyclePhase phase = new LifecyclePhase();
         assertNull(phase.getMojos());
 

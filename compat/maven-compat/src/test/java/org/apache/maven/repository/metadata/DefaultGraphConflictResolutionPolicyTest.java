@@ -45,7 +45,7 @@ class DefaultGraphConflictResolutionPolicyTest {
 
     // ------------------------------------------------------------------------------------------
     @Test
-    void testDefaultPolicy() throws Exception {
+    void defaultPolicy() throws Exception {
         MetadataGraphEdge res;
 
         res = policy.apply(e1, e2);

@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 class RequestTraceTest {
 
     @Test
-    void testRequestTraceCreation() {
+    void requestTraceCreation() {
         RequestTrace parentTrace = new RequestTrace("parent-context", null, "parent-data");
         RequestTrace childTrace = new RequestTrace("child-context", parentTrace, "child-data");
 
@@ -41,7 +41,7 @@ class RequestTraceTest {
     }
 
     @Test
-    void testRequestTraceWithParentContextInheritance() {
+    void requestTraceWithParentContextInheritance() {
         RequestTrace parentTrace = new RequestTrace("parent-context", null, "parent-data");
         RequestTrace childTrace = new RequestTrace(parentTrace, "child-data");
 
@@ -51,14 +51,14 @@ class RequestTraceTest {
     }
 
     @Test
-    void testPredefinedContexts() {
+    void predefinedContexts() {
         assertEquals("plugin", RequestTrace.CONTEXT_PLUGIN);
         assertEquals("project", RequestTrace.CONTEXT_PROJECT);
         assertEquals("bootstrap", RequestTrace.CONTEXT_BOOTSTRAP);
     }
 
     @Test
-    void testNullValues() {
+    void nullValues() {
         RequestTrace trace = new RequestTrace(null, null, null);
         assertNull(trace.context());
         assertNull(trace.parent());
@@ -66,7 +66,7 @@ class RequestTraceTest {
     }
 
     @Test
-    void testChainedTraces() {
+    void chainedTraces() {
         RequestTrace root = new RequestTrace("root", null, "root-data");
         RequestTrace level1 = new RequestTrace("level1", root, "level1-data");
         RequestTrace level2 = new RequestTrace("level2", level1, "level2-data");

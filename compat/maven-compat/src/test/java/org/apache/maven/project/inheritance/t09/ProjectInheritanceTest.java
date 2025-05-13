@@ -62,7 +62,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
      * a &amp; b only.
      */
     @Test
-    void testDependencyManagementExclusionsExcludeTransitively() throws Exception {
+    void dependencyManagementExclusionsExcludeTransitively() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -79,7 +79,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
         assertNotNull(map, "No artifacts");
         assertTrue(map.size() > 0, "No Artifacts");
-        assertTrue(map.size() == 2, "Set size should be 2, is " + map.size());
+        assertEquals(2, map.size(), "Set size should be 2, is " + map.size());
 
         assertTrue(map.containsKey("maven-test:t09-a"), "maven-test:t09-a is not in the project");
         assertTrue(map.containsKey("maven-test:t09-b"), "maven-test:t09-b is not in the project");
@@ -97,7 +97,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
      * @throws Exception
      */
     @Test
-    void testDependencyManagementExclusionDoesNotOverrideGloballyForTransitives() throws Exception {
+    void dependencyManagementExclusionDoesNotOverrideGloballyForTransitives() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -112,7 +112,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         Map map = project2.getArtifactMap();
         assertNotNull(map, "No artifacts");
         assertTrue(map.size() > 0, "No Artifacts");
-        assertTrue(map.size() == 4, "Set size should be 4, is " + map.size());
+        assertEquals(4, map.size(), "Set size should be 4, is " + map.size());
 
         assertTrue(map.containsKey("maven-test:t09-a"), "maven-test:t09-a is not in the project");
         assertTrue(map.containsKey("maven-test:t09-b"), "maven-test:t09-b is not in the project");

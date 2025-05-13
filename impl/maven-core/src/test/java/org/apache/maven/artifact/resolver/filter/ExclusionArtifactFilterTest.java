@@ -47,7 +47,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testExcludeExact() {
+    void excludeExact() {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("org.apache.maven");
         exclusion.setArtifactId("maven-core");
@@ -57,7 +57,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testExcludeNoMatch() {
+    void excludeNoMatch() {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("org.apache.maven");
         exclusion.setArtifactId("maven-model");
@@ -67,7 +67,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testExcludeGroupIdWildcard() {
+    void excludeGroupIdWildcard() {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("*");
         exclusion.setArtifactId("maven-core");
@@ -77,7 +77,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testExcludeGroupIdWildcardNoMatch() {
+    void excludeGroupIdWildcardNoMatch() {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("*");
         exclusion.setArtifactId("maven-compat");
@@ -87,7 +87,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testExcludeArtifactIdWildcard() {
+    void excludeArtifactIdWildcard() {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("org.apache.maven");
         exclusion.setArtifactId("*");
@@ -97,7 +97,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testExcludeArtifactIdWildcardNoMatch() {
+    void excludeArtifactIdWildcardNoMatch() {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("org.apache.groovy");
         exclusion.setArtifactId("*");
@@ -107,7 +107,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testExcludeAllWildcard() {
+    void excludeAllWildcard() {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("*");
         exclusion.setArtifactId("*");
@@ -117,7 +117,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testMultipleExclusionsExcludeArtifactIdWildcard() {
+    void multipleExclusionsExcludeArtifactIdWildcard() {
         Exclusion exclusion1 = new Exclusion();
         exclusion1.setGroupId("org.apache.groovy");
         exclusion1.setArtifactId("*");
@@ -132,7 +132,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testMultipleExclusionsExcludeGroupIdWildcard() {
+    void multipleExclusionsExcludeGroupIdWildcard() {
         Exclusion exclusion1 = new Exclusion();
         exclusion1.setGroupId("*");
         exclusion1.setArtifactId("maven-model");
@@ -147,7 +147,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testExcludeWithGlob() {
+    void excludeWithGlob() {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("*");
         exclusion.setArtifactId("maven-*");
@@ -158,7 +158,7 @@ class ExclusionArtifactFilterTest {
     }
 
     @Test
-    void testExcludeWithGlobStar() {
+    void excludeWithGlobStar() {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("**");
         exclusion.setArtifactId("maven-**");

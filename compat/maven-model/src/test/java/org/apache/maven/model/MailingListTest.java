@@ -20,10 +20,7 @@ package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@code MailingList}.
@@ -32,30 +29,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MailingListTest {
 
     @Test
-    void testHashCodeNullSafe() {
+    void hashCodeNullSafe() {
         new MailingList().hashCode();
     }
 
     @Test
-    void testEqualsNullSafe() {
-        assertFalse(new MailingList().equals(null));
+    void equalsNullSafe() {
+        assertNotEquals(null, new MailingList());
 
         new MailingList().equals(new MailingList());
     }
 
     @Test
-    void testEqualsIdentity() {
+    void equalsIdentity() {
         MailingList thing = new MailingList();
-        assertTrue(thing.equals(thing));
+        assertEquals(thing, thing);
     }
 
     @Test
-    void testToStringNullSafe() {
+    void toStringNullSafe() {
         assertNotNull(new MailingList().toString());
     }
 
     @Test
-    public void testToStringNotNonsense() {
+    void toStringNotNonsense() {
         MailingList list = new MailingList();
         list.setName("modello-dev");
 

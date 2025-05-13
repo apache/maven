@@ -39,7 +39,7 @@ class ArtifactHandlerTest {
 
     @Test
     @SuppressWarnings("checkstyle:UnusedLocalVariable")
-    void testAptConsistency() throws Exception {
+    void aptConsistency() throws Exception {
         File apt = getTestFile("src/site/apt/artifact-handlers.apt");
 
         List<String> lines = Files.readAllLines(apt.toPath());

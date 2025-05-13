@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests {@link DefaultProfileSelector}.
  */
 @Deprecated
-public class DefaultProfileSelectorTest {
+class DefaultProfileSelectorTest {
     private Profile newProfile(String id) {
         Activation activation = new Activation();
         Profile profile = new Profile();
@@ -45,7 +45,7 @@ public class DefaultProfileSelectorTest {
     }
 
     @Test
-    void testThrowingActivator() {
+    void throwingActivator() {
         DefaultProfileSelector selector = new DefaultProfileSelector();
         selector.addProfileActivator(new ProfileActivator() {
             @Override

@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class DefaultInterpolatorTest {
 
     @Test
-    void testBasicSubstitution() {
+    void basicSubstitution() {
         Map<String, String> props = new HashMap<>();
         props.put("key0", "value0");
         props.put("key1", "${value1}");
@@ -46,7 +46,7 @@ class DefaultInterpolatorTest {
     }
 
     @Test
-    void testBasicSubstitutionWithContext() {
+    void basicSubstitutionWithContext() {
         HashMap<String, String> props = new HashMap<>();
         props.put("key0", "value0");
         props.put("key1", "${value1}");
@@ -58,23 +58,23 @@ class DefaultInterpolatorTest {
     }
 
     @Test
-    void testSubstitutionFailures() {
+    void substitutionFailures() {
         assertEquals("a}", substVars("a}", "b"));
         assertEquals("${a", substVars("${a", "b"));
     }
 
     @Test
-    void testEmptyVariable() {
+    void emptyVariable() {
         assertEquals("", substVars("${}", "b"));
     }
 
     @Test
-    void testInnerSubst() {
+    void innerSubst() {
         assertEquals("c", substVars("${${a}}", "z", Map.of("a", "b", "b", "c")));
     }
 
     @Test
-    void testSubstLoop() {
+    void substLoop() {
         assertThrows(
                 InterpolatorException.class,
                 () -> substVars("${a}", "a"),
@@ -82,17 +82,17 @@ class DefaultInterpolatorTest {
     }
 
     @Test
-    void testLoopEmpty() {
+    void loopEmpty() {
         assertEquals("${a}", substVars("${a}", null, null, null, false));
     }
 
     @Test
-    void testLoopEmpty2() {
+    void loopEmpty2() {
         assertEquals("${a}", substVars("${a}", null, null, null, false));
     }
 
     @Test
-    void testSubstitutionEscape() {
+    void substitutionEscape() {
         assertEquals("${a}", substVars("$\\{a${#}\\}", "b"));
         assertEquals("${a}", substVars("$\\{a\\}${#}", "b"));
         assertEquals("${a}", substVars("$\\{a\\}", "b"));
@@ -100,7 +100,7 @@ class DefaultInterpolatorTest {
     }
 
     @Test
-    void testSubstitutionOrder() {
+    void substitutionOrder() {
         LinkedHashMap<String, String> map1 = new LinkedHashMap<>();
         map1.put("a", "$\\\\{var}");
         map1.put("abc", "${ab}c");
@@ -117,7 +117,7 @@ class DefaultInterpolatorTest {
     }
 
     @Test
-    void testMultipleEscapes() {
+    void multipleEscapes() {
         LinkedHashMap<String, String> map1 = new LinkedHashMap<>();
         map1.put("a", "$\\\\{var}");
         map1.put("abc", "${ab}c");
@@ -130,7 +130,7 @@ class DefaultInterpolatorTest {
     }
 
     @Test
-    void testPreserveUnresolved() {
+    void preserveUnresolved() {
         Map<String, String> props = new HashMap<>();
         props.put("a", "${b}");
         assertEquals("", substVars("${b}", "a", props, null, true));
@@ -145,7 +145,7 @@ class DefaultInterpolatorTest {
     }
 
     @Test
-    void testExpansion() {
+    void expansion() {
         Map<String, String> props = new LinkedHashMap<>();
         props.put("a", "foo");
         props.put("b", "");
@@ -170,7 +170,7 @@ class DefaultInterpolatorTest {
     }
 
     @Test
-    void testTernary() {
+    void ternary() {
         Map<String, String> props;
 
         props = new LinkedHashMap<>();
@@ -216,7 +216,7 @@ class DefaultInterpolatorTest {
     }
 
     @Test
-    void testXdg() {
+    void xdg() {
         Map<String, String> props;
 
         props = new LinkedHashMap<>();

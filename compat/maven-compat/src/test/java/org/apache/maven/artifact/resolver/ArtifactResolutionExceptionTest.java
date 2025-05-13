@@ -33,7 +33,7 @@ class ArtifactResolutionExceptionTest {
     private static final String LS = System.lineSeparator();
 
     @Test
-    void testMissingArtifactMessageFormat() {
+    void missingArtifactMessageFormat() {
         String message = "Missing artifact";
         String indentation = "  ";
         String groupId = "aGroupId";

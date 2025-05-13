@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PhaseRecorderTest {
     @Test
-    void testObserveExecution() throws Exception {
+    void observeExecution() throws Exception {
         PhaseRecorder phaseRecorder = new PhaseRecorder(ProjectDependencyGraphStub.A);
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
         final List<MojoExecution> executions = plan.getMojoExecutions();

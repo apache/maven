@@ -96,7 +96,7 @@ class DefaultClassRealmManagerTest {
     }
 
     @Test
-    void testDebugEnabled() throws PlexusContainerException {
+    void debugEnabled() throws PlexusContainerException {
         Logger logger = mock(Logger.class);
         when(logger.isDebugEnabled()).thenReturn(true);
 
@@ -130,7 +130,7 @@ class DefaultClassRealmManagerTest {
     }
 
     @Test
-    void testDebugDisabled() throws PlexusContainerException {
+    void debugDisabled() throws PlexusContainerException {
         Logger logger = mock(Logger.class);
         when(logger.isDebugEnabled()).thenReturn(false);
 

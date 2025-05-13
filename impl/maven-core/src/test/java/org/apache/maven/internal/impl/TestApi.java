@@ -149,7 +149,7 @@ class TestApi {
     }
 
     @Test
-    void testCreateAndResolveArtifact() {
+    void createAndResolveArtifact() {
         ArtifactCoordinates coords =
                 session.createArtifactCoordinates("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
@@ -162,7 +162,7 @@ class TestApi {
     }
 
     @Test
-    void testBuildProject() {
+    void buildProject() {
         Artifact artifact = session.createArtifact("org.codehaus.plexus", "plexus-utils", "1.4.5", "pom");
 
         Project project = project(artifact);
@@ -170,7 +170,7 @@ class TestApi {
     }
 
     @Test
-    void testCollectArtifactDependencies() {
+    void collectArtifactDependencies() {
         Artifact artifact =
                 session.createArtifact("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "jar");
         Node root = session.collectDependencies(artifact, PathScope.MAIN_RUNTIME);
@@ -178,7 +178,7 @@ class TestApi {
     }
 
     @Test
-    void testResolveArtifactCoordinatesDependencies() {
+    void resolveArtifactCoordinatesDependencies() {
         DependencyCoordinates coords = session.createDependencyCoordinates(
                 session.createArtifactCoordinates("org.apache.maven.core.test", "test-extension", "1", "jar"));
 
@@ -218,7 +218,7 @@ class TestApi {
     }
 
     @Test
-    void testMetadataGeneratorFactory() throws ComponentLookupException {
+    void metadataGeneratorFactory() throws ComponentLookupException {
         List<MetadataGeneratorFactory> factories = plexusContainer.lookupList(MetadataGeneratorFactory.class);
         assertNotNull(factories);
         factories.forEach(f -> System.out.println(f.getClass().getName()));
@@ -226,7 +226,7 @@ class TestApi {
     }
 
     @Test
-    void testProjectDependencies() {
+    void projectDependencies() {
         Artifact pom = session.createArtifact("org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "pom");
 
         Project project = project(pom);
