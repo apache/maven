@@ -20,15 +20,20 @@ package org.apache.maven.impl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
+import org.apache.maven.api.settings.Server;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.impl.model.DefaultInterpolator;
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,9 +41,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
+ *
  */
 @ExtendWith(MockitoExtension.class)
 class DefaultSettingsBuilderFactoryTest {
@@ -53,23 +59,115 @@ class DefaultSettingsBuilderFactoryTest {
                 .thenReturn(new DefaultSettingsXmlFactory());
     }
 
-    @Test
-    void testCompleteWiring() {
+    SettingsBuilderResult execute(String settingsName) {
         SettingsBuilder builder =
                 new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
-        assertNotNull(builder);
+        assertThat(builder).isNotNull();
 
         SettingsBuilderRequest request = SettingsBuilderRequest.builder()
                 .session(session)
-                .userSettingsSource(Sources.buildSource(getSettings("settings-simple")))
+                .userSettingsSource(Sources.buildSource(getSettings(settingsName)))
                 .build();
 
         SettingsBuilderResult result = builder.build(request);
-        assertNotNull(result);
-        assertNotNull(result.getEffectiveSettings());
+        return assertThat(result).isNotNull().actual();
+    }
+
+    @Test
+    void testCompleteWiring() {
+        Settings settings = assertThat(execute("settings-simple"))
+                .extracting(SettingsBuilderResult::getEffectiveSettings)
+                .actual();
+
+        assertThat(settings.getLocalRepository())
+                .satisfiesAnyOf(
+                        repo -> assertThat(repo).isEqualTo("${user.home}/.m2/repository"),
+                        repo -> assertThat(repo).endsWith("\\${user.home}\\.m2\\repository"));
+    }
+
+    @Test
+    void testSettingsWithServers() {
+        Settings settings = assertThat(execute("settings-servers-1"))
+                .extracting(SettingsBuilderResult::getEffectiveSettings)
+                .actual();
+
+        assertThat(settings.getServers())
+                .hasSize(2)
+                .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
+                        .withIgnoredFields("locations")
+                        .build())
+                .containsExactlyInAnyOrder(
+                        Server.newBuilder()
+                                .id("server-1")
+                                .username("username1")
+                                .password("password1")
+                                .build(),
+                        Server.newBuilder()
+                                .id("server-2")
+                                .username("username2")
+                                .password("password2")
+                                .build());
+    }
+
+    @Test
+    void testSettingsWithServersAndAliases() {
+        Settings settings = assertThat(execute("settings-servers-2"))
+                .extracting(SettingsBuilderResult::getEffectiveSettings)
+                .actual();
+
+        assertThat(settings.getLocalRepository()).isEqualTo("${user.home}/.m2/repository");
+
+        assertThat(settings.getServers())
+                .hasSize(6)
+                .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
+                        .withIgnoredFields("locations")
+                        .build())
+                .containsExactlyInAnyOrder(
+                        Server.newBuilder()
+                                .id("server-1")
+                                .username("username1")
+                                .password("password1")
+                                .ids(List.of("server-11", "server-12"))
+                                .build(),
+                        Server.newBuilder()
+                                .id("server-11")
+                                .username("username1")
+                                .password("password1")
+                                .build(),
+                        Server.newBuilder()
+                                .id("server-12")
+                                .username("username1")
+                                .password("password1")
+                                .build(),
+                        Server.newBuilder()
+                                .id("server-2")
+                                .username("username2")
+                                .password("password2")
+                                .ids(List.of("server-21"))
+                                .build(),
+                        Server.newBuilder()
+                                .id("server-21")
+                                .username("username2")
+                                .password("password2")
+                                .build(),
+                        Server.newBuilder()
+                                .id("server-3")
+                                .username("username3")
+                                .password("password3")
+                                .build());
+    }
+
+    @Test
+    void testSettingsWithDuplicateServersIds() throws Exception {
+        SettingsBuilderResult result = execute("settings-servers-3");
+
+        assertThat(result.getProblems().problems())
+                .hasSize(1)
+                .extracting(BuilderProblem::getMessage)
+                .containsExactly("'servers.server.id' must be unique but found duplicate server with id server-2");
     }
 
     private Path getSettings(String name) {
-        return Paths.get("src/test/resources/" + name + ".xml").toAbsolutePath();
+        return Paths.get("src/test/resources/settings/" + name + ".xml").toAbsolutePath();
     }
 }
