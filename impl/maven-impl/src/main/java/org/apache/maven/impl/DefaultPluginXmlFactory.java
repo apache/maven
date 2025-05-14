@@ -93,7 +93,7 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
                 new PluginDescriptorStaxWriter().write(outputStream, content);
             } else {
                 try (OutputStream os = Files.newOutputStream(path)) {
-                    new PluginDescriptorStaxWriter().write(outputStream, content);
+                    new PluginDescriptorStaxWriter().write(os, content);
                 }
             }
         } catch (Exception e) {
