@@ -26,13 +26,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -241,14 +242,18 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return servers;
         }
 
-        ArrayList<Server> result = new ArrayList<>(servers);
-
-        servers.stream().filter(server -> !server.getIds().isEmpty()).forEach(server -> server.getIds()
-                .forEach(id -> result.add(Server.newBuilder(server)
-                        .id(id)
-                        .ids(Collections.emptyList())
-                        .build())));
-        return result;
+        return servers.stream()
+                .flatMap(server -> {
+                    List<String> ids = server.getIds();
+                    if (ids.isEmpty()) {
+                        return Stream.of(server);
+                    }
+                    return Stream.concat(Stream.of(server), ids.stream().map(id -> Server.newBuilder(server, true)
+                            .id(id)
+                            .ids(Collections.emptyList())
+                            .build()));
+                })
+                .collect(Collectors.toList());
     }
 
     private Settings interpolate(

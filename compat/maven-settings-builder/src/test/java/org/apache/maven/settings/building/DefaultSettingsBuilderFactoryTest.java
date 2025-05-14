@@ -37,10 +37,6 @@ class DefaultSettingsBuilderFactoryTest {
         return new File("src/test/resources/settings/factory/" + name + ".xml").getAbsoluteFile();
     }
 
-    private org.apache.maven.settings.Server asServer(Server delegate) {
-        return new org.apache.maven.settings.Server(delegate);
-    }
-
     SettingsBuildingResult execute(String settingsName) throws Exception {
         Properties properties = new Properties();
         properties.setProperty("user.home", "/home/user");
