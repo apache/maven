@@ -26,10 +26,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
@@ -261,11 +262,16 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return servers;
         }
 
-        ArrayList<Server> result = new ArrayList<>(servers);
-
-        servers.stream().filter(server -> !server.getIds().isEmpty()).forEach(server -> server.getIds()
-                .forEach(id -> result.add(newServer(server, id))));
-        return result;
+        return servers.stream()
+                .flatMap(server -> {
+                    List<String> ids = server.getIds();
+                    if (ids.isEmpty()) {
+                        return Stream.of(server);
+                    } else {
+                        return Stream.concat(Stream.of(server), ids.stream().map(id -> newServer(server, id)));
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private Server newServer(Server server, String id) {
