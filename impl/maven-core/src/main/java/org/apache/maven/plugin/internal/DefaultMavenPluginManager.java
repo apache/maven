@@ -63,6 +63,7 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.SisuDiBridgeModule;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.ContextEnabled;
@@ -430,6 +431,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private void discoverPluginComponents(
             final ClassRealm pluginRealm, Plugin plugin, PluginDescriptor pluginDescriptor)
             throws PluginContainerException {
+        ClassLoader prevTccl = Thread.currentThread().getContextClassLoader();
         try {
             if (pluginDescriptor != null) {
                 for (MojoDescriptor mojo : pluginDescriptor.getMojos()) {
@@ -440,18 +442,22 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 }
             }
 
+            Thread.currentThread().setContextClassLoader(pluginRealm);
             ((DefaultPlexusContainer) container)
                     .discoverComponents(
                             pluginRealm,
                             new SessionScopeModule(container.lookup(SessionScope.class)),
                             new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
-                            new PluginConfigurationModule(plugin.getDelegate()));
+                            new PluginConfigurationModule(plugin.getDelegate()),
+                            new SisuDiBridgeModule(true));
         } catch (ComponentLookupException | CycleDetectedInComponentGraphException e) {
             throw new PluginContainerException(
                     plugin,
                     pluginRealm,
                     "Error in component graph of plugin " + plugin.getId() + ": " + e.getMessage(),
                     e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(prevTccl);
         }
     }
 
