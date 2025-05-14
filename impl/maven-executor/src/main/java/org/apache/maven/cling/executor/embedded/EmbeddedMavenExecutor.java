@@ -176,7 +176,7 @@ public class EmbeddedMavenExecutor implements Executor {
                 }
             }
         } catch (Exception e) {
-            throw new ExecutorException("Failed to dispose runtime created realms", e);
+            throw new RuntimeException(new ExecutorException("Failed to dispose runtime created realms", e));
         }
     }
 
@@ -285,7 +285,7 @@ public class EmbeddedMavenExecutor implements Executor {
                             args.toArray(new String[0]), r.cwd().toString(), stdout, stderr
                         });
                     } catch (Exception e) {
-                        throw new ExecutorException("Failed to execute", e);
+                        throw new RuntimeException(new ExecutorException("Failed to execute", e));
                     }
                 });
             } else {
@@ -313,7 +313,7 @@ public class EmbeddedMavenExecutor implements Executor {
                                     r.stdOut().orElse(null),
                                     r.stdErr().orElse(null));
                         } catch (Exception e) {
-                            throw new ExecutorException("Failed to execute", e);
+                            throw new RuntimeException(new ExecutorException("Failed to execute", e));
                         }
                     });
                 }
@@ -328,7 +328,7 @@ public class EmbeddedMavenExecutor implements Executor {
                     commands,
                     keepAlive);
         } catch (Exception e) {
-            throw new ExecutorException("Failed to create executor", e);
+            throw new RuntimeException(new ExecutorException("Failed to create executor", e));
         } finally {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
             System.setProperties(originalProperties);
@@ -402,7 +402,7 @@ public class EmbeddedMavenExecutor implements Executor {
         }
     }
 
-    protected void validate(ExecutorRequest executorRequest) throws ExecutorException {}
+    protected void validate(ExecutorRequest ignored) {}
 
     protected URLClassLoader createMavenBootClassLoader(Path boot, List<URL> extraClasspath) {
         ArrayList<URL> urls = new ArrayList<>(extraClasspath);
@@ -413,11 +413,11 @@ public class EmbeddedMavenExecutor implements Executor {
                         try {
                             urls.add(f.toUri().toURL());
                         } catch (MalformedURLException e) {
-                            throw new ExecutorException("Failed to build classpath: " + f, e);
+                            throw new RuntimeException(new ExecutorException("Failed to build classpath: " + f, e));
                         }
                     });
         } catch (IOException e) {
-            throw new ExecutorException("Failed to build classpath: " + e, e);
+            throw new RuntimeException(new ExecutorException("Failed to build classpath: " + e, e));
         }
         if (urls.isEmpty()) {
             throw new IllegalArgumentException("Invalid Maven home directory; boot is empty");

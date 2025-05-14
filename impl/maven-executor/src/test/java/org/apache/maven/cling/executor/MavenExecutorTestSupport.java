@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
+import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
 import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
@@ -323,11 +324,11 @@ public abstract class MavenExecutorTestSupport {
         return createAndMemoizeExecutor().mavenVersion(request);
     }
 
-    public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
+    public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() throws ExecutorException {
         return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")));
     }
 
-    public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
+    public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() throws ExecutorException {
         return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")));
     }
 

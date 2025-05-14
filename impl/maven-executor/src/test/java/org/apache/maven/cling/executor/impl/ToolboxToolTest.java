@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import org.apache.maven.api.cli.ExecutorException;
 import org.apache.maven.cling.executor.ExecutorHelper;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 import org.apache.maven.cling.executor.MimirInfuser;
@@ -81,7 +82,7 @@ public class ToolboxToolTest {
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
-    void version3(ExecutorHelper.Mode mode) {
+    void version3(ExecutorHelper.Mode mode) throws ExecutorException {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
@@ -94,7 +95,7 @@ public class ToolboxToolTest {
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
-    void version4(ExecutorHelper.Mode mode) {
+    void version4(ExecutorHelper.Mode mode) throws ExecutorException {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
@@ -107,7 +108,7 @@ public class ToolboxToolTest {
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
-    void localRepository3(ExecutorHelper.Mode mode) {
+    void localRepository3(ExecutorHelper.Mode mode) throws ExecutorException {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
@@ -123,7 +124,7 @@ public class ToolboxToolTest {
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     @Disabled("disable temporarily so that we can get the debug statement")
-    void localRepository4(ExecutorHelper.Mode mode) {
+    void localRepository4(ExecutorHelper.Mode mode) throws ExecutorException {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
@@ -138,7 +139,7 @@ public class ToolboxToolTest {
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
-    void artifactPath3(ExecutorHelper.Mode mode) {
+    void artifactPath3(ExecutorHelper.Mode mode) throws ExecutorException {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
@@ -157,7 +158,7 @@ public class ToolboxToolTest {
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
-    void artifactPath4(ExecutorHelper.Mode mode) {
+    void artifactPath4(ExecutorHelper.Mode mode) throws ExecutorException {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
@@ -176,7 +177,7 @@ public class ToolboxToolTest {
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
-    void metadataPath3(ExecutorHelper.Mode mode) {
+    void metadataPath3(ExecutorHelper.Mode mode) throws ExecutorException {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
@@ -191,7 +192,7 @@ public class ToolboxToolTest {
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
-    void metadataPath4(ExecutorHelper.Mode mode) {
+    void metadataPath4(ExecutorHelper.Mode mode) throws ExecutorException {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),

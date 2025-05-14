@@ -168,7 +168,7 @@ public interface ExecutorRequest {
      * also discovered by standard means.
      */
     @Nonnull
-    static Builder mavenBuilder(@Nullable Path installationDirectory) {
+    static Builder mavenBuilder(@Nullable Path installationDirectory) throws ExecutorException {
         return new Builder(
                 MVN,
                 null,
@@ -462,7 +462,7 @@ public interface ExecutorRequest {
     }
 
     @Nonnull
-    static Path discoverInstallationDirectory() {
+    static Path discoverInstallationDirectory() throws ExecutorException {
         String mavenHome = System.getProperty("maven.home");
         if (mavenHome == null) {
             throw new ExecutorException("requires maven.home Java System Property set");
@@ -471,7 +471,7 @@ public interface ExecutorRequest {
     }
 
     @Nonnull
-    static Path discoverUserHomeDirectory() {
+    static Path discoverUserHomeDirectory() throws ExecutorException {
         String userHome = System.getProperty("user.home");
         if (userHome == null) {
             throw new ExecutorException("requires user.home Java System Property set");
