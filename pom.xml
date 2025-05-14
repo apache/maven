@@ -800,6 +800,9 @@ under the License.</licenseText>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
           <configuration>
+            <rulesets>
+            <ruleset>/category/java/bestpractices.xml</ruleset>
+            </rulesets>
             <analysisCache>true</analysisCache>
             <excludeFromFailureFile>.pmd/exclude.properties</excludeFromFailureFile>
             <printFailingErrors>true</printFailingErrors>
