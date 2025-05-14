@@ -131,7 +131,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     private static final String FILE = "file";
     private static final String IMPORT = "import";
     private static final String PARENT = "parent";
-    private static final String MODEL = "model";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
