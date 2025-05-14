@@ -803,7 +803,7 @@ under the License.</licenseText>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>7.12.0</version>
+              <version>7.13.0</version>
             </dependency>
           </dependencies>
         </plugin>
