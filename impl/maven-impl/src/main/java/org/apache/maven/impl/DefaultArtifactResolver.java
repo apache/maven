@@ -51,7 +51,7 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 @Named
 @Singleton
@@ -60,7 +60,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
     @Override
     public ArtifactResolverResult resolve(ArtifactResolverRequest request)
             throws ArtifactResolverException, IllegalArgumentException {
-        nonNull(request, "request");
+        requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
         return session.request(request, this::doResolve);
     }

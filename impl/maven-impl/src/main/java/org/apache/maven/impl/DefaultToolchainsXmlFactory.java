@@ -37,7 +37,7 @@ import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxWriter;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.StaxLocation.getLocation;
 import static org.apache.maven.impl.StaxLocation.getMessage;
 
@@ -71,7 +71,7 @@ public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
 
     @Override
     public void write(XmlWriterRequest<PersistedToolchains> request) throws XmlWriterException {
-        nonNull(request, "request");
+        requireNonNull(request, "request");
         PersistedToolchains content = Objects.requireNonNull(request.getContent(), "content");
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
