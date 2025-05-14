@@ -801,7 +801,7 @@ under the License.</licenseText>
           <artifactId>maven-pmd-plugin</artifactId>
           <configuration>
             <rulesets>
-            <ruleset>/category/java/bestpractices.xml</ruleset>
+              <ruleset>category/java/bestpractices.xml</ruleset>
             </rulesets>
             <analysisCache>true</analysisCache>
             <excludeFromFailureFile>.pmd/exclude.properties</excludeFromFailureFile>
