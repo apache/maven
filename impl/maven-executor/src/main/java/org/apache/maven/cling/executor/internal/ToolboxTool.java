@@ -122,7 +122,7 @@ public class ToolboxTool implements ExecutorTool {
         return builder.argument(TOOLBOX + mojo).argument("--quiet").argument("-DforceStdout");
     }
 
-    private void doExecute(ExecutorRequest.Builder builder) {
+    private void doExecute(ExecutorRequest.Builder builder) throws ExecutorException {
         ExecutorRequest request = builder.build();
         int ec = helper.execute(request);
         if (ec != 0) {

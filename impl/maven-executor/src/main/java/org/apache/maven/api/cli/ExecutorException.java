@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Nullable;
  * @since 4.0.0
  */
 @Experimental
-public class ExecutorException extends RuntimeException {
+public class ExecutorException extends Exception {
     /**
      * Constructs a new {@code InvokerException} with the specified detail message.
      *

@@ -47,7 +47,8 @@ public class HelperImpl implements ExecutorHelper {
             @Nullable Path installationDirectory,
             @Nullable Path userHomeDirectory,
             Executor embedded,
-            Executor forked) {
+            Executor forked)
+            throws ExecutorException {
         this.defaultMode = requireNonNull(defaultMode);
         this.installationDirectory = installationDirectory != null
                 ? ExecutorRequest.getCanonicalPath(installationDirectory)
@@ -68,7 +69,7 @@ public class HelperImpl implements ExecutorHelper {
     }
 
     @Override
-    public ExecutorRequest.Builder executorRequest() {
+    public ExecutorRequest.Builder executorRequest() throws ExecutorException {
         return ExecutorRequest.mavenBuilder(installationDirectory).userHomeDirectory(userHomeDirectory);
     }
 
@@ -80,12 +81,16 @@ public class HelperImpl implements ExecutorHelper {
     @Override
     public String mavenVersion() {
         return cache.computeIfAbsent("maven.version", k -> {
-            ExecutorRequest request = executorRequest().build();
-            return getExecutor(Mode.AUTO, request).mavenVersion(request);
+            try {
+                ExecutorRequest request = executorRequest().build();
+                return getExecutor(Mode.AUTO, request).mavenVersion(request);
+            } catch (ExecutorException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
-    protected Executor getExecutor(Mode mode, ExecutorRequest request) throws ExecutorException {
+    protected Executor getExecutor(Mode mode, ExecutorRequest request) {
         return switch (mode) {
             case AUTO -> getExecutorByRequest(request);
             case EMBEDDED -> executors.get(Mode.EMBEDDED);

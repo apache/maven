@@ -58,7 +58,7 @@ public interface ExecutorHelper {
      * properly initialized request builder.
      */
     @Nonnull
-    ExecutorRequest.Builder executorRequest();
+    ExecutorRequest.Builder executorRequest() throws ExecutorException;
 
     /**
      * Executes the request with preferred mode executor.
