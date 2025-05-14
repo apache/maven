@@ -18,7 +18,6 @@
  */
 package org.apache.maven.lifecycle.internal.concurrent;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ class BuildPlanCreatorTest {
     void testMulti() {
         MavenProject project = new MavenProject();
         project.setCollectedProjects(List.of());
-        Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
+        Map<MavenProject, List<MavenProject>> projects = Map.of(project, List.of());
 
         BuildPlan plan = calculateLifecycleMappings(projects, "package");
 
@@ -55,8 +54,8 @@ class BuildPlanCreatorTest {
         p2.setCollectedProjects(List.of());
         p2.setArtifactId("p2");
         Map<MavenProject, List<MavenProject>> projects = new HashMap<>();
-        projects.put(p1, Collections.emptyList());
-        projects.put(p2, Collections.singletonList(p1));
+        projects.put(p1, List.of());
+        projects.put(p2, List.of(p1));
 
         BuildPlan plan = calculateLifecycleMappings(projects, "verify");
         plan.then(calculateLifecycleMappings(projects, "install"));
@@ -87,7 +86,7 @@ class BuildPlanCreatorTest {
         MavenProject p1 = new MavenProject();
         p1.setArtifactId("p1");
         p1.setCollectedProjects(List.of());
-        Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(p1, Collections.emptyList());
+        Map<MavenProject, List<MavenProject>> projects = Map.of(p1, List.of());
 
         BuildPlan plan = calculateLifecycleMappings(projects, "generate-resources");
         assertNotNull(plan);
@@ -123,7 +122,7 @@ class BuildPlanCreatorTest {
 
     @SuppressWarnings("checkstyle:UnusedLocalVariable")
     private BuildPlan calculateLifecycleMappings(Map<MavenProject, List<MavenProject>> projects, String phase) {
-        DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
+        DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(List.of());
         BuildPlanExecutor builder = new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles);
         BuildPlanExecutor.BuildContext context = builder.new BuildContext();
         return context.calculateLifecycleMappings(projects, phase);
@@ -133,7 +132,7 @@ class BuildPlanCreatorTest {
     @Test
     void testPlugins() {
         DefaultLifecycleRegistry lifecycles =
-                new DefaultLifecycleRegistry(Collections.emptyList(), Collections.emptyMap());
+                new DefaultLifecycleRegistry(List.of(), Map.of());
         BuildPlanCreator builder = new BuildPlanCreator(null, null, null, null, null, lifecycles);
         MavenProject p1 = new MavenProject();
         p1.setGroupId("g");
@@ -147,8 +146,8 @@ class BuildPlanCreatorTest {
         p2.setArtifactId("p2");
 
         Map<MavenProject, List<MavenProject>> projects = new HashMap<>();
-        projects.put(p1, Collections.emptyList());
-        projects.put(p2, Collections.singletonList(p1));
+        projects.put(p1, List.of());
+        projects.put(p2, List.of(p1));
         Lifecycle lifecycle = lifecycles.require("default");
         BuildPlan plan = builder.calculateLifecycleMappings(null, projects, lifecycle, "verify");
         plan.then(builder.calculateLifecycleMappings(null, projects, lifecycle, "install"));

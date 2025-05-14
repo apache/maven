@@ -18,7 +18,6 @@
  */
 package org.apache.maven.lifecycle.mapping;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -76,7 +75,7 @@ public class Lifecycle {
         }
 
         if (lphases.isEmpty()) {
-            return Collections.emptyMap();
+            return Map.of();
         }
 
         Map<String, String> phases = new LinkedHashMap<>();

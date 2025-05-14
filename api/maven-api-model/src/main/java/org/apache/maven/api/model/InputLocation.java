@@ -20,7 +20,6 @@ package org.apache.maven.api.model;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -44,7 +43,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.lineNumber = -1;
         this.columnNumber = -1;
         this.source = source;
-        this.locations = Collections.singletonMap(0, this);
+        this.locations = Map.of(0, this);
         this.importedFrom = null;
     }
 
@@ -60,8 +59,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-        this.locations =
-                selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
+        this.locations = selfLocationKey != null ? Map.of(selfLocationKey, this) : Map.of();
         this.importedFrom = null;
     }
 

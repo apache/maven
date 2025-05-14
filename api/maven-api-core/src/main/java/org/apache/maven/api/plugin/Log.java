@@ -21,6 +21,8 @@ package org.apache.maven.api.plugin;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.Provider;
 
 /**
@@ -46,7 +48,7 @@ public interface Log {
      *
      * @param content the message to log
      */
-    void debug(CharSequence content);
+    void debug(@Nullable CharSequence content);
 
     /**
      * Sends a message (and accompanying exception) to the user in the <b>debug</b> error level.
@@ -55,7 +57,7 @@ public interface Log {
      * @param content the message to log
      * @param error the error that caused this log
      */
-    void debug(CharSequence content, Throwable error);
+    void debug(@Nullable CharSequence content, @Nullable Throwable error);
 
     /**
      * Sends an exception to the user in the <b>debug</b> error level.
@@ -63,11 +65,11 @@ public interface Log {
      *
      * @param error the error that caused this log
      */
-    void debug(Throwable error);
+    void debug(@Nullable Throwable error);
 
-    void debug(Supplier<String> content);
+    void debug(@Nonnull Supplier<String> content);
 
-    void debug(Supplier<String> content, Throwable error);
+    void debug(@Nonnull Supplier<String> content, @Nullable Throwable error);
 
     /**
      * {@return true if the <b>info</b> error level is enabled}
@@ -79,7 +81,7 @@ public interface Log {
      *
      * @param content the message to log
      */
-    void info(CharSequence content);
+    void info(@Nullable CharSequence content);
 
     /**
      * Sends a message (and accompanying exception) to the user in the <b>info</b> error level.
@@ -88,7 +90,7 @@ public interface Log {
      * @param content the message to log
      * @param error the error that caused this log
      */
-    void info(CharSequence content, Throwable error);
+    void info(@Nullable CharSequence content, @Nullable Throwable error);
 
     /**
      * Sends an exception to the user in the <b>info</b> error level.
@@ -96,11 +98,11 @@ public interface Log {
      *
      * @param error the error that caused this log
      */
-    void info(Throwable error);
+    void info(@Nullable Throwable error);
 
-    void info(Supplier<String> content);
+    void info(@Nonnull Supplier<String> content);
 
-    void info(Supplier<String> content, Throwable error);
+    void info(@Nonnull Supplier<String> content, @Nullable Throwable error);
 
     /**
      * {@return true if the <b>warn</b> error level is enabled}
@@ -112,7 +114,7 @@ public interface Log {
      *
      * @param content the message to log
      */
-    void warn(CharSequence content);
+    void warn(@Nullable CharSequence content);
 
     /**
      * Sends a message (and accompanying exception) to the user in the <b>warn</b> error level.
@@ -121,7 +123,7 @@ public interface Log {
      * @param content the message to log
      * @param error the error that caused this log
      */
-    void warn(CharSequence content, Throwable error);
+    void warn(@Nullable CharSequence content, @Nullable Throwable error);
 
     /**
      * Sends an exception to the user in the <b>warn</b> error level.
@@ -129,11 +131,11 @@ public interface Log {
      *
      * @param error the error that caused this log
      */
-    void warn(Throwable error);
+    void warn(@Nullable Throwable error);
 
-    void warn(Supplier<String> content);
+    void warn(@Nonnull Supplier<String> content);
 
-    void warn(Supplier<String> content, Throwable error);
+    void warn(@Nonnull Supplier<String> content, @Nullable Throwable error);
 
     /**
      * {@return true if the <b>error</b> error level is enabled}
@@ -145,7 +147,7 @@ public interface Log {
      *
      * @param content the message to log
      */
-    void error(CharSequence content);
+    void error(@Nullable CharSequence content);
 
     /**
      * Sends a message (and accompanying exception) to the user in the <b>error</b> error level.
@@ -154,7 +156,7 @@ public interface Log {
      * @param content the message to log
      * @param error the error that caused this log
      */
-    void error(CharSequence content, Throwable error);
+    void error(@Nullable CharSequence content, @Nullable Throwable error);
 
     /**
      * Sends an exception to the user in the <b>error</b> error level.
@@ -162,9 +164,9 @@ public interface Log {
      *
      * @param error the error that caused this log
      */
-    void error(Throwable error);
+    void error(@Nullable Throwable error);
 
-    void error(Supplier<String> content);
+    void error(@Nonnull Supplier<String> content);
 
-    void error(Supplier<String> content, Throwable error);
+    void error(@Nonnull Supplier<String> content, @Nullable Throwable error);
 }

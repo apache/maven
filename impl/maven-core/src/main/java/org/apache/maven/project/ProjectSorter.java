@@ -262,11 +262,11 @@ public class ProjectSorter {
     }
 
     public List<String> getDependents(String id) {
-        return graph.getVertex(id).getParents().stream().map(Vertex::getLabel).collect(Collectors.toList());
+        return graph.getVertex(id).getParents().stream().map(Vertex::getLabel).toList();
     }
 
     public List<String> getDependencies(String id) {
-        return graph.getVertex(id).getChildren().stream().map(Vertex::getLabel).collect(Collectors.toList());
+        return graph.getVertex(id).getChildren().stream().map(Vertex::getLabel).toList();
     }
 
     public static String getId(MavenProject project) {

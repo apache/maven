@@ -19,7 +19,6 @@
 package org.apache.maven.project;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -208,6 +207,6 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                         repoDir.toURI().toASCIIString())
                 .build();
 
-        return Collections.singletonList(remoteRepository);
+        return List.of(remoteRepository);
     }
 }

@@ -22,6 +22,7 @@ import javax.inject.Provider;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping;
 import org.apache.maven.lifecycle.mapping.Lifecycle;
@@ -78,7 +79,7 @@ public abstract class AbstractLifecycleMappingProvider implements Provider<Lifec
         lifecycle.setId("default");
         lifecycle.setLifecyclePhases(Collections.unmodifiableMap(lifecyclePhaseBindings));
 
-        this.lifecycleMapping = new DefaultLifecycleMapping(Collections.singletonList(lifecycle));
+        this.lifecycleMapping = new DefaultLifecycleMapping(List.of(lifecycle));
     }
 
     @Override

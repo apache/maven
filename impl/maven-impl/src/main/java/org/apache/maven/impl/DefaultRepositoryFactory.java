@@ -20,6 +20,7 @@ package org.apache.maven.impl;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
@@ -31,8 +32,6 @@ import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
-
-import static org.apache.maven.impl.ImplUtils.nonNull;
 
 @Named
 @Singleton
@@ -71,11 +70,12 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
             List<RemoteRepository> dominant,
             List<RemoteRepository> recessive,
             boolean processRecessive) {
-        InternalSession internalSession = InternalSession.from(nonNull(session, "session"));
+        InternalSession internalSession =
+                InternalSession.from(Objects.requireNonNull(session, "session cannot be null"));
         List<org.eclipse.aether.repository.RemoteRepository> repos = remoteRepositoryManager.aggregateRepositories(
                 internalSession.getSession(),
-                internalSession.toRepositories(nonNull(dominant, "dominant")),
-                internalSession.toRepositories(nonNull(recessive, "recessive")),
+                internalSession.toRepositories(Objects.requireNonNull(dominant, "dominant cannot be null")),
+                internalSession.toRepositories(Objects.requireNonNull(recessive, "recessive cannot be null")),
                 processRecessive);
         return repos.stream()
                 .<RemoteRepository>map(DefaultRemoteRepository::new)

@@ -31,9 +31,9 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -227,7 +227,7 @@ public final class ReflectionUtils {
         Key<Object> key = keyOf(container.getType(), field.getGenericType(), field);
         boolean optional = field.isAnnotationPresent(Nullable.class);
         Dependency<Object> dep = new Dependency<>(key, optional);
-        return new BindingInitializer<T>(Collections.singleton(dep)) {
+        return new BindingInitializer<T>(Set.of(dep)) {
             @Override
             public Consumer<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
                 Supplier<?> binding = compiler.apply(dep);

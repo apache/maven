@@ -18,7 +18,7 @@
  */
 package org.apache.maven.impl.model;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Prerequisites;
@@ -82,20 +82,17 @@ class MavenModelMergerTest {
     // Profiles are neither inherited nor injected
     @Test
     void testMergeModelProfiles() {
-        Model parent = Model.newBuilder()
-                .profiles(Collections.singletonList(Profile.newInstance()))
-                .build();
+        Model parent =
+                Model.newBuilder().profiles(List.of(Profile.newInstance())).build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
         modelMerger.mergeModel_Profiles(builder, model, parent, false, null);
         assertEquals(0, builder.build().getProfiles().size());
 
         Profile modelProfile = Profile.newBuilder().id("MODEL").build();
-        model = Model.newBuilder()
-                .profiles(Collections.singletonList(modelProfile))
-                .build();
+        model = Model.newBuilder().profiles(List.of(modelProfile)).build();
         builder = Model.newBuilder(model);
         modelMerger.mergeModel_Prerequisites(builder, model, parent, false, null);
-        assertEquals(Collections.singletonList(modelProfile), builder.build().getProfiles());
+        assertEquals(List.of(modelProfile), builder.build().getProfiles());
     }
 }

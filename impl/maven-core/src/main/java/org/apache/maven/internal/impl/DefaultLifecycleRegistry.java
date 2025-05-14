@@ -28,17 +28,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Plugin;
@@ -102,7 +101,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     private final List<LifecycleProvider> providers;
 
     public DefaultLifecycleRegistry() {
-        this(Collections.emptyList());
+        this(List.of());
     }
 
     @Inject
@@ -123,28 +122,30 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     }
 
     @Override
+    @Nonnull
     public Iterator<Lifecycle> iterator() {
         return stream().toList().iterator();
     }
 
     @Override
+    @Nonnull
     public Stream<Lifecycle> stream() {
         return providers.stream().map(ExtensibleEnumProvider::provides).flatMap(Collection::stream);
     }
 
     @Override
-    public Optional<Lifecycle> lookup(String id) {
+    @Nonnull
+    public Optional<Lifecycle> lookup(@Nonnull String id) {
         return stream().filter(lf -> Objects.equals(id, lf.id())).findAny();
     }
 
-    public List<String> computePhases(Lifecycle lifecycle) {
+    @Nonnull
+    public List<String> computePhases(@Nonnull Lifecycle lifecycle) {
         Graph graph = new Graph();
         addPhases(graph, null, null, lifecycle.v3phases());
         List<String> allPhases = graph.visitAll();
         Collections.reverse(allPhases);
-        List<String> computed =
-                allPhases.stream().filter(s -> !s.startsWith("$")).collect(Collectors.toList());
-        return computed;
+        return allPhases.stream().filter(s -> !s.startsWith("$")).toList();
     }
 
     private static void addPhase(
@@ -202,6 +203,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Lifecycle> provides() {
             try {
                 Map<String, org.apache.maven.lifecycle.Lifecycle> all =
@@ -210,100 +212,95 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                         .filter(id -> !Lifecycle.CLEAN.equals(id)
                                 && !Lifecycle.DEFAULT.equals(id)
                                 && !Lifecycle.SITE.equals(id))
-                        .map(id -> wrap(all.get(id)))
-                        .collect(Collectors.toList());
+                        .map(id -> (Lifecycle) new WrappedLifecycle(all.get(id)))
+                        .toList();
             } catch (ComponentLookupException e) {
                 throw new LookupException(e);
             }
         }
+    }
 
-        private Lifecycle wrap(org.apache.maven.lifecycle.Lifecycle lifecycle) {
-            return new Lifecycle() {
-                @Override
-                public String id() {
-                    return lifecycle.getId();
-                }
+    /**
+     * Record implementation of Lifecycle.Phase for wrapped phases.
+     *
+     * @param name The name of the phase
+     * @param prev The name of the previous phase (may be null)
+     * @param lifecycle The original Maven 3 lifecycle
+     */
+    record WrappedPhase(String name, String prev, org.apache.maven.lifecycle.Lifecycle lifecycle)
+            implements Lifecycle.Phase {
+        /**
+         * Compact constructor with null validation.
+         */
+        WrappedPhase {
+            Objects.requireNonNull(name, "name cannot be null");
+            Objects.requireNonNull(lifecycle, "lifecycle cannot be null");
+            // prev can be null for the first phase
+        }
 
-                @Override
-                public Collection<Phase> phases() {
-                    List<String> names = lifecycle.getPhases();
-                    List<Phase> phases = new ArrayList<>();
-                    for (int i = 0; i < names.size(); i++) {
-                        String name = names.get(i);
-                        String prev = i > 0 ? names.get(i - 1) : null;
-                        phases.add(new Phase() {
-                            @Override
-                            public String name() {
-                                return name;
-                            }
+        @Override
+        @Nonnull
+        public List<Lifecycle.Phase> phases() {
+            return List.of();
+        }
 
-                            @Override
-                            public List<Phase> phases() {
-                                return List.of();
-                            }
+        @Override
+        @Nonnull
+        public List<Plugin> plugins() {
+            Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
+            return lfPhases != null
+                    ? List.copyOf(DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(lfPhases))
+                    : List.of();
+        }
 
-                            @Override
-                            public Stream<Phase> allPhases() {
-                                return Stream.concat(
-                                        Stream.of(this), phases().stream().flatMap(Lifecycle.Phase::allPhases));
-                            }
-
-                            @Override
-                            public List<Plugin> plugins() {
-                                Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
-                                LifecyclePhase phase = lfPhases != null ? lfPhases.get(name) : null;
-                                if (phase != null) {
-                                    Map<String, Plugin> plugins = new LinkedHashMap<>();
-                                    DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(plugins, name, phase);
-                                    return plugins.values().stream().toList();
-                                }
-                                return List.of();
-                            }
-
-                            @Override
-                            public Collection<Link> links() {
-                                if (prev == null) {
-                                    return List.of();
-                                } else {
-                                    return List.of(new Link() {
-                                        @Override
-                                        public Kind kind() {
-                                            return Kind.AFTER;
-                                        }
-
-                                        @Override
-                                        public Pointer pointer() {
-                                            return new Pointer() {
-                                                @Override
-                                                public String phase() {
-                                                    return prev;
-                                                }
-
-                                                @Override
-                                                public Type type() {
-                                                    return Type.PROJECT;
-                                                }
-                                            };
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                    return phases;
-                }
-
-                @Override
-                public Collection<Alias> aliases() {
-                    return Collections.emptyList();
-                }
-            };
+        @Override
+        @Nonnull
+        public Collection<Lifecycle.Link> links() {
+            if (prev == null) {
+                return List.of();
+            } else {
+                return List.of(new Lifecycles.DefaultLink(
+                        Lifecycle.Link.Kind.AFTER, new Lifecycles.DefaultPhasePointer(prev)));
+            }
         }
     }
 
-    static class WrappedLifecycle extends org.apache.maven.lifecycle.Lifecycle {
-        WrappedLifecycle(LifecycleRegistry registry, Lifecycle lifecycle) {
-            super(registry, lifecycle);
+    /**
+     * Record implementation of Lifecycle for wrapped lifecycles.
+     *
+     * @param lifecycle The original Maven 3 lifecycle
+     */
+    record WrappedLifecycle(org.apache.maven.lifecycle.Lifecycle lifecycle) implements Lifecycle {
+        /**
+         * Compact constructor with null validation.
+         */
+        WrappedLifecycle {
+            Objects.requireNonNull(lifecycle, "lifecycle cannot be null");
+        }
+
+        @Override
+        @Nonnull
+        public String id() {
+            return lifecycle.getId();
+        }
+
+        @Override
+        @Nonnull
+        public Collection<Phase> phases() {
+            List<String> names = lifecycle.getPhases();
+            List<Phase> phases = new ArrayList<>();
+            for (int i = 0; i < names.size(); i++) {
+                String name = names.get(i);
+                String prev = i > 0 ? names.get(i - 1) : null;
+                phases.add(new WrappedPhase(name, prev, lifecycle));
+            }
+            return phases;
+        }
+
+        @Override
+        @Nonnull
+        public Collection<Alias> aliases() {
+            return List.of();
         }
     }
 
@@ -321,7 +318,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         public org.apache.maven.lifecycle.Lifecycle get() {
             try {
                 LifecycleRegistry registry = lookup.lookup(LifecycleRegistry.class);
-                return new WrappedLifecycle(registry, registry.require(name));
+                return new org.apache.maven.lifecycle.Lifecycle(registry, registry.require(name));
             } catch (ComponentLookupException e) {
                 throw new LookupException(e);
             }
@@ -360,11 +357,13 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         private static final String MAVEN_CLEAN_PLUGIN_VERSION = "3.4.0";
 
         @Override
+        @Nonnull
         public String id() {
             return Lifecycle.CLEAN;
         }
 
         @Override
+        @Nonnull
         public Collection<Phase> phases() {
             // START SNIPPET: clean
             return List.of(phase(
@@ -376,6 +375,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Alias> aliases() {
             return List.of(alias("pre-clean", BEFORE + Phase.CLEAN), alias("post-clean", AFTER + Phase.CLEAN));
         }
@@ -383,11 +383,13 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     static class DefaultLifecycle implements Lifecycle {
         @Override
+        @Nonnull
         public String id() {
             return Lifecycle.DEFAULT;
         }
 
         @Override
+        @Nonnull
         public Collection<Phase> phases() {
             // START SNIPPET: default
             return List.of(phase(
@@ -428,6 +430,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Phase> v3phases() {
             return List.of(phase(
                     ALL,
@@ -450,6 +453,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Alias> aliases() {
             return List.of(
                     alias("generate-sources", SOURCES),
@@ -477,11 +481,13 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         private static final String PHASE_SITE_DEPLOY = "site-deploy";
 
         @Override
+        @Nonnull
         public String id() {
             return Lifecycle.SITE;
         }
 
         @Override
+        @Nonnull
         public Collection<Phase> phases() {
             // START SNIPPET: site
             return List.of(
@@ -494,6 +500,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         }
 
         @Override
+        @Nonnull
         public Collection<Alias> aliases() {
             return List.of(alias("pre-site", BEFORE + PHASE_SITE), alias("post-site", AFTER + PHASE_SITE));
         }

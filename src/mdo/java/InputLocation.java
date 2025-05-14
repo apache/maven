@@ -20,7 +20,6 @@ package ${package};
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -37,7 +36,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.lineNumber = -1;
         this.columnNumber = -1;
         this.source = source;
-        this.locations = Collections.singletonMap(0, this);
+        this.locations = Map.of(0, this);
     }
 
     public InputLocation(int lineNumber, int columnNumber) {
@@ -53,7 +52,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.columnNumber = columnNumber;
         this.source = source;
         this.locations =
-                selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
+                selfLocationKey != null ? Map.of(selfLocationKey, this) : Map.of();
     }
 
     public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {

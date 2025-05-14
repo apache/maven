@@ -144,7 +144,7 @@ public class DefaultProject implements Project {
         if (dependencyManagement != null) {
             return new MappedList<>(dependencyManagement.getDependencies(), this::toDependency);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override
@@ -158,11 +158,13 @@ public class DefaultProject implements Project {
     }
 
     @Override
+    @Nonnull
     public Path getRootDirectory() {
         return project.getRootDirectory();
     }
 
     @Override
+    @Nonnull
     public Optional<Project> getParent() {
         MavenProject parent = project.getParent();
         return Optional.ofNullable(session.getProject(parent));

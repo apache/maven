@@ -25,7 +25,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -341,11 +340,11 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
             throws CycleDetectedException, DuplicateProjectException {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setSystemProperties(properties)
-                .setGoals(Collections.emptyList())
+                .setGoals(List.of())
                 .setBaseDirectory(new File(""))
                 .setLocalRepository(repo);
 
-        return new MavenSession(container, request, new DefaultMavenExecutionResult(), Collections.emptyList());
+        return new MavenSession(container, request, new DefaultMavenExecutionResult(), List.of());
     }
 
     @Test
@@ -380,7 +379,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
 
         Artifact artifact = createArtifact("testGroup", "testArtifact", "1.0");
 
-        pd.setArtifacts(Collections.singletonList(artifact));
+        pd.setArtifacts(List.of(artifact));
 
         ExpressionEvaluator ee = createExpressionEvaluator(createDefaultProject(), pd, new Properties());
 

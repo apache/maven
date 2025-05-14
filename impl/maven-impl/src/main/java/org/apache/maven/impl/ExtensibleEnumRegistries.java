@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,8 +42,6 @@ import org.apache.maven.api.spi.ExtensibleEnumProvider;
 import org.apache.maven.api.spi.LanguageProvider;
 import org.apache.maven.api.spi.PathScopeProvider;
 import org.apache.maven.api.spi.ProjectScopeProvider;
-
-import static org.apache.maven.impl.ImplUtils.nonNull;
 
 public class ExtensibleEnumRegistries {
 
@@ -97,7 +96,8 @@ public class ExtensibleEnumRegistries {
 
         @Override
         public Optional<T> lookup(String id) {
-            return Optional.ofNullable(values.get(nonNull(id, "id").toLowerCase(Locale.ROOT)));
+            return Optional.ofNullable(
+                    values.get(Objects.requireNonNull(id, "id cannot be null").toLowerCase(Locale.ROOT)));
         }
     }
 }

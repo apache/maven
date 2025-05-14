@@ -62,9 +62,9 @@ public class MavenITmng4129PluginExecutionInheritanceTest extends AbstractMavenI
         assertEquals(Arrays.asList(new String[] {"inherited-execution", "non-inherited-execution"}), executions);
 
         List<String> executions1 = verifier.loadLines("child-1/target/executions.txt");
-        assertEquals(Collections.singletonList("inherited-execution"), executions1);
+        assertEquals(List.of("inherited-execution"), executions1);
 
         List<String> executions2 = verifier.loadLines("child-2/target/executions.txt");
-        assertEquals(Collections.singletonList("inherited-execution"), executions2);
+        assertEquals(List.of("inherited-execution"), executions2);
     }
 }

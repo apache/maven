@@ -62,6 +62,7 @@ public interface Lifecycle extends ExtensibleEnum {
      * @return the unique identifier for this lifecycle
      */
     @Override
+    @Nonnull
     String id();
 
     /**
@@ -69,6 +70,7 @@ public interface Lifecycle extends ExtensibleEnum {
      *
      * @return the collection of top-level phases in this lifecycle
      */
+    @Nonnull
     Collection<Phase> phases();
 
     /**
@@ -78,6 +80,7 @@ public interface Lifecycle extends ExtensibleEnum {
      *
      * @return the collection of phases in Maven 3 compatible ordering
      */
+    @Nonnull
     default Collection<Phase> v3phases() {
         return phases();
     }
@@ -87,6 +90,7 @@ public interface Lifecycle extends ExtensibleEnum {
      *
      * @return a stream of all phases in this lifecycle, including nested phases
      */
+    @Nonnull
     default Stream<Phase> allPhases() {
         return phases().stream().flatMap(Phase::allPhases);
     }
@@ -97,11 +101,12 @@ public interface Lifecycle extends ExtensibleEnum {
      *
      * @return the collection of phase aliases
      */
+    @Nonnull
     Collection<Alias> aliases();
 
     /**
      * A phase in the lifecycle.
-     *
+     * <p>
      * A phase is identified by its name. It also contains a list of plugins bound to that phase,
      * a list of {@link Link links}, and a list of sub-phases.  This forms a tree of phases.
      */
@@ -167,7 +172,9 @@ public interface Lifecycle extends ExtensibleEnum {
          * @return a stream of all phases
          */
         @Nonnull
-        Stream<Phase> allPhases();
+        default Stream<Phase> allPhases() {
+            return Stream.concat(Stream.of(this), phases().stream().flatMap(Lifecycle.Phase::allPhases));
+        }
     }
 
     /**
@@ -180,6 +187,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the Maven 3 phase name
          */
+        @Nonnull
         String v3Phase();
 
         /**
@@ -187,6 +195,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the Maven 4 phase name
          */
+        @Nonnull
         String v4Phase();
     }
 
@@ -206,6 +215,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the link kind
          */
+        @Nonnull
         Kind kind();
 
         /**
@@ -213,6 +223,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the phase pointer
          */
+        @Nonnull
         Pointer pointer();
     }
 
@@ -228,6 +239,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the phase name
          */
+        @Nonnull
         String phase();
 
         /**
@@ -235,6 +247,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the pointer type
          */
+        @Nonnull
         Type type();
     }
 
@@ -244,6 +257,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the PROJECT pointer type
          */
+        @Nonnull
         default Type type() {
             return Type.PROJECT;
         }
@@ -255,6 +269,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the dependency scope, or "all" if not specified
          */
+        @Nonnull
         String scope(); // default: all
 
         /**
@@ -262,6 +277,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the DEPENDENCIES pointer type
          */
+        @Nonnull
         default Type type() {
             return Type.DEPENDENCIES;
         }
@@ -273,6 +289,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the CHILDREN pointer type
          */
+        @Nonnull
         default Type type() {
             return Type.CHILDREN;
         }

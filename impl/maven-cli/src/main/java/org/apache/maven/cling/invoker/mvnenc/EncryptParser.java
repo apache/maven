@@ -18,7 +18,6 @@
  */
 package org.apache.maven.cling.invoker.mvnenc;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
@@ -56,7 +55,7 @@ public class EncryptParser extends BaseParser {
 
     @Override
     protected List<Options> parseCliOptions(LocalContext context) {
-        return Collections.singletonList(parseEncryptCliOptions(context.parserRequest.args()));
+        return List.of(parseEncryptCliOptions(context.parserRequest.args()));
     }
 
     protected CommonsCliEncryptOptions parseEncryptCliOptions(List<String> args) {

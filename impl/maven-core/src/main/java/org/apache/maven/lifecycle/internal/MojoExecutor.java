@@ -131,7 +131,7 @@ public class MojoExecutor {
     }
 
     private Collection<String> toScopes(String classpath) {
-        Collection<String> scopes = Collections.emptyList();
+        Collection<String> scopes = List.of();
 
         if (classpath != null && !classpath.isEmpty()) {
             if (Artifact.SCOPE_COMPILE.equals(classpath)) {
@@ -419,7 +419,7 @@ public class MojoExecutor {
 
     public List<MavenProject> executeForkedExecutions(MojoExecution mojoExecution, MavenSession session)
             throws LifecycleExecutionException {
-        List<MavenProject> forkedProjects = Collections.emptyList();
+        List<MavenProject> forkedProjects = List.of();
 
         Map<String, List<MojoExecution>> forkedExecutions = mojoExecution.getForkedExecutions();
 

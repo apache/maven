@@ -22,7 +22,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -87,7 +86,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
                 }
             }
             this.parentRealm = parentRealm;
-            this.foreignImports = (foreignImports != null) ? foreignImports : Collections.emptyMap();
+            this.foreignImports = (foreignImports != null) ? foreignImports : Map.of();
             this.filter = dependencyFilter;
 
             int hash = 17;

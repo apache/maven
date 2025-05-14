@@ -32,7 +32,7 @@ public abstract class Task {
     private final String value;
 
     public Task(String value) {
-        this.value = Objects.requireNonNull(value, "value");
+        this.value = Objects.requireNonNull(value, "value cannot be null");
     }
 
     public String getValue() {

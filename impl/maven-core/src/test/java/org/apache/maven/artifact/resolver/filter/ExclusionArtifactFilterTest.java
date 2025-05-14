@@ -19,7 +19,7 @@
 package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Exclusion;
@@ -51,7 +51,7 @@ class ExclusionArtifactFilterTest {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("org.apache.maven");
         exclusion.setArtifactId("maven-core");
-        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(List.of(exclusion));
 
         assertThat(filter.include(artifact), is(false));
     }
@@ -61,7 +61,7 @@ class ExclusionArtifactFilterTest {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("org.apache.maven");
         exclusion.setArtifactId("maven-model");
-        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(List.of(exclusion));
 
         assertThat(filter.include(artifact), is(true));
     }
@@ -71,7 +71,7 @@ class ExclusionArtifactFilterTest {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("*");
         exclusion.setArtifactId("maven-core");
-        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(List.of(exclusion));
 
         assertThat(filter.include(artifact), is(false));
     }
@@ -81,7 +81,7 @@ class ExclusionArtifactFilterTest {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("*");
         exclusion.setArtifactId("maven-compat");
-        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(List.of(exclusion));
 
         assertThat(filter.include(artifact), is(true));
     }
@@ -91,7 +91,7 @@ class ExclusionArtifactFilterTest {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("org.apache.maven");
         exclusion.setArtifactId("*");
-        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(List.of(exclusion));
 
         assertThat(filter.include(artifact), is(false));
     }
@@ -101,7 +101,7 @@ class ExclusionArtifactFilterTest {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("org.apache.groovy");
         exclusion.setArtifactId("*");
-        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(List.of(exclusion));
 
         assertThat(filter.include(artifact), is(true));
     }
@@ -111,7 +111,7 @@ class ExclusionArtifactFilterTest {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("*");
         exclusion.setArtifactId("*");
-        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(List.of(exclusion));
 
         assertThat(filter.include(artifact), is(false));
     }
@@ -151,7 +151,7 @@ class ExclusionArtifactFilterTest {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("*");
         exclusion.setArtifactId("maven-*");
-        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(List.of(exclusion));
 
         assertThat(filter.include(artifact), is(false));
         assertThat(filter.include(artifact2), is(true));
@@ -162,7 +162,7 @@ class ExclusionArtifactFilterTest {
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId("**");
         exclusion.setArtifactId("maven-**");
-        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
+        ExclusionArtifactFilter filter = new ExclusionArtifactFilter(List.of(exclusion));
 
         assertThat(filter.include(artifact), is(false));
         assertThat(filter.include(artifact2), is(true));

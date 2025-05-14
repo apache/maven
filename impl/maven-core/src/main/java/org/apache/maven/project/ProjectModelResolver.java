@@ -127,7 +127,7 @@ public class ProjectModelResolver implements ModelResolver {
         }
 
         List<RemoteRepository> newRepositories =
-                Collections.singletonList(ArtifactDescriptorUtils.toRemoteRepository(repository.getDelegate()));
+                List.of(ArtifactDescriptorUtils.toRemoteRepository(repository.getDelegate()));
 
         if (ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals(repositoryMerging)) {
             repositories = remoteRepositoryManager.aggregateRepositories(session, repositories, newRepositories, true);

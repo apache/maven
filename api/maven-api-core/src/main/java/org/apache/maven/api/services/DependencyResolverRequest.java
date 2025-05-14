@@ -20,7 +20,6 @@ package org.apache.maven.api.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -176,8 +175,8 @@ public interface DependencyResolverRequest extends Request<Session> {
         Project project;
         Artifact rootArtifact;
         DependencyCoordinates root;
-        List<DependencyCoordinates> dependencies = Collections.emptyList();
-        List<DependencyCoordinates> managedDependencies = Collections.emptyList();
+        List<DependencyCoordinates> dependencies = List.of();
+        List<DependencyCoordinates> managedDependencies = List.of();
         boolean verbose;
         PathScope pathScope;
         Predicate<PathType> pathTypeFilter;
@@ -246,7 +245,7 @@ public interface DependencyResolverRequest extends Request<Session> {
          */
         @Nonnull
         public DependencyResolverRequestBuilder dependencies(@Nullable List<DependencyCoordinates> dependencies) {
-            this.dependencies = (dependencies != null) ? dependencies : Collections.emptyList();
+            this.dependencies = (dependencies != null) ? dependencies : List.of();
             return this;
         }
 
@@ -278,7 +277,7 @@ public interface DependencyResolverRequest extends Request<Session> {
         @Nonnull
         public DependencyResolverRequestBuilder managedDependencies(
                 @Nullable List<DependencyCoordinates> managedDependencies) {
-            this.managedDependencies = (managedDependencies != null) ? managedDependencies : Collections.emptyList();
+            this.managedDependencies = (managedDependencies != null) ? managedDependencies : List.of();
             return this;
         }
 

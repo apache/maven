@@ -200,6 +200,7 @@ public interface DependencyResolver extends Service {
      * @see #flatten(Session, Node, PathScope)
      * @see ArtifactResolver#resolve(ArtifactResolverRequest)
      */
-    DependencyResolverResult resolve(DependencyResolverRequest request)
+    @Nonnull
+    DependencyResolverResult resolve(@Nonnull DependencyResolverRequest request)
             throws DependencyResolverException, ArtifactResolverException;
 }

@@ -76,9 +76,7 @@ public class BuildPlan {
     }
 
     public Stream<BuildStep> steps(MavenProject project) {
-        return Optional.ofNullable(plan.get(project))
-                .map(m -> m.values().stream())
-                .orElse(Stream.empty());
+        return Optional.ofNullable(plan.get(project)).stream().flatMap(m -> m.values().stream());
     }
 
     public Optional<BuildStep> step(MavenProject project, String name) {
@@ -103,7 +101,7 @@ public class BuildPlan {
                 add.values().stream().filter(b -> b.predecessors.isEmpty()).toList();
         firsts.stream()
                 .filter(addNode -> !org.containsKey(addNode.name))
-                .forEach(addNode -> lasts.forEach(orgNode -> addNode.executeAfter(orgNode)));
+                .forEach(addNode -> lasts.forEach(addNode::executeAfter));
         add.forEach((name, node) -> org.merge(name, node, this::merge));
         return org;
     }

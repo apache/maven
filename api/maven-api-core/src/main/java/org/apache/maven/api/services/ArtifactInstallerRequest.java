@@ -19,7 +19,6 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,7 +61,7 @@ public interface ArtifactInstallerRequest extends Request<Session> {
     class ArtifactInstallerRequestBuilder {
         Session session;
         RequestTrace trace;
-        Collection<ProducedArtifact> artifacts = Collections.emptyList();
+        Collection<ProducedArtifact> artifacts = List.of();
 
         ArtifactInstallerRequestBuilder() {}
 
@@ -80,7 +79,7 @@ public interface ArtifactInstallerRequest extends Request<Session> {
 
         @Nonnull
         public ArtifactInstallerRequestBuilder artifacts(@Nullable Collection<ProducedArtifact> artifacts) {
-            this.artifacts = artifacts != null ? artifacts : Collections.emptyList();
+            this.artifacts = artifacts != null ? artifacts : List.of();
             return this;
         }
 

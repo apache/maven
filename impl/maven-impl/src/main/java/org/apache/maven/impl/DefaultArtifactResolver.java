@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,8 +52,6 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
-
 @Named
 @Singleton
 public class DefaultArtifactResolver implements ArtifactResolver {
@@ -60,7 +59,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
     @Override
     public ArtifactResolverResult resolve(ArtifactResolverRequest request)
             throws ArtifactResolverException, IllegalArgumentException {
-        nonNull(request, "request");
+        Objects.requireNonNull(request, "request cannot be null");
         InternalSession session = InternalSession.from(request.getSession());
         return session.request(request, this::doResolve);
     }
@@ -240,7 +239,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
         @Nonnull
         @Override
         public Collection<DownloadedArtifact> getArtifacts() {
-            return results.values().stream().map(ResultItem::getArtifact).collect(Collectors.toList());
+            return results.values().stream().map(ResultItem::getArtifact).toList();
         }
 
         @Override

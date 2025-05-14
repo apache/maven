@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.Lifecycle;
@@ -54,26 +55,32 @@ public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInje
     private static final LifecycleRegistry EMPTY_LIFECYCLE_REGISTRY = new LifecycleRegistry() {
 
         @Override
+        @Nonnull
         public Iterator<Lifecycle> iterator() {
             return Collections.emptyIterator();
         }
 
         @Override
-        public Optional<Lifecycle> lookup(String id) {
+        @Nonnull
+        public Optional<Lifecycle> lookup(@Nonnull String id) {
             return Optional.empty();
         }
 
         @Override
-        public List<String> computePhases(Lifecycle lifecycle) {
+        @Nonnull
+        public List<String> computePhases(@Nonnull Lifecycle lifecycle) {
             return List.of();
         }
     };
 
     private static final PackagingRegistry EMPTY_PACKAGING_REGISTRY = new PackagingRegistry() {
         @Override
-        public Optional<Packaging> lookup(String id) {
+        @Nonnull
+        public Optional<Packaging> lookup(@Nonnull String id) {
+            Objects.requireNonNull(id, "id cannot be null");
             return Optional.of(new Packaging() {
                 @Override
+                @Nonnull
                 public String id() {
                     return id;
                 }
@@ -84,6 +91,7 @@ public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInje
                 }
 
                 @Override
+                @Nonnull
                 public Map<String, PluginContainer> plugins() {
                     if ("JAR".equals(id)) {
                         return Map.of(
@@ -133,11 +141,12 @@ public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInje
     static class WrapperLifecycleRegistry implements LifecycleRegistry {
         @Override
         @Nonnull
-        public Optional<Lifecycle> lookup(String id) {
+        public Optional<Lifecycle> lookup(@Nonnull String id) {
             return getDelegate().lookup(id);
         }
 
         @Override
+        @Nonnull
         public Iterator<Lifecycle> iterator() {
             return getDelegate().iterator();
         }
@@ -147,7 +156,8 @@ public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInje
         }
 
         @Override
-        public List<String> computePhases(Lifecycle lifecycle) {
+        @Nonnull
+        public List<String> computePhases(@Nonnull Lifecycle lifecycle) {
             return List.of();
         }
     }

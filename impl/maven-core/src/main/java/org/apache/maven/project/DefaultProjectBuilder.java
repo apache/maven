@@ -505,7 +505,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 return pomFiles.stream()
                         .map(pomFile -> build(pomFile, recursive))
                         .flatMap(List::stream)
-                        .collect(Collectors.toList());
+                        .toList();
             } finally {
                 Thread.currentThread().setContextClassLoader(oldContextClassLoader);
             }
@@ -551,7 +551,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     project.setCollectedProjects(results(r)
                             .filter(cr -> cr != r && cr.getEffectiveModel() != null)
                             .map(cr -> projectIndex.get(cr.getEffectiveModel().getId()))
-                            .collect(Collectors.toList()));
+                            .toList());
 
                     DependencyResolutionResult resolutionResult = null;
                     if (request.isResolveDependencies()) {
@@ -740,7 +740,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             project.setExtensionArtifacts(extensionArtifacts);
 
             // managedVersionMap
-            Map<String, Artifact> map = Collections.emptyMap();
+            Map<String, Artifact> map = Map.of();
             final DependencyManagement dependencyManagement =
                     project.getModel().getDelegate().getDependencyManagement();
             if (dependencyManagement != null
@@ -924,7 +924,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 RepositoryUtils.toArtifacts(
                         artifacts,
                         resolutionResult.getDependencyGraph().getChildren(),
-                        Collections.singletonList(project.getArtifact().getId()),
+                        List.of(project.getArtifact().getId()),
                         null);
 
                 // Maven 2.x quirk: an artifact always points at the local repo, regardless whether resolved or not
@@ -944,7 +944,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     }
 
     private List<String> getProfileIds(List<Profile> profiles) {
-        return profiles.stream().map(Profile::getId).collect(Collectors.toList());
+        return profiles.stream().map(Profile::getId).toList();
     }
 
     private static ModelSource createStubModelSource(Artifact artifact) {

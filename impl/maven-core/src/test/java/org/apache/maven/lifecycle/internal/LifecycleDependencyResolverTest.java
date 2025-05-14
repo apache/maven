@@ -22,8 +22,8 @@ import javax.inject.Inject;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -50,7 +50,7 @@ class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase
         MavenSession session = createMavenSession(
                 new File("src/test/projects/lifecycle-dependency-resolver/pom.xml"), new Properties(), true);
         Collection<String> scopesToCollect = null;
-        Collection<String> scopesToResolve = Collections.singletonList("compile");
+        Collection<String> scopesToResolve = List.of("compile");
         boolean aggregating = false;
 
         Set<Artifact> reactorArtifacts = new HashSet<>(3);

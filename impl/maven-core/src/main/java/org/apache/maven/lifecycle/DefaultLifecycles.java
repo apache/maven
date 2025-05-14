@@ -161,7 +161,7 @@ public class DefaultLifecycles {
         return lifecyclesMap.values().stream()
                 .peek(l -> Objects.requireNonNull(l.getId(), "A lifecycle must have an id."))
                 .sorted(Comparator.comparing(Lifecycle::getId, comparator))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private Map<String, Lifecycle> lookupLifecycles() {

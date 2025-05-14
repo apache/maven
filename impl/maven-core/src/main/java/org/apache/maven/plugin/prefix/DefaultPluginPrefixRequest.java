@@ -36,11 +36,11 @@ public class DefaultPluginPrefixRequest implements PluginPrefixRequest {
 
     private String prefix;
 
-    private List<String> pluginGroups = Collections.emptyList();
+    private List<String> pluginGroups = List.of();
 
     private Model pom;
 
-    private List<RemoteRepository> repositories = Collections.emptyList();
+    private List<RemoteRepository> repositories = List.of();
 
     private RepositorySystemSession session;
 
@@ -89,7 +89,7 @@ public class DefaultPluginPrefixRequest implements PluginPrefixRequest {
         if (pluginGroups != null) {
             this.pluginGroups = Collections.unmodifiableList(pluginGroups);
         } else {
-            this.pluginGroups = Collections.emptyList();
+            this.pluginGroups = List.of();
         }
 
         return this;
@@ -113,7 +113,7 @@ public class DefaultPluginPrefixRequest implements PluginPrefixRequest {
         if (repositories != null) {
             this.repositories = Collections.unmodifiableList(repositories);
         } else {
-            this.repositories = Collections.emptyList();
+            this.repositories = List.of();
         }
 
         return this;

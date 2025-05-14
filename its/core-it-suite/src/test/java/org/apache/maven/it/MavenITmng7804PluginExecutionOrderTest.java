@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +53,7 @@ class MavenITmng7804PluginExecutionOrderTest extends AbstractMavenIntegrationTes
 
         List<String> executions = verifier.loadLogLines().stream()
                 .filter(l -> l.contains(" This should be "))
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(4, executions.size());
         assertTrue(executions.get(0).contains("100"));
         assertTrue(executions.get(1).contains("200"));

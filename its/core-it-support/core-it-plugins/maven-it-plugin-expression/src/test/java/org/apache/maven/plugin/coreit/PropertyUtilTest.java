@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -97,7 +98,7 @@ public class PropertyUtilTest {
     @Test
     public void testStoreCycle() {
         Object[] arr = {null};
-        arr[0] = Collections.singleton(Collections.singletonMap("key", arr));
+        arr[0] = Set.of(Collections.singletonMap("key", arr));
 
         Properties props = new Properties();
         PropertyUtil.store(props, "cycle", arr);
