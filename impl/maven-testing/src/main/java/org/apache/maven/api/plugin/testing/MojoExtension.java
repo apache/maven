@@ -673,7 +673,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
     /**
      * sometimes the parent element might contain the correct value so generalize that access
-     *
+     * <p>
      * TODO find out where this is probably done elsewhere
      */
     private static String resolveFromRootThenParent(Xpp3Dom pluginPomDom, String element) throws Exception {

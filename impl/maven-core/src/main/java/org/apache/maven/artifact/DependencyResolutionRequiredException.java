@@ -20,7 +20,7 @@ package org.apache.maven.artifact;
 
 /**
  * Exception that occurs when an artifact file is used, but has not been resolved.
- *
+ * <p>
  * TODO it may be better for artifact.getFile() to throw it - perhaps it is a runtime exception?
  */
 public class DependencyResolutionRequiredException extends Exception {

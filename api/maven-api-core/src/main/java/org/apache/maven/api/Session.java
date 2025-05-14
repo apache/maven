@@ -133,7 +133,7 @@ public interface Session extends ProtoSession {
     /**
      * Returns the plugin context for mojo being executed and the specified
      * {@link Project}, never returns {@code null} as if context not present, creates it.
-     *
+     * <p>
      * <strong>Implementation note:</strong> while this method return type is {@link Map}, the
      * returned map instance implements {@link java.util.concurrent.ConcurrentMap} as well.
      *

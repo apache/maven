@@ -132,7 +132,7 @@ import org.eclipse.aether.spi.validator.ValidatorFactory;
 
 /**
  * DI Bridge for Maven Resolver
- *
+ * <p>
  * TODO: reuse mvn4 Supplier here
  */
 @SuppressWarnings({"unused", "checkstyle:ParameterNumber"})

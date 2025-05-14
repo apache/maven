@@ -40,7 +40,7 @@ public @interface Config {
     /**
      * Specifies the source of the configuration property, which determines when and where the property
      * will be read from or set for consumption in the Maven build lifecycle.
-     *
+     * <p>
      * The source indicates whether the property is:
      * - Set by Maven itself at startup (SYSTEM_PROPERTIES)
      * - Configured by users through external means like CLI options (USER_PROPERTIES)

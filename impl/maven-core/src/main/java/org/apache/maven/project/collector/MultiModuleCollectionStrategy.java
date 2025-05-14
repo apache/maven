@@ -135,9 +135,9 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
      * - Just the plugin is being built with the -f <pom> flag.
      * - Because of inter-module dependency collection, all projects in the multi-module project are collected.
      * - The plugin is not yet installed in a repository.
-     *
+     * <p>
      * Therefore, the build fails because the plugin is not found and plugins cannot be built in the same session.
-     *
+     * <p>
      * The integration test for <a href="https://issues.apache.org/jira/browse/MNG-5572">MNG-5572</a> is an
      *   example of this scenario.
      *

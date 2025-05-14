@@ -51,13 +51,13 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
     /**
      * How the test project is set up:
-     *
+     * <p>
      * 1. dependencyManagement lists dependencies on a &amp; b,
      *    with an exclusion on c in b.
      * 2. the child project lists a dependency on project a only
      * 3. a depends on b (which is transitive to the child project),
      *    and b depends on c.
-     *
+     * <p>
      * We should see that the resulting size of collected artifacts is two:
      * a &amp; b only.
      */

@@ -23,7 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 
 /**
  * Describes repository directory metadata.
- *
+ * <p>
  * TODO not happy about the store method - they use "this"
  */
 @Deprecated

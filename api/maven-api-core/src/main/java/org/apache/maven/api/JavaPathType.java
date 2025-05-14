@@ -108,7 +108,7 @@ public enum JavaPathType implements PathType {
     /**
      * The path identified by the Java {@code --patch-module} option.
      * The Java tools location is {@link StandardLocation#PATCH_MODULE_PATH}.
-     *
+     * <p>
      * Note that this option is incomplete, because it must be followed by a module name.
      * Use this type only when the module to patch is unknown.
      *

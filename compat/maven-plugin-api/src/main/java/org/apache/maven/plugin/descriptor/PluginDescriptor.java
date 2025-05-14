@@ -226,7 +226,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
 
     /**
      * Parse maven-...-plugin.
-     *
+     * <p>
      * TODO move to plugin-tools-api as a default only
      */
     public static String getGoalPrefixFromArtifactId(String artifactId) {

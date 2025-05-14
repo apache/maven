@@ -204,7 +204,7 @@ public class MavenSession implements Cloneable {
     /**
      * Returns the plugin context for given key ({@link PluginDescriptor#getPluginLookupKey()} and
      * {@link MavenProject}, never returns {@code null} as if context not present, creates it.
-     *
+     * <p>
      * <strong>Implementation note:</strong> while this method return type is {@link Map}, the returned map instance
      * implements {@link ConcurrentMap} as well.
      *
