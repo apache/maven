@@ -30,11 +30,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  */
 @Deprecated
 public class UnresolvedArtifacts {
-    private Artifact originatingArtifact;
-
-    private List<Artifact> artifacts;
-
-    private List<ArtifactRepository> remoteRepositories;
 
     public UnresolvedArtifacts(
             Artifact originatingArtifact, List<Artifact> artifacts, List<ArtifactRepository> remoteRepositories) {

@@ -39,9 +39,6 @@ import org.apache.maven.metadata.v4.MetadataStaxWriter;
  */
 @Deprecated
 public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
-    private static final String LS = System.lineSeparator();
-
-    private Metadata metadata;
 
     protected AbstractRepositoryMetadata(Metadata metadata) {
         this.metadata = metadata;

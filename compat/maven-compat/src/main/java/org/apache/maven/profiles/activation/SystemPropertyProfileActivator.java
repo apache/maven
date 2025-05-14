@@ -18,8 +18,6 @@
  */
 package org.apache.maven.profiles.activation;
 
-import java.util.Properties;
-
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
@@ -32,7 +30,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  */
 @Deprecated
 public class SystemPropertyProfileActivator extends DetectedProfileActivator implements Contextualizable {
-    private Properties properties;
 
     public void contextualize(Context context) throws ContextException {
         properties = (Properties) context.get("SystemProperties");

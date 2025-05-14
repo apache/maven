@@ -32,7 +32,6 @@ import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * JDK toolchain factory.
@@ -44,7 +43,6 @@ import org.slf4j.LoggerFactory;
  */
 @Deprecated(since = "4.0.0")
 public class JavaToolchainFactory implements ToolchainFactory {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ToolchainPrivate createToolchain(ToolchainModel model) throws MisconfiguredToolchainException {
         if (model == null) {

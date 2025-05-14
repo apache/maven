@@ -36,7 +36,6 @@ import org.codehaus.plexus.logging.Logger;
  */
 @Deprecated
 public class FileProfileActivator extends DetectedProfileActivator implements LogEnabled {
-    private Logger logger;
 
     protected boolean canDetectActivation(Profile profile) {
         return profile.getActivation() != null && profile.getActivation().getFile() != null;

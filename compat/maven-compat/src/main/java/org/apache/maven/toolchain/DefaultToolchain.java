@@ -18,7 +18,6 @@
  */
 package org.apache.maven.toolchain;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -37,15 +36,8 @@ import org.slf4j.Logger;
 @Deprecated(since = "4.0.0")
 public abstract class DefaultToolchain // should have been AbstractToolchain...
 implements Toolchain, ToolchainPrivate {
-    private final Logger logger;
 
-    private String type;
-
-    private Map<String, RequirementMatcher> provides = new HashMap<>();
-
-    public static final String KEY_TYPE = "type"; // NOI18N
-
-    private ToolchainModel model;
+    public static final String KEY_TYPE = "type";
 
     /**
      *

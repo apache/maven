@@ -35,7 +35,6 @@ import org.slf4j.Logger;
  */
 @Deprecated(since = "4.0.0")
 public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain {
-    private String javaHome;
 
     public static final String KEY_JAVAHOME = "jdkHome"; // NOI18N
 

@@ -27,8 +27,6 @@ import java.nio.file.Files;
 
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @deprecated instead use {@link org.apache.maven.toolchain.building.DefaultToolchainsBuilder}
@@ -37,7 +35,6 @@ import org.slf4j.LoggerFactory;
 @Named("default")
 @Singleton
 public class DefaultToolchainsBuilder implements ToolchainsBuilder {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public PersistedToolchains build(File userToolchainsFile) throws MisconfiguredToolchainException {
         PersistedToolchains toolchains = null;

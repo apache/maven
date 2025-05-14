@@ -21,7 +21,6 @@ package org.apache.maven.profiles;
 import javax.inject.Inject;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -48,16 +47,6 @@ public class DefaultProfileManager implements ProfileManager {
 
     @Inject
     private ProfileSelector profileSelector;
-
-    private List<String> activatedIds = new ArrayList<>();
-
-    private List<String> deactivatedIds = new ArrayList<>();
-
-    private List<String> defaultIds = new ArrayList<>();
-
-    private Map<String, Profile> profilesById = new LinkedHashMap<>();
-
-    private Properties requestProperties;
 
     /**
      * @deprecated without passing in the system properties, the SystemPropertiesProfileActivator will not work

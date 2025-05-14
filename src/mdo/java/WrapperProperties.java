@@ -372,7 +372,7 @@ class WrapperProperties extends Properties {
     }
 
 
-    private Object writeReplace() throws java.io.ObjectStreamException {
+    Object writeReplace() throws java.io.ObjectStreamException {
         Properties props = new Properties();
         props.putAll(getter.get());
         return props;

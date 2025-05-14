@@ -45,9 +45,6 @@ import org.slf4j.Logger;
 @Deprecated(since = "4.0.0")
 public class ToolchainManagerFactory {
 
-    private final Lookup lookup;
-    private final Logger logger;
-
     @Inject
     ToolchainManagerFactory(Lookup lookup) {
         this(lookup, null);

@@ -28,7 +28,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  */
 @Deprecated
 public class SnapshotArtifactRepositoryMetadata extends AbstractRepositoryMetadata {
-    private Artifact artifact;
 
     public SnapshotArtifactRepositoryMetadata(Artifact artifact) {
         super(createMetadata(artifact, null));

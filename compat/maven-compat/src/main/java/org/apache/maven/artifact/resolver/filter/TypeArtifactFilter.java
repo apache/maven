@@ -23,7 +23,6 @@ import org.apache.maven.artifact.Artifact;
 /** Artifact Filter which filters on artifact type */
 @Deprecated
 public class TypeArtifactFilter implements ArtifactFilter {
-    private String type = "jar";
 
     public TypeArtifactFilter(String type) {
         this.type = type;

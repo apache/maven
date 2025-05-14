@@ -37,12 +37,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 @Deprecated
 public class ExpressionDocumenter {
 
-    private static final String[] EXPRESSION_ROOTS = {"project", "settings", "session", "plugin", "rootless"};
-
-    private static final String EXPRESSION_DOCO_ROOTPATH = "META-INF/maven/plugin-expressions/";
-
-    private static Map<String, Expression> expressionDocumentation;
-
     public static Map<String, Expression> load() throws ExpressionDocumentationException {
         if (expressionDocumentation == null) {
             expressionDocumentation = new HashMap<>();

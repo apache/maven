@@ -806,10 +806,65 @@ under the License.</licenseText>
               <version>7.12.0</version>
             </dependency>
           </dependencies>
+          <executions>
+            <execution>
+              <id>maven-pmd-plugin</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <phase>verify</phase>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.openrewrite.maven</groupId>
+          <artifactId>rewrite-maven-plugin</artifactId>
+          <version>6.8.1</version>
+          <configuration>
+            <activeRecipes>
+              <!-- <recipe>org.openrewrite.java.recipes.JavaRecipeBestPractices</recipe> -->
+              <!-- <recipe>org.openrewrite.java.recipes.RecipeNullabilityBestPractices</recipe> -->
+              <!-- <recipe>org.openrewrite.java.recipes.RecipeTestingBestPractices</recipe> -->
+              <!-- <recipe>org.openrewrite.java.testing.assertj.SimplifyAssertJAssertion</recipe> -->
+              <!-- <recipe>org.openrewrite.java.testing.junit5.JUnit5BestPractices</recipe> -->
+              <!-- <recipe>org.openrewrite.staticanalysis.CodeCleanup</recipe> -->
+              <!-- <recipe>org.openrewrite.staticanalysis.CommonStaticAnalysis</recipe> -->
+              <recipe>org.openrewrite.staticanalysis.RemoveUnusedLocalVariables</recipe>
+              <recipe>org.openrewrite.staticanalysis.RemoveUnusedPrivateFields</recipe>
+              <recipe>org.openrewrite.staticanalysis.RemoveUnusedPrivateMethods</recipe>
+            </activeRecipes>
+            <exclusions>
+              <exclusion>src/mdo/java/WrapperList.java</exclusion>
+              <exclusion>src/mdo/java/WrapperProperties.java</exclusion>
+            </exclusions>
+            <exportDatatables>true</exportDatatables>
+            <failOnDryRunResults>true</failOnDryRunResults>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.openrewrite.recipe</groupId>
+              <artifactId>rewrite-static-analysis</artifactId>
+              <version>2.9.0</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>rewrite-maven-plugin</id>
+              <goals>
+                <goal>dryRun</goal>
+              </goals>
+              <phase>verify</phase>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
+      <!--      undo-->
+      <plugin>
+        <groupId>org.openrewrite.maven</groupId>
+        <artifactId>rewrite-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
@@ -1166,6 +1221,20 @@ under the License.</licenseText>
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>rewrite</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.openrewrite.maven</groupId>
+            <artifactId>rewrite-maven-plugin</artifactId>
           </plugin>
         </plugins>
       </build>

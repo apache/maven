@@ -20,7 +20,6 @@ package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -30,8 +29,6 @@ import org.apache.maven.artifact.Artifact;
  */
 @Deprecated
 public class OrArtifactFilter implements ArtifactFilter {
-
-    private Set<ArtifactFilter> filters;
 
     public OrArtifactFilter() {
         this.filters = new LinkedHashSet<>();

@@ -29,7 +29,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  */
 @Deprecated
 public class GroupRepositoryMetadata extends AbstractRepositoryMetadata {
-    private final String groupId;
 
     public GroupRepositoryMetadata(String groupId) {
         super(new Metadata());

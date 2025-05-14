@@ -29,7 +29,6 @@ import org.apache.maven.model.Profile;
  */
 @Deprecated
 public class JdkPrefixProfileActivator extends DetectedProfileActivator {
-    private static final String JDK_VERSION = System.getProperty("java.version");
 
     public boolean isActive(Profile profile) throws ProfileActivationException {
         Activation activation = profile.getActivation();

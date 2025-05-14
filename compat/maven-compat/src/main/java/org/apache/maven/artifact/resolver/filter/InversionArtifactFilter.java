@@ -25,7 +25,6 @@ import org.apache.maven.artifact.Artifact;
  */
 @Deprecated
 public class InversionArtifactFilter implements ArtifactFilter {
-    private final ArtifactFilter toInvert;
 
     public InversionArtifactFilter(ArtifactFilter toInvert) {
         this.toInvert = toInvert;

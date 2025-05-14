@@ -28,7 +28,6 @@ import org.codehaus.plexus.logging.Logger;
  */
 @Deprecated
 public class WarningResolutionListener implements ResolutionListener {
-    private Logger logger;
 
     public WarningResolutionListener(Logger logger) {
         this.logger = logger;

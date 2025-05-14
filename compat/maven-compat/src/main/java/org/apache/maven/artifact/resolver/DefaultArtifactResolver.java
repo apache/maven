@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -94,8 +93,6 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
 
     @Inject
     private LegacySupport legacySupport;
-
-    private final Executor executor;
 
     public DefaultArtifactResolver() {
         int threads = Integer.getInteger("maven.artifact.threads", 5);
@@ -549,18 +546,6 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
     }
 
     private class ResolveTask implements Runnable {
-
-        private final ClassLoader classLoader;
-
-        private final CountDownLatch latch;
-
-        private final Artifact artifact;
-
-        private final RepositorySystemSession session;
-
-        private final List<ArtifactRepository> remoteRepositories;
-
-        private final ArtifactResolutionResult result;
 
         ResolveTask(
                 ClassLoader classLoader,

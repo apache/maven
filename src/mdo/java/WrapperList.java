@@ -105,7 +105,7 @@ class WrapperList<T, U> extends AbstractList<T> implements Serializable {
         }
     }
 
-    private Object writeReplace() throws ObjectStreamException {
+    Object writeReplace() throws ObjectStreamException {
         return new ArrayList<T>(this);
     }
 }

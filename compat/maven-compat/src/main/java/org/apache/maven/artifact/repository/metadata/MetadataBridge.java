@@ -123,8 +123,6 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
     @SuppressWarnings("deprecation")
     static class MetadataRepository extends DefaultArtifactRepository {
 
-        private File metadataFile;
-
         MetadataRepository(File metadataFile) {
             super("local", "", null);
             this.metadataFile = metadataFile;

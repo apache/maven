@@ -39,8 +39,6 @@ public final class RequirementMatcherFactory {
 
     private static final class ExactMatcher implements RequirementMatcher {
 
-        private String provides;
-
         private ExactMatcher(String provides) {
             this.provides = provides;
         }

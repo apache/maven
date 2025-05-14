@@ -19,7 +19,6 @@
 package org.apache.maven.artifact;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Type safe enumeration for the artifact status field.
@@ -56,12 +55,6 @@ public final class ArtifactStatus implements Comparable<ArtifactStatus> {
      * Trusted, as it has had its data verified by hand.
      */
     public static final ArtifactStatus VERIFIED = new ArtifactStatus("verified", 5);
-
-    private final int rank;
-
-    private final String key;
-
-    private static Map<String, ArtifactStatus> map;
 
     private ArtifactStatus(String key, int rank) {
         this.rank = rank;

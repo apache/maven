@@ -31,7 +31,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
  */
 @Deprecated
 public class ArtifactRepositoryMetadata extends AbstractRepositoryMetadata {
-    private Artifact artifact;
 
     public ArtifactRepositoryMetadata(Artifact artifact) {
         this(artifact, null);
