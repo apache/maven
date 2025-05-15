@@ -26,13 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
@@ -206,9 +204,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         settings = decrypt(settingsSource, settings, request, problems);
 
         if (!isProjectSettings) {
-            settings = Settings.newBuilder(settings, false)
-                    .servers(serversByIds(settings.getServers()))
-                    .build();
+            settings = settings.withServers(serversByIds(settings.getServers()));
         }
 
         settingsValidator.validate(settings, isProjectSettings, problems);
@@ -237,23 +233,14 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     private List<Server> serversByIds(List<Server> servers) {
-
-        if (servers.stream().allMatch(server -> server.getIds().isEmpty())) {
-            return servers;
-        }
-
         return servers.stream()
-                .flatMap(server -> {
-                    List<String> ids = server.getIds();
-                    if (ids.isEmpty()) {
-                        return Stream.of(server);
-                    }
-                    return Stream.concat(Stream.of(server), ids.stream().map(id -> Server.newBuilder(server, true)
-                            .id(id)
-                            .ids(Collections.emptyList())
-                            .build()));
-                })
-                .collect(Collectors.toList());
+                .flatMap(server -> Stream.concat(
+                        Stream.of(server), server.getIds().stream().map(id -> serverAlias(server, id))))
+                .toList();
+    }
+
+    private Server serverAlias(Server server, String id) {
+        return Server.newBuilder(server, true).id(id).ids(List.of()).build();
     }
 
     private Settings interpolate(
@@ -360,7 +347,6 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     /**
      * Collects the output of the settings builder.
-     *
      */
     static class DefaultSettingsBuilderResult implements SettingsBuilderResult {
 
