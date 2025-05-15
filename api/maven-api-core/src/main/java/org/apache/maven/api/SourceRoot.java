@@ -48,8 +48,8 @@ public interface SourceRoot {
      *   </li>
      * </ul>
      *
-     * These default values are relative directories.
-     * Implementation classes may override this default with absolute paths instead.
+     * The default value is relative.
+     * Implementation may override with absolute path instead.
      */
     default Path directory() {
         return module().map((module) -> Path.of("src", language().id(), module, scope().id()))
