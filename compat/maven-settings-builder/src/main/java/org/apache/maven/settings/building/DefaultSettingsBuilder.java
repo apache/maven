@@ -29,7 +29,6 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.building.FileSource;
@@ -257,27 +256,16 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     private List<Server> serversByIds(List<Server> servers) {
-
-        if (servers.stream().allMatch(server -> server.getIds().isEmpty())) {
-            return servers;
-        }
-
         return servers.stream()
-                .flatMap(server -> {
-                    List<String> ids = server.getIds();
-                    if (ids.isEmpty()) {
-                        return Stream.of(server);
-                    } else {
-                        return Stream.concat(Stream.of(server), ids.stream().map(id -> newServer(server, id)));
-                    }
-                })
-                .collect(Collectors.toList());
+                .flatMap(server -> Stream.concat(
+                        Stream.of(server), server.getIds().stream().map(id -> serverAlias(server, id))))
+                .toList();
     }
 
-    private Server newServer(Server server, String id) {
-        return new Server(org.apache.maven.api.settings.Server.newBuilder(server.getDelegate(), false)
+    private Server serverAlias(Server server, String id) {
+        return new Server(org.apache.maven.api.settings.Server.newBuilder(server.getDelegate(), true)
                 .id(id)
-                .ids(Collections.emptyList())
+                .ids(List.of())
                 .build());
     }
 }
