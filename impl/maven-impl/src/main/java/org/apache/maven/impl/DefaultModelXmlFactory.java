@@ -141,28 +141,4 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             throw new XmlWriterException("Unable to write model: " + getMessage(e), getLocation(e), e);
         }
     }
-
-    /**
-     * Simply parse the given xml string.
-     *
-     * @param xml the input XML string
-     * @return the parsed object
-     * @throws XmlReaderException if an error occurs during the parsing
-     * @see #toXmlString(Object)
-     */
-    public static Model fromXml(@Nonnull String xml) throws XmlReaderException {
-        return new DefaultModelXmlFactory().fromXmlString(xml);
-    }
-
-    /**
-     * Simply converts the given content to an XML string.
-     *
-     * @param content the object to convert
-     * @return the XML string representation
-     * @throws XmlWriterException if an error occurs during the transformation
-     * @see #fromXmlString(String)
-     */
-    public static String toXml(@Nonnull Model content) throws XmlWriterException {
-        return new DefaultModelXmlFactory().toXmlString(content);
-    }
 }
