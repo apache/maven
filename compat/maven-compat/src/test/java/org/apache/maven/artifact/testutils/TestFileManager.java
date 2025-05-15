@@ -20,6 +20,7 @@ package org.apache.maven.artifact.testutils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -91,7 +92,7 @@ public class TestFileManager {
     }
 
     public synchronized File createTempFile() throws IOException {
-        File tempFile = File.createTempFile(baseFilename, fileSuffix);
+        File tempFile = Files.createTempFile(baseFilename, fileSuffix).toFile();
         tempFile.deleteOnExit();
         markForDeletion(tempFile);
 

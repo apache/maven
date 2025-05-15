@@ -39,8 +39,8 @@ package org.apache.maven.its.it0125;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -78,7 +78,7 @@ public class DependenciesMojo extends AbstractMojo {
         }
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            BufferedWriter writer = Files.newBufferedWriter(file.toPath());
 
             for (Iterator iterator = artifacts.iterator(); iterator.hasNext(); ) {
                 Artifact artifact = (Artifact) iterator.next();

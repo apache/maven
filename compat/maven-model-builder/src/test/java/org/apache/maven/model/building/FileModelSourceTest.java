@@ -20,6 +20,7 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,7 @@ class FileModelSourceTest {
     }
 
     private File createTempFile(String name) throws IOException {
-        File tempFile = File.createTempFile(name, ".xml");
+        File tempFile = Files.createTempFile(name, ".xml").toFile();
         tempFile.deleteOnExit();
         return tempFile;
     }

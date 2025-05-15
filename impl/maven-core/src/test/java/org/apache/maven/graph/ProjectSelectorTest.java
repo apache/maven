@@ -20,6 +20,7 @@ package org.apache.maven.graph;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -85,7 +86,8 @@ class ProjectSelectorTest {
 
     @Test
     void isMatchingProjectMatchOnFileReturnsTrue() throws IOException {
-        final File tempFile = File.createTempFile("maven-core-unit-test-pom", ".xml");
+        final File tempFile =
+                Files.createTempFile("maven-core-unit-test-pom", ".xml").toFile();
         final String selector = tempFile.getName();
         final MavenProject mavenProject = createMavenProject("maven-core");
         mavenProject.setFile(tempFile);
