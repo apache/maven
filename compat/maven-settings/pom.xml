@@ -75,6 +75,7 @@ under the License.
             <model>src/main/mdo/settings.mdo</model>
           </models>
           <params>
+            <!-- 1.3.0 ? -->
             <param>forcedIOModelVersion=1.2.0</param>
             <param>packageModelV3=org.apache.maven.settings</param>
             <param>packageModelV4=org.apache.maven.api.settings</param>
