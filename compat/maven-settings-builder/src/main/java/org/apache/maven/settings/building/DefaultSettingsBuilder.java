@@ -55,11 +55,11 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 @Deprecated(since = "4.0.0")
 public class DefaultSettingsBuilder implements SettingsBuilder {
 
-    private SettingsReader settingsReader;
+    private final SettingsReader settingsReader;
 
-    private SettingsWriter settingsWriter;
+    private final SettingsWriter settingsWriter;
 
-    private SettingsValidator settingsValidator;
+    private final SettingsValidator settingsValidator;
 
     private final MavenSettingsMerger settingsMerger = new MavenSettingsMerger();
 
@@ -71,31 +71,16 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         this.settingsValidator = settingsValidator;
     }
 
-    public DefaultSettingsBuilder setSettingsReader(SettingsReader settingsReader) {
-        this.settingsReader = settingsReader;
-        return this;
-    }
-
-    public DefaultSettingsBuilder setSettingsWriter(SettingsWriter settingsWriter) {
-        this.settingsWriter = settingsWriter;
-        return this;
-    }
-
-    public DefaultSettingsBuilder setSettingsValidator(SettingsValidator settingsValidator) {
-        this.settingsValidator = settingsValidator;
-        return this;
-    }
-
     @Override
     public SettingsBuildingResult build(SettingsBuildingRequest request) throws SettingsBuildingException {
         DefaultSettingsProblemCollector problems = new DefaultSettingsProblemCollector(null);
 
         Source globalSettingsSource =
                 getSettingsSource(request.getGlobalSettingsFile(), request.getGlobalSettingsSource());
-        Settings globalSettings = readSettings(globalSettingsSource, request, problems);
+        Settings globalSettings = readSettings(globalSettingsSource, problems);
 
         Source userSettingsSource = getSettingsSource(request.getUserSettingsFile(), request.getUserSettingsSource());
-        Settings userSettings = readSettings(userSettingsSource, request, problems);
+        Settings userSettings = readSettings(userSettingsSource, problems);
 
         settingsMerger.merge(userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL);
 
@@ -140,8 +125,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         return null;
     }
 
-    private Settings readSettings(
-            Source settingsSource, SettingsBuildingRequest request, DefaultSettingsProblemCollector problems) {
+    private Settings readSettings(Source settingsSource, DefaultSettingsProblemCollector problems) {
         if (settingsSource == null) {
             return new Settings();
         }
