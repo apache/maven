@@ -78,6 +78,12 @@ public interface XmlReaderRequest {
         String transform(String source, String fieldName);
     }
 
+    default void throwIfIncomplete() {
+        if (getInputStream() == null && getReader() == null && getPath() == null && getURL() == null) {
+            throw new IllegalArgumentException("writer, outputStream, or path must be non null");
+        }
+    }
+
     @Nonnull
     static XmlReaderRequestBuilder builder() {
         return new XmlReaderRequestBuilder();

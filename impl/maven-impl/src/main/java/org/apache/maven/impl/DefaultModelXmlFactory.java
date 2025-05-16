@@ -83,9 +83,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         URL url = request.getURL();
         Reader reader = request.getReader();
         InputStream inputStream = request.getInputStream();
-        if (path == null && url == null && reader == null && inputStream == null) {
-            throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
-        }
+        request.throwIfIncomplete();
         try {
             InputSource source = null;
             if (request.getModelId() != null || request.getLocation() != null) {
@@ -120,9 +118,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
         Function<Object, String> inputLocationFormatter = request.getInputLocationFormatter();
-        if (writer == null && outputStream == null && path == null) {
-            throw new IllegalArgumentException("writer, outputStream or path must be non null");
-        }
+        request.throwIfIncomplete();
         try {
             MavenStaxWriter w = new MavenStaxWriter();
             if (inputLocationFormatter != null) {
