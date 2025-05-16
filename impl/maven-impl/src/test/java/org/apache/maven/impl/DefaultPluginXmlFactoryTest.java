@@ -46,6 +46,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 class DefaultPluginXmlFactoryReadWriteTest {
@@ -184,7 +185,6 @@ class DefaultPluginXmlFactoryReadWriteTest {
                 .version("1.0.0")
                 .build());
         assertThat(xml).contains("<name>" + NAME + "</name>");
-        assertThat(xml).contains("<name>" + NAME + "</name>");
         assertThat(xml).contains("<groupId>org.example</groupId>");
         assertThat(xml).contains("<artifactId>sample-plugin</artifactId>");
         assertThat(xml).contains("<version>1.0.0</version>");
@@ -229,7 +229,7 @@ class DefaultPluginXmlFactoryReadWriteTest {
                                                 .build())
                                         .build()))
                         .getMessage())
-                .isEqualTo("writer, outputStream or path must be non null");
+                .isEqualTo("writer, outputStream, or path must be non null");
     }
 
     @Test
@@ -268,7 +268,7 @@ class DefaultPluginXmlFactoryReadWriteTest {
     void testReadWithPath() throws Exception {
         Path tempPath = Files.createTempFile("plugin", ".xml");
         Files.writeString(tempPath, "<plugin/>");
-        XmlReaderRequest request = mock(XmlReaderRequest.class);
+        XmlReaderRequest request = spy(XmlReaderRequest.class);
         when(request.getPath()).thenReturn(tempPath);
         when(request.getInputStream()).thenReturn(null);
         when(request.getReader()).thenReturn(null);
@@ -283,7 +283,7 @@ class DefaultPluginXmlFactoryReadWriteTest {
     void testReadWithPathUrlDefault() throws Exception {
         Path tempPath = Files.createTempFile("plugin", ".xml");
         Files.writeString(tempPath, "<plugin/>");
-        XmlReaderRequest request = mock(XmlReaderRequest.class);
+        XmlReaderRequest request = spy(XmlReaderRequest.class);
         when(request.getPath()).thenReturn(null);
         when(request.getInputStream()).thenReturn(null);
         when(request.getReader()).thenReturn(null);

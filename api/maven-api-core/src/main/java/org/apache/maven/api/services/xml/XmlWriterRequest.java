@@ -55,6 +55,12 @@ public interface XmlWriterRequest<T> {
         return new XmlWriterRequestBuilder<>();
     }
 
+    default void throwIfIncomplete() {
+        if (getWriter() == null && getOutputStream() == null && getPath() == null) {
+            throw new IllegalArgumentException("writer, outputStream, or path must be non null");
+        }
+    }
+
     class XmlWriterRequestBuilder<T> {
         Path path;
         OutputStream outputStream;
