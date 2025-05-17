@@ -839,6 +839,10 @@ under the License.</licenseText>
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
         <version>1.0.2</version>
