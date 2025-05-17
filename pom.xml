@@ -813,7 +813,7 @@ under the License.</licenseText>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>pmd</artifactId>
+          <artifactId>maven-pmd-plugin</artifactId>
           <configuration>
             <analysisCache>true</analysisCache>
             <excludeFromFailureFile>.pmd/exclude.properties</excludeFromFailureFile>
@@ -833,7 +833,7 @@ under the License.</licenseText>
           </dependencies>
           <executions>
             <execution>
-              <id>maven-pmd-plugin</id>
+              <id>pmd</id>
               <goals>
                 <goal>check</goal>
               </goals>
