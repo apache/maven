@@ -807,10 +807,10 @@ under the License.</licenseText>
           <configuration>
             <analysisCache>true</analysisCache>
             <excludeFromFailureFile>.pmd/exclude.properties</excludeFromFailureFile>
-                        <minimumPriority>2</minimumPriority>
+            <minimumPriority>2</minimumPriority>
             <printFailingErrors>true</printFailingErrors>
             <rulesets>
-              <!--              <ruleset>category/java/bestpractices.xml</ruleset>-->
+              <!-- <ruleset>category/java/bestpractices.xml</ruleset> -->
             </rulesets>
           </configuration>
           <dependencies>
