@@ -805,7 +805,6 @@ under the License.</licenseText>
               <id>spotbugs</id>
               <goals>
                 <goal>check</goal>
-<!--                <goal>spotbugs</goal>-->
               </goals>
               <phase>verify</phase>
             </execution>
