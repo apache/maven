@@ -800,10 +800,20 @@ under the License.</licenseText>
           <groupId>com.github.spotbugs</groupId>
           <artifactId>spotbugs-maven-plugin</artifactId>
           <version>4.9.3.0</version>
+          <executions>
+            <execution>
+              <id>spotbugs</id>
+              <goals>
+                <goal>check</goal>
+<!--                <goal>spotbugs</goal>-->
+              </goals>
+              <phase>verify</phase>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-pmd-plugin</artifactId>
+          <artifactId>pmd</artifactId>
           <configuration>
             <analysisCache>true</analysisCache>
             <excludeFromFailureFile>.pmd/exclude.properties</excludeFromFailureFile>
