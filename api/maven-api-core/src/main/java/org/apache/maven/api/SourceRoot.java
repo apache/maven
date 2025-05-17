@@ -44,7 +44,7 @@ public interface SourceRoot {
      *     <code>src/{@linkplain #scope() scope}/{@linkplain #language() language}</code>.
      *   </li><li>
      *     If a module name is present, then the default directory is
-     *     <code>src/{@linkplain #language() language}/{@linkplain #module() module}/{@linkplain #scope() scope}</code>.
+     *     <code>src/{@linkplain #module() module}/{@linkplain #scope() scope}/{@linkplain #language() language}</code>.
      *   </li>
      * </ul>
      *
@@ -52,8 +52,11 @@ public interface SourceRoot {
      * Implementation may override with absolute path instead.
      */
     default Path directory() {
-        return module().map((module) -> Path.of("src", language().id(), module, scope().id()))
-                .orElseGet(() -> Path.of("src", scope().id(), language().id()));
+        Path src = Path.of("src");
+        return module().map(src::resolve)
+                .orElse(src)
+                .resolve(scope().id())
+                .resolve(language().id());
     }
 
     /**

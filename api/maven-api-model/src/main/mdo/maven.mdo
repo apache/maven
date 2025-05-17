@@ -2014,7 +2014,7 @@
         If no source directories are specified, the default values depend on whether module names are specified:
         <ul>
           <li>{@code src/${scope}/${lang}} if no module is specified</li>
-          <li>{@code src/${lang}/${module}/${scope}} if a module is specified</li>
+          <li>{@code src/${module}/${scope}/${lang}} if a module is specified</li>
         </ul>
         where
         {@code ${scope}} is the value of the {@link #scope} element (typically {@code main} or {@code test}),
