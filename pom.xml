@@ -810,6 +810,7 @@ under the License.</licenseText>
             <minimumPriority>2</minimumPriority>
             <printFailingErrors>true</printFailingErrors>
             <rulesets>
+              <!-- https://github.com/apache/maven-pmd-plugin/pull/202 -->
               <!-- <ruleset>category/java/bestpractices.xml</ruleset> -->
             </rulesets>
           </configuration>
