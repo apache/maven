@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -56,6 +57,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      * The corresponding request.
      */
     private final DependencyResolverRequest request;
+
     /**
      * The exceptions that occurred while building the dependency graph.
      */
@@ -98,6 +100,24 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
     private final PathModularizationCache cache;
 
     /**
+     * Creates an initially empty result with a temporary cache.
+     * Callers should add path elements by calls to {@link #addDependency(Node, Dependency, Predicate, Path)}.
+     *
+     * <p><b>WARNING: this constructor may be removed in a future Maven release.</b>
+     * The reason is because {@code DefaultDependencyResolverResult} needs a cache, which should
+     * preferably by session-wide. But we have not yet clarified how such caches should be managed.</p>
+     *
+     * @param request the corresponding request
+     * @param exceptions the exceptions that occurred while building the dependency graph
+     * @param root the root node of the dependency graph
+     * @param count estimated number of dependencies
+     */
+    public DefaultDependencyResolverResult(
+            DependencyResolverRequest request, List<Exception> exceptions, Node root, int count) {
+        this(request, new PathModularizationCache(), exceptions, root, count);
+    }
+
+    /**
      * Creates an initially empty result. Callers should add path elements by calls
      * to {@link #addDependency(Node, Dependency, Predicate, Path)}.
      *
@@ -107,14 +127,14 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      * @param root the root node of the dependency graph
      * @param count estimated number of dependencies
      */
-    public DefaultDependencyResolverResult(
+    DefaultDependencyResolverResult(
             DependencyResolverRequest request,
             PathModularizationCache cache,
             List<Exception> exceptions,
             Node root,
             int count) {
         this.request = request;
-        this.cache = cache;
+        this.cache = Objects.requireNonNull(cache);
         this.exceptions = exceptions;
         this.root = root;
         nodes = new ArrayList<>(count);
