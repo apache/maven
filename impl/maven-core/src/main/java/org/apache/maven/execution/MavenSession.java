@@ -387,7 +387,7 @@ public class MavenSession implements Cloneable {
         this.request.setUserProperties(userProperties);
         this.request.setLocalRepository(localRepository);
         this.request.setGoals(goals);
-        this.request.setBaseDirectory((executionRootDir != null) ? new File(executionRootDir) : null);
+        this.request.setBaseDirectory(executionRootDir != null ? new File(executionRootDir) : null);
         this.request.setStartTime(startTime);
         this.result = null;
         this.repositorySystemSession = null;

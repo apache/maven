@@ -213,7 +213,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             result.addException(e);
         }
 
-        return (versioning != null) ? versioning : Versioning.newInstance();
+        return versioning != null ? versioning : Versioning.newInstance();
     }
 
     private Versioning filterVersionsByRepositoryType(Versioning versioning, RemoteRepository remoteRepository) {

@@ -246,7 +246,7 @@ public interface DependencyResolverRequest extends Request<Session> {
          */
         @Nonnull
         public DependencyResolverRequestBuilder dependencies(@Nullable List<DependencyCoordinates> dependencies) {
-            this.dependencies = (dependencies != null) ? dependencies : Collections.emptyList();
+            this.dependencies = dependencies != null ? dependencies : Collections.emptyList();
             return this;
         }
 
@@ -278,7 +278,7 @@ public interface DependencyResolverRequest extends Request<Session> {
         @Nonnull
         public DependencyResolverRequestBuilder managedDependencies(
                 @Nullable List<DependencyCoordinates> managedDependencies) {
-            this.managedDependencies = (managedDependencies != null) ? managedDependencies : Collections.emptyList();
+            this.managedDependencies = managedDependencies != null ? managedDependencies : Collections.emptyList();
             return this;
         }
 
@@ -437,7 +437,7 @@ public interface DependencyResolverRequest extends Request<Session> {
                         List.copyOf(requireNonNull(managedDependencies, "managedDependencies cannot be null"));
                 this.verbose = verbose;
                 this.pathScope = requireNonNull(pathScope, "pathScope cannot be null");
-                this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : DEFAULT_FILTER;
+                this.pathTypeFilter = pathTypeFilter != null ? pathTypeFilter : DEFAULT_FILTER;
                 this.repositories = repositories;
                 if (verbose && requestType != RequestType.COLLECT) {
                     throw new IllegalArgumentException("verbose cannot only be true when collecting dependencies");

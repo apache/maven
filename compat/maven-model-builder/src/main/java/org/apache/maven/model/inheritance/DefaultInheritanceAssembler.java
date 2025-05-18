@@ -154,7 +154,7 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
             StringBuilder url = new StringBuilder(parentUrl.length()
                     + pathAdjustment.length()
                     + childPath.length()
-                    + ((pathAdjustment.length() == 0) ? 1 : 2));
+                    + (pathAdjustment.length() == 0 ? 1 : 2));
 
             url.append(parentUrl);
             concatPath(url, pathAdjustment);

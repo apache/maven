@@ -52,8 +52,8 @@ public class StringSource implements Source {
      * @param location The location to report for this use, may be {@code null}.
      */
     public StringSource(CharSequence content, String location) {
-        this.content = (content != null) ? content.toString() : "";
-        this.location = (location != null) ? location : "(memory)";
+        this.content = content != null ? content.toString() : "";
+        this.location = location != null ? location : "(memory)";
         this.hashCode = this.content.hashCode();
     }
 

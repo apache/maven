@@ -153,7 +153,7 @@ public class MavenPropertiesLoader {
 
             // Handle case where end of token stream and
             // still got data
-            if ((!exit) && (tokStarted)) {
+            if ((!exit) && tokStarted) {
                 retVal = tokBuf.toString();
             }
         }

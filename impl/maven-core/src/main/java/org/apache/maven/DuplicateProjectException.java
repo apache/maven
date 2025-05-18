@@ -40,7 +40,7 @@ public class DuplicateProjectException extends MavenExecutionException {
     public DuplicateProjectException(String message, Map<String, List<File>> collisions) {
         super(message, (File) null);
 
-        this.collisions = (collisions != null) ? collisions : new LinkedHashMap<>();
+        this.collisions = collisions != null ? collisions : new LinkedHashMap<>();
     }
 
     /**

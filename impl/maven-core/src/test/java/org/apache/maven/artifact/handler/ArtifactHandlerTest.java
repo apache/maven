@@ -99,6 +99,6 @@ class ArtifactHandlerTest {
     private String trimApt(String content) {
         content = content.replace('<', ' ').replace('>', ' ').trim();
 
-        return (content.length() == 0) ? null : content;
+        return content.length() == 0 ? null : content;
     }
 }

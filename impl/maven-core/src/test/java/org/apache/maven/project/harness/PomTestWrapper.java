@@ -55,7 +55,7 @@ public class PomTestWrapper {
     }
 
     public File getBasedir() {
-        return (pomFile != null) ? pomFile.getParentFile() : null;
+        return pomFile != null ? pomFile.getParentFile() : null;
     }
 
     public void setValueOnModel(String expression, Object value) {

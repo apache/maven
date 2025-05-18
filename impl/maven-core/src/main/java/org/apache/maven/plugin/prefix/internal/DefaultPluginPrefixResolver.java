@@ -97,7 +97,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
                         request.getPrefix(),
                         result.getGroupId(),
                         result.getArtifactId(),
-                        (result.getRepository() != null ? result.getRepository().getId() : "null"));
+                        result.getRepository() != null ? result.getRepository().getId() : "null");
             }
         } else {
             logger.debug(

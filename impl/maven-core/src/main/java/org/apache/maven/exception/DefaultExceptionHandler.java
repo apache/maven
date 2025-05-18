@@ -227,7 +227,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     }
 
     private String getMessage(String message, Throwable exception) {
-        String fullMessage = (message != null) ? message : "";
+        String fullMessage = message != null ? message : "";
 
         // To break out of possible endless loop when getCause returns "this", or dejaVu for n-level recursion (n>1)
         Set<Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());

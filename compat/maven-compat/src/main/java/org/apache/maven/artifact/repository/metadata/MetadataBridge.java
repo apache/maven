@@ -83,7 +83,7 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
     }
 
     private String emptify(String string) {
-        return (string != null) ? string : "";
+        return string != null ? string : "";
     }
 
     public File getFile() {

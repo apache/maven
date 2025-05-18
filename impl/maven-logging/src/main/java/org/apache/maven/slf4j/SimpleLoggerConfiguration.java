@@ -130,7 +130,7 @@ public class SimpleLoggerConfiguration {
 
     private void loadProperties() {
         ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
-        ClassLoader toUseCL = (threadCL != null ? threadCL : ClassLoader.getSystemClassLoader());
+        ClassLoader toUseCL = threadCL != null ? threadCL : ClassLoader.getSystemClassLoader();
 
         // Try loading maven properties first
         boolean mavenPropsLoaded = false;
@@ -167,12 +167,12 @@ public class SimpleLoggerConfiguration {
 
     String getStringProperty(String name, String defaultValue) {
         String prop = getStringProperty(name);
-        return (prop == null) ? defaultValue : prop;
+        return prop == null ? defaultValue : prop;
     }
 
     boolean getBooleanProperty(String name, boolean defaultValue) {
         String prop = getStringProperty(name);
-        return (prop == null) ? defaultValue : "true".equalsIgnoreCase(prop);
+        return prop == null ? defaultValue : "true".equalsIgnoreCase(prop);
     }
 
     String getStringProperty(String name) {

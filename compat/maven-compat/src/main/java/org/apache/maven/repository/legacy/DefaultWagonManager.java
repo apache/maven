@@ -126,7 +126,7 @@ public class DefaultWagonManager implements WagonManager {
                     updateCheckManager.touch(artifact, repository, null);
                     throw e;
                 } catch (TransferFailedException e) {
-                    String error = (e.getMessage() != null)
+                    String error = e.getMessage() != null
                             ? e.getMessage()
                             : e.getClass().getSimpleName();
                     updateCheckManager.touch(artifact, repository, error);

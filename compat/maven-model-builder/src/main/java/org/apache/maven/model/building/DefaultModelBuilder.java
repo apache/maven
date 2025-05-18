@@ -411,7 +411,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         result.setEffectiveModel(resultModel);
 
         for (ModelData currentData : lineage) {
-            String modelId = (currentData != superData) ? currentData.getId() : "";
+            String modelId = currentData != superData ? currentData.getId() : "";
 
             result.addModelId(modelId);
             result.setActivePomProfiles(modelId, currentData.getActiveProfiles());
@@ -666,10 +666,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         // enrich user properties with project packaging
         Properties userProperties = request.getUserProperties();
         userProperties.computeIfAbsent(
-                (Object) ProfileActivationContext.PROPERTY_NAME_PACKAGING, (p) -> (Object) rawModel.getPackaging());
+                (Object) ProfileActivationContext.PROPERTY_NAME_PACKAGING, p -> (Object) rawModel.getPackaging());
         context.setUserProperties(userProperties);
         context.setProjectDirectory(
-                (request.getPomFile() != null) ? request.getPomFile().getParentFile() : null);
+                request.getPomFile() != null ? request.getPomFile().getParentFile() : null);
 
         return context;
     }

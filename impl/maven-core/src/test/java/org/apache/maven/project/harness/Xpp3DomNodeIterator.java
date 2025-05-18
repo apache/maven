@@ -75,7 +75,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
         if (position == 0) {
             setPosition(1);
         }
-        return (child == null) ? null : new Xpp3DomNodePointer(parent, child);
+        return child == null ? null : new Xpp3DomNodePointer(parent, child);
     }
 
     public int getPosition() {
@@ -85,7 +85,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
     public boolean setPosition(int position) {
         this.position = position;
         filterChildren(position);
-        child = (position > 0 && position <= filteredChildren.size()) ? filteredChildren.get(position - 1) : null;
+        child = position > 0 && position <= filteredChildren.size() ? filteredChildren.get(position - 1) : null;
         return child != null;
     }
 

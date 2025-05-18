@@ -2431,7 +2431,7 @@ public class ModelMerger {
                     Object key = e.getKey();
                     V oldValue = map.get(key);
                     // JDK8: this should be a call to map.merge( key, v, remapping )
-                    V newValue = (oldValue == null) ? e.getValue() : remapping.merge(oldValue, e.getValue());
+                    V newValue = oldValue == null ? e.getValue() : remapping.merge(oldValue, e.getValue());
                     if (newValue == null) {
                         remove(key);
                     } else if (newValue != oldValue) {
@@ -2443,7 +2443,7 @@ public class ModelMerger {
                     Object key = keyComputer.key(v);
                     // JDK8: this should be a call to map.merge( key, v, remapping )
                     V oldValue = map.get(key);
-                    V newValue = (oldValue == null) ? v : remapping.merge(oldValue, v);
+                    V newValue = oldValue == null ? v : remapping.merge(oldValue, v);
                     if (newValue == null) {
                         remove(key);
                     } else {

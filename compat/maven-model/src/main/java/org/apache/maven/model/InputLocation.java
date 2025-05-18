@@ -211,7 +211,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      * @return InputLocation
      */
     private InputLocation getOtherLocation(Object key) {
-        return (locations != null) ? locations.get(key) : null;
+        return locations != null ? locations.get(key) : null;
     } // -- InputLocation getOtherLocation( Object )
 
     /**

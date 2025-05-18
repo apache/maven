@@ -49,10 +49,10 @@ class DefaultProjectBuildingResult implements ProjectBuildingResult {
      */
     DefaultProjectBuildingResult(
             MavenProject project, List<ModelProblem> problems, DependencyResolutionResult dependencyResolutionResult) {
-        this.projectId = (project != null)
+        this.projectId = project != null
                 ? project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion()
                 : "";
-        this.pomFile = (project != null) ? project.getFile() : null;
+        this.pomFile = project != null ? project.getFile() : null;
         this.project = project;
         this.problems = problems != null ? problems : Collections.emptyList();
         this.dependencyResolutionResult = dependencyResolutionResult;
@@ -66,7 +66,7 @@ class DefaultProjectBuildingResult implements ProjectBuildingResult {
      * @param problems The problems that were encountered, may be {@code null}.
      */
     DefaultProjectBuildingResult(String projectId, File pomFile, List<ModelProblem> problems) {
-        this.projectId = (projectId != null) ? projectId : "";
+        this.projectId = projectId != null ? projectId : "";
         this.pomFile = pomFile;
         this.project = null;
         this.problems = problems != null ? problems : Collections.emptyList();

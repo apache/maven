@@ -117,7 +117,7 @@ public class DefaultNode extends AbstractNode {
         org.eclipse.aether.graph.DependencyNode winner =
                 (org.eclipse.aether.graph.DependencyNode) node.getData().get(ConflictResolver.NODE_DATA_WINNER);
         String winnerVersion = winner != null ? winner.getArtifact().getBaseVersion() : null;
-        boolean included = (winnerVersion == null);
+        boolean included = winnerVersion == null;
 
         String preManagedVersion = DependencyManagerUtils.getPremanagedVersion(node);
         if (preManagedVersion != null) {

@@ -173,12 +173,12 @@ public class Os {
         boolean isNT = false;
         if (isWindows) {
             // there are only four 9x platforms that we look for
-            is9x = (actualOsName.contains("95")
+            is9x = actualOsName.contains("95")
                     || actualOsName.contains("98")
                     || actualOsName.contains("me")
                     // wince isn't really 9x, but crippled enough to
                     // be a muchness. Maven doesn't run on CE, anyway.
-                    || actualOsName.contains("ce"));
+                    || actualOsName.contains("ce");
             isNT = !is9x;
         }
         return switch (family) {

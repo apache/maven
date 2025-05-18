@@ -87,7 +87,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
                 }
             }
             this.parentRealm = parentRealm;
-            this.foreignImports = (foreignImports != null) ? foreignImports : Collections.emptyMap();
+            this.foreignImports = foreignImports != null ? foreignImports : Collections.emptyMap();
             this.filter = dependencyFilter;
 
             int hash = 17;

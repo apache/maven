@@ -32,7 +32,7 @@ public class ConsoleRepositoryListener extends AbstractRepositoryListener {
     }
 
     public ConsoleRepositoryListener(PrintStream out) {
-        this.out = (out != null) ? out : System.out;
+        this.out = out != null ? out : System.out;
     }
 
     public void artifactDeployed(RepositoryEvent event) {

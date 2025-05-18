@@ -53,9 +53,9 @@ public class UnresolvableModelException extends Exception {
     public UnresolvableModelException(
             String message, String groupId, String artifactId, String version, Throwable cause) {
         super(message, cause);
-        this.groupId = (groupId != null) ? groupId : "";
-        this.artifactId = (artifactId != null) ? artifactId : "";
-        this.version = (version != null) ? version : "";
+        this.groupId = groupId != null ? groupId : "";
+        this.artifactId = artifactId != null ? artifactId : "";
+        this.version = version != null ? version : "";
     }
 
     /**
@@ -68,9 +68,9 @@ public class UnresolvableModelException extends Exception {
      */
     public UnresolvableModelException(String message, String groupId, String artifactId, String version) {
         super(message);
-        this.groupId = (groupId != null) ? groupId : "";
-        this.artifactId = (artifactId != null) ? artifactId : "";
-        this.version = (version != null) ? version : "";
+        this.groupId = groupId != null ? groupId : "";
+        this.artifactId = artifactId != null ? artifactId : "";
+        this.version = version != null ? version : "";
     }
 
     /**

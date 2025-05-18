@@ -42,7 +42,7 @@ public class ConsoleTransferListener extends AbstractTransferListener {
     }
 
     public ConsoleTransferListener(PrintStream out) {
-        this.out = (out != null) ? out : System.out;
+        this.out = out != null ? out : System.out;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class ConsoleTransferListener extends AbstractTransferListener {
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
         if (contentLength >= 0) {
-            String type = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
+            String type = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded";
             String len = contentLength >= 1024 ? toKB(contentLength) + " KB" : contentLength + " B";
 
             String throughput = "";

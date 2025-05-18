@@ -220,7 +220,7 @@ public class DefaultReportingConverter implements ReportingConverter {
             Xpp3Dom reports = new Xpp3Dom("reports", location);
             int n = 0;
             for (String report : reportSet.getReports()) {
-                addDom(reports, "report", report, (location == null) ? null : location.getLocation(n++));
+                addDom(reports, "report", report, location == null ? null : location.getLocation(n++));
             }
             dom.addChild(reports);
         }

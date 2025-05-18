@@ -37,7 +37,7 @@ class DefaultSettingsBuildingResult implements SettingsBuildingResult {
 
     DefaultSettingsBuildingResult(Settings effectiveSettings, List<SettingsProblem> problems) {
         this.effectiveSettings = effectiveSettings;
-        this.problems = (problems != null) ? problems : new ArrayList<>();
+        this.problems = problems != null ? problems : new ArrayList<>();
     }
 
     @Override

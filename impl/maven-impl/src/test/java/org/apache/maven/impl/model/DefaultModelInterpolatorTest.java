@@ -233,7 +233,7 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertCollectorState(0, 0, 0, collector);
 
-        assertEquals("3.8.1", (out.getDependencies().get(0)).getVersion());
+        assertEquals("3.8.1", out.getDependencies().get(0).getVersion());
     }
 
     @Test
@@ -249,7 +249,7 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals("${something}", (out.getDependencies().get(0)).getVersion());
+        assertEquals("${something}", out.getDependencies().get(0).getVersion());
     }
 
     @Test
@@ -267,7 +267,7 @@ class DefaultModelInterpolatorTest {
                 model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
         assertCollectorState(0, 0, 0, collector);
 
-        assertEquals("foo-3.8.1", (out.getDependencies().get(0)).getVersion());
+        assertEquals("foo-3.8.1", out.getDependencies().get(0).getVersion());
     }
 
     @Test
@@ -290,7 +290,7 @@ class DefaultModelInterpolatorTest {
 
         assertEquals(
                 "file://localhost/anotherBasedir/temp-repo",
-                (out.getRepositories().get(0)).getUrl());
+                out.getRepositories().get(0).getUrl());
     }
 
     @Test
@@ -312,7 +312,7 @@ class DefaultModelInterpolatorTest {
 
         assertEquals(
                 projectBasedir.toAbsolutePath() + "/temp-repo",
-                (out.getRepositories().get(0)).getUrl());
+                out.getRepositories().get(0).getUrl());
     }
 
     @Test
@@ -334,7 +334,7 @@ class DefaultModelInterpolatorTest {
 
         assertEquals(
                 projectBasedir.toAbsolutePath() + "/temp-repo",
-                (out.getRepositories().get(0)).getUrl());
+                out.getRepositories().get(0).getUrl());
     }
 
     @Test
@@ -356,7 +356,7 @@ class DefaultModelInterpolatorTest {
 
         assertEquals(
                 projectBasedir.resolve("temp-repo").toUri().toString(),
-                (out.getRepositories().get(0)).getUrl());
+                out.getRepositories().get(0).getUrl());
     }
 
     @Test
@@ -376,7 +376,7 @@ class DefaultModelInterpolatorTest {
                 model, rootDirectory, createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals("file:myRootDirectory/temp-repo", (out.getRepositories().get(0)).getUrl());
+        assertEquals("file:myRootDirectory/temp-repo", out.getRepositories().get(0).getUrl());
     }
 
     @Test
@@ -398,7 +398,7 @@ class DefaultModelInterpolatorTest {
 
         assertEquals(
                 rootDirectory.resolve("temp-repo").toUri().toString(),
-                (out.getRepositories().get(0)).getUrl());
+                out.getRepositories().get(0).getUrl());
     }
 
     @Test

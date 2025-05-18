@@ -217,13 +217,13 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         StringBuilder sb = new StringBuilder();
                         sb.append(totalProblems)
                                 .append(" ")
-                                .append((totalProblems == 1) ? "problem was" : "problems were")
+                                .append(totalProblems == 1 ? "problem was" : "problems were")
                                 .append(" encountered while building the effective model for '")
                                 .append(request.getArtifact())
                                 .append("' during ")
                                 .append(RequestTraceHelper.interpretTrace(true, request.getTrace()))
                                 .append("\n")
-                                .append((totalProblems == 1) ? "Problem" : "Problems");
+                                .append(totalProblems == 1 ? "Problem" : "Problems");
                         for (ModelProblem modelProblem :
                                 problemCollector.problems().toList()) {
                             sb.append("\n* ")
@@ -236,7 +236,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         logger.warn(
                                 "{} {} encountered while building the effective model for '{}' during {} (use -X to see details)",
                                 totalProblems,
-                                (totalProblems == 1) ? "problem was" : "problems were",
+                                totalProblems == 1 ? "problem was" : "problems were",
                                 request.getArtifact(),
                                 RequestTraceHelper.interpretTrace(false, request.getTrace()));
                     }

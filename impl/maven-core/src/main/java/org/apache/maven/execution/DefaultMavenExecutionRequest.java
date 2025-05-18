@@ -195,7 +195,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setInstallationSettingsFile(original.getInstallationSettingsFile());
         copy.setUserToolchainsFile(original.getUserToolchainsFile());
         copy.setInstallationToolchainsFile(original.getInstallationToolchainsFile());
-        copy.setBaseDirectory((original.getBaseDirectory() != null) ? new File(original.getBaseDirectory()) : null);
+        copy.setBaseDirectory(original.getBaseDirectory() != null ? new File(original.getBaseDirectory()) : null);
         copy.setGoals(original.getGoals());
         copy.setRecursive(original.isRecursive());
         copy.setPom(original.getPom());
@@ -483,7 +483,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     @Override
     public MavenExecutionRequest setLocalRepositoryPath(String localRepository) {
-        localRepositoryPath = (localRepository != null) ? new File(localRepository) : null;
+        localRepositoryPath = localRepository != null ? new File(localRepository) : null;
 
         return this;
     }

@@ -279,7 +279,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     }
 
     private static String getId(String gid, String aid, String type, String cls, String ver) {
-        return gid + ':' + aid + ':' + type + ((cls != null && !cls.isEmpty()) ? ':' + cls : "") + ':' + ver;
+        return gid + ':' + aid + ':' + type + (cls != null && !cls.isEmpty() ? ':' + cls : "") + ':' + ver;
     }
 
     private void callDelegates(

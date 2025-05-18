@@ -49,7 +49,7 @@ public class DefaultProjectRealmCache implements ProjectRealmCache, Disposable {
 
         public CacheKey(List<? extends ClassRealm> extensionRealms) {
             this.extensionRealms =
-                    (extensionRealms != null) ? Collections.unmodifiableList(extensionRealms) : Collections.emptyList();
+                    extensionRealms != null ? Collections.unmodifiableList(extensionRealms) : Collections.emptyList();
 
             this.hashCode = this.extensionRealms.hashCode();
         }

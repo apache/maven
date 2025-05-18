@@ -94,7 +94,7 @@ public class DefaultToolchainsReader implements ToolchainsReader {
     }
 
     private boolean isStrict(Map<String, ?> options) {
-        Object value = (options != null) ? options.get(IS_STRICT) : null;
+        Object value = options != null ? options.get(IS_STRICT) : null;
         return value == null || Boolean.parseBoolean(value.toString());
     }
 }

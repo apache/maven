@@ -57,7 +57,7 @@ public class ProjectArtifact extends DefaultArtifact implements ArtifactWithDepe
 
     public List<Dependency> getManagedDependencies() {
         DependencyManagement depMngt = project.getModel().getDependencyManagement();
-        return (depMngt != null) ? Collections.unmodifiableList(depMngt.getDependencies()) : Collections.emptyList();
+        return depMngt != null ? Collections.unmodifiableList(depMngt.getDependencies()) : Collections.emptyList();
     }
 
     // TODO: this is duplicate of PomArtifactHandlerProvider provided one

@@ -34,7 +34,7 @@ public class LifecyclePhaseNotFoundException extends Exception {
      */
     public LifecyclePhaseNotFoundException(String message, String lifecyclePhase) {
         super(message);
-        this.lifecyclePhase = (lifecyclePhase != null) ? lifecyclePhase : "";
+        this.lifecyclePhase = lifecyclePhase != null ? lifecyclePhase : "";
     }
 
     /**

@@ -118,7 +118,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         @Override
         public int compareTo(Item item) {
             if (item == null) {
-                return (value == 0) ? 0 : 1; // 1.0 == 1, 1.1 > 1
+                return value == 0 ? 0 : 1; // 1.0 == 1, 1.1 > 1
             }
 
             return switch (item.getType()) {
@@ -184,7 +184,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         @Override
         public int compareTo(Item item) {
             if (item == null) {
-                return (value == 0) ? 0 : 1; // 1.0 == 1, 1.1 > 1
+                return value == 0 ? 0 : 1; // 1.0 == 1, 1.1 > 1
             }
 
             return switch (item.getType()) {
@@ -532,7 +532,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
         @Override
         public boolean isNull() {
-            return (size() == 0);
+            return size() == 0;
         }
 
         void normalize() {
@@ -606,7 +606,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
             StringBuilder buffer = new StringBuilder();
             for (Item item : this) {
                 if (buffer.length() > 0) {
-                    buffer.append((item instanceof ListItem) ? '-' : '.');
+                    buffer.append(item instanceof ListItem ? '-' : '.');
                 }
                 buffer.append(item);
             }
@@ -840,7 +840,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
             if (prev != null) {
                 int compare = prev.compareTo(c);
                 System.out.println(
-                        "   " + prev + ' ' + ((compare == 0) ? "==" : ((compare < 0) ? "<" : ">")) + ' ' + version);
+                        "   " + prev + ' ' + (compare == 0 ? "==" : (compare < 0 ? "<" : ">")) + ' ' + version);
             }
 
             System.out.println(

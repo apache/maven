@@ -82,7 +82,7 @@ class DefaultDependencyResolutionResult implements DependencyResolutionResult {
 
     public List<Exception> getResolutionErrors(Dependency dependency) {
         List<Exception> errors = resolutionErrors.get(dependency);
-        return (errors != null) ? Collections.unmodifiableList(errors) : Collections.emptyList();
+        return errors != null ? Collections.unmodifiableList(errors) : Collections.emptyList();
     }
 
     public void setResolutionErrors(Dependency dependency, List<Exception> errors) {

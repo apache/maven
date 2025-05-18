@@ -56,7 +56,7 @@ class Xpp3DomAttributeIterator implements NodeIterator {
         if (position == 0) {
             setPosition(1);
         }
-        return (attribute == null) ? null : new Xpp3DomAttributePointer(parent, attribute);
+        return attribute == null ? null : new Xpp3DomAttributePointer(parent, attribute);
     }
 
     public int getPosition() {
@@ -65,7 +65,7 @@ class Xpp3DomAttributeIterator implements NodeIterator {
 
     public boolean setPosition(int position) {
         this.position = position;
-        attribute = (position > 0 && position <= attributes.size()) ? attributes.get(position - 1) : null;
+        attribute = position > 0 && position <= attributes.size() ? attributes.get(position - 1) : null;
         return attribute != null;
     }
 }

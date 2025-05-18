@@ -102,11 +102,11 @@ public class DefaultModelProblem implements ModelProblem {
             String modelId,
             Exception exception) {
         this.message = message;
-        this.severity = (severity != null) ? severity : Severity.ERROR;
-        this.source = (source != null) ? source : "";
+        this.severity = severity != null ? severity : Severity.ERROR;
+        this.source = source != null ? source : "";
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
-        this.modelId = (modelId != null) ? modelId : "";
+        this.modelId = modelId != null ? modelId : "";
         this.exception = exception;
         this.version = version;
     }

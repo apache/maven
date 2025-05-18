@@ -49,9 +49,9 @@ class ReactorModelPool {
         private final int hashCode;
 
         CacheKey(String groupId, String artifactId, String version) {
-            this.groupId = (groupId != null) ? groupId : "";
-            this.artifactId = (artifactId != null) ? artifactId : "";
-            this.version = (version != null) ? version : "";
+            this.groupId = groupId != null ? groupId : "";
+            this.artifactId = artifactId != null ? artifactId : "";
+            this.version = version != null ? version : "";
 
             int hash = 17;
             hash = hash * 31 + this.groupId.hashCode();

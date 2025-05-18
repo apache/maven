@@ -106,7 +106,7 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
 
     @Override
     public DefaultModelBuildingRequest setPomFile(File pomFile) {
-        this.pomFile = (pomFile != null) ? pomFile.getAbsoluteFile() : null;
+        this.pomFile = pomFile != null ? pomFile.getAbsoluteFile() : null;
 
         return this;
     }

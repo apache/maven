@@ -221,7 +221,7 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         String darkOn = MessageUtils.isColorEnabled() ? ANSI_DARK_SET : "";
         String darkOff = MessageUtils.isColorEnabled() ? ANSI_DARK_RESET : "";
 
-        String action = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
+        String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded";
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();

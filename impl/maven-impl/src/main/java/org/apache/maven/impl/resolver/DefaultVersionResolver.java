@@ -274,7 +274,7 @@ public class DefaultVersionResolver implements VersionResolver {
             result.addException(e);
         }
 
-        return (versioning != null) ? versioning : Versioning.newInstance();
+        return versioning != null ? versioning : Versioning.newInstance();
     }
 
     private void invalidMetadata(
@@ -396,7 +396,7 @@ public class DefaultVersionResolver implements VersionResolver {
         ArtifactRepository repository;
 
         VersionInfo(String timestamp, String version, ArtifactRepository repository) {
-            this.timestamp = (timestamp != null) ? timestamp : "";
+            this.timestamp = timestamp != null ? timestamp : "";
             this.version = version;
             this.repository = repository;
         }
@@ -437,7 +437,7 @@ public class DefaultVersionResolver implements VersionResolver {
             version = artifact.getVersion();
             localRepo = session.getLocalRepository().getBasePath();
             WorkspaceReader reader = session.getWorkspaceReader();
-            workspace = (reader != null) ? reader.getRepository() : null;
+            workspace = reader != null ? reader.getRepository() : null;
             repositories = new ArrayList<>(request.getRepositories().size());
             boolean repoMan = false;
             for (RemoteRepository repository : request.getRepositories()) {

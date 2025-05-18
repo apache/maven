@@ -151,7 +151,7 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
             StringBuilder sb = new StringBuilder();
             sb.append(totalProblems)
                     .append(
-                            (totalProblems == 1)
+                            totalProblems == 1
                                     ? " problem was "
                                     : " problems were encountered while building the effective model");
             if (modelId != null && !modelId.isEmpty()) {

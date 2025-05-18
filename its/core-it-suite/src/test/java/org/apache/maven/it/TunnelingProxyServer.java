@@ -52,7 +52,7 @@ public class TunnelingProxyServer implements Runnable {
     }
 
     public int getPort() {
-        return (server != null) ? server.getLocalPort() : port;
+        return server != null ? server.getLocalPort() : port;
     }
 
     public void start() throws IOException {

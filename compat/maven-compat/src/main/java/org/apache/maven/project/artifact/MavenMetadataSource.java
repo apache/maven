@@ -237,7 +237,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
                 dependencies = rel.project.getModel().getDependencies();
 
                 DependencyManagement depMgmt = rel.project.getModel().getDependencyManagement();
-                managedDependencies = (depMgmt != null) ? depMgmt.getDependencies() : null;
+                managedDependencies = depMgmt != null ? depMgmt.getDependencies() : null;
 
                 pomRepositories = rel.project.getRemoteArtifactRepositories();
             }
@@ -334,9 +334,9 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
     private Artifact createDependencyArtifact(Dependency dependency, Artifact owner, Artifact pom)
             throws ArtifactMetadataRetrievalException {
         try {
-            String inheritedScope = (owner != null) ? owner.getScope() : null;
+            String inheritedScope = owner != null ? owner.getScope() : null;
 
-            ArtifactFilter inheritedFilter = (owner != null) ? owner.getDependencyFilter() : null;
+            ArtifactFilter inheritedFilter = owner != null ? owner.getDependencyFilter() : null;
 
             return createDependencyArtifact(artifactFactory, dependency, inheritedScope, inheritedFilter);
         } catch (InvalidVersionSpecificationException e) {

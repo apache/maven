@@ -136,7 +136,7 @@ public class ModelBuildingException extends Exception {
         PrintWriter writer = new PrintWriter(buffer);
 
         writer.print(problems.size());
-        writer.print((problems.size() == 1) ? " problem was " : " problems were ");
+        writer.print(problems.size() == 1 ? " problem was " : " problems were ");
         writer.print("encountered while building the effective model");
         if (modelId != null && modelId.length() > 0) {
             writer.print(" for ");

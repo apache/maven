@@ -78,6 +78,6 @@ public class DefaultResolutionErrorHandler implements ResolutionErrorHandler {
     }
 
     private static <T> List<T> toList(Collection<T> items) {
-        return (items != null) ? new ArrayList<>(items) : null;
+        return items != null ? new ArrayList<>(items) : null;
     }
 }

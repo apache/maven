@@ -60,6 +60,6 @@ public class DefaultLegacySupport implements LegacySupport {
 
     public RepositorySystemSession getRepositorySession() {
         MavenSession session = getSession();
-        return (session != null) ? session.getRepositorySession() : null;
+        return session != null ? session.getRepositorySession() : null;
     }
 }

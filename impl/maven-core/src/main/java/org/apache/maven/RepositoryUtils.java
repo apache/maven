@@ -66,7 +66,7 @@ import org.eclipse.aether.util.repository.AuthenticationBuilder;
 public class RepositoryUtils {
 
     private static String nullify(String string) {
-        return (string == null || string.isEmpty()) ? null : string;
+        return string == null || string.isEmpty() ? null : string;
     }
 
     public static org.apache.maven.artifact.Artifact toArtifact(Dependency dependency) {
@@ -144,7 +144,7 @@ public class RepositoryUtils {
 
         Map<String, String> props = null;
         if (org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals(artifact.getScope())) {
-            String localPath = (artifact.getFile() != null) ? artifact.getFile().getPath() : "";
+            String localPath = artifact.getFile() != null ? artifact.getFile().getPath() : "";
             props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, localPath);
         }
 
@@ -331,7 +331,7 @@ public class RepositoryUtils {
 
     public static WorkspaceRepository getWorkspace(RepositorySystemSession session) {
         WorkspaceReader reader = session.getWorkspaceReader();
-        return (reader != null) ? reader.getRepository() : null;
+        return reader != null ? reader.getRepository() : null;
     }
 
     public static boolean repositoriesEquals(List<RemoteRepository> r1, List<RemoteRepository> r2) {

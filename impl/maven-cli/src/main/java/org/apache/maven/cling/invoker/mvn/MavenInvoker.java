@@ -209,7 +209,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             context.logger.info("");
             context.logger.info(String.format(
                     "%s %s encountered while building the effective toolchains (use -e to see details)",
-                    totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
+                    totalProblems, totalProblems == 1 ? "problem was" : "problems were"));
 
             if (context.invokerRequest.options().showErrors().orElse(false)) {
                 for (BuilderProblem problem :

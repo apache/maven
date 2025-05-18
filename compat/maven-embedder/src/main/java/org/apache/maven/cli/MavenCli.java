@@ -611,7 +611,7 @@ public class MavenCli {
         }
 
         if (slf4jLogger.isDebugEnabled()) {
-            slf4jLogger.debug("Message scheme: {}", (MessageUtils.isColorEnabled() ? "color" : "plain"));
+            slf4jLogger.debug("Message scheme: {}", MessageUtils.isColorEnabled() ? "color" : "plain");
             if (MessageUtils.isColorEnabled()) {
                 MessageBuilder buff = MessageUtils.builder();
                 buff.a("Message styles: ");
@@ -948,7 +948,7 @@ public class MavenCli {
 
             if (passwd == null) {
                 Console cons = System.console();
-                char[] password = (cons == null) ? null : cons.readPassword("Password: ");
+                char[] password = cons == null ? null : cons.readPassword("Password: ");
                 if (password != null) {
                     // Cipher uses Strings
                     passwd = String.copyValueOf(password);

@@ -53,12 +53,12 @@ public final class RelocatedArtifact extends AbstractArtifact {
             String version,
             String message) {
         this.artifact = Objects.requireNonNull(artifact, "artifact cannot be null");
-        this.groupId = (groupId != null && !groupId.isEmpty()) ? groupId : null;
-        this.artifactId = (artifactId != null && !artifactId.isEmpty()) ? artifactId : null;
-        this.classifier = (classifier != null && !classifier.isEmpty()) ? classifier : null;
-        this.extension = (extension != null && !extension.isEmpty()) ? extension : null;
-        this.version = (version != null && !version.isEmpty()) ? version : null;
-        this.message = (message != null && !message.isEmpty()) ? message : null;
+        this.groupId = groupId != null && !groupId.isEmpty() ? groupId : null;
+        this.artifactId = artifactId != null && !artifactId.isEmpty() ? artifactId : null;
+        this.classifier = classifier != null && !classifier.isEmpty() ? classifier : null;
+        this.extension = extension != null && !extension.isEmpty() ? extension : null;
+        this.version = version != null && !version.isEmpty() ? version : null;
+        this.message = message != null && !message.isEmpty() ? message : null;
     }
 
     @Override

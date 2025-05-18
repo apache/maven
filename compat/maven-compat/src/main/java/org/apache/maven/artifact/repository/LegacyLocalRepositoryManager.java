@@ -88,7 +88,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         ArtifactRepositoryLayout layout = delegate.getLayout();
         repo = new LocalRepository(
                 new File(delegate.getBasedir()),
-                (layout != null) ? layout.getClass().getSimpleName() : "legacy");
+                layout != null ? layout.getClass().getSimpleName() : "legacy");
 
         /*
          * NOTE: "invoker:install" vs "appassembler:assemble": Both mojos use the artifact installer to put an artifact
@@ -199,7 +199,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         }
 
         private String nullify(String str) {
-            return (str == null || str.isEmpty()) ? null : str;
+            return str == null || str.isEmpty() ? null : str;
         }
 
         public Object getKey() {

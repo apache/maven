@@ -91,6 +91,6 @@ public class DependencyContext {
 
     public void synchronizeWithProjectState() {
         lastDependencyArtifacts = project.getDependencyArtifacts();
-        lastDependencyArtifactCount = (lastDependencyArtifacts != null) ? lastDependencyArtifacts.size() : 0;
+        lastDependencyArtifactCount = lastDependencyArtifacts != null ? lastDependencyArtifacts.size() : 0;
     }
 }

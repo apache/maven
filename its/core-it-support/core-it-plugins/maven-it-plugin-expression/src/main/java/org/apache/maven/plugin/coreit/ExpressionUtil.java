@@ -128,7 +128,7 @@ class ExpressionUtil {
     }
 
     private static String concat(String prefix, String segment) {
-        return (prefix == null || prefix.length() <= 0) ? segment : (prefix + '/' + segment);
+        return prefix == null || prefix.length() <= 0 ? segment : (prefix + '/' + segment);
     }
 
     /**

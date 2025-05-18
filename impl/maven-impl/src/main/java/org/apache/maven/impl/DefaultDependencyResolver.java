@@ -206,7 +206,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                     ArtifactResolverResult artifactResolverResult =
                             session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
                     for (Node node : nodes) {
-                        Path path = (node.getArtifact() != null)
+                        Path path = node.getArtifact() != null
                                 ? artifactResolverResult
                                         .getResult(node.getArtifact().toCoordinates())
                                         .getPath()

@@ -220,7 +220,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model out = interpolator.interpolateModel(model, new File("."), createModelBuildingRequest(context), collector);
         assertCollectorState(0, 0, 0, collector);
 
-        assertEquals("3.8.1", (out.getDependencies().get(0)).getVersion());
+        assertEquals("3.8.1", out.getDependencies().get(0).getVersion());
     }
 
     @Test
@@ -238,7 +238,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model out = interpolator.interpolateModel(model, new File("."), createModelBuildingRequest(context), collector);
         assertProblemFree(collector);
 
-        assertEquals("${something}", (out.getDependencies().get(0)).getVersion());
+        assertEquals("${something}", out.getDependencies().get(0).getVersion());
     }
 
     @Test
@@ -257,7 +257,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model out = interpolator.interpolateModel(model, new File("."), createModelBuildingRequest(context), collector);
         assertCollectorState(0, 0, 0, collector);
 
-        assertEquals("foo-3.8.1", (out.getDependencies().get(0)).getVersion());
+        assertEquals("foo-3.8.1", out.getDependencies().get(0).getVersion());
     }
 
     @Test
@@ -277,7 +277,7 @@ public abstract class AbstractModelInterpolatorTest {
         assertProblemFree(collector);
 
         assertEquals(
-                "file://localhost/myBasedir/temp-repo", (out.getRepositories().get(0)).getUrl());
+                "file://localhost/myBasedir/temp-repo", out.getRepositories().get(0).getUrl());
     }
 
     @Test
@@ -296,7 +296,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
         assertProblemFree(collector);
 
-        assertEquals("myBaseUri/temp-repo", (out.getRepositories().get(0)).getUrl());
+        assertEquals("myBaseUri/temp-repo", out.getRepositories().get(0).getUrl());
     }
 
     @Test

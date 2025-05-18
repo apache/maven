@@ -130,7 +130,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      * @param path the path element to add
      */
     private void addPathElement(PathType type, Path path) {
-        dispatchedPaths.computeIfAbsent(type, (t) -> new ArrayList<>()).add(path);
+        dispatchedPaths.computeIfAbsent(type, t -> new ArrayList<>()).add(path);
     }
 
     /**
@@ -381,7 +381,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
     @Override
     public Optional<ModuleDescriptor> getModuleDescriptor(Path dependency) throws IOException {
         Object value = cache.getModuleInfo(dependency).descriptors.get(dependency);
-        return (value instanceof ModuleDescriptor moduleDescriptor) ? Optional.of(moduleDescriptor) : Optional.empty();
+        return value instanceof ModuleDescriptor moduleDescriptor ? Optional.of(moduleDescriptor) : Optional.empty();
     }
 
     @Override

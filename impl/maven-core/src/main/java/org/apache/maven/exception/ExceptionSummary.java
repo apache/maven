@@ -47,9 +47,9 @@ public class ExceptionSummary {
 
     public ExceptionSummary(Throwable exception, String message, String reference, List<ExceptionSummary> children) {
         this.exception = exception;
-        this.message = (message != null) ? message : "";
-        this.reference = (reference != null) ? reference : "";
-        this.children = (children != null) ? Collections.unmodifiableList(children) : Collections.emptyList();
+        this.message = message != null ? message : "";
+        this.reference = reference != null ? reference : "";
+        this.children = children != null ? Collections.unmodifiableList(children) : Collections.emptyList();
     }
 
     public Throwable getException() {

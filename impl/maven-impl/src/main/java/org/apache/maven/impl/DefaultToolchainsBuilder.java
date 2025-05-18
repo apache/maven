@@ -174,7 +174,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
                 ProblemCollector<BuilderProblem> problems) {
             this.request = request;
             this.effectiveToolchains = effectiveToolchains;
-            this.problems = (problems != null) ? problems : ProblemCollector.empty();
+            this.problems = problems != null ? problems : ProblemCollector.empty();
         }
 
         @Override

@@ -116,7 +116,7 @@ public class DelegatingLocalArtifactRepository extends MavenArtifactRepository {
 
     @Override
     public String getBasedir() {
-        return (userLocalArtifactRepository != null) ? userLocalArtifactRepository.getBasedir() : null;
+        return userLocalArtifactRepository != null ? userLocalArtifactRepository.getBasedir() : null;
     }
 
     @Override

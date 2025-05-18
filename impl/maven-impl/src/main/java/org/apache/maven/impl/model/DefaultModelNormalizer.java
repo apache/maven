@@ -124,7 +124,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
     private Dependency injectDependency(Dependency d) {
         // we cannot set this directly in the MDO due to the interactions with dependency management
-        return (d.getScope() == null || d.getScope().isEmpty()) ? d.withScope("compile") : d;
+        return d.getScope() == null || d.getScope().isEmpty() ? d.withScope("compile") : d;
     }
 
     /**

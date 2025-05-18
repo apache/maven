@@ -65,8 +65,8 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
             for (Artifact artifact : extensionArtifacts) {
                 File file = artifact.getFile();
                 files.add(file);
-                timestamps.add((file != null) ? Long.valueOf(file.lastModified()) : Long.valueOf(0));
-                sizes.add((file != null) ? Long.valueOf(file.length()) : Long.valueOf(0));
+                timestamps.add(file != null ? Long.valueOf(file.lastModified()) : Long.valueOf(0));
+                sizes.add(file != null ? Long.valueOf(file.length()) : Long.valueOf(0));
                 ids.add(artifact.getVersion());
             }
 

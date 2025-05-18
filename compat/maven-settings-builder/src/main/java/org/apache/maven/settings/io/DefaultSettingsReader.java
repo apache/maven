@@ -93,7 +93,7 @@ public class DefaultSettingsReader implements SettingsReader {
     }
 
     private boolean isStrict(Map<String, ?> options) {
-        Object value = (options != null) ? options.get(IS_STRICT) : null;
+        Object value = options != null ? options.get(IS_STRICT) : null;
         return value == null || Boolean.parseBoolean(value.toString());
     }
 }

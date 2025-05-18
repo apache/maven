@@ -34,7 +34,7 @@ class DefaultProblemCollector implements ProblemCollector {
     private String source;
 
     DefaultProblemCollector(List<Problem> problems) {
-        this.problems = (problems != null) ? problems : new ArrayList<>();
+        this.problems = problems != null ? problems : new ArrayList<>();
     }
 
     @Override

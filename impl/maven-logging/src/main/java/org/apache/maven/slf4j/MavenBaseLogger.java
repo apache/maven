@@ -252,7 +252,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     protected boolean isLevelEnabled(int logLevel) {
         // log level are numerically ordered so can use simple numeric
         // comparison
-        return (logLevel >= currentLogLevel);
+        return logLevel >= currentLogLevel;
     }
 
     /** Are {@code trace} messages currently enabled? */
@@ -377,7 +377,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     protected String renderLevel(int levelInt) {
         return switch (levelInt) {
             case LOG_LEVEL_TRACE -> "TRACE";
-            case LOG_LEVEL_DEBUG -> ("DEBUG");
+            case LOG_LEVEL_DEBUG -> "DEBUG";
             case LOG_LEVEL_INFO -> "INFO";
             case LOG_LEVEL_WARN -> "WARN";
             case LOG_LEVEL_ERROR -> "ERROR";

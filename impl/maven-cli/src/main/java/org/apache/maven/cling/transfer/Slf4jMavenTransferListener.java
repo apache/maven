@@ -72,7 +72,7 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
 
     @Override
     public void transferSucceeded(TransferEvent event) {
-        String action = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
+        String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded";
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();

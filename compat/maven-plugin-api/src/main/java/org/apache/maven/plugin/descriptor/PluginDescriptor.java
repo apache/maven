@@ -348,7 +348,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
     }
 
     public Set<Artifact> getIntroducedDependencyArtifacts() {
-        return (introducedDependencyArtifacts != null) ? introducedDependencyArtifacts : Collections.emptySet();
+        return introducedDependencyArtifacts != null ? introducedDependencyArtifacts : Collections.emptySet();
     }
 
     public void setName(String name) {
@@ -437,7 +437,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
     }
 
     private InputStream getDescriptorStream(String descriptor) throws IOException {
-        File pluginFile = (pluginArtifact != null) ? pluginArtifact.getFile() : null;
+        File pluginFile = pluginArtifact != null ? pluginArtifact.getFile() : null;
         if (pluginFile == null) {
             throw new IllegalStateException("plugin main artifact has not been resolved for " + getId());
         }

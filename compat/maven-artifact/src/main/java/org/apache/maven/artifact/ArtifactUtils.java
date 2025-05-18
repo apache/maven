@@ -112,7 +112,7 @@ public final class ArtifactUtils {
     }
 
     public static Artifact copyArtifactSafe(Artifact artifact) {
-        return (artifact != null) ? copyArtifact(artifact) : null;
+        return artifact != null ? copyArtifact(artifact) : null;
     }
 
     public static Artifact copyArtifact(Artifact artifact) {

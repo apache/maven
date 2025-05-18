@@ -346,7 +346,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                 SettingsBuilderRequest request, Settings effectiveSettings, ProblemCollector<BuilderProblem> problems) {
             this.request = request;
             this.effectiveSettings = effectiveSettings;
-            this.problems = (problems != null) ? problems : ProblemCollector.empty();
+            this.problems = problems != null ? problems : ProblemCollector.empty();
         }
 
         @Override

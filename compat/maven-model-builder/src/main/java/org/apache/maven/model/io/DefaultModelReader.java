@@ -77,12 +77,12 @@ public class DefaultModelReader implements ModelReader {
     }
 
     private boolean isStrict(Map<String, ?> options) {
-        Object value = (options != null) ? options.get(IS_STRICT) : null;
+        Object value = options != null ? options.get(IS_STRICT) : null;
         return value == null || Boolean.parseBoolean(value.toString());
     }
 
     private InputSource getSource(Map<String, ?> options) {
-        Object value = (options != null) ? options.get(INPUT_SOURCE) : null;
+        Object value = options != null ? options.get(INPUT_SOURCE) : null;
         return (InputSource) value;
     }
 

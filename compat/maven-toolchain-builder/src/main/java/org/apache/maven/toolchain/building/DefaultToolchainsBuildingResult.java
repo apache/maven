@@ -45,7 +45,7 @@ public class DefaultToolchainsBuildingResult implements ToolchainsBuildingResult
      */
     public DefaultToolchainsBuildingResult(PersistedToolchains effectiveToolchains, List<Problem> problems) {
         this.effectiveToolchains = effectiveToolchains;
-        this.problems = (problems != null) ? problems : new ArrayList<>();
+        this.problems = problems != null ? problems : new ArrayList<>();
     }
 
     @Override

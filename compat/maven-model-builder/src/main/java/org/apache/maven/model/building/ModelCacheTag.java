@@ -80,7 +80,7 @@ interface ModelCacheTag<T> {
 
         @Override
         public ModelData intoCache(ModelData data) {
-            Model model = (data.getModel() != null) ? data.getModel().clone() : null;
+            Model model = data.getModel() != null ? data.getModel().clone() : null;
             return new ModelData(data.getSource(), model, data.getGroupId(), data.getArtifactId(), data.getVersion());
         }
 
@@ -107,7 +107,7 @@ interface ModelCacheTag<T> {
 
         @Override
         public DependencyManagement intoCache(DependencyManagement data) {
-            return (data != null) ? data.clone() : null;
+            return data != null ? data.clone() : null;
         }
 
         @Override

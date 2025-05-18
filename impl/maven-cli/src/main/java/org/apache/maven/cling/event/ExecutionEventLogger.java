@@ -131,7 +131,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                         - project.getName().length()
                         - project.getPackaging().length()
                         - 2;
-                logger.info("{}{}[{}]", project.getName(), chars(' ', (len > 0) ? len : 1), project.getPackaging());
+                logger.info("{}{}[{}]", project.getName(), chars(' ', len > 0 ? len : 1), project.getPackaging());
             }
 
             final List<MavenProject> allProjects = event.getSession().getAllProjects();
@@ -338,7 +338,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
                 int pad = lineLength - building.length() - progress.length();
 
-                infoMain(building + ((pad > 0) ? chars(' ', pad) : "") + progress);
+                infoMain(building + (pad > 0 ? chars(' ', pad) : "") + progress);
             }
 
             // path to pom.xml

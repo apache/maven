@@ -36,7 +36,7 @@ class DefaultSettingsProblemCollector implements SettingsProblemCollector {
     private String source;
 
     DefaultSettingsProblemCollector(List<SettingsProblem> problems) {
-        this.problems = (problems != null) ? problems : new ArrayList<>();
+        this.problems = problems != null ? problems : new ArrayList<>();
     }
 
     public List<SettingsProblem> getProblems() {

@@ -135,7 +135,7 @@ class ModelData {
      * @return The effective group identifier of the model or an empty string if unknown, never {@code null}.
      */
     public String getGroupId() {
-        return (groupId != null) ? groupId : "";
+        return groupId != null ? groupId : "";
     }
 
     /**
@@ -153,7 +153,7 @@ class ModelData {
      * @return The effective artifact identifier of the model or an empty string if unknown, never {@code null}.
      */
     public String getArtifactId() {
-        return (artifactId != null) ? artifactId : "";
+        return artifactId != null ? artifactId : "";
     }
 
     /**
@@ -171,7 +171,7 @@ class ModelData {
      * @return The effective version of the model or an empty string if unknown, never {@code null}.
      */
     public String getVersion() {
-        return (version != null) ? version : "";
+        return version != null ? version : "";
     }
 
     /**

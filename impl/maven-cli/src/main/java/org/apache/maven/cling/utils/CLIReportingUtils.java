@@ -96,7 +96,7 @@ public final class CLIReportingUtils {
     public static String showVersionMinimal() {
         Properties properties = getBuildProperties();
         String version = reduce(properties.getProperty(BUILD_VERSION_PROPERTY));
-        return (version != null ? version : "<version unknown>");
+        return version != null ? version : "<version unknown>";
     }
 
     /**
@@ -116,7 +116,7 @@ public final class CLIReportingUtils {
     }
 
     private static String reduce(String s) {
-        return (s != null ? (s.startsWith("${") && s.endsWith("}") ? null : s) : null);
+        return s != null ? (s.startsWith("${") && s.endsWith("}") ? null : s) : null;
     }
 
     public static Properties getBuildProperties() {

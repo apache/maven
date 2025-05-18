@@ -57,7 +57,7 @@ public class MavenITmng3833PomInterpolationDataFlowChainTest extends AbstractMav
         Properties props = verifier.loadProperties("target/interpolated.properties");
 
         for (int i = 0; i < 24; i++) {
-            String index = ((i < 10) ? "0" : "") + i;
+            String index = (i < 10 ? "0" : "") + i;
             assertEquals("PASSED", props.getProperty("project.properties.property" + index));
         }
     }

@@ -40,9 +40,9 @@ class DefaultSettingsDecryptionResult implements SettingsDecryptionResult {
     private List<SettingsProblem> problems;
 
     DefaultSettingsDecryptionResult(List<Server> servers, List<Proxy> proxies, List<SettingsProblem> problems) {
-        this.servers = (servers != null) ? servers : new ArrayList<>();
-        this.proxies = (proxies != null) ? proxies : new ArrayList<>();
-        this.problems = (problems != null) ? problems : new ArrayList<>();
+        this.servers = servers != null ? servers : new ArrayList<>();
+        this.proxies = proxies != null ? proxies : new ArrayList<>();
+        this.problems = problems != null ? problems : new ArrayList<>();
     }
 
     @Override

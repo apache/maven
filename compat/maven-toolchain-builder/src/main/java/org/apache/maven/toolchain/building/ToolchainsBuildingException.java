@@ -63,7 +63,7 @@ public class ToolchainsBuildingException extends Exception {
         PrintWriter writer = new PrintWriter(buffer);
 
         writer.print(problems.size());
-        writer.print((problems.size() == 1) ? " problem was " : " problems were ");
+        writer.print(problems.size() == 1 ? " problem was " : " problems were ");
         writer.print("encountered while building the effective toolchains");
         writer.println();
 

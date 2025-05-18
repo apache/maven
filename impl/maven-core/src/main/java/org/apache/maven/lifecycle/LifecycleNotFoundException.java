@@ -33,7 +33,7 @@ public class LifecycleNotFoundException extends Exception {
      */
     public LifecycleNotFoundException(String lifecycleId) {
         super("Unknown lifecycle " + lifecycleId);
-        this.lifecycleId = (lifecycleId != null) ? lifecycleId : "";
+        this.lifecycleId = lifecycleId != null ? lifecycleId : "";
     }
 
     /**
