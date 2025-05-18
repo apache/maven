@@ -608,9 +608,9 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             // effective line, with indent and reset if end is colored
             line = indent + line + ("".equals(nextColor) ? "" : ANSI_RESET);
 
-            if ((i == lines.length - 1)
+            if (i == lines.length - 1
                     && (context.invokerRequest.options().showErrors().orElse(false)
-                            || (summary.getException() instanceof InternalErrorException))) {
+                            || summary.getException() instanceof InternalErrorException)) {
                 context.logger.error(line, summary.getException());
             } else {
                 context.logger.error(line);

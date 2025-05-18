@@ -127,7 +127,7 @@ public class XmlNodeBuilder {
                             String aname = parser.getAttributeName(i);
                             String avalue = parser.getAttributeValue(i);
                             attrs.put(aname, avalue);
-                            spacePreserve = spacePreserve || ("xml:space".equals(aname) && "preserve".equals(avalue));
+                            spacePreserve = spacePreserve || "xml:space".equals(aname) && "preserve".equals(avalue);
                         }
                     }
                 } else {
@@ -146,7 +146,7 @@ public class XmlNodeBuilder {
             } else if (eventType == XmlPullParser.END_TAG) {
                 return new XmlNodeImpl(
                         name,
-                        children == null ? (value != null ? value : emptyTag ? null : "") : null,
+                        children == null ? value != null ? value : emptyTag ? null : "" : null,
                         attrs,
                         children,
                         location);

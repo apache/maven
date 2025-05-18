@@ -163,7 +163,7 @@ public class PathSelector implements PathMatcher {
      *
      * @see #simplify()
      */
-    private static final PathMatcher INCLUDES_ALL = (path) -> true;
+    private static final PathMatcher INCLUDES_ALL = path -> true;
 
     /**
      * String representations of the normalized include filters.
@@ -379,7 +379,7 @@ public class PathSelector implements PathMatcher {
             }
             fragments[count++] = fragment;
         }
-        return (fragments.length == count) ? fragments : Arrays.copyOf(fragments, count);
+        return fragments.length == count ? fragments : Arrays.copyOf(fragments, count);
     }
 
     /**

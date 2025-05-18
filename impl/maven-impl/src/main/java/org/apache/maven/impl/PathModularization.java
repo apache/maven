@@ -163,7 +163,7 @@ class PathModularization {
             if (Files.isDirectory(file)) {
                 var multi = new HashMap<Path, ModuleDescriptor>();
                 try (Stream<Path> subdirs = Files.list(file)) {
-                    subdirs.filter(Files::isDirectory).forEach((subdir) -> {
+                    subdirs.filter(Files::isDirectory).forEach(subdir -> {
                         Path mf = subdir.resolve(MODULE_INFO);
                         if (Files.isRegularFile(mf)) {
                             ModuleDescriptor descriptor = null;

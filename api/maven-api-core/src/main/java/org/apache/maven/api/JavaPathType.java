@@ -263,7 +263,7 @@ public enum JavaPathType implements PathType {
         if (option == null) {
             throw new IllegalStateException("No option is associated to this path type.");
         }
-        String prefix = (moduleName == null) ? "" : (moduleName + '=');
+        String prefix = moduleName == null ? "" : moduleName + '=';
         StringJoiner joiner = new StringJoiner(File.pathSeparator, prefix, "");
         joiner.setEmptyValue("");
         for (Path p : paths) {

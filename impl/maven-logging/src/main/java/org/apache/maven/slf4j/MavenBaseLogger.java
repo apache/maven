@@ -208,7 +208,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         String tempName = name;
         String levelString = null;
         int indexOfLastDot = tempName.length();
-        while ((levelString == null) && (indexOfLastDot > -1)) {
+        while (levelString == null && indexOfLastDot > -1) {
             tempName = tempName.substring(0, indexOfLastDot);
             levelString = CONFIG_PARAMS.getStringProperty(Constants.MAVEN_LOGGER_LOG_PREFIX + tempName, null);
             indexOfLastDot = tempName.lastIndexOf(".");

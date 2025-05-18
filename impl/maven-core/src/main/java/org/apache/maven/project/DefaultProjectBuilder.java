@@ -367,14 +367,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
                     ModelBuilderRequest.RequestType type = reactorMember
                                     || isStandalone
-                                    || (pomFile != null
+                                    || pomFile != null
                                             && this.request.isProcessPlugins()
                                             && this.request.getValidationLevel()
-                                                    == ModelBuildingRequest.VALIDATION_LEVEL_STRICT)
+                                                    == ModelBuildingRequest.VALIDATION_LEVEL_STRICT
                             ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
-                            : (parent
+                            : parent
                                     ? ModelBuilderRequest.RequestType.CONSUMER_PARENT
-                                    : ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY);
+                                    : ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY;
                     MavenProject theProject = project;
                     ModelBuilderRequest request = builder.source(modelSource)
                             .requestType(type)

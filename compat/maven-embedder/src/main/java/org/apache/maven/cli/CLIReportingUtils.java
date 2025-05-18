@@ -126,7 +126,7 @@ public final class CLIReportingUtils {
     }
 
     private static String reduce(String s) {
-        return s != null ? (s.startsWith("${") && s.endsWith("}") ? null : s) : null;
+        return s != null ? s.startsWith("${") && s.endsWith("}") ? null : s : null;
     }
 
     public static Properties getBuildProperties() {
@@ -178,9 +178,9 @@ public final class CLIReportingUtils {
     public static String formatDuration(long duration) {
         // CHECKSTYLE_OFF: MagicNumber
         long ms = duration % 1000;
-        long s = (duration / ONE_SECOND) % 60;
-        long m = (duration / ONE_MINUTE) % 60;
-        long h = (duration / ONE_HOUR) % 24;
+        long s = duration / ONE_SECOND % 60;
+        long m = duration / ONE_MINUTE % 60;
+        long h = duration / ONE_HOUR % 24;
         long d = duration / ONE_DAY;
         // CHECKSTYLE_ON: MagicNumber
 

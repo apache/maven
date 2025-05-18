@@ -689,7 +689,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 cause = cause.getCause();
             }
 
-            if ((cause instanceof NoClassDefFoundError) || (cause instanceof ClassNotFoundException)) {
+            if (cause instanceof NoClassDefFoundError || cause instanceof ClassNotFoundException) {
                 ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
                 PrintStream ps = new PrintStream(os);
                 ps.println("Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"

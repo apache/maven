@@ -71,7 +71,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             String[] parts = version.split("\\.");
             int major = Integer.parseInt(parts[0]);
             int minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
-            return major > 4 || (major == 4 && minor > 0);
+            return major > 4 || major == 4 && minor > 0;
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             return false;
         }

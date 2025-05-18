@@ -134,9 +134,9 @@ public class SnapshotTransformation extends AbstractVersionTransformation {
 
         int buildNumber = 0;
         Metadata repoMetadata = metadata.getMetadata();
-        if ((repoMetadata != null)
-                && (repoMetadata.getVersioning() != null
-                        && repoMetadata.getVersioning().getSnapshot() != null)) {
+        if (repoMetadata != null
+                && repoMetadata.getVersioning() != null
+                && repoMetadata.getVersioning().getSnapshot() != null) {
             buildNumber = repoMetadata.getVersioning().getSnapshot().getBuildNumber();
         }
         return buildNumber;

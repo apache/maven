@@ -125,7 +125,7 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
 
                 moduleName = moduleName.substring(lastSlash + 1);
 
-                if ((moduleName.equals(childName) || (moduleName.equals(childDirectory))) && lastSlash >= 0) {
+                if ((moduleName.equals(childName) || moduleName.equals(childDirectory)) && lastSlash >= 0) {
                     adjustment = module.substring(0, lastSlash);
                     break;
                 }

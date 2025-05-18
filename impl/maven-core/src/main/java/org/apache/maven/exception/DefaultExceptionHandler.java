@@ -207,7 +207,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
             }
         }
 
-        if ((reference != null && !reference.isEmpty()) && !reference.startsWith("http:")) {
+        if (reference != null && !reference.isEmpty() && !reference.startsWith("http:")) {
             reference = "http://cwiki.apache.org/confluence/display/MAVEN/" + reference;
         }
 
@@ -242,7 +242,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
             }
 
             if (longMessage != null && !longMessage.isEmpty()) {
-                if ((exceptionMessage == null || exceptionMessage.isEmpty())
+                if (exceptionMessage == null || exceptionMessage.isEmpty()
                         || longMessage.contains(exceptionMessage)) {
                     exceptionMessage = longMessage;
                 } else if (!exceptionMessage.contains(longMessage)) {

@@ -111,7 +111,7 @@ public class DefaultArtifactVersion implements ArtifactVersion {
             }
         }
 
-        if ((!part1.contains(".")) && !part1.startsWith("0")) {
+        if (!part1.contains(".") && !part1.startsWith("0")) {
             majorVersion = tryParseInt(part1);
             if (majorVersion == null) {
                 // qualifier is the whole version, including "-"
@@ -178,7 +178,7 @@ public class DefaultArtifactVersion implements ArtifactVersion {
     }
 
     private static Integer getNextIntegerToken(String s) {
-        if ((s.length() > 1) && s.startsWith("0")) {
+        if (s.length() > 1 && s.startsWith("0")) {
             return null;
         }
         return tryParseInt(s);

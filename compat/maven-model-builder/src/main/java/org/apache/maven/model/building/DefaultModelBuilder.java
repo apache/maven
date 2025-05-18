@@ -841,8 +841,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     ModelSource expectedParentSource = getParentPomFile(childModel, childSource);
 
                     if (expectedParentSource == null
-                            || (expectedParentSource instanceof ModelSource2
-                                    && !pomSource.equals(expectedParentSource))) {
+                            || expectedParentSource instanceof ModelSource2
+                                    && !pomSource.equals(expectedParentSource)) {
                         parentData = readParentExternally(childModel, request, problems);
                     }
                 }

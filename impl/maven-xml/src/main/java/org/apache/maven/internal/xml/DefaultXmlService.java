@@ -109,7 +109,7 @@ public class DefaultXmlService extends XmlService {
                                 aName = aPrefix + ":" + aName;
                             }
                             attrs.put(aName, aValue);
-                            spacePreserve = spacePreserve || ("xml:space".equals(aName) && "preserve".equals(aValue));
+                            spacePreserve = spacePreserve || "xml:space".equals(aName) && "preserve".equals(aValue);
                         }
                     }
                 } else {
@@ -133,7 +133,7 @@ public class DefaultXmlService extends XmlService {
                         .prefix(lPrefix)
                         .namespaceUri(lNamespaceUri)
                         .name(lName)
-                        .value(children == null ? (lValue != null ? lValue : emptyTag ? null : "") : null)
+                        .value(children == null ? lValue != null ? lValue : emptyTag ? null : "" : null)
                         .attributes(attrs)
                         .children(children)
                         .inputLocation(location)

@@ -299,7 +299,7 @@ public class ConditionParser {
             return parseParentheses();
         } else if (functions.containsKey(token)) {
             return parseFunction();
-        } else if ((token.startsWith("\"") && token.endsWith("\"")) || (token.startsWith("'") && token.endsWith("'"))) {
+        } else if (token.startsWith("\"") && token.endsWith("\"") || token.startsWith("'") && token.endsWith("'")) {
             current++;
             return token.length() > 1 ? token.substring(1, token.length() - 1) : "";
         } else if (token.equalsIgnoreCase("true") || token.equalsIgnoreCase("false")) {

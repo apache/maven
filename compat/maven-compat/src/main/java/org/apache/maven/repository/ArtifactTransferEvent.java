@@ -276,7 +276,7 @@ public class ArtifactTransferEvent extends EventObject {
         if (this == obj) {
             return true;
         }
-        if ((obj == null) || (getClass() != obj.getClass())) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
         final ArtifactTransferEvent other = (ArtifactTransferEvent) obj;

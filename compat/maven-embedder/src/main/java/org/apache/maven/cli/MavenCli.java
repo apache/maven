@@ -1120,7 +1120,7 @@ public class MavenCli {
             // effective line, with indent and reset if end is colored
             line = indent + line + ("".equals(nextColor) ? "" : ANSI_RESET);
 
-            if ((i == lines.length - 1) && (showErrors || (summary.getException() instanceof InternalErrorException))) {
+            if (i == lines.length - 1 && (showErrors || summary.getException() instanceof InternalErrorException)) {
                 slf4jLogger.error(line, summary.getException());
             } else {
                 slf4jLogger.error(line);
@@ -1320,7 +1320,7 @@ public class MavenCli {
         request.setTransferListener(determineTransferListener(quiet, verbose, commandLine, request));
         request.setExecutionListener(determineExecutionListener());
 
-        if ((request.getPom() != null) && (request.getPom().getParentFile() != null)) {
+        if (request.getPom() != null && request.getPom().getParentFile() != null) {
             request.setBaseDirectory(request.getPom().getParentFile());
         }
 

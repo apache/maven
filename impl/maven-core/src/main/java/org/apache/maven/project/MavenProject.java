@@ -476,7 +476,7 @@ public class MavenProject implements Cloneable {
     @Deprecated
     private List<String> getSourceRootDirs(ProjectScope scope, Language language) {
         return getEnabledSourceRoots(scope, language)
-                .map((source) -> source.directory().toString())
+                .map(source -> source.directory().toString())
                 .toList();
     }
 
@@ -612,7 +612,7 @@ public class MavenProject implements Cloneable {
     public String getGroupId() {
         String groupId = getModel().getGroupId();
 
-        if ((groupId == null) && (getModel().getParent() != null)) {
+        if (groupId == null && getModel().getParent() != null) {
             groupId = getModel().getParent().getGroupId();
         }
 
@@ -647,7 +647,7 @@ public class MavenProject implements Cloneable {
     public String getVersion() {
         String version = getModel().getVersion();
 
-        if ((version == null) && (getModel().getParent() != null)) {
+        if (version == null && getModel().getParent() != null) {
             version = getModel().getParent().getVersion();
         }
 
@@ -1005,7 +1005,7 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public ArtifactRepository getDistributionManagementArtifactRepository() {
-        return getArtifact().isSnapshot() && (getSnapshotArtifactRepository() != null)
+        return getArtifact().isSnapshot() && getSnapshotArtifactRepository() != null
                 ? getSnapshotArtifactRepository()
                 : getReleaseArtifactRepository();
     }
@@ -1124,7 +1124,7 @@ public class MavenProject implements Cloneable {
     }
 
     public MavenProject getExecutionProject() {
-        return (executionProject == null ? this : executionProject);
+        return executionProject == null ? this : executionProject;
     }
 
     public void setExecutionProject(MavenProject executionProject) {
@@ -1203,7 +1203,7 @@ public class MavenProject implements Cloneable {
 
     public List<Extension> getBuildExtensions() {
         Build build = getBuild();
-        if ((build == null) || (build.getExtensions() == null)) {
+        if (build == null || build.getExtensions() == null) {
             return Collections.emptyList();
         } else {
             return Collections.unmodifiableList(build.getExtensions());
@@ -1293,7 +1293,7 @@ public class MavenProject implements Cloneable {
      */
     @Deprecated
     private void setSourceRootDirs(ProjectScope scope, Language language, List<String> roots) {
-        sources.removeIf((source) -> scope.equals(source.scope()) && language.equals(source.language()));
+        sources.removeIf(source -> scope.equals(source.scope()) && language.equals(source.language()));
         Path directory = getBaseDirectory();
         for (String root : roots) {
             addSourceRoot(new DefaultSourceRoot(scope, language, directory.resolve(root)));
@@ -1357,7 +1357,7 @@ public class MavenProject implements Cloneable {
             setExtensionArtifacts(Collections.unmodifiableSet(project.getExtensionArtifacts()));
         }
 
-        setParentArtifact((project.getParentArtifact()));
+        setParentArtifact(project.getParentArtifact());
 
         if (project.getRemoteArtifactRepositories() != null) {
             setRemoteArtifactRepositories(Collections.unmodifiableList(project.getRemoteArtifactRepositories()));
@@ -1368,7 +1368,7 @@ public class MavenProject implements Cloneable {
         }
 
         if (project.getActiveProfiles() != null) {
-            setActiveProfiles((Collections.unmodifiableList(project.getActiveProfiles())));
+            setActiveProfiles(Collections.unmodifiableList(project.getActiveProfiles()));
         }
 
         if (project.getAttachedArtifacts() != null) {
@@ -1489,7 +1489,7 @@ public class MavenProject implements Cloneable {
      * @param artifacts The set of artifacts, may be {@code null}.
      */
     public void setResolvedArtifacts(Set<Artifact> artifacts) {
-        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.emptySet();
+        this.resolvedArtifacts = artifacts != null ? artifacts : Collections.emptySet();
         this.artifacts = null;
         this.artifactMap = null;
     }
@@ -1636,7 +1636,7 @@ public class MavenProject implements Cloneable {
     public List<Dependency> getCompileDependencies() {
         Set<Artifact> artifacts = getArtifacts();
 
-        if ((artifacts == null) || artifacts.isEmpty()) {
+        if (artifacts == null || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -1677,7 +1677,7 @@ public class MavenProject implements Cloneable {
     public List<Dependency> getTestDependencies() {
         Set<Artifact> artifacts = getArtifacts();
 
-        if ((artifacts == null) || artifacts.isEmpty()) {
+        if (artifacts == null || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -1702,7 +1702,7 @@ public class MavenProject implements Cloneable {
     public List<Dependency> getRuntimeDependencies() {
         Set<Artifact> artifacts = getArtifacts();
 
-        if ((artifacts == null) || artifacts.isEmpty()) {
+        if (artifacts == null || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -1782,7 +1782,7 @@ public class MavenProject implements Cloneable {
     public List<Dependency> getSystemDependencies() {
         Set<Artifact> artifacts = getArtifacts();
 
-        if ((artifacts == null) || artifacts.isEmpty()) {
+        if (artifacts == null || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
 

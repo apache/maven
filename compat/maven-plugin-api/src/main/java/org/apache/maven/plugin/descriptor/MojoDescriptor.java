@@ -612,8 +612,8 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
      * @return {@code true} if this mojo forks either a goal or the lifecycle, {@code false} otherwise.
      */
     public boolean isForking() {
-        return (getExecuteGoal() != null && !getExecuteGoal().isEmpty())
-                || (getExecutePhase() != null && !getExecutePhase().isEmpty());
+        return getExecuteGoal() != null && !getExecuteGoal().isEmpty()
+                || getExecutePhase() != null && !getExecutePhase().isEmpty();
     }
 
     public boolean isV4Api() {

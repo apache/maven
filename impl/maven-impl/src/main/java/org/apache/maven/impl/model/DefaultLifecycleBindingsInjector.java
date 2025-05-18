@@ -98,7 +98,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                 int i = 0;
                 String id = e.getId();
                 while (execs.putIfAbsent(id, e.withId(id)) != null) {
-                    id = e.getId() + "-" + (++i);
+                    id = e.getId() + "-" + ++i;
                 }
             });
             Plugin merged = cur.withExecutions(execs.values());

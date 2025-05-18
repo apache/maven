@@ -72,10 +72,10 @@ public final class DefaultSourceRoot implements SourceRoot {
         moduleName = nonBlank(source.getModule());
 
         String value = nonBlank(source.getScope());
-        scope = (value != null) ? session.requireProjectScope(value) : ProjectScope.MAIN;
+        scope = value != null ? session.requireProjectScope(value) : ProjectScope.MAIN;
 
         value = nonBlank(source.getLang());
-        language = (value != null) ? session.requireLanguage(value) : Language.JAVA_FAMILY;
+        language = value != null ? session.requireLanguage(value) : Language.JAVA_FAMILY;
 
         value = nonBlank(source.getDirectory());
         if (value != null) {
@@ -85,10 +85,10 @@ public final class DefaultSourceRoot implements SourceRoot {
         }
 
         value = nonBlank(source.getTargetVersion());
-        targetVersion = (value != null) ? session.parseVersion(value) : null;
+        targetVersion = value != null ? session.parseVersion(value) : null;
 
         value = nonBlank(source.getTargetPath());
-        targetPath = (value != null) ? baseDir.resolve(value) : null;
+        targetPath = value != null ? baseDir.resolve(value) : null;
     }
 
     /**

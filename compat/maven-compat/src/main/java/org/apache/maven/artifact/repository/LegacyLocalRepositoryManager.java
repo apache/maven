@@ -102,7 +102,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
          * transformation however contradicts the other use case of precisely obeying the repository's layout. The below
          * flag tries to detect which use case applies to make both plugins happy.
          */
-        realLocalRepo = (layout instanceof DefaultRepositoryLayout) && "local".equals(delegate.getId());
+        realLocalRepo = layout instanceof DefaultRepositoryLayout && "local".equals(delegate.getId());
     }
 
     public LocalRepository getRepository() {

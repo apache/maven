@@ -257,7 +257,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
                         VersionRange previousRange = previous.getArtifact().getVersionRange();
                         VersionRange currentRange = node.getArtifact().getVersionRange();
 
-                        if ((previousRange != null) && (currentRange != null)) {
+                        if (previousRange != null && currentRange != null) {
                             // TODO shouldn't need to double up on this work, only done for simplicity of handling
                             // recommended
                             // version but the restriction is identical
@@ -348,7 +348,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
                             result.addVersionRangeViolation(are);
                         }
 
-                        if ((resolved != previous) && (resolved != node)) {
+                        if (resolved != previous && resolved != node) {
                             // TODO add better exception
                             result.addVersionRangeViolation(new ArtifactResolutionException(
                                     "Conflict resolver returned unknown resolution node: ", resolved.getArtifact()));
@@ -572,21 +572,21 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
         // explicit child override depMgmt (viz. depMgmt should only
         // provide defaults to children, but should override transitives).
         // We can do this by calling isChildOfRootNode on the current node.
-        if ((artifact.getVersion() != null)
+        if (artifact.getVersion() != null
                 && (!node.isChildOfRootNode() || node.getArtifact().getVersion() == null)) {
             fireEvent(ResolutionListener.MANAGE_ARTIFACT_VERSION, listeners, node, artifact);
             node.getArtifact().setVersion(artifact.getVersion());
         }
 
-        if ((artifact.getScope() != null)
+        if (artifact.getScope() != null
                 && (!node.isChildOfRootNode() || node.getArtifact().getScope() == null)) {
             fireEvent(ResolutionListener.MANAGE_ARTIFACT_SCOPE, listeners, node, artifact);
             node.getArtifact().setScope(artifact.getScope());
         }
 
         if (Artifact.SCOPE_SYSTEM.equals(node.getArtifact().getScope())
-                && (node.getArtifact().getFile() == null)
-                && (artifact.getFile() != null)) {
+                && node.getArtifact().getFile() == null
+                && artifact.getFile() != null) {
             fireEvent(ResolutionListener.MANAGE_ARTIFACT_SYSTEM_PATH, listeners, node, artifact);
             node.getArtifact().setFile(artifact.getFile());
         }
@@ -619,7 +619,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
         }
 
         /* current POM rules all, if nearest is in current pom, do not update its artifactScope */
-        if ((nearest.getDepth() < 2) && updateScope) {
+        if (nearest.getDepth() < 2 && updateScope) {
             updateScope = false;
 
             fireEvent(ResolutionListener.UPDATE_SCOPE_CURRENT_POM, listeners, nearest, farthestArtifact);

@@ -112,7 +112,7 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
                 if (lastIndex >= 0) {
                     String retVal = expr.substring(0, index);
 
-                    if ((index > 0) && (expr.charAt(index - 1) == '$')) {
+                    if (index > 0 && expr.charAt(index - 1) == '$') {
                         retVal += expr.substring(index + 1, lastIndex + 1);
                     } else {
                         Object subResult = evaluate(expr.substring(index, lastIndex + 1));
@@ -216,7 +216,7 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
     }
 
     private String stripTokens(String expr) {
-        if (expr.startsWith("${") && (expr.indexOf('}') == expr.length() - 1)) {
+        if (expr.startsWith("${") && expr.indexOf('}') == expr.length() - 1) {
             expr = expr.substring(2, expr.length() - 1);
         }
         return expr;

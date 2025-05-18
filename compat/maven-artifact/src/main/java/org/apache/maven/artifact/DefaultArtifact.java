@@ -177,14 +177,14 @@ public class DefaultArtifact implements Artifact {
             throw new InvalidArtifactRTException(groupId, artifactId, getVersion(), type, "The type cannot be empty.");
         }
 
-        if ((empty(version)) && (versionRange == null)) {
+        if (empty(version) && versionRange == null) {
             throw new InvalidArtifactRTException(
                     groupId, artifactId, getVersion(), type, "The version cannot be empty.");
         }
     }
 
     public static boolean empty(String value) {
-        return (value == null) || (value.trim().length() < 1);
+        return value == null || value.trim().length() < 1;
     }
 
     @Override
@@ -356,7 +356,7 @@ public class DefaultArtifact implements Artifact {
     }
 
     protected String getBaseVersionInternal() {
-        if ((baseVersion == null) && (version != null)) {
+        if (baseVersion == null && version != null) {
             setBaseVersionInternal(version);
         }
 
@@ -460,7 +460,7 @@ public class DefaultArtifact implements Artifact {
     }
 
     private void selectVersionFromNewRangeIfAvailable() {
-        if ((versionRange != null) && (versionRange.getRecommendedVersion() != null)) {
+        if (versionRange != null && versionRange.getRecommendedVersion() != null) {
             selectVersion(versionRange.getRecommendedVersion().toString());
         } else {
             version = null;

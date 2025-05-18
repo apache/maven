@@ -96,7 +96,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
             lastCheckDate = readLastUpdated(touchfile, getRepositoryKey(repository));
         }
 
-        return (lastCheckDate == null) || policy.checkOutOfDate(lastCheckDate);
+        return lastCheckDate == null || policy.checkOutOfDate(lastCheckDate);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
 
         Date lastCheckDate = readLastUpdated(metadata, repository, file);
 
-        return (lastCheckDate == null) || policy.checkOutOfDate(lastCheckDate);
+        return lastCheckDate == null || policy.checkOutOfDate(lastCheckDate);
     }
 
     private Date readLastUpdated(RepositoryMetadata metadata, ArtifactRepository repository, File file) {

@@ -93,7 +93,7 @@ public class MultipleArtifactsNotFoundException extends ArtifactResolutionExcept
         int counter = 0;
 
         for (Artifact artifact : artifacts) {
-            String message = (++counter) + ") " + artifact.getId();
+            String message = ++counter + ") " + artifact.getId();
 
             buffer.append(constructMissingArtifactMessage(
                     message,

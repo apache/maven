@@ -311,8 +311,8 @@ class ReactorReader implements MavenWorkspaceReader {
      * @return {@code true} if the artifact refers to test classes, {@code false} otherwise.
      */
     private static boolean isTestArtifact(Artifact artifact) {
-        return ("test-jar".equals(artifact.getProperty("type", "")))
-                || ("jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier()));
+        return "test-jar".equals(artifact.getProperty("type", ""))
+                || "jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier());
     }
 
     private File findInProjectLocalRepository(Artifact artifact) {

@@ -122,7 +122,7 @@ public class PluginParameterException extends PluginConfigurationException {
             messageBuffer.append("</configuration>");
 
             String alias = param.getAlias();
-            if ((alias != null && !alias.isEmpty()) && !alias.equals(param.getName())) {
+            if (alias != null && !alias.isEmpty() && !alias.equals(param.getName())) {
                 messageBuffer.append(LS).append(LS).append("-OR-").append(LS).append(LS);
                 messageBuffer
                         .append("<configuration>")

@@ -191,7 +191,7 @@ public class VersionRange {
 
             if (upperVersion != null && lowerVersion != null) {
                 int result = upperVersion.compareTo(lowerVersion);
-                if (result < 0 || (result == 0 && (!lowerBoundInclusive || !upperBoundInclusive))) {
+                if (result < 0 || result == 0 && (!lowerBoundInclusive || !upperBoundInclusive)) {
                     throw new InvalidVersionSpecificationException("Range defies version ordering: " + spec);
                 }
             }

@@ -121,7 +121,7 @@ public class MavenPropertiesLoader {
             boolean inQuote = false;
             boolean tokStarted = false;
             boolean exit = false;
-            while ((st.hasMoreTokens()) && (!exit)) {
+            while (st.hasMoreTokens() && !exit) {
                 tok = st.nextToken(tokenList);
                 switch (tok) {
                     case "\"":
@@ -152,7 +152,7 @@ public class MavenPropertiesLoader {
 
             // Handle case where end of token stream and
             // still got data
-            if ((!exit) && tokStarted) {
+            if (!exit && tokStarted) {
                 retVal = tokBuf.toString();
             }
         }

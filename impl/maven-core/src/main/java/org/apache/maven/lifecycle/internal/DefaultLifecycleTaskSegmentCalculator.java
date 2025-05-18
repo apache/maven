@@ -80,8 +80,8 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
         List<String> tasks = requireNonNull(session.getGoals()); // session never returns null, but empty list
 
         if (tasks.isEmpty()
-                && (rootProject.getDefaultGoal() != null
-                        && !rootProject.getDefaultGoal().isEmpty())) {
+                && rootProject.getDefaultGoal() != null
+                && !rootProject.getDefaultGoal().isEmpty()) {
             tasks = Stream.of(rootProject.getDefaultGoal().split("\\s+"))
                     .filter(g -> !g.isEmpty())
                     .collect(Collectors.toList());

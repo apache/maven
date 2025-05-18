@@ -219,7 +219,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
         @Override
         public int hashCode() {
-            return (int) (value ^ (value >>> 32));
+            return (int) (value ^ value >>> 32);
         }
 
         @Override
@@ -363,7 +363,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
             //  or QUALIFIERS.size and then resort to lexical ordering. Most comparisons are decided by the first
             // character,
             // so this is still fast. If more characters are needed then it requires a lexical sort anyway.
-            return i == -1 ? (QUALIFIERS.size() + "-" + qualifier) : String.valueOf(i);
+            return i == -1 ? QUALIFIERS.size() + "-" + qualifier : String.valueOf(i);
         }
 
         @Override
@@ -587,7 +587,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                         Item r = right.hasNext() ? right.next() : null;
 
                         // if this is shorter, then invert the compare and mul with -1
-                        int result = l == null ? (r == null ? 0 : -1 * r.compareTo(l)) : l.compareTo(r);
+                        int result = l == null ? r == null ? 0 : -1 * r.compareTo(l) : l.compareTo(r);
 
                         if (result != 0) {
                             return result;
@@ -840,11 +840,11 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
             if (prev != null) {
                 int compare = prev.compareTo(c);
                 System.out.println(
-                        "   " + prev + ' ' + (compare == 0 ? "==" : (compare < 0 ? "<" : ">")) + ' ' + version);
+                        "   " + prev + ' ' + (compare == 0 ? "==" : compare < 0 ? "<" : ">") + ' ' + version);
             }
 
             System.out.println(
-                    (i++) + ". " + version + " -> " + c.getCanonical() + "; tokens: " + c.items.toListString());
+                    i++ + ". " + version + " -> " + c.getCanonical() + "; tokens: " + c.items.toListString());
 
             prev = c;
         }

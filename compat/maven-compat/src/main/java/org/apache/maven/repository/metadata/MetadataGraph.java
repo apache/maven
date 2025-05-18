@@ -116,7 +116,7 @@ public class MetadataGraph {
 
         int count = countNodes(tree);
 
-        init(count, count + (count / 2));
+        init(count, count + count / 2);
 
         processTreeNodes(null, tree, 0, 0);
     }

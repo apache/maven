@@ -116,7 +116,7 @@ public final class CLIReportingUtils {
     }
 
     private static String reduce(String s) {
-        return s != null ? (s.startsWith("${") && s.endsWith("}") ? null : s) : null;
+        return s != null ? s.startsWith("${") && s.endsWith("}") ? null : s : null;
     }
 
     public static Properties getBuildProperties() {

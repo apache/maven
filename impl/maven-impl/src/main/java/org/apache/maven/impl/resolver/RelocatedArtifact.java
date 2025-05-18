@@ -110,7 +110,7 @@ public final class RelocatedArtifact extends AbstractArtifact {
     @Override
     public Artifact setVersion(String version) {
         String current = getVersion();
-        if (current.equals(version) || (version == null && current.isEmpty())) {
+        if (current.equals(version) || version == null && current.isEmpty()) {
             return this;
         }
         return new RelocatedArtifact(artifact, groupId, artifactId, classifier, extension, version, message);
@@ -140,7 +140,7 @@ public final class RelocatedArtifact extends AbstractArtifact {
     @Override
     public Artifact setProperties(Map<String, String> properties) {
         Map<String, String> current = getProperties();
-        if (current.equals(properties) || (properties == null && current.isEmpty())) {
+        if (current.equals(properties) || properties == null && current.isEmpty()) {
             return this;
         }
         return new RelocatedArtifact(

@@ -241,7 +241,7 @@ public class ProjectSorter {
     }
 
     private boolean isSpecificVersion(String version) {
-        return !((version == null || version.isEmpty()) || version.startsWith("[") || version.startsWith("("));
+        return !(version == null || version.isEmpty() || version.startsWith("[") || version.startsWith("("));
     }
 
     // TODO !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in

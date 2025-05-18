@@ -112,7 +112,7 @@ public class ConsoleTransferListener extends AbstractTransferListener {
             long duration = System.currentTimeMillis() - resource.getTransferStartTime();
             if (duration > 0) {
                 DecimalFormat format = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ENGLISH));
-                double kbPerSec = (contentLength / 1024.0) / (duration / 1000.0);
+                double kbPerSec = contentLength / 1024.0 / (duration / 1000.0);
                 throughput = " at " + format.format(kbPerSec) + " KB/sec";
             }
 

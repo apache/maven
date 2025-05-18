@@ -155,8 +155,8 @@ public class MetadataGraphEdge {
     @Override
     public String toString() {
         return "[ " + "FROM:("
-                + (source == null ? "no source" : (source.md == null ? "no source MD" : source.md.toString())) + ") "
-                + "TO:(" + (target == null ? "no target" : (target.md == null ? "no target MD" : target.md.toString()))
+                + (source == null ? "no source" : source.md == null ? "no source MD" : source.md.toString()) + ") "
+                + "TO:(" + (target == null ? "no target" : target.md == null ? "no target MD" : target.md.toString())
                 + ") " + "version=" + version + ", scope=" + (scope == null ? "null" : scope.getScope()) + ", depth="
                 + depth + "]";
     }

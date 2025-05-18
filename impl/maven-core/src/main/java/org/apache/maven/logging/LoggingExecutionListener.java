@@ -61,9 +61,9 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
         } else {
             // assume sensible default
             Throwable t = projectExecutionEvent.getCause();
-            halted = (t instanceof RuntimeException || !(t instanceof Exception))
+            halted = t instanceof RuntimeException || !(t instanceof Exception)
                     || !MavenExecutionRequest.REACTOR_FAIL_NEVER.equals(session.getReactorFailureBehavior())
-                            && !MavenExecutionRequest.REACTOR_FAIL_AT_END.equals(session.getReactorFailureBehavior());
+                    && !MavenExecutionRequest.REACTOR_FAIL_AT_END.equals(session.getReactorFailureBehavior());
         }
         Throwable cause = projectExecutionEvent.getCause();
         buildEventListener.executionFailure(

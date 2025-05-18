@@ -116,7 +116,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
                 return true;
             }
             if (wildcard || testName.equals(nodeName)) {
-                return (namespaceURI == null || namespaceURI.isEmpty()) || (testPrefix == null || testPrefix.isEmpty());
+                return namespaceURI == null || namespaceURI.isEmpty() || testPrefix == null || testPrefix.isEmpty();
             }
             return false;
         }

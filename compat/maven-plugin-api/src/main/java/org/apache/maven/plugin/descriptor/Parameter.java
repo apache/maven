@@ -121,7 +121,7 @@ public class Parameter implements Cloneable {
     }
 
     public boolean equals(Object other) {
-        return (other instanceof Parameter parameter) && getName().equals(parameter.getName());
+        return other instanceof Parameter parameter && getName().equals(parameter.getName());
     }
 
     public String getAlias() {

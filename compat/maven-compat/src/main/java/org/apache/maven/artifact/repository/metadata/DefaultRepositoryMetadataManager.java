@@ -212,8 +212,8 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                         m.getVersioning().setSnapshot(new Snapshot());
                     }
                 } else {
-                    if ((m.getVersioning() != null)
-                            && (m.getVersioning().getSnapshot() != null)
+                    if (m.getVersioning() != null
+                            && m.getVersioning().getSnapshot() != null
                             && m.getVersioning().getSnapshot().isLocalCopy()) {
                         m.getVersioning().getSnapshot().setLocalCopy(false);
                         metadata.setMetadata(m);
@@ -251,7 +251,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                 return setRepository;
             }
 
-            if (repoMetadata.isSnapshot() && (previousMetadata != null)) {
+            if (repoMetadata.isSnapshot() && previousMetadata != null) {
                 previousMetadata.put(remoteRepository, metadata);
             }
 

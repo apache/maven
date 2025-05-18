@@ -364,7 +364,7 @@ class MethodMap {
 
         // Check for widening primitive conversion.
         if (formal.isPrimitive()) {
-            if (formal == Short.TYPE && (actual == Byte.TYPE)) {
+            if (formal == Short.TYPE && actual == Byte.TYPE) {
                 return true;
             }
             if (formal == Integer.TYPE && (actual == Short.TYPE || actual == Byte.TYPE)) {

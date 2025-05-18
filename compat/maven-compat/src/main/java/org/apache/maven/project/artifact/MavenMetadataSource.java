@@ -469,7 +469,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
             Metadata repoMetadata, List<String> availableVersions) {
         Collection<String> versions = new LinkedHashSet<>();
 
-        if ((repoMetadata != null) && (repoMetadata.getVersioning() != null)) {
+        if (repoMetadata != null && repoMetadata.getVersioning() != null) {
             versions.addAll(repoMetadata.getVersioning().getVersions());
         }
 

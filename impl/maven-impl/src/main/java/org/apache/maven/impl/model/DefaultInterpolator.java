@@ -243,7 +243,7 @@ public class DefaultInterpolator implements Interpolator {
             startDelim = val.indexOf(DELIM_START);
             while (stopDelim >= 0) {
                 int idx = val.indexOf(DELIM_START, startDelim + DELIM_START.length());
-                if ((idx < 0) || (idx > stopDelim)) {
+                if (idx < 0 || idx > stopDelim) {
                     break;
                 } else if (idx < stopDelim) {
                     startDelim = idx;
@@ -253,7 +253,7 @@ public class DefaultInterpolator implements Interpolator {
 
         // If we do not have a start or stop delimiter, then just
         // return the existing value.
-        if ((startDelim < 0) || (stopDelim < 0)) {
+        if (startDelim < 0 || stopDelim < 0) {
             cycleMap.remove(currentKey);
             return val;
         }

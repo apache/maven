@@ -89,10 +89,10 @@ public class DefaultPrompter implements Prompter {
             if (line == null || line.isEmpty()) {
                 line = defaultReply;
             }
-            if (line != null && (possibleValues != null && !possibleValues.contains(line))) {
+            if (line != null && possibleValues != null && !possibleValues.contains(line)) {
                 doDisplay("Invalid selection.\n");
             }
-        } while (line == null || (possibleValues != null && !possibleValues.contains(line)));
+        } while (line == null || possibleValues != null && !possibleValues.contains(line));
         return line;
     }
 

@@ -339,8 +339,8 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
     private static String printHexBinary(byte[] data) {
         StringBuilder r = new StringBuilder(data.length * 2);
         for (byte b : data) {
-            r.append(HEX_CODE[(b >> 4) & 0xF]);
-            r.append(HEX_CODE[(b & 0xF)]);
+            r.append(HEX_CODE[b >> 4 & 0xF]);
+            r.append(HEX_CODE[b & 0xF]);
         }
         return r.toString();
     }

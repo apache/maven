@@ -343,9 +343,9 @@ public class DefaultVersionResolver implements VersionResolver {
         VersionInfo dstInfo = infos.get(dstKey);
 
         if (dstInfo == null
-                || (srcInfo != null
+                || srcInfo != null
                         && dstInfo.isOutdated(srcInfo.timestamp)
-                        && srcInfo.repository != dstInfo.repository)) {
+                        && srcInfo.repository != dstInfo.repository) {
             infos.put(dstKey, srcInfo);
         }
     }
