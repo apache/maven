@@ -376,7 +376,8 @@ class DefaultModelInterpolatorTest {
                 model, rootDirectory, createModelBuildingRequest(context).build(), collector);
         assertProblemFree(collector);
 
-        assertEquals("file:myRootDirectory/temp-repo", out.getRepositories().get(0).getUrl());
+        assertEquals(
+                "file:myRootDirectory/temp-repo", out.getRepositories().get(0).getUrl());
     }
 
     @Test

@@ -277,7 +277,8 @@ public abstract class AbstractModelInterpolatorTest {
         assertProblemFree(collector);
 
         assertEquals(
-                "file://localhost/myBasedir/temp-repo", out.getRepositories().get(0).getUrl());
+                "file://localhost/myBasedir/temp-repo",
+                out.getRepositories().get(0).getUrl());
     }
 
     @Test

@@ -50,9 +50,7 @@ public class Slf4jLoggerManager implements LoggerManager {
      */
     @Override
     public Logger getLoggerForComponent(String role, String hint) {
-        return null == hint
-                ? getLoggerForComponent(role)
-                : new Slf4jLogger(loggerFactory.getLogger(role + '.' + hint));
+        return null == hint ? getLoggerForComponent(role) : new Slf4jLogger(loggerFactory.getLogger(role + '.' + hint));
     }
 
     //

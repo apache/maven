@@ -314,7 +314,8 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                     String attributeForImplementation = parameterConfiguration.attribute("implementation");
                     String parameterForImplementation = parameter.getImplementation();
                     if ((attributeForImplementation == null || attributeForImplementation.isEmpty())
-                            && parameterForImplementation != null && !parameterForImplementation.isEmpty()) {
+                            && parameterForImplementation != null
+                            && !parameterForImplementation.isEmpty()) {
                         attributes.put("implementation", parameter.getImplementation());
                     }
 

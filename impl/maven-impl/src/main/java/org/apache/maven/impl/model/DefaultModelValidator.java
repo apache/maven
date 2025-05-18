@@ -695,8 +695,7 @@ public class DefaultModelValidator implements ModelValidator {
 
         for (Plugin plugin : plugins) {
             if (plugin.getGroupId() == null
-                    || plugin.getGroupId() != null
-                            && plugin.getGroupId().trim().isEmpty()) {
+                    || plugin.getGroupId() != null && plugin.getGroupId().trim().isEmpty()) {
                 addViolation(
                         problems,
                         Severity.FATAL,

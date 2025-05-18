@@ -242,8 +242,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
             }
 
             if (longMessage != null && !longMessage.isEmpty()) {
-                if (exceptionMessage == null || exceptionMessage.isEmpty()
-                        || longMessage.contains(exceptionMessage)) {
+                if (exceptionMessage == null || exceptionMessage.isEmpty() || longMessage.contains(exceptionMessage)) {
                     exceptionMessage = longMessage;
                 } else if (!exceptionMessage.contains(longMessage)) {
                     exceptionMessage = join(exceptionMessage, System.lineSeparator() + longMessage);
