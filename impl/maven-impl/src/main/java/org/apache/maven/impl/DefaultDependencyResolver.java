@@ -67,14 +67,15 @@ import static org.apache.maven.impl.ImplUtils.nonNull;
 @Named
 @Singleton
 public class DefaultDependencyResolver implements DependencyResolver {
+
     /**
      * Cache of information about the modules contained in a path element.
      * This cache is created when first needed. It may be never created.
      *
      * <p><b>TODO:</b> This field should not be in this class, because the cache should be global to the session.
-     * This field exists here only temporarily, until we clarified where to store session-wide caches.</p>
+     * This field exists here only temporarily, until clarified where to store session-wide caches.</p>
      *
-     * @see moduleCache()
+     * @see #moduleCache()
      */
     private PathModularizationCache moduleCache;
 
@@ -245,7 +246,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
      * {@return the cache of information about the modules contained in a path element}.
      *
      * <p><b>TODO:</b> This method should not be in this class, because the cache should be global to the session.
-     * This method exists here only temporarily, until we clarified where to store session-wide caches.</p>
+     * This method exists here only temporarily, until clarified where to store session-wide caches.</p>
      */
     private PathModularizationCache moduleCache() {
         if (moduleCache == null) {

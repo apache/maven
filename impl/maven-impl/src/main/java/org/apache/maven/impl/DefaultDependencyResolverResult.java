@@ -105,7 +105,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      *
      * <p><b>WARNING: this constructor may be removed in a future Maven release.</b>
      * The reason is because {@code DefaultDependencyResolverResult} needs a cache, which should
-     * preferably by session-wide. But we have not yet clarified how such caches should be managed.</p>
+     * preferably be session-wide. How to manage such caches has not yet been clarified.</p>
      *
      * @param request the corresponding request
      * @param exceptions the exceptions that occurred while building the dependency graph
