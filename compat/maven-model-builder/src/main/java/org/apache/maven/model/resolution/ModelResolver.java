@@ -47,7 +47,7 @@ public interface ModelResolver {
     /**
      * Tries to resolve the POM for the specified parent coordinates possibly updating {@code parent}.
      * <p>
-     * Unlike the {@link #resolveModel(java.lang.String, java.lang.String, java.lang.String)} method, this method
+     * Unlike the {@link #resolveModel(String, String, String)} method, this method
      * supports version ranges and updates the given {@code parent} instance to match the returned {@code ModelSource}.
      * If {@code parent} declares a version range, the version corresponding to the returned {@code ModelSource} will
      * be set on the given {@code parent}.
@@ -67,7 +67,7 @@ public interface ModelResolver {
     /**
      * Tries to resolve the POM for the specified dependency coordinates possibly updating {@code dependency}.
      * <p>
-     * Unlike the {@link #resolveModel(java.lang.String, java.lang.String, java.lang.String)} method, this method
+     * Unlike the {@link #resolveModel(String, String, String)} method, this method
      * supports version ranges and updates the given {@code dependency} instance to match the returned
      * {@code ModelSource}. If {@code dependency} declares a version range, the version corresponding to the returned
      * {@code ModelSource} will be set on the given {@code dependency}.

@@ -40,6 +40,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
@@ -69,7 +70,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
     protected EventSpyDispatcher eventSpyDispatcher;
 
     @Inject
-    protected org.eclipse.aether.RepositorySystem aetherRepositorySystem;
+    protected RepositorySystem aetherRepositorySystem;
 
     @Inject
     protected RuntimeInformation information;

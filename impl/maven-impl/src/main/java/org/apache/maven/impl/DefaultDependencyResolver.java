@@ -54,6 +54,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.scope.ResolutionScope;
@@ -67,6 +68,18 @@ import static org.apache.maven.impl.ImplUtils.nonNull;
 @Named
 @Singleton
 public class DefaultDependencyResolver implements DependencyResolver {
+    /**
+     * Cache of information about the modules contained in a path element.
+     * This cache is created when first needed. It may be never created.
+     *
+     * <p><b>TODO:</b> This field should not be in this class, because the cache should be global to the session.
+     * This field exists here only temporarily, until clarified where to store session-wide caches.</p>
+     *
+     * @see moduleCache()
+     *
+     * @see #moduleCache()
+     */
+    private PathModularizationCache moduleCache;
 
     @Nonnull
     @Override
@@ -126,7 +139,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 final CollectResult result =
                         session.getRepositorySystem().collectDependencies(systemSession, collectRequest);
                 return new DefaultDependencyResolverResult(
-                        null, null, result.getExceptions(), session.getNode(result.getRoot(), request.getVerbose()), 0);
+                        null,
+                        moduleCache(),
+                        result.getExceptions(),
+                        session.getNode(result.getRoot(), request.getVerbose()),
+                        0);
             } catch (DependencyCollectionException e) {
                 throw new DependencyResolverException("Unable to collect dependencies", e);
             }
@@ -154,7 +171,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         Set<String> scopes =
                 scope.dependencyScopes().stream().map(DependencyScope::id).collect(Collectors.toSet());
         return (n, p) -> {
-            org.eclipse.aether.graph.Dependency d = n.getDependency();
+            Dependency d = n.getDependency();
             return d == null || scopes.contains(d.getScope());
         };
     }
@@ -191,18 +208,14 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         .map(Artifact::toCoordinates)
                         .collect(Collectors.toList());
                 Predicate<PathType> filter = request.getPathTypeFilter();
+                DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
+                        null, moduleCache(), collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                 if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {
-                    DefaultDependencyResolverResult flattenResult = new DefaultDependencyResolverResult(
-                            null, null, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                     for (Node node : nodes) {
-                        flattenResult.addNode(node);
+                        resolverResult.addNode(node);
                     }
-                    result = flattenResult;
+                    result = resolverResult;
                 } else {
-                    PathModularizationCache cache =
-                            new PathModularizationCache(); // TODO: should be project-wide cache.
-                    DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
-                            null, cache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                     ArtifactResolverResult artifactResolverResult =
                             session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
                     for (Node node : nodes) {
@@ -224,6 +237,19 @@ public class DefaultDependencyResolver implements DependencyResolver {
         } finally {
             RequestTraceHelper.exit(trace);
         }
+    }
+
+    /**
+     * {@return the cache of information about the modules contained in a path element}.
+     *
+     * <p><b>TODO:</b> This method should not be in this class, because the cache should be global to the session.
+     * This method exists here only temporarily, until clarified where to store session-wide caches.</p>
+     */
+    private PathModularizationCache moduleCache() {
+        if (moduleCache == null) {
+            moduleCache = new PathModularizationCache();
+        }
+        return moduleCache;
     }
 
     private static DependencyResolverException cannotReadModuleInfo(final Path path, final IOException cause) {

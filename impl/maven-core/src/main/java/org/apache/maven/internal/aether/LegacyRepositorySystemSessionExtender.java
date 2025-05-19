@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.repository.Proxy;
 import org.apache.maven.settings.Mirror;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
@@ -99,12 +100,12 @@ public class LegacyRepositorySystemSessionExtender implements RepositorySystemSe
         }
     }
 
-    private org.apache.maven.repository.Proxy getProxy(ProxySelector selector, ArtifactRepository repository) {
+    private Proxy getProxy(ProxySelector selector, ArtifactRepository repository) {
         if (selector != null) {
             RemoteRepository repo = RepositoryUtils.toRepo(repository);
             org.eclipse.aether.repository.Proxy proxy = selector.getProxy(repo);
             if (proxy != null) {
-                org.apache.maven.repository.Proxy p = new org.apache.maven.repository.Proxy();
+                Proxy p = new Proxy();
                 p.setHost(proxy.getHost());
                 p.setProtocol(proxy.getType());
                 p.setPort(proxy.getPort());

@@ -46,7 +46,7 @@ import static java.util.Objects.requireNonNull;
 public interface ProblemCollector<P extends BuilderProblem> {
     /**
      * Returns {@code true} if there is at least one problem collected with severity equal or more severe than
-     * {@link org.apache.maven.api.services.BuilderProblem.Severity#WARNING}. This check is logically equivalent
+     * {@link BuilderProblem.Severity#WARNING}. This check is logically equivalent
      * to "is there any problem reported?", given warning is the lowest severity.
      */
     default boolean hasWarningProblems() {
@@ -55,7 +55,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
 
     /**
      * Returns {@code true} if there is at least one problem collected with severity equal or more severe than
-     * {@link org.apache.maven.api.services.BuilderProblem.Severity#ERROR}.
+     * {@link BuilderProblem.Severity#ERROR}.
      */
     default boolean hasErrorProblems() {
         return hasProblemsFor(BuilderProblem.Severity.ERROR);
@@ -63,7 +63,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
 
     /**
      * Returns {@code true} if there is at least one problem collected with severity equal or more severe than
-     * {@link org.apache.maven.api.services.BuilderProblem.Severity#FATAL}.
+     * {@link BuilderProblem.Severity#FATAL}.
      */
     default boolean hasFatalProblems() {
         return hasProblemsFor(BuilderProblem.Severity.FATAL);

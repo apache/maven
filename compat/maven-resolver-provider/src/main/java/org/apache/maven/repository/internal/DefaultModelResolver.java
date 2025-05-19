@@ -109,7 +109,7 @@ class DefaultModelResolver implements ModelResolver {
     }
 
     @Override
-    public void addRepository(org.apache.maven.model.Repository repository) throws InvalidRepositoryException {
+    public void addRepository(Repository repository) throws InvalidRepositoryException {
         addRepository(repository, false);
     }
 

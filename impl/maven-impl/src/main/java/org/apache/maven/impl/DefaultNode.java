@@ -35,11 +35,10 @@ import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 public class DefaultNode extends AbstractNode {
 
     protected final @Nonnull InternalSession session;
-    protected final @Nonnull org.eclipse.aether.graph.DependencyNode node;
+    protected final @Nonnull DependencyNode node;
     protected final boolean verbose;
 
-    public DefaultNode(
-            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.DependencyNode node, boolean verbose) {
+    public DefaultNode(@Nonnull InternalSession session, @Nonnull DependencyNode node, boolean verbose) {
         this.session = session;
         this.node = node;
         this.verbose = verbose;
@@ -114,8 +113,7 @@ public class DefaultNode extends AbstractNode {
         }
 
         List<String> details = new ArrayList<>();
-        org.eclipse.aether.graph.DependencyNode winner =
-                (org.eclipse.aether.graph.DependencyNode) node.getData().get(ConflictResolver.NODE_DATA_WINNER);
+        DependencyNode winner = (DependencyNode) node.getData().get(ConflictResolver.NODE_DATA_WINNER);
         String winnerVersion = winner != null ? winner.getArtifact().getBaseVersion() : null;
         boolean included = (winnerVersion == null);
 

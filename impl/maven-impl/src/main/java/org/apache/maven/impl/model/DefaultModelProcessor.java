@@ -33,6 +33,7 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
@@ -82,9 +83,7 @@ public class DefaultModelProcessor implements ModelProcessor {
         // Note that the ModelProcessor#locatePom never returns null
         // while the ModelParser#locatePom needs to return an existing path!
         Path pom = modelParsers.stream()
-                .map(m -> m.locate(projectDirectory)
-                        .map(org.apache.maven.api.services.Source::getPath)
-                        .orElse(null))
+                .map(m -> m.locate(projectDirectory).map(Source::getPath).orElse(null))
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElseGet(() -> doLocateExistingPom(projectDirectory));

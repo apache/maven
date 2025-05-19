@@ -34,6 +34,8 @@ import org.apache.maven.api.services.VersionRangeResolverRequest;
 import org.apache.maven.api.services.VersionRangeResolverResult;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
@@ -99,9 +101,9 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                 @Override
                 public Optional<Repository> getRepository(Version version) {
                     ArtifactRepository repo = repos.get(version.toString());
-                    if (repo instanceof org.eclipse.aether.repository.LocalRepository localRepository) {
+                    if (repo instanceof LocalRepository localRepository) {
                         return Optional.of(new DefaultLocalRepository(localRepository));
-                    } else if (repo instanceof org.eclipse.aether.repository.RemoteRepository remoteRepository) {
+                    } else if (repo instanceof RemoteRepository remoteRepository) {
                         return Optional.of(new DefaultRemoteRepository(remoteRepository));
                     } else {
                         return Optional.empty();

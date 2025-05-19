@@ -18,6 +18,10 @@
  */
 package org.apache.maven.plugin.lifecycle;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  *         A custom lifecycle mapping definition.
@@ -26,7 +30,7 @@ package org.apache.maven.plugin.lifecycle;
  * @version $Revision$ $Date$
  */
 @SuppressWarnings("all")
-public class Lifecycle implements java.io.Serializable {
+public class Lifecycle implements Serializable {
 
     // --------------------------/
     // - Class/Member Variables -/
@@ -41,7 +45,7 @@ public class Lifecycle implements java.io.Serializable {
     /**
      * Field phases.
      */
-    private java.util.List<Phase> phases;
+    private List<Phase> phases;
 
     // -----------/
     // - Methods -/
@@ -71,9 +75,9 @@ public class Lifecycle implements java.io.Serializable {
      *
      * @return List
      */
-    public java.util.List<Phase> getPhases() {
+    public List<Phase> getPhases() {
         if (this.phases == null) {
-            this.phases = new java.util.ArrayList<Phase>();
+            this.phases = new ArrayList<Phase>();
         }
 
         return this.phases;
@@ -103,7 +107,7 @@ public class Lifecycle implements java.io.Serializable {
      *
      * @param phases a phases object.
      */
-    public void setPhases(java.util.List<Phase> phases) {
+    public void setPhases(List<Phase> phases) {
         this.phases = phases;
     } // -- void setPhases( java.util.List )
 }

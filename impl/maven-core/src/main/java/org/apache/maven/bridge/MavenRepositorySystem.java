@@ -54,11 +54,14 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Repository;
+import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.settings.Mirror;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
+import org.eclipse.aether.repository.MirrorSelector;
 import org.eclipse.aether.repository.ProxySelector;
 import org.eclipse.aether.repository.RemoteRepository;
 
@@ -173,7 +176,7 @@ public class MavenRepositorySystem {
 
     private Mirror getMirror(RepositorySystemSession session, ArtifactRepository repository) {
         if (session != null) {
-            org.eclipse.aether.repository.MirrorSelector selector = session.getMirrorSelector();
+            MirrorSelector selector = session.getMirrorSelector();
             if (selector != null) {
                 RemoteRepository repo = selector.getMirror(RepositoryUtils.toRepo(repository));
                 if (repo != null) {
@@ -296,9 +299,8 @@ public class MavenRepositorySystem {
     // Taken from LegacyRepositorySystem
     //
 
-    public static org.apache.maven.model.Repository fromSettingsRepository(
-            org.apache.maven.settings.Repository settingsRepository) {
-        org.apache.maven.model.Repository modelRepository = new org.apache.maven.model.Repository();
+    public static Repository fromSettingsRepository(org.apache.maven.settings.Repository settingsRepository) {
+        Repository modelRepository = new Repository();
         modelRepository.setId(settingsRepository.getId());
         modelRepository.setLayout(settingsRepository.getLayout());
         modelRepository.setName(settingsRepository.getName());
@@ -308,9 +310,9 @@ public class MavenRepositorySystem {
         return modelRepository;
     }
 
-    public static org.apache.maven.model.RepositoryPolicy fromSettingsRepositoryPolicy(
+    public static RepositoryPolicy fromSettingsRepositoryPolicy(
             org.apache.maven.settings.RepositoryPolicy settingsRepositoryPolicy) {
-        org.apache.maven.model.RepositoryPolicy modelRepositoryPolicy = new org.apache.maven.model.RepositoryPolicy();
+        RepositoryPolicy modelRepositoryPolicy = new RepositoryPolicy();
         if (settingsRepositoryPolicy != null) {
             modelRepositoryPolicy.setEnabled(settingsRepositoryPolicy.isEnabled());
             modelRepositoryPolicy.setUpdatePolicy(settingsRepositoryPolicy.getUpdatePolicy());
@@ -324,8 +326,7 @@ public class MavenRepositorySystem {
         return buildArtifactRepository(fromSettingsRepository(repo));
     }
 
-    public static ArtifactRepository buildArtifactRepository(org.apache.maven.model.Repository repo)
-            throws InvalidRepositoryException {
+    public static ArtifactRepository buildArtifactRepository(Repository repo) throws InvalidRepositoryException {
         if (repo != null) {
             String id = repo.getId();
 
@@ -351,8 +352,7 @@ public class MavenRepositorySystem {
         }
     }
 
-    public static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy(
-            org.apache.maven.model.RepositoryPolicy policy) {
+    public static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy(RepositoryPolicy policy) {
         boolean enabled = true;
 
         String updatePolicy = null;

@@ -18,13 +18,17 @@
  */
 package org.apache.maven.plugin.lifecycle;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Root element of the <code>lifecycle.xml</code> file.
  *
  * @version $Revision$ $Date$
  */
 @SuppressWarnings("all")
-public class LifecycleConfiguration implements java.io.Serializable {
+public class LifecycleConfiguration implements Serializable {
 
     // --------------------------/
     // - Class/Member Variables -/
@@ -33,7 +37,7 @@ public class LifecycleConfiguration implements java.io.Serializable {
     /**
      * Field lifecycles.
      */
-    private java.util.List<Lifecycle> lifecycles;
+    private List<Lifecycle> lifecycles;
 
     /**
      * Field modelEncoding.
@@ -58,9 +62,9 @@ public class LifecycleConfiguration implements java.io.Serializable {
      *
      * @return List
      */
-    public java.util.List<Lifecycle> getLifecycles() {
+    public List<Lifecycle> getLifecycles() {
         if (this.lifecycles == null) {
-            this.lifecycles = new java.util.ArrayList<Lifecycle>();
+            this.lifecycles = new ArrayList<Lifecycle>();
         }
 
         return this.lifecycles;
@@ -89,7 +93,7 @@ public class LifecycleConfiguration implements java.io.Serializable {
      *
      * @param lifecycles a lifecycles object.
      */
-    public void setLifecycles(java.util.List<Lifecycle> lifecycles) {
+    public void setLifecycles(List<Lifecycle> lifecycles) {
         this.lifecycles = lifecycles;
     } // -- void setLifecycles( java.util.List )
 

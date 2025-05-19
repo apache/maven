@@ -693,7 +693,7 @@ public interface Session extends ProtoSession {
      *
      * @param artifact the artifact for which to resolve the version
      * @return resolved version of the given artifact
-     * @throws org.apache.maven.api.services.VersionResolverException if the resolution failed
+     * @throws VersionResolverException if the resolution failed
      *
      * @see org.apache.maven.api.services.VersionResolver#resolve(Session, ArtifactCoordinates) (String)
      */
@@ -839,7 +839,7 @@ public interface Session extends ProtoSession {
      * @return the scope for the given identifier (never null)
      * @throws IllegalArgumentException if the given identifier is not a known scope
      *
-     * @see org.apache.maven.api.DependencyScope#forId(String)
+     * @see DependencyScope#forId(String)
      */
     @Nonnull
     DependencyScope requireDependencyScope(@Nonnull String id);

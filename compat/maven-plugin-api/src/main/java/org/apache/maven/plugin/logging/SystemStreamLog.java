@@ -30,77 +30,77 @@ import java.io.StringWriter;
 @Deprecated
 public class SystemStreamLog implements Log {
     /**
-     * @see org.apache.maven.plugin.logging.Log#debug(java.lang.CharSequence)
+     * @see Log#debug(CharSequence)
      */
     public void debug(CharSequence content) {
         print("debug", content);
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#debug(java.lang.CharSequence, java.lang.Throwable)
+     * @see Log#debug(CharSequence, Throwable)
      */
     public void debug(CharSequence content, Throwable error) {
         print("debug", content, error);
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#debug(java.lang.Throwable)
+     * @see Log#debug(Throwable)
      */
     public void debug(Throwable error) {
         print("debug", error);
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#info(java.lang.CharSequence)
+     * @see Log#info(CharSequence)
      */
     public void info(CharSequence content) {
         print("info", content);
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#info(java.lang.CharSequence, java.lang.Throwable)
+     * @see Log#info(CharSequence, Throwable)
      */
     public void info(CharSequence content, Throwable error) {
         print("info", content, error);
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#info(java.lang.Throwable)
+     * @see Log#info(Throwable)
      */
     public void info(Throwable error) {
         print("info", error);
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#warn(java.lang.CharSequence)
+     * @see Log#warn(CharSequence)
      */
     public void warn(CharSequence content) {
         print("warn", content);
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#warn(java.lang.CharSequence, java.lang.Throwable)
+     * @see Log#warn(CharSequence, Throwable)
      */
     public void warn(CharSequence content, Throwable error) {
         print("warn", content, error);
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#warn(java.lang.Throwable)
+     * @see Log#warn(Throwable)
      */
     public void warn(Throwable error) {
         print("warn", error);
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#error(java.lang.CharSequence)
+     * @see Log#error(CharSequence)
      */
     public void error(CharSequence content) {
         System.err.println("[error] " + content.toString());
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#error(java.lang.CharSequence, java.lang.Throwable)
+     * @see Log#error(CharSequence, Throwable)
      */
     public void error(CharSequence content, Throwable error) {
         StringWriter sWriter = new StringWriter();
@@ -112,7 +112,7 @@ public class SystemStreamLog implements Log {
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#error(java.lang.Throwable)
+     * @see Log#error(Throwable)
      */
     public void error(Throwable error) {
         StringWriter sWriter = new StringWriter();
@@ -124,7 +124,7 @@ public class SystemStreamLog implements Log {
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#isDebugEnabled()
+     * @see Log#isDebugEnabled()
      */
     public boolean isDebugEnabled() {
         // TODO Not sure how best to set these for this implementation...
@@ -132,21 +132,21 @@ public class SystemStreamLog implements Log {
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#isInfoEnabled()
+     * @see Log#isInfoEnabled()
      */
     public boolean isInfoEnabled() {
         return true;
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#isWarnEnabled()
+     * @see Log#isWarnEnabled()
      */
     public boolean isWarnEnabled() {
         return true;
     }
 
     /**
-     * @see org.apache.maven.plugin.logging.Log#isErrorEnabled()
+     * @see Log#isErrorEnabled()
      */
     public boolean isErrorEnabled() {
         return true;

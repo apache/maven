@@ -43,8 +43,8 @@ import org.apache.maven.api.di.Named;
  * }
  * </pre>
  *
- * @see org.apache.maven.api.Packaging
- * @see org.apache.maven.api.spi.ExtensibleEnumProvider
+ * @see Packaging
+ * @see ExtensibleEnumProvider
  * @since 4.0.0
  */
 @Experimental

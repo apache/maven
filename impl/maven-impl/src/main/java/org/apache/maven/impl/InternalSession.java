@@ -39,6 +39,8 @@ import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Result;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.ArtifactRepository;
 
 import static org.apache.maven.impl.ImplUtils.cast;
 
@@ -48,11 +50,11 @@ public interface InternalSession extends Session {
         return cast(InternalSession.class, session, "session should be an " + InternalSession.class);
     }
 
-    static InternalSession from(org.eclipse.aether.RepositorySystemSession session) {
+    static InternalSession from(RepositorySystemSession session) {
         return cast(InternalSession.class, session.getData().get(InternalSession.class), "session");
     }
 
-    static void associate(org.eclipse.aether.RepositorySystemSession rsession, Session session) {
+    static void associate(RepositorySystemSession rsession, Session session) {
         if (!rsession.getData().set(InternalSession.class, null, from(session))) {
             throw new IllegalStateException("A maven session is already associated with the repository session");
         }
@@ -81,11 +83,11 @@ public interface InternalSession extends Session {
 
     WorkspaceRepository getWorkspaceRepository(org.eclipse.aether.repository.WorkspaceRepository repository);
 
-    Repository getRepository(org.eclipse.aether.repository.ArtifactRepository repository);
+    Repository getRepository(ArtifactRepository repository);
 
-    Node getNode(org.eclipse.aether.graph.DependencyNode node);
+    Node getNode(DependencyNode node);
 
-    Node getNode(org.eclipse.aether.graph.DependencyNode node, boolean verbose);
+    Node getNode(DependencyNode node, boolean verbose);
 
     @Nonnull
     Artifact getArtifact(@Nonnull org.eclipse.aether.artifact.Artifact artifact);

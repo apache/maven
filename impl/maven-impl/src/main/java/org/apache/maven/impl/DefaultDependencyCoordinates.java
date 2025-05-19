@@ -25,10 +25,10 @@ import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.eclipse.aether.graph.Dependency;
 
 public class DefaultDependencyCoordinates extends AetherDependencyWrapper implements DependencyCoordinates {
-    public DefaultDependencyCoordinates(
-            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
+    public DefaultDependencyCoordinates(@Nonnull InternalSession session, @Nonnull Dependency dependency) {
         super(session, dependency);
     }
 

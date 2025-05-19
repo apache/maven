@@ -21,6 +21,8 @@ package org.apache.maven.artifact.resolver;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector;
+
 /**
  * Artifact collector - takes a set of original artifacts and resolves the best versions to use
  * along with their metadata. No artifacts are downloaded.
@@ -28,5 +30,4 @@ import javax.inject.Singleton;
 @Deprecated
 @Named
 @Singleton
-public class DefaultArtifactCollector extends org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector
-        implements ArtifactCollector {}
+public class DefaultArtifactCollector extends DefaultLegacyArtifactCollector implements ArtifactCollector {}

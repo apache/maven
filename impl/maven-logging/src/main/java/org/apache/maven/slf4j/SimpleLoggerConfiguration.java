@@ -20,6 +20,7 @@ package org.apache.maven.slf4j;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.time.format.DateTimeFormatter;
@@ -139,7 +140,7 @@ public class SimpleLoggerConfiguration {
                 properties.load(in);
                 mavenPropsLoaded = true;
             }
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             // ignored
         }
 
@@ -160,7 +161,7 @@ public class SimpleLoggerConfiguration {
                     }
                 }
             }
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             // ignored
         }
     }

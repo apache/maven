@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
 /**
@@ -38,8 +39,7 @@ public class Lifecycle {
         this.defaultPhases = defaultPhases;
     }
 
-    public Lifecycle(
-            org.apache.maven.api.services.LifecycleRegistry registry, org.apache.maven.api.Lifecycle lifecycle) {
+    public Lifecycle(LifecycleRegistry registry, org.apache.maven.api.Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
         this.id = lifecycle.id();
         this.phases = registry.computePhases(lifecycle);

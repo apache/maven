@@ -147,8 +147,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         return computed;
     }
 
-    private static void addPhase(
-            Graph graph, Graph.Vertex before, Graph.Vertex after, org.apache.maven.api.Lifecycle.Phase phase) {
+    private static void addPhase(Graph graph, Graph.Vertex before, Graph.Vertex after, Lifecycle.Phase phase) {
         Graph.Vertex ep0 = graph.addVertex(BEFORE + phase.name());
         Graph.Vertex ep1 = graph.addVertex("$$" + phase.name());
         Graph.Vertex ep2 = graph.addVertex(phase.name());

@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.services.ModelBuilderException;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.internal.transformation.TransformationFailedException;
 import org.apache.maven.project.MavenProject;
@@ -58,7 +59,7 @@ class TransformedArtifact extends DefaultArtifact {
             MavenProject project,
             Path target,
             RepositorySystemSession session,
-            org.apache.maven.artifact.Artifact source,
+            Artifact source,
             Supplier<Path> sourcePathProvider,
             String classifier,
             String extension) {

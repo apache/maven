@@ -54,8 +54,8 @@ import org.apache.maven.api.model.PluginContainer;
  * }
  * </pre>
  *
- * @see org.apache.maven.api.Session#requirePackaging(String)
- * @see org.apache.maven.api.Project#getPackaging()
+ * @see Session#requirePackaging(String)
+ * @see Project#getPackaging()
  * @see org.apache.maven.api.model.Model#getPackaging()
  * @since 4.0.0
  */

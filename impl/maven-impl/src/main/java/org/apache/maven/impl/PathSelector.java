@@ -59,7 +59,7 @@ import java.util.Set;
  * @author Benjamin Bentmann
  * @author Martin Desruisseaux
  *
- * @see java.nio.file.FileSystem#getPathMatcher(String)
+ * @see FileSystem#getPathMatcher(String)
  */
 public class PathSelector implements PathMatcher {
     /**

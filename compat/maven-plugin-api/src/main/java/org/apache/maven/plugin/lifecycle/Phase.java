@@ -18,13 +18,17 @@
  */
 package org.apache.maven.plugin.lifecycle;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A phase mapping definition.
  *
  * @version $Revision$ $Date$
  */
 @SuppressWarnings("all")
-public class Phase implements java.io.Serializable {
+public class Phase implements Serializable {
 
     // --------------------------/
     // - Class/Member Variables -/
@@ -38,7 +42,7 @@ public class Phase implements java.io.Serializable {
     /**
      * Field executions.
      */
-    private java.util.List<Execution> executions;
+    private List<Execution> executions;
 
     /**
      * Configuration to pass to all goals run in this phase.
@@ -72,9 +76,9 @@ public class Phase implements java.io.Serializable {
      *
      * @return List
      */
-    public java.util.List<Execution> getExecutions() {
+    public List<Execution> getExecutions() {
         if (this.executions == null) {
-            this.executions = new java.util.ArrayList<Execution>();
+            this.executions = new ArrayList<Execution>();
         }
 
         return this.executions;
@@ -113,7 +117,7 @@ public class Phase implements java.io.Serializable {
      *
      * @param executions a executions object.
      */
-    public void setExecutions(java.util.List<Execution> executions) {
+    public void setExecutions(List<Execution> executions) {
         this.executions = executions;
     } // -- void setExecutions( java.util.List )
 

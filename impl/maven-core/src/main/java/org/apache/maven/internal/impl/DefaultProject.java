@@ -38,6 +38,7 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
@@ -45,6 +46,7 @@ import org.apache.maven.impl.MappedCollection;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
 public class DefaultProject implements Project {
@@ -94,8 +96,8 @@ public class DefaultProject implements Project {
     @Nonnull
     @Override
     public List<ProducedArtifact> getArtifacts() {
-        org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(new ProjectArtifact(project));
-        org.eclipse.aether.artifact.Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
+        Artifact pomArtifact = RepositoryUtils.toArtifact(new ProjectArtifact(project));
+        Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
 
         ArrayList<ProducedArtifact> result = new ArrayList<>(2);
         result.add(session.getArtifact(ProducedArtifact.class, pomArtifact));
@@ -200,7 +202,7 @@ public class DefaultProject implements Project {
     }
 
     @Nonnull
-    private DependencyCoordinates toDependency(org.apache.maven.api.model.Dependency dependency) {
+    private DependencyCoordinates toDependency(Dependency dependency) {
         return new DependencyCoordinates() {
             @Override
             public String getGroupId() {

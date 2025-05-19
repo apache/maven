@@ -31,6 +31,8 @@ import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.services.VersionResolverRequest;
 import org.apache.maven.api.services.VersionResolverResult;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
@@ -87,10 +89,9 @@ public class DefaultVersionResolver implements VersionResolver {
 
                 @Override
                 public Optional<Repository> getRepository() {
-                    if (res.getRepository() instanceof org.eclipse.aether.repository.LocalRepository localRepository) {
+                    if (res.getRepository() instanceof LocalRepository localRepository) {
                         return Optional.of(new DefaultLocalRepository(localRepository));
-                    } else if (res.getRepository()
-                            instanceof org.eclipse.aether.repository.RemoteRepository remoteRepository) {
+                    } else if (res.getRepository() instanceof RemoteRepository remoteRepository) {
                         return Optional.of(new DefaultRemoteRepository(remoteRepository));
                     } else {
                         return Optional.empty();

@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 class PluginLifecycle implements Lifecycle {
@@ -61,7 +62,7 @@ class PluginLifecycle implements Lifecycle {
                                 .version(pluginDescriptor.getVersion())
                                 .configuration(phase.getConfiguration())
                                 .executions(phase.getExecutions().stream()
-                                        .map(exec -> org.apache.maven.api.model.PluginExecution.newBuilder()
+                                        .map(exec -> PluginExecution.newBuilder()
                                                 .goals(exec.getGoals())
                                                 .configuration(exec.getConfiguration())
                                                 .build())

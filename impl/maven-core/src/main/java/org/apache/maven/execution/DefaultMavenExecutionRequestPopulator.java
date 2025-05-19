@@ -33,6 +33,7 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
@@ -208,7 +209,7 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
 
         request.setActiveProfiles(settings.getActiveProfiles());
 
-        for (org.apache.maven.settings.Profile rawProfile : settings.getProfiles()) {
+        for (Profile rawProfile : settings.getProfiles()) {
             request.addProfile(SettingsUtils.convertFromSettingsProfile(rawProfile));
 
             if (settings.getActiveProfiles().contains(rawProfile.getId())) {

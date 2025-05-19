@@ -30,6 +30,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Binding;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.spi.ModelParser;
@@ -38,6 +39,7 @@ import org.apache.maven.internal.impl.SisuDiBridgeModule;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
+import org.eclipse.sisu.Priority;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -102,13 +104,13 @@ public class DiTest {
         }
 
         static class DiInjected {
-            @org.apache.maven.api.di.Inject
+            @Inject
             ModelParser parser;
 
-            @org.apache.maven.api.di.Inject
+            @Inject
             List<ModelParser> parsers;
 
-            @org.apache.maven.api.di.Inject
+            @Inject
             Map<String, ModelParser> parsersMap;
         }
 
@@ -174,13 +176,13 @@ public class DiTest {
         }
 
         static class DiInjected {
-            @org.apache.maven.api.di.Inject
+            @Inject
             ModelParser parser;
 
-            @org.apache.maven.api.di.Inject
+            @Inject
             List<ModelParser> parsers;
 
-            @org.apache.maven.api.di.Inject
+            @Inject
             Map<String, ModelParser> parsersMap;
         }
 
@@ -246,13 +248,13 @@ public class DiTest {
         }
 
         static class DiInjected {
-            @org.apache.maven.api.di.Inject
+            @Inject
             ModelParser parser;
 
-            @org.apache.maven.api.di.Inject
+            @Inject
             List<ModelParser> parsers;
 
-            @org.apache.maven.api.di.Inject
+            @Inject
             Map<String, ModelParser> parsersMap;
         }
 
@@ -325,18 +327,18 @@ public class DiTest {
         }
 
         static class DiInjected {
-            @org.apache.maven.api.di.Inject
+            @Inject
             ModelParser parser;
 
-            @org.apache.maven.api.di.Inject
+            @Inject
             List<ModelParser> parsers;
 
-            @org.apache.maven.api.di.Inject
+            @Inject
             Map<String, ModelParser> parsersMap;
         }
 
-        @javax.inject.Named("sisu")
-        @org.eclipse.sisu.Priority(100)
+        @Named("sisu")
+        @Priority(100)
         static class TestModelParserSisu implements ModelParser {
             @Override
             public Optional<Source> locate(Path dir) {

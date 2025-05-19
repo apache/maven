@@ -25,10 +25,11 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.Node;
 import org.apache.maven.api.NodeVisitor;
+import org.eclipse.aether.graph.DependencyNode;
 
 public abstract class AbstractNode implements Node {
 
-    abstract org.eclipse.aether.graph.DependencyNode getDependencyNode();
+    abstract DependencyNode getDependencyNode();
 
     @Override
     public boolean accept(NodeVisitor visitor) {

@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.function.UnaryOperator;
 
@@ -35,8 +36,7 @@ public class MavenPropertiesLoader {
     public static final String OVERRIDE_PREFIX =
             "maven.override."; // prefix that marks that system property should override defaults.
 
-    public static void loadProperties(
-            java.util.Properties properties, Path path, UnaryOperator<String> callback, boolean escape)
+    public static void loadProperties(Properties properties, Path path, UnaryOperator<String> callback, boolean escape)
             throws IOException {
         MavenProperties sp = new MavenProperties(false);
         if (Files.exists(path)) {

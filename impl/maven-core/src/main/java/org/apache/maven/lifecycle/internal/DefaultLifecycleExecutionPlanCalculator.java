@@ -59,6 +59,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -511,7 +512,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
                 if (phaseConfiguration != null) {
                     for (MojoExecution forkedExecution : forkedExecutions) {
-                        org.codehaus.plexus.util.xml.Xpp3Dom config = forkedExecution.getConfiguration();
+                        Xpp3Dom config = forkedExecution.getConfiguration();
 
                         if (config != null) {
                             XmlNode forkedConfiguration = config.getDom();

@@ -30,6 +30,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Organization;
+import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.model.Scm;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
@@ -136,9 +140,7 @@ public abstract class AbstractModelInterpolatorTest {
     @Test
     public void testShouldNotThrowExceptionOnReferenceToNonExistentValue() throws Exception {
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
-                .scm(org.apache.maven.api.model.Scm.newBuilder()
-                        .connection("${test}/somepath")
-                        .build())
+                .scm(Scm.newBuilder().connection("${test}/somepath").build())
                 .build());
 
         ModelInterpolator interpolator = createInterpolator();
@@ -153,7 +155,7 @@ public abstract class AbstractModelInterpolatorTest {
     @Test
     public void testShouldThrowExceptionOnRecursiveScmConnectionReference() throws Exception {
         var model = new Model(org.apache.maven.api.model.Model.newBuilder()
-                .scm(org.apache.maven.api.model.Scm.newBuilder()
+                .scm(Scm.newBuilder()
                         .connection("${project.scm.connection}/somepath")
                         .build())
                 .build());
@@ -170,9 +172,7 @@ public abstract class AbstractModelInterpolatorTest {
         Map<String, String> props = new HashMap<>();
         props.put("test", "test");
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
-                .scm(org.apache.maven.api.model.Scm.newBuilder()
-                        .connection("${test}/somepath")
-                        .build())
+                .scm(Scm.newBuilder().connection("${test}/somepath").build())
                 .properties(props)
                 .build());
 
@@ -192,9 +192,7 @@ public abstract class AbstractModelInterpolatorTest {
 
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .name("${project.organization.name} Tools")
-                .organization(org.apache.maven.api.model.Organization.newBuilder()
-                        .name(orgName)
-                        .build())
+                .organization(Organization.newBuilder().name(orgName).build())
                 .build());
 
         ModelInterpolator interpolator = createInterpolator();
@@ -265,7 +263,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .repositories(Collections.singletonList(org.apache.maven.api.model.Repository.newBuilder()
+                .repositories(Collections.singletonList(Repository.newBuilder()
                         .url("file://localhost/${basedir}/temp-repo")
                         .build()))
                 .build());
@@ -285,7 +283,7 @@ public abstract class AbstractModelInterpolatorTest {
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
                 .version("3.8.1")
                 .artifactId("foo")
-                .repositories(Collections.singletonList(org.apache.maven.api.model.Repository.newBuilder()
+                .repositories(Collections.singletonList(Repository.newBuilder()
                         .url("${project.baseUri}/temp-repo")
                         .build()))
                 .build());
@@ -359,7 +357,7 @@ public abstract class AbstractModelInterpolatorTest {
     @Test
     public void shouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly() throws Exception {
         Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
-                .build(org.apache.maven.api.model.Build.newBuilder()
+                .build(Build.newBuilder()
                         .sourceDirectory("correct")
                         .resources(List.of(org.apache.maven.api.model.Resource.newBuilder()
                                 .directory("${project.build.sourceDirectory}")

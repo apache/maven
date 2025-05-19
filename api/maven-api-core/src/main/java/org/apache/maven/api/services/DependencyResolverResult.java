@@ -82,7 +82,7 @@ public interface DependencyResolverResult extends Result<DependencyResolverReque
      * Returns the file paths of all dependencies and their assignments to different paths.
      * The {@link PathType} keys identify, for example, {@code --class-path} or {@code --module-path} options.
      * In the case of Java tools, the map may also contain {@code --patch-module} options, which are
-     * {@linkplain org.apache.maven.api.JavaPathType#patchModule(String) handled in a special way}.
+     * {@linkplain JavaPathType#patchModule(String) handled in a special way}.
      *
      * <h4>Design note</h4>
      * All types of path are determined together because they are sometime mutually exclusive.

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl.model.profile;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
@@ -116,7 +117,7 @@ public class ConditionProfileActivator implements ProfileActivator {
 
         ConditionFunctions conditionFunctions = new ConditionFunctions(context, versionParser);
 
-        for (java.lang.reflect.Method method : ConditionFunctions.class.getDeclaredMethods()) {
+        for (Method method : ConditionFunctions.class.getDeclaredMethods()) {
             String methodName = method.getName();
             if (methodName.endsWith("_")) {
                 methodName = methodName.substring(0, methodName.length() - 1);

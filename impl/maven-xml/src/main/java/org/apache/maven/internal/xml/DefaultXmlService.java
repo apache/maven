@@ -39,6 +39,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.ctc.wstx.api.WstxOutputProperties;
+import com.ctc.wstx.stax.WstxOutputFactory;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.xml.XmlNode;
@@ -147,10 +149,10 @@ public class DefaultXmlService extends XmlService {
     @Override
     public void doWrite(XmlNode node, Writer writer) throws IOException {
         try {
-            XMLOutputFactory factory = new com.ctc.wstx.stax.WstxOutputFactory();
+            XMLOutputFactory factory = new WstxOutputFactory();
             factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
-            factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_USE_DOUBLE_QUOTES_IN_XML_DECL, true);
-            factory.setProperty(com.ctc.wstx.api.WstxOutputProperties.P_ADD_SPACE_AFTER_EMPTY_ELEM, true);
+            factory.setProperty(WstxOutputProperties.P_USE_DOUBLE_QUOTES_IN_XML_DECL, true);
+            factory.setProperty(WstxOutputProperties.P_ADD_SPACE_AFTER_EMPTY_ELEM, true);
             XMLStreamWriter serializer = new IndentingXMLStreamWriter(factory.createXMLStreamWriter(writer));
             writeNode(serializer, node);
             serializer.close();

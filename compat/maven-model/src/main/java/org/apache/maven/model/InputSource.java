@@ -18,13 +18,15 @@
  */
 package org.apache.maven.model;
 
+import java.io.Serializable;
+
 /**
  * Class InputSource.
  *
  * @version $Revision$ $Date$
  */
 @SuppressWarnings("all")
-public class InputSource implements java.io.Serializable, Cloneable {
+public class InputSource implements Serializable, Cloneable {
 
     // --------------------------/
     // - Class/Member Variables -/

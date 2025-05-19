@@ -33,6 +33,7 @@ import java.util.Properties;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Dependency;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Session;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -132,8 +133,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         MojoExecution exec = newMojoExecution(session);
 
         @SuppressWarnings("unchecked")
-        Map<String, org.apache.maven.api.Dependency> depResults = (Map<String, org.apache.maven.api.Dependency>)
-                new PluginParameterExpressionEvaluatorV4(session, null, exec)
+        Map<String, Dependency> depResults =
+                (Map<String, Dependency>) new PluginParameterExpressionEvaluatorV4(session, null, exec)
                         .evaluate("${mojo.plugin.dependenciesMap}");
 
         System.out.println("Result: " + depResults);

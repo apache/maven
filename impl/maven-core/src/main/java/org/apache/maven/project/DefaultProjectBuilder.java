@@ -51,6 +51,7 @@ import org.apache.maven.api.Language;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.WorkspaceRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Build;
@@ -449,7 +450,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 ArtifactResolverResult.ResultItem resItem = res.getResult(coordinates);
 
                 pomArtifact = InternalMavenSession.from(session).toArtifact(resItem.getArtifact());
-                localProject = resItem.getRepository() instanceof org.apache.maven.api.WorkspaceRepository;
+                localProject = resItem.getRepository() instanceof WorkspaceRepository;
             } catch (ArtifactResolverException e) {
                 if (e.getResult().getResults().values().iterator().next().isMissing() && allowStubModel) {
                     return build(parent, null, createStubModelSource(artifact));

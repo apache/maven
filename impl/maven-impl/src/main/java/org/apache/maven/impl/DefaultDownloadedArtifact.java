@@ -22,14 +22,14 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.annotations.Nonnull;
+import org.eclipse.aether.artifact.Artifact;
 
 /**
  * A wrapper class around a maven resolver artifact.
  */
 public class DefaultDownloadedArtifact extends DefaultArtifact implements DownloadedArtifact {
 
-    public DefaultDownloadedArtifact(
-            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
+    public DefaultDownloadedArtifact(@Nonnull InternalSession session, @Nonnull Artifact artifact) {
         super(session, artifact);
     }
 

@@ -33,6 +33,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -954,7 +955,7 @@ public class MavenCli {
                     passwd = String.copyValueOf(password);
 
                     // Sun/Oracle advises to empty the char array
-                    java.util.Arrays.fill(password, ' ');
+                    Arrays.fill(password, ' ');
                 }
             }
             System.out.println(dispatcher.encrypt(passwd, null));

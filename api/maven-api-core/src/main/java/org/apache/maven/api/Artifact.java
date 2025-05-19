@@ -117,7 +117,7 @@ public interface Artifact {
      * Determines whether this artifact uses a snapshot version.
      *
      * @return {@code true} if the artifact is a snapshot, {@code false} otherwise
-     * @see org.apache.maven.api.Session#isVersionSnapshot(String)
+     * @see Session#isVersionSnapshot(String)
      */
     boolean isSnapshot();
 
@@ -125,7 +125,7 @@ public interface Artifact {
      * {@return coordinates with the same identifiers as this artifact}
      * This is a shortcut for {@code session.createArtifactCoordinates(artifact)}.
      *
-     * @see org.apache.maven.api.Session#createArtifactCoordinates(Artifact)
+     * @see Session#createArtifactCoordinates(Artifact)
      */
     @Nonnull
     ArtifactCoordinates toCoordinates();

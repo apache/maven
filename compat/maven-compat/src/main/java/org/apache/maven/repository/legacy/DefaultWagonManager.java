@@ -34,6 +34,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -692,7 +693,7 @@ public class DefaultWagonManager implements WagonManager {
             throw new UnsupportedProtocolException("Unspecified protocol");
         }
 
-        String hint = protocol.toLowerCase(java.util.Locale.ENGLISH);
+        String hint = protocol.toLowerCase(Locale.ENGLISH);
 
         Wagon wagon;
         try {

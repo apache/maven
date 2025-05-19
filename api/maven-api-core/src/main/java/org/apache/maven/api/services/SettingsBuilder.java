@@ -24,6 +24,7 @@ import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Settings;
 
 /**
@@ -125,11 +126,11 @@ public interface SettingsBuilder extends Service {
      * Convert a model profile to a settings profile.
      */
     @Nonnull
-    org.apache.maven.api.settings.Profile convert(@Nonnull org.apache.maven.api.model.Profile profile);
+    Profile convert(@Nonnull org.apache.maven.api.model.Profile profile);
 
     /**
      * Convert a settings profile to a model profile.
      */
     @Nonnull
-    org.apache.maven.api.model.Profile convert(@Nonnull org.apache.maven.api.settings.Profile profile);
+    org.apache.maven.api.model.Profile convert(@Nonnull Profile profile);
 }

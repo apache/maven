@@ -426,29 +426,27 @@ public class InjectorImpl implements Injector {
     }
 
     private static class SingletonScope implements Scope {
-        Map<Key<?>, java.util.function.Supplier<?>> cache = new ConcurrentHashMap<>();
+        Map<Key<?>, Supplier<?>> cache = new ConcurrentHashMap<>();
 
         @Nonnull
         @SuppressWarnings("unchecked")
         @Override
-        public <T> java.util.function.Supplier<T> scope(
-                @Nonnull Key<T> key, @Nonnull java.util.function.Supplier<T> unscoped) {
-            return (java.util.function.Supplier<T>)
-                    cache.computeIfAbsent(key, k -> new java.util.function.Supplier<T>() {
-                        volatile T instance;
+        public <T> Supplier<T> scope(@Nonnull Key<T> key, @Nonnull Supplier<T> unscoped) {
+            return (Supplier<T>) cache.computeIfAbsent(key, k -> new Supplier<T>() {
+                volatile T instance;
 
-                        @Override
-                        public T get() {
+                @Override
+                public T get() {
+                    if (instance == null) {
+                        synchronized (this) {
                             if (instance == null) {
-                                synchronized (this) {
-                                    if (instance == null) {
-                                        instance = unscoped.get();
-                                    }
-                                }
+                                instance = unscoped.get();
                             }
-                            return instance;
                         }
-                    });
+                    }
+                    return instance;
+                }
+            });
         }
     }
 }

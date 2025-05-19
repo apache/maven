@@ -60,7 +60,7 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager {
     /**
      * Returns the artifact filter for the core + extension artifacts.
      *
-     * @see org.apache.maven.ArtifactFilterManager#getArtifactFilter()
+     * @see ArtifactFilterManager#getArtifactFilter()
      */
     public ArtifactFilter getArtifactFilter() {
         Set<String> excludes = new LinkedHashSet<>(getExcludedArtifacts());
@@ -75,7 +75,7 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager {
     /**
      * Returns the artifact filter for the standard core artifacts.
      *
-     * @see org.apache.maven.ArtifactFilterManager#getCoreArtifactFilter()
+     * @see ArtifactFilterManager#getCoreArtifactFilter()
      */
     public ArtifactFilter getCoreArtifactFilter() {
         return new ExclusionSetFilter(getCoreArtifactExcludes());
