@@ -19,6 +19,12 @@ specific language governing permissions and limitations
 under the License.
 -->
 
+<!--
+THIS FILE IS GENERATED - DO NOT EDIT
+Generated from: apache-maven/src/test/resources/maven-configuration.md.vm
+To modify this file, edit the template and regenerate.
+-->
+
 
 
 
