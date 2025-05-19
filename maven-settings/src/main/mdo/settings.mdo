@@ -19,10 +19,10 @@
   under the License.
 -->
 
-<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 https://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd"
   xml.namespace="http://maven.apache.org/SETTINGS/${version}"
-  xml.schemaLocation="http://maven.apache.org/xsd/settings-${version}.xsd">
+  xml.schemaLocation="https://maven.apache.org/xsd/settings-${version}.xsd">
   <id>settings</id>
   <name>Settings</name>
   <description>
