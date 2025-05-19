@@ -229,7 +229,7 @@ class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
             }
         };
 
-        ArtifactResolutionResult result = null;
+        ArtifactResolutionResult result;
 
         Set<Artifact> set = new LinkedHashSet<>();
         set.add(n);

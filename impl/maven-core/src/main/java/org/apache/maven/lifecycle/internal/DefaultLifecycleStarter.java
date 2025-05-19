@@ -77,8 +77,8 @@ public class DefaultLifecycleStarter implements LifecycleStarter {
     public void execute(MavenSession session) {
         eventCatapult.fire(ExecutionEvent.Type.SessionStarted, session, null);
 
-        ReactorContext reactorContext = null;
-        ProjectBuildList projectBuilds = null;
+        ReactorContext reactorContext;
+        ProjectBuildList projectBuilds;
         MavenExecutionResult result = session.getResult();
 
         try {

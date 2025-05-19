@@ -532,7 +532,7 @@ public interface XmlNode {
                 w = addToStringField(sb, value, o -> !o.isEmpty(), "value", w);
                 w = addToStringField(sb, attributes, o -> !o.isEmpty(), "attributes", w);
                 w = addToStringField(sb, children, o -> !o.isEmpty(), "children", w);
-                w = addToStringField(sb, inputLocation, Objects::nonNull, "inputLocation", w);
+                addToStringField(sb, inputLocation, Objects::nonNull, "inputLocation", w);
                 sb.append("]");
                 return sb.toString();
             }

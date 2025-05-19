@@ -48,7 +48,7 @@ public class MavenPluginMavenPrerequisiteChecker implements MavenPluginPrerequis
                 requiredMavenVersion == null || requiredMavenVersion.trim().isEmpty();
 
         if (!isBlankVersion) {
-            boolean isRequirementMet = false;
+            boolean isRequirementMet;
             try {
                 isRequirementMet = runtimeInformation.isMavenVersion(requiredMavenVersion);
             } catch (IllegalArgumentException e) {

@@ -316,7 +316,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         w = addToStringField(sb, value, o -> !o.isEmpty(), "value", w);
         w = addToStringField(sb, attributes, o -> !o.isEmpty(), "attributes", w);
         w = addToStringField(sb, children, o -> !o.isEmpty(), "children", w);
-        w = addToStringField(sb, location, Objects::nonNull, "location", w);
+        addToStringField(sb, location, Objects::nonNull, "location", w);
         sb.append("]");
         return sb.toString();
     }

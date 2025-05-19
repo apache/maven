@@ -450,7 +450,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 // 1-rc1 < 1, 1-ga1 > 1
                 return stringPart.compareTo(item);
             }
-            int result = 0;
+            int result;
             switch (item.getType()) {
                 case INT_ITEM:
                 case LONG_ITEM:

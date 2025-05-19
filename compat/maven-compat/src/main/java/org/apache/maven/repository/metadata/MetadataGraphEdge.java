@@ -30,9 +30,9 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 public class MetadataGraphEdge {
     String version;
     ArtifactScopeEnum scope;
-    int depth = -1;
-    int pomOrder = -1;
-    boolean resolved = true;
+    int depth;
+    int pomOrder;
+    boolean resolved;
     String artifactUri;
 
     /**
