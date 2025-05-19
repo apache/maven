@@ -118,8 +118,7 @@
                 <template>writer-stax.vm</template>
               </templates>
               <params>
-                <!-- 1.3.0 ? -->
-                <param>forcedIOModelVersion=1.2.0</param>
+                <param>forcedIOModelVersion=1.3.0</param>
                 <param>packageModelV3=org.apache.maven.settings</param>
                 <param>packageModelV4=org.apache.maven.api.settings</param>
                 <param>packageToolV4=org.apache.maven.settings.v4</param>

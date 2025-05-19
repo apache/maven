@@ -181,7 +181,6 @@
         </field>
         <field xdoc.separator="blank">
           <name>repositories</name>
-          <!-- 2.0.0+ ? -->
           <version>1.3.0+</version>
           <description>
             The lists of the remote repositories.
@@ -193,7 +192,6 @@
         </field>
         <field>
           <name>pluginRepositories</name>
-          <!-- 2.0.0+ ? -->
           <version>1.3.0+</version>
           <description>
             The lists of the remote repositories for discovering plugins.
