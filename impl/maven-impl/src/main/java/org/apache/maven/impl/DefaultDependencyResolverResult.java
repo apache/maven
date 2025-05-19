@@ -370,7 +370,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
 
     @Override
     public List<Exception> getExceptions() {
-        return exceptions;
+        return Collections.unmodifiableList(exceptions);
     }
 
     @Override
@@ -380,22 +380,22 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
 
     @Override
     public List<Node> getNodes() {
-        return nodes;
+        return Collections.unmodifiableList(nodes);
     }
 
     @Override
     public List<Path> getPaths() {
-        return paths;
+        return Collections.unmodifiableList(paths);
     }
 
     @Override
     public Map<PathType, List<Path>> getDispatchedPaths() {
-        return dispatchedPaths;
+        return Collections.unmodifiableMap(dispatchedPaths);
     }
 
     @Override
     public Map<Dependency, Path> getDependencies() {
-        return dependencies;
+        return Collections.unmodifiableMap(dependencies);
     }
 
     @Override

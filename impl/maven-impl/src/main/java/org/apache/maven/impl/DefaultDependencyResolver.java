@@ -70,19 +70,19 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
     /**
      * Cache of information about the modules contained in a path element.
-     * This cache is created when first needed. It may be never created.
      *
      * <p><b>TODO:</b> This field should not be in this class, because the cache should be global to the session.
      * This field exists here only temporarily, until clarified where to store session-wide caches.</p>
-     *
-     * @see #moduleCache()
      */
-    private PathModularizationCache moduleCache;
+    private final PathModularizationCache moduleCache;
 
     /**
      * Creates an initially empty resolver.
      */
-    public DefaultDependencyResolver() {}
+    public DefaultDependencyResolver() {
+        // TODO: the cache should not be instantiated here, but should rather be session-wide.
+        moduleCache = new PathModularizationCache();
+    }
 
     @Nonnull
     @Override
@@ -143,7 +143,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         session.getRepositorySystem().collectDependencies(systemSession, collectRequest);
                 return new DefaultDependencyResolverResult(
                         null,
-                        moduleCache(),
+                        moduleCache,
                         result.getExceptions(),
                         session.getNode(result.getRoot(), request.getVerbose()),
                         0);
@@ -191,8 +191,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
         InternalSession session =
                 InternalSession.from(nonNull(request, "request").getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        DependencyResolverResult result;
         try {
-            DependencyResolverResult result;
             DependencyResolverResult collectorResult = collect(request);
             List<RemoteRepository> repositories = request.getRepositories() != null
                     ? request.getRepositories()
@@ -212,12 +212,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         .collect(Collectors.toList());
                 Predicate<PathType> filter = request.getPathTypeFilter();
                 DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
-                        null, moduleCache(), collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
+                        null, moduleCache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                 if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {
                     for (Node node : nodes) {
                         resolverResult.addNode(node);
                     }
-                    result = resolverResult;
                 } else {
                     ArtifactResolverResult artifactResolverResult =
                             session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
@@ -233,26 +232,13 @@ public class DefaultDependencyResolver implements DependencyResolver {
                             throw cannotReadModuleInfo(path, e);
                         }
                     }
-                    result = resolverResult;
                 }
+                result = resolverResult;
             }
-            return result;
         } finally {
             RequestTraceHelper.exit(trace);
         }
-    }
-
-    /**
-     * {@return the cache of information about the modules contained in a path element}.
-     *
-     * <p><b>TODO:</b> This method should not be in this class, because the cache should be global to the session.
-     * This method exists here only temporarily, until clarified where to store session-wide caches.</p>
-     */
-    private PathModularizationCache moduleCache() {
-        if (moduleCache == null) {
-            moduleCache = new PathModularizationCache();
-        }
-        return moduleCache;
+        return result;
     }
 
     private static DependencyResolverException cannotReadModuleInfo(final Path path, final IOException cause) {
