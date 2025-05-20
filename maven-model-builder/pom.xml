@@ -55,7 +55,6 @@ under the License.
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.inject</artifactId>
-      <classifier>no_asm</classifier>
     </dependency>
     <dependency>
       <groupId>org.ow2.asm</groupId>
