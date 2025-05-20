@@ -109,6 +109,8 @@ public class CLIManager {
 
     public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
+    private static final String RAW_STREAMS = "raw-streams";
+
     protected Options options;
 
     @SuppressWarnings({"checkstyle:linelength", "checkstyle:MethodLength"})
@@ -290,6 +292,12 @@ public class CLIManager {
         options.addOption(Option.builder("llr")
                 .longOpt("legacy-local-repository")
                 .desc("UNSUPPORTED: Use of this option will make Maven invocation fail.")
+                .build());
+
+        // Adding this to make Maven3 silently ignore these otherwise Maven4 options
+        options.addOption(Option.builder()
+                .longOpt(RAW_STREAMS)
+                .desc("Ignored (Maven4 option)")
                 .build());
 
         options.addOption(Option.builder()
