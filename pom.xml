@@ -164,7 +164,7 @@ under the License.
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
     <resolverVersion>2.0.9</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
-    <sisuVersion>0.9.0.M3</sisuVersion>
+    <sisuVersion>0.9.0.M4</sisuVersion>
     <slf4jVersion>2.0.17</slf4jVersion>
     <stax2ApiVersion>4.2.2</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
@@ -410,12 +410,6 @@ under the License.
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${sisuVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>${sisuVersion}</version>
-        <classifier>no_asm</classifier>
       </dependency>
       <dependency>
         <groupId>jakarta.inject</groupId>
@@ -804,6 +798,18 @@ under the License.</licenseText>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
               <version>7.12.0</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.sisu</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>${sisuVersion}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm</artifactId>
+              <version>${asmVersion}</version>
             </dependency>
           </dependencies>
         </plugin>
