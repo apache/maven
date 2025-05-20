@@ -125,7 +125,7 @@ under the License.
 
   <properties>
     <javaVersion>8</javaVersion>
-    <version.sisu-maven-plugin>0.9.0.M3</version.sisu-maven-plugin>
+    <version.sisu-maven-plugin>0.9.0.M4</version.sisu-maven-plugin>
     <asmVersion>9.8</asmVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
@@ -307,7 +307,6 @@ under the License.
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${version.sisu-maven-plugin}</version>
-        <classifier>no_asm</classifier>
       </dependency>
       <dependency>
         <groupId>org.ow2.asm</groupId>
@@ -634,6 +633,18 @@ under the License.
           <artifactId>buildnumber-maven-plugin</artifactId>
           <version>3.2.1</version>
         </plugin>
+        <plugin>
+          <groupId>org.eclipse.sisu</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>${version.sisu-maven-plugin}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm</artifactId>
+              <version>${asmVersion}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -715,11 +726,9 @@ under the License.
                   <excludes>
                     <exclude>org.sonatype.plexus:plexus-sec-dispatcher</exclude>
                     <exclude>org.sonatype.plexus:plexus-cipher</exclude>
-                    <exclude>org.eclipse.sisu:org.eclipse.sisu.inject</exclude>
                     <exclude>com.google.inject:guice</exclude>
                   </excludes>
                   <includes>
-                    <include>org.eclipse.sisu:org.eclipse.sisu.inject:*:*:*:no_asm</include>
                     <include>com.google.inject:guice:*:*:*:classes</include>
                   </includes>
                 </bannedDependencies>
