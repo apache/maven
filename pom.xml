@@ -726,11 +726,9 @@ under the License.
                   <excludes>
                     <exclude>org.sonatype.plexus:plexus-sec-dispatcher</exclude>
                     <exclude>org.sonatype.plexus:plexus-cipher</exclude>
-                    <exclude>org.eclipse.sisu:org.eclipse.sisu.inject</exclude>
                     <exclude>com.google.inject:guice</exclude>
                   </excludes>
                   <includes>
-                    <include>org.eclipse.sisu:org.eclipse.sisu.inject:*:*:*:no_asm</include>
                     <include>com.google.inject:guice:*:*:*:classes</include>
                   </includes>
                 </bannedDependencies>
