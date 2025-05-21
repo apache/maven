@@ -46,20 +46,24 @@ import org.apache.maven.api.model.Organization;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.model.Scm;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.model.ModelInterpolator;
+import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.RootLocator;
+import org.apache.maven.api.services.model.UrlNormalizer;
 import org.apache.maven.impl.model.profile.SimpleProblemCollector;
+import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
 /**
  */
@@ -592,4 +596,97 @@ class DefaultModelInterpolatorTest {
             }
         };
     }
+
+@Test
+void testReflectionValueExtractorShouldReturnExpectedValue() throws Exception {
+    // Mock the sub-expression and project directory
+    String subExpr = "someExpression";
+    Path projectDir = Paths.get("/some/project/directory");
+
+    // Mocking the ReflectionValueExtractor behavior
+    Object expectedValue = "EvaluatedValue";
+    try (MockedStatic<ReflectionValueExtractor> mockedExtractor = mockStatic(ReflectionValueExtractor.class)) {
+        mockedExtractor
+            .when(() -> ReflectionValueExtractor.evaluate(subExpr, projectDir.toAbsolutePath().toUri(), true))
+            .thenReturn(expectedValue);
+
+        // Call the method under test
+        Object actualValue = ReflectionValueExtractor.evaluate(subExpr, projectDir.toAbsolutePath().toUri(), true);
+
+        // Assert the results
+        assertNotNull(actualValue, "Value should not be null");
+        assertEquals(expectedValue.toString(), actualValue.toString(), "The evaluated value should match");
+    }
+}
+
+@Test
+void testReflectionValueExtractorShouldHandleNullValueGracefully() throws Exception {
+    // Mock the sub-expression and project directory
+    String subExpr = "someExpression";
+    Path projectDir = Paths.get("/some/project/directory");
+
+    // Mocking the ReflectionValueExtractor behavior to return null
+    try (MockedStatic<ReflectionValueExtractor> mockedExtractor = mockStatic(ReflectionValueExtractor.class)) {
+        mockedExtractor
+            .when(() -> ReflectionValueExtractor.evaluate(subExpr, projectDir.toAbsolutePath().toUri(), true))
+            .thenReturn(null);
+
+        // Call the method under test
+        Object actualValue = ReflectionValueExtractor.evaluate(subExpr, projectDir.toAbsolutePath().toUri(), true);
+
+        // Assert the results
+        assertNull(actualValue, "Value should be null if ReflectionValueExtractor returns null");
+    }
+}
+
+
+    @Test
+    void testProjectPropertyExtraction() throws Exception {
+        Path projectDir = Paths.get("/test/path");
+        Model model = Model.newBuilder().build();
+
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class)
+        );
+
+        // Test basedir extraction
+        assertEquals(
+                "/test/path",
+                interpolator.projectProperty(model, projectDir, "basedir", false)
+        );
+
+        // Test null handling
+        assertNull(
+                interpolator.projectProperty(model, projectDir, "nonexistent.property", false)
+        );
+    }
+
+
+    @Test
+    void testWindowsPathHandling() {
+        FileSystem fs = Jimfs.newFileSystem(Configuration.windows());
+        Path projectDir = fs.getPath("C:\\test\\path");
+
+        Model model = Model.newBuilder()
+                .build(Build.newBuilder()
+                        .directory("${project.basedir}\\target")  // Note forward slash here
+                        .build())
+                .build();
+
+        Model out = interpolator.interpolateModel(
+                model,
+                projectDir,
+                createModelBuildingRequest(Collections.emptyMap()).build(),
+                new SimpleProblemCollector()
+        );
+
+        // Expect platform-specific path
+        String expected = projectDir.resolve("target").toString();
+        assertEquals(expected, out.getBuild().getDirectory());
+    }
+
+
 }

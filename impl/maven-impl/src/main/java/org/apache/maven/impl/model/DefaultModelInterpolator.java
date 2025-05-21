@@ -101,21 +101,15 @@ public class DefaultModelInterpolator implements ModelInterpolator {
     @Override
     public Model interpolateModel(
             Model model, Path projectDir, ModelBuilderRequest request, ModelProblemCollector problems) {
-        InnerInterpolator innerInterpolator = createInterpolator(model, projectDir, request, problems);
-        return new MavenTransformer(innerInterpolator::interpolate).visit(model);
+        return new MavenTransformer(createInterpolator(model, projectDir, request, problems)::interpolate).visit(model);
     }
 
     private InnerInterpolator createInterpolator(
             Model model, Path projectDir, ModelBuilderRequest request, ModelProblemCollector problems) {
-
-        Map<String, Optional<String>> cache = new HashMap<>();
-        Function<String, Optional<String>> ucb =
-                v -> Optional.ofNullable(callback(model, projectDir, request, problems, v));
-        UnaryOperator<String> cb = v -> cache.computeIfAbsent(v, ucb).orElse(null);
-        BinaryOperator<String> postprocessor = (e, v) -> postProcess(projectDir, request, e, v);
+        final Map<String, Optional<String>> cache = new HashMap<>();
         return value -> {
             try {
-                return interpolator.interpolate(value, cb, postprocessor, false);
+                return interpolator.interpolate(value, v -> cache.computeIfAbsent(v, v1 -> Optional.ofNullable(callback(model, projectDir, request, v1))).orElse(null), (e, v2) -> postProcess(projectDir, request, e, v2), false);
             } catch (InterpolatorException e) {
                 problems.add(BuilderProblem.Severity.ERROR, ModelProblem.Version.BASE, e.getMessage(), e);
                 return null;
@@ -133,13 +127,8 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             Model model,
             Path projectDir,
             ModelBuilderRequest request,
-            ModelProblemCollector problems,
             String expression) {
-        String value = doCallback(model, projectDir, request, problems, expression);
-        if (value != null) {
-            // value = postProcess(projectDir, request, expression, value);
-        }
-        return value;
+        return doCallback(model, projectDir, request, expression);
     }
 
     private String postProcess(Path projectDir, ModelBuilderRequest request, String expression, String value) {
@@ -168,7 +157,6 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             Model model,
             Path projectDir,
             ModelBuilderRequest request,
-            ModelProblemCollector problems,
             String expression) {
         // basedir (the prefixed combos are handled below)
         if ("basedir".equals(expression)) {
@@ -220,8 +208,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                     if (value != null) {
                         return value.toString();
                     }
-                } catch (Exception e) {
-                    // addFeedback("Failed to extract \'" + expression + "\' from: " + root, e);
+                } catch (Exception ignored) {
                 }
             } else if (prefixed && subExpr.equals("baseUri")) {
                 return projectDir.toAbsolutePath().toUri().toASCIIString();
@@ -232,8 +219,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                     if (value != null) {
                         return value.toString();
                     }
-                } catch (Exception e) {
-                    // addFeedback("Failed to extract \'" + expression + "\' from: " + root, e);
+                } catch (Exception ignored) {
                 }
             } else if (prefixed && subExpr.equals("rootDirectory")) {
                 return rootLocator.findMandatoryRoot(projectDir).toString();
@@ -244,8 +230,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                     if (value != null) {
                         return value.toString();
                     }
-                } catch (Exception e) {
-                    // addFeedback("Failed to extract \'" + expression + "\' from: " + root, e);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -254,8 +239,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             if (value != null) {
                 return value.toString();
             }
-        } catch (Exception e) {
-            // addFeedback("Failed to extract \'" + expression + "\' from: " + root, e);
+        } catch (Exception ignored) {
         }
         return null;
     }
