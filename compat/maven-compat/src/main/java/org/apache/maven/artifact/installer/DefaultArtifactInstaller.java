@@ -85,9 +85,6 @@ public class DefaultArtifactInstaller extends AbstractLogEnabled implements Arti
                 org.eclipse.aether.artifact.Artifact pomArtifact = new SubArtifact(mainArtifact, "", "pom");
                 pomArtifact = pomArtifact.setFile(projectArtifactMetadata.getFile());
                 request.addArtifact(pomArtifact);
-            } else if (metadata instanceof SnapshotArtifactRepositoryMetadata
-                    || metadata instanceof ArtifactRepositoryMetadata) {
-                // eaten, handled by repo system
             } else {
                 request.addMetadata(new MetadataBridge(metadata));
             }

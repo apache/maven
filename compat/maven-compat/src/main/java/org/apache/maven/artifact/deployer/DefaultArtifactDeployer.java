@@ -31,9 +31,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
-import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.MetadataBridge;
-import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -106,9 +104,6 @@ public class DefaultArtifactDeployer extends AbstractLogEnabled implements Artif
                 org.eclipse.aether.artifact.Artifact pomArtifact = new SubArtifact(mainArtifact, "", "pom");
                 pomArtifact = pomArtifact.setFile(projectArtifactMetadata.getFile());
                 request.addArtifact(pomArtifact);
-            } else if (metadata instanceof SnapshotArtifactRepositoryMetadata
-                    || metadata instanceof ArtifactRepositoryMetadata) {
-                // eaten, handled by repo system
             } else {
                 request.addMetadata(new MetadataBridge(metadata));
             }
