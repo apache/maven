@@ -101,11 +101,9 @@ class PropertiesUtil {
             for (Iterator it = collection.iterator(); it.hasNext(); i++) {
                 serialize(props, key + "." + i, it.next());
             }
-        } else if (value instanceof Map) {
-            Map map = (Map) value;
+        } else if (value instanceof Map<?, ?> map) {
             props.setProperty(key, Integer.toString(map.size()));
-            for (Iterator it = map.keySet().iterator(); it.hasNext();) {
-                Object k = it.next();
+            for (Object k : map.keySet()) {
                 Object v = map.get(k);
                 serialize(props, key + "." + k, v);
             }
