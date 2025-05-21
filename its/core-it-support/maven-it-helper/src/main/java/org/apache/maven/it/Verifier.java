@@ -665,24 +665,6 @@ public class Verifier {
                 + executorTool.artifactPath(executorHelper.executorRequest(), gav, null);
     }
 
-    private String getSupportArtifactPath(String artifact) {
-        StringTokenizer tok = new StringTokenizer(artifact, ":");
-        if (tok.countTokens() != 4) {
-            throw new IllegalArgumentException("Artifact must have 4 tokens: '" + artifact + "'");
-        }
-
-        String[] a = new String[4];
-        for (int i = 0; i < 4; i++) {
-            a[i] = tok.nextToken();
-        }
-
-        String groupId = a[0];
-        String artifactId = a[1];
-        String version = a[2];
-        String ext = a[3];
-        return getSupportArtifactPath(groupId, artifactId, version, ext);
-    }
-
     public String getSupportArtifactPath(String groupId, String artifactId, String version, String ext) {
         return getSupportArtifactPath(groupId, artifactId, version, ext, null);
     }

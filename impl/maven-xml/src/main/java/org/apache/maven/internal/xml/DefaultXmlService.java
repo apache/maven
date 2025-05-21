@@ -392,34 +392,6 @@ public class DefaultXmlService extends XmlService {
         return !isEmpty(value) ? value : DEFAULT_CHILDREN_COMBINATION_MODE;
     }
 
-    @Nullable
-    private static XmlNode findNodeById(@Nonnull List<XmlNode> nodes, @Nonnull String id) {
-        return nodes.stream()
-                .filter(n -> id.equals(n.attribute(ID_COMBINATION_MODE_ATTRIBUTE)))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Nullable
-    private static XmlNode findNodeByKeys(
-            @Nonnull List<XmlNode> nodes, @Nonnull XmlNode target, @Nonnull String[] keys) {
-        return nodes.stream()
-                .filter(n -> matchesKeys(n, target, keys))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private static boolean matchesKeys(@Nonnull XmlNode node1, @Nonnull XmlNode node2, @Nonnull String[] keys) {
-        for (String key : keys) {
-            String value1 = node1.attribute(key);
-            String value2 = node2.attribute(key);
-            if (!Objects.equals(value1, value2)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     static class IndentingXMLStreamWriter extends StreamWriterDelegate {
 
         int depth = 0;

@@ -222,11 +222,8 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
         MessageDigest digester = MessageDigest.getInstance("SHA-1");
 
         try (FileInputStream is = new FileInputStream(jarFile)) {
-            DigestInputStream dis = new DigestInputStream(is, digester);
-
-            for (byte[] buffer = new byte[1024 * 4]; dis.read(buffer) >= 0; ) {
-                // just read it
-            }
+            // [WARNING] PMD Failure: Rule:EmptyControlStatement Priority:3 Empty for statement.
+            new DigestInputStream(is, digester).read(new byte[1024 * 4]);
         }
 
         byte[] digest = digester.digest();

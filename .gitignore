@@ -17,3 +17,4 @@
 .vscode/
 repo/
 /*.svg
+.pmd/.cache
