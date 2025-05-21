@@ -293,7 +293,6 @@ class DefaultArtifactCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     void testResolveRangeWithManagedVersion() throws ArtifactResolutionException, InvalidVersionSpecificationException {
         ArtifactSpec a = createArtifactSpec("a", "1.0");
         ArtifactSpec b = a.addDependency("b", "[1.0,3.0]");
@@ -304,6 +303,8 @@ class DefaultArtifactCollectorTest {
         assertEquals(
                 createSet(new Object[] {a.artifact, managedB.artifact}), res.getArtifacts(), "Check artifact list");
         assertEquals("5.0", getArtifact("b", res.getArtifacts()).getVersion(), "Check version");
+        assertEquals("b", b.artifact.getArtifactId());
+        assertEquals("compile", b.artifact.getScope());
     }
 
     @Test
