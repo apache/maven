@@ -147,13 +147,14 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     private Map<String, String> systemProperties = Collections.emptyMap();
     private Map<String, String> userProperties = Collections.emptyMap();
     private Model model;
-    private Record record = new Record();
+    private final Record record;
 
     public DefaultProfileActivationContext(
             PathTranslator pathTranslator, RootLocator rootLocator, Interpolator interpolator) {
         this.pathTranslator = pathTranslator;
         this.rootLocator = rootLocator;
         this.interpolator = interpolator;
+        this.record = null;
     }
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -175,11 +176,11 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
                 systemProperties,
                 userProperties,
                 model,
-                new Record());
+                null);
     }
 
     @SuppressWarnings("checkstyle:ParameterNumber")
-    public DefaultProfileActivationContext(
+    private DefaultProfileActivationContext(
             PathTranslator pathTranslator,
             RootLocator rootLocator,
             Interpolator interpolator,
@@ -215,6 +216,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     Record stop() {
         // only keep keys for which the value is `true`
+        Objects.requireNonNull(record, "start() must be called before stop()");
         record.usedActiveProfiles.values().removeIf(value -> !value);
         record.usedInactiveProfiles.values().removeIf(value -> !value);
         return record;
@@ -222,17 +224,29 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public boolean isProfileActive(String profileId) {
-        return record.usedActiveProfiles.computeIfAbsent(profileId, activeProfileIds::contains);
+        if (record != null) {
+            return record.usedActiveProfiles.computeIfAbsent(profileId, activeProfileIds::contains);
+        } else {
+            return activeProfileIds.contains(profileId);
+        }
     }
 
     @Override
     public boolean isProfileInactive(String profileId) {
-        return record.usedInactiveProfiles.computeIfAbsent(profileId, inactiveProfileIds::contains);
+        if (record != null) {
+            return record.usedInactiveProfiles.computeIfAbsent(profileId, inactiveProfileIds::contains);
+        } else {
+            return inactiveProfileIds.contains(profileId);
+        }
     }
 
     @Override
     public String getSystemProperty(String key) {
-        return record.usedSystemProperties.computeIfAbsent(key, systemProperties::get);
+        if (record != null) {
+            return record.usedSystemProperties.computeIfAbsent(key, systemProperties::get);
+        } else {
+            return systemProperties.get(key);
+        }
     }
 
     /**
@@ -249,7 +263,11 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getUserProperty(String key) {
-        return record.usedUserProperties.computeIfAbsent(key, userProperties::get);
+        if (record != null) {
+            return record.usedUserProperties.computeIfAbsent(key, userProperties::get);
+        } else {
+            return userProperties.get(key);
+        }
     }
 
     /**
@@ -267,23 +285,39 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getModelArtifactId() {
-        return record.usedModelInfos.computeIfAbsent(ModelInfo.ArtifactId, k -> model.getArtifactId());
+        if (record != null) {
+            return record.usedModelInfos.computeIfAbsent(ModelInfo.ArtifactId, k -> model.getArtifactId());
+        } else {
+            return model.getArtifactId();
+        }
     }
 
     @Override
     public String getModelPackaging() {
-        return record.usedModelInfos.computeIfAbsent(ModelInfo.Packaging, k -> model.getPackaging());
+        if (record != null) {
+            return record.usedModelInfos.computeIfAbsent(ModelInfo.Packaging, k -> model.getPackaging());
+        } else {
+            return model.getPackaging();
+        }
     }
 
     @Override
     public String getModelProperty(String key) {
-        return record.usedModelProperties.computeIfAbsent(
-                key, k -> model.getProperties().get(k));
+        if (record != null) {
+            return record.usedModelProperties.computeIfAbsent(
+                    key, k -> model.getProperties().get(k));
+        } else {
+            return model.getProperties().get(key);
+        }
     }
 
     @Override
     public String getModelBaseDirectory() {
-        return record.usedModelInfos.computeIfAbsent(ModelInfo.BaseDirectory, k -> doGetModelBaseDirectory());
+        if (record != null) {
+            return record.usedModelInfos.computeIfAbsent(ModelInfo.BaseDirectory, k -> doGetModelBaseDirectory());
+        } else {
+            return doGetModelBaseDirectory();
+        }
     }
 
     private String doGetModelBaseDirectory() {
@@ -293,7 +327,11 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getModelRootDirectory() {
-        return record.usedModelInfos.computeIfAbsent(ModelInfo.RootDirectory, k -> doGetModelRootDirectory());
+        if (record != null) {
+            return record.usedModelInfos.computeIfAbsent(ModelInfo.RootDirectory, k -> doGetModelRootDirectory());
+        } else {
+            return doGetModelRootDirectory();
+        }
     }
 
     private String doGetModelRootDirectory() {
@@ -333,8 +371,12 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public boolean exists(String path, boolean enableGlob) throws ModelBuilderException {
-        return record.usedExists.computeIfAbsent(
-                new ExistRequest(path, enableGlob), r -> doExists(r.path, r.enableGlob));
+        if (record != null) {
+            return record.usedExists.computeIfAbsent(
+                    new ExistRequest(path, enableGlob), r -> doExists(r.path, r.enableGlob));
+        } else {
+            return doExists(path, enableGlob);
+        }
     }
 
     private boolean doExists(String path, boolean enableGlob) throws ModelBuilderException {
