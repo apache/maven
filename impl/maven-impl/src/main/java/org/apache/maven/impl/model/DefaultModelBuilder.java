@@ -1512,27 +1512,53 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         /**
+         * Record to store both the parent model and its activated profiles for caching.
+         */
+        private record ParentModelWithProfiles(Model model, List<Profile> activatedProfiles) {}
+
+        /**
          * Reads the request source's parent.
          */
         Model readAsParentModel(DefaultProfileActivationContext profileActivationContext) throws ModelBuilderException {
-            Map<DefaultProfileActivationContext.Record, Model> parentsPerContext =
+            Map<DefaultProfileActivationContext.Record, ParentModelWithProfiles> parentsPerContext =
                     cache(request.getSource(), PARENT, ConcurrentHashMap::new);
-            for (Map.Entry<DefaultProfileActivationContext.Record, Model> e : parentsPerContext.entrySet()) {
+
+            for (Map.Entry<DefaultProfileActivationContext.Record, ParentModelWithProfiles> e :
+                    parentsPerContext.entrySet()) {
                 if (e.getKey().matches(profileActivationContext)) {
-                    return e.getValue();
+                    ParentModelWithProfiles cached = e.getValue();
+                    // CRITICAL: On cache hit, we need to replay the cached record's keys into the
+                    // current recording context. The matches() method already re-evaluated the
+                    // conditions and recorded some keys in ctx, but we also need to ensure all
+                    // the keys from the cached record are recorded in the current context.
+                    if (profileActivationContext.record != null) {
+                        replayRecordIntoContext(e.getKey(), profileActivationContext);
+                    }
+                    // Add the activated profiles from cache to the result
+                    addActivePomProfiles(cached.activatedProfiles());
+                    return cached.model();
                 }
             }
-            DefaultProfileActivationContext.Record prev = profileActivationContext.start();
-            Model model = doReadAsParentModel(profileActivationContext);
-            DefaultProfileActivationContext.Record record = profileActivationContext.stop(prev);
-            parentsPerContext.put(record, model);
-            return model;
+
+            // Cache miss: process the parent model
+            // CRITICAL: Use a separate recording context to avoid recording intermediate keys
+            // that aren't essential to the final result. Only replay the final essential keys
+            // into the parent recording context to maintain clean cache keys and avoid
+            // over-recording during parent model processing.
+            DefaultProfileActivationContext ctx = profileActivationContext.start();
+            ParentModelWithProfiles modelWithProfiles = doReadAsParentModel(ctx);
+            DefaultProfileActivationContext.Record record = ctx.stop();
+            replayRecordIntoContext(record, profileActivationContext);
+
+            parentsPerContext.put(record, modelWithProfiles);
+            addActivePomProfiles(modelWithProfiles.activatedProfiles());
+            return modelWithProfiles.model();
         }
 
-        private Model doReadAsParentModel(DefaultProfileActivationContext profileActivationContext)
-                throws ModelBuilderException {
+        private ParentModelWithProfiles doReadAsParentModel(
+                DefaultProfileActivationContext childProfileActivationContext) throws ModelBuilderException {
             Model raw = readRawModel();
-            Model parentData = readParent(raw, profileActivationContext);
+            Model parentData = readParent(raw, childProfileActivationContext);
             Model parent = new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
                         @Override
                         protected void mergeModel_Modules(
@@ -1552,15 +1578,23 @@ public class DefaultModelBuilder implements ModelBuilder {
                     })
                     .assembleModelInheritance(raw, parentData, request, this);
 
-            // activate profiles
-            List<Profile> parentActivePomProfiles = getActiveProfiles(parent.getProfiles(), profileActivationContext);
-            // profile injection
+            // Profile injection SHOULD be performed on parent models to ensure
+            // that profile content becomes part of the parent model before inheritance.
+            // This ensures proper precedence: child elements override parent elements,
+            // including elements that came from parent profiles.
+            //
+            // Use the child's activation context (passed as parameter) to determine
+            // which parent profiles should be active, ensuring consistency.
+            List<Profile> parentActivePomProfiles =
+                    getActiveProfiles(parent.getProfiles(), childProfileActivationContext);
+
+            // Inject profiles into parent model
             Model injectedParentModel = profileInjector
                     .injectProfiles(parent, parentActivePomProfiles, request, this)
-                    .withProfiles(List.of());
-            addActivePomProfiles(parentActivePomProfiles);
+                    .withProfiles(List.of()); // Remove profiles after injection to avoid double-processing
 
-            return injectedParentModel.withParent(null);
+            // Note: addActivePomProfiles() will be called by the caller for cache miss case
+            return new ParentModelWithProfiles(injectedParentModel.withParent(null), parentActivePomProfiles);
         }
 
         private Model importDependencyManagement(Model model, Collection<String> importIds) {
@@ -1802,6 +1836,43 @@ public class DefaultModelBuilder implements ModelBuilder {
         boolean isBuildRequestWithActivation() {
             return request.getRequestType() != ModelBuilderRequest.RequestType.BUILD_CONSUMER;
         }
+
+        /**
+         * Replays the keys from a cached record into the current recording context.
+         * This ensures that when there's a cache hit, all the keys that were originally
+         * accessed during the cached computation are recorded in the current context.
+         */
+        private void replayRecordIntoContext(
+                DefaultProfileActivationContext.Record cachedRecord, DefaultProfileActivationContext targetContext) {
+            if (targetContext.record == null) {
+                return; // Target context is not recording
+            }
+
+            // Replay all the recorded keys from the cached record into the target context's record
+            // We need to access the mutable maps in the target context's record
+            DefaultProfileActivationContext.Record targetRecord = targetContext.record;
+
+            // Replay active profiles
+            cachedRecord.usedActiveProfiles.forEach(targetRecord.usedActiveProfiles::putIfAbsent);
+
+            // Replay inactive profiles
+            cachedRecord.usedInactiveProfiles.forEach(targetRecord.usedInactiveProfiles::putIfAbsent);
+
+            // Replay system properties
+            cachedRecord.usedSystemProperties.forEach(targetRecord.usedSystemProperties::putIfAbsent);
+
+            // Replay user properties
+            cachedRecord.usedUserProperties.forEach(targetRecord.usedUserProperties::putIfAbsent);
+
+            // Replay model properties
+            cachedRecord.usedModelProperties.forEach(targetRecord.usedModelProperties::putIfAbsent);
+
+            // Replay model infos
+            cachedRecord.usedModelInfos.forEach(targetRecord.usedModelInfos::putIfAbsent);
+
+            // Replay exists checks
+            cachedRecord.usedExists.forEach(targetRecord.usedExists::putIfAbsent);
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -1845,16 +1916,15 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private DefaultProfileActivationContext getProfileActivationContext(ModelBuilderRequest request, Model model) {
-        DefaultProfileActivationContext context =
-                new DefaultProfileActivationContext(pathTranslator, rootLocator, interpolator);
-
-        context.setActiveProfileIds(request.getActiveProfileIds());
-        context.setInactiveProfileIds(request.getInactiveProfileIds());
-        context.setSystemProperties(request.getSystemProperties());
-        context.setUserProperties(request.getUserProperties());
-        context.setModel(model);
-
-        return context;
+        return new DefaultProfileActivationContext(
+                pathTranslator,
+                rootLocator,
+                interpolator,
+                request.getActiveProfileIds(),
+                request.getInactiveProfileIds(),
+                request.getSystemProperties(),
+                request.getUserProperties(),
+                model);
     }
 
     private Map<String, Activation> getProfileActivations(Model model) {
