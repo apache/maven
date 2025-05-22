@@ -1522,9 +1522,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     return e.getValue();
                 }
             }
-            DefaultProfileActivationContext.Record prev = profileActivationContext.start();
-            Model model = doReadAsParentModel(profileActivationContext);
-            DefaultProfileActivationContext.Record record = profileActivationContext.stop(prev);
+            DefaultProfileActivationContext ctx = profileActivationContext.start();
+            Model model = doReadAsParentModel(ctx);
+            DefaultProfileActivationContext.Record record = profileActivationContext.stop();
             parentsPerContext.put(record, model);
             return model;
         }

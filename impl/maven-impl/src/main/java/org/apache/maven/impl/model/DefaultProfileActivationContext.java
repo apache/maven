@@ -147,8 +147,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     private Map<String, String> systemProperties = Collections.emptyMap();
     private Map<String, String> userProperties = Collections.emptyMap();
     private Model model;
-
-    private final ThreadLocal<Record> records = new ThreadLocal<>();
+    private Record record = new Record();
 
     public DefaultProfileActivationContext(
             PathTranslator pathTranslator, RootLocator rootLocator, Interpolator interpolator) {
@@ -157,15 +156,42 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         this.interpolator = interpolator;
     }
 
-    Record start() {
-        Record record = records.get();
-        records.set(new Record());
-        return record;
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultProfileActivationContext(
+            PathTranslator pathTranslator,
+            RootLocator rootLocator,
+            Interpolator interpolator,
+            List<String> activeProfileIds,
+            List<String> inactiveProfileIds,
+            Map<String, String> systemProperties,
+            Map<String, String> userProperties,
+            Model model,
+            Record record) {
+        this.pathTranslator = pathTranslator;
+        this.rootLocator = rootLocator;
+        this.interpolator = interpolator;
+        this.activeProfileIds = activeProfileIds;
+        this.inactiveProfileIds = inactiveProfileIds;
+        this.systemProperties = systemProperties;
+        this.userProperties = userProperties;
+        this.model = model;
+        this.record = record;
     }
 
-    Record stop(Record previous) {
-        Record record = records.get();
-        records.set(previous);
+    DefaultProfileActivationContext start() {
+        return new DefaultProfileActivationContext(
+                pathTranslator,
+                rootLocator,
+                interpolator,
+                activeProfileIds,
+                inactiveProfileIds,
+                systemProperties,
+                userProperties,
+                model,
+                new Record());
+    }
+
+    Record stop() {
         // only keep keys for which the value is `true`
         record.usedActiveProfiles.values().removeIf(value -> !value);
         record.usedInactiveProfiles.values().removeIf(value -> !value);
@@ -174,12 +200,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public boolean isProfileActive(String profileId) {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedActiveProfiles.computeIfAbsent(profileId, activeProfileIds::contains);
-        } else {
-            return activeProfileIds.contains(profileId);
-        }
+        return record.usedActiveProfiles.computeIfAbsent(profileId, activeProfileIds::contains);
     }
 
     /**
@@ -195,12 +216,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public boolean isProfileInactive(String profileId) {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedInactiveProfiles.computeIfAbsent(profileId, inactiveProfileIds::contains);
-        } else {
-            return inactiveProfileIds.contains(profileId);
-        }
+        return record.usedInactiveProfiles.computeIfAbsent(profileId, inactiveProfileIds::contains);
     }
 
     /**
@@ -216,12 +232,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getSystemProperty(String key) {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedSystemProperties.computeIfAbsent(key, systemProperties::get);
-        } else {
-            return systemProperties.get(key);
-        }
+        return record.usedSystemProperties.computeIfAbsent(key, systemProperties::get);
     }
 
     /**
@@ -238,12 +249,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getUserProperty(String key) {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedUserProperties.computeIfAbsent(key, userProperties::get);
-        } else {
-            return userProperties.get(key);
-        }
+        return record.usedUserProperties.computeIfAbsent(key, userProperties::get);
     }
 
     /**
@@ -261,43 +267,23 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getModelArtifactId() {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedModelInfos.computeIfAbsent(ModelInfo.ArtifactId, k -> model.getArtifactId());
-        } else {
-            return model.getArtifactId();
-        }
+        return record.usedModelInfos.computeIfAbsent(ModelInfo.ArtifactId, k -> model.getArtifactId());
     }
 
     @Override
     public String getModelPackaging() {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedModelInfos.computeIfAbsent(ModelInfo.Packaging, k -> model.getPackaging());
-        } else {
-            return model.getPackaging();
-        }
+        return record.usedModelInfos.computeIfAbsent(ModelInfo.Packaging, k -> model.getPackaging());
     }
 
     @Override
     public String getModelProperty(String key) {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedModelProperties.computeIfAbsent(
-                    key, k -> model.getProperties().get(k));
-        } else {
-            return model.getProperties().get(key);
-        }
+        return record.usedModelProperties.computeIfAbsent(
+                key, k -> model.getProperties().get(k));
     }
 
     @Override
     public String getModelBaseDirectory() {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedModelInfos.computeIfAbsent(ModelInfo.BaseDirectory, k -> doGetModelBaseDirectory());
-        } else {
-            return doGetModelBaseDirectory();
-        }
+        return record.usedModelInfos.computeIfAbsent(ModelInfo.BaseDirectory, k -> doGetModelBaseDirectory());
     }
 
     private String doGetModelBaseDirectory() {
@@ -307,12 +293,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getModelRootDirectory() {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedModelInfos.computeIfAbsent(ModelInfo.RootDirectory, k -> doGetModelRootDirectory());
-        } else {
-            return doGetModelRootDirectory();
-        }
+        return record.usedModelInfos.computeIfAbsent(ModelInfo.RootDirectory, k -> doGetModelRootDirectory());
     }
 
     private String doGetModelRootDirectory() {
@@ -352,13 +333,8 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public boolean exists(String path, boolean enableGlob) throws ModelBuilderException {
-        Record record = records.get();
-        if (record != null) {
-            return record.usedExists.computeIfAbsent(
-                    new ExistRequest(path, enableGlob), r -> doExists(r.path, r.enableGlob));
-        } else {
-            return doExists(path, enableGlob);
-        }
+        return record.usedExists.computeIfAbsent(
+                new ExistRequest(path, enableGlob), r -> doExists(r.path, r.enableGlob));
     }
 
     private boolean doExists(String path, boolean enableGlob) throws ModelBuilderException {
