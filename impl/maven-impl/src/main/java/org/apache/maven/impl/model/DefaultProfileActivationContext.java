@@ -165,6 +165,28 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             List<String> inactiveProfileIds,
             Map<String, String> systemProperties,
             Map<String, String> userProperties,
+            Model model) {
+        this(
+                pathTranslator,
+                rootLocator,
+                interpolator,
+                activeProfileIds,
+                inactiveProfileIds,
+                systemProperties,
+                userProperties,
+                model,
+                new Record());
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultProfileActivationContext(
+            PathTranslator pathTranslator,
+            RootLocator rootLocator,
+            Interpolator interpolator,
+            List<String> activeProfileIds,
+            List<String> inactiveProfileIds,
+            Map<String, String> systemProperties,
+            Map<String, String> userProperties,
             Model model,
             Record record) {
         this.pathTranslator = pathTranslator;
@@ -203,31 +225,9 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         return record.usedActiveProfiles.computeIfAbsent(profileId, activeProfileIds::contains);
     }
 
-    /**
-     * Sets the identifiers of those profiles that should be activated by explicit demand.
-     *
-     * @param activeProfileIds The identifiers of those profiles to activate, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
-    public DefaultProfileActivationContext setActiveProfileIds(List<String> activeProfileIds) {
-        this.activeProfileIds = unmodifiable(activeProfileIds);
-        return this;
-    }
-
     @Override
     public boolean isProfileInactive(String profileId) {
         return record.usedInactiveProfiles.computeIfAbsent(profileId, inactiveProfileIds::contains);
-    }
-
-    /**
-     * Sets the identifiers of those profiles that should be deactivated by explicit demand.
-     *
-     * @param inactiveProfileIds The identifiers of those profiles to deactivate, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
-    public DefaultProfileActivationContext setInactiveProfileIds(List<String> inactiveProfileIds) {
-        this.inactiveProfileIds = unmodifiable(inactiveProfileIds);
-        return this;
     }
 
     @Override
@@ -392,10 +392,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             }
         }
         return true;
-    }
-
-    private static List<String> unmodifiable(List<String> list) {
-        return list != null ? Collections.unmodifiableList(list) : Collections.emptyList();
     }
 
     private static Map<String, String> unmodifiable(Map<String, String> map) {
