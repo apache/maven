@@ -50,8 +50,6 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
 
     private static final String ERROR_KEY_SUFFIX = ".error";
 
-    public DefaultUpdateCheckManager() {}
-
     public DefaultUpdateCheckManager(Logger logger) {
         enableLogging(logger);
     }
@@ -130,13 +128,13 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
             return true;
         }
 
-        Date lastCheckDate = readLastUpdated(metadata, repository, file);
+        Date lastCheckDate = readLastUpdated(repository, file);
 
         return (lastCheckDate == null) || policy.checkOutOfDate(lastCheckDate);
     }
 
-    private Date readLastUpdated(RepositoryMetadata metadata, ArtifactRepository repository, File file) {
-        File touchfile = getTouchfile(metadata, file);
+    private Date readLastUpdated(ArtifactRepository repository, File file) {
+        File touchfile = getTouchfile(file);
 
         String key = getMetadataKey(repository, file);
 
@@ -164,7 +162,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
 
     @Override
     public void touch(RepositoryMetadata metadata, ArtifactRepository repository, File file) {
-        File touchfile = getTouchfile(metadata, file);
+        File touchfile = getTouchfile(file);
 
         String key = getMetadataKey(repository, file);
 
@@ -303,7 +301,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
                 Properties props = new Properties();
 
                 try (FileInputStream in = new FileInputStream(touchfile)) {
-                    try (FileLock lock = in.getChannel().lock(0, Long.MAX_VALUE, true)) {
+                    try (FileLock ignored = in.getChannel().lock(0, Long.MAX_VALUE, true)) {
                         getLogger().debug("Reading resolution-state from: " + touchfile);
                         props.load(in);
 
@@ -330,7 +328,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
         return new File(artifact.getFile().getParentFile(), sb.toString());
     }
 
-    File getTouchfile(RepositoryMetadata metadata, File file) {
+    File getTouchfile(File file) {
         return new File(file.getParent(), TOUCHFILE_NAME);
     }
 }
