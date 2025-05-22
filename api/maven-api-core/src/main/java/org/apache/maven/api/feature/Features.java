@@ -35,17 +35,17 @@ public final class Features {
     private Features() {}
 
     /**
-     * Check if the consumer POM feature is active.
+     * Check if the personality is "modern".
      */
-    public static boolean consumerPom(@Nullable Properties userProperties) {
-        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM, true);
+    public static boolean mavenModernPersonality(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_MODERN_PERSONALITY, true);
     }
 
     /**
      * Check if the consumer POM feature is active.
      */
-    public static boolean consumerPom(@Nullable Map<String, String> userProperties, boolean def) {
-        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM, def);
+    public static boolean consumerPom(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM, mavenModernPersonality(userProperties));
     }
 
     private static boolean doGet(Properties userProperties, String key, boolean def) {

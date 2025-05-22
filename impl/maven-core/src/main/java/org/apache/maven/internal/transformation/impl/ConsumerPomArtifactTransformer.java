@@ -37,7 +37,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderException;
-import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
+import org.apache.maven.internal.transformation.PomArtifactTransformer;
 import org.apache.maven.model.v4.MavenStaxWriter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
@@ -54,8 +54,11 @@ import org.eclipse.sisu.PreDestroy;
  * @since TBD
  */
 @Singleton
-@Named("consumer-pom")
-class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransformer {
+@Named
+class ConsumerPomArtifactTransformer implements PomArtifactTransformer {
+    private static final String CONSUMER_POM_CLASSIFIER = "consumer";
+
+    private static final String BUILD_POM_CLASSIFIER = "build";
 
     private static final String NAMESPACE_FORMAT = "http://maven.apache.org/POM/%s";
 
@@ -63,20 +66,21 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
 
     private final Set<Path> toDelete = new CopyOnWriteArraySet<>();
 
-    private final ConsumerPomBuilder builder;
+    private final PomBuilder builder;
 
     @Inject
-    DefaultConsumerPomArtifactTransformer(ConsumerPomBuilder builder) {
+    ConsumerPomArtifactTransformer(PomBuilder builder) {
         this.builder = builder;
     }
 
     @SuppressWarnings("deprecation")
+    @Override
     public void injectTransformedArtifacts(RepositorySystemSession session, MavenProject project) throws IOException {
         if (project.getFile() == null) {
             // If there is no build POM there is no reason to inject artifacts for the consumer POM.
             return;
         }
-        if (Features.consumerPom(session.getUserProperties(), true)) {
+        if (Features.consumerPom(session.getConfigProperties())) {
             Path buildDir =
                     project.getBuild() != null ? Paths.get(project.getBuild().getDirectory()) : null;
             if (buildDir != null) {
@@ -107,7 +111,8 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
                 "pom");
     }
 
-    void transform(MavenProject project, RepositorySystemSession session, Path src, Path tgt)
+    @Override
+    public void transform(MavenProject project, RepositorySystemSession session, Path src, Path tgt)
             throws ModelBuilderException, XMLStreamException, IOException {
         Model model = builder.build(session, project, src);
         write(model, tgt);
@@ -128,6 +133,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
         }
     }
 
+    @Override
     public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
         if (consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
@@ -135,6 +141,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
         return request;
     }
 
+    @Override
     public DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
         if (consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
@@ -170,7 +177,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
                         main.getExtension(),
                         main.getVersion(),
                         main.getProperties(),
-                        main.getFile()));
+                        main.getPath()));
             }
             for (Artifact consumer : consumers) {
                 result.remove(consumer);
@@ -181,7 +188,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
                         consumer.getExtension(),
                         consumer.getVersion(),
                         consumer.getProperties(),
-                        consumer.getFile()));
+                        consumer.getPath()));
             }
             artifacts = result;
         }

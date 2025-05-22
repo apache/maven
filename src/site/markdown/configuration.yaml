@@ -158,6 +158,12 @@ props:
       defaultValue: cores/2 + 1
       since: 4.0.0
       configurationSource: User properties
+    - key: maven.modernPersonality
+      configurationType: Boolean
+      description: "User property for controlling \"maven modern personality\". If set to {@code false} Maven will behave as previous major version."
+      defaultValue: true
+      since: 4.0.0
+      configurationSource: User properties
     - key: maven.plugin.validation
       configurationType: String
       description: "Plugin validation level."
