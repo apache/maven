@@ -955,7 +955,7 @@ public class DefaultModelValidator implements ModelValidator {
                             SourceHint.pluginKey(p),
                             p);
 
-                    validate20EffectivePluginDependencies(s, problems, p, validationLevel);
+                    validate20EffectivePluginDependencies(problems, p, validationLevel);
                 }
 
                 validate20RawResources(problems, build.getResources(), "build.resources.resource.", validationLevel);
@@ -1256,7 +1256,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validate20EffectivePluginDependencies(
-            Session s, ModelProblemCollector problems, Plugin plugin, int validationLevel) {
+            ModelProblemCollector problems, Plugin plugin, int validationLevel) {
         List<Dependency> dependencies = plugin.getDependencies();
 
         if (!dependencies.isEmpty()) {
