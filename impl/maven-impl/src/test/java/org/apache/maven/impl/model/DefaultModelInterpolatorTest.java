@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl.model;
 
+import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,20 +47,32 @@ import org.apache.maven.api.model.Organization;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.model.Scm;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.model.ModelInterpolator;
+import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.RootLocator;
+import org.apache.maven.api.services.model.UrlNormalizer;
 import org.apache.maven.impl.model.profile.SimpleProblemCollector;
+import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -591,5 +604,294 @@ class DefaultModelInterpolatorTest {
                         .orElseThrow(() -> new IllegalStateException(getNoRootMessage()));
             }
         };
+    }
+
+    @Test
+    void testReflectionValueExtractorShouldReturnExpectedValue() throws Exception {
+        String subExpr = "someExpression";
+        Path projectDir = Paths.get("/some/project/directory");
+        Object expectedValue = "EvaluatedValue";
+        try (MockedStatic<ReflectionValueExtractor> mockedExtractor = mockStatic(ReflectionValueExtractor.class)) {
+            mockedExtractor
+                    .when(() -> ReflectionValueExtractor.evaluate(
+                            subExpr, projectDir.toAbsolutePath().toUri(), true))
+                    .thenReturn(expectedValue);
+            Object actualValue = ReflectionValueExtractor.evaluate(
+                    subExpr, projectDir.toAbsolutePath().toUri(), true);
+            assertNotNull(actualValue, "Value should not be null");
+            assertEquals(expectedValue.toString(), actualValue.toString(), "The evaluated value should match");
+        }
+    }
+
+    @Test
+    void testReflectionValueExtractorShouldHandleNullValueGracefully() throws Exception {
+        String subExpr = "someExpression";
+        Path projectDir = Paths.get("/some/project/directory");
+        try (MockedStatic<ReflectionValueExtractor> mockedExtractor = mockStatic(ReflectionValueExtractor.class)) {
+            mockedExtractor
+                    .when(() -> ReflectionValueExtractor.evaluate(
+                            subExpr, projectDir.toAbsolutePath().toUri(), true))
+                    .thenReturn(null);
+            Object actualValue = ReflectionValueExtractor.evaluate(
+                    subExpr, projectDir.toAbsolutePath().toUri(), true);
+            assertNull(actualValue, "Value should be null if ReflectionValueExtractor returns null");
+        }
+    }
+
+    @Test
+    void testProjectPropertyExtraction() throws Exception {
+        Path projectDir = Paths.get("/test/path");
+        Model model = Model.newBuilder().build();
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class));
+        assertEquals("/test/path", interpolator.projectProperty(model, projectDir, "basedir", false));
+        assertNull(interpolator.projectProperty(model, projectDir, "nonexistent.property", false));
+    }
+
+    @Test
+    void testWindowsPathHandling() {
+        FileSystem fs = Jimfs.newFileSystem(Configuration.windows());
+        Path projectDir = fs.getPath("C:\\test\\path");
+        Model model = Model.newBuilder()
+                .build(Build.newBuilder()
+                        .directory("${project.basedir}\\target")
+                        .build())
+                .build();
+        Model out = interpolator.interpolateModel(
+                model,
+                projectDir,
+                createModelBuildingRequest(Collections.emptyMap()).build(),
+                new SimpleProblemCollector());
+        String expected = projectDir.resolve("target").toString();
+        assertEquals(expected, out.getBuild().getDirectory());
+    }
+
+    @Test
+    void testUrlNormalization() throws Exception {
+        UrlNormalizer urlNormalizer = mock(UrlNormalizer.class);
+        when(urlNormalizer.normalize("http://example.com/")).thenReturn("http://example.com");
+        Model model = Model.newBuilder()
+                .url("http://example.com/")
+                .scm(Scm.newBuilder()
+                        .url("http://example.com/scm/")
+                        .connection("scm:git:http://example.com/repo.git/")
+                        .developerConnection("scm:git:ssh://example.com/repo.git/")
+                        .build())
+                .build();
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class), urlNormalizer, mock(RootLocator.class), mock(Interpolator.class));
+        ModelBuilderRequest request =
+                createModelBuildingRequest(Collections.emptyMap()).build();
+        interpolator.interpolateModel(model, null, request, new SimpleProblemCollector());
+        verify(urlNormalizer, never()).normalize(anyString());
+    }
+
+    @Test
+    void testNonUrlFieldsNotNormalized() throws Exception {
+        UrlNormalizer urlNormalizer = mock(UrlNormalizer.class);
+        Model model = Model.newBuilder()
+                .name("Test Project")
+                .description("http://this.is.not.a.url.field")
+                .build();
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class), urlNormalizer, mock(RootLocator.class), mock(Interpolator.class));
+        ModelBuilderRequest request =
+                createModelBuildingRequest(Collections.emptyMap()).build();
+        interpolator.interpolateModel(model, null, request, new SimpleProblemCollector());
+        verify(urlNormalizer, never()).normalize(anyString());
+    }
+
+    @Test
+    void testBasedirPropertyExtraction() throws Exception {
+        Path testDir = Paths.get("/test/path").toAbsolutePath();
+        Model model = Model.newBuilder().build();
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class));
+        assertEquals(testDir.toString(), interpolator.projectProperty(model, testDir, "basedir", false));
+    }
+
+    @Test
+    void testBasedirPrefixedPropertyExtraction() throws Exception {
+        Path testDir = Paths.get("/test/path").toAbsolutePath();
+        try (MockedStatic<ReflectionValueExtractor> mockedExtractor = mockStatic(ReflectionValueExtractor.class)) {
+            mockedExtractor
+                    .when(() -> ReflectionValueExtractor.evaluate("basedir.parent", testDir, true))
+                    .thenReturn(testDir.getParent());
+            mockedExtractor
+                    .when(() -> ReflectionValueExtractor.evaluate("basedir.fileName", testDir, true))
+                    .thenReturn(testDir.getFileName());
+            Model model = Model.newBuilder().build();
+            DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                    mock(PathTranslator.class),
+                    mock(UrlNormalizer.class),
+                    mock(RootLocator.class),
+                    mock(Interpolator.class));
+            assertEquals(
+                    testDir.getParent().toString(),
+                    interpolator.projectProperty(model, testDir, "basedir.parent", false));
+            assertEquals(
+                    testDir.getFileName().toString(),
+                    interpolator.projectProperty(model, testDir, "basedir.fileName", false));
+        }
+    }
+
+    @Test
+    void testBasedirPrefixedPropertyExtractionFailure() throws Exception {
+        Path testDir = Paths.get("/test/path").toAbsolutePath();
+        try (MockedStatic<ReflectionValueExtractor> mockedExtractor = mockStatic(ReflectionValueExtractor.class)) {
+            mockedExtractor
+                    .when(() -> ReflectionValueExtractor.evaluate("basedir.invalid", testDir, true))
+                    .thenThrow(new IllegalArgumentException("Invalid property"));
+            Model model = Model.newBuilder().build();
+            DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                    mock(PathTranslator.class),
+                    mock(UrlNormalizer.class),
+                    mock(RootLocator.class),
+                    mock(Interpolator.class));
+            assertNull(interpolator.projectProperty(model, testDir, "basedir.invalid", false));
+        }
+    }
+
+    @Test
+    void testBasedirPropertyWithNullProjectDir() throws Exception {
+        Model model = Model.newBuilder().build();
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class));
+        assertNull(interpolator.projectProperty(model, null, "basedir", false));
+        assertNull(interpolator.projectProperty(model, null, "basedir.any", false));
+    }
+
+    @Test
+    void testBaseUriPropertyExtraction() throws Exception {
+        Path testDir = Paths.get("/test/path").toAbsolutePath();
+        URI testUri = testDir.toUri();
+        Model model = Model.newBuilder().build();
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class));
+        assertEquals(testUri.toASCIIString(), interpolator.projectProperty(model, testDir, "baseUri", true));
+    }
+
+    @Test
+    void testBaseUriPrefixedPropertyExtraction() throws Exception {
+        Path testDir = Paths.get("/test/path").toAbsolutePath();
+        URI testUri = testDir.toUri();
+        try (MockedStatic<ReflectionValueExtractor> mockedExtractor = mockStatic(ReflectionValueExtractor.class)) {
+            mockedExtractor
+                    .when(() -> ReflectionValueExtractor.evaluate("baseUri.path", testUri, true))
+                    .thenReturn(testUri.getPath());
+            mockedExtractor
+                    .when(() -> ReflectionValueExtractor.evaluate("baseUri.host", testUri, true))
+                    .thenReturn(testUri.getHost());
+            Model model = Model.newBuilder().build();
+            DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                    mock(PathTranslator.class),
+                    mock(UrlNormalizer.class),
+                    mock(RootLocator.class),
+                    mock(Interpolator.class));
+            assertEquals(testUri.getPath(), interpolator.projectProperty(model, testDir, "baseUri.path", true));
+            assertEquals(testUri.getHost(), interpolator.projectProperty(model, testDir, "baseUri.host", true));
+        }
+    }
+
+    @Test
+    void testBaseUriPrefixedPropertyExtractionFailure() throws Exception {
+        Path testDir = Paths.get("/test/path").toAbsolutePath();
+        URI testUri = testDir.toUri();
+        try (MockedStatic<ReflectionValueExtractor> mockedExtractor = mockStatic(ReflectionValueExtractor.class)) {
+            mockedExtractor
+                    .when(() -> ReflectionValueExtractor.evaluate("baseUri.invalid", testUri, true))
+                    .thenThrow(new IllegalArgumentException("Invalid property"));
+            Model model = Model.newBuilder().build();
+            DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                    mock(PathTranslator.class),
+                    mock(UrlNormalizer.class),
+                    mock(RootLocator.class),
+                    mock(Interpolator.class));
+            assertNull(interpolator.projectProperty(model, testDir, "baseUri.invalid", true));
+        }
+    }
+
+    @Test
+    void testBaseUriPropertyWithNullProjectDir() throws Exception {
+        Model model = Model.newBuilder().build();
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class));
+        assertNull(interpolator.projectProperty(model, null, "baseUri", true));
+        assertNull(interpolator.projectProperty(model, null, "baseUri.any", true));
+    }
+
+    @Test
+    void testBaseUriPropertyWithoutPrefix() throws Exception {
+        Path testDir = Paths.get("/test/path").toAbsolutePath();
+        Model model = Model.newBuilder().build();
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class));
+        assertNull(interpolator.projectProperty(model, testDir, "baseUri", false));
+        assertNull(interpolator.projectProperty(model, testDir, "baseUri.path", false));
+    }
+
+    @Test
+    void testBuildTimestampInterpolation() {
+        Instant testInstant = Instant.parse("2023-01-01T12:00:00Z");
+        Map<String, String> props = new HashMap<>();
+        props.put("maven.build.timestamp.format", "yyyy-MM-dd");
+        Model model = Model.newBuilder().properties(props).build();
+        ModelBuilderRequest request = mock(ModelBuilderRequest.class);
+        when(request.getSession()).thenReturn(mock(Session.class));
+        when(request.getSession().getStartTime()).thenReturn(testInstant);
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class));
+        assertEquals("2023-01-01", interpolator.doCallback(model, null, request, null, "build.timestamp"));
+        assertEquals("2023-01-01", interpolator.doCallback(model, null, request, null, "maven.build.timestamp"));
+    }
+
+    @Test
+    void testBuildTimestampWithDefaultFormat() {
+        Instant testInstant = Instant.parse("2023-01-01T12:00:00Z");
+        Model model = Model.newBuilder().build();
+        ModelBuilderRequest request = mock(ModelBuilderRequest.class);
+        when(request.getSession()).thenReturn(mock(Session.class));
+        when(request.getSession().getStartTime()).thenReturn(testInstant);
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class));
+        String result = interpolator.doCallback(model, null, request, null, "build.timestamp");
+        assertTrue(result.matches("2023-01-01T12:00:00Z"));
+    }
+
+    @Test
+    void testNonTimestampExpressions() {
+        Model model = Model.newBuilder().build();
+        ModelBuilderRequest request = mock(ModelBuilderRequest.class);
+        DefaultModelInterpolator interpolator = new DefaultModelInterpolator(
+                mock(PathTranslator.class),
+                mock(UrlNormalizer.class),
+                mock(RootLocator.class),
+                mock(Interpolator.class));
+        assertNull(interpolator.doCallback(model, null, request, null, "not.a.timestamp"));
+        assertNull(interpolator.doCallback(model, null, request, null, "build.something.else"));
     }
 }
