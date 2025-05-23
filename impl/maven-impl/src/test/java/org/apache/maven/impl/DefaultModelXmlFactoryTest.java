@@ -105,7 +105,7 @@ class DefaultModelXmlFactoryTest {
 
     @Test
     void testNullRequest() {
-        assertThrows(IllegalArgumentException.class, () -> factory.read((XmlReaderRequest) null));
+        assertThrows(NullPointerException.class, () -> factory.read((XmlReaderRequest) null));
     }
 
     @Test

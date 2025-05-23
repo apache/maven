@@ -28,7 +28,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -207,7 +206,7 @@ public class MavenRepositorySystem {
                     repository.getSnapshots(),
                     repository.getReleases());
 
-            repository.setMirroredRepositories(Collections.singletonList(original));
+            repository.setMirroredRepositories(List.of(original));
 
             repository.setId(mirror.getId());
             repository.setUrl(mirror.getUrl());

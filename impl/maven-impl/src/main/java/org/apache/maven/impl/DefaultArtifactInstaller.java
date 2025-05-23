@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl;
 
+import java.util.Objects;
+
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -29,8 +31,6 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallationException;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
-
 @Named
 @Singleton
 public class DefaultArtifactInstaller implements ArtifactInstaller {
@@ -39,12 +39,12 @@ public class DefaultArtifactInstaller implements ArtifactInstaller {
 
     @Inject
     DefaultArtifactInstaller(@Nonnull RepositorySystem repositorySystem) {
-        this.repositorySystem = nonNull(repositorySystem);
+        this.repositorySystem = Objects.requireNonNull(repositorySystem);
     }
 
     @Override
     public void install(ArtifactInstallerRequest request) throws ArtifactInstallerException, IllegalArgumentException {
-        nonNull(request, "request");
+        Objects.requireNonNull(request, "request cannot be null");
         InternalSession session = InternalSession.from(request.getSession());
         try {
             InstallRequest installRequest =

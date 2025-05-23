@@ -31,6 +31,7 @@ import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -109,22 +110,26 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
         }
 
         @Override
+        @Nonnull
         public String getJavaHome() {
             return javaHome;
         }
 
         @Override
+        @Nonnull
         public String getType() {
             return "jdk";
         }
 
         @Override
+        @Nonnull
         public ToolchainModel getModel() {
             return model;
         }
 
         @Override
-        public String findTool(String toolName) {
+        @Nullable
+        public String findTool(@Nonnull String toolName) {
             Path toRet = findTool(toolName, Paths.get(getJavaHome()).normalize());
             if (toRet != null) {
                 return toRet.toAbsolutePath().toString();
@@ -132,7 +137,8 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
             return null;
         }
 
-        private static Path findTool(String toolName, Path installDir) {
+        @Nullable
+        private static Path findTool(@Nonnull String toolName, @Nonnull Path installDir) {
             Path bin = installDir.resolve("bin"); // NOI18N
             if (Files.isDirectory(bin)) {
                 if (Os.IS_WINDOWS) {
@@ -150,7 +156,7 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
         }
 
         @Override
-        public boolean matchesRequirements(Map<String, String> requirements) {
+        public boolean matchesRequirements(@Nonnull Map<String, String> requirements) {
             for (Map.Entry<String, String> requirement : requirements.entrySet()) {
                 String key = requirement.getKey();
 

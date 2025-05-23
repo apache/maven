@@ -23,7 +23,6 @@ import java.lang.module.ModuleDescriptor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -318,7 +317,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      * @param moduleName name of the module to search
      */
     private boolean containsModule(String moduleName) throws IOException {
-        for (Path path : dispatchedPaths.getOrDefault(JavaPathType.MODULES, Collections.emptyList())) {
+        for (Path path : dispatchedPaths.getOrDefault(JavaPathType.MODULES, List.of())) {
             if (cache.getModuleInfo(path).containsModule(moduleName)) {
                 return true;
             }

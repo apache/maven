@@ -73,7 +73,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
         List<String> duplicates = sourceMap.entrySet().stream()
                 .filter(entry -> entry.getValue() > 1)
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
 
         assertTrue(duplicates.isEmpty(), "Duplicate items: " + String.join(System.lineSeparator(), duplicates));
     }
@@ -109,7 +109,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
         List<String> duplicates = sourceMap.entrySet().stream()
                 .filter(entry -> entry.getValue() > 1)
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
 
         assertTrue(duplicates.isEmpty(), "Duplicate items: " + String.join(System.lineSeparator(), duplicates));
     }

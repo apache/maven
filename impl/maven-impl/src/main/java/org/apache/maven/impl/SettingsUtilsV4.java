@@ -38,7 +38,6 @@ package org.apache.maven.impl;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,7 +68,7 @@ public final class SettingsUtilsV4 {
      * @param recessive
      */
     public static Settings merge(Settings dominant, Settings recessive) {
-        return new SettingsMerger().merge(dominant, recessive, true, Collections.emptyMap());
+        return new SettingsMerger().merge(dominant, recessive, true, Map.of());
     }
 
     /**
@@ -257,14 +256,14 @@ public final class SettingsUtilsV4 {
         if (repos != null) {
             profile.repositories(repos.stream()
                     .map(SettingsUtilsV4::convertFromSettingsRepository)
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         List<Repository> pluginRepos = settingsProfile.getPluginRepositories();
         if (pluginRepos != null) {
             profile.pluginRepositories(pluginRepos.stream()
                     .map(SettingsUtilsV4::convertFromSettingsRepository)
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         org.apache.maven.api.model.Profile value = profile.build();

@@ -33,7 +33,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -233,7 +232,7 @@ public class EmbeddedMavenExecutor implements Executor {
         properties.setProperty(
                 "maven.mainClass", requireNonNull(MVN4_MAIN_CLASSES.get(ExecutorRequest.MVN), "mainClass"));
         System.setProperties(properties);
-        URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, Collections.emptyList());
+        URLClassLoader bootClassLoader = createMavenBootClassLoader(boot, List.of());
         Thread.currentThread().setContextClassLoader(bootClassLoader);
         try {
             Class<?> launcherClass = bootClassLoader.loadClass("org.codehaus.plexus.classworlds.launcher.Launcher");

@@ -68,7 +68,7 @@ public class DefaultToolchainManager implements ToolchainManager {
     public List<Toolchain> getToolchains(
             @Nonnull Session session, @Nonnull String type, @Nullable Map<String, String> requirements)
             throws ToolchainManagerException {
-        ToolchainFactory factory = factories.get(Objects.requireNonNull(type, "type"));
+        ToolchainFactory factory = factories.get(Objects.requireNonNull(type, "type cannot be null"));
         if (factory == null) {
             logger.error("Missing toolchain factory for type: " + type + ". Possibly caused by misconfigured project.");
             return List.of();
@@ -99,7 +99,7 @@ public class DefaultToolchainManager implements ToolchainManager {
     }
 
     private Optional<Toolchain> createToolchain(ToolchainModel model) {
-        String type = Objects.requireNonNull(model.getType(), "model.getType()");
+        String type = Objects.requireNonNull(model.getType(), "model.getType() cannot be null");
         ToolchainFactory factory = factories.get(type);
         if (factory != null) {
             try {

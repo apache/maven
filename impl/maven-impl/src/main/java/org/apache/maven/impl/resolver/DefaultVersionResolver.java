@@ -23,11 +23,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Inject;
@@ -189,7 +189,7 @@ public class DefaultVersionResolver implements VersionResolver {
                     VersionRequest subRequest = new VersionRequest();
                     subRequest.setArtifact(artifact.setVersion(result.getVersion()));
                     if (result.getRepository() instanceof RemoteRepository r) {
-                        subRequest.setRepositories(Collections.singletonList(r));
+                        subRequest.setRepositories(List.of(r));
                     } else {
                         subRequest.setRepositories(request.getRepositories());
                     }
@@ -239,7 +239,7 @@ public class DefaultVersionResolver implements VersionResolver {
         try {
             if (metadata != null) {
                 try (SyncContext syncContext = syncContextFactory.newInstance(session, true)) {
-                    syncContext.acquire(null, Collections.singleton(metadata));
+                    syncContext.acquire(null, Set.of(metadata));
 
                     if (metadata.getPath() != null && Files.exists(metadata.getPath())) {
                         try (InputStream in = Files.newInputStream(metadata.getPath())) {

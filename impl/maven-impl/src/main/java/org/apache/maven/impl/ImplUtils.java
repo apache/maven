@@ -22,34 +22,50 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+
+/**
+ * Utility methods for Maven implementations.
+ * Provides standardized null checking and type casting functionality.
+ */
 class ImplUtils {
-    public static <T> T nonNull(T t) {
-        if (t == null) {
-            throw new IllegalArgumentException();
-        }
-        return t;
-    }
 
-    public static <T> T nonNull(T t, String name) {
-        if (t == null) {
-            throw new IllegalArgumentException(name + " cannot be null");
-        }
-        return t;
-    }
-
-    public static <T> T cast(Class<T> clazz, Object o, String name) {
+    /**
+     * Casts an object to the specified type, with validation and error handling.
+     *
+     * @param <T> the target type
+     * @param clazz the class representing the target type
+     * @param o the object to cast
+     * @param name the name of the parameter for error messages
+     * @return the cast object
+     * @throws NullPointerException if the object is null
+     * @throws ClassCastException if the object is not an instance of the target type
+     */
+    @Nonnull
+    public static <T> T cast(@Nonnull Class<T> clazz, @Nullable Object o, @Nonnull String name) {
         if (!clazz.isInstance(o)) {
             if (o == null) {
-                throw new IllegalArgumentException(name + " is null");
+                throw new NullPointerException(name + " is null");
             }
-            throw new IllegalArgumentException(name + " is not an instance of " + clazz.getName());
+            throw new ClassCastException(name + " is not an instance of " + clazz.getName());
         }
         return clazz.cast(o);
     }
 
-    public static <U, V> List<V> map(Collection<U> list, Function<U, V> mapper) {
-        return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
+    /**
+     * Maps a collection of elements to a new list using the provided mapping function.
+     * Null values in the resulting list are filtered out.
+     *
+     * @param <U> the input type
+     * @param <V> the output type
+     * @param list the collection to map
+     * @param mapper the mapping function
+     * @return a new list containing the mapped elements, with null values filtered out
+     */
+    @Nonnull
+    public static <U, V> List<V> map(@Nonnull Collection<U> list, @Nonnull Function<U, V> mapper) {
+        return list.stream().map(mapper).filter(Objects::nonNull).toList();
     }
 }

@@ -164,7 +164,7 @@ public class ApiRunner {
         private final Instant startTime = MonotonicClock.now();
 
         DefaultSession(RepositorySystemSession session, RepositorySystem repositorySystem, Lookup lookup) {
-            this(session, repositorySystem, Collections.emptyList(), null, lookup);
+            this(session, repositorySystem, List.of(), null, lookup);
         }
 
         protected DefaultSession(
@@ -347,17 +347,20 @@ public class ApiRunner {
         return new LifecycleRegistry() {
 
             @Override
+            @Nonnull
             public Iterator<Lifecycle> iterator() {
                 return Collections.emptyIterator();
             }
 
             @Override
-            public Optional<Lifecycle> lookup(String id) {
+            @Nonnull
+            public Optional<Lifecycle> lookup(@Nonnull String id) {
                 return Optional.empty();
             }
 
             @Override
-            public List<String> computePhases(Lifecycle lifecycle) {
+            @Nonnull
+            public List<String> computePhases(@Nonnull Lifecycle lifecycle) {
                 return List.of();
             }
         };

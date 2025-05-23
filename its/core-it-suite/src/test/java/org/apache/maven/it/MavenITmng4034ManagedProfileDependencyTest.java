@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -60,6 +59,6 @@ public class MavenITmng4034ManagedProfileDependencyTest extends AbstractMavenInt
         assertEquals(Arrays.asList(new String[0]), artifacts);
 
         artifacts = verifier.loadLines("target/runtime.txt");
-        assertEquals(Collections.singletonList("org.apache.maven.its:maven-core-it-support:jar:1.3"), artifacts);
+        assertEquals(List.of("org.apache.maven.its:maven-core-it-support:jar:1.3"), artifacts);
     }
 }

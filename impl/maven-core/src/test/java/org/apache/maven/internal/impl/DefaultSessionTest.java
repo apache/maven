@@ -19,7 +19,7 @@
 package org.apache.maven.internal.impl;
 
 import java.nio.file.Paths;
-import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
@@ -40,8 +40,7 @@ public class DefaultSessionTest {
         RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         MavenSession ms = new MavenSession(null, rss, mer, null);
-        DefaultSession session =
-                new DefaultSession(ms, mock(RepositorySystem.class), Collections.emptyList(), null, null, null);
+        DefaultSession session = new DefaultSession(ms, mock(RepositorySystem.class), List.of(), null, null, null);
 
         assertEquals(
                 RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE,
@@ -55,8 +54,7 @@ public class DefaultSessionTest {
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         MavenSession ms = new MavenSession(null, rss, mer, null);
         ms.getRequest().setRootDirectory(Paths.get("myRootDirectory"));
-        DefaultSession session =
-                new DefaultSession(ms, mock(RepositorySystem.class), Collections.emptyList(), null, null, null);
+        DefaultSession session = new DefaultSession(ms, mock(RepositorySystem.class), List.of(), null, null, null);
 
         assertEquals(Paths.get("myRootDirectory"), session.getRootDirectory());
     }

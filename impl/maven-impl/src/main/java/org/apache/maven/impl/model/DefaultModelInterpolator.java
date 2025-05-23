@@ -20,7 +20,6 @@ package org.apache.maven.impl.model;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +53,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
     private static final String PREFIX_PROJECT = "project.";
     private static final String PREFIX_POM = "pom.";
     private static final List<String> PROJECT_PREFIXES_3_1 = Arrays.asList(PREFIX_POM, PREFIX_PROJECT);
-    private static final List<String> PROJECT_PREFIXES_4_0 = Collections.singletonList(PREFIX_PROJECT);
+    private static final List<String> PROJECT_PREFIXES_4_0 = List.of(PREFIX_PROJECT);
 
     // MNG-1927, MNG-2124, MNG-3355:
     // If the build section is present and the project directory is non-null, we should make

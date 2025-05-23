@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -227,7 +226,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
             ArtifactRepository repository) {
         if (metadata != null && metadata.getFile() != null && metadata.getFile().isFile()) {
             try {
-                Map<String, ?> options = Collections.singletonMap(MetadataReader.IS_STRICT, Boolean.FALSE);
+                Map<String, ?> options = Map.of(MetadataReader.IS_STRICT, Boolean.FALSE);
 
                 Metadata pluginGroupMetadata = metadataReader.read(metadata.getFile(), options);
 

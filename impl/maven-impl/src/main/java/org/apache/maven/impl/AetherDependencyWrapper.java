@@ -40,11 +40,13 @@ abstract class AetherDependencyWrapper {
     /**
      * The session to install / deploy / resolve artifacts and dependencies.
      */
+    @Nonnull
     final InternalSession session;
 
     /**
      * The wrapped Eclipse Aether dependency.
      */
+    @Nonnull
     final Dependency dependency;
 
     /**
@@ -53,8 +55,8 @@ abstract class AetherDependencyWrapper {
      * @param dependency the Eclipse Aether dependency to wrap
      */
     AetherDependencyWrapper(@Nonnull InternalSession session, @Nonnull Dependency dependency) {
-        this.session = Objects.requireNonNull(session, "session");
-        this.dependency = Objects.requireNonNull(dependency, "dependency");
+        this.session = Objects.requireNonNull(session, "session cannot be null");
+        this.dependency = Objects.requireNonNull(dependency, "dependency cannot be null");
     }
 
     /**

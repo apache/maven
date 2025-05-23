@@ -24,12 +24,10 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
@@ -125,13 +123,13 @@ class TestApi {
         DefaultSession session = new DefaultSession(
                 ms,
                 repositorySystem,
-                Collections.emptyList(),
+                List.of(),
                 mavenRepositorySystem,
                 new DefaultLookup(plexusContainer),
                 runtimeInformation);
         org.apache.maven.api.RemoteRepository remoteRepository = session.getRemoteRepository(
                 new RemoteRepository.Builder("mirror", "default", "file:target/test-classes/repo").build());
-        this.session = session.withRemoteRepositories(Collections.singletonList(remoteRepository));
+        this.session = session.withRemoteRepositories(List.of(remoteRepository));
         InternalSession.associate(rss, this.session);
         sessionScope.enter();
         sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(this.session));
@@ -243,7 +241,7 @@ class TestApi {
         List<Dependency> deps2 = result.getNodes().stream()
                 .map(Node::getDependency)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(deps, deps2);
         for (Dependency dep : deps2) {
             dep.getVersion();

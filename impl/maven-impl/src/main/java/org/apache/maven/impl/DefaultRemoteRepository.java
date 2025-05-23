@@ -23,11 +23,24 @@ import java.util.Objects;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * Default implementation of the RemoteRepository interface.
+ * Wraps an Aether remote repository and provides access to its properties.
+ */
 public class DefaultRemoteRepository implements RemoteRepository {
+    /**
+     * The wrapped Aether remote repository.
+     */
+    @Nonnull
     private final org.eclipse.aether.repository.RemoteRepository repository;
 
-    public DefaultRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository) {
-        this.repository = repository;
+    /**
+     * Creates a new wrapper for the given remote repository.
+     *
+     * @param repository the Aether remote repository to wrap
+     */
+    public DefaultRemoteRepository(@Nonnull org.eclipse.aether.repository.RemoteRepository repository) {
+        this.repository = Objects.requireNonNull(repository, "repository cannot be null");
     }
 
     public org.eclipse.aether.repository.RemoteRepository getRepository() {

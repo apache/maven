@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.services.xml;
 
+import org.apache.maven.api.annotations.Nullable;
+
 public interface Location {
 
     /**
@@ -48,11 +50,13 @@ public interface Location {
      * Returns the public ID of the XML
      * @return the public ID, or null if not available
      */
+    @Nullable
     String getPublicId();
 
     /**
      * Returns the system ID of the XML
      * @return the system ID, or null if not available
      */
+    @Nullable
     String getSystemId();
 }

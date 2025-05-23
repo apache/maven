@@ -19,7 +19,6 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -58,6 +57,6 @@ public class MavenITmng4070WhitespaceTrimmingTest extends AbstractMavenIntegrati
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("target/artifacts.txt");
-        assertEquals(Collections.singletonList("org.apache.maven.its.mng4070:a:jar:0.1"), artifacts);
+        assertEquals(List.of("org.apache.maven.its.mng4070:a:jar:0.1"), artifacts);
     }
 }

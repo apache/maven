@@ -193,6 +193,7 @@ public class Verifier {
                 // remove it
                 args = args.stream()
                         .filter(s -> !s.startsWith("-Dmaven.repo.local.tail="))
+                        // do not use toList() here, as we need mutability
                         .collect(Collectors.toList());
             }
 
@@ -585,7 +586,7 @@ public class Verifier {
 
             return l;
         } else {
-            return Collections.singletonList(line);
+            return List.of(line);
         }
     }
 

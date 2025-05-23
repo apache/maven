@@ -19,7 +19,6 @@
 package org.apache.maven.impl.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +72,7 @@ public class DefaultPluginManagementInjector implements PluginManagementInjector
             if (!src.isEmpty()) {
                 Map<Object, Plugin> managedPlugins = new LinkedHashMap<>(src.size() * 2);
 
-                Map<Object, Object> context = Collections.emptyMap();
+                Map<Object, Object> context = Map.of();
 
                 for (Plugin element : src) {
                     Object key = getPluginKey().apply(element);

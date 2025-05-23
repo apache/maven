@@ -20,7 +20,7 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -58,6 +58,6 @@ public class MavenITmng0818WarDepsNotTransitiveTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         Collection<String> artifacts = verifier.loadLines("target/artifacts.txt");
-        assertEquals(Collections.singletonList("org.apache.maven.its.it0080:war:war:0.1"), artifacts);
+        assertEquals(List.of("org.apache.maven.its.it0080:war:war:0.1"), artifacts);
     }
 }

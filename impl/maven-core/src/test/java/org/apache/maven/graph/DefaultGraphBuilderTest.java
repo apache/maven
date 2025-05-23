@@ -57,7 +57,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM;
@@ -348,7 +347,7 @@ class DefaultGraphBuilderTest {
         MavenProject projectParent = getMavenProject(PARENT_MODULE);
         MavenProject projectModuleD = getMavenProject(MODULE_D, projectParent, "bom");
 
-        projectParent.setCollectedProjects(singletonList(projectModuleD));
+        projectParent.setCollectedProjects(List.of(projectModuleD));
 
         // Set up needed mocks
         when(session.getRequest()).thenReturn(mavenExecutionRequest);
@@ -404,8 +403,8 @@ class DefaultGraphBuilderTest {
                 .collect(Collectors.toMap(MavenProject::getArtifactId, identity()));
 
         // Set dependencies and modules
-        projectModuleB.setDependencies(singletonList(toDependency(projectModuleA)));
-        projectModuleC2.setDependencies(singletonList(toDependency(projectModuleB)));
+        projectModuleB.setDependencies(List.of(toDependency(projectModuleA)));
+        projectModuleC2.setDependencies(List.of(toDependency(projectModuleB)));
         projectParent.setCollectedProjects(asList(
                 projectIndependentModule,
                 projectModuleA,

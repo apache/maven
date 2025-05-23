@@ -18,7 +18,6 @@
  */
 package org.apache.maven.project.artifact;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -52,7 +51,7 @@ public class PluginArtifact extends DefaultArtifact implements ArtifactWithDepen
     }
 
     public List<Dependency> getManagedDependencies() {
-        return Collections.emptyList();
+        return List.of();
     }
 
     // TODO: this is duplicate of MavenPluginArtifactHandlerProvider provided one

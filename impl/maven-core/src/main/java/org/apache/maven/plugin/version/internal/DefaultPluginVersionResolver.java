@@ -311,7 +311,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             ArtifactRepository repository) {
         if (metadata != null && metadata.getFile() != null && metadata.getFile().isFile()) {
             try {
-                Map<String, ?> options = Collections.singletonMap(MetadataReader.IS_STRICT, Boolean.FALSE);
+                Map<String, ?> options = Map.of(MetadataReader.IS_STRICT, Boolean.FALSE);
 
                 Metadata repoMetadata = metadataReader.read(metadata.getFile(), options);
 

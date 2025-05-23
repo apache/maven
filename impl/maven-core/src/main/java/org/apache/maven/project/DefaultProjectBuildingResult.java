@@ -19,7 +19,6 @@
 package org.apache.maven.project;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.model.building.ModelProblem;
@@ -54,7 +53,7 @@ class DefaultProjectBuildingResult implements ProjectBuildingResult {
                 : "";
         this.pomFile = (project != null) ? project.getFile() : null;
         this.project = project;
-        this.problems = problems != null ? problems : Collections.emptyList();
+        this.problems = problems != null ? problems : List.of();
         this.dependencyResolutionResult = dependencyResolutionResult;
     }
 
@@ -69,7 +68,7 @@ class DefaultProjectBuildingResult implements ProjectBuildingResult {
         this.projectId = (projectId != null) ? projectId : "";
         this.pomFile = pomFile;
         this.project = null;
-        this.problems = problems != null ? problems : Collections.emptyList();
+        this.problems = problems != null ? problems : List.of();
         this.dependencyResolutionResult = null;
     }
 

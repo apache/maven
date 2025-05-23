@@ -19,7 +19,6 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -59,7 +58,7 @@ public class MavenITmng3769ExclusionRelocatedTransdepsTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("target/artifacts.txt");
-        assertEquals(Collections.singletonList("org.apache.maven.its.mng3769:dependency:jar:1.0"), artifacts);
+        assertEquals(List.of("org.apache.maven.its.mng3769:dependency:jar:1.0"), artifacts);
 
         List<String> paths = verifier.loadLines("target/test.txt");
         assertEquals(3, paths.size());

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.CycleDetectedException;
@@ -153,7 +152,7 @@ public class DefaultProjectDependencyGraph implements ProjectDependencyGraph {
         return projectIds.stream()
                 .map(projects::get)
                 .sorted(Comparator.comparingInt(order::get))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

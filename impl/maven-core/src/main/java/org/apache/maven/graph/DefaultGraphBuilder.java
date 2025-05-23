@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -106,12 +105,11 @@ public class DefaultGraphBuilder implements GraphBuilder {
 
             return result;
         } catch (final ProjectBuildingException | DuplicateProjectException | MavenExecutionException e) {
-            return Result.error(Collections.singletonList(new DefaultModelProblem(null, null, null, null, 0, 0, e)));
+            return Result.error(List.of(new DefaultModelProblem(null, null, null, null, 0, 0, e)));
         } catch (final CycleDetectedException e) {
             String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
             ProjectCycleException error = new ProjectCycleException(message, e);
-            return Result.error(
-                    Collections.singletonList(new DefaultModelProblem(null, null, null, null, 0, 0, error)));
+            return Result.error(List.of(new DefaultModelProblem(null, null, null, null, 0, 0, error)));
         }
     }
 
@@ -318,9 +316,8 @@ public class DefaultGraphBuilder implements GraphBuilder {
                 .orElseThrow(() -> new MavenExecutionException(
                         "Could not find a project in reactor matching the request POM", request.getPom()));
 
-        List<MavenProject> modules = requestPomProject.getCollectedProjects() != null
-                ? requestPomProject.getCollectedProjects()
-                : Collections.emptyList();
+        List<MavenProject> modules =
+                requestPomProject.getCollectedProjects() != null ? requestPomProject.getCollectedProjects() : List.of();
 
         List<MavenProject> result = new ArrayList<>(modules);
         result.add(requestPomProject);

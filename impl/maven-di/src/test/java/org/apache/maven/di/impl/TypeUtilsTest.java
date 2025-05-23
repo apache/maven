@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.apache.maven.di.Key;
 import org.junit.jupiter.api.Test;
@@ -41,9 +40,12 @@ public class TypeUtilsTest {
         Type type = new Key<TreeSet<String>>() {}.getType();
         Set<Type> types = Types.getAllSuperTypes(type);
         assertNotNull(types);
-        List<String> typesStr = types.stream().map(Type::toString).sorted().collect(Collectors.toList());
-        typesStr.remove("java.util.SequencedSet<java.lang.String>");
-        typesStr.remove("java.util.SequencedCollection<java.lang.String>");
+        List<String> typesStr = types.stream()
+                .map(Type::toString)
+                .sorted()
+                .filter(s -> !"java.util.SequencedSet<java.lang.String>".equals(s)
+                        && !"java.util.SequencedCollection<java.lang.String>".equals(s))
+                .toList();
         assertEquals(
                 Arrays.asList(
                         "class java.lang.Object",

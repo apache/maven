@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.maven.project.MavenProject;
@@ -45,7 +46,7 @@ public class DependencyContext {
 
     private final Collection<String> scopesToResolveForAggregatedProjects;
 
-    private volatile Collection<?> lastDependencyArtifacts = Collections.emptyList();
+    private volatile Collection<?> lastDependencyArtifacts = List.of();
 
     private volatile int lastDependencyArtifactCount = -1;
 

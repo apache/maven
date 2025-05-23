@@ -25,6 +25,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
@@ -38,7 +39,6 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
 import static org.apache.maven.impl.StaxLocation.getLocation;
 import static org.apache.maven.impl.StaxLocation.getMessage;
 
@@ -47,7 +47,7 @@ import static org.apache.maven.impl.StaxLocation.getMessage;
 public class DefaultPluginXmlFactory implements PluginXmlFactory {
     @Override
     public PluginDescriptor read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
-        nonNull(request, "request");
+        Objects.requireNonNull(request, "request cannot be null");
         Path path = request.getPath();
         URL url = request.getURL();
         Reader reader = request.getReader();
@@ -78,8 +78,8 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
 
     @Override
     public void write(XmlWriterRequest<PluginDescriptor> request) throws XmlWriterException {
-        nonNull(request, "request");
-        PluginDescriptor content = nonNull(request.getContent(), "content");
+        Objects.requireNonNull(request, "request cannot be null");
+        PluginDescriptor content = Objects.requireNonNull(request.getContent(), "content");
         Path path = request.getPath();
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();

@@ -76,7 +76,7 @@ public class EmptyLifecycleExecutor implements LifecycleExecutor {
         for (String goal : goals) {
             PluginExecution pluginExecution = new PluginExecution();
             pluginExecution.setId("default-" + goal);
-            pluginExecution.setGoals(Collections.singletonList(goal));
+            pluginExecution.setGoals(List.of(goal));
             plugin.addExecution(pluginExecution);
         }
 
@@ -86,6 +86,6 @@ public class EmptyLifecycleExecutor implements LifecycleExecutor {
     public void calculateForkedExecutions(MojoExecution mojoExecution, MavenSession session) {}
 
     public List<MavenProject> executeForkedExecutions(MojoExecution mojoExecution, MavenSession session) {
-        return Collections.emptyList();
+        return List.of();
     }
 }

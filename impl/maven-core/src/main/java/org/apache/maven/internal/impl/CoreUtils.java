@@ -22,21 +22,36 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 class CoreUtils {
 
-    public static <T> T cast(Class<T> clazz, Object o, String name) {
+    /**
+     * Casts an object to the specified type, with validation and error handling.
+     *
+     * @param <T> the target type
+     * @param clazz the class representing the target type
+     * @param o the object to cast
+     * @param name the name of the parameter for error messages
+     * @return the cast object
+     * @throws NullPointerException if the object is null
+     * @throws ClassCastException if the object is not an instance of the target type
+     */
+    @Nonnull
+    public static <T> T cast(@Nonnull Class<T> clazz, @Nullable Object o, @Nonnull String name) {
         if (!clazz.isInstance(o)) {
             if (o == null) {
-                throw new IllegalArgumentException(name + " is null");
+                throw new NullPointerException(name + " is null");
             }
-            throw new IllegalArgumentException(name + " is not an instance of " + clazz.getName());
+            throw new ClassCastException(name + " is not an instance of " + clazz.getName());
         }
         return clazz.cast(o);
     }
 
-    public static <U, V> List<V> map(Collection<U> list, Function<U, V> mapper) {
-        return list.stream().map(mapper).filter(Objects::nonNull).collect(Collectors.toList());
+    @Nonnull
+    public static <U, V> List<V> map(@Nonnull Collection<U> list, @Nonnull Function<U, V> mapper) {
+        return list.stream().map(mapper).filter(Objects::nonNull).toList();
     }
 }

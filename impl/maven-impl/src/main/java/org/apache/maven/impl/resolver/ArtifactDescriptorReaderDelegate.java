@@ -19,7 +19,6 @@
 package org.apache.maven.impl.resolver;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,7 +104,7 @@ public class ArtifactDescriptorReaderDelegate {
 
         Map<String, String> props = null;
         if (system) {
-            props = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
+            props = Map.of(MavenArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
         }
 
         Artifact artifact = new DefaultArtifact(

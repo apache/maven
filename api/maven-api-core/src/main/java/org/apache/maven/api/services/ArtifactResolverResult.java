@@ -88,6 +88,7 @@ public interface ArtifactResolverResult extends Result<ArtifactResolverRequest> 
          *
          * @return The {@link ArtifactCoordinates} of the artifact.
          */
+        @Nonnull
         ArtifactCoordinates getCoordinates();
 
         /**
@@ -95,6 +96,7 @@ public interface ArtifactResolverResult extends Result<ArtifactResolverRequest> 
          *
          * @return The {@link DownloadedArtifact} instance.
          */
+        @Nonnull
         DownloadedArtifact getArtifact();
 
         /**
@@ -102,6 +104,7 @@ public interface ArtifactResolverResult extends Result<ArtifactResolverRequest> 
          *
          * @return A {@link Map} where keys are {@link Repository} instances and values are {@link Exception} instances.
          */
+        @Nonnull
         Map<Repository, List<Exception>> getExceptions();
 
         /**
@@ -109,6 +112,7 @@ public interface ArtifactResolverResult extends Result<ArtifactResolverRequest> 
          *
          * @return The {@link Repository} instance.
          */
+        @Nullable
         Repository getRepository();
 
         /**
@@ -116,6 +120,7 @@ public interface ArtifactResolverResult extends Result<ArtifactResolverRequest> 
          *
          * @return The {@link Path} to the artifact.
          */
+        @Nonnull
         Path getPath();
 
         /**

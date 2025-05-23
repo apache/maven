@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.aether;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -78,7 +77,7 @@ public class LegacyRepositorySystemSessionExtender implements RepositorySystemSe
                     repository.getSnapshots(),
                     repository.getReleases());
 
-            repository.setMirroredRepositories(Collections.singletonList(original));
+            repository.setMirroredRepositories(List.of(original));
 
             repository.setId(mirror.getId());
             repository.setUrl(mirror.getUrl());

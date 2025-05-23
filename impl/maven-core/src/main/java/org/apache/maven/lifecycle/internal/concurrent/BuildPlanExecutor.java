@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -242,9 +241,8 @@ public class BuildPlanExecutor {
 
             BuildPlan plan = new BuildPlan(allProjects);
             for (TaskSegment taskSegment : taskSegments) {
-                Map<MavenProject, List<MavenProject>> projects = taskSegment.isAggregating()
-                        ? Collections.singletonMap(rootProject, allProjects.get(rootProject))
-                        : allProjects;
+                Map<MavenProject, List<MavenProject>> projects =
+                        taskSegment.isAggregating() ? Map.of(rootProject, allProjects.get(rootProject)) : allProjects;
 
                 BuildPlan segment = calculateMojoExecutions(projects, taskSegment.getTasks());
                 plan.then(segment);
@@ -253,7 +251,7 @@ public class BuildPlanExecutor {
             // Create plan, setup and teardown
             for (MavenProject project : plan.getAllProjects().keySet()) {
                 BuildStep pplan = new BuildStep(PLAN, project, null);
-                pplan.status.set(PLANNING); // the plan step always need planning
+                pplan.status.set(PLANNING); // the plan step always needs planning
                 BuildStep setup = new BuildStep(SETUP, project, null);
                 BuildStep teardown = new BuildStep(TEARDOWN, project, null);
                 teardown.executeAfter(setup);
@@ -535,7 +533,7 @@ public class BuildPlanExecutor {
                     } else if (allStepsExecuted) {
                         // If there were no failures, report success
                         projectExecutionListener.afterProjectExecutionSuccess(
-                                new ProjectExecutionEvent(session, step.project, Collections.emptyList()));
+                                new ProjectExecutionEvent(session, step.project, List.of()));
                         reactorContext
                                 .getResult()
                                 .addBuildSummary(new BuildSuccess(step.project, clock.wallTime(), clock.execTime()));
@@ -713,8 +711,8 @@ public class BuildPlanExecutor {
 
                 String resolvedPhase = getResolvedPhase(lifecycle, phase);
 
-                Map<MavenProject, List<MavenProject>> map = Collections.singletonMap(
-                        step.project, plan.getAllProjects().get(step.project));
+                Map<MavenProject, List<MavenProject>> map =
+                        Map.of(step.project, plan.getAllProjects().get(step.project));
                 BuildPlan forkedPlan = calculateLifecycleMappings(map, lifecycle, resolvedPhase);
                 forkedPlan.then(buildPlan);
                 return forkedPlan;
@@ -787,7 +785,7 @@ public class BuildPlanExecutor {
             } else if (MavenExecutionRequest.REACTOR_FAIL_FAST.equals(session.getReactorFailureBehavior())) {
                 buildContext.getReactorBuildStatus().halt();
             } else {
-                logger.error("invalid reactor failure behavior " + session.getReactorFailureBehavior());
+                logger.error("invalid reactor failure behavior {}", session.getReactorFailureBehavior());
                 buildContext.getReactorBuildStatus().halt();
             }
         }
@@ -941,11 +939,11 @@ public class BuildPlanExecutor {
                 plan.addProject(project, steps);
             }
 
-            // Create inter project dependencies
+            // Create inter-project dependencies
             plan.allSteps().filter(step -> step.phase != null).forEach(step -> {
                 Lifecycle.Phase phase = step.phase;
                 MavenProject project = step.project;
-                phase.links().stream().forEach(link -> {
+                phase.links().forEach(link -> {
                     BuildStep before = plan.requiredStep(project, BEFORE + phase.name());
                     BuildStep after = plan.requiredStep(project, AFTER + phase.name());
                     Lifecycle.Pointer pointer = link.pointer();

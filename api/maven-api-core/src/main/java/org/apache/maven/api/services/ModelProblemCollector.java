@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.services;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
 
@@ -31,6 +33,7 @@ import org.apache.maven.api.model.Model;
  */
 public interface ModelProblemCollector {
 
+    @Nonnull
     ProblemCollector<ModelProblem> getProblemCollector();
 
     default boolean hasErrors() {
@@ -66,15 +69,18 @@ public interface ModelProblemCollector {
         getProblemCollector().reportProblem(problem);
     }
 
+    @Nonnull
     ModelBuilderException newModelBuilderException();
 
-    void setSource(String location);
+    void setSource(@Nullable String location);
 
-    void setSource(Model model);
+    void setSource(@Nullable Model model);
 
+    @Nullable
     String getSource();
 
-    void setRootModel(Model model);
+    void setRootModel(@Nullable Model model);
 
+    @Nullable
     Model getRootModel();
 }

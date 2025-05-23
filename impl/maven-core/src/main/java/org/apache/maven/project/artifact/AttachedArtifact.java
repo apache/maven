@@ -19,7 +19,6 @@
 package org.apache.maven.project.artifact;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -52,7 +51,7 @@ public class AttachedArtifact extends DefaultArtifact {
                 artifactHandler,
                 parent.isOptional());
 
-        setDependencyTrail(Collections.singletonList(parent.getId()));
+        setDependencyTrail(List.of(parent.getId()));
 
         this.parent = parent;
 
@@ -162,6 +161,6 @@ public class AttachedArtifact extends DefaultArtifact {
     }
 
     public Collection<ArtifactMetadata> getMetadataList() {
-        return Collections.emptyList();
+        return List.of();
     }
 }
