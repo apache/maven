@@ -21,6 +21,7 @@ package org.apache.maven.project.artifact;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -57,12 +58,15 @@ public class PluginArtifact extends DefaultArtifact implements ArtifactWithDepen
 
     // TODO: this is duplicate of MavenPluginArtifactHandlerProvider provided one
     static class PluginArtifactHandler implements ArtifactHandler {
+
         @Override
+        @Nullable
         public String getClassifier() {
             return null;
         }
 
         @Override
+        @Nullable
         public String getDirectory() {
             return null;
         }

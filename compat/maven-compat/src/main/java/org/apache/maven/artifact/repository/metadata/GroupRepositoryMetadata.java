@@ -21,6 +21,7 @@ package org.apache.maven.artifact.repository.metadata;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
@@ -48,10 +49,12 @@ public class GroupRepositoryMetadata extends AbstractRepositoryMetadata {
         return groupId;
     }
 
+    @Nullable
     public String getArtifactId() {
         return null;
     }
 
+    @Nullable
     public String getBaseVersion() {
         return null;
     }
@@ -87,6 +90,7 @@ public class GroupRepositoryMetadata extends AbstractRepositoryMetadata {
         return false;
     }
 
+    @Nullable
     public ArtifactRepository getRepository() {
         return null;
     }

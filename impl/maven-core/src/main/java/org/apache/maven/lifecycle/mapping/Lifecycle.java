@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * Lifecycle definition for a packaging (multiple packagings share the same lifecycle id = usually "default").
  */
@@ -69,6 +71,7 @@ public class Lifecycle {
     }
 
     @Deprecated
+    @Nullable
     public Map<String, String> getPhases() {
         Map<String, LifecyclePhase> lphases = getLifecyclePhases();
         if (lphases == null) {

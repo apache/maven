@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -46,6 +47,7 @@ public class DefaultModelUrlNormalizer implements ModelUrlNormalizer {
     }
 
     @Override
+    @Nullable
     public Model normalize(Model model, ModelBuilderRequest request) {
         if (model == null) {
             return null;

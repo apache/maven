@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
@@ -97,6 +98,7 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
 
     @Override
     @SuppressWarnings("checkstyle:methodlength")
+    @Nullable
     public Object evaluate(String expr, Class<?> type) throws ExpressionEvaluationException {
         Object value = null;
 

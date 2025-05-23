@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.path.PathTranslator;
@@ -120,6 +121,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
             this.logger = logger;
         }
 
+        @Nullable
         public ModelInterpolationException run() {
             while (!interpolationTargets.isEmpty()) {
                 Object obj = interpolationTargets.removeFirst();

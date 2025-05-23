@@ -21,6 +21,7 @@ package org.apache.maven.model.interpolation;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 
@@ -52,6 +53,7 @@ class UrlNormalizingPostProcessor implements InterpolationPostProcessor {
     }
 
     @Override
+    @Nullable
     public Object execute(String expression, Object value) {
         if (value != null && URL_EXPRESSIONS.contains(expression)) {
             return normalizer.normalize(value.toString());

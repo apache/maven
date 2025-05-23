@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
@@ -85,6 +86,7 @@ public class DefaultProjectRealmCache implements ProjectRealmCache, Disposable {
         return new CacheKey(extensionRealms);
     }
 
+    @Nullable
     public CacheRecord get(Key key) {
         return cache.get(key);
     }

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.configuration.internal;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.converters.composite.ObjectWithFieldsConverter;
@@ -66,6 +67,7 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
         }
     }
 
+    @Nullable
     public Object fromConfiguration(
             final ConverterLookup lookup,
             final PlexusConfiguration configuration,

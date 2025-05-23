@@ -21,6 +21,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
@@ -36,6 +37,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 @Singleton
 @Deprecated
 public class NewestConflictResolver implements ConflictResolver {
+
     // ConflictResolver methods -----------------------------------------------
 
     /*
@@ -43,6 +45,7 @@ public class NewestConflictResolver implements ConflictResolver {
      *      org.apache.maven.artifact.resolver.ResolutionNode)
      */
 
+    @Nullable
     public ResolutionNode resolveConflict(ResolutionNode node1, ResolutionNode node2) {
         try {
             ArtifactVersion version1 = node1.getArtifact().getSelectedVersion();

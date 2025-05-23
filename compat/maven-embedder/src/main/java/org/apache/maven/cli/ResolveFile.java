@@ -21,11 +21,15 @@ package org.apache.maven.cli;
 import java.io.File;
 import java.nio.file.Paths;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * Resolve relative file path against the given base directory
  */
 @Deprecated
 public class ResolveFile {
+
+    @Nullable
     public static File resolveFile(File file, String baseDirectory) {
         if (file == null) {
             return null;

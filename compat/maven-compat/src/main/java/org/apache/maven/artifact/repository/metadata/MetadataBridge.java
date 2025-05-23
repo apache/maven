@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
@@ -86,6 +87,7 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
         return (string != null) ? string : "";
     }
 
+    @Nullable
     public File getFile() {
         return null;
     }
@@ -95,6 +97,7 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
     }
 
     @Override
+    @Nullable
     public Path getPath() {
         return null;
     }

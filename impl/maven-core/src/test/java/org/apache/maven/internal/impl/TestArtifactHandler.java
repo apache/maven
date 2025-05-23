@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 
 /**
@@ -40,6 +41,7 @@ class TestArtifactHandler implements ArtifactHandler {
     }
 
     @Override
+    @Nullable
     public String getClassifier() {
         return null;
     }

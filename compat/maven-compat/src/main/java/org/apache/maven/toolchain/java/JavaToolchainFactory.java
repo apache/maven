@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.RequirementMatcher;
 import org.apache.maven.toolchain.RequirementMatcherFactory;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
 public class JavaToolchainFactory implements ToolchainFactory {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Nullable
     public ToolchainPrivate createToolchain(ToolchainModel model) throws MisconfiguredToolchainException {
         if (model == null) {
             return null;
@@ -95,6 +97,7 @@ public class JavaToolchainFactory implements ToolchainFactory {
         return jtc;
     }
 
+    @Nullable
     public ToolchainPrivate createDefaultToolchain() {
         // not sure it's necessary to provide a default toolchain here.
         // only version can be eventually supplied.

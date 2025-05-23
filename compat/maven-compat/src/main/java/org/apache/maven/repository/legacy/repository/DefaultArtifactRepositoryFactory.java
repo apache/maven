@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -45,6 +46,7 @@ public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFacto
     @Inject
     private Map<String, ArtifactRepositoryLayout> repositoryLayouts;
 
+    @Nullable
     public ArtifactRepositoryLayout getLayout(String layoutId) throws UnknownRepositoryLayoutException {
         return repositoryLayouts.get(layoutId);
     }

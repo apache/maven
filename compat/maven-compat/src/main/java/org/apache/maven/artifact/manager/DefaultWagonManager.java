@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
@@ -101,6 +102,7 @@ public class DefaultWagonManager extends org.apache.maven.repository.legacy.Defa
         return new AuthenticationInfo();
     }
 
+    @Nullable
     public ProxyInfo getProxy(String protocol) {
         MavenSession session = legacySupport.getSession();
 

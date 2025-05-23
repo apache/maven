@@ -18,6 +18,8 @@
  */
 package org.apache.maven.artifact.repository.metadata;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * Assists in handling repository metadata.
  *
@@ -25,6 +27,7 @@ package org.apache.maven.artifact.repository.metadata;
 @Deprecated
 class MetadataUtils {
 
+    @Nullable
     public static Metadata cloneMetadata(Metadata src) {
         if (src == null) {
             return null;

@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -141,6 +142,7 @@ public class DefaultPluginManager implements PluginManager {
         }
     }
 
+    @Nullable
     public Plugin getPluginDefinitionForPrefix(String prefix, MavenSession session, MavenProject project) {
         PluginPrefixRequest request = new DefaultPluginPrefixRequest(prefix, session);
         request.setPom(project.getModel());
@@ -158,6 +160,7 @@ public class DefaultPluginManager implements PluginManager {
         }
     }
 
+    @Nullable
     public PluginDescriptor getPluginDescriptorForPrefix(String prefix) {
         MavenSession session = legacySupport.getSession();
 

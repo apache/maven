@@ -29,6 +29,7 @@ import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
@@ -78,6 +79,7 @@ public class EmptyLifecycleBindingsInjector extends DefaultLifecycleBindingsInje
                 }
 
                 @Override
+                @Nullable
                 public Type type() {
                     return null;
                 }

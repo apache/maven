@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
 /**
@@ -44,6 +45,7 @@ public class DefaultGraphConflictResolver implements GraphConflictResolver {
 
     // -------------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------------
+    @Nullable
     public MetadataGraph resolveConflicts(MetadataGraph graph, ArtifactScopeEnum scope)
             throws GraphConflictResolutionException {
         if (policy == null) {

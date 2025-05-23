@@ -56,7 +56,8 @@ public final class ReflectionUtils {
     private static final Pattern PACKAGE_AND_PARENT = Pattern.compile(PACKAGE.pattern() + "(?:" + IDENT + "\\$\\d*)?");
     private static final Pattern ARRAY_SIGNATURE = Pattern.compile("\\[L(.*?);");
 
-    public static @Nullable Object getOuterClassInstance(Object innerClassInstance) {
+    @Nullable
+    public static Object getOuterClassInstance(Object innerClassInstance) {
         if (innerClassInstance == null) {
             return null;
         }
@@ -79,7 +80,8 @@ public final class ReflectionUtils {
         return null;
     }
 
-    public static @Nullable Object qualifierOf(AnnotatedElement annotatedElement) {
+    @Nullable
+    public static Object qualifierOf(AnnotatedElement annotatedElement) {
         Object qualifier = null;
         for (Annotation annotation : annotatedElement.getDeclaredAnnotations()) {
             if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
@@ -97,7 +99,8 @@ public final class ReflectionUtils {
         return qualifier;
     }
 
-    public static @Nullable Annotation scopeOf(AnnotatedElement annotatedElement) {
+    @Nullable
+    public static Annotation scopeOf(AnnotatedElement annotatedElement) {
         Annotation scope = null;
         for (Annotation annotation : annotatedElement.getDeclaredAnnotations()) {
             if (annotation.annotationType().isAnnotationPresent(org.apache.maven.api.di.Scope.class)) {

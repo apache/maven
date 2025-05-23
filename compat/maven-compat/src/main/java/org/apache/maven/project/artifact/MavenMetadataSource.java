@@ -36,6 +36,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -150,6 +151,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
     }
 
     @Override
+    @Nullable
     public ResolutionGroup retrieve(MetadataResolutionRequest request) throws ArtifactMetadataRetrievalException {
         Artifact artifact = request.getArtifact();
 
