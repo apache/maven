@@ -463,13 +463,13 @@ public final class Constants {
     public static final String MAVEN_CONSUMER_POM = "maven.consumer.pom";
 
     /**
-     * User property for controlling "maven modern personality". If set to {@code false} Maven will behave
-     * as previous major version.
+     * User property for controlling "maven personality". If set to {@code true} Maven will behave
+     * as previous major version, Maven 3.
      *
      * @since 4.0.0
      */
-    @Config(type = "java.lang.Boolean", defaultValue = "true")
-    public static final String MAVEN_MODERN_PERSONALITY = "maven.modernPersonality";
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_MAVEN3_PERSONALITY = "maven.maven3Personality";
 
     /**
      * User property for disabling version resolver cache.

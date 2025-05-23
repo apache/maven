@@ -66,16 +66,16 @@ import static java.util.Objects.requireNonNull;
  */
 public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     protected final RepositorySystem repositorySystem;
-    protected final boolean mavenModernPersonality;
+    protected final boolean mavenMaven3Personality;
     protected final InternalScopeManager scopeManager;
 
-    public MavenSessionBuilderSupplier(RepositorySystem repositorySystem, boolean mavenModernPersonality) {
+    public MavenSessionBuilderSupplier(RepositorySystem repositorySystem, boolean mavenMaven3Personality) {
         this.repositorySystem = requireNonNull(repositorySystem);
-        this.mavenModernPersonality = mavenModernPersonality;
+        this.mavenMaven3Personality = mavenMaven3Personality;
         this.scopeManager = new ScopeManagerImpl(
-                mavenModernPersonality
-                        ? Maven4ScopeManagerConfiguration.INSTANCE
-                        : Maven3ScopeManagerConfiguration.INSTANCE);
+                mavenMaven3Personality
+                        ? Maven3ScopeManagerConfiguration.INSTANCE
+                        : Maven4ScopeManagerConfiguration.INSTANCE);
     }
 
     protected DependencyTraverser getDependencyTraverser() {
@@ -87,7 +87,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     }
 
     protected DependencyManager getDependencyManager() {
-        return getDependencyManager(mavenModernPersonality);
+        return getDependencyManager(!mavenMaven3Personality);
     }
 
     public DependencyManager getDependencyManager(boolean transitive) {

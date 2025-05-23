@@ -158,8 +158,8 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         // this map is read ONLY to get config from (profiles + env + system + user)
         Map<String, String> mergedProps = createMergedProperties(request);
 
-        boolean mavenModernPersonality = Features.mavenModernPersonality(mergedProps);
-        MavenSessionBuilderSupplier supplier = new MavenSessionBuilderSupplier(repoSystem, mavenModernPersonality);
+        boolean mavenMaven3Personality = Features.mavenMaven3Personality(mergedProps);
+        MavenSessionBuilderSupplier supplier = new MavenSessionBuilderSupplier(repoSystem, mavenMaven3Personality);
         SessionBuilder sessionBuilder = supplier.get();
         sessionBuilder.setArtifactTypeRegistry(new TypeRegistryAdapter(typeRegistry)); // dynamic
         sessionBuilder.setCache(request.getRepositoryCache());
@@ -357,7 +357,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
         // may be overridden
         String resolverDependencyManagerTransitivity = mergedProps.getOrDefault(
-                Constants.MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY, Boolean.toString(mavenModernPersonality));
+                Constants.MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY, Boolean.toString(!mavenMaven3Personality));
         sessionBuilder.setDependencyManager(
                 supplier.getDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
