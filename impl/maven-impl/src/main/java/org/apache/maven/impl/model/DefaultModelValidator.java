@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -73,8 +74,11 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
+import org.eclipse.aether.scope.DependencyScope;
+import org.eclipse.aether.scope.ScopeManager;
 
 import static java.util.Objects.requireNonNull;
 
@@ -300,7 +304,7 @@ public class DefaultModelValidator implements ModelValidator {
 
     @Override
     @SuppressWarnings("checkstyle:MethodLength")
-    public void validateFileModel(Model m, int validationLevel, ModelProblemCollector problems) {
+    public void validateFileModel(Session s, Model m, int validationLevel, ModelProblemCollector problems) {
 
         Parent parent = m.getParent();
         if (parent != null) {
@@ -583,7 +587,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     @Override
-    public void validateRawModel(Model m, int validationLevel, ModelProblemCollector problems) {
+    public void validateRawModel(Session s, Model m, int validationLevel, ModelProblemCollector problems) {
         // Check that the model version is correctly set wrt the model definition, i.e., that the
         // user does not use an attribute or element that is not available in the modelVersion used.
         String minVersion = new MavenModelVersion().getModelVersion(m);
@@ -828,7 +832,7 @@ public class DefaultModelValidator implements ModelValidator {
 
     @Override
     @SuppressWarnings("checkstyle:MethodLength")
-    public void validateEffectiveModel(Model m, int validationLevel, ModelProblemCollector problems) {
+    public void validateEffectiveModel(Session s, Model m, int validationLevel, ModelProblemCollector problems) {
         validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.BASE, m.getModelVersion(), m);
 
         validateCoordinatesId("groupId", problems, m.getGroupId(), m);
@@ -879,11 +883,11 @@ public class DefaultModelValidator implements ModelValidator {
 
         Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
 
-        validateEffectiveDependencies(problems, m, m.getDependencies(), false, validationLevel);
+        validateEffectiveDependencies(s, problems, m, m.getDependencies(), false, validationLevel);
 
         DependencyManagement mgmt = m.getDependencyManagement();
         if (mgmt != null) {
-            validateEffectiveDependencies(problems, m, mgmt.getDependencies(), true, validationLevel);
+            validateEffectiveDependencies(s, problems, m, mgmt.getDependencies(), true, validationLevel);
         }
 
         if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
@@ -951,7 +955,7 @@ public class DefaultModelValidator implements ModelValidator {
                             SourceHint.pluginKey(p),
                             p);
 
-                    validate20EffectivePluginDependencies(problems, p, validationLevel);
+                    validate20EffectivePluginDependencies(s, problems, p, validationLevel);
                 }
 
                 validate20RawResources(problems, build.getResources(), "build.resources.resource.", validationLevel);
@@ -1153,6 +1157,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validateEffectiveDependencies(
+            Session s,
             ModelProblemCollector problems,
             Model m,
             List<Dependency> dependencies,
@@ -1191,6 +1196,8 @@ public class DefaultModelValidator implements ModelValidator {
                      * TODO Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
                      * order to don't break backward-compat with those, only warn but don't error out.
                      */
+                    ScopeManager scopeManager =
+                            InternalSession.from(s).getSession().getScopeManager();
                     validateEnum(
                             prefix,
                             "scope",
@@ -1200,14 +1207,19 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getScope(),
                             SourceHint.dependencyManagementKey(d),
                             d,
-                            "provided",
-                            "compile",
-                            "runtime",
-                            "test",
-                            "system");
+                            scopeManager.getDependencyScopeUniverse().stream()
+                                    .map(DependencyScope::getId)
+                                    .distinct()
+                                    .toArray(String[]::new));
 
                     validateEffectiveModelAgainstDependency(prefix, problems, m, d);
                 } else {
+                    ScopeManager scopeManager =
+                            InternalSession.from(s).getSession().getScopeManager();
+                    Set<String> scopes = scopeManager.getDependencyScopeUniverse().stream()
+                            .map(DependencyScope::getId)
+                            .collect(Collectors.toCollection(HashSet::new));
+                    scopes.add("import");
                     validateEnum(
                             prefix,
                             "scope",
@@ -1217,12 +1229,7 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getScope(),
                             SourceHint.dependencyManagementKey(d),
                             d,
-                            "provided",
-                            "compile",
-                            "runtime",
-                            "test",
-                            "system",
-                            "import");
+                            scopes.toArray(new String[0]));
                 }
             }
         }
@@ -1249,7 +1256,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validate20EffectivePluginDependencies(
-            ModelProblemCollector problems, Plugin plugin, int validationLevel) {
+            Session s, ModelProblemCollector problems, Plugin plugin, int validationLevel) {
         List<Dependency> dependencies = plugin.getDependencies();
 
         if (!dependencies.isEmpty()) {

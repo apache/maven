@@ -58,6 +58,7 @@ import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -819,6 +820,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // effective model validation
             modelValidator.validateEffectiveModel(
+                    session,
                     resultModel,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
@@ -1418,9 +1420,15 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             setSource(model);
             modelValidator.validateFileModel(
+                    session,
                     model,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
+            InternalSession internalSession = InternalSession.from(session);
+            if (Features.mavenMaven3Personality(internalSession.getSession().getConfigProperties())
+                    && Objects.equals(ModelBuilder.MODEL_VERSION_4_1_0, model.getModelVersion())) {
+                add(Severity.FATAL, Version.BASE, "Maven3 mode: no higher model version than 4.0.0 allowed");
+            }
             if (hasFatalErrors()) {
                 throw newModelBuilderException();
             }
@@ -1500,6 +1508,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             modelValidator.validateRawModel(
+                    session,
                     rawModel,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
