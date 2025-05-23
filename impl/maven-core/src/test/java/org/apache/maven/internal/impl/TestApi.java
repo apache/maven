@@ -115,7 +115,7 @@ class TestApi {
     @BeforeEach
     void setup() {
         // create session with any local repo, is redefined anyway below
-        RepositorySystemSession rss = new MavenSessionBuilderSupplier(repositorySystem)
+        RepositorySystemSession rss = new MavenSessionBuilderSupplier(repositorySystem, true)
                 .get()
                 .withLocalRepositoryBaseDirectories(new File("target/test-classes/apiv4-repo").toPath())
                 .build();

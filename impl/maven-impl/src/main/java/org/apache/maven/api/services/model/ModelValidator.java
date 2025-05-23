@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.services.model;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelProblemCollector;
 
@@ -61,7 +62,7 @@ public interface ModelValidator {
      * @param validationLevel The validation level.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void validateFileModel(Model model, int validationLevel, ModelProblemCollector problems);
+    void validateFileModel(Session session, Model model, int validationLevel, ModelProblemCollector problems);
 
     /**
      * Checks the specified (raw) model for missing or invalid values. The raw model is the file model + buildpom filter
@@ -71,7 +72,7 @@ public interface ModelValidator {
      * @param validationLevel The validation level.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void validateRawModel(Model model, int validationLevel, ModelProblemCollector problems);
+    void validateRawModel(Session session, Model model, int validationLevel, ModelProblemCollector problems);
 
     /**
      * Checks the specified (effective) model for missing or invalid values. The effective model is fully assembled and
@@ -81,5 +82,5 @@ public interface ModelValidator {
      * @param validationLevel The validation level.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void validateEffectiveModel(Model model, int validationLevel, ModelProblemCollector problems);
+    void validateEffectiveModel(Session session, Model model, int validationLevel, ModelProblemCollector problems);
 }

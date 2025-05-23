@@ -26,16 +26,11 @@ import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.installation.InstallRequest;
 
 /**
- * Consumer POM transformer.
+ * Maven transformer manager.
  *
- * @since TBD
+ * @since 4.0.0
  */
-public interface ConsumerPomArtifactTransformer {
-
-    String CONSUMER_POM_CLASSIFIER = "consumer";
-
-    String BUILD_POM_CLASSIFIER = "build";
-
+public interface TransformerManager {
     InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request);
 
     DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request);
