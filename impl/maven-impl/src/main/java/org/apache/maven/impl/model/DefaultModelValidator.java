@@ -86,8 +86,6 @@ public class DefaultModelValidator implements ModelValidator {
     public static final String BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION =
             "maven.build.allowExpressionInEffectiveProjectVersion";
 
-    public static final List<String> VALID_MODEL_VERSIONS = ModelBuilder.VALID_MODEL_VERSIONS;
-
     private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile("\\$\\{(.+?)}");
     private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
 
@@ -341,7 +339,7 @@ public class DefaultModelValidator implements ModelValidator {
                             || parent.getArtifactId() != null
                                     && !parent.getArtifactId().isEmpty())
                     && validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0
-                    && VALID_MODEL_VERSIONS.contains(m.getModelVersion())
+                    && ModelBuilder.ALL_KNOWN_MODEL_VERSIONS.contains(m.getModelVersion())
                     && !Objects.equals(m.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {
                 addViolation(
                         problems,
@@ -372,7 +370,7 @@ public class DefaultModelValidator implements ModelValidator {
         } else if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
             validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
 
-            validateModelVersion(problems, m.getModelVersion(), m, VALID_MODEL_VERSIONS);
+            validateModelVersion(problems, m.getModelVersion(), m, ModelBuilder.ALL_KNOWN_MODEL_VERSIONS);
 
             Set<String> modules = new HashSet<>();
             for (int i = 0, n = m.getModules().size(); i < n; i++) {

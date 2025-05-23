@@ -846,7 +846,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 result.setParentModel(parentModel);
             } else {
                 String superModelVersion = childModel.getModelVersion();
-                if (superModelVersion == null || !VALID_MODEL_VERSIONS.contains(superModelVersion)) {
+                if (superModelVersion == null || !ALL_KNOWN_MODEL_VERSIONS.contains(superModelVersion)) {
                     // Maven 3.x is always using 4.0.0 version to load the supermodel, so
                     // do the same when loading a dependency.  The model validator will also
                     // check that field later.
