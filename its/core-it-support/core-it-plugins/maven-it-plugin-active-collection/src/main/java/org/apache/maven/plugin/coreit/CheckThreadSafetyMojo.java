@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -81,8 +82,8 @@ public class CheckThreadSafetyMojo extends AbstractMojo {
 
         final Map map = componentMap;
         final List list = componentList;
-        final List go = new Vector();
         final List exceptions = new Vector();
+        final CountDownLatch startLatch = new CountDownLatch(1);
 
         Thread[] threads = new Thread[2];
         for (int i = 0; i < threads.length; i++) {
@@ -94,35 +95,37 @@ public class CheckThreadSafetyMojo extends AbstractMojo {
                 public void run() {
                     getLog().info("[MAVEN-CORE-IT-LOG] Thread " + this + " uses " + tccl);
                     Thread.currentThread().setContextClassLoader(tccl);
-                    while (go.isEmpty()) {
-                        try {
-                            Thread.sleep(100); // wait for the start
-                        } catch (InterruptedException ignored) {
-                        }
-                    }
-                    for (int j = 0; j < 10 * 1000; j++) {
-                        try {
-                            for (Object o : map.values()) {
-                                o.toString();
+                    try {
+                        startLatch.await(); // Wait for the start signal
+                        for (int j = 0; j < 10 * 1000; j++) {
+                            try {
+                                for (Object o : map.values()) {
+                                    o.toString();
+                                }
+                                for (Object aList : list) {
+                                    aList.toString();
+                                }
+                            } catch (Exception e) {
+                                getLog().warn("[MAVEN-CORE-IT-LOG] Thread " + this + " encountered concurrency issue", e);
+                                exceptions.add(e);
                             }
-                            for (Object aList : list) {
-                                aList.toString();
-                            }
-                        } catch (Exception e) {
-                            getLog().warn("[MAVEN-CORE-IT-LOG] Thread " + this + " encountered concurrency issue", e);
-                            exceptions.add(e);
                         }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        getLog().warn("[MAVEN-CORE-IT-LOG] Thread " + this + " was interrupted while waiting");
                     }
                 }
             };
             threads[i].start();
         }
 
-        go.add(null);
+        startLatch.countDown(); // Signal all threads to start
+
         for (Thread thread : threads) {
             try {
                 thread.join();
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 getLog().warn("[MAVEN-CORE-IT-LOG] Interrupted while joining " + thread);
             }
         }
