@@ -27,7 +27,7 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.model.ModelVersionParser;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A wrapper class around a resolver version that works as model version parser as well.
@@ -39,7 +39,7 @@ public class DefaultVersionParser implements VersionParser {
 
     @Inject
     public DefaultVersionParser(ModelVersionParser modelVersionParser) {
-        this.modelVersionParser = nonNull(modelVersionParser, "modelVersionParser");
+        this.modelVersionParser = requireNonNull(modelVersionParser, "modelVersionParser");
     }
 
     @Override

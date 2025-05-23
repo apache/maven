@@ -35,7 +35,7 @@ import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 @Named
 @Singleton
@@ -50,7 +50,7 @@ public class DefaultVersionResolver implements VersionResolver {
 
     @Override
     public VersionResolverResult resolve(VersionResolverRequest request) throws VersionResolverException {
-        nonNull(request, "request");
+        requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
         return session.request(request, this::doResolve);
     }
