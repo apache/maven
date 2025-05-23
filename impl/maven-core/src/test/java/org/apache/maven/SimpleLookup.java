@@ -43,7 +43,8 @@ public class SimpleLookup implements Lookup {
     }
 
     @Override
-    public <T> @Nullable T lookup(Class<T> type, String name) {
+    @Nullable
+    public <T> T lookup(Class<T> type, String name) {
         return null;
     }
 
