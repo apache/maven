@@ -1522,9 +1522,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     return e.getValue();
                 }
             }
-            DefaultProfileActivationContext.Record prev = profileActivationContext.start();
-            Model model = doReadAsParentModel(profileActivationContext);
-            DefaultProfileActivationContext.Record record = profileActivationContext.stop(prev);
+            DefaultProfileActivationContext ctx = profileActivationContext.start();
+            Model model = doReadAsParentModel(ctx);
+            DefaultProfileActivationContext.Record record = ctx.stop();
             parentsPerContext.put(record, model);
             return model;
         }
@@ -1845,16 +1845,15 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private DefaultProfileActivationContext getProfileActivationContext(ModelBuilderRequest request, Model model) {
-        DefaultProfileActivationContext context =
-                new DefaultProfileActivationContext(pathTranslator, rootLocator, interpolator);
-
-        context.setActiveProfileIds(request.getActiveProfileIds());
-        context.setInactiveProfileIds(request.getInactiveProfileIds());
-        context.setSystemProperties(request.getSystemProperties());
-        context.setUserProperties(request.getUserProperties());
-        context.setModel(model);
-
-        return context;
+        return new DefaultProfileActivationContext(
+                pathTranslator,
+                rootLocator,
+                interpolator,
+                request.getActiveProfileIds(),
+                request.getInactiveProfileIds(),
+                request.getSystemProperties(),
+                request.getUserProperties(),
+                model);
     }
 
     private Map<String, Activation> getProfileActivations(Model model) {
