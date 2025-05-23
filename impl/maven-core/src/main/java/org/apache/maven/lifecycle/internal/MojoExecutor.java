@@ -214,13 +214,6 @@ public class MojoExecutor {
         doExecute(session, mojoExecution, dependencyContext);
     }
 
-    protected static class NoLock implements NoExceptionCloseable {
-        public NoLock() {}
-
-        @Override
-        public void close() {}
-    }
-
     /**
      * Aggregating mojo executions (possibly) modify all MavenProjects, including those that are currently in use
      * by concurrently running mojo executions. To prevent race conditions, an aggregating execution will block
@@ -306,8 +299,8 @@ public class MojoExecutor {
 
         ensureDependenciesAreResolved(mojoDescriptor, session, dependencyContext);
 
-        try (NoExceptionCloseable ignore = getProjectLock(session, mojoDescriptor)) {
-            doExecute2(session, mojoExecution);
+        try {
+            executeMojo(session, mojoExecution);
         } finally {
             for (MavenProject forkedProject : forkedProjects) {
                 forkedProject.setExecutionProject(null);
@@ -320,19 +313,7 @@ public class MojoExecutor {
         void close();
     }
 
-    protected NoExceptionCloseable getProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
-        if (useProjectLock(session)) {
-            return new ProjectLock(session, mojoDescriptor);
-        } else {
-            return new NoLock();
-        }
-    }
-
-    protected boolean useProjectLock(MavenSession session) {
-        return session.getRequest().getDegreeOfConcurrency() > 1;
-    }
-
-    private void doExecute2(MavenSession session, MojoExecution mojoExecution) throws LifecycleExecutionException {
+    private void executeMojo(MavenSession session, MojoExecution mojoExecution) throws LifecycleExecutionException {
         eventCatapult.fire(ExecutionEvent.Type.MojoStarted, session, mojoExecution);
         try {
             try {
