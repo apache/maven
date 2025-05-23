@@ -86,10 +86,9 @@ public class FileModelSource extends FileSource implements ModelSource2 {
             return true;
         }
 
-        if (!(obj instanceof FileModelSource)) {
+        if (!(obj instanceof FileModelSource other)) {
             return false;
         }
-        FileModelSource other = (FileModelSource) obj;
         return getFile().equals(other.getFile());
     }
 

@@ -169,10 +169,9 @@ public class ArtifactStub implements Artifact {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ArtifactStub)) {
+        if (!(o instanceof ArtifactStub that)) {
             return false;
         }
-        ArtifactStub that = (ArtifactStub) o;
         return Objects.equals(groupId, that.groupId)
                 && Objects.equals(artifactId, that.artifactId)
                 && Objects.equals(classifier, that.classifier)

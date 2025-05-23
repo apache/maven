@@ -2427,7 +2427,7 @@ public class ModelMerger {
                 list = null;
             }
             if (vs instanceof MergingList mergingList && mergingList.map != null) {
-                for (Map.Entry<Object, V> e : ((MergingList<V>) vs).map.entrySet()) {
+                for (Map.Entry<Object, V> e : mergingList.map.entrySet()) {
                     Object key = e.getKey();
                     V oldValue = map.get(key);
                     // JDK8: this should be a call to map.merge( key, v, remapping )

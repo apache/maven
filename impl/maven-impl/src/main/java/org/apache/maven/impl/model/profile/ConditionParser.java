@@ -622,7 +622,7 @@ public class ConditionParser {
             } catch (NumberFormatException e) {
                 // If string is not an int, tries parsing as double and converting to int
                 try {
-                    return (int) Double.parseDouble((String) value);
+                    return (int) Double.parseDouble(string);
                 } catch (NumberFormatException e2) {
                     throw new RuntimeException("Cannot convert string to integer: " + value);
                 }

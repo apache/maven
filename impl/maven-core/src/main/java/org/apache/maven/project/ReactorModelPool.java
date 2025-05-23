@@ -66,11 +66,9 @@ class ReactorModelPool {
                 return true;
             }
 
-            if (!(obj instanceof CacheKey)) {
+            if (!(obj instanceof CacheKey that)) {
                 return false;
             }
-
-            CacheKey that = (CacheKey) obj;
 
             return artifactId.equals(that.artifactId) && groupId.equals(that.groupId) && version.equals(that.version);
         }

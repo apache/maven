@@ -94,15 +94,13 @@ class PropertiesUtil {
             for (int i = Array.getLength(value) - 1; i >= 0; i--) {
                 serialize(props, key + "." + i, Array.get(value, i));
             }
-        } else if (value instanceof Collection) {
-            Collection collection = (Collection) value;
+        } else if (value instanceof Collection collection) {
             props.setProperty(key, Integer.toString(collection.size()));
             int i = 0;
             for (Iterator it = collection.iterator(); it.hasNext(); i++) {
                 serialize(props, key + "." + i, it.next());
             }
-        } else if (value instanceof Map) {
-            Map map = (Map) value;
+        } else if (value instanceof Map map) {
             props.setProperty(key, Integer.toString(map.size()));
             @SuppressWarnings("checkstyle:UnusedLocalVariable")
             int i = 0;
@@ -111,8 +109,7 @@ class PropertiesUtil {
                 Object v = map.get(k);
                 serialize(props, key + "." + k, v);
             }
-        } else if (value instanceof PlexusConfiguration) {
-            PlexusConfiguration config = (PlexusConfiguration) value;
+        } else if (value instanceof PlexusConfiguration config) {
 
             String val = config.getValue(null);
             if (val != null) {
