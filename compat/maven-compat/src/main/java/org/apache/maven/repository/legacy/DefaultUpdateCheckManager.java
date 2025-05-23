@@ -306,8 +306,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
                     try (FileLock lock = in.getChannel().lock(0, Long.MAX_VALUE, true)) {
                         getLogger().debug("Reading resolution-state from: " + touchfile);
                         props.load(in);
-                        lock.release();
-                        lock.close();
+
                         return props;
                     }
                 }

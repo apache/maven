@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -50,10 +49,5 @@ public class MojoExecutor extends org.apache.maven.lifecycle.internal.MojoExecut
                 eventCatapult,
                 mojosExecutionStrategy,
                 messageBuilderFactory);
-    }
-
-    @Override
-    protected boolean useProjectLock(MavenSession session) {
-        return false;
     }
 }
