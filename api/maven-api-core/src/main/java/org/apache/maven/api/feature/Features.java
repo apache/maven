@@ -35,7 +35,7 @@ public final class Features {
     private Features() {}
 
     /**
-     * Check if the personality is "modern".
+     * Check if the personality is "maven3".
      */
     public static boolean mavenMaven3Personality(@Nullable Map<String, ?> userProperties) {
         return doGet(userProperties, Constants.MAVEN_MAVEN3_PERSONALITY, false);
