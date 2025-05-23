@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
@@ -215,6 +216,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     @Override
+    @Nullable
     public String getSystemProperty(String key) {
         Record record = records.get();
         if (record != null) {
@@ -237,6 +239,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     @Override
+    @Nullable
     public String getUserProperty(String key) {
         Record record = records.get();
         if (record != null) {
@@ -280,6 +283,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     @Override
+    @Nullable
     public String getModelProperty(String key) {
         Record record = records.get();
         if (record != null) {
@@ -327,6 +331,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     @Override
+    @Nullable
     public String interpolatePath(String path) throws InterpolatorException {
         if (path == null) {
             return null;

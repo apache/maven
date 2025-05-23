@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
@@ -251,14 +252,17 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
             this.repository = repository;
         }
 
+        @Nullable
         public String pathOf(org.apache.maven.artifact.Artifact artifact) {
             return null;
         }
 
+        @Nullable
         public String pathOfRemoteRepositoryMetadata(ArtifactMetadata artifactMetadata) {
             return null;
         }
 
+        @Nullable
         public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
             return null;
         }
@@ -269,6 +273,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
         public void setUrl(String url) {}
 
+        @Nullable
         public String getBasedir() {
             return null;
         }
@@ -283,18 +288,21 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
         public void setId(String id) {}
 
+        @Nullable
         public ArtifactRepositoryPolicy getSnapshots() {
             return null;
         }
 
         public void setSnapshotUpdatePolicy(ArtifactRepositoryPolicy policy) {}
 
+        @Nullable
         public ArtifactRepositoryPolicy getReleases() {
             return null;
         }
 
         public void setReleaseUpdatePolicy(ArtifactRepositoryPolicy policy) {}
 
+        @Nullable
         public ArtifactRepositoryLayout getLayout() {
             return null;
         }
@@ -315,6 +323,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
         public void setBlacklisted(boolean blackListed) {}
 
+        @Nullable
         public org.apache.maven.artifact.Artifact find(org.apache.maven.artifact.Artifact artifact) {
             return null;
         }
@@ -329,12 +338,14 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
         public void setAuthentication(Authentication authentication) {}
 
+        @Nullable
         public Authentication getAuthentication() {
             return null;
         }
 
         public void setProxy(Proxy proxy) {}
 
+        @Nullable
         public Proxy getProxy() {
             return null;
         }

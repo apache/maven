@@ -28,6 +28,7 @@ import java.util.List;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
+import org.apache.maven.api.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ public class IdeWorkspaceReader implements WorkspaceReader {
     }
 
     @Override
+    @Nullable
     public File findArtifact(Artifact artifact) {
         log.info("findArtifact({})", artifact);
         return null;

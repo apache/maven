@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.Model;
 
 /**
@@ -87,6 +88,7 @@ public class ModelBuildingException extends Exception {
      *
      * @return The erroneous model or {@code null} if not available.
      */
+    @Nullable
     public Model getModel() {
         if (result == null) {
             return null;

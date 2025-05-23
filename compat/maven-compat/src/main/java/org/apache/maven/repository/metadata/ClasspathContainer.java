@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
 /**
@@ -68,6 +69,7 @@ public class ClasspathContainer implements Iterable<ArtifactMetadata> {
     }
 
     // -------------------------------------------------------------------------------------------
+    @Nullable
     public MetadataTreeNode getClasspathAsTree() throws MetadataResolutionException {
         if (classpath == null || classpath.size() < 1) {
             return null;

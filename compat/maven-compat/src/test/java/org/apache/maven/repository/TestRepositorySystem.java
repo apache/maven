@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -164,6 +165,7 @@ public class TestRepositorySystem implements RepositorySystem {
     }
 
     @Override
+    @Nullable
     public Artifact createPluginArtifact(Plugin plugin) {
         VersionRange versionRange;
         try {
@@ -190,6 +192,7 @@ public class TestRepositorySystem implements RepositorySystem {
     }
 
     @Override
+    @Nullable
     public Mirror getMirror(ArtifactRepository repository, List<Mirror> mirrors) {
         return null;
     }

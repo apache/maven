@@ -18,6 +18,7 @@
  */
 package org.apache.maven.artifact.repository.metadata;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -58,6 +59,7 @@ public class ArtifactRepositoryMetadata extends AbstractRepositoryMetadata {
         return artifact.getArtifactId();
     }
 
+    @Nullable
     public String getBaseVersion() {
         // Don't want the artifact's version in here, as this is stored in the directory above that
         return null;
@@ -93,6 +95,7 @@ public class ArtifactRepositoryMetadata extends AbstractRepositoryMetadata {
         return version != null && ArtifactUtils.isSnapshot(version.getQualifier());
     }
 
+    @Nullable
     public ArtifactRepository getRepository() {
         return null;
     }

@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.maven.api.Project;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
@@ -246,6 +247,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         public void setLog(Log log) {}
 
         @Override
+        @Nullable
         public Log getLog() {
             return null;
         }

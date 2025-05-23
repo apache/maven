@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
@@ -50,6 +51,7 @@ public class TestMavenWorkspaceReader implements MavenWorkspaceReader {
     }
 
     @Override
+    @Nullable
     public File findArtifact(Artifact artifact) {
         return null;
     }
@@ -60,6 +62,7 @@ public class TestMavenWorkspaceReader implements MavenWorkspaceReader {
     }
 
     @Override
+    @Nullable
     public Model findModel(Artifact artifact) {
         if (GROUP_ID.equals(artifact.getGroupId())
                 && ARTIFACT_ID.equals(artifact.getArtifactId())

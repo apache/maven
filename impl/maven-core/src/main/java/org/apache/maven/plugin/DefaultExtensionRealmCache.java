@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -108,6 +109,7 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
         return new CacheKey(extensionArtifacts);
     }
 
+    @Nullable
     public CacheRecord get(Key key) {
         return cache.get(key);
     }

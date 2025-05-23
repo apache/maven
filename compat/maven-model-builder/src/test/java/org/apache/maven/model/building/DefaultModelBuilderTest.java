@@ -18,6 +18,7 @@
  */
 package org.apache.maven.model.building;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
@@ -111,11 +112,13 @@ public class DefaultModelBuilderTest {
         }
 
         @Override
+        @Nullable
         public ModelSource resolveModel(Parent parent) throws UnresolvableModelException {
             return null;
         }
 
         @Override
+        @Nullable
         public ModelSource resolveModel(Dependency dependency) throws UnresolvableModelException {
             return null;
         }

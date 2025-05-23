@@ -473,11 +473,13 @@ public interface XmlNode {
             }
 
             @Override
+            @Nullable
             public String attribute(@Nonnull String name) {
                 return attributes.get(name);
             }
 
             @Override
+            @Nullable
             public XmlNode child(String name) {
                 if (name != null) {
                     ListIterator<XmlNode> it = children.listIterator(children.size());

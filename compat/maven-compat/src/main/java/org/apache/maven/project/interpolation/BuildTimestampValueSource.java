@@ -21,6 +21,7 @@ package org.apache.maven.project.interpolation;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
 /**
@@ -41,6 +42,7 @@ public class BuildTimestampValueSource extends AbstractValueSource {
         this.format = format;
     }
 
+    @Nullable
     public Object getValue(String expression) {
         if ("build.timestamp".equals(expression) || "maven.build.timestamp".equals(expression)) {
             if (formattedDate == null && startTime != null) {
