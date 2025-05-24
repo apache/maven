@@ -22,14 +22,18 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * IT that verifies that lifecycle participant
  * methods are invoked even with various build failures/errors.
  */
-@SuppressWarnings("checkstyle:UnusedLocalVariable")
 class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenIntegrationTestCase {
+
+    private static final String COMMAND_LINE_AND_LOG = "Exit code was non-zero: 1; command line and log";
+
     MavenITmng5640LifecycleParticipantAfterSessionEnd() {
         super("[3.2.2,)");
     }
@@ -92,6 +96,7 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
         // See https://issues.apache.org/jira/browse/MNG-5641
         // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
         verifier.verifyFilePresent("target/afterSessionEnd.txt");
+        assertThat(exception.getMessage(), startsWith(COMMAND_LINE_AND_LOG));
     }
 
     /**
@@ -129,6 +134,7 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
         // See https://issues.apache.org/jira/browse/MNG-5641
         // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
         verifier.verifyFilePresent("target/afterSessionEnd.txt");
+        assertThat(exception.getMessage(), startsWith(COMMAND_LINE_AND_LOG));
     }
 
     /**
@@ -166,5 +172,6 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
         // See https://issues.apache.org/jira/browse/MNG-5641
         // verifier.verifyFilePresent( "target/afterSessionStart.txt" );
         verifier.verifyFilePresent("target/afterSessionEnd.txt");
+        assertThat(exception.getMessage(), startsWith(COMMAND_LINE_AND_LOG));
     }
 }
