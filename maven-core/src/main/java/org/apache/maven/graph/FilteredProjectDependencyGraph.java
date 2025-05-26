@@ -55,6 +55,20 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
             this.transitive = transitive;
             this.upstream = upstream;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Key key = (Key) o;
+            return Objects.equals(project, key.project) && transitive == key.transitive && upstream == key.upstream;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(project, transitive, upstream);
+        }
     }
 
     /**
