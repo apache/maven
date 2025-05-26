@@ -23,15 +23,16 @@ import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.api.feature.Features;
-import org.apache.maven.api.services.ModelBuilderException;
-import org.apache.maven.internal.transformation.PomArtifactTransformer;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.deployment.DeployRequest;
-import org.eclipse.aether.installation.InstallRequest;
 
 /**
  * Inliner POM transformer.
@@ -40,28 +41,45 @@ import org.eclipse.aether.installation.InstallRequest;
  */
 @Singleton
 @Named
-class PomInlinerTransformer implements PomArtifactTransformer {
-    @Override
-    public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
-        return request;
-    }
+class PomInlinerTransformer extends TransformerSupport {
+    protected static final Pattern PLACEHOLDER_EXPRESSION = Pattern.compile("\\$\\{(.+?)}");
 
     @Override
-    public DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
-        return request;
-    }
-
-    @Override
-    public void injectTransformedArtifacts(RepositorySystemSession session, MavenProject currentProject)
-            throws IOException {
+    public void injectTransformedArtifacts(RepositorySystemSession session, MavenProject project) throws IOException {
         if (!Features.consumerPom(session.getConfigProperties())) {
-            // TODO
+            try {
+                Model model = read(project.getFile().toPath());
+                String version = model.getVersion();
+                String newVersion = version;
+                int lastEnd = -1;
+                if (version != null) {
+                    Matcher m = PLACEHOLDER_EXPRESSION.matcher(version.trim());
+                    while (m.find()) {
+                        String property = m.group(1);
+                        if (!session.getConfigProperties().containsKey(property)) {
+                            throw new IllegalArgumentException("Cannot inline property " + property);
+                        }
+                        String propertyValue =
+                                (String) session.getConfigProperties().get(property);
+                        if (lastEnd < 0) {
+                            newVersion = version.substring(0, m.start());
+                        } else {
+                            newVersion += version.substring(lastEnd, m.start());
+                        }
+                        lastEnd = m.end();
+                        newVersion += propertyValue;
+                    }
+                    if (!Objects.equals(version, newVersion)) {
+                        model = model.withVersion(newVersion);
+                        Path tmpPom = Files.createTempFile(
+                                project.getArtifactId() + "-" + project.getVersion() + "-", ".xml");
+                        write(model, tmpPom);
+                        project.setFile(tmpPom.toFile());
+                    }
+                }
+            } catch (XMLStreamException e) {
+                throw new IOException("Problem during inlining POM", e);
+            }
         }
-    }
-
-    @Override
-    public void transform(MavenProject project, RepositorySystemSession session, Path src, Path tgt)
-            throws ModelBuilderException, XMLStreamException, IOException {
-        // TODO
     }
 }

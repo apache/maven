@@ -22,11 +22,9 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -37,6 +35,8 @@ import org.apache.maven.internal.transformation.PomArtifactTransformer;
 import org.apache.maven.internal.transformation.TransformationFailedException;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.internal.impl.checksum.Sha1ChecksumAlgorithmFactory;
+import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmHelper;
 
 /**
  * Transformed artifact is derived with some transformation from source artifact.
@@ -98,12 +98,12 @@ class TransformedArtifact extends DefaultArtifact {
                 return null;
             }
             return target.toFile();
-        } catch (IOException | NoSuchAlgorithmException | XMLStreamException | ModelBuilderException e) {
+        } catch (IOException | XMLStreamException | ModelBuilderException e) {
             throw new TransformationFailedException(e);
         }
     }
 
-    private String mayUpdate() throws IOException, NoSuchAlgorithmException, XMLStreamException, ModelBuilderException {
+    private String mayUpdate() throws IOException, XMLStreamException, ModelBuilderException {
         String result;
         Path src = sourcePathProvider.get();
         if (src == null) {
@@ -113,7 +113,8 @@ class TransformedArtifact extends DefaultArtifact {
             Files.deleteIfExists(target);
             result = "";
         } else {
-            String current = sha1(src);
+            String current = ChecksumAlgorithmHelper.calculate(src, List.of(new Sha1ChecksumAlgorithmFactory()))
+                    .get(Sha1ChecksumAlgorithmFactory.NAME);
             String existing = sourceState.get();
             if (!Files.exists(target) || !Objects.equals(current, existing)) {
                 pomArtifactTransformer.transform(project, session, src, target);
@@ -123,21 +124,5 @@ class TransformedArtifact extends DefaultArtifact {
         }
         sourceState.set(result);
         return result;
-    }
-
-    static String sha1(Path path) throws NoSuchAlgorithmException, IOException {
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
-        try (InputStream fis = Files.newInputStream(path)) {
-            byte[] buffer = new byte[SHA1_BUFFER_SIZE];
-            int read;
-            while ((read = fis.read(buffer)) != -1) {
-                md.update(buffer, 0, read);
-            }
-        }
-        StringBuilder result = new StringBuilder();
-        for (byte b : md.digest()) {
-            result.append(String.format("%02x", b));
-        }
-        return result.toString();
     }
 }

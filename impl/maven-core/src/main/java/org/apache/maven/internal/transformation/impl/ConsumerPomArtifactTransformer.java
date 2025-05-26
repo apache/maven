@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,8 +36,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderException;
-import org.apache.maven.internal.transformation.PomArtifactTransformer;
-import org.apache.maven.model.v4.MavenStaxWriter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.RepositorySystemSession;
@@ -55,14 +52,10 @@ import org.eclipse.sisu.PreDestroy;
  */
 @Singleton
 @Named
-class ConsumerPomArtifactTransformer implements PomArtifactTransformer {
+class ConsumerPomArtifactTransformer extends TransformerSupport {
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
     private static final String BUILD_POM_CLASSIFIER = "build";
-
-    private static final String NAMESPACE_FORMAT = "http://maven.apache.org/POM/%s";
-
-    private static final String SCHEMA_LOCATION_FORMAT = "https://maven.apache.org/xsd/maven-%s.xsd";
 
     private final Set<Path> toDelete = new CopyOnWriteArraySet<>();
 
@@ -193,17 +186,5 @@ class ConsumerPomArtifactTransformer implements PomArtifactTransformer {
             artifacts = result;
         }
         return artifacts;
-    }
-
-    void write(Model model, Path dest) throws IOException, XMLStreamException {
-        String version = model.getModelVersion();
-        Files.createDirectories(dest.getParent());
-        try (Writer w = Files.newBufferedWriter(dest)) {
-            MavenStaxWriter writer = new MavenStaxWriter();
-            writer.setNamespace(String.format(NAMESPACE_FORMAT, version));
-            writer.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
-            writer.setAddLocationInformation(false);
-            writer.write(w, model);
-        }
     }
 }
