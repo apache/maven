@@ -1512,24 +1512,34 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         /**
+         * Record to store both the parent model and its activated profiles for caching.
+         */
+        private record ParentModelWithProfiles(Model model, List<Profile> activatedProfiles) {}
+
+        /**
          * Reads the request source's parent.
          */
         Model readAsParentModel(DefaultProfileActivationContext profileActivationContext) throws ModelBuilderException {
-            Map<DefaultProfileActivationContext.Record, Model> parentsPerContext =
+            Map<DefaultProfileActivationContext.Record, ParentModelWithProfiles> parentsPerContext =
                     cache(request.getSource(), PARENT, ConcurrentHashMap::new);
-            for (Map.Entry<DefaultProfileActivationContext.Record, Model> e : parentsPerContext.entrySet()) {
+            for (Map.Entry<DefaultProfileActivationContext.Record, ParentModelWithProfiles> e :
+                    parentsPerContext.entrySet()) {
                 if (e.getKey().matches(profileActivationContext)) {
-                    return e.getValue();
+                    ParentModelWithProfiles cached = e.getValue();
+                    // Add the activated profiles from cache to the result
+                    addActivePomProfiles(cached.activatedProfiles());
+                    return cached.model();
                 }
             }
             DefaultProfileActivationContext ctx = profileActivationContext.start();
-            Model model = doReadAsParentModel(ctx);
+            ParentModelWithProfiles modelWithProfiles = doReadAsParentModel(ctx);
             DefaultProfileActivationContext.Record record = ctx.stop();
-            parentsPerContext.put(record, model);
-            return model;
+            parentsPerContext.put(record, modelWithProfiles);
+            addActivePomProfiles(modelWithProfiles.activatedProfiles());
+            return modelWithProfiles.model();
         }
 
-        private Model doReadAsParentModel(DefaultProfileActivationContext profileActivationContext)
+        private ParentModelWithProfiles doReadAsParentModel(DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
             Model raw = readRawModel();
             Model parentData = readParent(raw, profileActivationContext);
@@ -1558,9 +1568,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model injectedParentModel = profileInjector
                     .injectProfiles(parent, parentActivePomProfiles, request, this)
                     .withProfiles(List.of());
-            addActivePomProfiles(parentActivePomProfiles);
 
-            return injectedParentModel.withParent(null);
+            // Note: addActivePomProfiles() will be called by the caller for cache miss case
+            return new ParentModelWithProfiles(injectedParentModel.withParent(null), parentActivePomProfiles);
         }
 
         private Model importDependencyManagement(Model model, Collection<String> importIds) {
