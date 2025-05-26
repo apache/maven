@@ -24,6 +24,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
@@ -41,6 +42,34 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
     private final Map<MavenProject, ?> whiteList;
 
     private final List<MavenProject> sortedProjects;
+
+    private final Map<Key, List<MavenProject>> cache = new ConcurrentHashMap<>();
+
+    private static class Key {
+        private final MavenProject project;
+        private final boolean transitive;
+        private final boolean upstream;
+
+        private Key(MavenProject project, boolean transitive, boolean upstream) {
+            this.project = project;
+            this.transitive = transitive;
+            this.upstream = upstream;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Key key = (Key) o;
+            return Objects.equals(project, key.project) && transitive == key.transitive && upstream == key.upstream;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(project, transitive, upstream);
+        }
+    }
 
     /**
      * Creates a new project dependency graph from the specified graph.
@@ -76,12 +105,28 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
 
     @Override
     public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
-        return applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive), transitive, false);
+        Key key = new Key(project, transitive, false);
+        // Do not use computeIfAbsent here, as the computation is recursive
+        // and this is not supported by computeIfAbsent.
+        List<MavenProject> list = cache.get(key);
+        if (list == null) {
+            list = applyFilter(projectDependencyGraph.getDownstreamProjects(project, transitive), transitive, false);
+            cache.put(key, list);
+        }
+        return list;
     }
 
     @Override
     public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
-        return applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive), transitive, true);
+        Key key = new Key(project, transitive, true);
+        // Do not use computeIfAbsent here, as the computation is recursive
+        // and this is not supported by computeIfAbsent.
+        List<MavenProject> list = cache.get(key);
+        if (list == null) {
+            list = applyFilter(projectDependencyGraph.getUpstreamProjects(project, transitive), transitive, true);
+            cache.put(key, list);
+        }
+        return list;
     }
 
     /**
