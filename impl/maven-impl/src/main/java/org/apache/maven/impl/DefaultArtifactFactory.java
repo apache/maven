@@ -27,14 +27,14 @@ import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 @Named
 @Singleton
 public class DefaultArtifactFactory implements ArtifactFactory {
     @Override
     public Artifact create(@Nonnull ArtifactFactoryRequest request) {
-        nonNull(request, "request");
+        requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
         ArtifactType type = null;
         if (request.getType() != null) {
@@ -59,7 +59,7 @@ public class DefaultArtifactFactory implements ArtifactFactory {
 
     @Override
     public ProducedArtifact createProduced(@Nonnull ArtifactFactoryRequest request) {
-        nonNull(request, "request");
+        requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
         ArtifactType type = null;
         if (request.getType() != null) {

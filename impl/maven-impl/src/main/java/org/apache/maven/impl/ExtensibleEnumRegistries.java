@@ -42,7 +42,7 @@ import org.apache.maven.api.spi.LanguageProvider;
 import org.apache.maven.api.spi.PathScopeProvider;
 import org.apache.maven.api.spi.ProjectScopeProvider;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 public class ExtensibleEnumRegistries {
 
@@ -97,7 +97,7 @@ public class ExtensibleEnumRegistries {
 
         @Override
         public Optional<T> lookup(String id) {
-            return Optional.ofNullable(values.get(nonNull(id, "id").toLowerCase(Locale.ROOT)));
+            return Optional.ofNullable(values.get(requireNonNull(id, "id").toLowerCase(Locale.ROOT)));
         }
     }
 }
