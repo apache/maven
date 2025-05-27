@@ -52,8 +52,8 @@ public class ItMojo extends AbstractMojo {
     private File outputFile;
 
     public void execute() throws MojoExecutionException {
+        outputFile.getParentFile().mkdirs();
         try {
-            outputFile.getParentFile().mkdirs();
             outputFile.createNewFile();
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to create touch file: " + e.getMessage(), e);

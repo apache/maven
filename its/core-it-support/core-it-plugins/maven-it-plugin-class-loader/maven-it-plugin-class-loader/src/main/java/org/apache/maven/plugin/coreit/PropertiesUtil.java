@@ -36,8 +36,8 @@ class PropertiesUtil {
 
     public static void write(File outputFile, Properties props) throws MojoExecutionException {
         OutputStream out = null;
+        outputFile.getParentFile().mkdirs();
         try {
-            outputFile.getParentFile().mkdirs();
             out = new FileOutputStream(outputFile);
             props.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
