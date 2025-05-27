@@ -45,7 +45,7 @@ class FilteredProjectDependencyGraphTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void downstreamProjectsSoudabehCached(boolean transitive) {
+    void downstreamProjectsShouldBeCached(boolean transitive) {
         FilteredProjectDependencyGraph graph =
                 new FilteredProjectDependencyGraph(projectDependencyGraph, List.of(aProject));
 
@@ -59,7 +59,7 @@ class FilteredProjectDependencyGraphTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void upstreamProjectsSoudabehCached(boolean transitive) {
+    void upstreamProjectsShouldBeCached(boolean transitive) {
         FilteredProjectDependencyGraph graph =
                 new FilteredProjectDependencyGraph(projectDependencyGraph, List.of(aProject));
 
