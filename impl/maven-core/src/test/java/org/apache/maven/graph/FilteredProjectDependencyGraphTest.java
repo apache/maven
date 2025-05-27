@@ -28,7 +28,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -55,7 +54,7 @@ class FilteredProjectDependencyGraphTest {
         graph.getDownstreamProjects(bProject, transitive);
         graph.getDownstreamProjects(bProject, transitive);
 
-        verify(projectDependencyGraph, times(1)).getDownstreamProjects(bProject, transitive);
+        verify(projectDependencyGraph).getDownstreamProjects(bProject, transitive);
     }
 
     @ParameterizedTest
@@ -69,7 +68,7 @@ class FilteredProjectDependencyGraphTest {
         graph.getUpstreamProjects(bProject, transitive);
         graph.getUpstreamProjects(bProject, transitive);
 
-        verify(projectDependencyGraph, times(1)).getUpstreamProjects(bProject, transitive);
+        verify(projectDependencyGraph).getUpstreamProjects(bProject, transitive);
     }
 
     private static MavenProject createProject(String id) {
