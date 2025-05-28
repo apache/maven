@@ -16,30 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
+package org.apache.maven.cling.invoker.mvnup.jdom;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+import org.eclipse.aether.artifact.Artifact;
 
 /**
- * Represents most common tools supported by CLIng.
- *
- * @since 4.0.0
+ * Artifacts.
  */
-@Immutable
-@Experimental
-public final class Tools {
-    private Tools() {}
+public final class Artifacts {
+    private Artifacts() {}
 
-    public static final String MVN_CMD = "mvn";
-    public static final String MVN_NAME = "Maven";
+    public interface Sink extends org.apache.maven.cling.invoker.mvnup.jdom.Sink<Artifact> {}
 
-    public static final String MVNENC_CMD = "mvnenc";
-    public static final String MVNENC_NAME = "Maven Password Encrypting Tool";
-
-    public static final String MVNSHELL_CMD = "mvnsh";
-    public static final String MVNSHELL_NAME = "Maven Shell Tool";
-
-    public static final String MVNUP_CMD = "mvnup";
-    public static final String MVNUP_NAME = "Maven Upgrade Tool";
+    public interface Source extends org.apache.maven.cling.invoker.mvnup.jdom.Source<Artifact> {}
 }

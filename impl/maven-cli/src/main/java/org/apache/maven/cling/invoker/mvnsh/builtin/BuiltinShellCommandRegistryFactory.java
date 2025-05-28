@@ -44,6 +44,8 @@ import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
 import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
 import org.apache.maven.cling.invoker.mvnenc.Goal;
 import org.apache.maven.cling.invoker.mvnsh.ShellCommandRegistryFactory;
+import org.apache.maven.cling.invoker.mvnup.UpgradeInvoker;
+import org.apache.maven.cling.invoker.mvnup.UpgradeParser;
 import org.apache.maven.impl.util.Os;
 import org.jline.builtins.Completers;
 import org.jline.console.CmdDesc;
@@ -70,6 +72,8 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         private final MavenParser mavenParser;
         private final EncryptInvoker shellEncryptInvoker;
         private final EncryptParser encryptParser;
+        private final UpgradeInvoker shellUpgradeInvoker;
+        private final UpgradeParser upgradeParser;
 
         private BuiltinShellCommandRegistry(LookupContext shellContext) {
             this.shellContext = requireNonNull(shellContext, "shellContext");
@@ -77,12 +81,15 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             this.mavenParser = new MavenParser();
             this.shellEncryptInvoker = new EncryptInvoker(shellContext.invokerRequest.lookup(), contextCopier());
             this.encryptParser = new EncryptParser();
+            this.shellUpgradeInvoker = new UpgradeInvoker(shellContext.invokerRequest.lookup(), contextCopier());
+            this.upgradeParser = new UpgradeParser();
             Map<String, CommandMethods> commandExecute = new HashMap<>();
             commandExecute.put("!", new CommandMethods(this::shell, this::defaultCompleter));
             commandExecute.put("cd", new CommandMethods(this::cd, this::cdCompleter));
             commandExecute.put("pwd", new CommandMethods(this::pwd, this::defaultCompleter));
             commandExecute.put("mvn", new CommandMethods(this::mvn, this::mvnCompleter));
             commandExecute.put("mvnenc", new CommandMethods(this::mvnenc, this::mvnencCompleter));
+            commandExecute.put("mvnup", new CommandMethods(this::mvnup, this::mvnupCompleter));
             registerCommands(commandExecute);
         }
 
@@ -113,6 +120,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         public void close() throws Exception {
             shellMavenInvoker.close();
             shellEncryptInvoker.close();
+            shellUpgradeInvoker.close();
         }
 
         @Override
@@ -240,6 +248,26 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         private List<Completer> mvnencCompleter(String name) {
             return List.of(new ArgumentCompleter(new StringsCompleter(
                     shellContext.lookup.lookupMap(Goal.class).keySet())));
+        }
+
+        private void mvnup(CommandInput input) {
+            try {
+                shellUpgradeInvoker.invoke(upgradeParser.parseInvocation(
+                        ParserRequest.mvnup(input.args(), shellContext.invokerRequest.messageBuilderFactory())
+                                .cwd(shellContext.cwd.get())
+                                .build()));
+            } catch (InvokerException.ExitException e) {
+                shellContext.logger.error("mvnup command exited with exit code " + e.getExitCode());
+            } catch (Exception e) {
+                saveException(e);
+            }
+        }
+
+        private List<Completer> mvnupCompleter(String name) {
+            return List.of(new ArgumentCompleter(new StringsCompleter(shellContext
+                    .lookup
+                    .lookupMap(org.apache.maven.cling.invoker.mvnup.Goal.class)
+                    .keySet())));
         }
     }
 

@@ -230,6 +230,30 @@ public interface ParserRequest {
     }
 
     /**
+     * Creates a new Builder instance for constructing a Maven Upgrade Tool ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvnup(@Nonnull String[] args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvnup(Arrays.asList(args), messageBuilderFactory);
+    }
+
+    /**
+     * Creates a new Builder instance for constructing a Maven Upgrade Tool ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvnup(@Nonnull List<String> args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(Tools.MVNUP_CMD, Tools.MVNUP_NAME, args, messageBuilderFactory);
+    }
+
+    /**
      * Creates a new Builder instance for constructing a ParserRequest.
      *
      * @param command the Maven command to be executed
