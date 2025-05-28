@@ -342,7 +342,7 @@ public class DefaultInterpolator implements Interpolator {
                     break;
                 }
             } else {
-                throw new InterpolatorException("Bad substitution operator in: ${" + org + "}");
+                throw new InterpolatorException("Bad substitution operator in: ${" + variable + "}");
             }
 
             startIdx = nextIdx >= 0 ? nextIdx : variable.length();
