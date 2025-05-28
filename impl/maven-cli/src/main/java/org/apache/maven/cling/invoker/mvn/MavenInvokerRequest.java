@@ -70,6 +70,7 @@ public class MavenInvokerRequest extends BaseInvokerRequest {
      * The mandatory Maven options.
      */
     @Nonnull
+    @Override
     public MavenOptions options() {
         return options;
     }

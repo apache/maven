@@ -94,6 +94,7 @@ public class MavenExecutionPlan implements Iterable<ExecutionPlanItem> {
         }
     }
 
+    @Override
     public Iterator<ExecutionPlanItem> iterator() {
         return getExecutionPlanItems().iterator();
     }

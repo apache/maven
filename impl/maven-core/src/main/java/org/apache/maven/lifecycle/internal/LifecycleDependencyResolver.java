@@ -358,6 +358,7 @@ public class LifecycleDependencyResolver {
             }
         }
 
+        @Override
         public boolean accept(DependencyNode node, List<DependencyNode> parents) {
             Dependency dependency = node.getDependency();
             if (dependency != null) {

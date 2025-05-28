@@ -40,6 +40,7 @@ class DefaultPluginVersionResult implements PluginVersionResult {
         this.version = version;
     }
 
+    @Override
     public String getVersion() {
         return version;
     }
@@ -48,6 +49,7 @@ class DefaultPluginVersionResult implements PluginVersionResult {
         this.version = version;
     }
 
+    @Override
     public ArtifactRepository getRepository() {
         return repository;
     }

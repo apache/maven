@@ -319,6 +319,7 @@ public class RepositoryUtils {
             this.handlerManager = handlerManager;
         }
 
+        @Override
         public ArtifactType get(String stereotypeId) {
             ArtifactHandler handler = handlerManager.getArtifactHandler(stereotypeId);
             return newArtifactType(stereotypeId, handler);

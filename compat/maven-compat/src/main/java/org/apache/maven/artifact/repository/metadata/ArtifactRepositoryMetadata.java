@@ -42,36 +42,44 @@ public class ArtifactRepositoryMetadata extends AbstractRepositoryMetadata {
         this.artifact = artifact;
     }
 
+    @Override
     public boolean storedInGroupDirectory() {
         return false;
     }
 
+    @Override
     public boolean storedInArtifactVersionDirectory() {
         return false;
     }
 
+    @Override
     public String getGroupId() {
         return artifact.getGroupId();
     }
 
+    @Override
     public String getArtifactId() {
         return artifact.getArtifactId();
     }
 
+    @Override
     public String getBaseVersion() {
         // Don't want the artifact's version in here, as this is stored in the directory above that
         return null;
     }
 
+    @Override
     public Object getKey() {
         return "artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
+    @Override
     public boolean isSnapshot() {
         // Don't consider the artifact's version in here, as this is stored in the directory above that
         return false;
     }
 
+    @Override
     public int getNature() {
         if (artifact.getVersion() != null) {
             return artifact.isSnapshot() ? SNAPSHOT : RELEASE;
@@ -93,10 +101,12 @@ public class ArtifactRepositoryMetadata extends AbstractRepositoryMetadata {
         return version != null && ArtifactUtils.isSnapshot(version.getQualifier());
     }
 
+    @Override
     public ArtifactRepository getRepository() {
         return null;
     }
 
+    @Override
     public void setRepository(ArtifactRepository remoteRepository) {
         /*
          * NOTE: Metadata at the g:a level contains a collection of available versions. After merging, we can't tell

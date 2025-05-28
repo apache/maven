@@ -70,6 +70,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
         this.builder = builder;
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public void injectTransformedArtifacts(RepositorySystemSession session, MavenProject project) throws IOException {
         if (project.getFile() == null) {
@@ -128,6 +129,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
         }
     }
 
+    @Override
     public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
         if (consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));
@@ -135,6 +137,7 @@ class DefaultConsumerPomArtifactTransformer implements ConsumerPomArtifactTransf
         return request;
     }
 
+    @Override
     public DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
         if (consumerPomPresent(request.getArtifacts())) {
             request.setArtifacts(replacePom(request.getArtifacts()));

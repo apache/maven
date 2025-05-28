@@ -47,6 +47,7 @@ public class PathTranslatingPostProcessor implements InterpolationPostProcessor 
         this.pathTranslator = pathTranslator;
     }
 
+    @Override
     public Object execute(String expression, Object value) {
         expression = ValueSourceUtils.trimPrefix(expression, expressionPrefixes, true);
 

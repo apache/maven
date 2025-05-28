@@ -116,6 +116,7 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
 
     protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
 
+    @Override
     public Key createKey(
             Plugin plugin,
             DependencyFilter extensionFilter,
@@ -124,6 +125,7 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
         return new CacheKey(plugin, extensionFilter, repositories, session);
     }
 
+    @Override
     public CacheRecord get(Key key) throws PluginResolutionException {
         CacheRecord cacheRecord = cache.get(key);
 
@@ -134,6 +136,7 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
         return cacheRecord;
     }
 
+    @Override
     public CacheRecord put(Key key, List<Artifact> pluginArtifacts) {
         Objects.requireNonNull(pluginArtifacts, "pluginArtifacts cannot be null");
 
@@ -152,6 +155,7 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
         }
     }
 
+    @Override
     public CacheRecord put(Key key, PluginResolutionException exception) {
         Objects.requireNonNull(exception, "exception cannot be null");
 
@@ -164,6 +168,7 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
         return record;
     }
 
+    @Override
     public void flush() {
         cache.clear();
     }
@@ -176,6 +181,7 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
         return CacheUtils.pluginEquals(a, b);
     }
 
+    @Override
     public void register(MavenProject project, Key cacheKey, CacheRecord record) {
         // default cache does not track record usage
     }

@@ -31,6 +31,7 @@ public class DefaultEventSpyContext implements EventSpy.Context {
 
     private final Map<String, Object> data = new HashMap<>();
 
+    @Override
     public Map<String, Object> getData() {
         return data;
     }

@@ -41,10 +41,12 @@ public class DefaultRuntimeInformation implements RuntimeInformation, Initializa
 
     private ArtifactVersion applicationVersion;
 
+    @Override
     public ArtifactVersion getApplicationVersion() {
         return applicationVersion;
     }
 
+    @Override
     public void initialize() throws InitializationException {
         String mavenVersion = rtInfo.getMavenVersion();
 

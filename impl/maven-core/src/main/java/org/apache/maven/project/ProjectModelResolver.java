@@ -110,6 +110,7 @@ public class ProjectModelResolver implements ModelResolver {
         this.modelPool = original.modelPool;
     }
 
+    @Override
     public void addRepository(Repository repository) throws InvalidRepositoryException {
         addRepository(repository, false);
     }
@@ -149,10 +150,12 @@ public class ProjectModelResolver implements ModelResolver {
         }
     }
 
+    @Override
     public ModelResolver newCopy() {
         return new ProjectModelResolver(this);
     }
 
+    @Override
     public ModelSource resolveModel(String groupId, String artifactId, String version)
             throws UnresolvableModelException {
         File pomFile = null;

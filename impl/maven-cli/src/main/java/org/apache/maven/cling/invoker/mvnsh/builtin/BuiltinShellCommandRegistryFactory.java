@@ -60,6 +60,7 @@ import static java.util.Objects.requireNonNull;
 @Named("builtin")
 @Singleton
 public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryFactory {
+    @Override
     public CommandRegistry createShellCommandRegistry(LookupContext context) {
         return new BuiltinShellCommandRegistry(context);
     }

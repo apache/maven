@@ -56,6 +56,7 @@ class ValidatingConfigurationListener implements ConfigurationListener {
         return missingParameters.values();
     }
 
+    @Override
     public void notifyFieldChangeUsingSetter(String fieldName, Object value, Object target) {
         delegate.notifyFieldChangeUsingSetter(fieldName, value, target);
 
@@ -64,6 +65,7 @@ class ValidatingConfigurationListener implements ConfigurationListener {
         }
     }
 
+    @Override
     public void notifyFieldChangeUsingReflection(String fieldName, Object value, Object target) {
         delegate.notifyFieldChangeUsingReflection(fieldName, value, target);
 

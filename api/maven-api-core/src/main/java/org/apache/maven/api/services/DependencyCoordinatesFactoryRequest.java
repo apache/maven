@@ -282,6 +282,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                 return type;
             }
 
+            @Override
             public String getCoordinatesString() {
                 return coordinateString;
             }

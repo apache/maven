@@ -45,6 +45,7 @@ public class MavenServiceProvider implements SLF4JServiceProvider {
         return ServiceLoader.load(MavenLoggerFactory.class).findFirst().orElseGet(MavenLoggerFactory::new);
     }
 
+    @Override
     public ILoggerFactory getLoggerFactory() {
         return loggerFactory;
     }

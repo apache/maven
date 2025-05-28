@@ -46,6 +46,7 @@ public class DefaultMavenProjectHelper extends AbstractLogEnabled implements Mav
         this.artifactHandlerManager = artifactHandlerManager;
     }
 
+    @Override
     public void attachArtifact(
             MavenProject project, String artifactType, String artifactClassifier, File artifactFile) {
         ArtifactHandler handler = null;
@@ -66,6 +67,7 @@ public class DefaultMavenProjectHelper extends AbstractLogEnabled implements Mav
         attachArtifact(project, artifact);
     }
 
+    @Override
     public void attachArtifact(MavenProject project, String artifactType, File artifactFile) {
         ArtifactHandler handler = artifactHandlerManager.getArtifactHandler(artifactType);
 
@@ -77,6 +79,7 @@ public class DefaultMavenProjectHelper extends AbstractLogEnabled implements Mav
         attachArtifact(project, artifact);
     }
 
+    @Override
     public void attachArtifact(MavenProject project, File artifactFile, String artifactClassifier) {
         Artifact projectArtifact = project.getArtifact();
 
@@ -100,6 +103,7 @@ public class DefaultMavenProjectHelper extends AbstractLogEnabled implements Mav
         project.addAttachedArtifact(artifact);
     }
 
+    @Override
     public void addResource(
             MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes) {
         Resource resource = new Resource();
@@ -110,6 +114,7 @@ public class DefaultMavenProjectHelper extends AbstractLogEnabled implements Mav
         project.addResource(resource);
     }
 
+    @Override
     public void addTestResource(
             MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes) {
         Resource resource = new Resource();

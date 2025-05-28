@@ -31,6 +31,7 @@ import org.apache.maven.model.Repository;
  */
 public class EmptyProjectBuildingHelper implements ProjectBuildingHelper {
 
+    @Override
     public List<ArtifactRepository> createArtifactRepositories(
             List<Repository> pomRepositories,
             List<ArtifactRepository> externalRepositories,
@@ -42,10 +43,12 @@ public class EmptyProjectBuildingHelper implements ProjectBuildingHelper {
         }
     }
 
+    @Override
     public ProjectRealmCache.CacheRecord createProjectRealm(
             MavenProject project, Model model, ProjectBuildingRequest request) {
         return new ProjectRealmCache.CacheRecord(null, null);
     }
 
+    @Override
     public void selectProjectRealm(MavenProject project) {}
 }

@@ -68,6 +68,7 @@ public class DefaultWagonManager extends org.apache.maven.repository.legacy.Defa
     @Inject
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
+    @Override
     public AuthenticationInfo getAuthenticationInfo(String id) {
         MavenSession session = legacySupport.getSession();
 
@@ -101,6 +102,7 @@ public class DefaultWagonManager extends org.apache.maven.repository.legacy.Defa
         return new AuthenticationInfo();
     }
 
+    @Override
     public ProxyInfo getProxy(String protocol) {
         MavenSession session = legacySupport.getSession();
 
@@ -135,17 +137,20 @@ public class DefaultWagonManager extends org.apache.maven.repository.legacy.Defa
         return null;
     }
 
+    @Override
     public void getArtifact(Artifact artifact, ArtifactRepository repository)
             throws TransferFailedException, ResourceDoesNotExistException {
         getArtifact(artifact, repository, null, false);
     }
 
+    @Override
     public void getArtifact(Artifact artifact, List<ArtifactRepository> remoteRepositories)
             throws TransferFailedException, ResourceDoesNotExistException {
         getArtifact(artifact, remoteRepositories, null, false);
     }
 
     @Deprecated
+    @Override
     public ArtifactRepository getMirrorRepository(ArtifactRepository repository) {
 
         Mirror mirror = mirrorSelector.getMirror(
