@@ -283,7 +283,7 @@ public class DefaultInterpolator implements Interpolator {
     }
 
     private static String processSubstitution(
-            String variable,
+            final String variable,
             Set<String> cycleMap,
             Map<String, String> configProps,
             UnaryOperator<String> callback,
