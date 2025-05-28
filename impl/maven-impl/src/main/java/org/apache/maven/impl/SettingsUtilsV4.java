@@ -154,7 +154,7 @@ public final class SettingsUtilsV4 {
 
         profile.properties(modelProfile.getProperties().entrySet().stream()
                 .collect(Collectors.toMap(
-                        e -> e.getKey().toString(), e -> e.getValue().toString())));
+                        e -> e.getKey(), e -> e.getValue())));
         profile.location("properties", toLocation(modelProfile.getLocation("properties")));
 
         List<org.apache.maven.api.model.Repository> repos = modelProfile.getRepositories();
