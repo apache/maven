@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
+import ch.qos.logback.core.Layout;
 import org.apache.maven.impl.model.DefaultInterpolator;
 
 /**
@@ -486,39 +487,40 @@ public class MavenProperties extends AbstractMap<String, String> {
      * @throws IOException if an error occurs
      */
     protected void saveLayout(Writer out, boolean typed) throws IOException {
-        PropertiesWriter writer = new PropertiesWriter(out, typed);
-        if (header != null) {
-            for (String s : header) {
-                writer.writeln(s);
-            }
-        }
+        try (PropertiesWriter writer = new PropertiesWriter(out, typed)) {
 
-        for (String key : storage.keySet()) {
-            Layout l = layout.get(key);
-            if (l != null && l.getCommentLines() != null) {
-                for (String s : l.getCommentLines()) {
+            if (header != null) {
+                for (String s : header) {
                     writer.writeln(s);
                 }
             }
-            if (l != null && l.getValueLines() != null) {
-                for (int i = 0; i < l.getValueLines().size(); i++) {
-                    String s = l.getValueLines().get(i);
-                    if (i < l.getValueLines().size() - 1) {
-                        writer.writeln(s + "\\");
-                    } else {
+
+            for (String key : storage.keySet()) {
+                Layout l = layout.get(key);
+                if (l != null && l.getCommentLines() != null) {
+                    for (String s : l.getCommentLines()) {
                         writer.writeln(s);
                     }
                 }
-            } else {
-                writer.writeProperty(key, storage.get(key));
+                if (l != null && l.getValueLines() != null) {
+                    for (int i = 0; i < l.getValueLines().size(); i++) {
+                        String s = l.getValueLines().get(i);
+                        if (i < l.getValueLines().size() - 1) {
+                            writer.writeln(s + "\\");
+                        } else {
+                            writer.writeln(s);
+                        }
+                    }
+                } else {
+                    writer.writeProperty(key, storage.get(key));
+                }
+            }
+            if (footer != null) {
+                for (String s : footer) {
+                    writer.writeln(s);
+                }
             }
         }
-        if (footer != null) {
-            for (String s : footer) {
-                writer.writeln(s);
-            }
-        }
-        writer.flush();
     }
 
     /**

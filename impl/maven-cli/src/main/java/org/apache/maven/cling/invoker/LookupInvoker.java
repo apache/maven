@@ -408,9 +408,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             // Given the terminal creation has been offloaded to a different thread,
             // do not pass directly the terminal writer
             return msg -> {
-                PrintWriter pw = context.terminal.writer();
-                pw.println(msg);
-                pw.flush();
+                try (PrintWriter pw = context.terminal.writer()) {
+                    pw.println(msg);
+                }
             };
         }
     }

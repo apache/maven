@@ -163,10 +163,8 @@ public class ForkedMavenExecutor implements Executor {
         CountDownLatch latch = new CountDownLatch(3);
         String suffix = "-pump-" + p.pid();
         Thread stdoutPump = new Thread(() -> {
-            try {
-                OutputStream stdout = executorRequest.stdOut().orElse(OutputStream.nullOutputStream());
+            try (OutputStream stdout = executorRequest.stdOut().orElse(OutputStream.nullOutputStream())) {
                 p.getInputStream().transferTo(stdout);
-                stdout.flush();
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             } finally {
@@ -176,10 +174,8 @@ public class ForkedMavenExecutor implements Executor {
         stdoutPump.setName("stdout" + suffix);
         stdoutPump.start();
         Thread stderrPump = new Thread(() -> {
-            try {
-                OutputStream stderr = executorRequest.stdErr().orElse(OutputStream.nullOutputStream());
+            try (OutputStream stderr = executorRequest.stdErr().orElse(OutputStream.nullOutputStream())) {
                 p.getErrorStream().transferTo(stderr);
-                stderr.flush();
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             } finally {
@@ -189,10 +185,8 @@ public class ForkedMavenExecutor implements Executor {
         stderrPump.setName("stderr" + suffix);
         stderrPump.start();
         Thread stdinPump = new Thread(() -> {
-            try {
-                OutputStream in = p.getOutputStream();
+            try (OutputStream in = p.getOutputStream()) {
                 executorRequest.stdIn().orElse(InputStream.nullInputStream()).transferTo(in);
-                in.flush();
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             } finally {
