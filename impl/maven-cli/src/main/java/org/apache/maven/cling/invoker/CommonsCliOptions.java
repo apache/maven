@@ -486,7 +486,9 @@ public abstract class CommonsCliOptions implements Options {
                         System.lineSeparator(),
                         false);
             }
-            Arrays.stream(sw.toString().split(System.lineSeparator())).forEach(pw);
+            for (String s : sw.toString().split(System.lineSeparator())) {
+                pw.accept(s);
+            }
         }
 
         protected String commandLineSyntax(String command) {
