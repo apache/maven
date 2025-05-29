@@ -407,15 +407,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         } else {
             // Given the terminal creation has been offloaded to a different thread,
             // do not pass directly the terminal writer
-            return msg -> {
-                // try (PrintWriter pw = context.terminal.writer()) {
-                //   pw.println(msg);
-                //     pw.flush(); fixme even with flush its not working, why?
-                // }
-                PrintWriter pw = context.terminal.writer();
-                pw.println(msg);
-                pw.flush();
-            };
+            return msg -> context.terminal.writer().println(msg);
         }
     }
 
@@ -446,10 +438,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
-        Logger logger =
-                new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
-        context.logger.drain().forEach(e -> logger.log(e.level(), e.message(), e.error()));
-        context.logger = logger;
+        context.logger = new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
+        context.logger.drain().forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {
@@ -720,10 +710,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         };
     }
 
-    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest)
-            throws Exception {}
+    protected abstract void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) throws Exception;
 
-    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception {}
+    protected abstract void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception;
 
     protected boolean mayDisableInteractiveMode(C context, boolean proposedInteractive) {
         if (!context.invokerRequest.options().forceInteractive().orElse(false)) {

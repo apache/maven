@@ -206,13 +206,11 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
 </settings>""";
         Path dotMvn = cwd.resolve(".mvn");
         Files.createDirectories(dotMvn);
-        Path projectExtensions = dotMvn.resolve("settings.xml");
-        Files.writeString(projectExtensions, settingsXml);
+        Files.writeString(dotMvn.resolve("settings.xml"), settingsXml);
 
         Path userConf = userHome.resolve(".m2");
         Files.createDirectories(userConf);
-        Path userExtensions = userConf.resolve("settings.xml");
-        Files.writeString(userExtensions, settingsXml);
+        Files.writeString(userConf.resolve("settings.xml"), settingsXml);
 
         // we just execute a Mojo for downloading it only and to assert from which URL it came
         Map<String, String> logs = invoke(
