@@ -113,14 +113,12 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
     }
 
     @Override
-    protected void customizeSettingsRequest(EncryptContext context, SettingsBuilderRequest settingsBuilderRequest) throws Exception {
-
-    }
+    protected void customizeSettingsRequest(EncryptContext context, SettingsBuilderRequest settingsBuilderRequest)
+            throws Exception {}
 
     @Override
-    protected void customizeSettingsResult(EncryptContext context, SettingsBuilderResult settingsBuilderResult) throws Exception {
-
-    }
+    protected void customizeSettingsResult(EncryptContext context, SettingsBuilderResult settingsBuilderResult)
+            throws Exception {}
 
     protected int badGoalsErrorMessage(String message, EncryptContext context) {
         context.logger.error(message);
