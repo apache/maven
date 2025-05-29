@@ -438,7 +438,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
-        context.logger = new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
+        context.logger =
+                new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
         context.logger.drain().forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
     }
 
@@ -710,10 +711,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         };
     }
 
-    protected abstract void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest) throws Exception;
-
-    protected abstract void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception;
-
     protected boolean mayDisableInteractiveMode(C context, boolean proposedInteractive) {
         if (!context.invokerRequest.options().forceInteractive().orElse(false)) {
             if (context.invokerRequest.options().nonInteractive().orElse(false)) {
@@ -929,4 +926,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected abstract int execute(C context) throws Exception;
+
+    protected abstract void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest)
+            throws Exception;
+
+    protected abstract void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult)
+            throws Exception;
 }
