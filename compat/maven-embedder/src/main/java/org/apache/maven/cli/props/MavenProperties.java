@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
-import ch.qos.logback.core.Layout;
 import org.apache.maven.impl.model.DefaultInterpolator;
 
 /**
