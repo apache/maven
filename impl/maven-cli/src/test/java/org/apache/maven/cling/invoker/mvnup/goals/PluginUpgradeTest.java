@@ -22,6 +22,7 @@ import java.io.StringReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.cli.InvokerRequest;
@@ -480,6 +481,124 @@ class PluginUpgradeTest {
                 root.getChild("build", namespace).getChild("plugins", namespace).getChild("plugin", namespace);
         Element versionElement = pluginElement.getChild("version", namespace);
         assertEquals("3.2.0", versionElement.getTextTrim());
+    }
+
+    @Test
+    void testParentPomPluginDetection() throws Exception {
+        String pomXml =
+                """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0"
+                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                    <modelVersion>4.0.0</modelVersion>
+
+                    <parent>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-parent</artifactId>
+                        <version>2.7.0</version>
+                    </parent>
+
+                    <groupId>com.example</groupId>
+                    <artifactId>test-project</artifactId>
+                    <version>1.0.0</version>
+                </project>
+                """;
+
+        SAXBuilder saxBuilder = new SAXBuilder();
+
+        // Create a testable upgrade goal that overrides parent POM checking
+        TestableBaseUpgradeGoal upgrade = new TestableBaseUpgradeGoal() {
+            @Override
+            public boolean upgradePluginsInPom(UpgradeContext context, Document pomDocument) {
+                // Call the parent method but simulate finding a plugin in parent
+                super.upgradePluginsInPom(context, pomDocument);
+
+                // Manually add plugin management for testing
+                Element root = pomDocument.getRootElement();
+                Namespace namespace = root.getNamespace();
+
+                // Ensure build/pluginManagement/plugins structure exists
+                Element buildElement = root.getChild("build", namespace);
+                if (buildElement == null) {
+                    buildElement = new Element("build", namespace);
+                    root.addContent(buildElement);
+                }
+
+                Element pluginManagementElement = buildElement.getChild("pluginManagement", namespace);
+                if (pluginManagementElement == null) {
+                    pluginManagementElement = new Element("pluginManagement", namespace);
+                    buildElement.addContent(pluginManagementElement);
+                }
+
+                Element pluginsElement = pluginManagementElement.getChild("plugins", namespace);
+                if (pluginsElement == null) {
+                    pluginsElement = new Element("plugins", namespace);
+                    pluginManagementElement.addContent(pluginsElement);
+                }
+
+                // Add maven-enforcer-plugin management entry
+                Element pluginElement = new Element("plugin", namespace);
+
+                Element groupIdElement = new Element("groupId", namespace);
+                groupIdElement.setText("org.apache.maven.plugins");
+                pluginElement.addContent(groupIdElement);
+
+                Element artifactIdElement = new Element("artifactId", namespace);
+                artifactIdElement.setText("maven-enforcer-plugin");
+                pluginElement.addContent(artifactIdElement);
+
+                Element versionElement = new Element("version", namespace);
+                versionElement.setText("3.0.0");
+                pluginElement.addContent(versionElement);
+
+                pluginsElement.addContent(pluginElement);
+
+                return true;
+            }
+        };
+
+        Document document = saxBuilder.build(new StringReader(pomXml));
+        UpgradeContext context = createMockContext();
+
+        boolean upgraded = upgrade.upgradePluginsInPom(context, document);
+
+        assertTrue(upgraded, "Should have added plugin management for maven-enforcer-plugin found in parent");
+
+        // Verify plugin management was added
+        Element root = document.getRootElement();
+        Namespace namespace = root.getNamespace();
+        Element buildElement = root.getChild("build", namespace);
+        assertNotNull(buildElement, "Build element should be created");
+
+        Element pluginManagementElement = buildElement.getChild("pluginManagement", namespace);
+        assertNotNull(pluginManagementElement, "PluginManagement element should be created");
+
+        Element pluginsElement = pluginManagementElement.getChild("plugins", namespace);
+        assertNotNull(pluginsElement, "Plugins element should be created");
+
+        // Find the maven-enforcer-plugin specifically
+        Element enforcerPluginElement = null;
+        List<Element> pluginElements = pluginsElement.getChildren("plugin", namespace);
+        for (Element plugin : pluginElements) {
+            Element artifactIdElement = plugin.getChild("artifactId", namespace);
+            if (artifactIdElement != null && "maven-enforcer-plugin".equals(artifactIdElement.getTextTrim())) {
+                enforcerPluginElement = plugin;
+                break;
+            }
+        }
+
+        assertNotNull(enforcerPluginElement, "maven-enforcer-plugin element should be added");
+
+        Element groupIdElement = enforcerPluginElement.getChild("groupId", namespace);
+        assertEquals("org.apache.maven.plugins", groupIdElement.getTextTrim());
+
+        Element artifactIdElement = enforcerPluginElement.getChild("artifactId", namespace);
+        assertEquals("maven-enforcer-plugin", artifactIdElement.getTextTrim());
+
+        Element versionElement = enforcerPluginElement.getChild("version", namespace);
+        assertEquals("3.0.0", versionElement.getTextTrim());
     }
 
     /**

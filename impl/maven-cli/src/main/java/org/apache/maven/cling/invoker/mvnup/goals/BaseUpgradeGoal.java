@@ -1423,6 +1423,7 @@ public abstract class BaseUpgradeGoal implements Goal {
     /**
      * Upgrades plugins in a POM document.
      * Checks both build/plugins and build/pluginManagement/plugins sections.
+     * Also checks parent POMs for plugins that need to be managed locally.
      */
     protected boolean upgradePluginsInPom(UpgradeContext context, Document pomDocument) {
         Element root = pomDocument.getRootElement();
@@ -1456,6 +1457,9 @@ public abstract class BaseUpgradeGoal implements Goal {
                 }
             }
         }
+
+        // Check parent POMs for plugins that need to be managed locally
+        hasUpgrades |= ParentPomResolver.checkParentPomsForPlugins(context, pomDocument, pluginUpgrades);
 
         return hasUpgrades;
     }
