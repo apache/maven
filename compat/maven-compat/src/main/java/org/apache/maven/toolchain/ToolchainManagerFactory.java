@@ -212,6 +212,11 @@ public class ToolchainManagerFactory {
         public boolean matchesRequirements(Map<String, String> requirements) {
             return delegate.matchesRequirements(requirements);
         }
+
+        @Override
+        public String toString() {
+            return delegate.toString();
+        }
     }
 
     private record ToolchainWrapperV3(org.apache.maven.api.Toolchain delegate) implements Toolchain, ToolchainPrivate {
@@ -234,6 +239,11 @@ public class ToolchainManagerFactory {
         @Override
         public ToolchainModel getModel() {
             return new ToolchainModel(delegate.getModel());
+        }
+
+        @Override
+        public String toString() {
+            return delegate.toString();
         }
     }
 }

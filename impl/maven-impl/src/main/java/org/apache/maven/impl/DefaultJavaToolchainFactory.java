@@ -167,6 +167,11 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
             }
             return true;
         }
+
+        @Override
+        public String toString() {
+            return "JDK[" + getJavaHome() + "]";
+        }
     }
 
     static final class ExactMatcher implements Predicate<String> {
