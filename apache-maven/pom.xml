@@ -234,7 +234,7 @@ under the License.
       <plugin>
         <groupId>eu.maveniverse.maven.plugins</groupId>
         <artifactId>bom-builder3</artifactId>
-        <version>1.0.4</version>
+        <version>1.1.1</version>
         <executions>
           <execution>
             <id>skinny-bom</id>
