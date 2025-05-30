@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.io.StringReader;
+import java.util.List;
 
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.jdom2.Document;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -205,6 +207,117 @@ class Maven4CompatibilityFixesTest {
         assertTrue(defaultFixModel, "Default behavior should enable --fix-model");
     }
 
+    @Test
+    void testFixDuplicatePlugins() throws Exception {
+        String pomXml =
+                """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <project xmlns="http://maven.apache.org/POM/4.0.0"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                <modelVersion>4.0.0</modelVersion>
+                <groupId>com.example</groupId>
+                <artifactId>test</artifactId>
+                <version>1.0.0</version>
+                <build>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>3.8.1</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>3.9.0</version>
+                        </plugin>
+                    </plugins>
+                </build>
+            </project>
+            """;
+
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(new StringReader(pomXml));
+
+        TestableBaseUpgradeGoal goal = new TestableBaseUpgradeGoal();
+        UpgradeContext context = Mockito.mock(UpgradeContext.class);
+        context.logger = Mockito.mock(org.apache.maven.api.cli.Logger.class);
+
+        boolean fixed = goal.fixDuplicatePlugins(context, document);
+
+        assertTrue(fixed, "Should have fixed duplicate plugins");
+
+        // Verify only one plugin remains
+        Element buildElement = document.getRootElement()
+                .getChild("build", document.getRootElement().getNamespace());
+        Element pluginsElement = buildElement.getChild("plugins", buildElement.getNamespace());
+        List<Element> plugins = pluginsElement.getChildren("plugin", pluginsElement.getNamespace());
+
+        assertEquals(1, plugins.size(), "Should have only one plugin after removing duplicates");
+    }
+
+    @Test
+    void testFixIncorrectParentRelativePaths() throws Exception {
+        String pomXml =
+                """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <project xmlns="http://maven.apache.org/POM/4.0.0"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                <modelVersion>4.0.0</modelVersion>
+                <parent>
+                    <groupId>com.example</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1.0.0</version>
+                    <relativePath>../wrong-path/pom.xml</relativePath>
+                </parent>
+                <artifactId>child</artifactId>
+            </project>
+            """;
+
+        String parentPomXml =
+                """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <project xmlns="http://maven.apache.org/POM/4.0.0"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                <modelVersion>4.0.0</modelVersion>
+                <groupId>com.example</groupId>
+                <artifactId>parent</artifactId>
+                <version>1.0.0</version>
+                <packaging>pom</packaging>
+            </project>
+            """;
+
+        SAXBuilder builder = new SAXBuilder();
+        Document childDocument = builder.build(new StringReader(pomXml));
+        Document parentDocument = builder.build(new StringReader(parentPomXml));
+
+        // Create mock pomMap with parent POM
+        java.util.Map<java.nio.file.Path, Document> pomMap = new java.util.HashMap<>();
+        java.nio.file.Path childPath = java.nio.file.Paths.get("child/pom.xml");
+        java.nio.file.Path parentPath = java.nio.file.Paths.get("pom.xml");
+        pomMap.put(childPath, childDocument);
+        pomMap.put(parentPath, parentDocument);
+
+        TestableBaseUpgradeGoal goal = new TestableBaseUpgradeGoal();
+        UpgradeContext context = Mockito.mock(UpgradeContext.class);
+        context.logger = Mockito.mock(org.apache.maven.api.cli.Logger.class);
+
+        boolean fixed = goal.fixIncorrectParentRelativePaths(context, childDocument, childPath, pomMap);
+
+        assertTrue(fixed, "Should have fixed incorrect parent relative path");
+
+        // Verify the relativePath was updated
+        Element parentElement = childDocument
+                .getRootElement()
+                .getChild("parent", childDocument.getRootElement().getNamespace());
+        Element relativePathElement = parentElement.getChild("relativePath", parentElement.getNamespace());
+
+        assertNotNull(relativePathElement, "relativePath element should exist");
+        assertEquals("../pom.xml", relativePathElement.getTextTrim(), "relativePath should be corrected");
+    }
+
     /**
      * Testable subclass that exposes protected methods for testing.
      */
@@ -222,6 +335,20 @@ class Maven4CompatibilityFixesTest {
         @Override
         public boolean fixUnsupportedCombineSelfAttributes(UpgradeContext context, Document pomDocument) {
             return super.fixUnsupportedCombineSelfAttributes(context, pomDocument);
+        }
+
+        @Override
+        public boolean fixDuplicatePlugins(UpgradeContext context, Document pomDocument) {
+            return super.fixDuplicatePlugins(context, pomDocument);
+        }
+
+        @Override
+        public boolean fixIncorrectParentRelativePaths(
+                UpgradeContext context,
+                Document pomDocument,
+                java.nio.file.Path pomPath,
+                java.util.Map<java.nio.file.Path, Document> pomMap) {
+            return super.fixIncorrectParentRelativePaths(context, pomDocument, pomPath, pomMap);
         }
 
         // Test helper methods to expose internal logic

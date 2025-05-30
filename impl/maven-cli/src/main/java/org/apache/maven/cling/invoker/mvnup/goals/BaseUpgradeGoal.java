@@ -405,8 +405,18 @@ public abstract class BaseUpgradeGoal implements Goal {
                     hasIssues = true;
                 }
 
+                // Fix duplicate plugins
+                if (fixDuplicatePlugins(context, pomDocument)) {
+                    hasIssues = true;
+                }
+
                 // Fix unsupported expressions in repository URLs
                 if (fixUnsupportedRepositoryExpressions(context, pomDocument)) {
+                    hasIssues = true;
+                }
+
+                // Fix incorrect parent relative paths
+                if (fixIncorrectParentRelativePaths(context, pomDocument, pomPath, pomMap)) {
                     hasIssues = true;
                 }
 
@@ -1845,45 +1855,233 @@ public abstract class BaseUpgradeGoal implements Goal {
      */
     protected boolean fixRepositoryExpressions(
             UpgradeContext context, Element repositoriesElement, Namespace namespace) {
+        if (repositoriesElement == null) {
+            return false;
+        }
+
         boolean fixed = false;
+        String elementType = repositoriesElement.getName().equals("repositories") ? "repository" : "pluginRepository";
+        List<Element> repositories = repositoriesElement.getChildren(elementType, namespace);
 
-        if (repositoriesElement != null) {
-            String elementType =
-                    repositoriesElement.getName().equals("repositories") ? "repository" : "pluginRepository";
-            List<Element> repositories = repositoriesElement.getChildren(elementType, namespace);
+        for (Element repository : repositories) {
+            Element urlElement = repository.getChild("url", namespace);
+            if (urlElement != null) {
+                String url = urlElement.getTextTrim();
+                if (url.contains("${")
+                        && !url.contains("${project.basedir}")
+                        && !url.contains("${project.rootDirectory}")) {
+                    String repositoryId = getChildText(repository, "id", namespace);
+                    context.logger.warn("      • Found unsupported expression in " + elementType + " URL (id: "
+                            + repositoryId + "): " + url);
+                    context.logger.warn(
+                            "        Maven 4 only supports ${project.basedir} and ${project.rootDirectory} expressions in repository URLs");
 
-            for (Element repository : repositories) {
-                Element urlElement = repository.getChild("url", namespace);
-                if (urlElement != null) {
-                    String url = urlElement.getTextTrim();
-                    if (url.contains("${")
-                            && !url.contains("${project.basedir}")
-                            && !url.contains("${project.rootDirectory}")) {
-                        // Replace unsupported expressions with a comment
-                        String repositoryId = getChildText(repository, "id", namespace);
-                        context.logger.warn("      • Found unsupported expression in " + elementType + " URL (id: "
-                                + repositoryId + "): " + url);
-                        context.logger.warn(
-                                "        Maven 4 only supports ${project.basedir} and ${project.rootDirectory} expressions in repository URLs");
+                    // Comment out the problematic repository
+                    org.jdom2.Comment comment = new org.jdom2.Comment(
+                            " Repository disabled due to unsupported expression in URL: " + url + " ");
+                    Element parent = repository.getParentElement();
+                    parent.addContent(parent.indexOf(repository), comment);
+                    removeElementWithFormatting(repository);
 
-                        // For now, we'll comment out the problematic repository
-                        // In a real implementation, you might want to ask the user how to handle this
-                        org.jdom2.Comment comment = new org.jdom2.Comment(
-                                " Repository disabled due to unsupported expression in URL: " + url + " ");
-                        Element parent = repository.getParentElement();
-                        int index = parent.indexOf(repository);
-                        parent.addContent(index, comment);
-                        removeElementWithFormatting(repository);
-
-                        context.logger.info("      • Commented out " + elementType
-                                + " with unsupported URL expression (id: " + repositoryId + ")");
-                        fixed = true;
-                    }
+                    context.logger.info("      • Commented out " + elementType
+                            + " with unsupported URL expression (id: " + repositoryId + ")");
+                    fixed = true;
                 }
             }
         }
 
         return fixed;
+    }
+
+    /**
+     * Fixes duplicate plugin declarations.
+     * Maven 4 enforces stricter validation for duplicate plugins in the same section.
+     */
+    protected boolean fixDuplicatePlugins(UpgradeContext context, Document pomDocument) {
+        boolean fixed = false;
+        Element root = pomDocument.getRootElement();
+        Namespace namespace = root.getNamespace();
+
+        // Check main build plugins
+        Element buildElement = root.getChild("build", namespace);
+        if (buildElement != null) {
+            fixed |= fixPluginsInBuildElement(context, buildElement, namespace, "build");
+        }
+
+        // Check profile plugins
+        Element profilesElement = root.getChild("profiles", namespace);
+        if (profilesElement != null) {
+            for (Element profileElement : profilesElement.getChildren("profile", namespace)) {
+                Element profileBuildElement = profileElement.getChild("build", namespace);
+                if (profileBuildElement != null) {
+                    fixed |= fixPluginsInBuildElement(context, profileBuildElement, namespace, "profile build");
+                }
+            }
+        }
+
+        return fixed;
+    }
+
+    /**
+     * Fixes duplicate plugins in a build element (both plugins and pluginManagement).
+     */
+    protected boolean fixPluginsInBuildElement(
+            UpgradeContext context, Element buildElement, Namespace namespace, String prefix) {
+        boolean fixed = false;
+
+        Element pluginsElement = buildElement.getChild("plugins", namespace);
+        if (pluginsElement != null) {
+            fixed |= fixDuplicatePluginsInSection(context, pluginsElement, namespace, prefix + "/plugins");
+        }
+
+        Element pluginManagementElement = buildElement.getChild("pluginManagement", namespace);
+        if (pluginManagementElement != null) {
+            Element managedPluginsElement = pluginManagementElement.getChild("plugins", namespace);
+            if (managedPluginsElement != null) {
+                fixed |= fixDuplicatePluginsInSection(
+                        context, managedPluginsElement, namespace, prefix + "/pluginManagement/plugins");
+            }
+        }
+
+        return fixed;
+    }
+
+    /**
+     * Fixes duplicate plugins within a specific plugins section.
+     */
+    protected boolean fixDuplicatePluginsInSection(
+            UpgradeContext context, Element pluginsElement, Namespace namespace, String sectionName) {
+        boolean fixed = false;
+        List<Element> plugins = pluginsElement.getChildren("plugin", namespace);
+        Map<String, Element> seenPlugins = new HashMap<>();
+        List<Element> toRemove = new ArrayList<>();
+
+        for (Element plugin : plugins) {
+            String groupId = getChildText(plugin, "groupId", namespace);
+            String artifactId = getChildText(plugin, "artifactId", namespace);
+
+            // Default groupId for Maven plugins
+            if (groupId == null && artifactId != null && artifactId.startsWith("maven-")) {
+                groupId = "org.apache.maven.plugins";
+            }
+
+            if (groupId != null && artifactId != null) {
+                // Create a key for uniqueness check (groupId:artifactId)
+                String key = groupId + ":" + artifactId;
+
+                if (seenPlugins.containsKey(key)) {
+                    // Found duplicate - remove it
+                    toRemove.add(plugin);
+                    context.logger.info("      • Removed duplicate plugin: " + key + " in " + sectionName);
+                    fixed = true;
+                } else {
+                    seenPlugins.put(key, plugin);
+                }
+            }
+        }
+
+        // Remove duplicates while preserving formatting
+        for (Element duplicate : toRemove) {
+            removeElementWithFormatting(duplicate);
+        }
+
+        return fixed;
+    }
+
+    /**
+     * Fixes incorrect parent relative paths by searching for the correct parent POM in the project structure.
+     */
+    protected boolean fixIncorrectParentRelativePaths(
+            UpgradeContext context, Document pomDocument, Path pomPath, Map<Path, Document> pomMap) {
+        Element root = pomDocument.getRootElement();
+        Namespace namespace = root.getNamespace();
+        Element parentElement = root.getChild("parent", namespace);
+
+        if (parentElement == null) {
+            return false;
+        }
+
+        // Get current relativePath (default is "../pom.xml")
+        Element relativePathElement = parentElement.getChild("relativePath", namespace);
+        String currentRelativePath = relativePathElement != null ? relativePathElement.getTextTrim() : "../pom.xml";
+        if (currentRelativePath == null || currentRelativePath.trim().isEmpty()) {
+            currentRelativePath = "../pom.xml";
+        }
+
+        // Check if current path is valid
+        Path resolvedParentPath = resolveParentPomPath(pomPath, currentRelativePath);
+        if (resolvedParentPath != null && Files.exists(resolvedParentPath)) {
+            return false; // Path is correct
+        }
+
+        // Find correct parent in pomMap
+        String parentGroupId = getChildText(parentElement, "groupId", namespace);
+        String parentArtifactId = getChildText(parentElement, "artifactId", namespace);
+        String parentVersion = getChildText(parentElement, "version", namespace);
+
+        if (parentGroupId == null || parentArtifactId == null) {
+            return false;
+        }
+
+        Path correctParentPath = findParentPomInMap(parentGroupId, parentArtifactId, parentVersion, pomMap);
+        if (correctParentPath == null) {
+            return false;
+        }
+
+        String correctRelativePath = calculateRelativePath(pomPath, correctParentPath);
+        if (correctRelativePath == null || correctRelativePath.equals(currentRelativePath)) {
+            return false;
+        }
+
+        // Update relativePath element
+        if (relativePathElement == null) {
+            relativePathElement = new Element("relativePath", namespace);
+            Element insertAfter = parentElement.getChild("version", namespace);
+            if (insertAfter == null) {
+                insertAfter = parentElement.getChild("artifactId", namespace);
+            }
+            if (insertAfter != null) {
+                parentElement.addContent(parentElement.indexOf(insertAfter) + 1, relativePathElement);
+            } else {
+                parentElement.addContent(relativePathElement);
+            }
+        }
+
+        relativePathElement.setText(correctRelativePath);
+        context.logger.info("      • Fixed parent relativePath from '" + currentRelativePath + "' to '"
+                + correctRelativePath + "'");
+        return true;
+    }
+
+    /**
+     * Finds a parent POM in the pomMap by GAV coordinates.
+     */
+    protected Path findParentPomInMap(String groupId, String artifactId, String version, Map<Path, Document> pomMap) {
+        return pomMap.entrySet().stream()
+                .filter(entry -> {
+                    GAV gav = extractGAVWithParentResolution(entry.getValue(), null);
+                    return gav != null
+                            && java.util.Objects.equals(gav.groupId, groupId)
+                            && java.util.Objects.equals(gav.artifactId, artifactId)
+                            && (version == null || java.util.Objects.equals(gav.version, version));
+                })
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Calculates the relative path from a child POM to a parent POM.
+     */
+    protected String calculateRelativePath(Path childPomPath, Path parentPomPath) {
+        try {
+            Path childDir = childPomPath.getParent();
+            return childDir != null
+                    ? childDir.relativize(parentPomPath).toString().replace('\\', '/')
+                    : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
