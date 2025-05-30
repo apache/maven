@@ -368,6 +368,58 @@ class Maven4CompatibilityFixesTest {
         assertEquals(1, dependencies.size(), "Should have only one dependency after removing duplicates");
     }
 
+    @Test
+    void testFixDuplicatePluginsInPluginManagement() throws Exception {
+        String pomXml =
+                """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <project xmlns="http://maven.apache.org/POM/4.0.0"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                <modelVersion>4.0.0</modelVersion>
+                <groupId>com.example</groupId>
+                <artifactId>test</artifactId>
+                <version>1.0.0</version>
+                <build>
+                    <pluginManagement>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>3.8.1</version>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>3.9.0</version>
+                            </plugin>
+                        </plugins>
+                    </pluginManagement>
+                </build>
+            </project>
+            """;
+
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(new StringReader(pomXml));
+
+        TestableBaseUpgradeGoal goal = new TestableBaseUpgradeGoal();
+        UpgradeContext context = Mockito.mock(UpgradeContext.class);
+        context.logger = Mockito.mock(org.apache.maven.api.cli.Logger.class);
+
+        boolean fixed = goal.fixDuplicatePlugins(context, document);
+
+        assertTrue(fixed, "Should have fixed duplicate plugins in pluginManagement");
+
+        // Verify only one plugin remains
+        Element buildElement = document.getRootElement()
+                .getChild("build", document.getRootElement().getNamespace());
+        Element pluginManagementElement = buildElement.getChild("pluginManagement", buildElement.getNamespace());
+        Element pluginsElement = pluginManagementElement.getChild("plugins", pluginManagementElement.getNamespace());
+        List<Element> plugins = pluginsElement.getChildren("plugin", pluginsElement.getNamespace());
+
+        assertEquals(1, plugins.size(), "Should have only one plugin after removing duplicates from pluginManagement");
+    }
+
     /**
      * Testable subclass that exposes protected methods for testing.
      */
