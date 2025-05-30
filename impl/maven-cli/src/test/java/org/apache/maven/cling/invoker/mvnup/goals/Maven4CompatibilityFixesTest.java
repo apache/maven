@@ -318,6 +318,56 @@ class Maven4CompatibilityFixesTest {
         assertEquals("../pom.xml", relativePathElement.getTextTrim(), "relativePath should be corrected");
     }
 
+    @Test
+    void testFixDuplicateDependenciesInDependencyManagement() throws Exception {
+        String pomXml =
+                """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <project xmlns="http://maven.apache.org/POM/4.0.0"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                <modelVersion>4.0.0</modelVersion>
+                <groupId>com.example</groupId>
+                <artifactId>test</artifactId>
+                <version>1.0.0</version>
+                <dependencyManagement>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.vysper.extensions</groupId>
+                            <artifactId>vysper-websockets</artifactId>
+                            <version>1.0.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.vysper.extensions</groupId>
+                            <artifactId>vysper-websockets</artifactId>
+                            <version>1.0.0</version>
+                        </dependency>
+                    </dependencies>
+                </dependencyManagement>
+            </project>
+            """;
+
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(new StringReader(pomXml));
+
+        TestableBaseUpgradeGoal goal = new TestableBaseUpgradeGoal();
+        UpgradeContext context = Mockito.mock(UpgradeContext.class);
+        context.logger = Mockito.mock(org.apache.maven.api.cli.Logger.class);
+
+        boolean fixed = goal.fixDuplicateDependencies(context, document);
+
+        assertTrue(fixed, "Should have fixed duplicate dependencies in dependencyManagement");
+
+        // Verify only one dependency remains
+        Element dependencyManagementElement = document.getRootElement()
+                .getChild("dependencyManagement", document.getRootElement().getNamespace());
+        Element dependenciesElement =
+                dependencyManagementElement.getChild("dependencies", dependencyManagementElement.getNamespace());
+        List<Element> dependencies = dependenciesElement.getChildren("dependency", dependenciesElement.getNamespace());
+
+        assertEquals(1, dependencies.size(), "Should have only one dependency after removing duplicates");
+    }
+
     /**
      * Testable subclass that exposes protected methods for testing.
      */

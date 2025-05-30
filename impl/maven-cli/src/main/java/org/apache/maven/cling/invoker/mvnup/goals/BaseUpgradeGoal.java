@@ -1757,7 +1757,7 @@ public abstract class BaseUpgradeGoal implements Goal {
 
     /**
      * Fixes duplicate dependency declarations.
-     * Maven 4 enforces stricter validation for duplicate dependencies.
+     * Maven 4 enforces stricter validation for duplicate dependencies in both dependencies and dependencyManagement.
      */
     protected boolean fixDuplicateDependencies(UpgradeContext context, Document pomDocument) {
         boolean fixed = false;
@@ -1767,12 +1767,16 @@ public abstract class BaseUpgradeGoal implements Goal {
         // Check dependencies in main project
         fixed |= fixDuplicateDependenciesInElement(context, root, namespace);
 
-        // Check dependencies in profiles
+        // Check dependencyManagement in main project
+        fixed |= fixDuplicateDependencyManagementInElement(context, root, namespace);
+
+        // Check dependencies and dependencyManagement in profiles
         Element profilesElement = root.getChild("profiles", namespace);
         if (profilesElement != null) {
             List<Element> profileElements = profilesElement.getChildren("profile", namespace);
             for (Element profileElement : profileElements) {
                 fixed |= fixDuplicateDependenciesInElement(context, profileElement, namespace);
+                fixed |= fixDuplicateDependencyManagementInElement(context, profileElement, namespace);
             }
         }
 
@@ -1814,6 +1818,51 @@ public abstract class BaseUpgradeGoal implements Goal {
             // Remove duplicates while preserving formatting
             for (Element duplicate : toRemove) {
                 removeElementWithFormatting(duplicate);
+            }
+        }
+
+        return fixed;
+    }
+
+    /**
+     * Fixes duplicate dependencies in dependencyManagement within a specific element (project or profile).
+     */
+    protected boolean fixDuplicateDependencyManagementInElement(
+            UpgradeContext context, Element parent, Namespace namespace) {
+        boolean fixed = false;
+        Element dependencyManagementElement = parent.getChild("dependencyManagement", namespace);
+
+        if (dependencyManagementElement != null) {
+            Element dependenciesElement = dependencyManagementElement.getChild("dependencies", namespace);
+            if (dependenciesElement != null) {
+                List<Element> dependencies = dependenciesElement.getChildren("dependency", namespace);
+                Map<String, Element> seenDependencies = new HashMap<>();
+                List<Element> toRemove = new ArrayList<>();
+
+                for (Element dependency : dependencies) {
+                    String groupId = getChildText(dependency, "groupId", namespace);
+                    String artifactId = getChildText(dependency, "artifactId", namespace);
+                    String type = getChildText(dependency, "type", namespace);
+                    String classifier = getChildText(dependency, "classifier", namespace);
+
+                    // Create a key for uniqueness check (same as Maven's validation)
+                    String key = groupId + ":" + artifactId + ":" + (type != null ? type : "jar") + ":"
+                            + (classifier != null ? classifier : "");
+
+                    if (seenDependencies.containsKey(key)) {
+                        // Found duplicate - remove it
+                        toRemove.add(dependency);
+                        context.logger.info("      • Removed duplicate dependency in dependencyManagement: " + key);
+                        fixed = true;
+                    } else {
+                        seenDependencies.put(key, dependency);
+                    }
+                }
+
+                // Remove duplicates while preserving formatting
+                for (Element duplicate : toRemove) {
+                    removeElementWithFormatting(duplicate);
+                }
             }
         }
 
