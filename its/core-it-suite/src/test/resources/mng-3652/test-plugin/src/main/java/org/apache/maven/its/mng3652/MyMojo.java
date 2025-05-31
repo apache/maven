@@ -162,7 +162,7 @@ public class MyMojo extends AbstractMojo {
 
         FileWriter w = null;
         try {
-            touchFile.getParentFile().mkdirs();
+            mkDirForParentFile(file);
             w = new FileWriter(touchFile);
 
             w.write(runtimeInformation.getApplicationVersion().toString());

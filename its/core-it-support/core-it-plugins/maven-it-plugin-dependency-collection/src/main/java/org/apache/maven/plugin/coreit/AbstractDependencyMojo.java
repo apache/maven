@@ -64,7 +64,7 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
 
         BufferedWriter writer = null;
         try {
-            file.getParentFile().mkdirs();
+            mkDirForParentFile(file);
 
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
@@ -87,8 +87,7 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (IOException e) {
-                    // just ignore
+                } catch (IOException ignore) {
                 }
             }
         }

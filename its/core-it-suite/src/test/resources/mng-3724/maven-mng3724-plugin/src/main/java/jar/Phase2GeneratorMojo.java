@@ -74,8 +74,7 @@ public class Phase2GeneratorMojo extends AbstractMng2734Mojo {
             if (w != null) {
                 try {
                     w.close();
-                } catch (IOException e) {
-                    // ignore
+                } catch (IOException ignored) {
                 }
             }
         }

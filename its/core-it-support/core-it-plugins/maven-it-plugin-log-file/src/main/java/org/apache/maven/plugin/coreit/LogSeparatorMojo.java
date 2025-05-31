@@ -44,10 +44,6 @@ public class LogSeparatorMojo extends AbstractLogMojo {
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute() throws MojoExecutionException {
-        StringBuilder buffer = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            buffer.append('-');
-        }
-        append(buffer.toString());
+        append("-".repeat(Math.max(0, length)));
     }
 }

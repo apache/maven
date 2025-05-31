@@ -74,8 +74,7 @@ public class TouchMojo extends AbstractMojo {
             if (w != null) {
                 try {
                     w.close();
-                } catch (IOException e) {
-                    // ignore
+                } catch (IOException ignored) {
                 }
             }
         }

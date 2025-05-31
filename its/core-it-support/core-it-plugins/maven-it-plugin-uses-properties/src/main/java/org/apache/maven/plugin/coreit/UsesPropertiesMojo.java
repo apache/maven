@@ -45,7 +45,7 @@ public class UsesPropertiesMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         try {
             File file = new File(basedir, "target/project.properties");
-            file.getParentFile().mkdirs();
+            mkDirForParentFile(file);
             FileOutputStream fos = new FileOutputStream(file);
 
             properties.store(

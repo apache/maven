@@ -84,11 +84,11 @@ public class ModelProblemUtils {
      * @return The user-friendly artifact id, never {@code null}.
      */
     static String toId(String groupId, String artifactId, String version) {
-        return ((groupId != null && !groupId.isEmpty()) ? groupId : "[unknown-group-id]")
+        return (groupId != null && !groupId.isEmpty() ? groupId : "[unknown-group-id]")
                 + ':'
-                + ((artifactId != null && !artifactId.isEmpty()) ? artifactId : "[unknown-artifact-id]")
+                + (artifactId != null && !artifactId.isEmpty() ? artifactId : "[unknown-artifact-id]")
                 + ':'
-                + ((version != null && !version.isEmpty()) ? version : "[unknown-version]");
+                + (version != null && !version.isEmpty() ? version : "[unknown-version]");
     }
 
     /**

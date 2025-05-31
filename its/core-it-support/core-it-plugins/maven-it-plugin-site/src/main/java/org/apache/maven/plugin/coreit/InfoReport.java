@@ -97,8 +97,8 @@ public class InfoReport extends AbstractMojo implements MavenReport {
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 
         OutputStream out = null;
+        mkDirForParentFile(outputFile);
         try {
-            outputFile.getParentFile().mkdirs();
             out = new FileOutputStream(outputFile);
             props.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
@@ -107,8 +107,7 @@ public class InfoReport extends AbstractMojo implements MavenReport {
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException e) {
-                    // just ignore
+                } catch (IOException ignore) {
                 }
             }
         }

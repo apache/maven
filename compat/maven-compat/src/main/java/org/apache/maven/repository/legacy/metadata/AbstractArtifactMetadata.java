@@ -20,13 +20,14 @@ package org.apache.maven.repository.legacy.metadata;
 
 import org.apache.maven.artifact.Artifact;
 
+import static java.lang.System.lineSeparator;
+
 /**
  * Common elements of artifact metadata.
  *
  */
 @Deprecated
 public abstract class AbstractArtifactMetadata implements ArtifactMetadata {
-    private static final String LS = System.lineSeparator();
 
     protected Artifact artifact;
 
@@ -47,13 +48,9 @@ public abstract class AbstractArtifactMetadata implements ArtifactMetadata {
     }
 
     public String extendedToString() {
-        StringBuilder buffer = new StringBuilder(256);
-
-        buffer.append(LS).append("Artifact Metadata").append(LS).append("--------------------------");
-        buffer.append(LS).append("GroupId: ").append(getGroupId());
-        buffer.append(LS).append("ArtifactId: ").append(getArtifactId());
-        buffer.append(LS).append("Metadata Type: ").append(getClass().getName());
-
-        return buffer.toString();
+        return lineSeparator() + "Artifact Metadata" + lineSeparator() + "--------------------------" + lineSeparator()
+                + "GroupId: " + getGroupId() + lineSeparator()
+                + "ArtifactId: " + getArtifactId() + lineSeparator()
+                + "Metadata Type: " + getClass().getName();
     }
 }

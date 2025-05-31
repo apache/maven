@@ -132,8 +132,7 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
             ClassRealm realm = record.getRealm();
             try {
                 realm.getWorld().disposeRealm(realm.getId());
-            } catch (NoSuchRealmException e) {
-                // ignore
+            } catch (NoSuchRealmException ignored) {
             }
         }
         cache.clear();

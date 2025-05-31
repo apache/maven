@@ -392,8 +392,7 @@ class ReactorReader implements MavenWorkspaceReader {
                     Files.delete(artifactPath);
                     Files.delete(artifactPath.getParent());
                     Files.delete(artifactPath.getParent().getParent());
-                } catch (DirectoryNotEmptyException e) {
-                    // ignore
+                } catch (DirectoryNotEmptyException ignored) {
                 }
             }
         } catch (IOException e) {

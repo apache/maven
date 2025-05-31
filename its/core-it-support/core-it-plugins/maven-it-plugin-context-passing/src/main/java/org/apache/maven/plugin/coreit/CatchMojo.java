@@ -71,8 +71,7 @@ public class CatchMojo extends AbstractMojo {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (IOException e) {
-                    // ignore
+                } catch (IOException ignored) {
                 }
             }
         }

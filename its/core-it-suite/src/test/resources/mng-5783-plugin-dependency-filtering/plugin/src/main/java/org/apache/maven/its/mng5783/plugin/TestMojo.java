@@ -61,7 +61,7 @@ public class TestMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         try {
             File file = new File(target, "dependencies.txt");
-            file.getParentFile().mkdirs();
+            mkDirForParentFile(file);
             BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
             try {
                 for (Artifact artifact : artifacts) {
