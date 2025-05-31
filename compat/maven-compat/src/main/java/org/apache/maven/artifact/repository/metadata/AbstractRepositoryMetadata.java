@@ -159,14 +159,11 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
     }
 
     public String extendedToString() {
-        StringBuilder buffer = new StringBuilder(256);
 
-        buffer.append(LS).append("Repository Metadata").append(LS).append("--------------------------");
-        buffer.append(LS).append("GroupId: ").append(getGroupId());
-        buffer.append(LS).append("ArtifactId: ").append(getArtifactId());
-        buffer.append(LS).append("Metadata Type: ").append(getClass().getName());
-
-        return buffer.toString();
+        return LS + "Repository Metadata" + LS + "--------------------------" + LS
+                + "GroupId: " + getGroupId() + LS
+                + "ArtifactId: " + getArtifactId() + LS
+                + "Metadata Type: " + getClass().getName();
     }
 
     public int getNature() {

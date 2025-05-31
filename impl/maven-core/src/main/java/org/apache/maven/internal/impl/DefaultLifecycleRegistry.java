@@ -142,9 +142,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         addPhases(graph, null, null, lifecycle.v3phases());
         List<String> allPhases = graph.visitAll();
         Collections.reverse(allPhases);
-        List<String> computed =
-                allPhases.stream().filter(s -> !s.startsWith("$")).collect(Collectors.toList());
-        return computed;
+        return allPhases.stream().filter(s -> !s.startsWith("$")).collect(Collectors.toList());
     }
 
     private static void addPhase(

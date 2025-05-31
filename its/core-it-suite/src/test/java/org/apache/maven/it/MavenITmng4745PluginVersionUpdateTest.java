@@ -145,23 +145,21 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
     }
 
     private static void writeMetadata(File testdir, String version, String timestamp) throws Exception {
-        StringBuilder content = new StringBuilder(1024);
-        content.append("<?xml version=\"1.0\"?>\n");
-        content.append("<metadata>\n");
-        content.append("  <groupId>org.apache.maven.its.mng4745</groupId>\n");
-        content.append("  <artifactId>maven-it-plugin</artifactId>\n");
-        content.append("  <versioning>\n");
-        content.append("    <latest>" + version + "</latest>\n");
-        content.append("    <release>" + version + "</release>\n");
-        content.append("    <versions>\n");
-        content.append("      <version>1.0</version>\n");
-        content.append("    </versions>\n");
-        content.append("    <lastUpdated>" + timestamp + "</lastUpdated>\n");
-        content.append("  </versioning>\n");
-        content.append("</metadata>\n");
+        String content = "<?xml version=\"1.0\"?>\n" + "<metadata>\n"
+                + "  <groupId>org.apache.maven.its.mng4745</groupId>\n"
+                + "  <artifactId>maven-it-plugin</artifactId>\n"
+                + "  <versioning>\n"
+                + "    <latest>"
+                + version + "</latest>\n" + "    <release>"
+                + version + "</release>\n" + "    <versions>\n"
+                + "      <version>1.0</version>\n"
+                + "    </versions>\n"
+                + "    <lastUpdated>"
+                + timestamp + "</lastUpdated>\n" + "  </versioning>\n"
+                + "</metadata>\n";
 
         File metadata = new File(testdir, "repo/org/apache/maven/its/mng4745/maven-it-plugin/maven-metadata.xml");
         metadata.getParentFile().mkdirs();
-        Files.writeString(metadata.getAbsoluteFile().toPath(), content.toString());
+        Files.writeString(metadata.getAbsoluteFile().toPath(), content);
     }
 }

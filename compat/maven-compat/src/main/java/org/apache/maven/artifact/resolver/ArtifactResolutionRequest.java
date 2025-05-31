@@ -207,21 +207,18 @@ public class ArtifactResolutionRequest implements RepositoryRequest {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder()
-                .append("REQUEST: ")
-                .append(LS)
-                .append("artifact: ")
-                .append(artifact)
-                .append(LS)
-                .append(artifactDependencies)
-                .append(LS)
-                .append("localRepository: ")
-                .append(localRepository)
-                .append(LS)
-                .append("remoteRepositories: ")
-                .append(remoteRepositories);
 
-        return sb.toString();
+        return "REQUEST: " + LS
+                + "artifact: "
+                + artifact
+                + LS
+                + artifactDependencies
+                + LS
+                + "localRepository: "
+                + localRepository
+                + LS
+                + "remoteRepositories: "
+                + remoteRepositories;
     }
 
     public boolean isOffline() {

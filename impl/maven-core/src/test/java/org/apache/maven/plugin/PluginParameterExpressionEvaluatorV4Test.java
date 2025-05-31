@@ -421,9 +421,8 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
     }
 
     private DefaultSession newSession() throws Exception {
-        DefaultSession session = new DefaultSession(
+        return new DefaultSession(
                 newMavenSession(), mock(RepositorySystem.class), null, null, new DefaultLookup(container), null);
-        return session;
     }
 
     private MavenSession newMavenSession() throws Exception {

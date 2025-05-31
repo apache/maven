@@ -199,11 +199,10 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
-        StringBuilder message = new StringBuilder();
-        message.append(darkOn).append(action).append(' ').append(direction).append(' ');
-        message.append(darkOff).append(resource.getRepositoryId());
-        message.append(darkOn).append(": ").append(resource.getRepositoryUrl());
-        message.append(darkOff).append(resource.getResourceName());
+        String message = darkOn + action + ' ' + direction + ' ' + darkOff
+                + resource.getRepositoryId() + darkOn
+                + ": " + resource.getRepositoryUrl() + darkOff
+                + resource.getResourceName();
 
         out.println(message);
     }

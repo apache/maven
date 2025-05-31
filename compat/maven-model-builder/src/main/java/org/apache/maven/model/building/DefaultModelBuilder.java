@@ -984,9 +984,7 @@ public class DefaultModelBuilder implements ModelBuilder {
          * if ( version == null || !version.equals( parent.getVersion() ) ) { return null; }
          */
 
-        ModelData parentData = new ModelData(candidateSource, candidateModel, groupId, artifactId, version);
-
-        return parentData;
+        return new ModelData(candidateSource, candidateModel, groupId, artifactId, version);
     }
 
     private boolean rawChildVersionReferencesParent(String rawChildModelVersion) {
@@ -1094,10 +1092,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             // MNG-2199: What else to check here ?
         }
 
-        ModelData parentData = new ModelData(
+        return new ModelData(
                 modelSource, parentModel, parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
-
-        return parentData;
     }
 
     private Model getSuperModel() {

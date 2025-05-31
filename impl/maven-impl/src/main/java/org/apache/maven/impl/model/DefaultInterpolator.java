@@ -263,10 +263,9 @@ public class DefaultInterpolator implements Interpolator {
         // Using the start and stop delimiter indices, extract
         // the first, deepest nested variable placeholder.
         String variable = val.substring(startDelim + DELIM_START.length(), stopDelim);
-        String org = variable;
 
         String substValue = processSubstitution(
-                variable, org, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+                variable, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
 
         // Append the leading characters, the substituted value of
         // the variable, and the trailing characters to get the new

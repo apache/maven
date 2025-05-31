@@ -41,9 +41,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     private Profile newProfile(ActivationOS.Builder activationBuilder) {
         Activation a = Activation.newBuilder().os(activationBuilder.build()).build();
 
-        Profile p = Profile.newBuilder().activation(a).build();
-
-        return p;
+        return Profile.newBuilder().activation(a).build();
     }
 
     private Map<String, String> newProperties(String osName, String osVersion, String osArch) {

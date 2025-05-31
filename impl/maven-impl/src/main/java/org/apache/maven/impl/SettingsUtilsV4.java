@@ -305,7 +305,7 @@ public final class SettingsUtilsV4 {
      */
     private static org.apache.maven.api.model.RepositoryPolicy convertRepositoryPolicy(
             RepositoryPolicy settingsPolicy) {
-        org.apache.maven.api.model.RepositoryPolicy policy = org.apache.maven.api.model.RepositoryPolicy.newBuilder()
+        return org.apache.maven.api.model.RepositoryPolicy.newBuilder()
                 .enabled(Boolean.toString(settingsPolicy.isEnabled()))
                 .updatePolicy(settingsPolicy.getUpdatePolicy())
                 .checksumPolicy(settingsPolicy.getChecksumPolicy())
@@ -313,7 +313,6 @@ public final class SettingsUtilsV4 {
                 .location("updatePolicy", toLocation(settingsPolicy.getLocation("updatePolicy")))
                 .location("checksumPolicy", toLocation(settingsPolicy.getLocation("checksumPolicy")))
                 .build();
-        return policy;
     }
 
     /**
@@ -321,7 +320,8 @@ public final class SettingsUtilsV4 {
      * @return a repository
      */
     private static Repository convertToSettingsRepository(org.apache.maven.api.model.Repository modelRepo) {
-        Repository repo = Repository.newBuilder()
+
+        return Repository.newBuilder()
                 .id(modelRepo.getId())
                 .layout(modelRepo.getLayout())
                 .name(modelRepo.getName())
@@ -334,8 +334,6 @@ public final class SettingsUtilsV4 {
                 .location("name", toLocation(modelRepo.getLocation("name")))
                 .location("url", toLocation(modelRepo.getLocation("url")))
                 .build();
-
-        return repo;
     }
 
     /**
@@ -343,7 +341,7 @@ public final class SettingsUtilsV4 {
      * @return a RepositoryPolicy
      */
     private static RepositoryPolicy convertRepositoryPolicy(org.apache.maven.api.model.RepositoryPolicy modelPolicy) {
-        RepositoryPolicy policy = RepositoryPolicy.newBuilder()
+        return RepositoryPolicy.newBuilder()
                 .enabled(modelPolicy.isEnabled())
                 .updatePolicy(modelPolicy.getUpdatePolicy())
                 .checksumPolicy(modelPolicy.getChecksumPolicy())
@@ -352,7 +350,6 @@ public final class SettingsUtilsV4 {
                 .location("updatePolicy", toLocation(modelPolicy.getLocation("updatePolicy")))
                 .location("checksumPolicy", toLocation(modelPolicy.getLocation("checksumPolicy")))
                 .build();
-        return policy;
     }
 
     private static org.apache.maven.api.settings.InputLocation toLocation(

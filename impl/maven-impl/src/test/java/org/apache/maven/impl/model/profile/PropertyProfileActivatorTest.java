@@ -44,9 +44,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
 
         Activation a = Activation.newBuilder().property(ap).build();
 
-        Profile p = Profile.newBuilder().activation(a).build();
-
-        return p;
+        return Profile.newBuilder().activation(a).build();
     }
 
     private Map<String, String> newProperties(String key, String value) {

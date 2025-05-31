@@ -282,9 +282,8 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
     }
 
     protected Artifact createArtifact(String groupId, String artifactId, String version, String type) throws Exception {
-        Artifact a = artifactFactory.createBuildArtifact(groupId, artifactId, version, type);
 
-        return a;
+        return artifactFactory.createBuildArtifact(groupId, artifactId, version, type);
     }
 
     protected void deleteLocalArtifact(Artifact artifact) throws Exception {

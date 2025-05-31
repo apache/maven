@@ -1403,9 +1403,7 @@ public class MavenProject implements Cloneable {
     }
 
     private static String getProjectReferenceId(String groupId, String artifactId, String version) {
-        StringBuilder buffer = new StringBuilder(128);
-        buffer.append(groupId).append(':').append(artifactId).append(':').append(version);
-        return buffer.toString();
+        return groupId + ':' + artifactId + ':' + version;
     }
 
     /**

@@ -137,19 +137,11 @@ public class InstallArtifactsMojo extends AbstractMojo {
         }
 
         public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
-            return pathOfRepositoryMetadata(metadata.getLocalFilename(repository));
-        }
-
-        private String pathOfRepositoryMetadata(String filename) {
-            StringBuilder path = new StringBuilder();
-
-            path.append(filename);
-
-            return path.toString();
+            return metadata.getLocalFilename(repository);
         }
 
         public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
-            return pathOfRepositoryMetadata(metadata.getRemoteFilename());
+            return metadata.getRemoteFilename();
         }
     }
 }

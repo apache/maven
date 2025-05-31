@@ -47,13 +47,10 @@ public abstract class AbstractArtifactMetadata implements ArtifactMetadata {
     }
 
     public String extendedToString() {
-        StringBuilder buffer = new StringBuilder(256);
 
-        buffer.append(LS).append("Artifact Metadata").append(LS).append("--------------------------");
-        buffer.append(LS).append("GroupId: ").append(getGroupId());
-        buffer.append(LS).append("ArtifactId: ").append(getArtifactId());
-        buffer.append(LS).append("Metadata Type: ").append(getClass().getName());
-
-        return buffer.toString();
+        return LS + "Artifact Metadata" + LS + "--------------------------" + LS
+                + "GroupId: " + getGroupId() + LS
+                + "ArtifactId: " + getArtifactId() + LS
+                + "Metadata Type: " + getClass().getName();
     }
 }

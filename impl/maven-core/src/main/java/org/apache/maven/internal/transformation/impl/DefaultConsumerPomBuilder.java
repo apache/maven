@@ -198,8 +198,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.lifecycleBindingsInjector(lifecycleBindingsInjector::injectLifecycleBindings);
         ModelBuilder.ModelBuilderSession mbSession =
                 iSession.getData().get(SessionData.key(ModelBuilder.ModelBuilderSession.class));
-        ModelBuilderResult result = mbSession.build(request.build());
-        return result;
+        return mbSession.build(request.build());
     }
 
     static Model transformNonPom(Model model, MavenProject project) {

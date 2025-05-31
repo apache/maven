@@ -66,8 +66,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
 
     private Profile newProfile(String condition) {
         Activation a = Activation.newBuilder().condition(condition).build();
-        Profile p = Profile.newBuilder().activation(a).build();
-        return p;
+        return Profile.newBuilder().activation(a).build();
     }
 
     private Map<String, String> newJdkProperties(String javaVersion) {

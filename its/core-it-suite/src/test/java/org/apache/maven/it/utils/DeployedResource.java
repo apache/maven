@@ -55,13 +55,10 @@ public class DeployedResource {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("DeployedResource");
-        sb.append("{httpMethod='").append(httpMethod).append('\'');
-        sb.append(", requestUri='").append(requestUri).append('\'');
-        sb.append(", contentLength='").append(contentLength).append('\'');
-        sb.append(", transferEncoding='").append(transferEncoding).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "DeployedResource" + "{httpMethod='"
+                + httpMethod + '\'' + ", requestUri='"
+                + requestUri + '\'' + ", contentLength='"
+                + contentLength + '\'' + ", transferEncoding='"
+                + transferEncoding + '\'' + '}';
     }
 }

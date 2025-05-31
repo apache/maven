@@ -81,10 +81,8 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
      */
     @Test
     public void testitComplex() throws Exception {
-        File testDir = extractResources("/mng-2068/test-3");
-        File projectDir = testDir;
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(extractResources("/mng-2068/test-3").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2068");
         verifier.addCliArgument("validate");

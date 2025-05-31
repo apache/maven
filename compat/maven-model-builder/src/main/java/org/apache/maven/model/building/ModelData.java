@@ -189,15 +189,8 @@ class ModelData {
      * @return The effective identifier of the model, never {@code null}.
      */
     public String getId() {
-        StringBuilder buffer = new StringBuilder(128);
 
-        buffer.append(getGroupId())
-                .append(':')
-                .append(getArtifactId())
-                .append(':')
-                .append(getVersion());
-
-        return buffer.toString();
+        return getGroupId() + ':' + getArtifactId() + ':' + getVersion();
     }
 
     @Override

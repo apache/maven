@@ -146,12 +146,8 @@ public class MojoExecution {
     }
 
     public String identify() {
-        StringBuilder sb = new StringBuilder(256);
 
-        sb.append(executionId);
-        sb.append(configuration.toString());
-
-        return sb.toString();
+        return executionId + configuration.toString();
     }
 
     public String getLifecyclePhase() {

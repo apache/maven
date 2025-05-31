@@ -50,14 +50,13 @@ final class LocalSnapshotMetadata extends MavenMetadata {
     private static Metadata createMetadata(Artifact artifact) {
         Snapshot snapshot = Snapshot.newBuilder().localCopy(true).build();
         Versioning versioning = Versioning.newBuilder().snapshot(snapshot).build();
-        Metadata metadata = Metadata.newBuilder()
+        return Metadata.newBuilder()
                 .versioning(versioning)
                 .groupId(artifact.getGroupId())
                 .artifactId(artifact.getArtifactId())
                 .version(artifact.getBaseVersion())
                 .modelVersion("1.1.0")
                 .build();
-        return metadata;
     }
 
     public void bind(Artifact artifact) {

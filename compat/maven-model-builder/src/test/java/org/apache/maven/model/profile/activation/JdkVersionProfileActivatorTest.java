@@ -47,9 +47,7 @@ class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVer
     private Profile newProfile(String jdkVersion) {
         Activation a = Activation.newBuilder().jdk(jdkVersion).build();
 
-        Profile p = Profile.newBuilder().activation(a).build();
-
-        return p;
+        return Profile.newBuilder().activation(a).build();
     }
 
     private Properties newProperties(String javaVersion) {

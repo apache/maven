@@ -112,10 +112,8 @@ public abstract class AbstractMavenProjectTestCase {
     protected ArtifactRepository getLocalRepository() throws Exception {
         ArtifactRepositoryLayout repoLayout = getContainer().lookup(ArtifactRepositoryLayout.class);
 
-        ArtifactRepository r = repositorySystem.createArtifactRepository(
+        return repositorySystem.createArtifactRepository(
                 "local", "file://" + getLocalRepositoryPath().getAbsolutePath(), repoLayout, null, null);
-
-        return r;
     }
 
     // ----------------------------------------------------------------------
