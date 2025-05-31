@@ -95,7 +95,10 @@ public class CheckThreadSafetyMojo extends AbstractMojo {
                     getLog().info("[MAVEN-CORE-IT-LOG] Thread " + this + " uses " + tccl);
                     Thread.currentThread().setContextClassLoader(tccl);
                     while (go.isEmpty()) {
-                        // wait for start
+                        try {
+                            Thread.sleep(100); // wait for the start
+                        } catch (InterruptedException ignored) {
+                        }
                     }
                     for (int j = 0; j < 10 * 1000; j++) {
                         try {
