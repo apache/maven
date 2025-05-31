@@ -107,8 +107,7 @@ public class InfoReport extends AbstractMojo implements MavenReport {
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException e) {
-                    // just ignore
+                } catch (IOException ignore) {
                 }
             }
         }

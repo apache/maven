@@ -81,8 +81,7 @@ class PropertiesUtil {
             if (os != null) {
                 try {
                     os.close();
-                } catch (IOException e) {
-                    // just ignore
+                } catch (IOException ignore) {
                 }
             }
         }
