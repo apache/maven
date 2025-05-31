@@ -147,26 +147,76 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     private Map<String, String> systemProperties = Collections.emptyMap();
     private Map<String, String> userProperties = Collections.emptyMap();
     private Model model;
-
-    private final ThreadLocal<Record> records = new ThreadLocal<>();
+    private final Record record;
 
     public DefaultProfileActivationContext(
             PathTranslator pathTranslator, RootLocator rootLocator, Interpolator interpolator) {
         this.pathTranslator = pathTranslator;
         this.rootLocator = rootLocator;
         this.interpolator = interpolator;
+        this.record = null;
     }
 
-    Record start() {
-        Record record = records.get();
-        records.set(new Record());
-        return record;
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultProfileActivationContext(
+            PathTranslator pathTranslator,
+            RootLocator rootLocator,
+            Interpolator interpolator,
+            List<String> activeProfileIds,
+            List<String> inactiveProfileIds,
+            Map<String, String> systemProperties,
+            Map<String, String> userProperties,
+            Model model) {
+        this(
+                pathTranslator,
+                rootLocator,
+                interpolator,
+                activeProfileIds,
+                inactiveProfileIds,
+                systemProperties,
+                userProperties,
+                model,
+                null);
     }
 
-    Record stop(Record previous) {
-        Record record = records.get();
-        records.set(previous);
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    private DefaultProfileActivationContext(
+            PathTranslator pathTranslator,
+            RootLocator rootLocator,
+            Interpolator interpolator,
+            List<String> activeProfileIds,
+            List<String> inactiveProfileIds,
+            Map<String, String> systemProperties,
+            Map<String, String> userProperties,
+            Model model,
+            Record record) {
+        this.pathTranslator = pathTranslator;
+        this.rootLocator = rootLocator;
+        this.interpolator = interpolator;
+        this.activeProfileIds = activeProfileIds;
+        this.inactiveProfileIds = inactiveProfileIds;
+        this.systemProperties = systemProperties;
+        this.userProperties = userProperties;
+        this.model = model;
+        this.record = record;
+    }
+
+    DefaultProfileActivationContext start() {
+        return new DefaultProfileActivationContext(
+                pathTranslator,
+                rootLocator,
+                interpolator,
+                activeProfileIds,
+                inactiveProfileIds,
+                systemProperties,
+                userProperties,
+                model,
+                new Record());
+    }
+
+    Record stop() {
         // only keep keys for which the value is `true`
+        Objects.requireNonNull(record, "start() must be called before stop()");
         record.usedActiveProfiles.values().removeIf(value -> !value);
         record.usedInactiveProfiles.values().removeIf(value -> !value);
         return record;
@@ -174,7 +224,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public boolean isProfileActive(String profileId) {
-        Record record = records.get();
         if (record != null) {
             return record.usedActiveProfiles.computeIfAbsent(profileId, activeProfileIds::contains);
         } else {
@@ -182,20 +231,8 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         }
     }
 
-    /**
-     * Sets the identifiers of those profiles that should be activated by explicit demand.
-     *
-     * @param activeProfileIds The identifiers of those profiles to activate, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
-    public DefaultProfileActivationContext setActiveProfileIds(List<String> activeProfileIds) {
-        this.activeProfileIds = unmodifiable(activeProfileIds);
-        return this;
-    }
-
     @Override
     public boolean isProfileInactive(String profileId) {
-        Record record = records.get();
         if (record != null) {
             return record.usedInactiveProfiles.computeIfAbsent(profileId, inactiveProfileIds::contains);
         } else {
@@ -203,20 +240,8 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         }
     }
 
-    /**
-     * Sets the identifiers of those profiles that should be deactivated by explicit demand.
-     *
-     * @param inactiveProfileIds The identifiers of those profiles to deactivate, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
-    public DefaultProfileActivationContext setInactiveProfileIds(List<String> inactiveProfileIds) {
-        this.inactiveProfileIds = unmodifiable(inactiveProfileIds);
-        return this;
-    }
-
     @Override
     public String getSystemProperty(String key) {
-        Record record = records.get();
         if (record != null) {
             return record.usedSystemProperties.computeIfAbsent(key, systemProperties::get);
         } else {
@@ -238,7 +263,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getUserProperty(String key) {
-        Record record = records.get();
         if (record != null) {
             return record.usedUserProperties.computeIfAbsent(key, userProperties::get);
         } else {
@@ -261,7 +285,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getModelArtifactId() {
-        Record record = records.get();
         if (record != null) {
             return record.usedModelInfos.computeIfAbsent(ModelInfo.ArtifactId, k -> model.getArtifactId());
         } else {
@@ -271,7 +294,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getModelPackaging() {
-        Record record = records.get();
         if (record != null) {
             return record.usedModelInfos.computeIfAbsent(ModelInfo.Packaging, k -> model.getPackaging());
         } else {
@@ -281,7 +303,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getModelProperty(String key) {
-        Record record = records.get();
         if (record != null) {
             return record.usedModelProperties.computeIfAbsent(
                     key, k -> model.getProperties().get(k));
@@ -292,7 +313,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getModelBaseDirectory() {
-        Record record = records.get();
         if (record != null) {
             return record.usedModelInfos.computeIfAbsent(ModelInfo.BaseDirectory, k -> doGetModelBaseDirectory());
         } else {
@@ -307,7 +327,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String getModelRootDirectory() {
-        Record record = records.get();
         if (record != null) {
             return record.usedModelInfos.computeIfAbsent(ModelInfo.RootDirectory, k -> doGetModelRootDirectory());
         } else {
@@ -352,7 +371,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public boolean exists(String path, boolean enableGlob) throws ModelBuilderException {
-        Record record = records.get();
         if (record != null) {
             return record.usedExists.computeIfAbsent(
                     new ExistRequest(path, enableGlob), r -> doExists(r.path, r.enableGlob));
@@ -416,10 +434,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             }
         }
         return true;
-    }
-
-    private static List<String> unmodifiable(List<String> list) {
-        return list != null ? Collections.unmodifiableList(list) : Collections.emptyList();
     }
 
     private static Map<String, String> unmodifiable(Map<String, String> map) {
