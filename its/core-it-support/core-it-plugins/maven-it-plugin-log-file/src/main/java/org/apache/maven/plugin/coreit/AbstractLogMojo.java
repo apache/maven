@@ -22,7 +22,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -78,25 +77,14 @@ public abstract class AbstractLogMojo extends AbstractMojo {
         File file = getLogFile();
         getLog().info("[MAVEN-CORE-IT-LOG] Updating log file: " + file);
         getLog().info("[MAVEN-CORE-IT-LOG]   " + value);
-        try {
-            file.getParentFile().mkdirs();
-            OutputStream out = new FileOutputStream(file, true);
-            try {
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, encoding));
-                if (value != null) {
-                    writer.write(value.toString());
-                    writer.newLine();
-                    writer.flush();
-                }
-            } finally {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // just ignore, we tried our best to clean up
-                }
+        if (value != null && file.getParentFile().mkdirs()) {
+            try (BufferedWriter writer =
+                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), encoding))) {
+                writer.write(value.toString());
+                writer.newLine();
+            } catch (IOException e) {
+                throw new MojoExecutionException("Failed to update log file " + logFile, e);
             }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Failed to update log file " + logFile, e);
         }
     }
 
@@ -108,19 +96,15 @@ public abstract class AbstractLogMojo extends AbstractMojo {
     protected void reset() throws MojoExecutionException {
         File file = getLogFile();
         getLog().info("[MAVEN-CORE-IT-LOG] Resetting log file: " + file);
-        try {
+        if (file.getParentFile().mkdirs()) {
             /*
              * NOTE: Intentionally don't delete the file but create a new empty one to check the plugin was executed.
              */
-            file.getParentFile().mkdirs();
-            OutputStream out = new FileOutputStream(file);
             try {
-                out.close();
-            } catch (IOException e) {
-                // just ignore, we tried our best to clean up
+                new FileOutputStream(file).close();
+            } catch (IOException ignore) {
+                // tried our best to clean up
             }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Failed to reset log file " + logFile, e);
         }
     }
 }
