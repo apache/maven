@@ -75,7 +75,7 @@ public class ListMojo extends AbstractMojo {
 
         OutputStream out = null;
         try {
-            reportsFile.getParentFile().mkdirs();
+            reportsFilemkDirForParentFile();
             out = new FileOutputStream(reportsFile);
             reportProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {

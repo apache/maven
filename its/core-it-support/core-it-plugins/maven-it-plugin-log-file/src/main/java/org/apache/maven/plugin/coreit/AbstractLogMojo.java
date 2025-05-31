@@ -79,7 +79,7 @@ public abstract class AbstractLogMojo extends AbstractMojo {
         getLog().info("[MAVEN-CORE-IT-LOG] Updating log file: " + file);
         getLog().info("[MAVEN-CORE-IT-LOG]   " + value);
         try {
-            file.getParentFile().mkdirs();
+            filemkDirForParentFile();
             OutputStream out = new FileOutputStream(file, true);
             try {
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, encoding));
@@ -112,7 +112,7 @@ public abstract class AbstractLogMojo extends AbstractMojo {
             /*
              * NOTE: Intentionally don't delete the file but create a new empty one to check the plugin was executed.
              */
-            file.getParentFile().mkdirs();
+            filemkDirForParentFile();
             OutputStream out = new FileOutputStream(file);
             try {
                 out.close();

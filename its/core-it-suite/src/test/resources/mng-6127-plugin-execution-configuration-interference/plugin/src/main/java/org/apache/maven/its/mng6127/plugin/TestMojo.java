@@ -76,7 +76,7 @@ public class TestMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
         File file = new File(project.getBasedir(), "configuration.txt");
-        file.getParentFile().mkdirs();
+        filemkDirForParentFile();
 
         Writer w = null;
 

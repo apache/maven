@@ -39,7 +39,7 @@ public class TouchMojo extends AbstractMojo {
         getLog().info("[MAVEN-CORE-IT-LOG] Creating touch file: " + touchFile);
 
         try {
-            touchFile.getParentFile().mkdirs();
+            touchFilemkDirForParentFile();
             touchFile.createNewFile();
         } catch (IOException e) {
             throw new MojoExecutionException("Error creating touch file: " + e.getMessage(), e);

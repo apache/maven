@@ -123,7 +123,7 @@ public class ResolveMojo extends AbstractMojo {
             getLog().info("[MAVEN-CORE-IT-LOG] Creating properties file " + propertiesFile);
 
             try {
-                propertiesFile.getParentFile().mkdirs();
+                propertiesFilemkDirForParentFile();
 
                 try (FileOutputStream fos = new FileOutputStream(propertiesFile)) {
                     props.store(fos, "MAVEN-CORE-IT");

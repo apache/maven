@@ -64,7 +64,7 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
 
         BufferedWriter writer = null;
         try {
-            file.getParentFile().mkdirs();
+            filemkDirForParentFile();
 
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 

@@ -103,7 +103,7 @@ public class DumpRepoLayoutsMojo extends AbstractMojo {
 
         OutputStream out = null;
         try {
-            layoutsFile.getParentFile().mkdirs();
+            layoutsFilemkDirForParentFile();
             out = new FileOutputStream(layoutsFile);
             layoutProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {

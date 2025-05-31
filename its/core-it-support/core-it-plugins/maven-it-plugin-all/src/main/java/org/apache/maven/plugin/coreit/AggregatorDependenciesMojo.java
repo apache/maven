@@ -48,7 +48,7 @@ public class AggregatorDependenciesMojo extends AbstractMojo {
 
         if (touchFile != null) {
             try {
-                touchFile.getParentFile().mkdirs();
+                touchFilemkDirForParentFile();
                 touchFile.createNewFile();
             } catch (IOException e) {
                 throw new MojoExecutionException("Failed to create touch file " + touchFile, e);

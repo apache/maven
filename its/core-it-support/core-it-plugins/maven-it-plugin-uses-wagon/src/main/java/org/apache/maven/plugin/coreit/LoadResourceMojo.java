@@ -132,7 +132,7 @@ public class LoadResourceMojo extends AbstractMojo {
 
         OutputStream out = null;
         try {
-            wagonClassLoaderOutput.getParentFile().mkdirs();
+            wagonClassLoaderOutputmkDirForParentFile();
             out = new FileOutputStream(wagonClassLoaderOutput);
             loaderProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
