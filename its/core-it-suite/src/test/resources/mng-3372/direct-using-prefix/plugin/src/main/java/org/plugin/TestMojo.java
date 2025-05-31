@@ -45,7 +45,7 @@ public class TestMojo implements Mojo {
         File outFile = new File(buildDir, "out.txt");
         FileWriter writer = null;
         try {
-            outFilemkDirForParentFile();
+            mkDirForParentFile(outFile);
 
             writer = new FileWriter(outFile);
             writer.write("Test");
