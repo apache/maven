@@ -262,6 +262,7 @@ public class DefaultMavenMetadataCache implements MavenMetadataCache {
         }
     }
 
+    @Override
     public ResolutionGroup get(
             Artifact artifact,
             boolean resolveManagedVersions,
@@ -288,6 +289,7 @@ public class DefaultMavenMetadataCache implements MavenMetadataCache {
         return null;
     }
 
+    @Override
     public void put(
             Artifact artifact,
             boolean resolveManagedVersions,
@@ -316,6 +318,7 @@ public class DefaultMavenMetadataCache implements MavenMetadataCache {
         cache.put(cacheKey, cacheRecord);
     }
 
+    @Override
     public void flush() {
         cache.clear();
     }

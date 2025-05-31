@@ -59,6 +59,7 @@ public class SimpleProblemCollector implements ModelProblemCollector {
         return fatals;
     }
 
+    @Override
     public void add(ModelProblemCollectorRequest req) {
         switch (req.getSeverity()) {
             case FATAL:

@@ -119,6 +119,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
         return getNumberOfExceutions(projectBuildList);
     }
 
+    @Override
     public void calculateForkedExecutions(MojoExecution mojoExecution, MavenSession session)
             throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
                     PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
@@ -126,6 +127,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
         // Maybe do something ?
     }
 
+    @Override
     public MavenExecutionPlan calculateExecutionPlan(
             MavenSession session, MavenProject project, List<Task> tasks, boolean setup)
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
@@ -144,6 +146,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
         return createExecutionPlan(project, me);
     }
 
+    @Override
     public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Task> tasks)
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
                     PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
@@ -151,6 +154,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
         return calculateExecutionPlan(session, project, tasks, true);
     }
 
+    @Override
     public void setupMojoExecution(
             MavenSession session,
             MavenProject project,

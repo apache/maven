@@ -48,6 +48,7 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
         this.metadata = metadata;
     }
 
+    @Override
     public void merge(File current, File result) throws RepositoryException {
         try {
             if (current.exists()) {
@@ -62,22 +63,27 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
         }
     }
 
+    @Override
     public boolean isMerged() {
         return merged;
     }
 
+    @Override
     public String getGroupId() {
         return emptify(metadata.getGroupId());
     }
 
+    @Override
     public String getArtifactId() {
         return metadata.storedInGroupDirectory() ? "" : emptify(metadata.getArtifactId());
     }
 
+    @Override
     public String getVersion() {
         return metadata.storedInArtifactVersionDirectory() ? emptify(metadata.getBaseVersion()) : "";
     }
 
+    @Override
     public String getType() {
         return metadata.getRemoteFilename();
     }
@@ -86,10 +92,12 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
         return (string != null) ? string : "";
     }
 
+    @Override
     public File getFile() {
         return null;
     }
 
+    @Override
     public MetadataBridge setFile(File file) {
         return this;
     }
@@ -99,6 +107,7 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
         return null;
     }
 
+    @Override
     public Nature getNature() {
         if (metadata instanceof RepositoryMetadata repositoryMetadata) {
             return switch (repositoryMetadata.getNature()) {
@@ -111,6 +120,7 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
         }
     }
 
+    @Override
     public Map<String, String> getProperties() {
         return Collections.emptyMap();
     }

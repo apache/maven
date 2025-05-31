@@ -47,6 +47,7 @@ public class LifecycleTaskSegmentCalculatorStub extends DefaultLifecycleTaskSegm
         super(null, null);
     }
 
+    @Override
     public List<TaskSegment> calculateTaskSegments(MavenSession session, List<String> tasks)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
@@ -78,6 +79,7 @@ public class LifecycleTaskSegmentCalculatorStub extends DefaultLifecycleTaskSegm
         return taskSegments;
     }
 
+    @Override
     public boolean requiresProject(MavenSession session) {
         return true;
     }

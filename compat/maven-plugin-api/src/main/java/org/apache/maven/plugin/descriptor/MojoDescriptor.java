@@ -442,11 +442,13 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getRole() {
         return isV4Api() ? "org.apache.maven.api.plugin.Mojo" : Mojo.ROLE;
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getRoleHint() {
         return getId();
     }
@@ -468,6 +470,7 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getComponentType() {
         return MAVEN_PLUGIN;
     }
@@ -501,6 +504,7 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean equals(Object object) {
         if (this == object) {
             return true;
@@ -515,6 +519,7 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
     }
 
     /** {@inheritDoc} */
+    @Override
     public int hashCode() {
         return Objects.hash(getGoal(), getPluginDescriptor());
     }

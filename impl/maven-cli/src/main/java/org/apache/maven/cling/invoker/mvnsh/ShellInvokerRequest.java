@@ -67,6 +67,7 @@ public class ShellInvokerRequest extends BaseInvokerRequest {
      * The mandatory Shell options.
      */
     @Nonnull
+    @Override
     public ShellOptions options() {
         return options;
     }

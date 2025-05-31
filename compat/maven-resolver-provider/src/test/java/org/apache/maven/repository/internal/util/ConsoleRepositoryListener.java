@@ -35,72 +35,89 @@ public class ConsoleRepositoryListener extends AbstractRepositoryListener {
         this.out = (out != null) ? out : System.out;
     }
 
+    @Override
     public void artifactDeployed(RepositoryEvent event) {
         println("artifactDeployed", event.getArtifact() + " to " + event.getRepository());
     }
 
+    @Override
     public void artifactDeploying(RepositoryEvent event) {
         println("artifactDeploying", event.getArtifact() + " to " + event.getRepository());
     }
 
+    @Override
     public void artifactDescriptorInvalid(RepositoryEvent event) {
         println(
                 "artifactDescriptorInvalid",
                 "for " + event.getArtifact() + ": " + event.getException().getMessage());
     }
 
+    @Override
     public void artifactDescriptorMissing(RepositoryEvent event) {
         println("artifactDescriptorMissing", "for " + event.getArtifact());
     }
 
+    @Override
     public void artifactInstalled(RepositoryEvent event) {
         println("artifactInstalled", event.getArtifact() + " to " + event.getFile());
     }
 
+    @Override
     public void artifactInstalling(RepositoryEvent event) {
         println("artifactInstalling", event.getArtifact() + " to " + event.getFile());
     }
 
+    @Override
     public void artifactResolved(RepositoryEvent event) {
         println("artifactResolved", event.getArtifact() + " from " + event.getRepository());
     }
 
+    @Override
     public void artifactDownloading(RepositoryEvent event) {
         println("artifactDownloading", event.getArtifact() + " from " + event.getRepository());
     }
 
+    @Override
     public void artifactDownloaded(RepositoryEvent event) {
         println("artifactDownloaded", event.getArtifact() + " from " + event.getRepository());
     }
 
+    @Override
     public void artifactResolving(RepositoryEvent event) {
         println("artifactResolving", event.getArtifact().toString());
     }
 
+    @Override
     public void metadataDeployed(RepositoryEvent event) {
         println("metadataDeployed", event.getMetadata() + " to " + event.getRepository());
     }
 
+    @Override
     public void metadataDeploying(RepositoryEvent event) {
         println("metadataDeploying", event.getMetadata() + " to " + event.getRepository());
     }
 
+    @Override
     public void metadataInstalled(RepositoryEvent event) {
         println("metadataInstalled", event.getMetadata() + " to " + event.getFile());
     }
 
+    @Override
     public void metadataInstalling(RepositoryEvent event) {
         println("metadataInstalling", event.getMetadata() + " to " + event.getFile());
     }
 
+    @Override
     public void metadataInvalid(RepositoryEvent event) {
         println("metadataInvalid", event.getMetadata().toString());
     }
 
+    @Override
     public void metadataResolved(RepositoryEvent event) {
         println("metadataResolved", event.getMetadata() + " from " + event.getRepository());
     }
 
+    @Override
     public void metadataResolving(RepositoryEvent event) {
         println("metadataResolving", event.getMetadata() + " from " + event.getRepository());
     }

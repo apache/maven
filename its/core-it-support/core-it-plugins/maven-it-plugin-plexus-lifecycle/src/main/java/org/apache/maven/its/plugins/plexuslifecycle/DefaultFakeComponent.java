@@ -45,6 +45,7 @@ public class DefaultFakeComponent implements FakeComponent, Contextualizable, Di
         logger.info("DefaultFakeComponent :: dispose");
     }
 
+    @Override
     public void doNothing() {
         logger.info("doNothing DefaultFakeComponent");
     }

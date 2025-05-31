@@ -44,6 +44,7 @@ public class DefaultGraphConflictResolver implements GraphConflictResolver {
 
     // -------------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------------
+    @Override
     public MetadataGraph resolveConflicts(MetadataGraph graph, ArtifactScopeEnum scope)
             throws GraphConflictResolutionException {
         if (policy == null) {

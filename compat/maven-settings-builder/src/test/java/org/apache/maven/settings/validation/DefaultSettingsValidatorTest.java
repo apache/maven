@@ -223,6 +223,7 @@ class DefaultSettingsValidatorTest {
 
         List<String> messages = new ArrayList<>();
 
+        @Override
         public void add(Severity severity, String message, int line, int column, Exception cause) {
             messages.add(message);
         }

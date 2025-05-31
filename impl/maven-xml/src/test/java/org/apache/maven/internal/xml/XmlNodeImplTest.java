@@ -701,6 +701,7 @@ class XmlNodeImplTest {
             this.location = location;
         }
 
+        @Override
         public Object toInputLocation(XMLStreamReader parser) {
             return location;
         }

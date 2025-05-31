@@ -83,6 +83,7 @@ public final class ArtifactStatus implements Comparable<ArtifactStatus> {
         return retVal != null ? retVal : NONE;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -96,14 +97,17 @@ public final class ArtifactStatus implements Comparable<ArtifactStatus> {
         return rank == that.rank;
     }
 
+    @Override
     public int hashCode() {
         return rank;
     }
 
+    @Override
     public String toString() {
         return key;
     }
 
+    @Override
     public int compareTo(ArtifactStatus s) {
         return rank - s.rank;
     }

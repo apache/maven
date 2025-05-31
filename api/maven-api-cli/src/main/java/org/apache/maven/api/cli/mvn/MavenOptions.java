@@ -229,5 +229,6 @@ public interface MavenOptions extends Options {
      * @return a new MavenOptions instance with interpolated values
      */
     @Nonnull
+    @Override
     MavenOptions interpolate(@Nonnull UnaryOperator<String> callback);
 }

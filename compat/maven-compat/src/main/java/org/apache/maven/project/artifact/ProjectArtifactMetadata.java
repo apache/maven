@@ -49,10 +49,12 @@ public class ProjectArtifactMetadata extends AbstractArtifactMetadata {
         return file;
     }
 
+    @Override
     public String getRemoteFilename() {
         return getFilename();
     }
 
+    @Override
     public String getLocalFilename(ArtifactRepository repository) {
         return getFilename();
     }
@@ -61,6 +63,7 @@ public class ProjectArtifactMetadata extends AbstractArtifactMetadata {
         return getArtifactId() + "-" + artifact.getVersion() + ".pom";
     }
 
+    @Override
     public void storeInLocalRepository(ArtifactRepository localRepository, ArtifactRepository remoteRepository)
             throws RepositoryMetadataStoreException {
         File destination = new File(
@@ -81,22 +84,27 @@ public class ProjectArtifactMetadata extends AbstractArtifactMetadata {
         }
     }
 
+    @Override
     public String toString() {
         return "project information for " + artifact.getArtifactId() + " " + artifact.getVersion();
     }
 
+    @Override
     public boolean storedInArtifactVersionDirectory() {
         return true;
     }
 
+    @Override
     public String getBaseVersion() {
         return artifact.getBaseVersion();
     }
 
+    @Override
     public Object getKey() {
         return "project " + artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
+    @Override
     public void merge(ArtifactMetadata metadata) {
         ProjectArtifactMetadata m = (ProjectArtifactMetadata) metadata;
         if (!m.file.equals(file)) {
@@ -104,6 +112,7 @@ public class ProjectArtifactMetadata extends AbstractArtifactMetadata {
         }
     }
 
+    @Override
     public void merge(org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata) {
         this.merge((ArtifactMetadata) metadata);
     }

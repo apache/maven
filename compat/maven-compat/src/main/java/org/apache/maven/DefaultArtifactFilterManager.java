@@ -62,6 +62,7 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager {
      *
      * @see org.apache.maven.ArtifactFilterManager#getArtifactFilter()
      */
+    @Override
     public ArtifactFilter getArtifactFilter() {
         Set<String> excludes = new LinkedHashSet<>(getExcludedArtifacts());
 
@@ -77,14 +78,17 @@ public class DefaultArtifactFilterManager implements ArtifactFilterManager {
      *
      * @see org.apache.maven.ArtifactFilterManager#getCoreArtifactFilter()
      */
+    @Override
     public ArtifactFilter getCoreArtifactFilter() {
         return new ExclusionSetFilter(getCoreArtifactExcludes());
     }
 
+    @Override
     public void excludeArtifact(String artifactId) {
         getExcludedArtifacts().add(artifactId);
     }
 
+    @Override
     public Set<String> getCoreArtifactExcludes() {
         Set<String> excludes = new LinkedHashSet<>(coreArtifacts);
 

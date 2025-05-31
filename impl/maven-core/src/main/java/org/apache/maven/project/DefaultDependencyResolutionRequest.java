@@ -40,28 +40,34 @@ public class DefaultDependencyResolutionRequest implements DependencyResolutionR
         setRepositorySession(session);
     }
 
+    @Override
     public DependencyFilter getResolutionFilter() {
         return filter;
     }
 
+    @Override
     public MavenProject getMavenProject() {
         return project;
     }
 
+    @Override
     public RepositorySystemSession getRepositorySession() {
         return session;
     }
 
+    @Override
     public DependencyResolutionRequest setResolutionFilter(DependencyFilter filter) {
         this.filter = filter;
         return this;
     }
 
+    @Override
     public DependencyResolutionRequest setMavenProject(MavenProject project) {
         this.project = project;
         return this;
     }
 
+    @Override
     public DependencyResolutionRequest setRepositorySession(RepositorySystemSession repositorySession) {
         this.session = repositorySession;
         return this;

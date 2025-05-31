@@ -191,6 +191,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     // ----------------------------------------------------------------------
 
     @Deprecated(since = "4.0.0", forRemoval = true)
+    @Override
     public XmlNode getChild(String name) {
         if (name != null) {
             ListIterator<XmlNode> it = children.listIterator(children.size());
@@ -236,6 +237,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
      * @return input location
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
+    @Override
     public Object getInputLocation() {
         return location;
     }

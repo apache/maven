@@ -137,6 +137,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
         return stream().filter(lf -> Objects.equals(id, lf.id())).findAny();
     }
 
+    @Override
     public List<String> computePhases(Lifecycle lifecycle) {
         Graph graph = new Graph();
         addPhases(graph, null, null, lifecycle.v3phases());

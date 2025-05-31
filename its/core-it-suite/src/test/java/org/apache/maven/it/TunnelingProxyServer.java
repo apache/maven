@@ -67,6 +67,7 @@ public class TunnelingProxyServer implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         try {
             while (true) {
@@ -85,6 +86,7 @@ public class TunnelingProxyServer implements Runnable {
             this.client = client;
         }
 
+        @Override
         public void run() {
             try {
                 PushbackInputStream is = new PushbackInputStream(client.getInputStream());
@@ -167,6 +169,7 @@ public class TunnelingProxyServer implements Runnable {
             this.os = os;
         }
 
+        @Override
         public void run() {
             try {
                 for (byte[] buffer = new byte[1024 * 8]; ; ) {

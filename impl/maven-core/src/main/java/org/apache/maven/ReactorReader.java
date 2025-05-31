@@ -93,10 +93,12 @@ class ReactorReader implements MavenWorkspaceReader {
     // Public API
     //
 
+    @Override
     public WorkspaceRepository getRepository() {
         return repository;
     }
 
+    @Override
     public File findArtifact(Artifact artifact) {
         MavenProject project = getProject(artifact);
 
@@ -122,6 +124,7 @@ class ReactorReader implements MavenWorkspaceReader {
         return null;
     }
 
+    @Override
     public List<String> findVersions(Artifact artifact) {
         List<String> versions = getProjects()
                 .getOrDefault(artifact.getGroupId(), Collections.emptyMap())

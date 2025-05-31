@@ -150,6 +150,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         return newRepositorySessionBuilder(request).build();
     }
 
+    @Override
     @SuppressWarnings({"checkstyle:methodLength"})
     public SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
         requireNonNull(request, "request");

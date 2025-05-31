@@ -42,20 +42,25 @@ public class DebugResolutionListener implements ResolutionListener, ResolutionLi
         this.logger = logger;
     }
 
+    @Override
     public void testArtifact(Artifact node) {}
 
+    @Override
     public void startProcessChildren(Artifact artifact) {
         indent += "  ";
     }
 
+    @Override
     public void endProcessChildren(Artifact artifact) {
         indent = indent.substring(2);
     }
 
+    @Override
     public void includeArtifact(Artifact artifact) {
         logger.debug(indent + artifact + " (selected for " + artifact.getScope() + ")");
     }
 
+    @Override
     public void omitForNearer(Artifact omitted, Artifact kept) {
         String omittedVersion = omitted.getVersion();
         String keptVersion = kept.getVersion();
@@ -65,10 +70,12 @@ public class DebugResolutionListener implements ResolutionListener, ResolutionLi
         }
     }
 
+    @Override
     public void omitForCycle(Artifact omitted) {
         logger.debug(indent + omitted + " (removed - causes a cycle in the graph)");
     }
 
+    @Override
     public void updateScopeCurrentPom(Artifact artifact, String ignoredScope) {
         logger.debug(indent + artifact + " (not setting artifactScope to: " + ignoredScope + "; local artifactScope "
                 + artifact.getScope() + " wins)");
@@ -82,15 +89,18 @@ public class DebugResolutionListener implements ResolutionListener, ResolutionLi
         }
     }
 
+    @Override
     public void updateScope(Artifact artifact, String scope) {
         logger.debug(indent + artifact + " (setting artifactScope to: " + scope + ")");
     }
 
+    @Override
     public void selectVersionFromRange(Artifact artifact) {
         logger.debug(indent + artifact + " (setting version to: " + artifact.getVersion() + " from range: "
                 + artifact.getVersionRange() + ")");
     }
 
+    @Override
     public void restrictRange(Artifact artifact, Artifact replacement, VersionRange newRange) {
         logger.debug(indent + artifact + " (range restricted from: " + artifact.getVersionRange() + " and: "
                 + replacement.getVersionRange() + " to: " + newRange + " )");
@@ -102,6 +112,7 @@ public class DebugResolutionListener implements ResolutionListener, ResolutionLi
      * (and more information) is needed to be able to determine when and if the version and/or artifactScope changes.
      * See the two added methods, manageArtifactVersion and manageArtifactScope.
      */
+    @Override
     public void manageArtifact(Artifact artifact, Artifact replacement) {
         String msg = indent + artifact;
         msg += " (";
@@ -115,6 +126,7 @@ public class DebugResolutionListener implements ResolutionListener, ResolutionLi
         logger.debug(msg);
     }
 
+    @Override
     public void manageArtifactVersion(Artifact artifact, Artifact replacement) {
         // only show msg if a change is actually taking place
         if (!replacement.getVersion().equals(artifact.getVersion())) {
@@ -123,6 +135,7 @@ public class DebugResolutionListener implements ResolutionListener, ResolutionLi
         }
     }
 
+    @Override
     public void manageArtifactScope(Artifact artifact, Artifact replacement) {
         // only show msg if a change is actually taking place
         if (!replacement.getScope().equals(artifact.getScope())) {
@@ -131,6 +144,7 @@ public class DebugResolutionListener implements ResolutionListener, ResolutionLi
         }
     }
 
+    @Override
     public void manageArtifactSystemPath(Artifact artifact, Artifact replacement) {
         // only show msg if a change is actually taking place
         if (!replacement.getScope().equals(artifact.getScope())) {

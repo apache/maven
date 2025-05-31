@@ -28,104 +28,129 @@ import java.io.Writer;
 public class MXSerializer implements XmlSerializer {
     private Writer output;
 
+    @Override
     public void setOutput(Writer writer) {
         output = writer;
     }
 
+    @Override
     public XmlSerializer attribute(String namespace, String name, String value) {
         return null;
     }
 
+    @Override
     public void cdsect(String text) {
         // ignore
     }
 
+    @Override
     public void comment(String text) {
         // ignore
     }
 
+    @Override
     public void docdecl(String text) {
         // ignore
     }
 
+    @Override
     public void endDocument() {
         // ignore
     }
 
+    @Override
     public XmlSerializer endTag(String namespace, String name) {
         return null;
     }
 
+    @Override
     public void entityRef(String text) {
         // ignore
     }
 
+    @Override
     public void flush() {
         // ignore
     }
 
+    @Override
     public int getDepth() {
         return 0;
     }
 
+    @Override
     public boolean getFeature(String name) {
         return false;
     }
 
+    @Override
     public String getName() {
         return null;
     }
 
+    @Override
     public String getNamespace() {
         return null;
     }
 
+    @Override
     public String getPrefix(String namespace, boolean generatePrefix) {
         return null;
     }
 
+    @Override
     public Object getProperty(String name) {
         return null;
     }
 
+    @Override
     public void ignorableWhitespace(String text) {
         // ignore
     }
 
+    @Override
     public void processingInstruction(String text) {
         // ignore
     }
 
+    @Override
     public void setFeature(String name, boolean state) {
         // ignore
     }
 
+    @Override
     public void setOutput(OutputStream os, String encoding) {
         // ignore
     }
 
+    @Override
     public void setPrefix(String prefix, String namespace) {
         // ignore
     }
 
+    @Override
     public void setProperty(String name, Object value) {
         // ignore
     }
 
+    @Override
     public void startDocument(String encoding, Boolean standalone) {
         // ignore
     }
 
+    @Override
     public XmlSerializer startTag(String namespace, String name) throws IOException {
         output.write(name);
 
         return this;
     }
 
+    @Override
     public XmlSerializer text(String text) {
         return null;
     }
 
+    @Override
     public XmlSerializer text(char[] buf, int start, int len) {
         return null;
     }

@@ -44,6 +44,7 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 @Deprecated
 public class ClasspathArtifactResolver implements ArtifactResolver {
 
+    @Override
     public List<ArtifactResult> resolveArtifacts(
             RepositorySystemSession session, Collection<? extends ArtifactRequest> requests)
             throws ArtifactResolutionException {
@@ -73,6 +74,7 @@ public class ClasspathArtifactResolver implements ArtifactResolver {
         return results;
     }
 
+    @Override
     public ArtifactResult resolveArtifact(RepositorySystemSession session, ArtifactRequest request)
             throws ArtifactResolutionException {
         return resolveArtifacts(session, Collections.singleton(request)).get(0);

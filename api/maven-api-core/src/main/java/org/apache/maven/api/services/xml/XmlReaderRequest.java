@@ -216,6 +216,7 @@ public interface XmlReaderRequest {
                 return inputStream;
             }
 
+            @Override
             public Reader getReader() {
                 return reader;
             }

@@ -142,6 +142,7 @@ public class ResolveTransitiveMojo extends AbstractMojo {
 
         Exception error;
 
+        @Override
         public void run() {
             if (dependencies != null) {
                 try {

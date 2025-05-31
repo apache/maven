@@ -27,16 +27,20 @@ import org.eclipse.aether.repository.ArtifactRepository;
 /**
  */
 public class PluginPrefixResolverStub implements PluginPrefixResolver {
+    @Override
     public PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException {
         return new PluginPrefixResult() {
+            @Override
             public String getGroupId() {
                 return "com.foobar";
             }
 
+            @Override
             public String getArtifactId() {
                 return "bazbaz";
             }
 
+            @Override
             public ArtifactRepository getRepository() {
                 return null;
             }

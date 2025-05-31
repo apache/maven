@@ -44,12 +44,14 @@ public class DebugConfigurationListener implements ConfigurationListener {
         this.logger = logger;
     }
 
+    @Override
     public void notifyFieldChangeUsingSetter(String fieldName, Object value, Object target) {
         if (logger.isDebugEnabled()) {
             logger.debug("  (s) " + fieldName + " = " + toString(value));
         }
     }
 
+    @Override
     public void notifyFieldChangeUsingReflection(String fieldName, Object value, Object target) {
         if (logger.isDebugEnabled()) {
             logger.debug("  (f) " + fieldName + " = " + toString(value));

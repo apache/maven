@@ -62,6 +62,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
         this.packagingRegistry = packagingRegistry;
     }
 
+    @Override
     public Model injectLifecycleBindings(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         String packagingId = model.getPackaging();
         Packaging packaging = packagingRegistry.lookup(packagingId).orElse(null);

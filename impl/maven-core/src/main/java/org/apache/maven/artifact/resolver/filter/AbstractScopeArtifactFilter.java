@@ -62,6 +62,7 @@ abstract class AbstractScopeArtifactFilter implements ArtifactFilter {
         }
     }
 
+    @Override
     public boolean include(Artifact artifact) {
         if (Artifact.SCOPE_COMPILE.equals(artifact.getScope())) {
             return compileScope;

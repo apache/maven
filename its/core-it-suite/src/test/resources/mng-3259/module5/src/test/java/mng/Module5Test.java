@@ -23,10 +23,12 @@ import java.util.Calendar;
 public class Module5Test extends XStreamTestCase {
     private Calendar cal = Calendar.getInstance();
 
+    @Override
     protected Object getObject() {
         return cal;
     }
 
+    @Override
     protected String getXML() {
         return Module3TestUtil.getCalendarAsXML(cal);
     }

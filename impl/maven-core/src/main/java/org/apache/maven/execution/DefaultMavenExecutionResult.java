@@ -40,56 +40,67 @@ public class DefaultMavenExecutionResult implements MavenExecutionResult {
 
     private boolean canResume = false;
 
+    @Override
     public MavenExecutionResult setProject(MavenProject project) {
         this.project = project;
 
         return this;
     }
 
+    @Override
     public MavenProject getProject() {
         return project;
     }
 
+    @Override
     public MavenExecutionResult setTopologicallySortedProjects(List<MavenProject> topologicallySortedProjects) {
         this.topologicallySortedProjects = topologicallySortedProjects;
 
         return this;
     }
 
+    @Override
     public List<MavenProject> getTopologicallySortedProjects() {
         return null == topologicallySortedProjects
                 ? Collections.emptyList()
                 : Collections.unmodifiableList(topologicallySortedProjects);
     }
 
+    @Override
     public DependencyResolutionResult getDependencyResolutionResult() {
         return dependencyResolutionResult;
     }
 
+    @Override
     public MavenExecutionResult setDependencyResolutionResult(DependencyResolutionResult dependencyResolutionResult) {
         this.dependencyResolutionResult = dependencyResolutionResult;
 
         return this;
     }
 
+    @Override
     public List<Throwable> getExceptions() {
         return exceptions;
     }
 
+    @Override
     public MavenExecutionResult addException(Throwable t) {
         exceptions.add(t);
 
         return this;
     }
 
+    @Override
     public boolean hasExceptions() {
         return !getExceptions().isEmpty();
     }
 
+    @Override
     public BuildSummary getBuildSummary(MavenProject project) {
         return buildSummaries.get(project);
     }
 
+    @Override
     public void addBuildSummary(BuildSummary summary) {
         buildSummaries.put(summary.getProject(), summary);
     }

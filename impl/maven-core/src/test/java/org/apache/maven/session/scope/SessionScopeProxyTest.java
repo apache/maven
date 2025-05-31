@@ -123,14 +123,17 @@ public class SessionScopeProxyTest {
         @Inject
         BeanItf2 anotherBean;
 
+        @Override
         public Session getSession() {
             return session;
         }
 
+        @Override
         public BeanItf2 getAnotherBean() {
             return anotherBean;
         }
 
+        @Override
         public void throwException() throws TestException {
             throw new TestException();
         }

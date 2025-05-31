@@ -39,6 +39,7 @@ public class TestMetadataSource implements ArtifactMetadataSource {
     @Inject
     private ArtifactFactory factory;
 
+    @Override
     public ResolutionGroup retrieve(
             Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
             throws ArtifactMetadataRetrievalException {
@@ -67,22 +68,26 @@ public class TestMetadataSource implements ArtifactMetadataSource {
         return new ResolutionGroup(artifact, dependencies, remoteRepositories);
     }
 
+    @Override
     public List<ArtifactVersion> retrieveAvailableVersions(
             Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
             throws ArtifactMetadataRetrievalException {
         throw new UnsupportedOperationException("Cannot get available versions in this test case");
     }
 
+    @Override
     public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
             Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository)
             throws ArtifactMetadataRetrievalException {
         throw new UnsupportedOperationException("Cannot get available versions in this test case");
     }
 
+    @Override
     public ResolutionGroup retrieve(MetadataResolutionRequest request) throws ArtifactMetadataRetrievalException {
         return retrieve(request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories());
     }
 
+    @Override
     public List<ArtifactVersion> retrieveAvailableVersions(MetadataResolutionRequest request)
             throws ArtifactMetadataRetrievalException {
         return retrieveAvailableVersions(

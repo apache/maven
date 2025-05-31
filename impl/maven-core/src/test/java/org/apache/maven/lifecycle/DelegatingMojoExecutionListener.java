@@ -33,18 +33,21 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class DelegatingMojoExecutionListener implements MojoExecutionListener {
     private final List<MojoExecutionListener> listeners = new CopyOnWriteArrayList<>();
 
+    @Override
     public void beforeMojoExecution(MojoExecutionEvent event) throws MojoExecutionException {
         for (MojoExecutionListener listener : listeners) {
             listener.beforeMojoExecution(event);
         }
     }
 
+    @Override
     public void afterMojoExecutionSuccess(MojoExecutionEvent event) throws MojoExecutionException {
         for (MojoExecutionListener listener : listeners) {
             listener.afterMojoExecutionSuccess(event);
         }
     }
 
+    @Override
     public void afterExecutionFailure(MojoExecutionEvent event) {
         for (MojoExecutionListener listener : listeners) {
             listener.afterExecutionFailure(event);

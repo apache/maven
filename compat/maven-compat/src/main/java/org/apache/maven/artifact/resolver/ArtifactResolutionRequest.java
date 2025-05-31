@@ -107,20 +107,24 @@ public class ArtifactResolutionRequest implements RepositoryRequest {
         return artifactDependencies;
     }
 
+    @Override
     public ArtifactRepository getLocalRepository() {
         return localRepository;
     }
 
+    @Override
     public ArtifactResolutionRequest setLocalRepository(ArtifactRepository localRepository) {
         this.localRepository = localRepository;
 
         return this;
     }
 
+    @Override
     public List<ArtifactRepository> getRemoteRepositories() {
         return remoteRepositories;
     }
 
+    @Override
     public ArtifactResolutionRequest setRemoteRepositories(List<ArtifactRepository> remoteRepositories) {
         this.remoteRepositories = remoteRepositories;
 
@@ -206,6 +210,7 @@ public class ArtifactResolutionRequest implements RepositoryRequest {
         return resolveTransitively;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder()
                 .append("REQUEST: ")
@@ -224,20 +229,24 @@ public class ArtifactResolutionRequest implements RepositoryRequest {
         return sb.toString();
     }
 
+    @Override
     public boolean isOffline() {
         return offline;
     }
 
+    @Override
     public ArtifactResolutionRequest setOffline(boolean offline) {
         this.offline = offline;
 
         return this;
     }
 
+    @Override
     public boolean isForceUpdate() {
         return forceUpdate;
     }
 
+    @Override
     public ArtifactResolutionRequest setForceUpdate(boolean forceUpdate) {
         this.forceUpdate = forceUpdate;
 

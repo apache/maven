@@ -48,26 +48,32 @@ class DefaultClassRealmRequest implements ClassRealmRequest {
         this.constituents = constituents;
     }
 
+    @Override
     public RealmType getType() {
         return type;
     }
 
+    @Override
     public ClassLoader getParent() {
         return parent;
     }
 
+    @Override
     public List<String> getImports() {
         return getParentImports();
     }
 
+    @Override
     public List<String> getParentImports() {
         return parentImports;
     }
 
+    @Override
     public Map<String, ClassLoader> getForeignImports() {
         return foreignImports;
     }
 
+    @Override
     public List<ClassRealmConstituent> getConstituents() {
         return constituents;
     }

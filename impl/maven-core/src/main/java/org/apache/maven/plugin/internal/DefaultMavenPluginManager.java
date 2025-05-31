@@ -193,6 +193,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         this.prerequisitesCheckers = prerequisitesCheckers;
     }
 
+    @Override
     public PluginDescriptor getPluginDescriptor(
             Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException {
@@ -283,6 +284,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         }
     }
 
+    @Override
     public MojoDescriptor getMojoDescriptor(
             Plugin plugin, String goal, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws MojoNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
@@ -329,6 +331,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         checkPrerequisites(pluginDescriptor);
     }
 
+    @Override
     public void setupPluginRealm(
             PluginDescriptor pluginDescriptor,
             MavenSession session,
@@ -493,6 +496,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         return foreignImports;
     }
 
+    @Override
     public <T> T getConfiguredMojo(Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution)
             throws PluginConfigurationException, PluginContainerException {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -907,6 +911,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         }
     }
 
+    @Override
     public void releaseMojo(Object mojo, MojoExecution mojoExecution) {
         if (mojo != null) {
             try {
@@ -927,6 +932,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         }
     }
 
+    @Override
     public ExtensionRealmCache.CacheRecord setupExtensionsRealm(
             MavenProject project, Plugin plugin, RepositorySystemSession session) throws PluginManagerException {
         @SuppressWarnings("unchecked")

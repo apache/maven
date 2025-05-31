@@ -60,6 +60,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
         this.lifecycle = lifecycle;
     }
 
+    @Override
     public void injectLifecycleBindings(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         String packaging = model.getPackaging();
 

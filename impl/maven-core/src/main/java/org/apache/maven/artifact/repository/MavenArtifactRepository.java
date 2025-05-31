@@ -109,46 +109,57 @@ public class MavenArtifactRepository implements ArtifactRepository {
         this.basedirPath = path;
     }
 
+    @Override
     public String pathOf(Artifact artifact) {
         return layout.pathOf(artifact);
     }
 
+    @Override
     public String pathOfRemoteRepositoryMetadata(ArtifactMetadata artifactMetadata) {
         return layout.pathOfRemoteRepositoryMetadata(artifactMetadata);
     }
 
+    @Override
     public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
         return layout.pathOfLocalRepositoryMetadata(metadata, repository);
     }
 
+    @Override
     public void setLayout(ArtifactRepositoryLayout layout) {
         this.layout = layout;
     }
 
+    @Override
     public ArtifactRepositoryLayout getLayout() {
         return layout;
     }
 
+    @Override
     public void setSnapshotUpdatePolicy(ArtifactRepositoryPolicy snapshots) {
         this.snapshots = snapshots;
     }
 
+    @Override
     public ArtifactRepositoryPolicy getSnapshots() {
         return snapshots;
     }
 
+    @Override
     public void setReleaseUpdatePolicy(ArtifactRepositoryPolicy releases) {
         this.releases = releases;
     }
 
+    @Override
     public ArtifactRepositoryPolicy getReleases() {
         return releases;
     }
 
+    @Override
     public String getKey() {
         return getId();
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(256);
 
@@ -179,6 +190,7 @@ public class MavenArtifactRepository implements ArtifactRepository {
         return sb.toString();
     }
 
+    @Override
     public Artifact find(Artifact artifact) {
         File artifactFile = new File(getBasedir(), pathOf(artifact));
 
@@ -189,18 +201,22 @@ public class MavenArtifactRepository implements ArtifactRepository {
         return artifact;
     }
 
+    @Override
     public List<String> findVersions(Artifact artifact) {
         return Collections.emptyList();
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public String getUrl() {
         return url;
     }
 
+    @Override
     public String getBasedir() {
         return basedir;
     }
@@ -210,14 +226,17 @@ public class MavenArtifactRepository implements ArtifactRepository {
         return basedirPath;
     }
 
+    @Override
     public String getProtocol() {
         return protocol;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public void setUrl(String url) {
         this.url = url;
 
@@ -319,6 +338,7 @@ public class MavenArtifactRepository implements ArtifactRepository {
         return decoded;
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -326,6 +346,7 @@ public class MavenArtifactRepository implements ArtifactRepository {
         return result;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -346,42 +367,52 @@ public class MavenArtifactRepository implements ArtifactRepository {
         return Objects.equals(s1, s2);
     }
 
+    @Override
     public Authentication getAuthentication() {
         return authentication;
     }
 
+    @Override
     public void setAuthentication(Authentication authentication) {
         this.authentication = authentication;
     }
 
+    @Override
     public Proxy getProxy() {
         return proxy;
     }
 
+    @Override
     public void setProxy(Proxy proxy) {
         this.proxy = proxy;
     }
 
+    @Override
     public boolean isBlacklisted() {
         return false;
     }
 
+    @Override
     public void setBlacklisted(boolean blackListed) {
         // no op
     }
 
+    @Override
     public boolean isUniqueVersion() {
         return true;
     }
 
+    @Override
     public boolean isProjectAware() {
         return false;
     }
 
+    @Override
     public List<ArtifactRepository> getMirroredRepositories() {
         return mirroredRepositories;
     }
 
+    @Override
     public void setMirroredRepositories(List<ArtifactRepository> mirroredRepositories) {
         if (mirroredRepositories != null) {
             this.mirroredRepositories = Collections.unmodifiableList(mirroredRepositories);
@@ -390,10 +421,12 @@ public class MavenArtifactRepository implements ArtifactRepository {
         }
     }
 
+    @Override
     public boolean isBlocked() {
         return blocked;
     }
 
+    @Override
     public void setBlocked(boolean blocked) {
         this.blocked = blocked;
     }

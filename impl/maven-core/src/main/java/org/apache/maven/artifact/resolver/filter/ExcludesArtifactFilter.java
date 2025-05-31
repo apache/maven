@@ -32,6 +32,7 @@ public class ExcludesArtifactFilter extends IncludesArtifactFilter {
         super(patterns);
     }
 
+    @Override
     public boolean include(Artifact artifact) {
         return !super.include(artifact);
     }

@@ -53,6 +53,7 @@ public class DefaultArtifactTransformationManager implements ArtifactTransformat
                 .collect(Collectors.toList());
     }
 
+    @Override
     public void transformForResolve(Artifact artifact, RepositoryRequest request)
             throws ArtifactResolutionException, ArtifactNotFoundException {
         for (ArtifactTransformation transform : artifactTransformations) {
@@ -60,6 +61,7 @@ public class DefaultArtifactTransformationManager implements ArtifactTransformat
         }
     }
 
+    @Override
     public void transformForResolve(
             Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository)
             throws ArtifactResolutionException, ArtifactNotFoundException {
@@ -68,6 +70,7 @@ public class DefaultArtifactTransformationManager implements ArtifactTransformat
         }
     }
 
+    @Override
     public void transformForInstall(Artifact artifact, ArtifactRepository localRepository)
             throws ArtifactInstallationException {
         for (ArtifactTransformation transform : artifactTransformations) {
@@ -75,6 +78,7 @@ public class DefaultArtifactTransformationManager implements ArtifactTransformat
         }
     }
 
+    @Override
     public void transformForDeployment(
             Artifact artifact, ArtifactRepository remoteRepository, ArtifactRepository localRepository)
             throws ArtifactDeploymentException {
@@ -83,6 +87,7 @@ public class DefaultArtifactTransformationManager implements ArtifactTransformat
         }
     }
 
+    @Override
     public List<ArtifactTransformation> getArtifactTransformations() {
         return artifactTransformations;
     }

@@ -93,6 +93,7 @@ public class MetadataGraphVertex implements Comparable<MetadataGraphVertex> {
     }
 
     // ---------------------------------------------------------------------
+    @Override
     public int compareTo(MetadataGraphVertex vertex) {
         if (vertex == null || vertex.getMd() == null) {
             return 1;

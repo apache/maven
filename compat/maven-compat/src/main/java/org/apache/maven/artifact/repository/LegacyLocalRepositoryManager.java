@@ -105,10 +105,12 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         realLocalRepo = (layout instanceof DefaultRepositoryLayout) && "local".equals(delegate.getId());
     }
 
+    @Override
     public LocalRepository getRepository() {
         return repo;
     }
 
+    @Override
     public String getPathForLocalArtifact(Artifact artifact) {
         if (realLocalRepo) {
             return delegate.pathOf(RepositoryUtils.toArtifact(artifact.setVersion(artifact.getBaseVersion())));
@@ -116,19 +118,23 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         return delegate.pathOf(RepositoryUtils.toArtifact(artifact));
     }
 
+    @Override
     public String getPathForRemoteArtifact(Artifact artifact, RemoteRepository repository, String context) {
         return delegate.pathOf(RepositoryUtils.toArtifact(artifact));
     }
 
+    @Override
     public String getPathForLocalMetadata(Metadata metadata) {
         return delegate.pathOfLocalRepositoryMetadata(new ArtifactMetadataAdapter(metadata), delegate);
     }
 
+    @Override
     public String getPathForRemoteMetadata(Metadata metadata, RemoteRepository repository, String context) {
         return delegate.pathOfLocalRepositoryMetadata(
                 new ArtifactMetadataAdapter(metadata), new ArtifactRepositoryAdapter(repository));
     }
 
+    @Override
     public LocalArtifactResult find(RepositorySystemSession session, LocalArtifactRequest request) {
         String path = getPathForLocalArtifact(request.getArtifact());
         File file = new File(getRepository().getBasedir(), path);
@@ -142,6 +148,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         return result;
     }
 
+    @Override
     public LocalMetadataResult find(RepositorySystemSession session, LocalMetadataRequest request) {
         Metadata metadata = request.getMetadata();
 
@@ -162,10 +169,12 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         return result;
     }
 
+    @Override
     public void add(RepositorySystemSession session, LocalArtifactRegistration request) {
         // noop
     }
 
+    @Override
     public void add(RepositorySystemSession session, LocalMetadataRegistration request) {
         // noop
     }
@@ -178,22 +187,27 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
             this.metadata = metadata;
         }
 
+        @Override
         public boolean storedInArtifactVersionDirectory() {
             return !metadata.getVersion().isEmpty();
         }
 
+        @Override
         public boolean storedInGroupDirectory() {
             return metadata.getArtifactId().isEmpty();
         }
 
+        @Override
         public String getGroupId() {
             return nullify(metadata.getGroupId());
         }
 
+        @Override
         public String getArtifactId() {
             return nullify(metadata.getArtifactId());
         }
 
+        @Override
         public String getBaseVersion() {
             return nullify(metadata.getVersion());
         }
@@ -202,14 +216,17 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
             return (str == null || str.isEmpty()) ? null : str;
         }
 
+        @Override
         public Object getKey() {
             return metadata.toString();
         }
 
+        @Override
         public String getRemoteFilename() {
             return metadata.getType();
         }
 
+        @Override
         public String getLocalFilename(ArtifactRepository repository) {
             return insertRepositoryKey(getRemoteFilename(), repository.getKey());
         }
@@ -225,19 +242,23 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
             return result;
         }
 
+        @Override
         public void merge(org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata) {
             // not used
         }
 
+        @Override
         public void merge(ArtifactMetadata metadata) {
             // not used
         }
 
+        @Override
         public void storeInLocalRepository(ArtifactRepository localRepository, ArtifactRepository remoteRepository)
                 throws RepositoryMetadataStoreException {
             // not used
         }
 
+        @Override
         public String extendedToString() {
             return metadata.toString();
         }
@@ -251,104 +272,134 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
             this.repository = repository;
         }
 
+        @Override
         public String pathOf(org.apache.maven.artifact.Artifact artifact) {
             return null;
         }
 
+        @Override
         public String pathOfRemoteRepositoryMetadata(ArtifactMetadata artifactMetadata) {
             return null;
         }
 
+        @Override
         public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
             return null;
         }
 
+        @Override
         public String getUrl() {
             return repository.getUrl();
         }
 
+        @Override
         public void setUrl(String url) {}
 
+        @Override
         public String getBasedir() {
             return null;
         }
 
+        @Override
         public String getProtocol() {
             return repository.getProtocol();
         }
 
+        @Override
         public String getId() {
             return repository.getId();
         }
 
+        @Override
         public void setId(String id) {}
 
+        @Override
         public ArtifactRepositoryPolicy getSnapshots() {
             return null;
         }
 
+        @Override
         public void setSnapshotUpdatePolicy(ArtifactRepositoryPolicy policy) {}
 
+        @Override
         public ArtifactRepositoryPolicy getReleases() {
             return null;
         }
 
+        @Override
         public void setReleaseUpdatePolicy(ArtifactRepositoryPolicy policy) {}
 
+        @Override
         public ArtifactRepositoryLayout getLayout() {
             return null;
         }
 
+        @Override
         public void setLayout(ArtifactRepositoryLayout layout) {}
 
+        @Override
         public String getKey() {
             return getId();
         }
 
+        @Override
         public boolean isUniqueVersion() {
             return true;
         }
 
+        @Override
         public boolean isBlacklisted() {
             return false;
         }
 
+        @Override
         public void setBlacklisted(boolean blackListed) {}
 
+        @Override
         public org.apache.maven.artifact.Artifact find(org.apache.maven.artifact.Artifact artifact) {
             return null;
         }
 
+        @Override
         public List<String> findVersions(org.apache.maven.artifact.Artifact artifact) {
             return Collections.emptyList();
         }
 
+        @Override
         public boolean isProjectAware() {
             return false;
         }
 
+        @Override
         public void setAuthentication(Authentication authentication) {}
 
+        @Override
         public Authentication getAuthentication() {
             return null;
         }
 
+        @Override
         public void setProxy(Proxy proxy) {}
 
+        @Override
         public Proxy getProxy() {
             return null;
         }
 
+        @Override
         public List<ArtifactRepository> getMirroredRepositories() {
             return Collections.emptyList();
         }
 
+        @Override
         public void setMirroredRepositories(List<ArtifactRepository> mirroredRepositories) {}
 
+        @Override
         public boolean isBlocked() {
             return false;
         }
 
+        @Override
         public void setBlocked(boolean blocked) {}
     }
 }

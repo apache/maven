@@ -31,6 +31,7 @@ import org.apache.maven.model.Profile;
 public class JdkPrefixProfileActivator extends DetectedProfileActivator {
     private static final String JDK_VERSION = System.getProperty("java.version");
 
+    @Override
     public boolean isActive(Profile profile) throws ProfileActivationException {
         Activation activation = profile.getActivation();
 
@@ -74,6 +75,7 @@ public class JdkPrefixProfileActivator extends DetectedProfileActivator {
         return JDK_VERSION;
     }
 
+    @Override
     protected boolean canDetectActivation(Profile profile) {
         return profile.getActivation() != null
                 && profile.getActivation().getJdk() != null

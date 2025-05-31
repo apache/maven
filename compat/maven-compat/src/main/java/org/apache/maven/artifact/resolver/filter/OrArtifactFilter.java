@@ -41,6 +41,7 @@ public class OrArtifactFilter implements ArtifactFilter {
         this.filters = new LinkedHashSet<>(filters);
     }
 
+    @Override
     public boolean include(Artifact artifact) {
         for (ArtifactFilter filter : filters) {
             if (filter.include(artifact)) {

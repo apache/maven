@@ -39,5 +39,6 @@ public interface ShellOptions extends Options {
      * @return a new EncryptOptions instance with interpolated values
      */
     @Nonnull
+    @Override
     ShellOptions interpolate(UnaryOperator<String> callback);
 }

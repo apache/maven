@@ -39,16 +39,20 @@ import org.apache.maven.plugin.MojoExecution;
 @Deprecated
 public class EmptyLifecycleExecutor implements LifecycleExecutor {
 
+    @Override
     public MavenExecutionPlan calculateExecutionPlan(MavenSession session, String... tasks) {
         return new MavenExecutionPlan(null, new DefaultLifecycles());
     }
 
+    @Override
     public MavenExecutionPlan calculateExecutionPlan(MavenSession session, boolean setup, String... tasks) {
         return new MavenExecutionPlan(null, new DefaultLifecycles());
     }
 
+    @Override
     public void execute(MavenSession session) {}
 
+    @Override
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles(String packaging) {
         Set<Plugin> plugins;
 
@@ -85,8 +89,10 @@ public class EmptyLifecycleExecutor implements LifecycleExecutor {
         return plugin;
     }
 
+    @Override
     public void calculateForkedExecutions(MojoExecution mojoExecution, MavenSession session) {}
 
+    @Override
     public List<MavenProject> executeForkedExecutions(MojoExecution mojoExecution, MavenSession session) {
         return Collections.emptyList();
     }

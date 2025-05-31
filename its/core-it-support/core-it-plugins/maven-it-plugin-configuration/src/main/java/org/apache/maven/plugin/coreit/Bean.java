@@ -42,6 +42,7 @@ public class Bean {
         setterCalled = true;
     }
 
+    @Override
     public String toString() {
         return getClass().getName() + "[fieldParam=" + fieldParam + ", setterParam=" + setterParam + ", setterCalled="
                 + setterCalled + "]";

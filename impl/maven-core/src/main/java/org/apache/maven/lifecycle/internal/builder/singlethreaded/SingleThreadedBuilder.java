@@ -48,6 +48,7 @@ public class SingleThreadedBuilder implements Builder {
         this.lifecycleModuleBuilder = lifecycleModuleBuilder;
     }
 
+    @Override
     public void build(
             MavenSession session,
             ReactorContext reactorContext,

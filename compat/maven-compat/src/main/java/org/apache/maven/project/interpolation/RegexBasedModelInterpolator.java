@@ -41,6 +41,7 @@ public class RegexBasedModelInterpolator extends AbstractStringBasedModelInterpo
 
     public RegexBasedModelInterpolator(Properties envars) {}
 
+    @Override
     protected Interpolator createInterpolator() {
         return new RegexBasedInterpolator(true);
     }

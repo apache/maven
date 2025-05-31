@@ -32,6 +32,7 @@ public class CyclicDependencyException extends ArtifactResolutionException {
         this.artifact = artifact;
     }
 
+    @Override
     public Artifact getArtifact() {
         return artifact;
     }

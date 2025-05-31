@@ -43,6 +43,7 @@ class DefaultDependencyResolutionResult implements DependencyResolutionResult {
 
     private Map<Dependency, List<Exception>> resolutionErrors = new IdentityHashMap<>();
 
+    @Override
     public DependencyNode getDependencyGraph() {
         return root;
     }
@@ -51,10 +52,12 @@ class DefaultDependencyResolutionResult implements DependencyResolutionResult {
         this.root = root;
     }
 
+    @Override
     public List<Dependency> getDependencies() {
         return dependencies;
     }
 
+    @Override
     public List<Dependency> getResolvedDependencies() {
         return resolvedDependencies;
     }
@@ -64,10 +67,12 @@ class DefaultDependencyResolutionResult implements DependencyResolutionResult {
         resolvedDependencies.add(dependency);
     }
 
+    @Override
     public List<Dependency> getUnresolvedDependencies() {
         return unresolvedDependencies;
     }
 
+    @Override
     public List<Exception> getCollectionErrors() {
         return collectionErrors;
     }
@@ -80,6 +85,7 @@ class DefaultDependencyResolutionResult implements DependencyResolutionResult {
         }
     }
 
+    @Override
     public List<Exception> getResolutionErrors(Dependency dependency) {
         List<Exception> errors = resolutionErrors.get(dependency);
         return (errors != null) ? Collections.unmodifiableList(errors) : Collections.emptyList();

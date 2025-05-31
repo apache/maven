@@ -36,6 +36,7 @@ public class ManagedVersionMap extends HashMap<String, Artifact> {
         }
     }
 
+    @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder("ManagedVersionMap (" + size() + " entries)\n");
         Iterator<String> iter = keySet().iterator();

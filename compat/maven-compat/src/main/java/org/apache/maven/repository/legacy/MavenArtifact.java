@@ -43,10 +43,12 @@ class MavenArtifact implements ArtifactTransferResource {
         this.transferStartTime = System.currentTimeMillis();
     }
 
+    @Override
     public String getRepositoryUrl() {
         return repositoryUrl;
     }
 
+    @Override
     public String getName() {
         String name = resource.getName();
 
@@ -59,14 +61,17 @@ class MavenArtifact implements ArtifactTransferResource {
         return name;
     }
 
+    @Override
     public String getUrl() {
         return getRepositoryUrl() + getName();
     }
 
+    @Override
     public long getContentLength() {
         return resource.getContentLength();
     }
 
+    @Override
     public long getTransferStartTime() {
         return transferStartTime;
     }

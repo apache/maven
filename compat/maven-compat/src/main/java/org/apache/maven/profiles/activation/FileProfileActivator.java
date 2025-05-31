@@ -38,10 +38,12 @@ import org.codehaus.plexus.logging.Logger;
 public class FileProfileActivator extends DetectedProfileActivator implements LogEnabled {
     private Logger logger;
 
+    @Override
     protected boolean canDetectActivation(Profile profile) {
         return profile.getActivation() != null && profile.getActivation().getFile() != null;
     }
 
+    @Override
     public boolean isActive(Profile profile) {
         Activation activation = profile.getActivation();
 
@@ -87,6 +89,7 @@ public class FileProfileActivator extends DetectedProfileActivator implements Lo
         return false;
     }
 
+    @Override
     public void enableLogging(Logger logger) {
         this.logger = logger;
     }

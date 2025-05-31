@@ -42,10 +42,12 @@ import org.apache.maven.project.MavenProject;
  */
 public class CheckMojo extends AbstractCheckMojo {
 
+    @Override
     protected MavenProject getTestProject() {
         return getExecutionProject();
     }
 
+    @Override
     protected String getTestProjectLabel() {
         return "forked project";
     }

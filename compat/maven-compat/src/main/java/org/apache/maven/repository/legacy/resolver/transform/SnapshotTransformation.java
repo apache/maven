@@ -51,6 +51,7 @@ public class SnapshotTransformation extends AbstractVersionTransformation {
 
     private String deploymentTimestamp;
 
+    @Override
     public void transformForResolve(Artifact artifact, RepositoryRequest request) throws ArtifactResolutionException {
         // Only select snapshots that are unresolved (eg 1.0-SNAPSHOT, not 1.0-20050607.123456)
         if (artifact.isSnapshot() && artifact.getBaseVersion().equals(artifact.getVersion())) {
@@ -63,6 +64,7 @@ public class SnapshotTransformation extends AbstractVersionTransformation {
         }
     }
 
+    @Override
     public void transformForInstall(Artifact artifact, ArtifactRepository localRepository) {
         if (artifact.isSnapshot()) {
             Snapshot snapshot = new Snapshot();
@@ -73,6 +75,7 @@ public class SnapshotTransformation extends AbstractVersionTransformation {
         }
     }
 
+    @Override
     public void transformForDeployment(
             Artifact artifact, ArtifactRepository remoteRepository, ArtifactRepository localRepository)
             throws ArtifactDeploymentException {
@@ -110,6 +113,7 @@ public class SnapshotTransformation extends AbstractVersionTransformation {
         return deploymentTimestamp;
     }
 
+    @Override
     protected String constructVersion(Versioning versioning, String baseVersion) {
         String version = null;
         Snapshot snapshot = versioning.getSnapshot();

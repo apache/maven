@@ -66,6 +66,7 @@ public interface Packaging extends ExtensibleEnum {
      * The packaging id.
      */
     @Nonnull
+    @Override
     String id();
 
     /**

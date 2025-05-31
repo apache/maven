@@ -42,6 +42,7 @@ class CLIManagerDocumentationTest {
     private static final String LS = System.lineSeparator();
 
     private static class OptionComparator implements Comparator<Option> {
+        @Override
         public int compare(Option opt1, Option opt2) {
             String s1 = opt1.getOpt() != null ? opt1.getOpt() : opt1.getLongOpt();
             String s2 = opt2.getOpt() != null ? opt2.getOpt() : opt2.getLongOpt();

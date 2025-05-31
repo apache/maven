@@ -142,6 +142,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      * @param key
      * @return InputLocation
      */
+    @Override
     public InputLocation getLocation(Object key) {
         if (key instanceof String string) {
             switch (string) {
@@ -172,6 +173,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      * @param key
      * @param location
      */
+    @Override
     public void setLocation(Object key, InputLocation location) {
         if (key instanceof String string) {
             switch (string) {

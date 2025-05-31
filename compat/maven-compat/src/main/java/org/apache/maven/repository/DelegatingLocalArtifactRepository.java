@@ -101,10 +101,12 @@ public class DelegatingLocalArtifactRepository extends MavenArtifactRepository {
         return Collections.unmodifiableList(new ArrayList<>(versions));
     }
 
+    @Override
     public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
         return userLocalArtifactRepository.pathOfLocalRepositoryMetadata(metadata, repository);
     }
 
+    @Override
     public String getId() {
         return userLocalArtifactRepository.getId();
     }

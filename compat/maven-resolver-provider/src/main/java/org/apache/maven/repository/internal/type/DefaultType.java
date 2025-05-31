@@ -105,6 +105,7 @@ public class DefaultType implements Type, ArtifactType {
         return this.includesDependencies;
     }
 
+    @Override
     public Set<PathType> getPathTypes() {
         return this.pathTypes;
     }

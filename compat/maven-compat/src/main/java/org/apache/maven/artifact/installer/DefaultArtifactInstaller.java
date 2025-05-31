@@ -59,6 +59,7 @@ public class DefaultArtifactInstaller extends AbstractLogEnabled implements Arti
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     @Deprecated
+    @Override
     public void install(String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository)
             throws ArtifactInstallationException {
         String extension = artifact.getArtifactHandler().getExtension();
@@ -67,6 +68,7 @@ public class DefaultArtifactInstaller extends AbstractLogEnabled implements Arti
         install(source, artifact, localRepository);
     }
 
+    @Override
     public void install(File source, Artifact artifact, ArtifactRepository localRepository)
             throws ArtifactInstallationException {
         RepositorySystemSession session =

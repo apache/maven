@@ -299,18 +299,22 @@ class DefaultWagonManagerTest {
     }
 
     private final class ArtifactRepositoryLayoutStub implements ArtifactRepositoryLayout {
+        @Override
         public String getId() {
             return "test";
         }
 
+        @Override
         public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
             return "path";
         }
 
+        @Override
         public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
             return "path";
         }
 
+        @Override
         public String pathOf(Artifact artifact) {
             return "path";
         }

@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class VersionTest extends AbstractVersionTest {
     private final ModelVersionParser modelVersionParser = new DefaultModelVersionParser(new GenericVersionScheme());
 
+    @Override
     protected Version newVersion(String version) {
         return modelVersionParser.parseVersion(version);
     }

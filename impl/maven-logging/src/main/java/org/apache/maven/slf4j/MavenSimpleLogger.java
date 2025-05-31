@@ -69,6 +69,7 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         };
     }
 
+    @Override
     protected void write(StringBuilder buf, Throwable t) {
         Consumer<String> sink = logSink;
         if (sink != null) {

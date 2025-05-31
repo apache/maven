@@ -71,20 +71,24 @@ public class DefaultPluginPrefixRequest implements PluginPrefixRequest {
         setPluginGroups(session.getPluginGroups());
     }
 
+    @Override
     public String getPrefix() {
         return prefix;
     }
 
+    @Override
     public DefaultPluginPrefixRequest setPrefix(String prefix) {
         this.prefix = prefix;
 
         return this;
     }
 
+    @Override
     public List<String> getPluginGroups() {
         return pluginGroups;
     }
 
+    @Override
     public DefaultPluginPrefixRequest setPluginGroups(List<String> pluginGroups) {
         if (pluginGroups != null) {
             this.pluginGroups = Collections.unmodifiableList(pluginGroups);
@@ -95,20 +99,24 @@ public class DefaultPluginPrefixRequest implements PluginPrefixRequest {
         return this;
     }
 
+    @Override
     public Model getPom() {
         return pom;
     }
 
+    @Override
     public DefaultPluginPrefixRequest setPom(Model pom) {
         this.pom = pom;
 
         return this;
     }
 
+    @Override
     public List<RemoteRepository> getRepositories() {
         return repositories;
     }
 
+    @Override
     public DefaultPluginPrefixRequest setRepositories(List<RemoteRepository> repositories) {
         if (repositories != null) {
             this.repositories = Collections.unmodifiableList(repositories);
@@ -119,10 +127,12 @@ public class DefaultPluginPrefixRequest implements PluginPrefixRequest {
         return this;
     }
 
+    @Override
     public RepositorySystemSession getRepositorySession() {
         return session;
     }
 
+    @Override
     public DefaultPluginPrefixRequest setRepositorySession(RepositorySystemSession session) {
         this.session = session;
 

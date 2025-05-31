@@ -419,6 +419,7 @@ public class VersionRange {
         return value;
     }
 
+    @Override
     public String toString() {
         if (recommendedVersion != null) {
             return recommendedVersion.toString();
@@ -465,6 +466,7 @@ public class VersionRange {
         return !restrictions.isEmpty() && recommendedVersion == null;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -477,6 +479,7 @@ public class VersionRange {
         }
     }
 
+    @Override
     public int hashCode() {
         int hash = 7;
         hash = 31 * hash + (recommendedVersion == null ? 0 : recommendedVersion.hashCode());

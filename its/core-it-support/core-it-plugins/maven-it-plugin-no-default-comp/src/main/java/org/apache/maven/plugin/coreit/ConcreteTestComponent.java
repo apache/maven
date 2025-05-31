@@ -28,6 +28,7 @@ import org.codehaus.plexus.component.annotations.Component;
 @Component(role = TestComponent.class, hint = "concrete")
 public class ConcreteTestComponent implements TestComponent {
 
+    @Override
     public String getId() {
         return "concrete";
     }

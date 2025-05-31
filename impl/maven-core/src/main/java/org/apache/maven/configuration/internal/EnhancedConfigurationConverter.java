@@ -66,6 +66,7 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
         }
     }
 
+    @Override
     public Object fromConfiguration(
             final ConverterLookup lookup,
             final PlexusConfiguration configuration,

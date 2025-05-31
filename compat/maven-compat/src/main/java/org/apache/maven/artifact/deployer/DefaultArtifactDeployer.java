@@ -67,6 +67,7 @@ public class DefaultArtifactDeployer extends AbstractLogEnabled implements Artif
      *             correctly.
      */
     @Deprecated
+    @Override
     public void deploy(
             String basedir,
             String finalName,
@@ -79,6 +80,7 @@ public class DefaultArtifactDeployer extends AbstractLogEnabled implements Artif
         deploy(source, artifact, deploymentRepository, localRepository);
     }
 
+    @Override
     public void deploy(
             File source, Artifact artifact, ArtifactRepository deploymentRepository, ArtifactRepository localRepository)
             throws ArtifactDeploymentException {

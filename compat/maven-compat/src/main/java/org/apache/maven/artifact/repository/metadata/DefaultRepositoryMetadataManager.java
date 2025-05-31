@@ -59,6 +59,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
     @Inject
     private UpdateCheckManager updateCheckManager;
 
+    @Override
     public void resolve(
             RepositoryMetadata metadata,
             List<ArtifactRepository> remoteRepositories,
@@ -70,6 +71,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
         resolve(metadata, request);
     }
 
+    @Override
     public void resolve(RepositoryMetadata metadata, RepositoryRequest request)
             throws RepositoryMetadataResolutionException {
         ArtifactRepository localRepo = request.getLocalRepository();
@@ -321,6 +323,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
         }
     }
 
+    @Override
     public void resolveAlways(
             RepositoryMetadata metadata, ArtifactRepository localRepository, ArtifactRepository remoteRepository)
             throws RepositoryMetadataResolutionException {
@@ -378,6 +381,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
         return file;
     }
 
+    @Override
     public void deploy(
             ArtifactMetadata metadata, ArtifactRepository localRepository, ArtifactRepository deploymentRepository)
             throws RepositoryMetadataDeploymentException {
@@ -420,6 +424,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
         }
     }
 
+    @Override
     public void install(ArtifactMetadata metadata, ArtifactRepository localRepository)
             throws RepositoryMetadataInstallationException {
         try {

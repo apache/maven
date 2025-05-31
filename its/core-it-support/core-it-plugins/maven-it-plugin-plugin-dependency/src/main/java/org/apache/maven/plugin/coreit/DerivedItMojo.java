@@ -38,6 +38,7 @@ public class DerivedItMojo extends EvalMojo {
     @Parameter
     private File file;
 
+    @Override
     public void execute() throws MojoFailureException, MojoExecutionException {
         if (file != null) {
             super.setOutputFile(file);

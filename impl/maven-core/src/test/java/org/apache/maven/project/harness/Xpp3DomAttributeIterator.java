@@ -52,6 +52,7 @@ class Xpp3DomAttributeIterator implements NodeIterator {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public NodePointer getNodePointer() {
         if (position == 0) {
             setPosition(1);
@@ -59,10 +60,12 @@ class Xpp3DomAttributeIterator implements NodeIterator {
         return (attribute == null) ? null : new Xpp3DomAttributePointer(parent, attribute);
     }
 
+    @Override
     public int getPosition() {
         return position;
     }
 
+    @Override
     public boolean setPosition(int position) {
         this.position = position;
         attribute = (position > 0 && position <= attributes.size()) ? attributes.get(position - 1) : null;

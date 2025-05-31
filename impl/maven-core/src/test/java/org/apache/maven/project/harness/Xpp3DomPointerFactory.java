@@ -31,10 +31,12 @@ import org.apache.maven.api.xml.XmlNode;
  */
 public class Xpp3DomPointerFactory implements NodePointerFactory {
 
+    @Override
     public int getOrder() {
         return 200;
     }
 
+    @Override
     public NodePointer createNodePointer(QName name, Object object, Locale locale) {
         if (object instanceof org.codehaus.plexus.util.xml.Xpp3Dom xpp3Dom) {
             object = xpp3Dom.getDom();
@@ -45,6 +47,7 @@ public class Xpp3DomPointerFactory implements NodePointerFactory {
         return null;
     }
 
+    @Override
     public NodePointer createNodePointer(NodePointer parent, QName name, Object object) {
         if (object instanceof org.codehaus.plexus.util.xml.Xpp3Dom xpp3Dom) {
             object = xpp3Dom.getDom();

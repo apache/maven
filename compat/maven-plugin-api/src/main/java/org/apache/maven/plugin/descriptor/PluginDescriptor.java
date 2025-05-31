@@ -308,6 +308,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         return artifactMap;
     }
 
+    @Override
     public boolean equals(Object object) {
         if (this == object) {
             return true;
@@ -316,6 +317,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         return object instanceof PluginDescriptor pluginDescriptor && getId().equals(pluginDescriptor.getId());
     }
 
+    @Override
     public int hashCode() {
         return 10 + getId().hashCode();
     }

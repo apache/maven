@@ -84,6 +84,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         this.runtimeInformation = runtimeInformation;
     }
 
+    @Override
     public MavenSession getMavenSession() {
         if (mavenSession == null) {
             throw new IllegalArgumentException("Found null mavenSession on session " + this);
@@ -216,6 +217,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
                 runtimeInformation);
     }
 
+    @Override
     public ArtifactRepository toArtifactRepository(RemoteRepository repository) {
         if (repository instanceof DefaultRemoteRepository defaultRemoteRepository) {
             org.eclipse.aether.repository.RemoteRepository rr = defaultRemoteRepository.getRepository();

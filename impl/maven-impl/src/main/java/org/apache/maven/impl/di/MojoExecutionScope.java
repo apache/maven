@@ -97,6 +97,7 @@ public class MojoExecutionScope implements Scope {
 
     @SuppressWarnings("unchecked")
     @Nonnull
+    @Override
     public <T> Supplier<T> scope(@Nonnull Key<T> key, @Nonnull Supplier<T> unscoped) {
         return () -> {
             LinkedList<ScopeState> stack = values.get();

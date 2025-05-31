@@ -33,11 +33,13 @@ import org.eclipse.aether.transfer.NoRepositoryConnectorException;
 @Singleton
 public class TestRepositoryConnectorFactory implements RepositoryConnectorFactory {
 
+    @Override
     public RepositoryConnector newInstance(RepositorySystemSession session, RemoteRepository repository)
             throws NoRepositoryConnectorException {
         return new TestRepositoryConnector(repository);
     }
 
+    @Override
     public float getPriority() {
         return 0;
     }

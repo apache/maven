@@ -141,6 +141,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         }
     }
 
+    @Override
     public ClassRealm getMavenApiRealm() {
         return mavenApiRealm;
     }
@@ -209,10 +210,12 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         return classRealm;
     }
 
+    @Override
     public ClassRealm getCoreRealm() {
         return containerRealm;
     }
 
+    @Override
     public ClassRealm createProjectRealm(Model model, List<Artifact> artifacts) {
         Objects.requireNonNull(model, "model cannot be null");
 
@@ -225,6 +228,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         return "project>" + model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
     }
 
+    @Override
     public ClassRealm createExtensionRealm(Plugin plugin, List<Artifact> artifacts) {
         Objects.requireNonNull(plugin, "plugin cannot be null");
 
@@ -239,6 +243,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         return provided.contains(artifact.getGroupId() + ":" + artifact.getArtifactId());
     }
 
+    @Override
     public ClassRealm createPluginRealm(
             Plugin plugin,
             ClassLoader parent,

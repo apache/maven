@@ -67,6 +67,7 @@ public class EncryptInvokerRequest extends BaseInvokerRequest {
      * The mandatory Encrypt options.
      */
     @Nonnull
+    @Override
     public EncryptOptions options() {
         return options;
     }

@@ -43,6 +43,7 @@ public class NewestConflictResolver implements ConflictResolver {
      *      org.apache.maven.artifact.resolver.ResolutionNode)
      */
 
+    @Override
     public ResolutionNode resolveConflict(ResolutionNode node1, ResolutionNode node2) {
         try {
             ArtifactVersion version1 = node1.getArtifact().getSelectedVersion();
