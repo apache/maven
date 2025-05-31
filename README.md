@@ -17,7 +17,6 @@
 Apache Maven
 ============
 
-[![ASF Jira](https://img.shields.io/endpoint?url=https%3A%2F%2Fmaven.apache.org%2Fbadges%2Fasf_jira-MNG.json)][jira]
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License)][license]
 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central&versionPrefix=3.)](https://search.maven.org/artifact/org.apache.maven/apache-maven)
 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.maven/apache-maven)
@@ -75,7 +74,6 @@ If you want to bootstrap Maven, you'll need:
 
 
 [home]: https://maven.apache.org/
-[jira]: https://issues.apache.org/jira/projects/MNG/
 [license]: https://www.apache.org/licenses/LICENSE-2.0
 [build]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/
 [test-results]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/lastCompletedBuild/testReport/

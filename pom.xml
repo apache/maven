@@ -112,8 +112,8 @@ under the License.
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
-    <system>jira</system>
-    <url>https://issues.apache.org/jira/browse/MNG</url>
+    <system>GitHub Issues</system>
+    <url>https://github.com/apache/maven/issues</url>
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
